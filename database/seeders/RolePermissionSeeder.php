@@ -1,0 +1,102 @@
+<?php
+// database/seeders/RolePermissionSeeder.php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use App\Models\User;
+
+class RolePermissionSeeder extends Seeder
+{
+    public function run(): void
+    {
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        $permissions = [
+            // Branch
+            'branch.view', 'branch.create', 'branch.edit', 'branch.delete',
+            // Students
+            'student.view', 'student.create', 'student.edit', 'student.delete',
+            // Teachers
+            'teacher.view', 'teacher.create', 'teacher.edit', 'teacher.delete',
+            // Employees
+            'employee.view', 'employee.create', 'employee.edit', 'employee.delete',
+            // Schedules
+            'schedule.view', 'schedule.create', 'schedule.edit', 'schedule.delete',
+            // Payments
+            'payment.view', 'payment.create', 'payment.edit', 'payment.approve',
+            // Tryout
+            'tryout.view', 'tryout.create', 'tryout.edit', 'tryout.delete',
+            // Reports
+            'report.view', 'report.export',
+            // Settings
+            'setting.view', 'setting.edit',
+            // Salary
+            'salary.view', 'salary.create', 'salary.edit',
+            // Certificate
+            'certificate.view', 'certificate.create', 'certificate.download',
+        ];
+
+        foreach ($permissions as $perm) {
+            Permission::firstOrCreate(['name' => $perm]);
+        }
+
+        // Create Roles & assign permissions
+        $owner = Role::firstOrCreate(['name' => 'owner']);
+        $owner->syncPermissions(Permission::all());
+
+        $admin = Role::firstOrCreate(['name' => 'admin']);
+        $admin->syncPermissions([
+            'student.view', 'student.create', 'student.edit', 'student.delete',
+            'teacher.view', 'teacher.create', 'teacher.edit',
+            'employee.view', 'employee.create', 'employee.edit',
+            'schedule.view', 'schedule.create', 'schedule.edit', 'schedule.delete',
+            'payment.view', 'payment.create', 'payment.approve',
+            'tryout.view', 'tryout.create', 'tryout.edit',
+            'report.view', 'report.export',
+            'salary.view', 'salary.create',
+            'certificate.view', 'certificate.create', 'certificate.download',
+        ]);
+
+        $guru = Role::firstOrCreate(['name' => 'guru']);
+        $guru->syncPermissions([
+            'schedule.view', 'student.view',
+            'salary.view', 'certificate.download',
+        ]);
+
+        $siswa = Role::firstOrCreate(['name' => 'siswa']);
+        $siswa->syncPermissions([
+            'schedule.view', 'payment.view',
+            'tryout.view', 'certificate.download',
+        ]);
+
+        $karyawan = Role::firstOrCreate(['name' => 'karyawan']);
+        $karyawan->syncPermissions(['schedule.view', 'salary.view']);
+
+        // Create Owner user
+        $ownerUser = User::firstOrCreate(
+            ['email' => 'owner@akademi.com'],
+            [
+                'name'      => 'Owner Akademi',
+                'password'  => bcrypt('password'),
+                'is_active' => true,
+            ]
+        );
+        $ownerUser->assignRole('owner');
+
+        // Create Admin Cabang
+        $adminUser = User::firstOrCreate(
+            ['email' => 'admin@akademi.com'],
+            [
+                'name'      => 'Admin Cabang Utama',
+                'password'  => bcrypt('password'),
+                'is_active' => true,
+            ]
+        );
+        $adminUser->assignRole('admin');
+
+        $this->command->info('✅ Roles, Permissions & Users seeded!');
+    }
+}
