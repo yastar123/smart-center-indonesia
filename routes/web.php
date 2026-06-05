@@ -6,6 +6,9 @@ use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\ScheduleController;
+use App\Http\Controllers\Admin\CourseController;
+use App\Http\Controllers\Admin\SchoolClassController;
+use App\Http\Controllers\Admin\CertificateController;
 use App\Http\Controllers\Owner\BranchController;
 
 Route::get('/', function () {
@@ -76,6 +79,27 @@ Route::middleware(['auth'])
         Route::get('/schedules/{schedule}',   [ScheduleController::class, 'show'])    ->name('schedules.show');
         Route::put('/schedules/{schedule}',   [ScheduleController::class, 'update'])  ->name('schedules.update');
         Route::delete('/schedules/{schedule}',[ScheduleController::class, 'destroy']) ->name('schedules.destroy');
+
+        // COURSES (Mata Pelajaran)
+        Route::get('/courses',            [CourseController::class, 'index'])   ->name('courses.index');
+        Route::post('/courses',           [CourseController::class, 'store'])   ->name('courses.store');
+        Route::get('/courses/{course}',   [CourseController::class, 'show'])    ->name('courses.show');
+        Route::put('/courses/{course}',   [CourseController::class, 'update'])  ->name('courses.update');
+        Route::delete('/courses/{course}',[CourseController::class, 'destroy']) ->name('courses.destroy');
+
+        // CLASSES (Kelas)
+        Route::get('/classes',           [SchoolClassController::class, 'index'])   ->name('classes.index');
+        Route::post('/classes',          [SchoolClassController::class, 'store'])   ->name('classes.store');
+        Route::get('/classes/{class}',   [SchoolClassController::class, 'show'])    ->name('classes.show');
+        Route::put('/classes/{class}',   [SchoolClassController::class, 'update'])  ->name('classes.update');
+        Route::delete('/classes/{class}',[SchoolClassController::class, 'destroy']) ->name('classes.destroy');
+
+        // CERTIFICATES (Sertifikat)
+        Route::get('/certificates',                  [CertificateController::class, 'index'])   ->name('certificates.index');
+        Route::post('/certificates',                 [CertificateController::class, 'store'])   ->name('certificates.store');
+        Route::get('/certificates/{certificate}',    [CertificateController::class, 'show'])    ->name('certificates.show');
+        Route::put('/certificates/{certificate}',    [CertificateController::class, 'update'])  ->name('certificates.update');
+        Route::delete('/certificates/{certificate}', [CertificateController::class, 'destroy']) ->name('certificates.destroy');
 
         // TRYOUTS (placeholder route kept)
         Route::get('/tryouts', fn() => view('admin.tryouts.index'))->name('tryouts.index');

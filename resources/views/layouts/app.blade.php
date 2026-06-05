@@ -783,23 +783,27 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="{{ route('admin.courses.index') }}" class="nav-link {{ request()->routeIs('admin.courses.*') ? 'active' : '' }}">
                 <i class="bi bi-journal-bookmark"></i>
                 <span>Mata Pelajaran</span>
-                <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="{{ route('admin.classes.index') }}" class="nav-link {{ request()->routeIs('admin.classes.*') ? 'active' : '' }}">
                 <i class="bi bi-diagram-3"></i>
                 <span>Kelas</span>
-                <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
         </div>
         <div class="nav-item">
             <a href="{{ route('admin.schedules.index') }}" class="nav-link {{ request()->routeIs('admin.schedules.*') ? 'active' : '' }}">
                 <i class="bi bi-calendar-week"></i>
                 <span>Jadwal</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('admin.certificates.index') }}" class="nav-link {{ request()->routeIs('admin.certificates.*') ? 'active' : '' }}">
+                <i class="bi bi-award"></i>
+                <span>Sertifikat</span>
             </a>
         </div>
 
