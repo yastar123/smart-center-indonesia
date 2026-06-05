@@ -4,70 +4,110 @@
 
 @section('content')
 
+{{-- STAT CARDS (populated by AJAX) --}}
 <div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
-        <div class="stat-card text-center">
-            <div class="stat-icon bg-success bg-opacity-10 text-success mx-auto mb-2">
-                <i class="bi bi-person-badge-fill"></i>
+    <div class="col-6 col-lg-3 fade-up">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-title">Total Guru</div>
+                    <div class="stat-value text-success" id="statTotal">
+                        <span class="placeholder col-4 bg-success-subtle" style="height:1.5rem;border-radius:6px"></span>
+                    </div>
+                    <div class="stat-growth text-muted"><i class="bi bi-person-badge me-1"></i>Semua cabang</div>
+                </div>
+                <div class="stat-icon bg-success-soft" style="color:white">
+                    <i class="bi bi-person-badge-fill"></i>
+                </div>
             </div>
-            <div class="stat-value text-success" id="totalGuru">-</div>
-            <div class="stat-label">Total Guru</div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-card text-center">
-            <div class="stat-icon bg-primary bg-opacity-10 text-primary mx-auto mb-2">
-                <i class="bi bi-person-check-fill"></i>
+    <div class="col-6 col-lg-3 fade-up" style="animation-delay:.05s">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-title">Guru Aktif</div>
+                    <div class="stat-value text-primary" id="statAktif">
+                        <span class="placeholder col-4 bg-primary-subtle" style="height:1.5rem;border-radius:6px"></span>
+                    </div>
+                    <div class="stat-growth text-success"><i class="bi bi-check-circle me-1"></i>Bertugas</div>
+                </div>
+                <div class="stat-icon bg-primary-soft" style="color:white">
+                    <i class="bi bi-person-check-fill"></i>
+                </div>
             </div>
-            <div class="stat-value text-primary" id="totalAktif">-</div>
-            <div class="stat-label">Guru Aktif</div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-card text-center">
-            <div class="stat-icon bg-warning bg-opacity-10 text-warning mx-auto mb-2">
-                <i class="bi bi-gender-male"></i>
+    <div class="col-6 col-lg-3 fade-up" style="animation-delay:.10s">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-title">Laki-laki</div>
+                    <div class="stat-value text-primary" id="statMale">–</div>
+                    <div class="stat-growth text-muted"><i class="bi bi-gender-male me-1"></i>Guru putra</div>
+                </div>
+                <div class="stat-icon" style="background:linear-gradient(135deg,#3b82f6,#60a5fa);color:white">
+                    <i class="bi bi-person-fill"></i>
+                </div>
             </div>
-            <div class="stat-value text-warning" id="totalL">-</div>
-            <div class="stat-label">Laki-laki</div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-card text-center">
-            <div class="stat-icon bg-danger bg-opacity-10 text-danger mx-auto mb-2">
-                <i class="bi bi-gender-female"></i>
+    <div class="col-6 col-lg-3 fade-up" style="animation-delay:.15s">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-title">Perempuan</div>
+                    <div class="stat-value" style="color:#ec4899" id="statFemale">–</div>
+                    <div class="stat-growth text-muted"><i class="bi bi-gender-female me-1"></i>Guru putri</div>
+                </div>
+                <div class="stat-icon" style="background:linear-gradient(135deg,#ec4899,#f472b6);color:white">
+                    <i class="bi bi-person-fill"></i>
+                </div>
             </div>
-            <div class="stat-value text-danger" id="totalP">-</div>
-            <div class="stat-label">Perempuan</div>
         </div>
     </div>
 </div>
 
-<div class="stat-card">
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-        <h6 class="fw-bold mb-0"><i class="bi bi-person-badge text-success me-2"></i>Daftar Guru</h6>
-        <button class="btn btn-success btn-sm px-3" onclick="openModal()">
-            <i class="bi bi-plus-lg me-1"></i>Tambah Guru
-        </button>
+{{-- MAIN TABLE CARD --}}
+<div class="dashboard-card fade-up">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <h6 class="fw-bold mb-1" style="color:var(--text-primary)">
+                <i class="bi bi-person-badge-fill text-success me-2"></i>Daftar Guru
+            </h6>
+            <p class="text-muted mb-0" style="font-size:12px">Kelola data guru dan pengajar seluruh cabang</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">
+                <i class="bi bi-printer me-1"></i><span class="d-none d-md-inline">Print</span>
+            </button>
+            <button class="btn btn-success btn-sm" onclick="openModal()">
+                <i class="bi bi-plus-lg me-1"></i>Tambah Guru
+            </button>
+        </div>
     </div>
 
-    <div class="row g-2 mb-3">
-        <div class="col-md-5">
+    {{-- Filter --}}
+    <div class="row g-2 mb-4">
+        <div class="col-12 col-md-5">
             <div class="input-group input-group-sm">
-                <span class="input-group-text bg-light border-end-0">
+                <span class="input-group-text" style="background:var(--input-bg);border:1.5px solid var(--card-border);border-right:none;border-radius:10px 0 0 10px">
                     <i class="bi bi-search text-muted"></i>
                 </span>
-                <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Cari nama atau NIG...">
+                <input type="text" id="searchInput" class="form-control"
+                       placeholder="Cari nama atau NIG..."
+                       style="border-left:none;border-radius:0 10px 10px 0">
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-6 col-md-3">
             <select id="filterStatus" class="form-select form-select-sm" onchange="loadTeachers()">
                 <option value="">Semua Status</option>
                 <option value="aktif">Aktif</option>
                 <option value="nonaktif">Nonaktif</option>
             </select>
         </div>
-        <div class="col-md-4">
+        <div class="col-6 col-md-4">
             <select id="filterBranch" class="form-select form-select-sm" onchange="loadTeachers()">
                 <option value="">Semua Cabang</option>
                 @foreach($branches as $branch)
@@ -77,129 +117,167 @@
         </div>
     </div>
 
+    {{-- TABLE --}}
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
-            <thead style="background:#f8fafc">
+            <thead style="background:var(--input-bg)">
                 <tr>
-                    <th class="text-muted small fw-semibold" style="width:45px">#</th>
-                    <th class="text-muted small fw-semibold">GURU</th>
-                    <th class="text-muted small fw-semibold">NIG</th>
-                    <th class="text-muted small fw-semibold">CABANG</th>
-                    <th class="text-muted small fw-semibold">MATA PELAJARAN</th>
-                    <th class="text-muted small fw-semibold">KONTAK</th>
-                    <th class="text-muted small fw-semibold">STATUS</th>
-                    <th class="text-muted small fw-semibold text-center" style="width:100px">AKSI</th>
+                    <th class="small text-muted fw-semibold py-3" style="width:46px">#</th>
+                    <th class="small text-muted fw-semibold py-3">GURU</th>
+                    <th class="small text-muted fw-semibold py-3">NIG</th>
+                    <th class="small text-muted fw-semibold py-3 d-none d-md-table-cell">CABANG</th>
+                    <th class="small text-muted fw-semibold py-3 d-none d-lg-table-cell">MATA PELAJARAN</th>
+                    <th class="small text-muted fw-semibold py-3 d-none d-xl-table-cell">KONTAK</th>
+                    <th class="small text-muted fw-semibold py-3">STATUS</th>
+                    <th class="small text-muted fw-semibold py-3 text-center" style="width:100px">AKSI</th>
                 </tr>
             </thead>
             <tbody id="teacherBody">
-                <tr><td colspan="8" class="text-center py-5">
-                    <div class="spinner-border text-success"></div>
-                    <div class="text-muted small mt-2">Memuat data...</div>
-                </td></tr>
+                <tr>
+                    <td colspan="8" class="text-center py-5">
+                        <div class="spinner-border text-success mb-2" style="width:1.8rem;height:1.8rem"></div>
+                        <div class="text-muted small">Memuat data guru...</div>
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
-        <small class="text-muted" id="paginationInfo"></small>
+    {{-- PAGINATION --}}
+    <div class="d-flex flex-wrap justify-content-between align-items-center mt-4 pt-3 gap-2"
+         style="border-top:1px solid var(--card-border)">
+        <small class="text-muted" id="paginationInfo">Memuat...</small>
         <div id="paginationLinks"></div>
     </div>
+
 </div>
 
-{{-- MODAL --}}
+{{-- ===== MODAL TAMBAH / EDIT ===== --}}
 <div class="modal fade" id="teacherModal" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header border-0" style="background:linear-gradient(135deg,#28a745,#20c997);color:#fff">
-                <h6 class="modal-title fw-bold" id="modalTitle">
-                    <i class="bi bi-person-plus me-2"></i>Tambah Guru
-                </h6>
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg">
+
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#059669,#10b981);color:#fff">
+                <div>
+                    <h6 class="modal-title fw-bold mb-0" id="modalTitle">
+                        <i class="bi bi-person-plus me-2"></i>Tambah Guru Baru
+                    </h6>
+                    <div style="font-size:12px;opacity:.75;margin-top:3px">Isi data lengkap guru di bawah ini</div>
+                </div>
                 <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
+
             <div class="modal-body p-4">
-                <form id="teacherForm" enctype="multipart/form-data">
+                <form id="teacherForm" enctype="multipart/form-data" novalidate>
                     @csrf
                     <input type="hidden" id="teacherId">
 
-                    <div class="text-center mb-4">
+                    {{-- PHOTO --}}
+                    <div class="text-center mb-4 pb-4" style="border-bottom:1px solid var(--card-border)">
                         <div class="position-relative d-inline-block">
                             <img id="photoPreview"
-                                 src="https://ui-avatars.com/api/?name=G&background=28a745&color=fff&size=100"
-                                 class="rounded-circle border border-3 border-success"
-                                 width="90" height="90" style="object-fit:cover">
-                            <label class="position-absolute bottom-0 end-0 btn btn-success btn-sm rounded-circle p-1"
-                                   style="width:28px;height:28px;cursor:pointer">
-                                <i class="bi bi-camera" style="font-size:.75rem"></i>
+                                 src="https://ui-avatars.com/api/?name=Guru&background=059669&color=fff&size=120"
+                                 class="rounded-circle" width="100" height="100"
+                                 style="object-fit:cover;border:3px solid #10b981;box-shadow:0 8px 24px rgba(16,185,129,.3)">
+                            <label class="position-absolute bottom-0 end-0 d-flex align-items-center justify-content-center"
+                                   style="width:32px;height:32px;background:#10b981;border-radius:50%;cursor:pointer;border:2.5px solid white">
+                                <i class="bi bi-camera-fill text-white" style="font-size:13px"></i>
                                 <input type="file" name="photo" id="photoInput" class="d-none" accept="image/*">
                             </label>
                         </div>
+                        <div class="text-muted mt-2" style="font-size:12px">Klik ikon kamera untuk upload foto (opsional)</div>
                     </div>
 
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Nama Lengkap <span class="text-danger">*</span></label>
-                            <input type="text" name="name" id="name" class="form-control form-control-sm" required>
+                    {{-- DATA PRIBADI --}}
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <div style="width:4px;height:20px;background:linear-gradient(#10b981,#059669);border-radius:4px"></div>
+                            <span class="fw-bold text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em">Data Pribadi</span>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-semibold">NIG <span class="text-danger">*</span></label>
-                            <input type="text" name="nig" id="nig" class="form-control form-control-sm" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Jenis Kelamin <span class="text-danger">*</span></label>
-                            <select name="gender" id="gender" class="form-select form-select-sm" required>
-                                <option value="">Pilih</option>
-                                <option value="L">Laki-laki</option>
-                                <option value="P">Perempuan</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Tanggal Lahir</label>
-                            <input type="date" name="birth_date" id="birth_date" class="form-control form-control-sm">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Cabang <span class="text-danger">*</span></label>
-                            <select name="branch_id" id="branch_id" class="form-select form-select-sm" required>
-                                <option value="">Pilih Cabang</option>
-                                @foreach($branches as $branch)
-                                <option value="{{ $branch->id }}">{{ $branch->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Email</label>
-                            <input type="email" name="email" id="email" class="form-control form-control-sm">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-semibold">No. HP</label>
-                            <input type="text" name="phone" id="phone" class="form-control form-control-sm">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Pendidikan</label>
-                            <select name="education" id="education" class="form-select form-select-sm">
-                                <option value="">Pilih</option>
-                                <option value="S1">S1</option>
-                                <option value="S2">S2</option>
-                                <option value="S3">S3</option>
-                                <option value="D3">D3</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Mata Pelajaran</label>
-                            <input type="text" name="subjects" id="subjects" class="form-control form-control-sm" placeholder="Matematika, Fisika, dll">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label small fw-semibold">Alamat</label>
-                            <textarea name="address" id="address" class="form-control form-control-sm" rows="2"></textarea>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold">Nama Lengkap <span class="text-danger">*</span></label>
+                                <input type="text" name="name" id="name" class="form-control form-control-sm" placeholder="Nama lengkap guru" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold">NIG <span class="text-danger">*</span></label>
+                                <input type="text" name="nig" id="nig" class="form-control form-control-sm" placeholder="Nomor Induk Guru" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold">Jenis Kelamin <span class="text-danger">*</span></label>
+                                <select name="gender" id="gender" class="form-select form-select-sm" required>
+                                    <option value="">Pilih...</option>
+                                    <option value="L">👦 Laki-laki</option>
+                                    <option value="P">👧 Perempuan</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold">Tanggal Lahir</label>
+                                <input type="date" name="birth_date" id="birth_date" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold">Pendidikan</label>
+                                <select name="education" id="education" class="form-select form-select-sm">
+                                    <option value="">Pilih...</option>
+                                    <option value="D3">D3</option>
+                                    <option value="S1">S1</option>
+                                    <option value="S2">S2</option>
+                                    <option value="S3">S3</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold">Alamat</label>
+                                <textarea name="address" id="address" class="form-control form-control-sm" rows="2" placeholder="Alamat lengkap"></textarea>
+                            </div>
                         </div>
                     </div>
+
+                    {{-- DATA AKADEMIK --}}
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <div style="width:4px;height:20px;background:linear-gradient(#3b82f6,#2563eb);border-radius:4px"></div>
+                            <span class="fw-bold text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em">Data Mengajar</span>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold">Cabang <span class="text-danger">*</span></label>
+                                <select name="branch_id" id="branch_id" class="form-select form-select-sm" required>
+                                    <option value="">Pilih Cabang</option>
+                                    @foreach($branches as $branch)
+                                    <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold">Mata Pelajaran</label>
+                                <input type="text" name="subjects" id="subjects" class="form-control form-control-sm" placeholder="Matematika, Fisika, Kimia...">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold">Email</label>
+                                <input type="email" name="email" id="email" class="form-control form-control-sm" placeholder="email@domain.com">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold">No. HP</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">+62</span>
+                                    <input type="text" name="phone" id="phone" class="form-control" placeholder="8xxxxxxxxxx">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </form>
             </div>
-            <div class="modal-footer border-0 bg-light rounded-bottom">
-                <button type="button" class="btn btn-sm btn-light px-4" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-sm btn-success px-4" onclick="saveTeacher()">
+
+            <div class="modal-footer border-0 p-4" style="background:var(--input-bg)">
+                <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal" style="border-radius:10px">
+                    <i class="bi bi-x me-1"></i>Batal
+                </button>
+                <button type="button" class="btn btn-success px-5 fw-semibold" id="saveBtn" onclick="saveTeacher()" style="border-radius:10px">
                     <i class="bi bi-check-lg me-1"></i>Simpan Data
                 </button>
             </div>
+
         </div>
     </div>
 </div>
@@ -210,144 +288,242 @@
 <script>
 let currentPage = 1;
 
-function loadTeachers(page = 1) {
+// ---- LOAD TEACHERS (AJAX) ----
+function loadTeachers(page) {
+    page = page || 1;
     currentPage = page;
-    $('#teacherBody').html(`<tr><td colspan="8" class="text-center py-5">
-        <div class="spinner-border text-success"></div>
-        <div class="text-muted small mt-2">Memuat data...</div>
-    </td></tr>`);
 
-    $.get('{{ route("admin.teachers.index") }}', {
-        search: $('#searchInput').val(),
-        status: $('#filterStatus').val(),
-        branch_id: $('#filterBranch').val(),
-        page
-    }, function(res) {
-        $('#totalGuru').text(res.total ?? 0);
-        $('#totalAktif').text(res.data?.filter(t => t.status === 'aktif').length ?? 0);
-        $('#totalL').text(res.data?.filter(t => t.gender === 'L').length ?? 0);
-        $('#totalP').text(res.data?.filter(t => t.gender === 'P').length ?? 0);
+    document.getElementById('teacherBody').innerHTML = `
+        <tr><td colspan="8" class="text-center py-5">
+            <div class="spinner-border text-success mb-2" style="width:1.8rem;height:1.8rem"></div>
+            <div class="text-muted small">Memuat data...</div>
+        </td></tr>`;
 
-        let html = '';
-        if (!res.data || res.data.length === 0) {
-            html = `<tr><td colspan="8" class="text-center py-5">
-                <i class="bi bi-inbox text-muted" style="font-size:3rem"></i>
-                <div class="text-muted mt-2">Belum ada data guru</div>
-            </td></tr>`;
-        } else {
-            res.data.forEach((t, i) => {
-                const badge = t.status === 'aktif'
-                    ? '<span class="badge rounded-pill" style="background:#dcfce7;color:#15803d">● Aktif</span>'
-                    : '<span class="badge rounded-pill" style="background:#f3f4f6;color:#6b7280">● Nonaktif</span>';
-                const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=28a745&color=fff&size=40`;
-                html += `<tr>
-                    <td class="text-muted small">${res.from + i}</td>
-                    <td>
-                        <div class="d-flex align-items-center gap-2">
-                            <img src="${t.photo ? '/storage/'+t.photo : avatar}"
-                                 class="rounded-circle" width="38" height="38" style="object-fit:cover;border:2px solid #e5e7eb">
-                            <div>
-                                <div class="fw-semibold small">${t.name}</div>
-                                <div class="text-muted" style="font-size:.72rem">${t.education ?? '-'}</div>
+    $.ajax({
+        url: '{{ route("admin.teachers.index") }}',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        data: {
+            search:    document.getElementById('searchInput').value,
+            status:    document.getElementById('filterStatus').value,
+            branch_id: document.getElementById('filterBranch').value,
+            page
+        },
+        success(res) {
+            // Update global stats
+            if (res.stats) {
+                document.getElementById('statTotal').textContent  = res.stats.total;
+                document.getElementById('statAktif').textContent  = res.stats.aktif;
+                document.getElementById('statMale').textContent   = res.stats.male;
+                document.getElementById('statFemale').textContent = res.stats.female;
+            }
+
+            let html = '';
+            const teachers = res.data || [];
+
+            if (!teachers.length) {
+                html = `<tr><td colspan="8" class="py-5">
+                    <div class="text-center">
+                        <div style="width:72px;height:72px;border-radius:50%;background:var(--input-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
+                            <i class="bi bi-person-badge" style="font-size:2rem;opacity:.35"></i>
+                        </div>
+                        <p class="text-muted mb-3">Belum ada data guru${document.getElementById('searchInput').value ? ' yang cocok' : ''}</p>
+                        <button class="btn btn-sm btn-success" onclick="openModal()">
+                            <i class="bi bi-plus-lg me-1"></i>Tambah Guru
+                        </button>
+                    </div>
+                </td></tr>`;
+            } else {
+                teachers.forEach((t, i) => {
+                    const badgeBg  = t.status === 'aktif' ? '#dcfce7' : '#f3f4f6';
+                    const badgeCol = t.status === 'aktif' ? '#15803d' : '#6b7280';
+                    const badgeLbl = t.status === 'aktif' ? 'Aktif' : 'Nonaktif';
+                    const avatar   = `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=${t.gender==='P'?'ec4899':'10b981'}&color=fff&size=80`;
+                    const num      = (res.from || ((page - 1) * 10 + 1)) + i;
+                    html += `<tr>
+                        <td class="text-muted small fw-semibold">${num}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="${t.photo ? '/storage/'+t.photo : avatar}"
+                                     class="rounded-circle flex-shrink-0" width="40" height="40"
+                                     style="object-fit:cover;border:2.5px solid ${t.gender==='P'?'#f9a8d4':'#6ee7b7'}" loading="lazy">
+                                <div>
+                                    <div class="fw-semibold" style="font-size:13.5px">${t.name}</div>
+                                    <div class="text-muted" style="font-size:11px">${t.gender==='L'?'👦':'👧'} ${t.education ?? ''}</div>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td><code class="small">${t.nig}</code></td>
-                    <td><span class="badge bg-light text-dark small">${t.branch?.name ?? '-'}</span></td>
-                    <td><span class="small text-truncate d-block" style="max-width:150px">${t.subjects ?? '-'}</span></td>
-                    <td>
-                        <div class="small">${t.phone ?? '-'}</div>
-                        <div class="text-muted" style="font-size:.72rem">${t.email ?? ''}</div>
-                    </td>
-                    <td>${badge}</td>
-                    <td class="text-center">
-                        <div class="btn-group btn-group-sm">
-                            <button class="btn btn-outline-warning" onclick="editTeacher(${t.id})" title="Edit">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-outline-danger" onclick="deleteTeacher(${t.id})" title="Hapus">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>`;
-            });
+                        </td>
+                        <td><code style="background:var(--input-bg);padding:3px 8px;border-radius:6px;font-size:12px;color:#10b981">${t.nig}</code></td>
+                        <td class="d-none d-md-table-cell">
+                            <span style="background:var(--input-bg);color:var(--text-muted);border:1px solid var(--card-border);padding:3px 10px;border-radius:6px;font-size:11px">
+                                <i class="bi bi-building me-1"></i>${t.branch?.name ?? '–'}
+                            </span>
+                        </td>
+                        <td class="d-none d-lg-table-cell">
+                            <span class="text-muted" style="font-size:12.5px;max-width:160px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                                ${t.subjects ?? '–'}
+                            </span>
+                        </td>
+                        <td class="d-none d-xl-table-cell">
+                            <div style="font-size:13px">${t.phone ?? '–'}</div>
+                            <div class="text-muted" style="font-size:11px">${t.email ?? ''}</div>
+                        </td>
+                        <td>
+                            <span style="background:${badgeBg};color:${badgeCol};padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600">
+                                <i class="bi bi-circle-fill me-1" style="font-size:7px"></i>${badgeLbl}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex gap-1 justify-content-center">
+                                <button class="btn btn-sm btn-outline-warning" onclick="editTeacher(${t.id})"
+                                        title="Edit" style="border-radius:8px;padding:5px 8px"><i class="bi bi-pencil"></i></button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteTeacher(${t.id}, '${t.name.replace(/'/g, "\\\'")}')"
+                                        title="Hapus" style="border-radius:8px;padding:5px 8px"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>`;
+                });
+            }
+
+            document.getElementById('teacherBody').innerHTML = html;
+
+            // Pagination info
+            const from = res.from || 0, to = res.to || 0, total = res.total || 0;
+            document.getElementById('paginationInfo').innerHTML =
+                total ? `Menampilkan <strong>${from}</strong>–<strong>${to}</strong> dari <strong>${total}</strong> guru` : 'Tidak ada data';
+
+            // Pagination links (simple prev/next)
+            let links = '';
+            if (res.current_page > 1)
+                links += `<button class="btn btn-sm btn-outline-secondary me-1" style="border-radius:8px" onclick="loadTeachers(${res.current_page-1})"><i class="bi bi-chevron-left"></i></button>`;
+            if (res.last_page > 1) {
+                for (let p = Math.max(1,res.current_page-2); p <= Math.min(res.last_page,res.current_page+2); p++) {
+                    links += `<button class="btn btn-sm me-1 ${p===res.current_page?'btn-primary':'btn-outline-secondary'}" style="border-radius:8px;min-width:36px" onclick="loadTeachers(${p})">${p}</button>`;
+                }
+            }
+            if (res.current_page < res.last_page)
+                links += `<button class="btn btn-sm btn-outline-secondary" style="border-radius:8px" onclick="loadTeachers(${res.current_page+1})"><i class="bi bi-chevron-right"></i></button>`;
+            document.getElementById('paginationLinks').innerHTML = links;
+        },
+        error() {
+            document.getElementById('teacherBody').innerHTML = `
+                <tr><td colspan="8" class="text-center py-5 text-danger">
+                    <i class="bi bi-exclamation-triangle d-block mb-2" style="font-size:2rem"></i>
+                    Gagal memuat data. <a href="javascript:loadTeachers()">Coba lagi</a>
+                </td></tr>`;
         }
-        $('#teacherBody').html(html);
-        $('#paginationInfo').text(`Menampilkan ${res.from ?? 0}-${res.to ?? 0} dari ${res.total ?? 0} guru`);
     });
 }
 
+// ---- OPEN MODAL (ADD) ----
 function openModal() {
-    $('#modalTitle').html('<i class="bi bi-person-plus me-2"></i>Tambah Guru');
-    $('#teacherForm')[0].reset();
-    $('#teacherId').val('');
-    $('#photoPreview').attr('src', 'https://ui-avatars.com/api/?name=G&background=28a745&color=fff&size=100');
+    document.getElementById('teacherForm').reset();
+    document.getElementById('teacherId').value = '';
+    document.getElementById('modalTitle').innerHTML = '<i class="bi bi-person-plus me-2"></i>Tambah Guru Baru';
+    document.getElementById('photoPreview').src = 'https://ui-avatars.com/api/?name=Guru&background=059669&color=fff&size=120';
     new bootstrap.Modal('#teacherModal').show();
 }
 
+// ---- EDIT ----
 function editTeacher(id) {
-    $.get(`/admin/teachers/${id}`, function(res) {
+    $.get('/admin/teachers/' + id, function(res) {
         const t = res.data;
-        $('#modalTitle').html('<i class="bi bi-pencil me-2"></i>Edit Guru');
-        $('#teacherId').val(t.id);
-        $('#name').val(t.name); $('#nig').val(t.nig);
-        $('#gender').val(t.gender); $('#birth_date').val(t.birth_date);
-        $('#branch_id').val(t.branch_id); $('#email').val(t.email);
-        $('#phone').val(t.phone); $('#education').val(t.education);
-        $('#subjects').val(t.subjects); $('#address').val(t.address);
-        const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=28a745&color=fff&size=100`;
-        $('#photoPreview').attr('src', t.photo ? '/storage/'+t.photo : avatar);
+        document.getElementById('modalTitle').innerHTML = '<i class="bi bi-pencil me-2"></i>Edit Data Guru';
+        document.getElementById('teacherId').value   = t.id;
+        document.getElementById('name').value        = t.name        ?? '';
+        document.getElementById('nig').value         = t.nig         ?? '';
+        document.getElementById('gender').value      = t.gender      ?? '';
+        document.getElementById('birth_date').value  = t.birth_date  ?? '';
+        document.getElementById('branch_id').value   = t.branch_id   ?? '';
+        document.getElementById('email').value       = t.email       ?? '';
+        document.getElementById('phone').value       = t.phone       ?? '';
+        document.getElementById('education').value   = t.education   ?? '';
+        document.getElementById('subjects').value    = t.subjects    ?? '';
+        document.getElementById('address').value     = t.address     ?? '';
+        const avatar = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(t.name) + '&background=059669&color=fff&size=120';
+        document.getElementById('photoPreview').src = t.photo ? '/storage/' + t.photo : avatar;
         new bootstrap.Modal('#teacherModal').show();
+    }).fail(function() {
+        Swal.fire({ icon:'error', title:'Gagal', text:'Tidak dapat memuat data guru.' });
     });
 }
 
+// ---- SAVE ----
 function saveTeacher() {
-    const id = $('#teacherId').val();
-    const url = id ? `/admin/teachers/${id}` : '{{ route("admin.teachers.store") }}';
-    const fd = new FormData($('#teacherForm')[0]);
+    const id  = document.getElementById('teacherId').value;
+    const url = id ? '/admin/teachers/' + id : '{{ route("admin.teachers.store") }}';
+    const fd  = new FormData(document.getElementById('teacherForm'));
     if (id) fd.append('_method', 'PUT');
+
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';
+
     $.ajax({
-        url, method: 'POST', data: fd, processData: false, contentType: false,
+        url, method:'POST', data:fd, processData:false, contentType:false,
         success(res) {
             if (res.success) {
                 bootstrap.Modal.getInstance(document.getElementById('teacherModal'))?.hide();
-                Swal.fire({ icon: 'success', title: res.message, timer: 2000, showConfirmButton: false });
+                Swal.fire({ icon:'success', title:'Berhasil!', text:res.message, timer:2200, showConfirmButton:false, iconColor:'#10b981' });
                 loadTeachers(currentPage);
             }
         },
         error(xhr) {
             const errors = xhr.responseJSON?.errors;
-            Swal.fire({ icon: 'error', title: 'Gagal!', html: errors ? Object.values(errors).flat().join('<br>') : 'Terjadi kesalahan' });
+            const msg = errors
+                ? '<ul class="text-start mb-0">' + Object.values(errors).flat().map(e=>`<li>${e}</li>`).join('') + '</ul>'
+                : (xhr.responseJSON?.message ?? 'Terjadi kesalahan.');
+            Swal.fire({ icon:'error', title:'Gagal!', html:msg });
+        },
+        complete() {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Simpan Data';
         }
     });
 }
 
-function deleteTeacher(id) {
+// ---- DELETE ----
+function deleteTeacher(id, name) {
     Swal.fire({
-        title: 'Hapus Guru?', icon: 'warning',
-        showCancelButton: true, confirmButtonColor: '#dc3545',
-        confirmButtonText: 'Ya, Hapus!', cancelButtonText: 'Batal'
+        title: `Hapus "${name}"?`,
+        text: 'Data guru ini akan dihapus secara permanen!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: '<i class="bi bi-trash me-1"></i>Ya, Hapus!',
+        cancelButtonText: 'Batal'
     }).then(r => {
         if (r.isConfirmed) {
-            $.post(`/admin/teachers/${id}`, { _method: 'DELETE', _token: $('meta[name=csrf-token]').attr('content') }, function(res) {
-                Swal.fire({ icon: 'success', title: res.message, timer: 2000, showConfirmButton: false });
+            $.post('/admin/teachers/' + id, {
+                _method: 'DELETE',
+                _token: document.querySelector('meta[name=csrf-token]').content
+            }, function(res) {
+                Swal.fire({ icon:'success', title:'Terhapus!', text:res.message, timer:2000, showConfirmButton:false });
                 loadTeachers(currentPage);
+            }).fail(function() {
+                Swal.fire({ icon:'error', title:'Gagal!', text:'Tidak dapat menghapus data.' });
             });
         }
     });
 }
 
-$('#photoInput').on('change', function() {
+// ---- PHOTO PREVIEW ----
+document.getElementById('photoInput').addEventListener('change', function() {
     if (this.files[0]) {
         const reader = new FileReader();
-        reader.onload = e => $('#photoPreview').attr('src', e.target.result);
+        reader.onload = e => { document.getElementById('photoPreview').src = e.target.result; };
         reader.readAsDataURL(this.files[0]);
     }
 });
 
-let timer;
-$('#searchInput').on('input', () => { clearTimeout(timer); timer = setTimeout(loadTeachers, 400); });
-$(document).ready(() => loadTeachers());
+// ---- SEARCH DEBOUNCE ----
+let searchTimer;
+document.getElementById('searchInput').addEventListener('input', function() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => loadTeachers(), 400);
+});
+
+// ---- INIT ----
+document.addEventListener('DOMContentLoaded', () => loadTeachers());
 </script>
 @endpush

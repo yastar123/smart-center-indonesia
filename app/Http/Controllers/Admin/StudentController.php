@@ -20,6 +20,7 @@ public function index(Request $request)
             $q->where('name', 'like', "%{$request->search}%")
               ->orWhere('nis', 'like', "%{$request->search}%"))
         ->when($request->status,    fn($q) => $q->where('status',    $request->status))
+        ->when($request->gender,    fn($q) => $q->where('gender',    $request->gender))
         ->when($request->branch_id, fn($q) => $q->where('branch_id', $request->branch_id))
         ->latest()
         ->paginate(10);
@@ -36,18 +37,19 @@ $stats = [
 public function store(Request $request)
 {
     $data = $request->validate([
-        'name' => 'required',
-        'nis' => 'required|unique:students,nis',
-        'gender' => 'required',
-        'birth_date' => 'nullable',
-        'branch_id' => 'required',
-        'phone' => 'nullable',
-        'address' => 'nullable',
-        'parent_name' => 'nullable',
-        'parent_phone' => 'nullable',
-        'school_name' => 'nullable',
-        'grade' => 'nullable',
-        'photo' => 'nullable|image|max:2048',
+        'name'         => 'required|string|max:100',
+        'nis'          => 'required|string|unique:students,nis',
+        'gender'       => 'required|in:L,P',
+        'birth_date'   => 'nullable|date',
+        'birth_place'  => 'nullable|string|max:100',
+        'branch_id'    => 'required|exists:branches,id',
+        'phone'        => 'nullable|string|max:20',
+        'address'      => 'nullable|string',
+        'parent_name'  => 'nullable|string|max:100',
+        'parent_phone' => 'nullable|string|max:20',
+        'school_name'  => 'nullable|string|max:100',
+        'grade'        => 'nullable|string|max:50',
+        'photo'        => 'nullable|image|max:2048',
     ]);
 
     $data['join_date'] = now()->toDateString();

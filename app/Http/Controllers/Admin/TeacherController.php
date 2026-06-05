@@ -16,15 +16,24 @@ class TeacherController extends Controller
             $teachers = Teacher::with('branch')
                 ->when($request->search, fn($q) =>
                     $q->where('name', 'like', "%{$request->search}%")
-                      ->orWhere('nig', 'like', "%{$request->search}%"))
-                ->when($request->status, fn($q) =>
-                    $q->where('status', $request->status))
-                ->latest()->paginate(10);
+                      ->orWhere('nig',  'like', "%{$request->search}%"))
+                ->when($request->status,    fn($q) => $q->where('status',    $request->status))
+                ->when($request->branch_id, fn($q) => $q->where('branch_id', $request->branch_id))
+                ->latest()
+                ->paginate(10);
 
-            return response()->json($teachers);
+            // Global stats — unfiltered, always show totals across all branches
+            $stats = [
+                'total'  => Teacher::count(),
+                'aktif'  => Teacher::where('status', 'aktif')->count(),
+                'male'   => Teacher::where('gender', 'L')->count(),
+                'female' => Teacher::where('gender', 'P')->count(),
+            ];
+
+            return response()->json(array_merge($teachers->toArray(), ['stats' => $stats]));
         }
 
-       $branches = Branch::all();
+        $branches = Branch::all();
         return view('admin.teachers.index', compact('branches'));
     }
 
@@ -64,11 +73,13 @@ class TeacherController extends Controller
     public function update(Request $request, Teacher $teacher)
     {
         $request->validate([
-            'name'      => 'required|string|max:100',
-            'nig'       => 'required|string|unique:teachers,nig,' . $teacher->id,
-            'gender'    => 'required|in:L,P',
-            'branch_id' => 'required|exists:branches,id',
-            'photo'     => 'nullable|image|max:2048',
+            'name'       => 'required|string|max:100',
+            'nig'        => 'required|string|unique:teachers,nig,' . $teacher->id,
+            'gender'     => 'required|in:L,P',
+            'birth_date' => 'nullable|date',
+            'branch_id'  => 'required|exists:branches,id',
+            'email'      => 'nullable|email|unique:teachers,email,' . $teacher->id,
+            'photo'      => 'nullable|image|max:2048',
         ]);
 
         $data = $request->except('photo');
