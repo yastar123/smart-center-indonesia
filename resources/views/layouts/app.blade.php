@@ -44,6 +44,8 @@
             --shadow-md: 0 4px 16px rgba(0,0,0,.07);
             --shadow-lg: 0 10px 36px rgba(0,0,0,.10);
             --transition: .25s cubic-bezier(.4,0,.2,1);
+            --overdue-bg: #fef2f2;
+            --overdue-border: #fecaca;
         }
 
         [data-theme="dark"] {
@@ -54,6 +56,8 @@
             --text-muted: #94a3b8;
             --topbar-bg: #1e293b;
             --input-bg: #0f172a;
+            --overdue-bg: #2d1515;
+            --overdue-border: #7f1d1d;
         }
 
         /* ============================================================
@@ -951,8 +955,7 @@
                 <i class="bi bi-moon" id="darkIcon"></i>
             </button>
 
-            <button class="top-btn position-relative" title="Notifikasi" id="notifBtn"
-                    onclick="this.querySelector('.notif-badge')?.remove(); this.querySelector('i').style.color='var(--text-muted)'">
+            <button class="top-btn position-relative" title="Notifikasi" id="notifBtn">
                 <i class="bi bi-bell"></i>
             </button>
 

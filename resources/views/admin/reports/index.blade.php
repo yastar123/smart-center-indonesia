@@ -14,9 +14,9 @@ $monthRevenue   = Payment::where('status','verified')
                     ->whereMonth('created_at', now()->month)
                     ->whereYear('created_at',  now()->year)
                     ->sum('jumlah');
-$pendingCount   = Invoice::where('status','belum_lunas')->count();
-$pendingTotal   = Invoice::where('status','belum_lunas')->sum('total');
-$overdueCount   = Invoice::where('status','belum_lunas')
+$pendingCount   = Invoice::where('status','belum_bayar')->count();
+$pendingTotal   = Invoice::where('status','belum_bayar')->sum('total');
+$overdueCount   = Invoice::where('status','belum_bayar')
                     ->where('jatuh_tempo','<', now()->toDateString())->count();
 
 // Monthly revenue — last 6 months
@@ -32,15 +32,15 @@ for ($i = 5; $i >= 0; $i--) {
 }
 
 // Recent verified payments
-$recentPayments = Payment::with(['invoice.student','invoice.branch'])
+$recentPayments = Payment::with(['invoice.siswa','invoice.cabang'])
                     ->where('status','verified')
                     ->latest()
                     ->limit(10)
                     ->get();
 
 // Outstanding invoices
-$outstanding = Invoice::with(['student','branch'])
-                ->where('status','belum_lunas')
+$outstanding = Invoice::with(['siswa','cabang'])
+                ->where('status','belum_bayar')
                 ->orderBy('jatuh_tempo')
                 ->limit(10)
                 ->get();
@@ -169,7 +169,7 @@ $outstanding = Invoice::with(['student','branch'])
             <div id="chartInvoiceStatus"></div>
             @php
                 $lunas    = Invoice::where('status','lunas')->count();
-                $belum    = Invoice::where('status','belum_lunas')->count();
+                $belum    = Invoice::where('status','belum_bayar')->count();
                 $sebagian = Invoice::where('status','sebagian')->count();
                 $totalInv = max($lunas + $belum + $sebagian, 1);
             @endphp
@@ -217,12 +217,12 @@ $outstanding = Invoice::with(['student','branch'])
                         @forelse($recentPayments as $p)
                         <tr>
                             <td class="py-3">
-                                <div class="fw-semibold" style="font-size:13px">{{ $p->invoice?->student?->name ?? '—' }}</div>
-                                <div class="text-muted" style="font-size:11px">{{ $p->invoice?->branch?->name ?? '—' }}</div>
+                                <div class="fw-semibold" style="font-size:13px">{{ $p->invoice?->siswa?->name ?? '—' }}</div>
+                                <div class="text-muted" style="font-size:11px">{{ $p->invoice?->cabang?->name ?? '—' }}</div>
                             </td>
                             <td class="py-3 d-none d-md-table-cell">
                                 <span class="badge" style="background:var(--input-bg);color:var(--text-muted);font-size:11px;padding:3px 8px;border-radius:6px">
-                                    {{ ucwords(str_replace('_',' ', $p->metode_pembayaran ?? '-')) }}
+                                    {{ ucwords(str_replace('_',' ', $p->metode ?? '-')) }}
                                 </span>
                             </td>
                             <td class="py-3 fw-bold text-success" style="font-size:13px">
@@ -261,10 +261,10 @@ $outstanding = Invoice::with(['student','branch'])
                     $overdue = $inv->jatuh_tempo && \Carbon\Carbon::parse($inv->jatuh_tempo)->isPast();
                 @endphp
                 <div class="d-flex align-items-center justify-content-between p-3 rounded-3"
-                     style="background:{{ $overdue ? '#fef2f2' : 'var(--input-bg)' }};border:1px solid {{ $overdue ? '#fecaca' : 'var(--card-border)' }}">
+                     style="background:{{ $overdue ? 'var(--overdue-bg,#fef2f2)' : 'var(--input-bg)' }};border:1px solid {{ $overdue ? 'var(--overdue-border,#fecaca)' : 'var(--card-border)' }}">
                     <div style="min-width:0">
                         <div class="fw-semibold text-truncate" style="font-size:12.5px;color:{{ $overdue ? '#dc2626' : 'var(--text-primary)' }}">
-                            {{ $inv->student?->name ?? '—' }}
+                            {{ $inv->siswa?->name ?? '—' }}
                         </div>
                         <div style="font-size:11px;color:var(--text-muted)">
                             @if($overdue)

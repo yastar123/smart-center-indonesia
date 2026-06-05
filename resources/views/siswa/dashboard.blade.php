@@ -13,17 +13,17 @@ use Carbon\Carbon;
 $student = Student::where('user_id', auth()->id())->first();
 
 $invoices = $student
-    ? Invoice::where('student_id', $student->id)
+    ? Invoice::where('siswa_id', $student->id)
         ->latest()
         ->limit(5)
         ->get()
     : collect();
 
 $totalTagihan = $student
-    ? Invoice::where('student_id', $student->id)->sum('total')
+    ? Invoice::where('siswa_id', $student->id)->sum('total')
     : 0;
 $totalLunas   = $student
-    ? Invoice::where('student_id', $student->id)->where('status','lunas')->sum('total')
+    ? Invoice::where('siswa_id', $student->id)->where('status','lunas')->sum('total')
     : 0;
 $sisaTunggakan = $totalTagihan - $totalLunas;
 
@@ -158,13 +158,13 @@ $weekSchedules = ($student && $student->branch_id)
             </h6>
             @forelse($invoices as $inv)
             @php
-                $stClr = ['lunas'=>'#10b981','belum_lunas'=>'#f59e0b','sebagian'=>'#3b82f6'][$inv->status] ?? '#94a3b8';
-                $stBg  = ['lunas'=>'#ecfdf5','belum_lunas'=>'#fffbeb','sebagian'=>'#eff6ff'][$inv->status] ?? '#f1f5f9';
-                $stLbl = ['lunas'=>'Lunas','belum_lunas'=>'Belum Lunas','sebagian'=>'Sebagian'][$inv->status] ?? $inv->status;
+                $stClr = ['lunas'=>'#10b981','belum_bayar'=>'#f59e0b','sebagian'=>'#3b82f6'][$inv->status] ?? '#94a3b8';
+                $stBg  = ['lunas'=>'#ecfdf5','belum_bayar'=>'#fffbeb','sebagian'=>'#eff6ff'][$inv->status] ?? '#f1f5f9';
+                $stLbl = ['lunas'=>'Lunas','belum_bayar'=>'Belum Bayar','sebagian'=>'Sebagian'][$inv->status] ?? $inv->status;
                 $overdue = $inv->status !== 'lunas' && $inv->jatuh_tempo && \Carbon\Carbon::parse($inv->jatuh_tempo)->isPast();
             @endphp
-            <div class="d-flex align-items-center justify-content-between p-3 rounded-3 mb-2"
-                 style="background:{{ $overdue ? '#fef2f2' : 'var(--input-bg)' }};border:1px solid {{ $overdue ? '#fecaca' : 'var(--card-border)' }}">
+            <div class="d-flex align-items-center justify-content-between p-3 rounded-3 mb-2 {{ $overdue ? 'row-overdue' : '' }}"
+                 style="background:{{ $overdue ? 'var(--overdue-bg,#fef2f2)' : 'var(--input-bg)' }};border:1px solid {{ $overdue ? 'var(--overdue-border,#fecaca)' : 'var(--card-border)' }}">
                 <div style="min-width:0">
                     <div class="fw-semibold" style="font-size:13px">{{ $inv->nomor_invoice }}</div>
                     <div style="font-size:11px;color:var(--text-muted)">

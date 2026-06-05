@@ -21,6 +21,7 @@ class Teacher extends Model
         'birth_date'   => 'date',
         'join_date'    => 'date',
         'salary_base'  => 'decimal:2',
+        'subjects'     => 'array',
     ];
 
     public function user()   { return $this->belongsTo(User::class); }
