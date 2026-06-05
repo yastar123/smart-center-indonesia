@@ -118,19 +118,19 @@ Route::middleware(['auth'])
         Route::post('/branches', [BranchController::class, 'store'])
             ->name('branches.store');
 
-        Route::put('/branches/{branch}', [BranchController::class, 'update'])
-            ->name('branches.update');
-
-        Route::delete('/branches/{branch}', [BranchController::class, 'destroy'])
-            ->name('branches.destroy');
-
+        // Static routes MUST come before {branch} wildcard
         Route::get('/branches/export/excel', [BranchController::class, 'exportExcel'])
             ->name('branches.export.excel');
 
         Route::get('/branches/export/pdf', [BranchController::class, 'exportPdf'])
             ->name('branches.export.pdf');
 
-        // RESET PASSWORD
+        Route::put('/branches/{branch}', [BranchController::class, 'update'])
+            ->name('branches.update');
+
+        Route::delete('/branches/{branch}', [BranchController::class, 'destroy'])
+            ->name('branches.destroy');
+
         Route::post('/branches/{branch}/reset-password',
             [BranchController::class, 'resetPassword'])
             ->name('branches.resetPassword');

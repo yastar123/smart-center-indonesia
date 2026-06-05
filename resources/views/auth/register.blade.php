@@ -1,52 +1,232 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Daftar | Smart Center Indonesia</title>
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 40%, #1d4ed8 75%, #6c63ff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            padding: 1.5rem 1rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+        body::before {
+            content:'';
+            position:fixed;
+            width:500px;height:500px;
+            background:radial-gradient(circle,rgba(99,102,241,.25) 0%,transparent 70%);
+            top:-150px;right:-150px;border-radius:50%;
+            animation:orb1 8s ease-in-out infinite alternate;pointer-events:none;
+        }
+        body::after {
+            content:'';
+            position:fixed;
+            width:400px;height:400px;
+            background:radial-gradient(circle,rgba(59,130,246,.2) 0%,transparent 70%);
+            bottom:-120px;left:-120px;border-radius:50%;
+            animation:orb2 10s ease-in-out infinite alternate;pointer-events:none;
+        }
+        @keyframes orb1{from{transform:translate(0,0) scale(1);}to{transform:translate(30px,20px) scale(1.1);}}
+        @keyframes orb2{from{transform:translate(0,0) scale(1);}to{transform:translate(-20px,-30px) scale(1.15);}}
+
+        .register-card {
+            width: min(500px, 100%);
+            background: white;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 40px 80px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.08);
+            animation: slideUp .5s cubic-bezier(.22,1,.36,1) both;
+            position: relative; z-index: 1;
+        }
+        @keyframes slideUp{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
+
+        .card-header-band {
+            background: linear-gradient(135deg, #1e3a5f, #2563eb, #6366f1);
+            padding: 2rem 2.5rem 1.5rem;
+            color: white;
+            text-align: center;
+        }
+        .brand-logo {
+            width: 52px; height: 52px;
+            border-radius: 15px;
+            background: rgba(255,255,255,.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+            margin: 0 auto 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,.25);
+        }
+        .card-header-band h4 { font-size:22px;font-weight:800;margin:0;letter-spacing:-.01em; }
+        .card-header-band p { font-size:13px;opacity:.75;margin:4px 0 0; }
+
+        .card-body-inner { padding: 2rem 2.5rem; }
+
+        .form-label { font-weight:600;font-size:.8rem;color:#374151;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem; }
+        .form-control {
+            border:2px solid #e5e7eb;border-radius:11px;padding:.7rem 1rem;font-size:.9rem;
+            background:#fafafa;transition:border-color .25s,box-shadow .25s,background .25s;
+        }
+        .form-control:focus { border-color:#4f8ef7;box-shadow:0 0 0 4px rgba(79,142,247,.12);background:#fff;outline:none; }
+        .form-control.is-invalid { border-color:#ef4444; }
+        .invalid-feedback { font-size:.8rem;color:#ef4444;margin-top:4px; }
+
+        .input-group .form-control { border-right:none;border-radius:11px 0 0 11px; }
+        .input-group-text {
+            background:#fafafa;border:2px solid #e5e7eb;border-left:none;
+            border-radius:0 11px 11px 0;cursor:pointer;color:#6b7280;transition:.2s;
+        }
+        .input-group-text:hover { color:#374151;background:#f3f4f6; }
+        .form-control:focus + .input-group-text,.form-control:focus ~ .input-group-text { border-color:#4f8ef7; }
+
+        .btn-register {
+            background:linear-gradient(135deg,#2563eb,#4f8ef7 50%,#6c63ff);
+            background-size:200% auto;border:none;border-radius:12px;padding:.85rem;
+            font-size:.95rem;font-weight:700;color:white;width:100%;margin-top:.5rem;
+            transition:background-position .4s,transform .2s,box-shadow .2s;
+        }
+        .btn-register:hover { background-position:right center;transform:translateY(-2px);box-shadow:0 10px 28px rgba(79,142,247,.45);color:white; }
+        .btn-register:active { transform:translateY(0); }
+
+        .strength-bar { height:5px;border-radius:10px;background:#e5e7eb;overflow:hidden;margin-top:8px; }
+        .strength-fill { height:100%;border-radius:10px;transition:.3s; }
+
+        @media(max-width:480px){ .card-body-inner{padding:1.5rem;} .card-header-band{padding:1.5rem;} }
+    </style>
+</head>
+<body>
+
+<div class="register-card">
+
+    <div class="card-header-band">
+        <div class="brand-logo"><i class="bi bi-mortarboard-fill"></i></div>
+        <h4>Buat Akun Baru</h4>
+        <p>Smart Center Indonesia — Sistem Manajemen Bimbel</p>
+    </div>
+
+    <div class="card-body-inner">
+
+        @if ($errors->any())
+        <div class="d-flex align-items-center gap-2 mb-3 p-3 rounded-3" style="background:#fef2f2;border:1.5px solid #fecaca;color:#dc2626">
+            <i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
+            <span style="font-size:.85rem">{{ $errors->first() }}</span>
         </div>
+        @endif
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+        <form method="POST" action="{{ route('register') }}" id="registerForm">
+            @csrf
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+            <div class="mb-3">
+                <label class="form-label">Nama Lengkap</label>
+                <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
+                       value="{{ old('name') }}" placeholder="Masukkan nama lengkap" required autofocus>
+                @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </div>
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
+                       value="{{ old('email') }}" placeholder="contoh@email.com" required>
+                @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </div>
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <div class="input-group">
+                    <input type="password" name="password" id="password"
+                           class="form-control @error('password') is-invalid @enderror"
+                           placeholder="Min. 8 karakter" required autocomplete="new-password">
+                    <span class="input-group-text" onclick="togglePwd('password','eye1')">
+                        <i class="bi bi-eye" id="eye1"></i>
+                    </span>
+                </div>
+                <div class="strength-bar mt-2" id="strengthBar" style="display:none">
+                    <div class="strength-fill" id="strengthFill"></div>
+                </div>
+                <div id="strengthLabel" class="mt-1" style="font-size:11px;font-weight:600"></div>
+                @error('password')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+            </div>
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+            <div class="mb-4">
+                <label class="form-label">Konfirmasi Password</label>
+                <div class="input-group">
+                    <input type="password" name="password_confirmation" id="password_confirmation"
+                           class="form-control" placeholder="Ulangi password" required autocomplete="new-password">
+                    <span class="input-group-text" onclick="togglePwd('password_confirmation','eye2')">
+                        <i class="bi bi-eye" id="eye2"></i>
+                    </span>
+                </div>
+            </div>
 
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
+            <button type="submit" class="btn btn-register" id="regBtn">
+                <span id="regText"><i class="bi bi-person-plus me-2"></i>Daftar Sekarang</span>
+                <span id="regLoading" class="d-none">
+                    <span class="spinner-border spinner-border-sm me-2"></span>Memproses...
+                </span>
+            </button>
 
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
+            <div class="text-center mt-4" style="font-size:.875rem;color:#6b7280">
+                Sudah punya akun?
+                <a href="{{ route('login') }}" class="fw-semibold text-decoration-none" style="color:#4f8ef7">
+                    Masuk di sini
+                </a>
+            </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
+        </form>
 
-            <x-primary-button class="ml-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function togglePwd(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon  = document.getElementById(iconId);
+    input.type = input.type === 'password' ? 'text' : 'password';
+    icon.className = input.type === 'text' ? 'bi bi-eye-slash' : 'bi bi-eye';
+}
+
+document.getElementById('password').addEventListener('input', function() {
+    const val = this.value;
+    const bar   = document.getElementById('strengthBar');
+    const fill  = document.getElementById('strengthFill');
+    const label = document.getElementById('strengthLabel');
+    if (!val) { bar.style.display='none'; label.textContent=''; return; }
+    bar.style.display='block';
+    let s = 0;
+    if (val.length >= 8) s++;
+    if (/[A-Z]/.test(val)) s++;
+    if (/[0-9]/.test(val)) s++;
+    if (/[^A-Za-z0-9]/.test(val)) s++;
+    const cfgs = [
+        {p:'25%',c:'#ef4444',t:'Lemah'},
+        {p:'50%',c:'#f59e0b',t:'Cukup'},
+        {p:'75%',c:'#3b82f6',t:'Kuat'},
+        {p:'100%',c:'#10b981',t:'Sangat Kuat'},
+    ];
+    const cfg = cfgs[s-1] || cfgs[0];
+    fill.style.width=cfg.p; fill.style.background=cfg.c;
+    label.textContent=cfg.t; label.style.color=cfg.c;
+});
+
+document.getElementById('registerForm').addEventListener('submit', function() {
+    document.getElementById('regText').classList.add('d-none');
+    document.getElementById('regLoading').classList.remove('d-none');
+    document.getElementById('regBtn').disabled = true;
+});
+</script>
+</body>
+</html>

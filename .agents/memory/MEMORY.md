@@ -1,0 +1,3 @@
+- [Route ordering bug](route-ordering.md) — static routes must come before wildcard `{param}` routes in the same prefix group or Laravel matches the wildcard first.
+- [Profile page stack mismatch](profile-stack.md) — profile/edit and auth views used `<x-app-layout>` (Breeze Tailwind) which is incompatible with the Bootstrap app layout; rewritten as plain Bootstrap + `@extends('layouts.app')`.
+- [Owner dashboard fake data](owner-dashboard-fake.md) — original owner dashboard had hardcoded numbers (12, 1240, 85, Rp120JT); replaced with live Eloquent queries in the view.
