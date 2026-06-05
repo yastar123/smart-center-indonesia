@@ -752,10 +752,9 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="{{ route('owner.analytics') }}" class="nav-link {{ request()->routeIs('owner.analytics') ? 'active' : '' }}">
                 <i class="bi bi-graph-up-arrow"></i>
                 <span>Analytics</span>
-                <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
         </div>
         @endrole
@@ -813,10 +812,9 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="bi bi-award"></i>
-                <span>Sertifikat</span>
-                <span class="menu-badge" style="background:#6366f1">Soon</span>
+            <a href="{{ route('admin.reports.index') }}" class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
+                <i class="bi bi-bar-chart-line"></i>
+                <span>Laporan Keuangan</span>
             </a>
         </div>
 
@@ -834,16 +832,32 @@
         @role('guru')
         <div class="nav-header">GURU PANEL</div>
         <div class="nav-item">
-            <a href="#" class="nav-link"><i class="bi bi-calendar2-week"></i><span>Jadwal Mengajar</span></a>
+            <a href="{{ route('guru.dashboard') }}" class="nav-link {{ request()->routeIs('guru.dashboard') ? 'active' : '' }}">
+                <i class="bi bi-speedometer2"></i><span>Dashboard Guru</span>
+            </a>
         </div>
         <div class="nav-item">
-            <a href="#" class="nav-link"><i class="bi bi-check2-square"></i><span>Absensi</span></a>
+            <a href="{{ route('guru.dashboard') }}" class="nav-link {{ request()->routeIs('guru.dashboard') && request()->is('guru/dashboard') ? 'active' : '' }}">
+                <i class="bi bi-calendar2-week"></i><span>Jadwal Mengajar</span>
+            </a>
         </div>
         <div class="nav-item">
-            <a href="#" class="nav-link"><i class="bi bi-bar-chart-line"></i><span>Input Nilai</span></a>
+            <a href="#" class="nav-link">
+                <i class="bi bi-check2-square"></i><span>Absensi</span>
+                <span class="menu-badge" style="background:#6366f1">Soon</span>
+            </a>
         </div>
         <div class="nav-item">
-            <a href="#" class="nav-link"><i class="bi bi-cloud-upload"></i><span>Upload Materi</span></a>
+            <a href="#" class="nav-link">
+                <i class="bi bi-bar-chart-line"></i><span>Input Nilai</span>
+                <span class="menu-badge" style="background:#6366f1">Soon</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="#" class="nav-link">
+                <i class="bi bi-cloud-upload"></i><span>Upload Materi</span>
+                <span class="menu-badge" style="background:#6366f1">Soon</span>
+            </a>
         </div>
         @endrole
 
@@ -851,16 +865,30 @@
         @role('siswa')
         <div class="nav-header">SISWA PANEL</div>
         <div class="nav-item">
-            <a href="#" class="nav-link"><i class="bi bi-calendar-event"></i><span>Jadwal Belajar</span></a>
+            <a href="{{ route('siswa.dashboard') }}" class="nav-link {{ request()->routeIs('siswa.*') ? 'active' : '' }}">
+                <i class="bi bi-speedometer2"></i><span>Dashboard Siswa</span>
+            </a>
         </div>
         <div class="nav-item">
-            <a href="#" class="nav-link"><i class="bi bi-credit-card"></i><span>Pembayaran</span></a>
+            <a href="{{ route('siswa.dashboard') }}" class="nav-link">
+                <i class="bi bi-calendar-event"></i><span>Jadwal Belajar</span>
+            </a>
         </div>
         <div class="nav-item">
-            <a href="#" class="nav-link"><i class="bi bi-laptop"></i><span>Tryout CBT</span></a>
+            <a href="{{ route('siswa.dashboard') }}" class="nav-link">
+                <i class="bi bi-credit-card"></i><span>Pembayaran</span>
+            </a>
         </div>
         <div class="nav-item">
-            <a href="#" class="nav-link"><i class="bi bi-file-earmark-text"></i><span>Raport Digital</span></a>
+            <a href="{{ route('admin.tryouts.index') }}" class="nav-link {{ request()->routeIs('admin.tryouts.*') ? 'active' : '' }}">
+                <i class="bi bi-laptop"></i><span>Tryout CBT</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="#" class="nav-link">
+                <i class="bi bi-file-earmark-text"></i><span>Raport Digital</span>
+                <span class="menu-badge" style="background:#6366f1">Soon</span>
+            </a>
         </div>
         @endrole
 

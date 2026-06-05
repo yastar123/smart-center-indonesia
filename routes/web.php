@@ -79,6 +79,9 @@ Route::middleware(['auth'])
 
         // TRYOUTS (placeholder route kept)
         Route::get('/tryouts', fn() => view('admin.tryouts.index'))->name('tryouts.index');
+
+        // REPORTS
+        Route::get('/reports', fn() => view('admin.reports.index'))->name('reports.index');
     });
 
 /*
@@ -125,6 +128,32 @@ Route::middleware(['auth'])
         Route::get('/settings', function () {
             return view('owner.settings');
         })->name('settings.index');
+
+        Route::get('/analytics', fn() => view('owner.analytics'))->name('analytics');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| GURU PORTAL
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])
+    ->prefix('guru')
+    ->name('guru.')
+    ->group(function () {
+        Route::get('/dashboard', fn() => view('guru.dashboard'))->name('dashboard');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| SISWA PORTAL
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])
+    ->prefix('siswa')
+    ->name('siswa.')
+    ->group(function () {
+        Route::get('/dashboard', fn() => view('siswa.dashboard'))->name('dashboard');
     });
 
 require __DIR__.'/auth.php';
