@@ -10,6 +10,9 @@
     {{-- BOOTSTRAP --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
+    {{-- GOOGLE FONTS --}}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
     {{-- ICON --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -32,6 +35,14 @@
             --dark:#0f172a;
             --text:#cbd5e1;
             --border:rgba(255,255,255,.06);
+
+            /* Typography */
+            --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial;
+            --type-base: 16px;
+            --type-scale: 1.15;
+            --space-1: 8px;
+            --space-2: 16px;
+            --space-3: 24px;
         }
 
         *{
@@ -41,10 +52,23 @@
         }
 
         body{
-            font-family:'Segoe UI',sans-serif;
+            font-family:var(--font-sans);
+            font-size:clamp(14px, 1.2vw, 16px);
             background:#f1f5f9;
             overflow-x:hidden;
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
+            color:#0f172a;
         }
+
+        h1{font-size:clamp(28px, 4vw, 42px);}
+        h2{font-size:clamp(22px, 3vw, 32px);}
+        h3{font-size:clamp(18px, 2.2vw, 24px);}
+
+        /* Micro animations */
+        .anim { transition: all .45s cubic-bezier(.2,.9,.2,1); will-change: transform, opacity; }
+        .fade-up { opacity:0; transform:translateY(12px); }
+        .fade-up.in-view { opacity:1; transform:translateY(0); }
 
         /* =========================
             SIDEBAR
@@ -685,6 +709,10 @@
     {{-- TOPBAR --}}
     <div class="topbar">
 
+        <button class="btn btn-sm d-lg-none me-2" style="background:transparent;border:0;color:#0f172a" onclick="toggleSidebar()" aria-label="Toggle navigation">
+            <i class="bi bi-list" style="font-size:20px"></i>
+        </button>
+
         <div class="topbar-left">
 
             <h4>@yield('page-title','Dashboard')</h4>
@@ -789,6 +817,21 @@
         document.getElementById('sidebar').classList.toggle('show');
     }
 
+</script>
+<script>
+    // IntersectionObserver for simple reveal animations
+    document.addEventListener('DOMContentLoaded', function(){
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting){
+                    entry.target.classList.add('in-view');
+                    io.unobserve(entry.target);
+                }
+            });
+        }, {threshold: 0.12});
+
+        document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+    });
 </script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

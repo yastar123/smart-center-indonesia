@@ -124,6 +124,12 @@ Route::middleware(['auth'])
         Route::delete('/branches/{branch}', [BranchController::class, 'destroy'])
             ->name('branches.destroy');
 
+        Route::get('/branches/export/excel', [BranchController::class, 'exportExcel'])
+            ->name('branches.export.excel');
+
+        Route::get('/branches/export/pdf', [BranchController::class, 'exportPdf'])
+            ->name('branches.export.pdf');
+
         // RESET PASSWORD
         Route::post('/branches/{branch}/reset-password',
             [BranchController::class, 'resetPassword'])

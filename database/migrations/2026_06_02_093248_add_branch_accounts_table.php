@@ -8,19 +8,36 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('branches', function (Blueprint $table) {
+            if (! Schema::hasColumn('branches', 'regency')) {
+                $table->string('regency')->nullable();
+            }
 
-            $table->string('regency')->nullable();
+            if (! Schema::hasColumn('branches', 'email')) {
+                $table->string('email')->nullable();
+            }
+            if (! Schema::hasColumn('branches', 'password')) {
+                $table->string('password')->nullable();
+            }
 
-            $table->string('email')->nullable();
-            $table->string('password')->nullable();
+            if (! Schema::hasColumn('branches', 'status')) {
+                $table->enum('status', ['active', 'inactive'])->default('active');
+            }
 
-            $table->enum('status', ['active', 'inactive'])->default('active');
-
-            $table->boolean('can_students')->default(true);
-            $table->boolean('can_teachers')->default(true);
-            $table->boolean('can_schedules')->default(true);
-            $table->boolean('can_payments')->default(true);
-            $table->boolean('can_tryouts')->default(true);
+            if (! Schema::hasColumn('branches', 'can_students')) {
+                $table->boolean('can_students')->default(true);
+            }
+            if (! Schema::hasColumn('branches', 'can_teachers')) {
+                $table->boolean('can_teachers')->default(true);
+            }
+            if (! Schema::hasColumn('branches', 'can_schedules')) {
+                $table->boolean('can_schedules')->default(true);
+            }
+            if (! Schema::hasColumn('branches', 'can_payments')) {
+                $table->boolean('can_payments')->default(true);
+            }
+            if (! Schema::hasColumn('branches', 'can_tryouts')) {
+                $table->boolean('can_tryouts')->default(true);
+            }
         });
     }
 

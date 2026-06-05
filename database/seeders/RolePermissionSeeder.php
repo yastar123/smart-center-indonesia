@@ -75,11 +75,11 @@ class RolePermissionSeeder extends Seeder
         $karyawan = Role::firstOrCreate(['name' => 'karyawan']);
         $karyawan->syncPermissions(['schedule.view', 'salary.view']);
 
-        // Create Owner user
+        // Create Super Admin (Admin Pusat)
         $ownerUser = User::firstOrCreate(
-            ['email' => 'owner@akademi.com'],
+            ['email' => 'adminpusatsci@akademi.com'],
             [
-                'name'      => 'Owner Akademi',
+                'name'      => 'Admin Pusat SCI',
                 'password'  => bcrypt('password'),
                 'is_active' => true,
             ]
@@ -88,9 +88,9 @@ class RolePermissionSeeder extends Seeder
 
         // Create Admin Cabang
         $adminUser = User::firstOrCreate(
-            ['email' => 'admin@akademi.com'],
+            ['email' => 'admincabangsci@akademi.com'],
             [
-                'name'      => 'Admin Cabang Utama',
+                'name'      => 'Admin Cabang SCI',
                 'password'  => bcrypt('password'),
                 'is_active' => true,
             ]

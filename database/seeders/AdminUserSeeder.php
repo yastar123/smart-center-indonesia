@@ -15,11 +15,11 @@ class AdminUserSeeder extends Seeder
         // =========================
         $owner = User::updateOrCreate(
             [
-                'email' => 'owner@akademipro.com'
+                'email' => 'adminpusatsci@akademi.com'
             ],
             [
-                'name' => 'Owner Akademi',
-                'password' => Hash::make('password123'),
+                'name' => 'Admin Pusat SCI',
+                'password' => Hash::make('password'),
             ]
         );
 
@@ -30,11 +30,11 @@ class AdminUserSeeder extends Seeder
         // =========================
         $admin = User::updateOrCreate(
             [
-                'email' => 'admin@akademipro.com'
+                'email' => 'admincabangsci@akademi.com'
             ],
             [
-                'name' => 'Admin Cabang',
-                'password' => Hash::make('password123'),
+                'name' => 'Admin Cabang SCI',
+                'password' => Hash::make('password'),
             ]
         );
 

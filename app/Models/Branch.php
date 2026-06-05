@@ -10,6 +10,8 @@ class Branch extends Model
         'name',
         'city',
         'regency',
+        'address',
+        'phone',
         'email',
         'password',
         'status',
@@ -32,5 +34,10 @@ class Branch extends Model
     public function students()
     {
         return $this->hasMany(Student::class);
+    }
+
+    public function admin()
+    {
+        return $this->belongsTo(User::class, 'admin_id');
     }
 }

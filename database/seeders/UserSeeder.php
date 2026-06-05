@@ -10,26 +10,6 @@ class UserSeeder extends Seeder
 {
     public function run()
     {
-        // OWNER
-        $owner = User::firstOrCreate(
-            ['email' => 'ownersci@gmail.com'],
-            [
-                'name' => 'Owner SCI',
-                'password' => Hash::make('password123'),
-            ]
-        );
-        $owner->assignRole('owner');
-
-        // ADMIN CABANG
-        $admin = User::firstOrCreate(
-            ['email' => 'adminsci@gmail.com'],
-            [
-                'name' => 'Admin Cabang SCI',
-                'password' => Hash::make('password123'),
-            ]
-        );
-        $admin->assignRole('admin');
-
         // GURU
         $guru = User::firstOrCreate(
             ['email' => 'gurusci@gmail.com'],

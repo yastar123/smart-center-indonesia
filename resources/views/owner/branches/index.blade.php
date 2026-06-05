@@ -282,6 +282,12 @@
         </div>
     </div>
 
+        <div class="mb-3">
+            <a href="{{ route('owner.branches.export.excel') }}" class="btn btn-success">Export Excel</a>
+            <a href="{{ route('owner.branches.export.pdf') }}" class="btn btn-danger">Export PDF</a>
+            <button onclick="window.print()" class="btn btn-secondary">Print</button>
+        </div>
+
 </div>
 
 {{-- ADD MODAL --}}
@@ -320,11 +326,31 @@
                         class="form-control mb-3"
                         name="regency">
 
+                    <label>Alamat</label>
+                    <input type="text"
+                        class="form-control mb-3"
+                        name="address">
+
+                    <label>Telepon</label>
+                    <input type="text"
+                        class="form-control mb-3"
+                        name="phone">
+
                     <hr>
 
                     <h6 class="fw-bold">
                         Akun Login Cabang
                     </h6>
+
+                    <label>Nama Admin</label>
+                    <input type="text"
+                        class="form-control mb-3"
+                        name="admin_name">
+
+                    <label>Username (opsional)</label>
+                    <input type="text"
+                        class="form-control mb-3"
+                        name="admin_username">
 
                     <label>Email</label>
                     <input type="email"
