@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+# Install PHP dependencies if missing
+if [ ! -f "vendor/autoload.php" ]; then
+    echo "Installing Composer dependencies..."
+    composer install --no-interaction --prefer-dist 2>&1
+fi
+
 # Generate .env file from environment variables
 cat > .env << EOF
 APP_NAME="Akademi Bimbel"
@@ -57,6 +63,7 @@ php artisan storage:link 2>/dev/null || true
 # Build assets if public/build doesn't exist
 if [ ! -d "public/build" ]; then
     echo "Building frontend assets..."
+    npm install --no-audit 2>&1
     npm run build 2>&1
 fi
 
