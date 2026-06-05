@@ -148,7 +148,7 @@ $weekSchedules = ($student && $student->branch_id)
     </div>
 </div>
 
-<div class="row g-4">
+<div class="row g-4" id="pembayaran">
 
     {{-- PAYMENT HISTORY --}}
     <div class="col-lg-5 fade-up">
@@ -194,7 +194,7 @@ $weekSchedules = ($student && $student->branch_id)
     </div>
 
     {{-- WEEKLY SCHEDULE --}}
-    <div class="col-lg-7 fade-up" style="animation-delay:.05s">
+    <div class="col-lg-7 fade-up" id="jadwal" style="animation-delay:.05s">
         <div class="dashboard-card h-100">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h6 class="fw-bold mb-0" style="font-size:14px">

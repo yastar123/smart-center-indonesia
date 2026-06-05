@@ -14,11 +14,12 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
+        if ($user->isTeacher())  return redirect()->route('guru.dashboard');
+        if ($user->isStudent())  return redirect()->route('siswa.dashboard');
+
         $data = match(true) {
             $user->isOwner()    => $this->dashboardService->ownerDashboard(),
             $user->isAdmin()    => $this->dashboardService->adminDashboard($user->branch_id),
-            $user->isTeacher()  => $this->dashboardService->teacherDashboard($user->id),
-            $user->isStudent()  => $this->dashboardService->studentDashboard($user->id),
             $user->isEmployee() => $this->dashboardService->employeeDashboard($user->id),
             default             => [],
         };

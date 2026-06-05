@@ -16,7 +16,7 @@ $totalStudents  = Student::count();
 $newThisMonth   = Student::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count();
 $totalTeachers  = Teacher::count();
 $activeBranches = Branch::where('status','active')->count();
-$monthRevenue   = Payment::where('status','verified')->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('jumlah');
+$monthRevenue   = Payment::where('status','verified')->whereMonth('tanggal_pembayaran', now()->month)->whereYear('tanggal_pembayaran', now()->year)->sum('jumlah');
 $totalRevenue   = Payment::where('status','verified')->sum('jumlah');
 
 // Monthly student registrations — last 6 months
@@ -34,7 +34,7 @@ $revData   = [];
 for ($i = 5; $i >= 0; $i--) {
     $d = now()->subMonths($i);
     $revMonths[] = $d->locale('id')->isoFormat('MMM');
-    $revData[]   = (int) Payment::where('status','verified')->whereMonth('created_at', $d->month)->whereYear('created_at', $d->year)->sum('jumlah');
+    $revData[]   = (int) Payment::where('status','verified')->whereMonth('tanggal_pembayaran', $d->month)->whereYear('tanggal_pembayaran', $d->year)->sum('jumlah');
 }
 
 // Branch performance

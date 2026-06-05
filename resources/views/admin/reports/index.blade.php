@@ -26,8 +26,8 @@ for ($i = 5; $i >= 0; $i--) {
     $d = now()->subMonths($i);
     $monthlyLabels[] = $d->locale('id')->isoFormat('MMM YYYY');
     $monthlyData[]   = (int) Payment::where('status','verified')
-                            ->whereMonth('created_at', $d->month)
-                            ->whereYear('created_at',  $d->year)
+                            ->whereMonth('tanggal_pembayaran', $d->month)
+                            ->whereYear('tanggal_pembayaran',  $d->year)
                             ->sum('jumlah');
 }
 

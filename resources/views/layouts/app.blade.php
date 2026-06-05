@@ -845,8 +845,13 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('guru.dashboard') }}" class="nav-link {{ request()->routeIs('guru.dashboard') && request()->is('guru/dashboard') ? 'active' : '' }}">
+            <a href="{{ route('guru.dashboard') }}#jadwal" class="nav-link">
                 <i class="bi bi-calendar2-week"></i><span>Jadwal Mengajar</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('admin.schedules.index') }}" class="nav-link {{ request()->routeIs('admin.schedules.*') ? 'active' : '' }}">
+                <i class="bi bi-table"></i><span>Semua Jadwal</span>
             </a>
         </div>
         <div class="nav-item">
@@ -861,12 +866,6 @@
                 <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
         </div>
-        <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="bi bi-cloud-upload"></i><span>Upload Materi</span>
-                <span class="menu-badge" style="background:#6366f1">Soon</span>
-            </a>
-        </div>
         @endrole
 
         {{-- SISWA --}}
@@ -874,17 +873,17 @@
         <div class="nav-header">SISWA PANEL</div>
         <div class="nav-item">
             <a href="{{ route('siswa.dashboard') }}" class="nav-link {{ request()->routeIs('siswa.*') ? 'active' : '' }}">
-                <i class="bi bi-speedometer2"></i><span>Dashboard Siswa</span>
+                <i class="bi bi-speedometer2"></i><span>Dashboard</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.dashboard') }}" class="nav-link">
+            <a href="{{ route('siswa.dashboard') }}#jadwal" class="nav-link">
                 <i class="bi bi-calendar-event"></i><span>Jadwal Belajar</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.dashboard') }}" class="nav-link">
-                <i class="bi bi-credit-card"></i><span>Pembayaran</span>
+            <a href="{{ route('siswa.dashboard') }}#pembayaran" class="nav-link">
+                <i class="bi bi-credit-card"></i><span>Tagihan & Bayar</span>
             </a>
         </div>
         <div class="nav-item">
@@ -1020,6 +1019,26 @@
     <a href="{{ route('admin.payments.index') }}" class="mob-nav-item {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
         <i class="bi bi-cash{{ request()->routeIs('admin.payments.*') ? '-stack' : '' }}"></i>
         <span>Bayar</span>
+    </a>
+    @endrole
+    @role('guru')
+    <a href="{{ route('guru.dashboard') }}#jadwal" class="mob-nav-item">
+        <i class="bi bi-calendar2-week"></i>
+        <span>Jadwal</span>
+    </a>
+    <a href="{{ route('admin.schedules.index') }}" class="mob-nav-item {{ request()->routeIs('admin.schedules.*') ? 'active' : '' }}">
+        <i class="bi bi-table"></i>
+        <span>Semua</span>
+    </a>
+    @endrole
+    @role('siswa')
+    <a href="{{ route('siswa.dashboard') }}#jadwal" class="mob-nav-item">
+        <i class="bi bi-calendar-event"></i>
+        <span>Jadwal</span>
+    </a>
+    <a href="{{ route('siswa.dashboard') }}#pembayaran" class="mob-nav-item">
+        <i class="bi bi-credit-card"></i>
+        <span>Tagihan</span>
     </a>
     @endrole
     <a href="{{ route('profile.edit') }}" class="mob-nav-item {{ request()->routeIs('profile.*') ? 'active' : '' }}">

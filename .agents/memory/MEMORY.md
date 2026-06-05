@@ -4,3 +4,5 @@
 - [Payment/Schedule controllers](payment-schedule-controllers.md) — Invoice CRUD uses route model binding on `Invoice $payment` (matches `{payment}` param), markPaid route uses `{invoice}`. SchoolClass table is `school_classes`, field for name is `nama`.
 - [DashboardService revenue](dashboard-revenue.md) — revenue was hardcoded 0; now queries Payment::where('status','verified')->sum('jumlah'), scoped by branch_id for admin.
 - [Demo data seeding](demo-data-seeding.md) — DemoDataSeeder pitfalls: teachers.user_id was missing, admin.branch_id was NULL, Branch fillable excludes user_id/admin_id.
+- [Revenue date field](revenue-date-field.md) — Payment monthly revenue must filter on `tanggal_pembayaran` not `created_at`; seeded payments have tanggal_pembayaran set to historical dates, not created_at.
+- [Dashboard redirects](dashboard-redirects.md) — guru/siswa must be redirected from DashboardController before the match expression; they have dedicated portals at guru.dashboard and siswa.dashboard routes.

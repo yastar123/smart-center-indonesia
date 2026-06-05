@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Sertifikat')
+@section('page-title', 'Sertifikat')
 
 @section('content')
 <div class="fade-up">
