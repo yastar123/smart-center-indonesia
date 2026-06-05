@@ -34,7 +34,7 @@
 
         <div class="dashboard-card text-center fade-up">
             <div class="position-relative d-inline-block mb-3">
-                <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=2563eb&color=fff&size=160"
+                <img src="{{ $user->avatar ? asset('storage/'.$user->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=2563eb&color=fff&size=160' }}"
                      class="rounded-circle"
                      width="100" height="100"
                      style="object-fit:cover;border:4px solid #3b82f6;box-shadow:0 8px 24px rgba(59,130,246,.3)"
@@ -354,15 +354,37 @@ if (newPwd) {
     });
 }
 
-// Avatar preview (UI only — no upload backend connected yet)
+// Avatar upload with live preview
 document.getElementById('avatarFile').addEventListener('change', function() {
-    if (this.files[0]) {
-        const reader = new FileReader();
-        reader.onload = e => {
-            document.getElementById('avatarPreview').src = e.target.result;
-        };
-        reader.readAsDataURL(this.files[0]);
-    }
+    if (!this.files[0]) return;
+    const file = this.files[0];
+
+    // Local preview immediately
+    const reader = new FileReader();
+    reader.onload = e => {
+        document.getElementById('avatarPreview').src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    // Upload to server
+    const fd = new FormData();
+    fd.append('avatar', file);
+    fd.append('_token', document.querySelector('meta[name=csrf-token]').content);
+
+    fetch('{{ route("profile.avatar") }}', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success) {
+                // Update sidebar avatar too
+                const sidebarAvatar = document.getElementById('sidebarAvatar');
+                if (sidebarAvatar) sidebarAvatar.src = res.avatar_url;
+                // Show success toast
+                Swal.fire({ icon:'success', title:'Foto Diperbarui!', text:res.message, timer:2000, showConfirmButton:false, iconColor:'#10b981' });
+            }
+        })
+        .catch(() => {
+            Swal.fire({ icon:'error', title:'Gagal', text:'Tidak dapat mengunggah foto. Coba lagi.' });
+        });
 });
 
 // Auto-dismiss profile alert

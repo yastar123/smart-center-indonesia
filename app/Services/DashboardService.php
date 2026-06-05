@@ -19,7 +19,8 @@ class DashboardService
             'active_teachers' => Teacher::where('status', 'aktif')->count(),
             'total_branches'  => Branch::count(),
             'active_branches' => Branch::where('status', 'active')->count(),
-            'total_revenue'   => 0,
+            'total_revenue'   => Payment::where('status', 'verified')->sum('jumlah'),
+            'pending_invoices' => Invoice::where('status', 'belum_bayar')->count(),
         ];
     }
 
@@ -32,7 +33,12 @@ class DashboardService
             'active_teachers' => Teacher::where('status', 'aktif')->when($branchId, fn($q) => $q->where('branch_id', $branchId))->count(),
             'total_branches'  => Branch::count(),
             'active_branches' => Branch::where('status', 'active')->count(),
-            'total_revenue'   => 0,
+            'total_revenue'   => Payment::where('status', 'verified')
+                                    ->when($branchId, fn($q) => $q->where('cabang_id', $branchId))
+                                    ->sum('jumlah'),
+            'pending_invoices' => Invoice::where('status', 'belum_bayar')
+                                    ->when($branchId, fn($q) => $q->where('cabang_id', $branchId))
+                                    ->count(),
         ];
     }
 

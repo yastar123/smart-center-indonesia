@@ -34,6 +34,13 @@
 
     // Recent students
     $recentStudents = \App\Models\Student::with('branch')->latest()->limit(5)->get();
+
+    // Revenue (current month, verified payments)
+    $revenueThisMonth = \App\Models\Payment::where('status', 'verified')
+        ->whereYear('tanggal_pembayaran', now()->year)
+        ->whereMonth('tanggal_pembayaran', now()->month)
+        ->sum('jumlah');
+    $revenueTotal = \App\Models\Payment::where('status', 'verified')->sum('jumlah');
 @endphp
 
 {{-- WELCOME BANNER --}}
@@ -122,16 +129,19 @@
     </div>
 
     <div class="col-6 col-xl-3 fade-up" style="animation-delay:.15s">
-        <div class="stat-card" style="border-top:3px solid #ef4444">
+        <div class="stat-card" style="border-top:3px solid #10b981">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <div class="stat-title">Pendapatan</div>
-                    <div class="stat-value text-danger" style="font-size:22px">Rp 0</div>
+                    <div class="stat-title">Pendapatan Bulan Ini</div>
+                    <div class="stat-value text-success" style="font-size:{{ strlen('Rp '.number_format($revenueThisMonth,0,',','.')) > 14 ? '16px' : '20px' }}">
+                        Rp {{ number_format($revenueThisMonth, 0, ',', '.') }}
+                    </div>
                     <div class="stat-growth text-muted">
-                        <i class="bi bi-calendar-month"></i> Bulan ini
+                        <i class="bi bi-calendar-month"></i>
+                        Total: Rp {{ number_format($revenueTotal/1000000, 1, ',', '.') }}Jt
                     </div>
                 </div>
-                <div class="stat-icon bg-danger-soft" style="color:white">
+                <div class="stat-icon" style="background:#f0fdf4;color:#16a34a">
                     <i class="bi bi-cash-coin"></i>
                 </div>
             </div>

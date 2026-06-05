@@ -79,7 +79,7 @@ public function store(Request $request)
             'name'         => 'required|string|max:100',
             'nis'          => 'required|string|unique:students,nis,' . $student->id,
             'gender'       => 'required|in:L,P',
-            'birth_date'   => 'required|date',
+            'birth_date'   => 'nullable|date',
             'phone'        => 'nullable|string|max:20',
             'address'      => 'nullable|string',
             'parent_name'  => 'nullable|string|max:100',

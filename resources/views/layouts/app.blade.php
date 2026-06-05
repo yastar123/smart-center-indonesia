@@ -614,8 +614,8 @@
     </a>
 
     <div class="sidebar-user">
-        <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=2563eb&color=fff&size=80"
-             class="sidebar-avatar" alt="Avatar">
+        <img src="{{ auth()->user()->avatar ? asset('storage/'.auth()->user()->avatar) : 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&background=2563eb&color=fff&size=80' }}"
+             class="sidebar-avatar" alt="Avatar" id="sidebarAvatar">
         <div>
             <div class="user-name">{{ auth()->user()->name }}</div>
             <div class="user-role">{{ ucfirst(auth()->user()->getRoleNames()->first() ?? 'User') }}</div>
@@ -643,23 +643,21 @@
             </a>
         </div>
         <div class="nav-item">
+            <a href="{{ route('owner.activity-log') }}" class="nav-link {{ request()->routeIs('owner.activity-log') ? 'active' : '' }}">
+                <i class="bi bi-journal-text"></i>
+                <span>Log Aktivitas</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('owner.settings.index') }}" class="nav-link {{ request()->routeIs('owner.settings.*') ? 'active' : '' }}">
+                <i class="bi bi-gear"></i>
+                <span>Pengaturan</span>
+            </a>
+        </div>
+        <div class="nav-item">
             <a href="#" class="nav-link">
                 <i class="bi bi-graph-up-arrow"></i>
                 <span>Analytics</span>
-                <span class="menu-badge" style="background:#6366f1">Soon</span>
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="bi bi-cash-stack"></i>
-                <span>Lap. Keuangan</span>
-                <span class="menu-badge" style="background:#6366f1">Soon</span>
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="bi bi-people-fill"></i>
-                <span>Manajemen User</span>
                 <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
         </div>

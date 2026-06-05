@@ -1,142 +1,612 @@
 @extends('layouts.app')
-@section('title', 'Pembayaran')
+@section('title', 'Manajemen Pembayaran')
 @section('page-title', 'Pembayaran')
 
 @section('content')
 
 {{-- HEADER BANNER --}}
-<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#0f172a,#064e3b,#059669);color:white;border:none">
+<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#064e3b,#065f46,#059669);color:white;border:none">
     <div class="row align-items-center g-3">
         <div class="col-md-8">
-            <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="d-flex align-items-center gap-3 mb-2">
                 <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px">
                     <i class="bi bi-wallet2"></i>
                 </div>
                 <div>
-                    <h5 class="fw-bold mb-1" style="color:white">Manajemen Keuangan & Pembayaran</h5>
-                    <span style="background:rgba(255,255,255,.15);color:rgba(255,255,255,.9);padding:3px 12px;border-radius:20px;font-size:11px;font-weight:600">
-                        🚧 Segera Hadir
-                    </span>
+                    <h5 class="fw-bold mb-0" style="color:white">Manajemen Keuangan & Pembayaran</h5>
+                    <span style="font-size:12px;opacity:.8">Kelola invoice dan pembayaran siswa</span>
                 </div>
             </div>
-            <p style="opacity:.75;font-size:14px;line-height:1.7;margin:0">
-                Sistem keuangan terintegrasi untuk manajemen tagihan, pembayaran SPP, laporan keuangan cabang, dan rekonsiliasi otomatis sedang dalam pengembangan.
-            </p>
         </div>
-        <div class="col-md-4 text-center d-none d-md-block">
-            <i class="bi bi-cash-stack" style="font-size:80px;opacity:.15"></i>
+        <div class="col-md-4 text-md-end">
+            <button onclick="openModal()" class="btn fw-semibold px-4"
+                style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
+                <i class="bi bi-plus-lg me-2"></i>Buat Invoice
+            </button>
         </div>
     </div>
 </div>
 
-{{-- PREVIEW STATS --}}
+{{-- STATS --}}
 <div class="row g-3 mb-4">
     <div class="col-6 col-lg-3 fade-up">
-        <div class="stat-card" style="border:2px dashed var(--card-border)">
+        <div class="stat-card">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Total Tagihan</div>
-                    <div class="stat-value text-success">Rp –</div>
-                    <div class="stat-growth text-muted"><i class="bi bi-hourglass me-1"></i>Bulan ini</div>
+                    <div class="stat-value text-success">Rp {{ number_format($stats['total_tagihan'],0,',','.') }}</div>
+                    <div class="stat-growth text-muted"><i class="bi bi-receipt me-1"></i>Semua invoice</div>
                 </div>
-                <div class="stat-icon bg-success-soft" style="color:white;opacity:.5">
-                    <i class="bi bi-receipt"></i>
-                </div>
+                <div class="stat-icon" style="background:#f0fdf4;color:#16a34a"><i class="bi bi-receipt-cutoff"></i></div>
             </div>
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.05s">
-        <div class="stat-card" style="border:2px dashed var(--card-border)">
+        <div class="stat-card">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Sudah Lunas</div>
-                    <div class="stat-value text-primary">– Siswa</div>
-                    <div class="stat-growth text-muted"><i class="bi bi-check me-1"></i>Terbayar</div>
+                    <div class="stat-value text-primary">{{ $stats['lunas'] }} Invoice</div>
+                    <div class="stat-growth text-success"><i class="bi bi-check-circle me-1"></i>Terbayar</div>
                 </div>
-                <div class="stat-icon bg-primary-soft" style="color:white;opacity:.5">
-                    <i class="bi bi-check-circle"></i>
-                </div>
+                <div class="stat-icon" style="background:#eff6ff;color:#2563eb"><i class="bi bi-check-circle-fill"></i></div>
             </div>
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.10s">
-        <div class="stat-card" style="border:2px dashed var(--card-border)">
+        <div class="stat-card">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Belum Bayar</div>
-                    <div class="stat-value text-warning">– Siswa</div>
-                    <div class="stat-growth text-warning"><i class="bi bi-exclamation me-1"></i>Menunggak</div>
+                    <div class="stat-value text-warning">{{ $stats['belum_bayar'] }} Invoice</div>
+                    <div class="stat-growth text-warning"><i class="bi bi-exclamation-circle me-1"></i>Menunggak</div>
                 </div>
-                <div class="stat-icon bg-warning-soft" style="color:white;opacity:.5">
-                    <i class="bi bi-clock"></i>
-                </div>
+                <div class="stat-icon" style="background:#fffbeb;color:#d97706"><i class="bi bi-clock-fill"></i></div>
             </div>
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.15s">
-        <div class="stat-card" style="border:2px dashed var(--card-border)">
+        <div class="stat-card">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <div class="stat-title">Pendapatan</div>
-                    <div class="stat-value text-danger">Rp –</div>
-                    <div class="stat-growth text-muted"><i class="bi bi-graph-up me-1"></i>Bulan ini</div>
+                    <div class="stat-title">Total Pendapatan</div>
+                    <div class="stat-value text-success">Rp {{ number_format($stats['pendapatan'],0,',','.') }}</div>
+                    <div class="stat-growth text-success"><i class="bi bi-graph-up me-1"></i>Terverifikasi</div>
                 </div>
-                <div class="stat-icon bg-danger-soft" style="color:white;opacity:.5">
-                    <i class="bi bi-cash-coin"></i>
-                </div>
+                <div class="stat-icon" style="background:#f0fdf4;color:#16a34a"><i class="bi bi-cash-coin"></i></div>
             </div>
         </div>
     </div>
 </div>
 
-{{-- FEATURE PREVIEW --}}
-<div class="row g-3 mb-4">
-    @php
-    $features = [
-        ['icon'=>'bi-receipt-cutoff','color'=>'#10b981','bg'=>'#f0fdf4','title'=>'Tagihan Otomatis','desc'=>'Generate tagihan SPP bulanan otomatis per siswa aktif dengan sistem cicilan fleksibel'],
-        ['icon'=>'bi-credit-card-2-front','color'=>'#3b82f6','bg'=>'#eff6ff','title'=>'Multi Payment Gateway','desc'=>'Terima pembayaran via transfer bank, QRIS, Virtual Account, dan dompet digital'],
-        ['icon'=>'bi-file-earmark-spreadsheet','color'=>'#f59e0b','bg'=>'#fffbeb','title'=>'Laporan Keuangan','desc'=>'Rekap otomatis pendapatan, piutang, dan arus kas per cabang dalam format Excel/PDF'],
-        ['icon'=>'bi-bell-fill','color'=>'#ef4444','bg'=>'#fef2f2','title'=>'Reminder Tunggakan','desc'=>'Kirim notifikasi WA/email otomatis ke siswa yang belum melunasi pembayaran'],
-    ];
-    @endphp
-    @foreach($features as $f)
-    <div class="col-md-6 fade-up">
-        <div class="dashboard-card d-flex align-items-start gap-3" style="border-left:4px solid {{ $f['color'] }}">
-            <div style="width:44px;height:44px;border-radius:12px;background:{{ $f['bg'] }};display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                <i class="bi {{ $f['icon'] }}" style="font-size:20px;color:{{ $f['color'] }}"></i>
+{{-- FILTER BAR --}}
+<div class="dashboard-card mb-4 fade-up">
+    <form id="filterForm" method="GET" action="{{ route('admin.payments.index') }}">
+        <div class="row g-2 align-items-end">
+            <div class="col-12 col-md-4">
+                <label class="form-label fw-semibold" style="font-size:12px">Cari Invoice / Siswa</label>
+                <div class="input-group">
+                    <span class="input-group-text" style="border-radius:10px 0 0 10px;background:var(--input-bg);border-color:var(--card-border)">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Nomor invoice atau nama siswa..."
+                        class="form-control" style="border-radius:0 10px 10px 0;border-color:var(--card-border);background:var(--input-bg)"
+                        onchange="document.getElementById('filterForm').submit()">
+                </div>
             </div>
-            <div>
-                <div class="fw-bold mb-1" style="font-size:14px">{{ $f['title'] }}</div>
-                <div class="text-muted" style="font-size:12.5px;line-height:1.6">{{ $f['desc'] }}</div>
+            <div class="col-6 col-md-3">
+                <label class="form-label fw-semibold" style="font-size:12px">Status</label>
+                <select name="status" class="form-select" style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)"
+                    onchange="document.getElementById('filterForm').submit()">
+                    <option value="">Semua Status</option>
+                    <option value="belum_bayar" {{ request('status')=='belum_bayar'?'selected':'' }}>Belum Bayar</option>
+                    <option value="sebagian"    {{ request('status')=='sebagian'?'selected':'' }}>Sebagian</option>
+                    <option value="lunas"       {{ request('status')=='lunas'?'selected':'' }}>Lunas</option>
+                </select>
+            </div>
+            <div class="col-6 col-md-3">
+                <label class="form-label fw-semibold" style="font-size:12px">Cabang</label>
+                <select name="branch_id" class="form-select" style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)"
+                    onchange="document.getElementById('filterForm').submit()">
+                    <option value="">Semua Cabang</option>
+                    @foreach($branches as $b)
+                    <option value="{{ $b->id }}" {{ request('branch_id')==$b->id?'selected':'' }}>{{ $b->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-12 col-md-2">
+                @if(request()->hasAny(['search','status','branch_id']))
+                <a href="{{ route('admin.payments.index') }}" class="btn btn-outline-secondary w-100" style="border-radius:10px">
+                    <i class="bi bi-x-lg me-1"></i>Reset
+                </a>
+                @else
+                <button type="button" onclick="openModal()" class="btn btn-success w-100 fw-semibold" style="border-radius:10px">
+                    <i class="bi bi-plus-lg me-1"></i>Buat Invoice
+                </button>
+                @endif
             </div>
         </div>
-    </div>
-    @endforeach
+    </form>
 </div>
 
-{{-- PROGRESS --}}
+{{-- TABLE --}}
 <div class="dashboard-card fade-up">
-    <h6 class="fw-bold mb-4"><i class="bi bi-kanban text-success me-2"></i>Status Pengembangan</h6>
-    <div class="row g-3">
-        @php $tasks = [
-            ['label'=>'Desain UI/UX','pct'=>90,'color'=>'#10b981'],
-            ['label'=>'Model & Migrasi Database','pct'=>100,'color'=>'#3b82f6'],
-            ['label'=>'API Pembayaran','pct'=>30,'color'=>'#f59e0b'],
-            ['label'=>'Integrasi Payment Gateway','pct'=>5,'color'=>'#8b5cf6'],
-            ['label'=>'Laporan & Rekonsiliasi','pct'=>0,'color'=>'#94a3b8'],
-        ]; @endphp
-        @foreach($tasks as $t)
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-1">
-                <span style="font-size:13px;font-weight:500">{{ $t['label'] }}</span>
-                <span style="font-size:12px;font-weight:700;color:{{ $t['color'] }}">{{ $t['pct'] }}%</span>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="fw-bold mb-0"><i class="bi bi-list-ul text-success me-2"></i>Daftar Invoice
+            <span class="badge ms-2" style="background:#f0fdf4;color:#16a34a;font-size:11px">{{ $invoices->total() }} data</span>
+        </h6>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle mb-0" style="font-size:13px">
+            <thead>
+                <tr style="background:var(--sidebar-hover);border-bottom:2px solid var(--card-border)">
+                    <th class="ps-3" style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">No. Invoice</th>
+                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Siswa</th>
+                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Cabang</th>
+                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Periode</th>
+                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Total</th>
+                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Jatuh Tempo</th>
+                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Status</th>
+                    <th class="text-center" style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($invoices as $inv)
+                @php
+                    $statusMap = [
+                        'lunas'       => ['bg'=>'#f0fdf4','color'=>'#16a34a','label'=>'Lunas'],
+                        'sebagian'    => ['bg'=>'#fffbeb','color'=>'#d97706','label'=>'Sebagian'],
+                        'belum_bayar' => ['bg'=>'#fef2f2','color'=>'#dc2626','label'=>'Belum Bayar'],
+                    ];
+                    $st = $statusMap[$inv->status] ?? ['bg'=>'#f1f5f9','color'=>'#64748b','label'=>$inv->status];
+                @endphp
+                <tr style="border-bottom:1px solid var(--card-border);transition:background .15s" onmouseover="this.style.background='var(--sidebar-hover)'" onmouseout="this.style.background=''">
+                    <td class="ps-3">
+                        <code style="background:#f0fdf4;color:#065f46;padding:3px 8px;border-radius:6px;font-size:11px">{{ $inv->nomor_invoice }}</code>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="width:32px;height:32px;border-radius:50%;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#2563eb;flex-shrink:0">
+                                {{ strtoupper(substr($inv->siswa?->name ?? 'S', 0, 1)) }}
+                            </div>
+                            <div>
+                                <div class="fw-semibold" style="font-size:13px">{{ $inv->siswa?->name ?? '–' }}</div>
+                                <div style="font-size:11px;color:#6b7280">{{ $inv->siswa?->nis ?? '' }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="color:#6b7280">{{ $inv->cabang?->name ?? '–' }}</td>
+                    <td style="color:#6b7280">{{ $inv->periode ?? '–' }}</td>
+                    <td class="fw-bold" style="color:#059669">Rp {{ number_format($inv->total,0,',','.') }}</td>
+                    <td style="color:#6b7280">
+                        @if($inv->jatuh_tempo)
+                            {{ $inv->jatuh_tempo->format('d M Y') }}
+                            @if($inv->jatuh_tempo->isPast() && $inv->status !== 'lunas')
+                                <span class="ms-1" style="font-size:10px;color:#dc2626">● Terlambat</span>
+                            @endif
+                        @else
+                            –
+                        @endif
+                    </td>
+                    <td>
+                        <span style="background:{{ $st['bg'] }};color:{{ $st['color'] }};padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600">
+                            {{ $st['label'] }}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-1">
+                            <button onclick="showDetail({{ $inv->id }})" class="btn btn-sm" title="Detail"
+                                style="background:#eff6ff;color:#2563eb;border:none;border-radius:8px;width:32px;height:32px;padding:0">
+                                <i class="bi bi-eye-fill" style="font-size:13px"></i>
+                            </button>
+                            @if($inv->status !== 'lunas')
+                            <button onclick="openPayModal({{ $inv->id }}, '{{ addslashes($inv->siswa?->name ?? '') }}', {{ $inv->total }})" class="btn btn-sm" title="Bayar"
+                                style="background:#f0fdf4;color:#16a34a;border:none;border-radius:8px;width:32px;height:32px;padding:0">
+                                <i class="bi bi-cash-stack" style="font-size:13px"></i>
+                            </button>
+                            @endif
+                            <button onclick="editInvoice({{ $inv->id }})" class="btn btn-sm" title="Edit"
+                                style="background:#fffbeb;color:#d97706;border:none;border-radius:8px;width:32px;height:32px;padding:0">
+                                <i class="bi bi-pencil-fill" style="font-size:13px"></i>
+                            </button>
+                            <button onclick="deleteInvoice({{ $inv->id }}, '{{ addslashes($inv->nomor_invoice) }}')" class="btn btn-sm" title="Hapus"
+                                style="background:#fef2f2;color:#dc2626;border:none;border-radius:8px;width:32px;height:32px;padding:0">
+                                <i class="bi bi-trash-fill" style="font-size:13px"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="8" class="text-center py-5">
+                        <div style="color:#9ca3af">
+                            <i class="bi bi-receipt" style="font-size:40px;display:block;margin-bottom:12px;opacity:.4"></i>
+                            <div class="fw-semibold mb-1">Belum ada invoice</div>
+                            <div style="font-size:12px">Klik "Buat Invoice" untuk membuat invoice pertama</div>
+                        </div>
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+    @if($invoices->hasPages())
+    <div class="mt-4 d-flex justify-content-center">
+        {{ $invoices->links() }}
+    </div>
+    @endif
+</div>
+
+{{-- MODAL ADD/EDIT --}}
+<div class="modal fade" id="invoiceModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:18px;overflow:hidden">
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#065f46,#059669);color:#fff">
+                <h6 class="modal-title fw-bold" id="modalTitle"><i class="bi bi-receipt-cutoff me-2"></i>Buat Invoice Baru</h6>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div style="height:8px;background:var(--card-border);border-radius:10px;overflow:hidden">
-                <div style="width:{{ $t['pct'] }}%;height:100%;background:{{ $t['color'] }};border-radius:10px"></div>
+            <div class="modal-body p-4" style="background:var(--input-bg)">
+                <input type="hidden" id="invoiceId">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:12px">Siswa <span class="text-danger">*</span></label>
+                        <select id="siswa_id" class="form-select" style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
+                            <option value="">— Pilih Siswa —</option>
+                            @foreach($students as $s)
+                            <option value="{{ $s->id }}" data-branch="{{ $s->branch_id }}">{{ $s->name }} ({{ $s->nis }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:12px">Cabang <span class="text-danger">*</span></label>
+                        <select id="cabang_id" class="form-select" style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
+                            <option value="">— Pilih Cabang —</option>
+                            @foreach($branches as $b)
+                            <option value="{{ $b->id }}">{{ $b->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:12px">Subtotal (Rp) <span class="text-danger">*</span></label>
+                        <input type="number" id="subtotal" class="form-control" placeholder="0" min="0"
+                            style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)"
+                            oninput="calcTotal()">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold" style="font-size:12px">Diskon (Rp)</label>
+                        <input type="number" id="diskon" class="form-control" placeholder="0" min="0"
+                            style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)"
+                            oninput="calcTotal()">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold" style="font-size:12px">Pajak (Rp)</label>
+                        <input type="number" id="pajak" class="form-control" placeholder="0" min="0"
+                            style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)"
+                            oninput="calcTotal()">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:12px">Total (Rp) <span class="text-danger">*</span></label>
+                        <input type="number" id="inv_total" class="form-control fw-bold" placeholder="0" min="0" readonly
+                            style="border-radius:10px;border-color:#059669;background:#f0fdf4;color:#065f46;font-weight:700">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:12px">Periode (contoh: Juli 2025)</label>
+                        <input type="text" id="periode" class="form-control" placeholder="cth: Juli 2025"
+                            style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:12px">Jatuh Tempo</label>
+                        <input type="date" id="jatuh_tempo" class="form-control"
+                            style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
+                    </div>
+                    <div class="col-12" id="statusField" style="display:none">
+                        <label class="form-label fw-semibold" style="font-size:12px">Status</label>
+                        <select id="inv_status" class="form-select" style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
+                            <option value="belum_bayar">Belum Bayar</option>
+                            <option value="sebagian">Sebagian</option>
+                            <option value="lunas">Lunas</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold" style="font-size:12px">Deskripsi</label>
+                        <input type="text" id="deskripsi" class="form-control" placeholder="cth: SPP Bulan Juli 2025"
+                            style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold" style="font-size:12px">Catatan</label>
+                        <textarea id="catatan" class="form-control" rows="2" placeholder="Catatan tambahan..."
+                            style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4" style="background:var(--input-bg)">
+                <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal" style="border-radius:10px">
+                    <i class="bi bi-x me-1"></i>Batal
+                </button>
+                <button type="button" class="btn btn-success px-5 fw-semibold" id="saveBtn" onclick="saveInvoice()" style="border-radius:10px">
+                    <i class="bi bi-check-lg me-1"></i>Simpan
+                </button>
             </div>
         </div>
-        @endforeach
+    </div>
+</div>
+
+{{-- MODAL DETAIL --}}
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:18px;overflow:hidden">
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff">
+                <h6 class="modal-title fw-bold"><i class="bi bi-file-earmark-text me-2"></i>Detail Invoice</h6>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0" id="detailBody">
+                <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- MODAL BAYAR --}}
+<div class="modal fade" id="payModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:18px;overflow:hidden">
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#14532d,#16a34a);color:#fff">
+                <h6 class="modal-title fw-bold" id="payModalTitle"><i class="bi bi-cash-stack me-2"></i>Catat Pembayaran</h6>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4" style="background:var(--input-bg)">
+                <input type="hidden" id="payInvoiceId">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="p-3 rounded-3 mb-2" style="background:#f0fdf4;border:1px solid #bbf7d0">
+                            <div class="fw-semibold" style="font-size:12px;color:#065f46" id="payStudentName"></div>
+                            <div style="font-size:20px;font-weight:700;color:#059669" id="payTotalLabel"></div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold" style="font-size:12px">Jumlah Bayar (Rp) <span class="text-danger">*</span></label>
+                        <input type="number" id="pay_jumlah" class="form-control" placeholder="0" min="1"
+                            style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:12px">Metode <span class="text-danger">*</span></label>
+                        <select id="pay_metode" class="form-select" style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
+                            <option value="cash">💵 Cash</option>
+                            <option value="transfer">🏦 Transfer Bank</option>
+                            <option value="qris">📱 QRIS</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:12px">Tanggal Bayar <span class="text-danger">*</span></label>
+                        <input type="date" id="pay_tanggal" class="form-control"
+                            style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold" style="font-size:12px">Catatan</label>
+                        <input type="text" id="pay_catatan" class="form-control" placeholder="Catatan opsional..."
+                            style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4" style="background:var(--input-bg)">
+                <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal" style="border-radius:10px">Batal</button>
+                <button type="button" class="btn btn-success px-5 fw-semibold" id="payBtn" onclick="submitPayment()" style="border-radius:10px">
+                    <i class="bi bi-check-lg me-1"></i>Konfirmasi Bayar
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+function calcTotal() {
+    const sub  = parseFloat(document.getElementById('subtotal').value) || 0;
+    const disc = parseFloat(document.getElementById('diskon').value)   || 0;
+    const tax  = parseFloat(document.getElementById('pajak').value)    || 0;
+    document.getElementById('inv_total').value = Math.max(0, sub - disc + tax);
+}
+
+function openModal() {
+    document.getElementById('invoiceId').value = '';
+    document.getElementById('modalTitle').innerHTML = '<i class="bi bi-receipt-cutoff me-2"></i>Buat Invoice Baru';
+    document.getElementById('siswa_id').value   = '';
+    document.getElementById('cabang_id').value  = '';
+    document.getElementById('subtotal').value   = '';
+    document.getElementById('diskon').value     = '';
+    document.getElementById('pajak').value      = '';
+    document.getElementById('inv_total').value  = '';
+    document.getElementById('periode').value    = '';
+    document.getElementById('jatuh_tempo').value= '';
+    document.getElementById('deskripsi').value  = '';
+    document.getElementById('catatan').value    = '';
+    document.getElementById('statusField').style.display = 'none';
+    document.getElementById('siswa_id').disabled = false;
+    document.getElementById('cabang_id').disabled = false;
+    new bootstrap.Modal('#invoiceModal').show();
+}
+
+function editInvoice(id) {
+    $.get('/admin/payments/' + id, function(res) {
+        const inv = res.data;
+        document.getElementById('modalTitle').innerHTML = '<i class="bi bi-pencil me-2"></i>Edit Invoice';
+        document.getElementById('invoiceId').value     = inv.id;
+        document.getElementById('siswa_id').value      = inv.siswa_id;
+        document.getElementById('cabang_id').value     = inv.cabang_id;
+        document.getElementById('subtotal').value      = inv.subtotal;
+        document.getElementById('diskon').value        = inv.diskon  || 0;
+        document.getElementById('pajak').value         = inv.pajak   || 0;
+        document.getElementById('inv_total').value     = inv.total;
+        document.getElementById('periode').value       = inv.periode  || '';
+        document.getElementById('jatuh_tempo').value   = inv.jatuh_tempo ? inv.jatuh_tempo.substr(0,10) : '';
+        document.getElementById('deskripsi').value     = inv.deskripsi || '';
+        document.getElementById('catatan').value       = inv.catatan  || '';
+        document.getElementById('inv_status').value    = inv.status;
+        document.getElementById('statusField').style.display = 'block';
+        document.getElementById('siswa_id').disabled = true;
+        document.getElementById('cabang_id').disabled = true;
+        new bootstrap.Modal('#invoiceModal').show();
+    }).fail(() => Swal.fire({icon:'error', title:'Gagal', text:'Tidak dapat memuat data.'}));
+}
+
+function saveInvoice() {
+    const id  = document.getElementById('invoiceId').value;
+    const url = id ? '/admin/payments/' + id : '{{ route("admin.payments.store") }}';
+
+    const payload = {
+        _token:       document.querySelector('meta[name=csrf-token]').content,
+        siswa_id:     document.getElementById('siswa_id').value,
+        cabang_id:    document.getElementById('cabang_id').value,
+        subtotal:     document.getElementById('subtotal').value,
+        diskon:       document.getElementById('diskon').value   || 0,
+        pajak:        document.getElementById('pajak').value    || 0,
+        total:        document.getElementById('inv_total').value,
+        periode:      document.getElementById('periode').value,
+        jatuh_tempo:  document.getElementById('jatuh_tempo').value,
+        deskripsi:    document.getElementById('deskripsi').value,
+        catatan:      document.getElementById('catatan').value,
+    };
+    if (id) { payload._method = 'PUT'; payload.status = document.getElementById('inv_status').value; }
+
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';
+
+    $.ajax({
+        url, method: 'POST', data: payload,
+        success(res) {
+            if (res.success) {
+                bootstrap.Modal.getInstance(document.getElementById('invoiceModal'))?.hide();
+                Swal.fire({icon:'success', title:'Berhasil!', text:res.message, timer:2000, showConfirmButton:false})
+                    .then(() => location.reload());
+            }
+        },
+        error(xhr) {
+            const errors = xhr.responseJSON?.errors;
+            const msg = errors
+                ? '<ul class="text-start mb-0">' + Object.values(errors).flat().map(e=>`<li>${e}</li>`).join('') + '</ul>'
+                : (xhr.responseJSON?.message ?? 'Terjadi kesalahan.');
+            Swal.fire({icon:'error', title:'Gagal Menyimpan', html:msg});
+        },
+        complete() { btn.disabled=false; btn.innerHTML='<i class="bi bi-check-lg me-1"></i>Simpan'; }
+    });
+}
+
+function showDetail(id) {
+    document.getElementById('detailBody').innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
+    new bootstrap.Modal('#detailModal').show();
+    $.get('/admin/payments/' + id, function(res) {
+        const inv = res.data;
+        const statusMap = {lunas:'#f0fdf4:#16a34a:Lunas', sebagian:'#fffbeb:#d97706:Sebagian', belum_bayar:'#fef2f2:#dc2626:Belum Bayar'};
+        const [sbg,scol,slbl] = (statusMap[inv.status]||'#f1f5f9:#64748b:'+inv.status).split(':');
+
+        let paymentsHtml = '';
+        if (inv.pembayaran && inv.pembayaran.length > 0) {
+            paymentsHtml = `<div style="padding:0 20px 16px"><div class="fw-semibold mb-2" style="font-size:12px;color:#6b7280">Riwayat Pembayaran</div>`;
+            inv.pembayaran.forEach(p => {
+                paymentsHtml += `<div class="d-flex justify-content-between align-items-center p-2 mb-1 rounded-2" style="background:#f8fafc;font-size:12px">
+                    <div><span class="fw-semibold">${p.nomor_pembayaran}</span> · ${p.metode}</div>
+                    <div class="fw-bold text-success">Rp ${Number(p.jumlah).toLocaleString('id-ID')}</div>
+                </div>`;
+            });
+            paymentsHtml += `</div>`;
+        }
+
+        document.getElementById('detailBody').innerHTML = `
+            <div style="padding:20px 20px 12px">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <div class="fw-bold" style="font-size:15px">${inv.siswa?.name ?? '–'}</div>
+                        <div style="font-size:12px;color:#6b7280">${inv.nomor_invoice}</div>
+                    </div>
+                    <span style="background:${sbg};color:${scol};padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600">${slbl}</span>
+                </div>
+                <table style="width:100%;border-collapse:collapse;font-size:13px">
+                    ${drow('Cabang', inv.cabang?.name ?? '–')}
+                    ${drow('Deskripsi', inv.deskripsi ?? '–')}
+                    ${drow('Periode', inv.periode ?? '–')}
+                    ${drow('Subtotal', 'Rp ' + Number(inv.subtotal).toLocaleString('id-ID'))}
+                    ${drow('Diskon', 'Rp ' + Number(inv.diskon||0).toLocaleString('id-ID'))}
+                    ${drow('Pajak', 'Rp ' + Number(inv.pajak||0).toLocaleString('id-ID'))}
+                    ${drow('Total', '<span style="font-weight:700;color:#059669">Rp ' + Number(inv.total).toLocaleString('id-ID') + '</span>')}
+                    ${drow('Jatuh Tempo', inv.jatuh_tempo ? inv.jatuh_tempo.substr(0,10) : '–')}
+                    ${drow('Catatan', inv.catatan ?? '–')}
+                </table>
+            </div>
+            ${paymentsHtml}
+        `;
+    }).fail(() => { document.getElementById('detailBody').innerHTML = '<div class="text-center py-5 text-muted">Gagal memuat data</div>'; });
+}
+
+function drow(label, val) {
+    return `<tr style="border-bottom:1px solid #f1f5f9">
+        <td style="padding:7px 4px 7px 0;color:#6b7280;font-size:12px;width:36%">${label}</td>
+        <td style="padding:7px 0;font-size:13px;font-weight:500">${val}</td>
+    </tr>`;
+}
+
+function openPayModal(id, name, total) {
+    document.getElementById('payInvoiceId').value = id;
+    document.getElementById('payStudentName').textContent = name;
+    document.getElementById('payTotalLabel').textContent = 'Rp ' + Number(total).toLocaleString('id-ID');
+    document.getElementById('pay_jumlah').value = total;
+    document.getElementById('pay_tanggal').value = new Date().toISOString().substr(0,10);
+    document.getElementById('pay_catatan').value = '';
+    new bootstrap.Modal('#payModal').show();
+}
+
+function submitPayment() {
+    const id = document.getElementById('payInvoiceId').value;
+    const btn = document.getElementById('payBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
+
+    $.post('/admin/payments/' + id + '/pay', {
+        _token:              document.querySelector('meta[name=csrf-token]').content,
+        jumlah:              document.getElementById('pay_jumlah').value,
+        metode:              document.getElementById('pay_metode').value,
+        tanggal_pembayaran:  document.getElementById('pay_tanggal').value,
+        catatan:             document.getElementById('pay_catatan').value,
+    }, function(res) {
+        if (res.success) {
+            bootstrap.Modal.getInstance(document.getElementById('payModal'))?.hide();
+            Swal.fire({icon:'success', title:'Pembayaran Berhasil!', text:res.message, timer:2000, showConfirmButton:false})
+                .then(() => location.reload());
+        }
+    }).fail(xhr => {
+        const msg = xhr.responseJSON?.message ?? 'Terjadi kesalahan.';
+        Swal.fire({icon:'error', title:'Gagal', text:msg});
+    }).always(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Konfirmasi Bayar';
+    });
+}
+
+function deleteInvoice(id, nomor) {
+    Swal.fire({
+        title: `Hapus Invoice?`,
+        html: `Invoice <b>${nomor}</b> akan dihapus secara permanen.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: '<i class="bi bi-trash me-1"></i>Ya, Hapus!',
+        cancelButtonText: 'Batal'
+    }).then(r => {
+        if (r.isConfirmed) {
+            $.post('/admin/payments/' + id, {
+                _method: 'DELETE',
+                _token:  document.querySelector('meta[name=csrf-token]').content
+            }, function(res) {
+                if (res.success) {
+                    Swal.fire({icon:'success', title:'Terhapus!', text:res.message, timer:2000, showConfirmButton:false})
+                        .then(() => location.reload());
+                }
+            }).fail(() => Swal.fire({icon:'error', title:'Gagal!', text:'Tidak dapat menghapus invoice.'}));
+        }
+    });
+}
+</script>
+@endpush
