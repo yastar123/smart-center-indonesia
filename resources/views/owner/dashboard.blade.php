@@ -12,6 +12,11 @@
     $totalTeachers  = \App\Models\Teacher::count();
     $activeTeachers = \App\Models\Teacher::where('status','aktif')->count();
     $branches       = \App\Models\Branch::withCount('students')->latest()->limit(6)->get();
+    $totalRevenue   = \App\Models\Payment::where('status','verified')->sum('jumlah');
+    $monthRevenue   = \App\Models\Payment::where('status','verified')
+                        ->whereMonth('created_at', now()->month)
+                        ->whereYear('created_at',  now()->year)
+                        ->sum('jumlah');
 @endphp
 
 {{-- WELCOME BANNER --}}
@@ -91,10 +96,13 @@
         <div class="stat-card" style="border-top:3px solid #ef4444">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <div class="stat-title">Pendapatan</div>
-                    <div class="stat-value" style="color:#dc2626;font-size:20px">Rp 0</div>
+                    <div class="stat-title">Pendapatan Bulan Ini</div>
+                    <div class="stat-value" style="color:#dc2626;font-size:20px">
+                        Rp {{ number_format($monthRevenue, 0, ',', '.') }}
+                    </div>
                     <div class="stat-label" style="font-size:11px;color:#6b7280">
-                        <i class="bi bi-calendar-month me-1"></i>Bulan ini
+                        <i class="bi bi-arrow-up-circle me-1 text-success"></i>
+                        Total: Rp {{ number_format($totalRevenue, 0, ',', '.') }}
                     </div>
                 </div>
                 <div class="stat-icon" style="background:linear-gradient(135deg,#dc2626,#ef4444)">

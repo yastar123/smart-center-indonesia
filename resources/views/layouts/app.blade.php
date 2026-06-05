@@ -460,6 +460,12 @@
         [data-theme="dark"] .form-control:focus, [data-theme="dark"] .form-select:focus {
             background: #1e293b;
         }
+        [data-theme="dark"] .form-control::placeholder,
+        [data-theme="dark"] .form-select::placeholder { color: #4b5563; }
+        [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(.7); }
+        [data-theme="dark"] input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(.7); }
+        [data-theme="dark"] .table-responsive { color: var(--text-primary); }
+        [data-theme="dark"] code { background: rgba(255,255,255,.08); color: #7dd3fc; }
 
         /* ============================================================
            EMPTY STATE
@@ -470,6 +476,97 @@
         }
         .empty-state i { font-size: 3.5rem; color: #cbd5e1; }
         .empty-state p { color: var(--text-muted); margin-top: .75rem; font-size: 14px; }
+
+        /* ============================================================
+           SCROLL TO TOP
+        ============================================================ */
+        #scrollTop {
+            position: fixed;
+            bottom: 28px; right: 24px;
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #2563eb, #6366f1);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 16px rgba(37,99,235,.35);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 17px;
+            opacity: 0;
+            transform: translateY(10px) scale(.9);
+            transition: opacity .25s, transform .25s;
+            pointer-events: none;
+            z-index: 998;
+        }
+        #scrollTop.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
+        #scrollTop:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 6px 20px rgba(37,99,235,.45); }
+        @media (max-width: 992px) { #scrollTop { bottom: 80px; } }
+
+        /* ============================================================
+           MOBILE BOTTOM NAV
+        ============================================================ */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 62px;
+            background: var(--card-bg);
+            border-top: 1px solid var(--card-border);
+            z-index: 1048;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 4px;
+            box-shadow: 0 -4px 24px rgba(0,0,0,.08);
+        }
+        @media (max-width: 992px) {
+            .mobile-bottom-nav { display: flex; }
+            .content-wrapper { padding-bottom: 78px !important; }
+        }
+        .mob-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            flex: 1;
+            padding: 8px 2px;
+            cursor: pointer;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text-muted);
+            transition: color var(--transition), background var(--transition);
+            font-size: 9.5px;
+            font-weight: 600;
+        }
+        .mob-nav-item i { font-size: 20px; transition: transform .2s; }
+        .mob-nav-item:hover, .mob-nav-item.active { color: #3b82f6; }
+        .mob-nav-item.active i { transform: scale(1.15); }
+
+        /* ============================================================
+           GLOBAL FLASH TOAST
+        ============================================================ */
+        #globalToastWrap {
+            position: fixed;
+            top: 80px; right: 20px;
+            z-index: 9990;
+            display: flex; flex-direction: column; gap: 10px;
+            pointer-events: none;
+        }
+        .g-toast {
+            min-width: 260px; max-width: 360px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 8px 28px rgba(0,0,0,.12);
+            display: flex; align-items: flex-start; gap: 12px;
+            pointer-events: all;
+            opacity: 0; transform: translateX(20px);
+            animation: toastIn .3s cubic-bezier(.34,1.56,.64,1) forwards;
+        }
+        .g-toast.hide { animation: toastOut .25s ease forwards; }
+        @keyframes toastIn  { to { opacity:1; transform:translateX(0); } }
+        @keyframes toastOut { to { opacity:0; transform:translateX(20px); } }
 
         /* ============================================================
            TOAST
@@ -717,13 +814,6 @@
         </div>
         <div class="nav-item">
             <a href="#" class="nav-link">
-                <i class="bi bi-receipt"></i>
-                <span>Invoice</span>
-                <span class="menu-badge" style="background:#6366f1">Soon</span>
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="#" class="nav-link">
                 <i class="bi bi-award"></i>
                 <span>Sertifikat</span>
                 <span class="menu-badge" style="background:#6366f1">Soon</span>
@@ -837,8 +927,9 @@
             <div class="dropdown">
                 <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border"
                         data-bs-toggle="dropdown" style="border-radius:12px;padding:6px 12px 6px 8px;font-size:13px">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=2563eb&color=fff&size=64"
-                         width="32" height="32" class="rounded-circle">
+                    <img id="topbarAvatar"
+                         src="{{ auth()->user()->avatar ? asset('storage/'.auth()->user()->avatar) : 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&background=2563eb&color=fff&size=64' }}"
+                         width="32" height="32" class="rounded-circle" style="object-fit:cover">
                     <div class="text-start d-none d-md-block">
                         <div class="fw-semibold" style="font-size:13px;line-height:1.2">{{ Str::limit(auth()->user()->name, 16) }}</div>
                         <div style="font-size:10px;color:var(--text-muted)">{{ ucfirst(auth()->user()->getRoleNames()->first() ?? 'User') }}</div>
@@ -875,6 +966,40 @@
 
 </div>
 
+{{-- SCROLL TO TOP --}}
+<button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Kembali ke atas">
+    <i class="bi bi-arrow-up"></i>
+</button>
+
+{{-- MOBILE BOTTOM NAV --}}
+<nav class="mobile-bottom-nav" id="mobileBottomNav">
+    <a href="{{ route('dashboard') }}" class="mob-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+        <i class="bi bi-house-door{{ request()->routeIs('dashboard') ? '-fill' : '' }}"></i>
+        <span>Home</span>
+    </a>
+    @role('admin|owner')
+    <a href="{{ route('admin.students.index') }}" class="mob-nav-item {{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
+        <i class="bi bi-people{{ request()->routeIs('admin.students.*') ? '-fill' : '' }}"></i>
+        <span>Siswa</span>
+    </a>
+    <a href="{{ route('admin.payments.index') }}" class="mob-nav-item {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
+        <i class="bi bi-cash{{ request()->routeIs('admin.payments.*') ? '-stack' : '' }}"></i>
+        <span>Bayar</span>
+    </a>
+    @endrole
+    <a href="{{ route('profile.edit') }}" class="mob-nav-item {{ request()->routeIs('profile.*') ? 'active' : '' }}">
+        <i class="bi bi-person{{ request()->routeIs('profile.*') ? '-fill' : '' }}"></i>
+        <span>Profil</span>
+    </a>
+    <button class="mob-nav-item border-0" onclick="toggleSidebar()" style="background:none">
+        <i class="bi bi-grid-3x3-gap-fill"></i>
+        <span>Menu</span>
+    </button>
+</nav>
+
+{{-- GLOBAL TOAST WRAPPER --}}
+<div id="globalToastWrap"></div>
+
 {{-- PAGE LOADER --}}
 <div id="pageLoader">
     <div class="text-center">
@@ -882,6 +1007,16 @@
         <div style="font-size:13px;color:#64748b">Loading...</div>
     </div>
 </div>
+
+{{-- FLASH DATA FOR JS TOAST SYSTEM --}}
+<script id="__flash__" type="application/json">
+{
+    "success": "{{ addslashes(session('success') ?? session('status') ?? '') }}",
+    "error":   "{{ addslashes(session('error')   ?? '') }}",
+    "warning": "{{ addslashes(session('warning') ?? '') }}",
+    "info":    "{{ addslashes(session('info')    ?? '') }}"
+}
+</script>
 
 {{-- SCRIPTS --}}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -980,6 +1115,98 @@ document.addEventListener('keydown', e => {
 
 // ---- SKELETON → SHIMMER for placeholder spans ----
 document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skeleton'));
+
+// ---- SCROLL TO TOP ----
+(function() {
+    const btn = document.getElementById('scrollTop');
+    if (!btn) return;
+    const mainEl = document.querySelector('.main-content') || window;
+    const scroller = document.querySelector('.main-content') || document.documentElement;
+    function checkScroll() {
+        const top = (mainEl === window ? window.pageYOffset : mainEl.scrollTop);
+        btn.classList.toggle('visible', top > 220);
+    }
+    (mainEl === window ? window : mainEl).addEventListener('scroll', checkScroll, { passive: true });
+    checkScroll();
+})();
+
+// ---- GLOBAL FLASH TOASTS ----
+(function() {
+    const icons = {
+        success: { icon: 'bi-check-circle-fill', color: '#10b981', bg: '#ecfdf5', border: '#bbf7d0' },
+        error:   { icon: 'bi-x-circle-fill',     color: '#ef4444', bg: '#fef2f2', border: '#fecaca' },
+        warning: { icon: 'bi-exclamation-triangle-fill', color: '#f59e0b', bg: '#fffbeb', border: '#fde68a' },
+        info:    { icon: 'bi-info-circle-fill',   color: '#3b82f6', bg: '#eff6ff', border: '#bfdbfe' },
+    };
+    function showToast(msg, type = 'info', duration = 4000) {
+        if (!msg) return;
+        const wrap = document.getElementById('globalToastWrap');
+        if (!wrap) return;
+        const cfg = icons[type] || icons.info;
+        const el = document.createElement('div');
+        el.className = 'g-toast';
+        el.style.cssText = `background:${cfg.bg};border-color:${cfg.border}`;
+        el.innerHTML = `
+            <i class="bi ${cfg.icon}" style="font-size:20px;color:${cfg.color};flex-shrink:0;margin-top:1px"></i>
+            <div style="flex:1;min-width:0">
+                <div style="font-size:13.5px;font-weight:600;color:#0f172a;line-height:1.3">${msg}</div>
+            </div>
+            <button onclick="this.closest('.g-toast').remove()" style="border:none;background:none;color:#94a3b8;cursor:pointer;padding:0;font-size:16px;line-height:1;flex-shrink:0">&times;</button>`;
+        wrap.appendChild(el);
+        setTimeout(() => {
+            el.classList.add('hide');
+            el.addEventListener('animationend', () => el.remove());
+        }, duration);
+    }
+    // Expose globally
+    window.showToast = showToast;
+    // Read server-sent flash data from meta tags rendered at page load
+    document.addEventListener('DOMContentLoaded', () => {
+        const flashEl = document.getElementById('__flash__');
+        if (!flashEl) return;
+        try {
+            const data = JSON.parse(flashEl.textContent);
+            if (data.success) showToast(data.success, 'success');
+            if (data.error)   showToast(data.error,   'error');
+            if (data.warning) showToast(data.warning, 'warning');
+            if (data.info)    showToast(data.info,    'info');
+            if (data.status)  showToast(data.status,  'success');
+        } catch(e) {}
+    });
+})();
+
+// ---- NOTIFICATION DROPDOWN (click → show simple panel) ----
+(function() {
+    const btn = document.getElementById('notifBtn');
+    if (!btn) return;
+    btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        this.querySelector('.notif-badge')?.remove();
+        const existing = document.getElementById('notifPanel');
+        if (existing) { existing.remove(); return; }
+        const panel = document.createElement('div');
+        panel.id = 'notifPanel';
+        panel.style.cssText = `
+            position:fixed; top:${btn.getBoundingClientRect().bottom + 8}px;
+            right:${document.documentElement.clientWidth - btn.getBoundingClientRect().right}px;
+            width:300px; background:var(--card-bg); border:1px solid var(--card-border);
+            border-radius:16px; box-shadow:0 12px 40px rgba(0,0,0,.12);
+            z-index:9998; overflow:hidden; animation:fadeIn .2s ease both;
+        `;
+        panel.innerHTML = `
+            <div style="padding:14px 16px;border-bottom:1px solid var(--card-border);display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:14px;font-weight:700;color:var(--text-primary)"><i class="bi bi-bell-fill me-2 text-primary"></i>Notifikasi</span>
+                <span style="font-size:11px;color:var(--text-muted)">Hari ini</span>
+            </div>
+            <div style="padding:20px 16px;text-align:center">
+                <i class="bi bi-bell-slash" style="font-size:2.5rem;color:#cbd5e1;display:block;margin-bottom:8px"></i>
+                <div style="font-size:13px;color:var(--text-muted)">Tidak ada notifikasi baru</div>
+            </div>`;
+        document.body.appendChild(panel);
+        const close = e2 => { if (!panel.contains(e2.target) && e2.target !== btn) { panel.remove(); document.removeEventListener('click', close); } };
+        setTimeout(() => document.addEventListener('click', close), 0);
+    });
+})();
 </script>
 
 @stack('scripts')

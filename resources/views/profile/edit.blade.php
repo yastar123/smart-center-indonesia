@@ -378,6 +378,8 @@ document.getElementById('avatarFile').addEventListener('change', function() {
                 // Update sidebar avatar too
                 const sidebarAvatar = document.getElementById('sidebarAvatar');
                 if (sidebarAvatar) sidebarAvatar.src = res.avatar_url;
+                const topbarAvatar = document.getElementById('topbarAvatar');
+                if (topbarAvatar) topbarAvatar.src = res.avatar_url;
                 // Show success toast
                 Swal.fire({ icon:'success', title:'Foto Diperbarui!', text:res.message, timer:2000, showConfirmButton:false, iconColor:'#10b981' });
             }
