@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 29 Bulan Mei 2026 pada 12.32
+-- Waktu pembuatan: 05 Jun 2026 pada 05.19
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.0.30
 
@@ -114,21 +114,30 @@ CREATE TABLE `activity_logs` (
 
 CREATE TABLE `branches` (
   `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
   `name` varchar(255) NOT NULL,
   `city` varchar(255) NOT NULL,
   `admin_id` bigint(20) UNSIGNED DEFAULT NULL,
   `student_count` int(11) NOT NULL DEFAULT 0,
   `status` enum('active','inactive') NOT NULL DEFAULT 'active',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `regency` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `can_students` tinyint(1) NOT NULL DEFAULT 1,
+  `can_teachers` tinyint(1) NOT NULL DEFAULT 1,
+  `can_schedules` tinyint(1) NOT NULL DEFAULT 1,
+  `can_payments` tinyint(1) NOT NULL DEFAULT 1,
+  `can_tryouts` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data untuk tabel `branches`
 --
 
-INSERT INTO `branches` (`id`, `name`, `city`, `admin_id`, `student_count`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'wawa', 'wawa', NULL, 0, 'active', '2026-05-29 03:17:39', '2026-05-29 03:17:39');
+INSERT INTO `branches` (`id`, `user_id`, `name`, `city`, `admin_id`, `student_count`, `status`, `created_at`, `updated_at`, `regency`, `email`, `password`, `can_students`, `can_teachers`, `can_schedules`, `can_payments`, `can_tryouts`) VALUES
+(2, NULL, 'Riau', 'Paus', NULL, 0, 'active', '2026-05-29 09:31:32', '2026-06-02 02:46:32', NULL, NULL, NULL, 1, 1, 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -340,7 +349,6 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (7, '2026_05_29_071947_create_courses_table', 1),
 (8, '2026_05_29_071954_create_packages_table', 1),
 (9, '2026_05_29_072000_create_students_table', 1),
-(10, '2026_05_29_072005_create_teachers_table', 1),
 (11, '2026_05_29_072011_create_school_classes_table', 1),
 (12, '2026_05_29_072018_create_schedules_table', 1),
 (13, '2026_05_29_072035_create_modules_table', 1),
@@ -378,7 +386,10 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (45, '2026_05_29_084320_add_event_column_to_activity_log_table', 1),
 (46, '2026_05_29_084321_add_batch_uuid_column_to_activity_log_table', 1),
 (47, '2026_05_29_093916_add_deleted_at_to_students_table', 1),
-(48, '2026_05_29_100111_add_branch_id_to_students_table', 1);
+(48, '2026_05_29_100111_add_branch_id_to_students_table', 1),
+(49, '2026_06_02_000001_add_columns_to_students_table', 2),
+(50, '2026_05_29_072005_create_teachers_table', 3),
+(51, '2026_06_02_092952_add_account_to_branches_table', 4);
 
 -- --------------------------------------------------------
 
@@ -795,8 +806,30 @@ CREATE TABLE `students` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  `branch_id` bigint(20) UNSIGNED DEFAULT NULL
+  `branch_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `nis` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `gender` enum('L','P') NOT NULL,
+  `birth_date` date DEFAULT NULL,
+  `birth_place` varchar(255) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `phone` varchar(255) DEFAULT NULL,
+  `parent_name` varchar(255) DEFAULT NULL,
+  `parent_phone` varchar(255) DEFAULT NULL,
+  `photo` varchar(255) DEFAULT NULL,
+  `status` varchar(255) NOT NULL DEFAULT 'aktif',
+  `join_date` date DEFAULT NULL,
+  `school_name` varchar(255) DEFAULT NULL,
+  `grade` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data untuk tabel `students`
+--
+
+INSERT INTO `students` (`id`, `created_at`, `updated_at`, `deleted_at`, `branch_id`, `user_id`, `nis`, `name`, `gender`, `birth_date`, `birth_place`, `address`, `phone`, `parent_name`, `parent_phone`, `photo`, `status`, `join_date`, `school_name`, `grade`) VALUES
+(2, '2026-06-02 01:40:43', '2026-06-02 01:45:32', NULL, 2, NULL, '212121212', 'nusa techno indonesia', 'L', '2026-06-02', 'WAWA', 'smp 1siak hulu', '082284352106', 'QW', '082284352106', 'students/F28wL7IMMcp3gh7TGriVNTAB90w4212Ke9HhlYfu.jpg', 'aktif', '2026-06-02', 'AWAWA', '1212');
 
 -- --------------------------------------------------------
 
@@ -830,6 +863,22 @@ CREATE TABLE `tahun_ajarans` (
 
 CREATE TABLE `teachers` (
   `id` bigint(20) UNSIGNED NOT NULL,
+  `branch_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `nig` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `gender` enum('L','P') DEFAULT NULL,
+  `birth_date` date DEFAULT NULL,
+  `birth_place` varchar(255) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `phone` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `education` varchar(255) DEFAULT NULL,
+  `subjects` text DEFAULT NULL,
+  `photo` varchar(255) DEFAULT NULL,
+  `salary_base` decimal(15,2) NOT NULL DEFAULT 0.00,
+  `join_date` date DEFAULT NULL,
+  `status` enum('aktif','nonaktif') NOT NULL DEFAULT 'aktif',
+  `deleted_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1168,7 +1217,9 @@ ALTER TABLE `siswas`
 --
 ALTER TABLE `students`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `students_branch_id_foreign` (`branch_id`);
+  ADD UNIQUE KEY `students_nis_unique` (`nis`),
+  ADD KEY `students_branch_id_foreign` (`branch_id`),
+  ADD KEY `students_user_id_foreign` (`user_id`);
 
 --
 -- Indeks untuk tabel `tagihans`
@@ -1186,7 +1237,8 @@ ALTER TABLE `tahun_ajarans`
 -- Indeks untuk tabel `teachers`
 --
 ALTER TABLE `teachers`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `teachers_nig_unique` (`nig`);
 
 --
 -- Indeks untuk tabel `tryouts`
@@ -1245,7 +1297,7 @@ ALTER TABLE `activity_logs`
 -- AUTO_INCREMENT untuk tabel `branches`
 --
 ALTER TABLE `branches`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT untuk tabel `certificates`
@@ -1341,7 +1393,7 @@ ALTER TABLE `mapel_paket`
 -- AUTO_INCREMENT untuk tabel `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT untuk tabel `modules`
@@ -1443,7 +1495,7 @@ ALTER TABLE `siswas`
 -- AUTO_INCREMENT untuk tabel `students`
 --
 ALTER TABLE `students`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT untuk tabel `tagihans`
@@ -1461,7 +1513,7 @@ ALTER TABLE `tahun_ajarans`
 -- AUTO_INCREMENT untuk tabel `teachers`
 --
 ALTER TABLE `teachers`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT untuk tabel `tryouts`
@@ -1520,7 +1572,8 @@ ALTER TABLE `semesters`
 -- Ketidakleluasaan untuk tabel `students`
 --
 ALTER TABLE `students`
-  ADD CONSTRAINT `students_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `students_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `students_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
