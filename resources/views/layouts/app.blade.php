@@ -493,11 +493,109 @@
         }
         #pageLoader.show { opacity: 1; pointer-events: all; }
         [data-theme="dark"] #pageLoader { background: rgba(15,23,42,.85); }
+
+        /* ============================================================
+           NAV PROGRESS BAR (top of page, NProgress-style)
+        ============================================================ */
+        #navProgress {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            width: 0%;
+            background: linear-gradient(90deg, #3b82f6, #6366f1, #3b82f6);
+            background-size: 200% 100%;
+            z-index: 99999;
+            transition: width .3s ease, opacity .4s ease;
+            opacity: 0;
+            animation: shimmerBar 1.5s linear infinite;
+        }
+        #navProgress.active { opacity: 1; }
+        @keyframes shimmerBar {
+            0%   { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+
+        /* ============================================================
+           SKELETON SHIMMER
+        ============================================================ */
+        @keyframes skeletonShimmer {
+            0%   { background-position: -200% 0; }
+            100% { background-position:  200% 0; }
+        }
+        .skeleton {
+            background: linear-gradient(90deg,
+                var(--card-border) 25%,
+                var(--input-bg) 50%,
+                var(--card-border) 75%);
+            background-size: 200% 100%;
+            animation: skeletonShimmer 1.4s ease-in-out infinite;
+            border-radius: 6px;
+        }
+
+        /* ============================================================
+           STAT CARD — accent line animation on hover
+        ============================================================ */
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #6366f1);
+            border-radius: var(--radius-card) var(--radius-card) 0 0;
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+        .stat-card:hover::before { opacity: 1; }
+
+        /* ============================================================
+           BREADCRUMB IN TOPBAR
+        ============================================================ */
+        .topbar-breadcrumb {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .topbar-breadcrumb a { color: var(--text-muted); text-decoration: none; }
+        .topbar-breadcrumb a:hover { color: var(--primary); }
+
+        /* ============================================================
+           SIDEBAR BRAND GLOW PULSE
+        ============================================================ */
+        .brand-logo {
+            animation: brandPulse 4s ease-in-out infinite;
+        }
+        @keyframes brandPulse {
+            0%, 100% { box-shadow: 0 4px 12px rgba(59,130,246,.4); }
+            50%       { box-shadow: 0 4px 22px rgba(99,102,241,.7); }
+        }
+
+        /* ============================================================
+           CARD HOVER — lift shadow upgrade
+        ============================================================ */
+        .dashboard-card { cursor: default; }
+        a .dashboard-card, a.dashboard-card { cursor: pointer; }
+
+        /* ============================================================
+           PRINT
+        ============================================================ */
+        @media print {
+            .sidebar, .topbar, .sidebar-overlay, #pageLoader, #navProgress,
+            .btn, .dropdown, form[action*="logout"] { display: none !important; }
+            .main-content { margin-left: 0 !important; }
+            .content-wrapper { padding: 0 !important; }
+            .stat-card, .dashboard-card { break-inside: avoid; box-shadow: none !important; border: 1px solid #ddd !important; }
+            body { font-size: 12px; }
+        }
     </style>
 
     @stack('styles')
 </head>
 <body>
+
+{{-- NAV PROGRESS BAR --}}
+<div id="navProgress"></div>
 
 {{-- SIDEBAR OVERLAY (mobile) --}}
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
@@ -733,9 +831,9 @@
                 <i class="bi bi-moon" id="darkIcon"></i>
             </button>
 
-            <button class="top-btn position-relative" title="Notifikasi">
+            <button class="top-btn position-relative" title="Notifikasi" id="notifBtn"
+                    onclick="this.querySelector('.notif-badge')?.remove(); this.querySelector('i').style.color='var(--text-muted)'">
                 <i class="bi bi-bell"></i>
-                <span class="notif-badge">3</span>
             </button>
 
             <div class="dropdown">
@@ -850,6 +948,40 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeSidebar();
 });
+
+// ---- NAV PROGRESS BAR ----
+(function() {
+    const bar = document.getElementById('navProgress');
+    if (!bar) return;
+    let timer;
+    function startProgress() {
+        bar.classList.add('active');
+        bar.style.width = '0%';
+        let pct = 0;
+        clearInterval(timer);
+        timer = setInterval(() => {
+            pct += pct < 70 ? Math.random() * 8 : (pct < 90 ? Math.random() * 2 : 0);
+            if (pct >= 95) { clearInterval(timer); pct = 95; }
+            bar.style.width = pct + '%';
+        }, 120);
+    }
+    function finishProgress() {
+        clearInterval(timer);
+        bar.style.width = '100%';
+        setTimeout(() => { bar.classList.remove('active'); bar.style.width = '0%'; }, 400);
+    }
+    // Intercept sidebar nav link clicks
+    document.querySelectorAll('.nav-link[href]:not([href="#"])').forEach(a => {
+        a.addEventListener('click', function(e) {
+            if (!e.ctrlKey && !e.metaKey && !e.shiftKey) startProgress();
+        });
+    });
+    window.addEventListener('pageshow', finishProgress);
+    document.addEventListener('DOMContentLoaded', finishProgress);
+})();
+
+// ---- SKELETON → SHIMMER for placeholder spans ----
+document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skeleton'));
 </script>
 
 @stack('scripts')

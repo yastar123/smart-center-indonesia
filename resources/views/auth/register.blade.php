@@ -131,14 +131,16 @@
             <div class="mb-3">
                 <label class="form-label">Nama Lengkap</label>
                 <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
-                       value="{{ old('name') }}" placeholder="Masukkan nama lengkap" required autofocus>
+                       value="{{ old('name') }}" placeholder="Masukkan nama lengkap"
+                       required autofocus autocomplete="name">
                 @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Email</label>
                 <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
-                       value="{{ old('email') }}" placeholder="contoh@email.com" required>
+                       value="{{ old('email') }}" placeholder="contoh@email.com"
+                       required autocomplete="email">
                 @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
 
