@@ -1,442 +1,363 @@
-```blade
 @extends('layouts.app')
+@section('title', 'Monitoring Cabang')
+@section('page-title', 'Monitoring Cabang')
 
 @section('content')
 
-<div class="container-fluid py-3">
-
-    {{-- HEADER --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h3 class="fw-bold mb-0">Monitoring Cabang</h3>
-            <small class="text-muted">Owner Panel - Semua Cabang Akademi</small>
+{{-- STATS --}}
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 fade-up">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-title">Total Cabang</div>
+                    <div class="stat-value text-primary">{{ $total }}</div>
+                    <div class="stat-growth text-muted"><i class="bi bi-building me-1"></i>Semua cabang</div>
+                </div>
+                <div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-building-fill"></i></div>
+            </div>
         </div>
+    </div>
+    <div class="col-6 col-md-4 fade-up" style="animation-delay:.05s">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-title">Cabang Aktif</div>
+                    <div class="stat-value text-success">{{ $active }}</div>
+                    <div class="stat-growth text-success"><i class="bi bi-check-circle me-1"></i>Beroperasi</div>
+                </div>
+                <div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-building-fill-check"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 fade-up" style="animation-delay:.10s">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-title">Total Siswa</div>
+                    <div class="stat-value text-warning">{{ $students }}</div>
+                    <div class="stat-growth text-muted"><i class="bi bi-people me-1"></i>Semua cabang</div>
+                </div>
+                <div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-people-fill"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
 
-        <button class="btn btn-primary shadow-sm"
-            data-bs-toggle="modal"
-            data-bs-target="#addModal">
-            <i class="bi bi-plus-circle"></i> Tambah Cabang
-        </button>
+{{-- TABLE CARD --}}
+<div class="dashboard-card fade-up">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <h6 class="fw-bold mb-0" style="color:var(--text-primary)">
+            <i class="bi bi-building text-primary me-2"></i>Daftar Cabang
+        </h6>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ route('owner.branches.export.excel') }}" class="btn btn-success btn-sm">
+                <i class="bi bi-file-earmark-excel me-1"></i>Excel
+            </a>
+            <a href="{{ route('owner.branches.export.pdf') }}" class="btn btn-danger btn-sm">
+                <i class="bi bi-file-earmark-pdf me-1"></i>PDF
+            </a>
+            <button onclick="window.print()" class="btn btn-secondary btn-sm">
+                <i class="bi bi-printer me-1"></i>Print
+            </button>
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addModal">
+                <i class="bi bi-plus-lg me-1"></i>Tambah Cabang
+            </button>
+        </div>
     </div>
 
-    {{-- STATISTIK --}}
-    <div class="row g-3 mb-4">
-
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-body">
-                    <small class="text-muted">Total Cabang</small>
-                    <h2 class="fw-bold">{{ $total }}</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-body">
-                    <small class="text-muted">Cabang Aktif</small>
-                    <h2 class="fw-bold text-success">{{ $active }}</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-body">
-                    <small class="text-muted">Total Siswa</small>
-                    <h2 class="fw-bold text-primary">{{ $students }}</h2>
-                </div>
-            </div>
-        </div>
-
+    @if(session('success'))
+    <div class="alert alert-success border-0 rounded-3 mb-3 d-flex align-items-center gap-2" style="background:#f0fdf4;color:#15803d">
+        <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
     </div>
+    @endif
 
-    {{-- TABLE --}}
-    <div class="card border-0 shadow-sm rounded-4">
-        <div class="card-body table-responsive">
+    @if($errors->any())
+    <div class="alert alert-danger border-0 rounded-3 mb-3">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ $errors->first() }}
+    </div>
+    @endif
 
-            <table class="table align-middle table-hover">
-
-                <thead class="table-light">
-                    <tr>
-                        <th>Nama Cabang</th>
-                        <th>Kota</th>
-                        <th>Siswa</th>
-                        <th>Email</th>
-                        <th>Fitur</th>
-                        <th>Status</th>
-                        <th width="260">Aksi</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    @foreach($branches as $branch)
-
-                    <tr>
-
-                        <td class="fw-semibold">
-                            {{ $branch->name }}
-                        </td>
-
-                        <td>{{ $branch->city }}</td>
-
-                        <td>
-                            <span class="badge bg-primary">
-                                {{ $branch->students->count() }} Siswa
-                            </span>
-                        </td>
-
-                        <td>{{ $branch->email }}</td>
-
-                        {{-- FITUR --}}
-                        <td>
-
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead style="background:var(--input-bg)">
+                <tr>
+                    <th class="small text-muted fw-semibold py-3">CABANG</th>
+                    <th class="small text-muted fw-semibold py-3">LOKASI</th>
+                    <th class="small text-muted fw-semibold py-3 text-center">SISWA</th>
+                    <th class="small text-muted fw-semibold py-3">KONTAK</th>
+                    <th class="small text-muted fw-semibold py-3">FITUR</th>
+                    <th class="small text-muted fw-semibold py-3 text-center">STATUS</th>
+                    <th class="small text-muted fw-semibold py-3 text-center" style="width:160px">AKSI</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($branches as $branch)
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;color:white;font-size:15px;flex-shrink:0">
+                                <i class="bi bi-building"></i>
+                            </div>
+                            <div>
+                                <div class="fw-semibold small">{{ $branch->name }}</div>
+                                <div class="text-muted" style="font-size:.72rem">{{ $branch->email ?? '-' }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="small fw-semibold">{{ $branch->city ?? '-' }}</div>
+                        <div class="text-muted" style="font-size:.72rem">{{ $branch->regency ?? '' }}</div>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge bg-primary">{{ $branch->students->count() }}</span>
+                    </td>
+                    <td class="small text-muted">{{ $branch->phone ?? '-' }}</td>
+                    <td>
+                        <div class="d-flex flex-wrap gap-1">
                             @if($branch->can_students)
-                                <span class="badge rounded-pill bg-primary">
-                                    Siswa
-                                </span>
+                                <span class="badge" style="background:#dbeafe;color:#1d4ed8;font-size:10px">Siswa</span>
                             @endif
-
                             @if($branch->can_teachers)
-                                <span class="badge rounded-pill bg-success">
-                                    Guru
-                                </span>
+                                <span class="badge" style="background:#dcfce7;color:#15803d;font-size:10px">Guru</span>
                             @endif
-
                             @if($branch->can_schedules)
-                                <span class="badge rounded-pill bg-info">
-                                    Jadwal
-                                </span>
+                                <span class="badge" style="background:#e0f2fe;color:#0369a1;font-size:10px">Jadwal</span>
                             @endif
-
                             @if($branch->can_payments)
-                                <span class="badge rounded-pill bg-warning text-dark">
-                                    Keuangan
-                                </span>
+                                <span class="badge" style="background:#fef3c7;color:#92400e;font-size:10px">Keuangan</span>
                             @endif
-
                             @if($branch->can_tryouts)
-                                <span class="badge rounded-pill bg-dark">
-                                    Tryout
-                                </span>
+                                <span class="badge" style="background:#f3e8ff;color:#6b21a8;font-size:10px">Tryout</span>
                             @endif
-
-                        </td>
-
-                        {{-- STATUS --}}
-                        <td>
-
-                            @if($branch->status == 'active')
-                                <span class="badge bg-success">
-                                    Active
-                                </span>
-                            @else
-                                <span class="badge bg-danger">
-                                    Inactive
-                                </span>
-                            @endif
-
-                        </td>
-
-                        {{-- AKSI --}}
-                        <td class="d-flex gap-2 flex-wrap">
-
-                            {{-- EDIT --}}
-                            <button class="btn btn-warning btn-sm"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editModal{{ $branch->id }}">
-                                <i class="bi bi-pencil-square"></i>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        @if($branch->status === 'active')
+                            <span class="badge" style="background:#dcfce7;color:#15803d">
+                                <i class="bi bi-circle-fill me-1" style="font-size:8px"></i>Aktif
+                            </span>
+                        @else
+                            <span class="badge" style="background:#fee2e2;color:#991b1b">
+                                <i class="bi bi-circle-fill me-1" style="font-size:8px"></i>Nonaktif
+                            </span>
+                        @endif
+                    </td>
+                    <td class="text-center">
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-warning"
+                                data-bs-toggle="modal" data-bs-target="#editModal{{ $branch->id }}"
+                                title="Edit">
+                                <i class="bi bi-pencil"></i>
                             </button>
-
-                            {{-- RESET PASSWORD --}}
-                            <button class="btn btn-info btn-sm text-white"
-                                data-bs-toggle="modal"
-                                data-bs-target="#resetModal{{ $branch->id }}">
+                            <button class="btn btn-outline-info"
+                                data-bs-toggle="modal" data-bs-target="#resetModal{{ $branch->id }}"
+                                title="Reset Password">
                                 <i class="bi bi-key"></i>
                             </button>
-
-                            {{-- DELETE --}}
-                            <form method="POST"
-                                action="{{ route('owner.branches.destroy', $branch) }}"
-                                onsubmit="return confirm('Hapus cabang ini ?')">
-
+                            <form method="POST" action="{{ route('owner.branches.destroy', $branch) }}"
+                                  onsubmit="return confirmDelete(event, '{{ $branch->name }}')">
                                 @csrf
                                 @method('DELETE')
-
-                                <button class="btn btn-danger btn-sm">
+                                <button class="btn btn-outline-danger" title="Hapus">
                                     <i class="bi bi-trash"></i>
                                 </button>
-
                             </form>
+                        </div>
+                    </td>
+                </tr>
 
-                        </td>
-
-                    </tr>
-
-                    {{-- EDIT MODAL --}}
-                    <div class="modal fade" id="editModal{{ $branch->id }}">
-                        <div class="modal-dialog">
-                            <div class="modal-content border-0 rounded-4">
-
-                                <div class="modal-header">
-                                    <h5>Edit Cabang</h5>
-
-                                    <button class="btn-close"
-                                        data-bs-dismiss="modal"></button>
-                                </div>
-
-                                <div class="modal-body">
-
-                                    <form method="POST"
-                                        action="{{ route('owner.branches.update', $branch) }}">
-
-                                        @csrf
-                                        @method('PUT')
-
-                                        <label class="mb-1">Nama Cabang</label>
-                                        <input type="text"
-                                            class="form-control mb-3"
-                                            name="name"
-                                            value="{{ $branch->name }}">
-
-                                        <label class="mb-1">Kota</label>
-                                        <input type="text"
-                                            class="form-control mb-3"
-                                            name="city"
-                                            value="{{ $branch->city }}">
-
-                                        <label class="mb-1">Status</label>
-
-                                        <select name="status"
-                                            class="form-select mb-3">
-
-                                            <option value="active"
-                                                {{ $branch->status=='active'?'selected':'' }}>
-                                                Active
-                                            </option>
-
-                                            <option value="inactive"
-                                                {{ $branch->status=='inactive'?'selected':'' }}>
-                                                Inactive
-                                            </option>
-
+                {{-- EDIT MODAL --}}
+                <div class="modal fade" id="editModal{{ $branch->id }}" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow">
+                            <div class="modal-header border-0" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white">
+                                <h6 class="modal-title fw-bold"><i class="bi bi-pencil me-2"></i>Edit Cabang — {{ $branch->name }}</h6>
+                                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body p-4">
+                                <form method="POST" action="{{ route('owner.branches.update', $branch) }}">
+                                    @csrf
+                                    @method('PUT')
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Nama Cabang</label>
+                                        <input type="text" class="form-control form-control-sm" name="name" value="{{ $branch->name }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Kota</label>
+                                        <input type="text" class="form-control form-control-sm" name="city" value="{{ $branch->city }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Status</label>
+                                        <select name="status" class="form-select form-select-sm">
+                                            <option value="active" {{ $branch->status==='active'?'selected':'' }}>Aktif</option>
+                                            <option value="inactive" {{ $branch->status==='inactive'?'selected':'' }}>Nonaktif</option>
                                         </select>
-
-                                        <button class="btn btn-success w-100">
-                                            Update Cabang
-                                        </button>
-
-                                    </form>
-
-                                </div>
-
+                                    </div>
+                                    <button class="btn btn-warning w-100 fw-semibold">
+                                        <i class="bi bi-check-lg me-2"></i>Simpan Perubahan
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    {{-- RESET PASSWORD MODAL --}}
-                    <div class="modal fade" id="resetModal{{ $branch->id }}">
-                        <div class="modal-dialog">
-                            <div class="modal-content border-0 rounded-4">
-
-                                <div class="modal-header">
-                                    <h5>Reset Password</h5>
-
-                                    <button class="btn-close"
-                                        data-bs-dismiss="modal"></button>
-                                </div>
-
-                                <div class="modal-body">
-
-                                    <form method="POST"
-                                        action="{{ route('owner.branches.resetPassword', $branch) }}">
-
-                                        @csrf
-
-                                        <label>Password Baru</label>
-
-                                        <input type="password"
-                                            class="form-control mb-3"
-                                            name="password"
-                                            placeholder="Masukkan Password Baru">
-
-                                        <button class="btn btn-primary w-100">
-                                            Reset Password
-                                        </button>
-
-                                    </form>
-
-                                </div>
-
+                {{-- RESET PASSWORD MODAL --}}
+                <div class="modal fade" id="resetModal{{ $branch->id }}" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow">
+                            <div class="modal-header border-0" style="background:linear-gradient(135deg,#06b6d4,#0891b2);color:white">
+                                <h6 class="modal-title fw-bold"><i class="bi bi-key me-2"></i>Reset Password — {{ $branch->name }}</h6>
+                                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body p-4">
+                                <form method="POST" action="{{ route('owner.branches.resetPassword', $branch) }}">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Password Baru</label>
+                                        <input type="password" class="form-control form-control-sm" name="password" placeholder="Min. 8 karakter" required minlength="8">
+                                    </div>
+                                    <button class="btn btn-info text-white w-100 fw-semibold">
+                                        <i class="bi bi-key me-2"></i>Reset Password
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    @endforeach
-
-                </tbody>
-
-            </table>
-
-        </div>
+                @empty
+                <tr>
+                    <td colspan="7" class="text-center py-5">
+                        <div class="empty-state">
+                            <i class="bi bi-building text-muted d-block mb-2" style="font-size:3rem;opacity:.3"></i>
+                            <p class="text-muted">Belum ada data cabang</p>
+                            <button class="btn btn-primary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                                <i class="bi bi-plus-lg me-1"></i>Tambah Cabang Pertama
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
-
-        <div class="mb-3">
-            <a href="{{ route('owner.branches.export.excel') }}" class="btn btn-success">Export Excel</a>
-            <a href="{{ route('owner.branches.export.pdf') }}" class="btn btn-danger">Export PDF</a>
-            <button onclick="window.print()" class="btn btn-secondary">Print</button>
-        </div>
 
 </div>
 
 {{-- ADD MODAL --}}
-<div class="modal fade" id="addModal">
-
-    <div class="modal-dialog">
-
-        <div class="modal-content border-0 rounded-4">
-
-            <div class="modal-header">
-                <h5>Tambah Cabang</h5>
-
-                <button class="btn-close"
-                    data-bs-dismiss="modal"></button>
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0" style="background:linear-gradient(135deg,#2563eb,#6366f1);color:white">
+                <h6 class="modal-title fw-bold"><i class="bi bi-plus-circle me-2"></i>Tambah Cabang Baru</h6>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-
-            <div class="modal-body">
-
-                <form method="POST"
-                    action="{{ route('owner.branches.store') }}">
-
+            <div class="modal-body p-4">
+                <form method="POST" action="{{ route('owner.branches.store') }}">
                     @csrf
 
-                    <label>Nama Cabang</label>
-                    <input type="text"
-                        class="form-control mb-3"
-                        name="name">
-
-                    <label>Kota</label>
-                    <input type="text"
-                        class="form-control mb-3"
-                        name="city">
-
-                    <label>Kabupaten</label>
-                    <input type="text"
-                        class="form-control mb-3"
-                        name="regency">
-
-                    <label>Alamat</label>
-                    <input type="text"
-                        class="form-control mb-3"
-                        name="address">
-
-                    <label>Telepon</label>
-                    <input type="text"
-                        class="form-control mb-3"
-                        name="phone">
-
-                    <hr>
-
-                    <h6 class="fw-bold">
-                        Akun Login Cabang
+                    <h6 class="fw-bold mb-3 text-muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.06em">
+                        <i class="bi bi-building me-2 text-primary"></i>Info Cabang
                     </h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Nama Cabang <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-sm" name="name" placeholder="Contoh: Cabang Jakarta" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Kota</label>
+                            <input type="text" class="form-control form-control-sm" name="city" placeholder="Jakarta">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Kabupaten / Kecamatan</label>
+                            <input type="text" class="form-control form-control-sm" name="regency" placeholder="Kebayoran Baru">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Telepon</label>
+                            <input type="text" class="form-control form-control-sm" name="phone" placeholder="021-xxxxxxxx">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold">Alamat</label>
+                            <input type="text" class="form-control form-control-sm" name="address" placeholder="Alamat lengkap cabang">
+                        </div>
+                    </div>
 
-                    <label>Nama Admin</label>
-                    <input type="text"
-                        class="form-control mb-3"
-                        name="admin_name">
+                    <hr class="my-3" style="border-color:var(--card-border)">
 
-                    <label>Username (opsional)</label>
-                    <input type="text"
-                        class="form-control mb-3"
-                        name="admin_username">
-
-                    <label>Email</label>
-                    <input type="email"
-                        class="form-control mb-3"
-                        name="email">
-
-                    <label>Password</label>
-                    <input type="password"
-                        class="form-control mb-3"
-                        name="password">
-
-                    <hr>
-
-                    <h6 class="fw-bold mb-3">
-                        Fitur Akses
+                    <h6 class="fw-bold mb-3 text-muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.06em">
+                        <i class="bi bi-person-badge me-2 text-success"></i>Akun Login Cabang
                     </h6>
-
-                    {{-- SWITCH --}}
-                    <div class="form-check form-switch mb-2">
-                        <input class="form-check-input"
-                            type="checkbox"
-                            name="can_students"
-                            checked>
-
-                        <label class="form-check-label">
-                            Siswa
-                        </label>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Nama Admin <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-sm" name="admin_name" placeholder="Nama admin cabang" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Username (opsional)</label>
+                            <input type="text" class="form-control form-control-sm" name="admin_username" placeholder="admin.jakarta">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control form-control-sm" name="email" placeholder="admin@cabang.com" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Password <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control form-control-sm" name="password" placeholder="Min. 8 karakter" required minlength="8">
+                        </div>
                     </div>
 
-                    <div class="form-check form-switch mb-2">
-                        <input class="form-check-input"
-                            type="checkbox"
-                            name="can_teachers"
-                            checked>
+                    <hr class="my-3" style="border-color:var(--card-border)">
 
-                        <label class="form-check-label">
-                            Guru
-                        </label>
+                    <h6 class="fw-bold mb-3 text-muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.06em">
+                        <i class="bi bi-toggles me-2 text-warning"></i>Fitur Akses
+                    </h6>
+                    <div class="row g-2 mb-4">
+                        @foreach([
+                            ['can_students','Manajemen Siswa','people','primary'],
+                            ['can_teachers','Manajemen Guru','person-workspace','success'],
+                            ['can_schedules','Jadwal & Kelas','calendar-week','info'],
+                            ['can_payments','Keuangan','wallet2','warning'],
+                            ['can_tryouts','Tryout CBT','ui-checks-grid','purple'],
+                        ] as [$name, $label, $icon, $color])
+                        <div class="col-md-6">
+                            <div class="form-check form-switch p-3 rounded-3" style="background:var(--input-bg);border:1.5px solid var(--card-border);padding-left:3rem !important">
+                                <input class="form-check-input" type="checkbox" name="{{ $name }}" id="{{ $name }}" checked>
+                                <label class="form-check-label fw-semibold small" for="{{ $name }}">
+                                    <i class="bi bi-{{ $icon }} me-1 text-{{ $color==='purple'?'primary':$color }}"></i>{{ $label }}
+                                </label>
+                            </div>
+                        </div>
+                        @endforeach
                     </div>
 
-                    <div class="form-check form-switch mb-2">
-                        <input class="form-check-input"
-                            type="checkbox"
-                            name="can_schedules"
-                            checked>
-
-                        <label class="form-check-label">
-                            Jadwal
-                        </label>
-                    </div>
-
-                    <div class="form-check form-switch mb-2">
-                        <input class="form-check-input"
-                            type="checkbox"
-                            name="can_payments"
-                            checked>
-
-                        <label class="form-check-label">
-                            Keuangan
-                        </label>
-                    </div>
-
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input"
-                            type="checkbox"
-                            name="can_tryouts"
-                            checked>
-
-                        <label class="form-check-label">
-                            Tryout
-                        </label>
-                    </div>
-
-                    <button class="btn btn-primary w-100">
-                        Simpan Cabang
+                    <button class="btn btn-primary w-100 py-2 fw-bold">
+                        <i class="bi bi-check-lg me-2"></i>Simpan Cabang
                     </button>
-
                 </form>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 @endsection
-```
+
+@push('scripts')
+<script>
+function confirmDelete(e, name) {
+    e.preventDefault();
+    const form = e.target;
+    Swal.fire({
+        title: `Hapus cabang "${name}"?`,
+        text: 'Semua data terkait cabang ini akan dihapus!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        confirmButtonText: '<i class="bi bi-trash me-1"></i>Ya, Hapus!',
+        cancelButtonText: 'Batal'
+    }).then(r => { if (r.isConfirmed) form.submit(); });
+    return false;
+}
+</script>
+@endpush

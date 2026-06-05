@@ -1,485 +1,534 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title','Dashboard') | Akademi Pro</title>
+    <title>@yield('title','Dashboard') | Smart Center</title>
 
-    {{-- BOOTSTRAP --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    {{-- GOOGLE FONTS --}}
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-
-    {{-- ICON --}}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
-    {{-- DATATABLE --}}
     <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-
-    {{-- APEXCHART --}}
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
     <style>
-
-        :root{
-            --sidebar-width:270px;
-            --sidebar-bg:#0f172a;
-            --sidebar-hover:#1e293b;
-            --primary:#3b82f6;
-            --success:#10b981;
-            --danger:#ef4444;
-            --warning:#f59e0b;
-            --dark:#0f172a;
-            --text:#cbd5e1;
-            --border:rgba(255,255,255,.06);
-
-            /* Typography */
-            --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial;
-            --type-base: 16px;
-            --type-scale: 1.15;
-            --space-1: 8px;
-            --space-2: 16px;
-            --space-3: 24px;
+        /* ============================================================
+           CSS CUSTOM PROPERTIES
+        ============================================================ */
+        :root {
+            --sidebar-width: 270px;
+            --sidebar-bg: #0f172a;
+            --sidebar-hover: #1e293b;
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #06b6d4;
+            --dark: #0f172a;
+            --text: #cbd5e1;
+            --border: rgba(255,255,255,.07);
+            --content-bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-muted: #64748b;
+            --topbar-bg: #ffffff;
+            --input-bg: #f8fafc;
+            --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --radius-card: 20px;
+            --radius-btn: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+            --shadow-md: 0 4px 16px rgba(0,0,0,.07);
+            --shadow-lg: 0 10px 36px rgba(0,0,0,.10);
+            --transition: .25s cubic-bezier(.4,0,.2,1);
         }
 
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
+        [data-theme="dark"] {
+            --content-bg: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: rgba(255,255,255,.08);
+            --text-primary: #f1f5f9;
+            --text-muted: #94a3b8;
+            --topbar-bg: #1e293b;
+            --input-bg: #0f172a;
         }
 
-        body{
-            font-family:var(--font-sans);
-            font-size:clamp(14px, 1.2vw, 16px);
-            background:#f1f5f9;
-            overflow-x:hidden;
-            -webkit-font-smoothing:antialiased;
-            -moz-osx-font-smoothing:grayscale;
-            color:#0f172a;
+        /* ============================================================
+           RESET & BASE
+        ============================================================ */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-sans);
+            font-size: clamp(13.5px, 1.1vw, 15px);
+            background: var(--content-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            transition: background var(--transition), color var(--transition);
         }
 
-        h1{font-size:clamp(28px, 4vw, 42px);}
-        h2{font-size:clamp(22px, 3vw, 32px);}
-        h3{font-size:clamp(18px, 2.2vw, 24px);}
+        h1 { font-size: clamp(26px, 3.5vw, 40px); }
+        h2 { font-size: clamp(20px, 2.8vw, 30px); }
+        h3 { font-size: clamp(17px, 2vw, 22px); }
 
-        /* Micro animations */
-        .anim { transition: all .45s cubic-bezier(.2,.9,.2,1); will-change: transform, opacity; }
-        .fade-up { opacity:0; transform:translateY(12px); }
-        .fade-up.in-view { opacity:1; transform:translateY(0); }
+        /* ============================================================
+           ANIMATIONS
+        ============================================================ */
+        .anim { transition: all .4s cubic-bezier(.22,1,.36,1); will-change: transform, opacity; }
+        .fade-up { opacity: 0; transform: translateY(16px); }
+        .fade-up.in-view { opacity: 1; transform: translateY(0); }
+        .fade-in { animation: fadeIn .4s ease both; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
 
-        /* =========================
-            SIDEBAR
-        ==========================*/
-
-        .sidebar{
-            position:fixed;
-            top:0;
-            left:0;
-            width:var(--sidebar-width);
-            height:100vh;
-            background:linear-gradient(180deg,#0f172a,#111827);
-            overflow-y:auto;
-            z-index:999;
-            transition:.3s;
-            border-right:1px solid var(--border);
+        /* ============================================================
+           SIDEBAR
+        ============================================================ */
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 1050;
+            transition: transform var(--transition), box-shadow var(--transition);
+            border-right: 1px solid var(--border);
         }
 
-        .sidebar::-webkit-scrollbar{
-            width:5px;
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+
+        /* Brand */
+        .sidebar-brand {
+            height: 72px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid var(--border);
+            text-decoration: none;
+        }
+        .brand-logo {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; color: white;
+            margin-right: 12px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(59,130,246,.4);
+        }
+        .brand-title { color: white; font-size: 17px; font-weight: 700; line-height: 1.1; }
+        .brand-sub { color: #64748b; font-size: 11px; margin-top: 2px; }
+
+        /* User */
+        .sidebar-user {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sidebar-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,.12);
+            flex-shrink: 0;
+        }
+        .user-name { color: #f1f5f9; font-size: 14px; font-weight: 600; }
+        .user-role {
+            font-size: 10.5px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: rgba(59,130,246,.2);
+            color: #93c5fd;
+            display: inline-block;
+            margin-top: 3px;
+            font-weight: 500;
         }
 
-        .sidebar::-webkit-scrollbar-thumb{
-            background:#334155;
-            border-radius:10px;
+        /* Nav */
+        .sidebar-nav { padding: 12px 10px 100px; }
+
+        .nav-header {
+            color: #475569;
+            font-size: 10px;
+            font-weight: 700;
+            margin: 18px 12px 8px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
         }
 
-        .sidebar-brand{
-            height:75px;
-            display:flex;
-            align-items:center;
-            padding:0 22px;
-            border-bottom:1px solid var(--border);
+        .nav-item { margin-bottom: 2px; }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #94a3b8;
+            text-decoration: none;
+            padding: 11px 14px;
+            border-radius: 12px;
+            transition: all var(--transition);
+            font-size: 13.5px;
+            font-weight: 500;
+            position: relative;
+        }
+        .nav-link i { font-size: 17px; flex-shrink: 0; }
+        .nav-link:hover {
+            background: rgba(255,255,255,.06);
+            color: #e2e8f0;
+            transform: translateX(3px);
+        }
+        .nav-link.active {
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+            color: white;
+            box-shadow: 0 6px 20px rgba(59,130,246,.35);
+        }
+        .nav-link.active i { color: white; }
+
+        .menu-badge {
+            margin-left: auto;
+            background: #ef4444;
+            color: white;
+            padding: 2px 7px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
         }
 
-        .brand-logo{
-            width:45px;
-            height:45px;
-            border-radius:14px;
-            background:linear-gradient(135deg,#3b82f6,#6366f1);
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:22px;
-            color:white;
-            margin-right:14px;
+        /* ============================================================
+           SIDEBAR OVERLAY (mobile)
+        ============================================================ */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.55);
+            z-index: 1049;
+            backdrop-filter: blur(2px);
+            animation: fadeOverlay .2s ease both;
+        }
+        .sidebar-overlay.show { display: block; }
+        @keyframes fadeOverlay { from{opacity:0;} to{opacity:1;} }
+
+        /* ============================================================
+           MAIN CONTENT
+        ============================================================ */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: margin var(--transition);
         }
 
-        .brand-title{
-            color:white;
-            font-size:20px;
-            font-weight:700;
-            line-height:1;
+        /* ============================================================
+           TOPBAR
+        ============================================================ */
+        .topbar {
+            height: 70px;
+            background: var(--topbar-bg);
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background var(--transition), border-color var(--transition);
         }
 
-        .brand-sub{
-            color:#94a3b8;
-            font-size:12px;
+        .topbar-left { display: flex; align-items: center; gap: 12px; }
+        .topbar-left h4 { margin: 0; font-size: 20px; font-weight: 700; color: var(--text-primary); }
+        .topbar-left p { margin: 0; color: var(--text-muted); font-size: 12px; }
+
+        .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+        .top-btn {
+            width: 40px; height: 40px;
+            border-radius: 11px;
+            background: var(--input-bg);
+            border: 1px solid var(--card-border);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+        .top-btn:hover { background: var(--card-border); color: var(--text-primary); transform: translateY(-1px); }
+
+        .notif-badge {
+            position: absolute; top: -4px; right: -4px;
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: #ef4444;
+            color: white;
+            font-size: 9px;
+            font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--topbar-bg);
         }
 
-        /* =========================
-            USER
-        ==========================*/
+        /* ============================================================
+           CONTENT WRAPPER
+        ============================================================ */
+        .content-wrapper { padding: 24px; }
 
-        .sidebar-user{
-            padding:20px;
-            border-bottom:1px solid var(--border);
-            display:flex;
-            align-items:center;
-            gap:14px;
+        /* ============================================================
+           CARDS & STATS
+        ============================================================ */
+        .dashboard-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-card);
+            padding: 24px;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow-sm);
+            transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+        }
+        .dashboard-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-card);
+            padding: 22px;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow-sm);
+            transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+
+        .stat-icon {
+            width: 52px; height: 52px;
+            border-radius: 15px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+        }
+        .stat-title { color: var(--text-muted); font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+        .stat-label { color: var(--text-muted); font-size: 13px; font-weight: 500; margin-top: 6px; }
+        .stat-value { font-size: 28px; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
+        .stat-growth { font-size: 12px; margin-top: 8px; display: flex; align-items: center; gap: 4px; }
+
+        .bg-primary-soft   { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .bg-success-soft   { background: linear-gradient(135deg, #10b981, #059669); }
+        .bg-warning-soft   { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .bg-danger-soft    { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .bg-info-soft      { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+        .bg-purple-soft    { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+
+        /* ============================================================
+           TABLE
+        ============================================================ */
+        .table-modern { background: var(--card-bg); border-radius: var(--radius-card); overflow: hidden; }
+        .table-modern thead { background: var(--input-bg); }
+        .table-modern th {
+            border: none;
+            padding: 14px 16px;
+            font-size: 11.5px;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+        .table-modern td { padding: 14px 16px; vertical-align: middle; color: var(--text-primary); }
+        .table-modern tbody tr { border-color: var(--card-border); transition: background var(--transition); }
+        .table-modern tbody tr:hover { background: var(--input-bg); }
+
+        /* ============================================================
+           BUTTONS
+        ============================================================ */
+        .btn {
+            border-radius: var(--radius-btn);
+            font-weight: 600;
+            font-size: 13.5px;
+            transition: all var(--transition);
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            border: none;
+            box-shadow: 0 4px 14px rgba(59,130,246,.3);
+        }
+        .btn-primary:hover { box-shadow: 0 6px 20px rgba(59,130,246,.4); background: linear-gradient(135deg, #1d4ed8, #2563eb); }
+        .btn-success {
+            background: linear-gradient(135deg, #059669, #10b981);
+            border: none;
+            box-shadow: 0 4px 14px rgba(16,185,129,.3);
+        }
+        .btn-success:hover { box-shadow: 0 6px 20px rgba(16,185,129,.4); }
+
+        /* ============================================================
+           FORM CONTROLS
+        ============================================================ */
+        .form-control, .form-select {
+            background: var(--input-bg);
+            border: 1.5px solid var(--card-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            transition: border-color var(--transition), box-shadow var(--transition);
+            font-size: 13.5px;
+        }
+        .form-control:focus, .form-select:focus {
+            background: var(--card-bg);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+            color: var(--text-primary);
+            outline: none;
         }
 
-        .sidebar-avatar{
-            width:52px;
-            height:52px;
-            border-radius:50%;
-            object-fit:cover;
-            border:3px solid rgba(255,255,255,.1);
+        /* ============================================================
+           BADGES
+        ============================================================ */
+        .badge { font-weight: 600; border-radius: 8px; }
+
+        /* ============================================================
+           MODAL
+        ============================================================ */
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
         }
 
-        .user-name{
-            color:white;
-            font-size:15px;
-            font-weight:600;
+        /* ============================================================
+           SCROLLBAR (webkit)
+        ============================================================ */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+
+        /* ============================================================
+           PAGE HEADER
+        ============================================================ */
+        .page-header {
+            margin-bottom: 20px;
+        }
+        .page-header h5 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        .page-header p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 4px 0 0;
         }
 
-        .user-role{
-            font-size:11px;
-            padding:4px 10px;
-            border-radius:30px;
-            background:rgba(59,130,246,.2);
-            color:#93c5fd;
-            display:inline-block;
-            margin-top:4px;
+        /* ============================================================
+           MOBILE RESPONSIVE
+        ============================================================ */
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.show { transform: translateX(0); box-shadow: 4px 0 30px rgba(0,0,0,0.3); }
+            .main-content { margin-left: 0; }
+            .content-wrapper { padding: 16px; }
+            .topbar { padding: 0 16px; }
         }
 
-        /* =========================
-            MENU
-        ==========================*/
-
-        .sidebar-nav{
-            padding:15px 10px 100px;
+        @media (max-width: 576px) {
+            .stat-value { font-size: 22px; }
+            .topbar-left h4 { font-size: 17px; }
         }
 
-        .nav-header{
-            color:#64748b;
-            font-size:11px;
-            font-weight:700;
-            margin:20px 10px 10px;
-            text-transform:uppercase;
-            letter-spacing:1px;
+        /* ============================================================
+           DARK MODE OVERRIDES
+        ============================================================ */
+        [data-theme="dark"] .table { color: var(--text-primary); }
+        [data-theme="dark"] .table-light { background: rgba(255,255,255,.04) !important; }
+        [data-theme="dark"] .modal-header { border-color: var(--card-border); }
+        [data-theme="dark"] .modal-footer { border-color: var(--card-border); }
+        [data-theme="dark"] .dropdown-menu {
+            background: #1e293b;
+            border-color: rgba(255,255,255,.1);
+        }
+        [data-theme="dark"] .dropdown-item { color: #e2e8f0; }
+        [data-theme="dark"] .dropdown-item:hover { background: rgba(255,255,255,.08); }
+        [data-theme="dark"] .dropdown-divider { border-color: rgba(255,255,255,.1); }
+        [data-theme="dark"] .btn-light { background: #334155; border-color: #475569; color: #e2e8f0; }
+        [data-theme="dark"] .form-control:focus, [data-theme="dark"] .form-select:focus {
+            background: #1e293b;
         }
 
-        .nav-item{
-            margin-bottom:4px;
+        /* ============================================================
+           EMPTY STATE
+        ============================================================ */
+        .empty-state {
+            padding: 3rem;
+            text-align: center;
         }
+        .empty-state i { font-size: 3.5rem; color: #cbd5e1; }
+        .empty-state p { color: var(--text-muted); margin-top: .75rem; font-size: 14px; }
 
-        .nav-link{
-            display:flex;
-            align-items:center;
-            gap:14px;
-            color:#cbd5e1;
-            text-decoration:none;
-            padding:12px 14px;
-            border-radius:14px;
-            transition:.25s;
-            font-size:14px;
-            font-weight:500;
+        /* ============================================================
+           TOAST
+        ============================================================ */
+        .toast-container { z-index: 9999; }
+
+        /* ============================================================
+           LOADING SPINNER
+        ============================================================ */
+        #pageLoader {
+            position: fixed;
+            inset: 0;
+            background: rgba(255,255,255,.8);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .2s;
         }
-
-        .nav-link i{
-            font-size:18px;
-        }
-
-        .nav-link:hover{
-            background:var(--sidebar-hover);
-            color:white;
-            transform:translateX(4px);
-        }
-
-        .nav-link.active{
-            background:linear-gradient(90deg,#2563eb,#3b82f6);
-            color:white;
-            box-shadow:0 8px 20px rgba(59,130,246,.3);
-        }
-
-        .menu-badge{
-            margin-left:auto;
-            background:#ef4444;
-            color:white;
-            padding:2px 8px;
-            border-radius:20px;
-            font-size:10px;
-        }
-
-        /* =========================
-            MAIN
-        ==========================*/
-
-        .main-content{
-            margin-left:var(--sidebar-width);
-            min-height:100vh;
-        }
-
-        /* =========================
-            TOPBAR
-        ==========================*/
-
-        .topbar{
-            height:75px;
-            background:white;
-            border-bottom:1px solid #e2e8f0;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            padding:0 30px;
-            position:sticky;
-            top:0;
-            z-index:100;
-        }
-
-        .topbar-left h4{
-            margin:0;
-            font-size:22px;
-            font-weight:700;
-            color:#0f172a;
-        }
-
-        .topbar-left p{
-            margin:0;
-            color:#64748b;
-            font-size:13px;
-        }
-
-        .topbar-right{
-            display:flex;
-            align-items:center;
-            gap:18px;
-        }
-
-        .top-icon{
-            width:42px;
-            height:42px;
-            border-radius:12px;
-            background:#f1f5f9;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            cursor:pointer;
-            position:relative;
-        }
-
-        .top-icon i{
-            font-size:18px;
-            color:#334155;
-        }
-
-        .notif-badge{
-            position:absolute;
-            top:-5px;
-            right:-5px;
-            width:18px;
-            height:18px;
-            border-radius:50%;
-            background:#ef4444;
-            color:white;
-            font-size:10px;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-        }
-
-        /* =========================
-            CONTENT
-        ==========================*/
-
-        .content-wrapper{
-            padding:25px;
-        }
-
-        .dashboard-card{
-            background:white;
-            border-radius:24px;
-            padding:24px;
-            border:1px solid #e2e8f0;
-            box-shadow:0 10px 30px rgba(0,0,0,.03);
-            transition:.3s;
-        }
-
-        .dashboard-card:hover{
-            transform:translateY(-4px);
-        }
-
-        .stat-card{
-            background:white;
-            border-radius:22px;
-            padding:24px;
-            position:relative;
-            overflow:hidden;
-            border:1px solid #e2e8f0;
-            transition:.3s;
-        }
-
-        .stat-card:hover{
-            transform:translateY(-5px);
-            box-shadow:0 15px 40px rgba(0,0,0,.08);
-        }
-
-        .stat-icon{
-            width:60px;
-            height:60px;
-            border-radius:18px;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:24px;
-            color:white;
-            margin-bottom:18px;
-        }
-
-        .bg-primary-soft{
-            background:linear-gradient(135deg,#3b82f6,#2563eb);
-        }
-
-        .bg-success-soft{
-            background:linear-gradient(135deg,#10b981,#059669);
-        }
-
-        .bg-warning-soft{
-            background:linear-gradient(135deg,#f59e0b,#d97706);
-        }
-
-        .bg-danger-soft{
-            background:linear-gradient(135deg,#ef4444,#dc2626);
-        }
-
-        .stat-title{
-            color:#64748b;
-            font-size:14px;
-            margin-bottom:8px;
-        }
-
-        .stat-value{
-            font-size:30px;
-            font-weight:700;
-            color:#0f172a;
-        }
-
-        .stat-growth{
-            font-size:13px;
-            margin-top:10px;
-            color:#10b981;
-        }
-
-        /* =========================
-            TABLE
-        ==========================*/
-
-        .table-modern{
-            background:white;
-            border-radius:20px;
-            overflow:hidden;
-        }
-
-        .table-modern thead{
-            background:#f8fafc;
-        }
-
-        .table-modern th{
-            border:none;
-            padding:16px;
-            font-size:13px;
-            color:#475569;
-        }
-
-        .table-modern td{
-            padding:16px;
-            vertical-align:middle;
-        }
-
-        /* =========================
-            MOBILE
-        ==========================*/
-
-        @media(max-width:992px){
-
-            .sidebar{
-                transform:translateX(-100%);
-            }
-
-            .sidebar.show{
-                transform:translateX(0);
-            }
-
-            .main-content{
-                margin-left:0;
-            }
-
-        }
-
+        #pageLoader.show { opacity: 1; pointer-events: all; }
+        [data-theme="dark"] #pageLoader { background: rgba(15,23,42,.85); }
     </style>
 
     @stack('styles')
 </head>
 <body>
 
+{{-- SIDEBAR OVERLAY (mobile) --}}
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
 {{-- SIDEBAR --}}
 <nav class="sidebar" id="sidebar">
 
-    {{-- BRAND --}}
-    <div class="sidebar-brand">
-
-        <div class="d-flex align-items-center">
-            <div class="brand-logo">
-                <i class="bi bi-mortarboard-fill"></i>
-            </div>
-
-            <div>
-                <div class="brand-title">Smart Center </div>
-                <div class="brand-sub">Enterprise System</div>
-            </div>
+    <a href="{{ route('dashboard') }}" class="sidebar-brand">
+        <div class="brand-logo">
+            <i class="bi bi-mortarboard-fill"></i>
         </div>
-
-    </div>
-
-    {{-- USER --}}
-    <div class="sidebar-user">
-
-        <img
-            src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=2563eb&color=fff"
-            class="sidebar-avatar">
-
         <div>
-            <div class="user-name">
-                {{ auth()->user()->name }}
-            </div>
-
-            <div class="user-role">
-                {{ ucfirst(auth()->user()->getRoleNames()->first()) }}
-            </div>
+            <div class="brand-title">Smart Center</div>
+            <div class="brand-sub">Enterprise System</div>
         </div>
+    </a>
 
+    <div class="sidebar-user">
+        <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=2563eb&color=fff&size=80"
+             class="sidebar-avatar" alt="Avatar">
+        <div>
+            <div class="user-name">{{ auth()->user()->name }}</div>
+            <div class="user-role">{{ ucfirst(auth()->user()->getRoleNames()->first() ?? 'User') }}</div>
+        </div>
     </div>
 
-    {{-- MENU --}}
     <div class="sidebar-nav">
 
         {{-- DASHBOARD --}}
         <div class="nav-item">
-            <a href="{{ route('dashboard') }}"
-               class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+            <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <i class="bi bi-grid-fill"></i>
                 <span>Dashboard</span>
             </a>
@@ -487,82 +536,76 @@
 
         {{-- OWNER --}}
         @role('owner')
-
         <div class="nav-header">OWNER PANEL</div>
 
         <div class="nav-item">
-            <a href="{{ route('owner.branches.index') }}" class="nav-link">
+            <a href="{{ route('owner.branches.index') }}" class="nav-link {{ request()->routeIs('owner.branches.*') ? 'active' : '' }}">
                 <i class="bi bi-building"></i>
                 <span>Monitoring Cabang</span>
             </a>
         </div>
-
         <div class="nav-item">
             <a href="#" class="nav-link">
                 <i class="bi bi-graph-up-arrow"></i>
                 <span>Analytics</span>
+                <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
         </div>
-
         <div class="nav-item">
             <a href="#" class="nav-link">
                 <i class="bi bi-cash-stack"></i>
-                <span>Laporan Keuangan</span>
+                <span>Lap. Keuangan</span>
+                <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
         </div>
-
         <div class="nav-item">
             <a href="#" class="nav-link">
                 <i class="bi bi-people-fill"></i>
                 <span>Manajemen User</span>
+                <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
         </div>
-
         @endrole
 
         {{-- ADMIN --}}
         @role('admin|owner')
-
         <div class="nav-header">AKADEMIK</div>
 
         <div class="nav-item">
-            <a href="{{ route('admin.students.index') }}" class="nav-link">
+            <a href="{{ route('admin.students.index') }}" class="nav-link {{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
                 <i class="bi bi-mortarboard"></i>
                 <span>Siswa</span>
-                <span class="menu-badge">120</span>
             </a>
         </div>
-
         <div class="nav-item">
-            <a href="{{ route('admin.teachers.index') }}" class="nav-link">
+            <a href="{{ route('admin.teachers.index') }}" class="nav-link {{ request()->routeIs('admin.teachers.*') ? 'active' : '' }}">
                 <i class="bi bi-person-workspace"></i>
                 <span>Guru</span>
             </a>
         </div>
-
         <div class="nav-item">
             <a href="#" class="nav-link">
                 <i class="bi bi-book-half"></i>
                 <span>Modul Belajar</span>
+                <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
         </div>
-
         <div class="nav-item">
             <a href="#" class="nav-link">
                 <i class="bi bi-journal-bookmark"></i>
                 <span>Mata Pelajaran</span>
+                <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
         </div>
-
         <div class="nav-item">
             <a href="#" class="nav-link">
                 <i class="bi bi-diagram-3"></i>
                 <span>Kelas</span>
+                <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
         </div>
-
         <div class="nav-item">
-            <a href="{{ route('admin.schedules.index') }}" class="nav-link">
+            <a href="{{ route('admin.schedules.index') }}" class="nav-link {{ request()->routeIs('admin.schedules.*') ? 'active' : '' }}">
                 <i class="bi bi-calendar-week"></i>
                 <span>Jadwal</span>
             </a>
@@ -571,129 +614,93 @@
         <div class="nav-header">KEUANGAN</div>
 
         <div class="nav-item">
-            <a href="{{ route('admin.payments.index') }}" class="nav-link">
+            <a href="{{ route('admin.payments.index') }}" class="nav-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
                 <i class="bi bi-wallet2"></i>
                 <span>Pembayaran</span>
             </a>
         </div>
-
         <div class="nav-item">
             <a href="#" class="nav-link">
                 <i class="bi bi-receipt"></i>
                 <span>Invoice</span>
+                <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
         </div>
-
         <div class="nav-item">
             <a href="#" class="nav-link">
                 <i class="bi bi-award"></i>
                 <span>Sertifikat</span>
+                <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
         </div>
 
         <div class="nav-header">TRYOUT CBT</div>
 
         <div class="nav-item">
-            <a href="{{ route('admin.tryouts.index') }}" class="nav-link">
+            <a href="{{ route('admin.tryouts.index') }}" class="nav-link {{ request()->routeIs('admin.tryouts.*') ? 'active' : '' }}">
                 <i class="bi bi-ui-checks-grid"></i>
                 <span>Tryout Online</span>
             </a>
         </div>
-
         @endrole
 
         {{-- GURU --}}
         @role('guru')
-
         <div class="nav-header">GURU PANEL</div>
-
         <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="bi bi-calendar2-week"></i>
-                <span>Jadwal Mengajar</span>
-            </a>
+            <a href="#" class="nav-link"><i class="bi bi-calendar2-week"></i><span>Jadwal Mengajar</span></a>
         </div>
-
         <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="bi bi-check2-square"></i>
-                <span>Absensi</span>
-            </a>
+            <a href="#" class="nav-link"><i class="bi bi-check2-square"></i><span>Absensi</span></a>
         </div>
-
         <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="bi bi-bar-chart-line"></i>
-                <span>Input Nilai</span>
-            </a>
+            <a href="#" class="nav-link"><i class="bi bi-bar-chart-line"></i><span>Input Nilai</span></a>
         </div>
-
         <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="bi bi-cloud-upload"></i>
-                <span>Upload Materi</span>
-            </a>
+            <a href="#" class="nav-link"><i class="bi bi-cloud-upload"></i><span>Upload Materi</span></a>
         </div>
-
         @endrole
 
         {{-- SISWA --}}
         @role('siswa')
-
         <div class="nav-header">SISWA PANEL</div>
-
         <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="bi bi-calendar-event"></i>
-                <span>Jadwal Belajar</span>
-            </a>
+            <a href="#" class="nav-link"><i class="bi bi-calendar-event"></i><span>Jadwal Belajar</span></a>
         </div>
-
         <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="bi bi-credit-card"></i>
-                <span>Pembayaran</span>
-            </a>
+            <a href="#" class="nav-link"><i class="bi bi-credit-card"></i><span>Pembayaran</span></a>
         </div>
-
         <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="bi bi-laptop"></i>
-                <span>Tryout CBT</span>
-            </a>
+            <a href="#" class="nav-link"><i class="bi bi-laptop"></i><span>Tryout CBT</span></a>
         </div>
-
         <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="bi bi-file-earmark-text"></i>
-                <span>Raport Digital</span>
-            </a>
+            <a href="#" class="nav-link"><i class="bi bi-file-earmark-text"></i><span>Raport Digital</span></a>
         </div>
-
         @endrole
 
         {{-- SYSTEM --}}
         <div class="nav-header">SYSTEM</div>
 
         <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="bi bi-chat-dots"></i>
-                <span>Chat Realtime</span>
+            <a href="{{ route('profile.edit') }}" class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
+                <i class="bi bi-person-circle"></i>
+                <span>Profil Saya</span>
             </a>
         </div>
 
         <div class="nav-item">
             <a href="#" class="nav-link">
-                <i class="bi bi-bell"></i>
-                <span>Notifikasi</span>
+                <i class="bi bi-chat-dots"></i>
+                <span>Chat Realtime</span>
+                <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
         </div>
 
         <div class="nav-item">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button class="nav-link border-0 bg-transparent w-100 text-start">
-                    <i class="bi bi-box-arrow-left"></i>
+                <button class="nav-link border-0 bg-transparent w-100 text-start" style="color:#94a3b8">
+                    <i class="bi bi-box-arrow-left" style="color:#ef4444"></i>
                     <span>Logout</span>
                 </button>
             </form>
@@ -703,97 +710,62 @@
 
 </nav>
 
-{{-- MAIN --}}
+{{-- MAIN CONTENT --}}
 <div class="main-content">
 
     {{-- TOPBAR --}}
     <div class="topbar">
 
-        <button class="btn btn-sm d-lg-none me-2" style="background:transparent;border:0;color:#0f172a" onclick="toggleSidebar()" aria-label="Toggle navigation">
-            <i class="bi bi-list" style="font-size:20px"></i>
-        </button>
-
         <div class="topbar-left">
+            <button class="top-btn d-lg-none" onclick="toggleSidebar()" aria-label="Menu">
+                <i class="bi bi-list" style="font-size:18px"></i>
+            </button>
 
-            <h4>@yield('page-title','Dashboard')</h4>
-
-            <p>
-                Sistem Management Akademi & Bimbel Enterprise
-            </p>
-
+            <div>
+                <h4>@yield('page-title','Dashboard')</h4>
+                <p class="d-none d-md-block">Smart Center — Sistem Manajemen Bimbel Enterprise</p>
+            </div>
         </div>
 
         <div class="topbar-right">
 
-            <div class="top-icon">
-                <i class="bi bi-search"></i>
-            </div>
+            <button class="top-btn" id="darkToggle" onclick="toggleDark()" title="Toggle dark mode">
+                <i class="bi bi-moon" id="darkIcon"></i>
+            </button>
 
-            <div class="top-icon">
-                <i class="bi bi-moon"></i>
-            </div>
-
-            <div class="top-icon">
+            <button class="top-btn position-relative" title="Notifikasi">
                 <i class="bi bi-bell"></i>
-                <span class="notif-badge">5</span>
-            </div>
+                <span class="notif-badge">3</span>
+            </button>
 
             <div class="dropdown">
-
-                <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2"
-                        data-bs-toggle="dropdown">
-
-                    <img
-                        src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=2563eb&color=fff"
-                        width="38"
-                        class="rounded-circle">
-
+                <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border"
+                        data-bs-toggle="dropdown" style="border-radius:12px;padding:6px 12px 6px 8px;font-size:13px">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=2563eb&color=fff&size=64"
+                         width="32" height="32" class="rounded-circle">
                     <div class="text-start d-none d-md-block">
-                        <div class="fw-semibold small">
-                            {{ auth()->user()->name }}
-                        </div>
-
-                        <div style="font-size:11px;color:#64748b">
-                            {{ ucfirst(auth()->user()->getRoleNames()->first()) }}
-                        </div>
+                        <div class="fw-semibold" style="font-size:13px;line-height:1.2">{{ Str::limit(auth()->user()->name, 16) }}</div>
+                        <div style="font-size:10px;color:var(--text-muted)">{{ ucfirst(auth()->user()->getRoleNames()->first() ?? 'User') }}</div>
                     </div>
-
+                    <i class="bi bi-chevron-down small d-none d-md-block ms-1" style="font-size:10px"></i>
                 </button>
 
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius:14px;min-width:180px">
                     <li>
-                        <a class="dropdown-item" href="#">
-                            <i class="bi bi-person me-2"></i>
-                            Profile
+                        <a class="dropdown-item py-2" href="{{ route('profile.edit') }}">
+                            <i class="bi bi-person me-2 text-primary"></i>Profil Saya
                         </a>
                     </li>
-
+                    <li><hr class="dropdown-divider my-1"></li>
                     <li>
-                        <a class="dropdown-item" href="#">
-                            <i class="bi bi-gear me-2"></i>
-                            Settings
-                        </a>
-                    </li>
-
-                    <li><hr class="dropdown-divider"></li>
-
-                    <li>
-
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-
-                            <button class="dropdown-item text-danger">
-                                <i class="bi bi-box-arrow-right me-2"></i>
-                                Logout
+                            <button class="dropdown-item py-2 text-danger">
+                                <i class="bi bi-box-arrow-right me-2"></i>Logout
                             </button>
-
                         </form>
-
                     </li>
-
                 </ul>
-
             </div>
 
         </div>
@@ -801,41 +773,85 @@
     </div>
 
     {{-- CONTENT --}}
-    <div class="content-wrapper">
-
+    <div class="content-wrapper fade-in">
         @yield('content')
-
     </div>
 
 </div>
 
+{{-- PAGE LOADER --}}
+<div id="pageLoader">
+    <div class="text-center">
+        <div class="spinner-border text-primary mb-2" role="status"></div>
+        <div style="font-size:13px;color:#64748b">Loading...</div>
+    </div>
+</div>
+
+{{-- SCRIPTS --}}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-
-    function toggleSidebar(){
-        document.getElementById('sidebar').classList.toggle('show');
-    }
-
-</script>
-<script>
-    // IntersectionObserver for simple reveal animations
-    document.addEventListener('DOMContentLoaded', function(){
-        const io = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if(entry.isIntersecting){
-                    entry.target.classList.add('in-view');
-                    io.unobserve(entry.target);
-                }
-            });
-        }, {threshold: 0.12});
-
-        document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
-    });
-</script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-@stack('scripts')
 
+<script>
+// ---- SIDEBAR TOGGLE ----
+function toggleSidebar() {
+    const sidebar  = document.getElementById('sidebar');
+    const overlay  = document.getElementById('sidebarOverlay');
+    const isOpen   = sidebar.classList.contains('show');
+    if (isOpen) {
+        closeSidebar();
+    } else {
+        sidebar.classList.add('show');
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+}
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('show');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+// ---- DARK MODE ----
+(function() {
+    const saved = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+    updateDarkIcon(saved);
+})();
+
+function toggleDark() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next    = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateDarkIcon(next);
+}
+
+function updateDarkIcon(theme) {
+    const icon = document.getElementById('darkIcon');
+    if (!icon) return;
+    icon.className = theme === 'dark' ? 'bi bi-sun' : 'bi bi-moon';
+}
+
+// ---- INTERSECTION OBSERVER (fade-up) ----
+document.addEventListener('DOMContentLoaded', function() {
+    const io = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('in-view');
+                io.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+});
+
+// ---- CLOSE SIDEBAR ON ESC ----
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeSidebar();
+});
+</script>
+
+@stack('scripts')
 </body>
 </html>
