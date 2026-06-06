@@ -1,4 +1,6 @@
 - [Route ordering bug](route-ordering.md) — static routes must come before wildcard `{param}` routes in the same prefix group or Laravel matches the wildcard first.
+- [Course & Grade model fields](course-grade-fields.md) — Course uses `cabang_id`/`nama` (not branch_id/name); Grade uses `siswa_id`/`mata_pelajaran_id`/`jenis_penilaian`/`nilai` (not student_id/course_id/jenis); SchoolClass uses `nama_kelas` (not nama), `cabang_id`.
+- [Blade push-scripts PHP scope](blade-push-scope.md) — PHP functions defined in `@push('scripts')` are NOT available in `@section('content')` which renders first; define helper functions in a `@php` block at the TOP of the file before `@section`.
 - [Profile page stack mismatch](profile-stack.md) — profile/edit and auth views used `<x-app-layout>` (Breeze Tailwind) which is incompatible with the Bootstrap app layout; rewritten as plain Bootstrap + `@extends('layouts.app')`.
 - [Owner dashboard fake data](owner-dashboard-fake.md) — original owner dashboard had hardcoded numbers (12, 1240, 85, Rp120JT); replaced with live Eloquent queries in the view.
 - [Payment/Schedule controllers](payment-schedule-controllers.md) — Invoice CRUD uses route model binding on `Invoice $payment` (matches `{payment}` param), markPaid route uses `{invoice}`. SchoolClass table is `school_classes`, field for name is `nama`.

@@ -12,7 +12,10 @@ use App\Http\Controllers\Admin\CertificateController;
 use App\Http\Controllers\Owner\BranchController;
 
 Route::get('/', function () {
-    return view('auth.login');
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+    return view('welcome');
 });
 
 Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
@@ -165,17 +168,9 @@ Route::middleware(['auth'])
     ->prefix('guru')
     ->name('guru.')
     ->group(function () {
-        Route::get('/dashboard',   fn() => view('guru.dashboard'))->name('dashboard');
-        Route::get('/attendance',  fn() => view('guru.coming-soon', [
-            'title' => 'Absensi Siswa',
-            'icon'  => 'bi-check2-square',
-            'desc'  => 'Fitur input absensi siswa per sesi sedang dalam pengembangan.',
-        ]))->name('attendance');
-        Route::get('/grades',      fn() => view('guru.coming-soon', [
-            'title' => 'Input Nilai',
-            'icon'  => 'bi-bar-chart-line',
-            'desc'  => 'Fitur input dan rekap nilai siswa akan segera tersedia.',
-        ]))->name('grades');
+        Route::get('/dashboard',  fn() => view('guru.dashboard'))->name('dashboard');
+        Route::get('/attendance', fn() => view('guru.attendance'))->name('attendance');
+        Route::get('/grades',     fn() => view('guru.grades'))->name('grades');
     });
 
 /*
@@ -188,16 +183,12 @@ Route::middleware(['auth'])
     ->name('siswa.')
     ->group(function () {
         Route::get('/dashboard', fn() => view('siswa.dashboard'))->name('dashboard');
+        Route::get('/schedule',  fn() => view('siswa.schedule'))->name('schedule');
         Route::get('/tryout',    fn() => view('siswa.coming-soon', [
             'title' => 'Tryout Online',
             'icon'  => 'bi-pencil-square',
             'desc'  => 'Fitur CBT (Computer Based Test) online sedang dalam pengembangan aktif.',
         ]))->name('tryout');
-        Route::get('/schedule',  fn() => view('siswa.coming-soon', [
-            'title' => 'Jadwal Belajar',
-            'icon'  => 'bi-calendar-week',
-            'desc'  => 'Tampilan jadwal belajar personal untuk siswa akan segera hadir.',
-        ]))->name('schedule');
     });
 
 require __DIR__.'/auth.php';

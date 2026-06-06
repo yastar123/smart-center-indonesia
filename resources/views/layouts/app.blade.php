@@ -949,15 +949,13 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="{{ route('guru.attendance') }}" class="nav-link {{ request()->routeIs('guru.attendance') ? 'active' : '' }}">
                 <i class="bi bi-check2-square"></i><span>Absensi</span>
-                <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="{{ route('guru.grades') }}" class="nav-link {{ request()->routeIs('guru.grades') ? 'active' : '' }}">
                 <i class="bi bi-bar-chart-line"></i><span>Input Nilai</span>
-                <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
         </div>
         @endrole
@@ -966,12 +964,12 @@
         @role('siswa')
         <div class="nav-header">SISWA PANEL</div>
         <div class="nav-item">
-            <a href="{{ route('siswa.dashboard') }}" class="nav-link {{ request()->routeIs('siswa.*') ? 'active' : '' }}">
+            <a href="{{ route('siswa.dashboard') }}" class="nav-link {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
                 <i class="bi bi-speedometer2"></i><span>Dashboard</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.dashboard') }}#jadwal" class="nav-link">
+            <a href="{{ route('siswa.schedule') }}" class="nav-link {{ request()->routeIs('siswa.schedule') ? 'active' : '' }}">
                 <i class="bi bi-calendar-event"></i><span>Jadwal Belajar</span>
             </a>
         </div>
@@ -981,8 +979,9 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.tryouts.index') }}" class="nav-link {{ request()->routeIs('admin.tryouts.*') ? 'active' : '' }}">
+            <a href="{{ route('siswa.tryout') }}" class="nav-link {{ request()->routeIs('siswa.tryout') ? 'active' : '' }}">
                 <i class="bi bi-laptop"></i><span>Tryout CBT</span>
+                <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
         </div>
         <div class="nav-item">
@@ -1126,8 +1125,8 @@
     </a>
     @endrole
     @role('siswa')
-    <a href="{{ route('siswa.dashboard') }}#jadwal" class="mob-nav-item">
-        <i class="bi bi-calendar-event"></i>
+    <a href="{{ route('siswa.schedule') }}" class="mob-nav-item {{ request()->routeIs('siswa.schedule') ? 'active' : '' }}">
+        <i class="bi bi-calendar-event{{ request()->routeIs('siswa.schedule') ? '-fill' : '' }}"></i>
         <span>Jadwal</span>
     </a>
     <a href="{{ route('siswa.dashboard') }}#pembayaran" class="mob-nav-item">
