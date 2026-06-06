@@ -18,7 +18,10 @@ class TeacherController extends Controller
                     $q->where('name', 'like', "%{$request->search}%")
                       ->orWhere('nig',  'like', "%{$request->search}%"))
                 ->when($request->status,    fn($q) => $q->where('status',    $request->status))
-                ->when($request->branch_id, fn($q) => $q->where('branch_id', $request->branch_id))
+                ->when($request->branch_id, function($q) use ($request) {
+                    if ($request->branch_id === 'pusat') return $q->whereNull('branch_id');
+                    return $q->where('branch_id', $request->branch_id);
+                })
                 ->latest()
                 ->paginate(10);
 
@@ -39,6 +42,11 @@ class TeacherController extends Controller
 
     public function store(Request $request)
     {
+        // normalize 'pusat' selection
+        if ($request->input('branch_id') === 'pusat' || $request->input('branch_id') === '0') {
+            $request->merge(['branch_id' => null]);
+        }
+
         $request->validate([
             'name'       => 'required|string|max:100',
             'nig'        => 'required|string|unique:teachers,nig',
@@ -46,7 +54,7 @@ class TeacherController extends Controller
             'birth_date' => 'required|date',
             'phone'      => 'nullable|string|max:20',
             'email'      => 'nullable|email|unique:teachers,email',
-            'branch_id'  => 'required|exists:branches,id',
+            'branch_id'  => 'nullable|exists:branches,id',
             'education'  => 'nullable|string|max:50',
             'subjects'   => 'nullable|string',
             'photo'      => 'nullable|image|max:2048',
@@ -72,12 +80,17 @@ class TeacherController extends Controller
 
     public function update(Request $request, Teacher $teacher)
     {
+        // normalize 'pusat' selection
+        if ($request->input('branch_id') === 'pusat' || $request->input('branch_id') === '0') {
+            $request->merge(['branch_id' => null]);
+        }
+
         $request->validate([
             'name'       => 'required|string|max:100',
             'nig'        => 'required|string|unique:teachers,nig,' . $teacher->id,
             'gender'     => 'required|in:L,P',
             'birth_date' => 'nullable|date',
-            'branch_id'  => 'required|exists:branches,id',
+            'branch_id'  => 'nullable|exists:branches,id',
             'email'      => 'nullable|email|unique:teachers,email,' . $teacher->id,
             'photo'      => 'nullable|image|max:2048',
         ]);

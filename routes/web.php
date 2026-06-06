@@ -12,7 +12,7 @@ use App\Http\Controllers\Admin\CertificateController;
 use App\Http\Controllers\Owner\BranchController;
 
 Route::get('/', function () {
-    return redirect('/admin');
+    return redirect('/login');
 });
 
 Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
@@ -87,6 +87,13 @@ Route::middleware(['auth'])
         Route::put('/courses/{course}',   [CourseController::class, 'update'])  ->name('courses.update');
         Route::delete('/courses/{course}',[CourseController::class, 'destroy']) ->name('courses.destroy');
 
+        // CATEGORIES for courses
+        Route::get('/categories',           [\App\Http\Controllers\Admin\CategoryController::class, 'index'])->name('categories.index');
+        Route::post('/categories',          [\App\Http\Controllers\Admin\CategoryController::class, 'store'])->name('categories.store');
+        Route::get('/categories/{category}',[\App\Http\Controllers\Admin\CategoryController::class, 'show'])->name('categories.show');
+        Route::put('/categories/{category}',[\App\Http\Controllers\Admin\CategoryController::class, 'update'])->name('categories.update');
+        Route::delete('/categories/{category}',[\App\Http\Controllers\Admin\CategoryController::class, 'destroy'])->name('categories.destroy');
+
         // CLASSES (Kelas)
         Route::get('/classes',           [SchoolClassController::class, 'index'])   ->name('classes.index');
         Route::post('/classes',          [SchoolClassController::class, 'store'])   ->name('classes.store');
@@ -121,6 +128,17 @@ Route::middleware(['auth'])
 
         Route::get('/branches', [BranchController::class, 'index'])
             ->name('branches.index');
+
+        // Branch-specific dashboard for owner to view branch details
+        Route::get('/branches/{branch}/dashboard', [BranchController::class, 'dashboard'])
+            ->name('branches.dashboard');
+        
+        // impersonation: owner can act as branch admin
+        Route::post('/branches/{branch}/impersonate', [BranchController::class, 'impersonate'])
+            ->name('branches.impersonate');
+
+        // (leave impersonation route is defined globally below so it remains accessible
+        // even while impersonating)
 
         Route::post('/branches', [BranchController::class, 'store'])
             ->name('branches.store');
@@ -189,3 +207,14 @@ Route::middleware(['auth'])
     });
 
 require __DIR__.'/auth.php';
+
+// Global route to leave impersonation — kept outside owner group so it is
+// accessible while impersonating (current user may be branch admin).
+Route::post('/impersonate/leave', function () {
+    $orig = session()->pull('impersonate.original_user');
+    session()->forget('impersonate.branch_id');
+    if ($orig) {
+        auth()->loginUsingId($orig);
+    }
+    return redirect()->route('owner.branches.index');
+})->name('impersonate.leave')->middleware('auth');

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Branch;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CourseController extends Controller
 {
@@ -46,11 +47,17 @@ class CourseController extends Controller
             'nama'      => 'required|string|max:100',
             'deskripsi' => 'nullable|string',
             'kategori'  => 'nullable|string|max:50',
-            'icon'      => 'nullable|string|max:50',
+            'icon'      => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
             'warna'     => 'nullable|string|max:10',
             'cabang_id' => 'nullable|exists:branches,id',
             'status'    => 'required|in:aktif,nonaktif',
         ]);
+
+        // Handle uploaded icon image
+        if ($request->hasFile('icon')) {
+            $path = $request->file('icon')->store('courses', 'public');
+            $data['icon'] = $path;
+        }
 
         Course::create($data);
 
@@ -59,7 +66,10 @@ class CourseController extends Controller
 
     public function show(Course $course)
     {
-        return response()->json($course->load('cabang'));
+        $course->load('cabang');
+        $payload = $course->toArray();
+        $payload['icon_url'] = $course->icon ? Storage::url($course->icon) : null;
+        return response()->json($payload);
     }
 
     public function update(Request $request, Course $course)
@@ -69,11 +79,20 @@ class CourseController extends Controller
             'nama'      => 'required|string|max:100',
             'deskripsi' => 'nullable|string',
             'kategori'  => 'nullable|string|max:50',
-            'icon'      => 'nullable|string|max:50',
+            'icon'      => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
             'warna'     => 'nullable|string|max:10',
             'cabang_id' => 'nullable|exists:branches,id',
             'status'    => 'required|in:aktif,nonaktif',
         ]);
+
+        if ($request->hasFile('icon')) {
+            // delete old if exists
+            if ($course->icon) {
+                Storage::disk('public')->delete($course->icon);
+            }
+            $path = $request->file('icon')->store('courses', 'public');
+            $data['icon'] = $path;
+        }
 
         $course->update($data);
 

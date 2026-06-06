@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Support\Facades\Response;
 use PDF;
@@ -178,6 +179,91 @@ class BranchController extends Controller
         }
 
         return response()->view('owner.branches.pdf', compact('branches'));
+    }
+
+    /**
+     * Owner view of a branch dashboard
+     */
+    public function dashboard(Branch $branch)
+    {
+        // load some quick stats for the branch
+        $studentsCount = $branch->students()->count();
+
+        return view('owner.branches.dashboard', [
+            'branch' => $branch,
+            'studentsCount' => $studentsCount,
+        ]);
+    }
+
+    /**
+     * Impersonate branch admin (owner only)
+     */
+    public function impersonate(Request $request, Branch $branch)
+    {
+        $user = auth()->user();
+        if (! $user) {
+            abort(403);
+        }
+        // defensive: prefer helper methods if available
+        $isOwner = false;
+        try {
+            if (method_exists($user, 'isOwner')) $isOwner = $user->isOwner();
+            elseif (method_exists($user, 'hasRole')) $isOwner = $user->hasRole('owner');
+        } catch (\Throwable $e) {
+            $isOwner = false;
+        }
+        if (! $isOwner) {
+            // include current roles to help debugging instead of immediate 403
+            try {
+                $roles = $user->getRoleNames()->toArray();
+            } catch (\Throwable $e) {
+                $roles = [];
+            }
+            \Log::warning('Impersonate denied: user lacks owner role', ['user_id' => $user->id, 'roles' => $roles]);
+            return back()->with('error', 'Akses ditolak: Anda tidak memiliki peran owner. Peran saat ini: ' . implode(',', $roles));
+        }
+
+        if (! $branch->admin_id) {
+            return back()->with('error', 'Cabang belum memiliki akun admin');
+        }
+
+        $admin = User::find($branch->admin_id);
+        if (! $admin) {
+            return back()->with('error', 'Akun admin cabang tidak ditemukan');
+        }
+
+        // store original user id to allow leaving impersonation
+        $request->session()->put('impersonate.original_user', $user->id);
+        $request->session()->put('impersonate.branch_id', $branch->id);
+
+        // log in as branch admin and regenerate session to avoid stale intended URL/session
+        Auth::loginUsingId($admin->id);
+        try {
+            $request->session()->regenerate();
+            // clear any intended owner URL so user doesn't get redirected back to owner pages
+            $intended = $request->session()->get('url.intended');
+            if ($intended && str_starts_with($intended, url('/').'/owner')) {
+                $request->session()->forget('url.intended');
+            }
+        } catch (\Throwable $e) {
+            // ignore session regen failures
+        }
+
+        return redirect()->route('dashboard');
+    }
+
+    /**
+     * Leave impersonation and restore original owner session
+     */
+    public function leaveImpersonation(Request $request)
+    {
+        $orig = $request->session()->pull('impersonate.original_user');
+        $request->session()->forget('impersonate.branch_id');
+        if ($orig) {
+            Auth::loginUsingId($orig);
+        }
+
+        return redirect()->route('owner.branches.index');
     }
 
 }

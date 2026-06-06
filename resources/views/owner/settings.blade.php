@@ -51,28 +51,7 @@
             </div>
         </div>
 
-        {{-- ACADEMIC SETTINGS --}}
-        <div class="dashboard-card fade-up mb-4">
-            <h6 class="fw-bold mb-4"><i class="bi bi-mortarboard me-2 text-success"></i>Pengaturan Akademik</h6>
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold" style="font-size:12px">Tahun Ajaran Aktif</label>
-                    <input type="text" class="form-control" value="2025/2026" style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold" style="font-size:12px">Semester Aktif</label>
-                    <select class="form-select" style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
-                        <option>Semester 1 (Ganjil)</option>
-                        <option>Semester 2 (Genap)</option>
-                    </select>
-                </div>
-            </div>
-            <div class="mt-3 d-flex justify-content-end">
-                <button class="btn btn-success px-4 fw-semibold" style="border-radius:10px" onclick="Swal.fire({icon:'info',title:'Coming Soon',text:'Fitur simpan pengaturan akan segera tersedia.',timer:2000,showConfirmButton:false})">
-                    <i class="bi bi-save me-2"></i>Simpan
-                </button>
-            </div>
-        </div>
+        
     </div>
 
     {{-- SIDE PANEL --}}

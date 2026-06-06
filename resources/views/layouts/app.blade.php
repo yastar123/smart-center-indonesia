@@ -105,7 +105,7 @@
             background: linear-gradient(180deg, #260632 0%, #461256 100%);
             overflow-y: auto;
             overflow-x: hidden;
-            z-index: 1050;
+            z-index: 1030;
             transition: transform var(--transition), box-shadow var(--transition);
             border-right: 1px solid var(--border);
         }
@@ -237,7 +237,7 @@
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,.55);
-            z-index: 1049;
+            z-index: 1029;
             backdrop-filter: blur(2px);
             animation: fadeOverlay .2s ease both;
         }
@@ -425,6 +425,18 @@
             border-radius: 20px;
         }
 
+        /* Ensure Bootstrap modals/backdrops are above any global overlays */
+        .modal {
+            z-index: 2100 !important;
+        }
+        .modal-backdrop {
+            z-index: 2090 !important;
+        }
+        /* pageLoader should never block pointer events over modals */
+        #pageLoader {
+            pointer-events: none !important;
+        }
+
         /* ============================================================
            SCROLLBAR (webkit)
         ============================================================ */
@@ -607,7 +619,8 @@
             position: fixed;
             inset: 0;
             background: rgba(255,255,255,.8);
-            z-index: 9999;
+            /* keep loader below modal/backdrop so modals remain interactive */
+            z-index: 1040;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -890,6 +903,40 @@
         }
 
         /* ============================================================
+           PAGINATION / ICON FIXES
+           Normalize pagination/button icon sizes and spacing so
+           large icons (injected by extensions or fonts) don't
+           overflow the layout.
+        ============================================================ */
+        .pagination { display: flex; gap: .25rem; align-items: center; }
+        .pagination .page-link { padding: .3125rem .6rem; min-width: 2.2rem; height: 2.2rem; display: inline-flex; align-items: center; justify-content: center; }
+        .pagination .page-link, .pagination .page-item .page-link { font-size: .9rem; }
+            .page-link .bi, .page-link i { font-size: 1rem; line-height: 1; vertical-align: middle; }
+            .page-link svg, .page-link svg * { width: 1rem; height: 1rem; }
+        .btn-sm .bi, #paginationLinks .bi { font-size: .95rem !important; line-height: 1 !important; }
+            /* Strong rule to protect pagination icons from extension font replacement */
+            #paginationLinks svg, .pagination .page-link svg { width: 1rem !important; height: 1rem !important; max-width:1rem !important; max-height:1rem !important; }
+
+            /* If icons keep getting injected by extensions, hide them entirely in pagination areas */
+            .pagination .bi, #paginationLinks .bi, .pagination svg, #paginationLinks svg, .pagination img, #paginationLinks img { display: none !important; }
+
+            /* Target common Heroicon path used in injected chevrons and hide it */
+            .pagination svg path[d*="M12.707 5.293"], #paginationLinks svg path[d*="M12.707 5.293"] { display: none !important; }
+            /* Also hide svg elements using Tailwind-like size classes if present */
+            .pagination svg.w-5.h-5, #paginationLinks svg.w-5.h-5 { display: none !important; }
+
+            /* Also neutralize pseudo-element content inside pagination */
+            .pagination::before, .pagination::after,
+            .pagination *::before, .pagination *::after,
+            #paginationLinks::before, #paginationLinks::after,
+            #paginationLinks *::before, #paginationLinks *::after {
+                content: none !important; display: none !important; width:0; height:0; overflow:hidden; visibility:hidden;
+            }
+        #paginationLinks .btn { display: inline-flex; align-items: center; justify-content: center; }
+        /* ensure prev/next custom buttons don't expand vertically */
+        #paginationLinks .btn { height: auto; padding-top: .25rem; padding-bottom: .25rem; }
+
+        /* ============================================================
            DARK MODE — SELECT OPTIONS
         ============================================================ */
         [data-theme="dark"] option { background: #2d0a3e; color: #f0e8f5; }
@@ -991,6 +1038,15 @@
     @stack('styles')
 </head>
 <body>
+    @if(session()->has('impersonate.original_user'))
+        <div style="background:#fff4f4;border-bottom:1px solid #fecaca;padding:8px;text-align:center;z-index:1200">
+            Anda sedang <strong>mengakses sebagai admin cabang</strong>. 
+            <form method="POST" action="{{ route('impersonate.leave') }}" style="display:inline;margin-left:8px">
+                @csrf
+                <button class="btn btn-sm btn-danger">Kembali ke Pusat</button>
+            </form>
+        </div>
+    @endif
 
 {{-- NAV PROGRESS BAR --}}
 <div id="navProgress"></div>
@@ -1611,7 +1667,62 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
     });
 })();
 </script>
+</script>
+
+<script src="{{ asset('js/modal-fallback.js') }}" defer></script>
 
 @stack('scripts')
 </body>
+<script>
+// Sanitize pagination UI: hide or shrink unexpected oversized elements
+function sanitizePaginationArea(selector) {
+    document.querySelectorAll(selector).forEach(root => {
+        function clean() {
+            // Remove icons (svg, i, img) and large injected nodes
+            root.querySelectorAll('svg,i,img').forEach(e => e.remove());
+            root.querySelectorAll('*').forEach(el => {
+                try {
+                    const rect = el.getBoundingClientRect();
+                    const tag = el.tagName || '';
+                    // Hide any element that's clearly oversized inside pagination
+                    if ((rect.width > 48 || rect.height > 48) && !['BUTTON','A','UL','LI','NAV','SPAN'].includes(tag)) {
+                        el.style.display = 'none';
+                    }
+                    // Ensure buttons/links show text, not icons
+                    if ((tag === 'A' || tag === 'BUTTON' || tag === 'SPAN') && el.querySelectorAll && el.querySelectorAll('svg,i,img').length) {
+                        el.querySelectorAll('svg,i,img').forEach(x=>x.remove());
+                        if (!el.textContent.trim()) {
+                            // set sensible fallback
+                            if (el.getAttribute('aria-label') && /previous/i.test(el.getAttribute('aria-label'))) el.textContent = '‹';
+                            else if (el.getAttribute('aria-label') && /next/i.test(el.getAttribute('aria-label'))) el.textContent = '›';
+                        }
+                    }
+                } catch (e) {
+                    // ignore
+                }
+            });
+        }
+        clean();
+        const mo = new MutationObserver(clean);
+        mo.observe(root, { childList: true, subtree: true, attributes: true });
+    });
+}
+document.addEventListener('DOMContentLoaded', function() {
+    sanitizePaginationArea('#paginationLinks');
+    sanitizePaginationArea('.pagination');
+    sanitizePaginationArea('nav.d-flex');
+    // Remove specific SVGs matching known chevron path or tailwind classes inside pagination
+    function removeKnownChevrons() {
+        const targetPath = 'M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z';
+        document.querySelectorAll('#paginationLinks svg, .pagination svg, nav.d-flex svg').forEach(s => {
+            try {
+                const inner = s.innerHTML || '';
+                if (inner.includes(targetPath) || s.classList.contains('w-5') || s.classList.contains('h-5')) s.remove();
+            } catch(e) {}
+        });
+    }
+    removeKnownChevrons();
+    new MutationObserver(removeKnownChevrons).observe(document.body, { childList:true, subtree:true });
+});
+</script>
 </html>

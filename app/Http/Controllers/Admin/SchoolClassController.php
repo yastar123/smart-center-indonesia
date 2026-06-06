@@ -7,7 +7,7 @@ use App\Models\SchoolClass;
 use App\Models\Course;
 use App\Models\Teacher;
 use App\Models\Branch;
-use App\Models\TahunAkademik;
+use App\Models\AcademicYear;
 use Illuminate\Http\Request;
 
 class SchoolClassController extends Controller
@@ -33,7 +33,7 @@ class SchoolClassController extends Controller
         $courses       = Course::where('status', 'aktif')->orderBy('nama')->get();
         $teachers      = Teacher::where('status', 'aktif')->orderBy('name')->get();
         $branches      = Branch::orderBy('name')->get();
-        $tahunAkademik = TahunAkademik::orderByDesc('tahun_mulai')->get();
+        $tahunAkademik = AcademicYear::orderByDesc('year_start')->get();
 
         $stats = [
             'total'   => SchoolClass::count(),
@@ -49,9 +49,14 @@ class SchoolClassController extends Controller
 
     public function store(Request $request)
     {
+        // normalize 'pusat' selection to null so validation accepts it
+        if ($request->input('cabang_id') === 'pusat' || $request->input('cabang_id') === '0') {
+            $request->merge(['cabang_id' => null]);
+        }
+
         $data = $request->validate([
             'nama_kelas'        => 'required|string|max:100',
-            'cabang_id'         => 'required|exists:branches,id',
+            'cabang_id'         => 'nullable|exists:branches,id',
             'mata_pelajaran_id' => 'nullable|exists:courses,id',
             'guru_id'           => 'nullable|exists:teachers,id',
             'tahun_akademik_id' => 'nullable|exists:academic_years,id',
@@ -61,6 +66,11 @@ class SchoolClassController extends Controller
             'link_zoom'         => 'nullable|url',
             'status'            => 'required|in:aktif,nonaktif,penuh',
         ]);
+
+        // ensure stored value maps to null for pusat selection
+        if ($request->input('cabang_id') === 'pusat' || $request->input('cabang_id') === '0') {
+            $data['cabang_id'] = null;
+        }
 
         SchoolClass::create($data);
 
@@ -74,9 +84,14 @@ class SchoolClassController extends Controller
 
     public function update(Request $request, SchoolClass $class)
     {
+        // normalize 'pusat' selection to null so validation accepts it
+        if ($request->input('cabang_id') === 'pusat' || $request->input('cabang_id') === '0') {
+            $request->merge(['cabang_id' => null]);
+        }
+
         $data = $request->validate([
             'nama_kelas'        => 'required|string|max:100',
-            'cabang_id'         => 'required|exists:branches,id',
+            'cabang_id'         => 'nullable|exists:branches,id',
             'mata_pelajaran_id' => 'nullable|exists:courses,id',
             'guru_id'           => 'nullable|exists:teachers,id',
             'tahun_akademik_id' => 'nullable|exists:academic_years,id',
@@ -86,6 +101,10 @@ class SchoolClassController extends Controller
             'link_zoom'         => 'nullable|url',
             'status'            => 'required|in:aktif,nonaktif,penuh',
         ]);
+
+        if ($request->input('cabang_id') === 'pusat' || $request->input('cabang_id') === '0') {
+            $data['cabang_id'] = null;
+        }
 
         $class->update($data);
 

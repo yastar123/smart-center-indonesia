@@ -202,6 +202,7 @@
                             <label class="form-label fw-semibold" style="font-size:.85rem;">Cabang <span class="text-danger">*</span></label>
                             <select class="form-select" id="cls_cabang_id" required>
                                 <option value="">-- Pilih Cabang --</option>
+                                <option value="pusat">Pusat</option>
                                 @foreach($branches as $b)
                                 <option value="{{ $b->id }}">{{ $b->name }}</option>
                                 @endforeach
@@ -301,7 +302,8 @@ function editClass(id) {
         .then(d => {
             document.getElementById('classId').value = d.id;
             document.getElementById('nama_kelas').value = d.nama_kelas || '';
-            document.getElementById('cls_cabang_id').value = d.cabang_id || '';
+            const cabangVal = (d.cabang_id === null) ? 'pusat' : (d.cabang_id || '');
+            document.getElementById('cls_cabang_id').value = cabangVal;
             document.getElementById('mata_pelajaran_id').value = d.mata_pelajaran_id || '';
             document.getElementById('guru_id').value = d.guru_id || '';
             document.getElementById('tahun_akademik_id').value = d.tahun_akademik_id || '';

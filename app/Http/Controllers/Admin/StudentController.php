@@ -15,13 +15,16 @@ public function index(Request $request)
 {
     $branches = Branch::all();
 
-    $students = Student::with('branch')
+        $students = Student::with('branch')
         ->when($request->search, fn($q) =>
             $q->where('name', 'like', "%{$request->search}%")
               ->orWhere('nis', 'like', "%{$request->search}%"))
         ->when($request->status,    fn($q) => $q->where('status',    $request->status))
         ->when($request->gender,    fn($q) => $q->where('gender',    $request->gender))
-        ->when($request->branch_id, fn($q) => $q->where('branch_id', $request->branch_id))
+            ->when($request->branch_id, function($q) use ($request) {
+                if ($request->branch_id === 'pusat') return $q->whereNull('branch_id');
+                return $q->where('branch_id', $request->branch_id);
+            })
         ->latest()
         ->paginate(10);
 
@@ -36,13 +39,18 @@ $stats = [
 
 public function store(Request $request)
 {
-    $data = $request->validate([
+        // normalize 'pusat' selection to null so validation accepts it
+        if ($request->input('branch_id') === 'pusat' || $request->input('branch_id') === '0') {
+            $request->merge(['branch_id' => null]);
+        }
+
+        $data = $request->validate([
         'name'         => 'required|string|max:100',
         'nis'          => 'required|string|unique:students,nis',
         'gender'       => 'required|in:L,P',
         'birth_date'   => 'nullable|date',
         'birth_place'  => 'nullable|string|max:100',
-        'branch_id'    => 'required|exists:branches,id',
+            'branch_id'    => 'nullable|exists:branches,id',
         'phone'        => 'nullable|string|max:20',
         'address'      => 'nullable|string',
         'parent_name'  => 'nullable|string|max:100',
@@ -53,6 +61,11 @@ public function store(Request $request)
     ]);
 
     $data['join_date'] = now()->toDateString();
+
+        // allow choosing 'pusat' from the UI (maps to null branch)
+        if ($request->input('branch_id') === 'pusat' || $request->input('branch_id') === '0') {
+            $data['branch_id'] = null;
+        }
 
     if ($request->hasFile('photo')) {
         $data['photo'] = $request->file('photo')->store('students', 'public');
@@ -75,6 +88,11 @@ public function store(Request $request)
 
     public function update(Request $request, Student $student)
     {
+        // normalize 'pusat' selection to null so validation accepts it
+        if ($request->input('branch_id') === 'pusat' || $request->input('branch_id') === '0') {
+            $request->merge(['branch_id' => null]);
+        }
+
         $request->validate([
             'name'         => 'required|string|max:100',
             'nis'          => 'required|string|unique:students,nis,' . $student->id,
@@ -84,11 +102,15 @@ public function store(Request $request)
             'address'      => 'nullable|string',
             'parent_name'  => 'nullable|string|max:100',
             'parent_phone' => 'nullable|string|max:20',
-            'branch_id'    => 'required|exists:branches,id',
+            'branch_id'    => 'nullable|exists:branches,id',
             'photo'        => 'nullable|image|max:2048',
         ]);
 
         $data = $request->except('photo');
+
+        if ($request->input('branch_id') === 'pusat' || $request->input('branch_id') === '0') {
+            $data['branch_id'] = null;
+        }
 
         if ($request->hasFile('photo')) {
             if ($student->photo) Storage::disk('public')->delete($student->photo);

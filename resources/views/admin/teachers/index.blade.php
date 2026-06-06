@@ -134,6 +134,7 @@
         <div class="col-6 col-md-4">
             <select id="filterBranch" class="form-select form-select-sm" onchange="loadTeachers()">
                 <option value="">Semua Cabang</option>
+                <option value="pusat">Pusat</option>
                 @foreach($branches as $branch)
                 <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                 @endforeach
@@ -267,6 +268,7 @@
                                 <label class="form-label small fw-semibold">Cabang <span class="text-danger">*</span></label>
                                 <select name="branch_id" id="branch_id" class="form-select form-select-sm" required>
                                     <option value="">Pilih Cabang</option>
+                                    <option value="pusat">Pusat</option>
                                     @foreach($branches as $branch)
                                     <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                                     @endforeach
@@ -379,7 +381,7 @@ function loadTeachers(page) {
                         <td><code style="background:var(--input-bg);padding:3px 8px;border-radius:6px;font-size:12px;color:#10b981">${t.nig}</code></td>
                         <td class="d-none d-md-table-cell">
                             <span style="background:var(--input-bg);color:var(--text-muted);border:1px solid var(--card-border);padding:3px 10px;border-radius:6px;font-size:11px">
-                                <i class="bi bi-building me-1"></i>${t.branch?.name ?? '–'}
+                                <i class="bi bi-building me-1"></i>${t.branch?.name ?? 'Pusat'}
                             </span>
                         </td>
                         <td class="d-none d-lg-table-cell">
@@ -418,14 +420,14 @@ function loadTeachers(page) {
             // Pagination links (simple prev/next)
             let links = '';
             if (res.current_page > 1)
-                links += `<button class="btn btn-sm btn-outline-secondary me-1" style="border-radius:8px" onclick="loadTeachers(${res.current_page-1})"><i class="bi bi-chevron-left"></i></button>`;
+                links += `<button class="btn btn-sm btn-outline-secondary me-1" style="border-radius:8px;display:inline-flex;align-items:center;justify-content:center" onclick="loadTeachers(${res.current_page-1})">‹</button>`;
             if (res.last_page > 1) {
                 for (let p = Math.max(1,res.current_page-2); p <= Math.min(res.last_page,res.current_page+2); p++) {
                     links += `<button class="btn btn-sm me-1 ${p===res.current_page?'btn-primary':'btn-outline-secondary'}" style="border-radius:8px;min-width:36px" onclick="loadTeachers(${p})">${p}</button>`;
                 }
             }
             if (res.current_page < res.last_page)
-                links += `<button class="btn btn-sm btn-outline-secondary" style="border-radius:8px" onclick="loadTeachers(${res.current_page+1})"><i class="bi bi-chevron-right"></i></button>`;
+                links += `<button class="btn btn-sm btn-outline-secondary" style="border-radius:8px;display:inline-flex;align-items:center;justify-content:center" onclick="loadTeachers(${res.current_page+1})">›</button>`;
             document.getElementById('paginationLinks').innerHTML = links;
         },
         error() {
@@ -457,7 +459,7 @@ function editTeacher(id) {
         document.getElementById('nig').value         = t.nig         ?? '';
         document.getElementById('gender').value      = t.gender      ?? '';
         document.getElementById('birth_date').value  = t.birth_date  ?? '';
-        document.getElementById('branch_id').value   = t.branch_id   ?? '';
+        document.getElementById('branch_id').value   = t.branch_id   ?? 'pusat';
         document.getElementById('email').value       = t.email       ?? '';
         document.getElementById('phone').value       = t.phone       ?? '';
         document.getElementById('education').value   = t.education   ?? '';

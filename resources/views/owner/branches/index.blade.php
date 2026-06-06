@@ -169,6 +169,12 @@
                     </td>
                     <td class="text-center">
                         <div class="btn-group btn-group-sm">
+                            <form method="POST" action="{{ route('owner.branches.impersonate', $branch) }}" style="display:inline;margin-left:4px">
+                                @csrf
+                                <button class="btn btn-outline-secondary" title="Masuk sebagai cabang">
+                                    <i class="bi bi-box-arrow-in-right"></i>
+                                </button>
+                            </form>
                             <button class="btn btn-outline-warning"
                                 data-bs-toggle="modal" data-bs-target="#editModal{{ $branch->id }}"
                                 title="Edit">
@@ -191,6 +197,7 @@
                     </td>
                 </tr>
 
+                @push('modals')
                 {{-- EDIT MODAL --}}
                 <div class="modal fade" id="editModal{{ $branch->id }}" tabindex="-1">
                     <div class="modal-dialog modal-dialog-centered">
@@ -250,6 +257,7 @@
                         </div>
                     </div>
                 </div>
+                @endpush
 
                 @empty
                 <tr>
@@ -257,9 +265,6 @@
                         <div class="empty-state">
                             <i class="bi bi-building text-muted d-block mb-2" style="font-size:3rem;opacity:.3"></i>
                             <p class="text-muted">Belum ada data cabang</p>
-                            <button class="btn btn-primary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#addModal">
-                                <i class="bi bi-plus-lg me-1"></i>Tambah Cabang Pertama
-                            </button>
                         </div>
                     </td>
                 </tr>
@@ -269,6 +274,8 @@
     </div>
 
 </div>
+
+@stack('modals')
 
 {{-- ADD MODAL --}}
 <div class="modal fade" id="addModal" tabindex="-1">

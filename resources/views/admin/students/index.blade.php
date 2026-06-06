@@ -149,6 +149,7 @@
             <div class="col-6 col-md-3">
                 <select name="branch_id" class="form-select form-select-sm" onchange="this.form.submit()">
                     <option value="">Semua Cabang</option>
+                    <option value="pusat" {{ request('branch_id')==='pusat' ? 'selected':'' }}>Pusat</option>
                     @foreach($branches as $b)
                     <option value="{{ $b->id }}" {{ request('branch_id')==$b->id ? 'selected':'' }}>{{ $b->name }}</option>
                     @endforeach
@@ -245,7 +246,7 @@
                     </td>
                     <td class="d-none d-md-table-cell">
                         <span class="badge" style="background:var(--input-bg);color:var(--text-muted);border:1px solid var(--card-border);font-size:11px">
-                            <i class="bi bi-building me-1"></i>{{ $s->branch->name ?? '-' }}
+                            <i class="bi bi-building me-1"></i>{{ $s->branch->name ?? 'Pusat' }}
                         </span>
                     </td>
                     <td class="small text-muted d-none d-lg-table-cell">{{ $s->grade ?? '–' }}</td>
@@ -408,12 +409,13 @@
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label small fw-semibold">Cabang <span class="text-danger">*</span></label>
-                                <select name="branch_id" id="branch_id" class="form-select form-select-sm" required>
-                                    <option value="">Pilih Cabang</option>
-                                    @foreach($branches as $b)
-                                    <option value="{{ $b->id }}">{{ $b->name }}</option>
-                                    @endforeach
-                                </select>
+                                    <select name="branch_id" id="branch_id" class="form-select form-select-sm" required>
+                                        <option value="">Pilih Cabang</option>
+                                        <option value="pusat">Pusat</option>
+                                        @foreach($branches as $b)
+                                        <option value="{{ $b->id }}">{{ $b->name }}</option>
+                                        @endforeach
+                                    </select>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-semibold">Asal Sekolah</label>
@@ -509,7 +511,7 @@ function editStudent(id) {
         document.getElementById('gender').value      = s.gender      ?? '';
         document.getElementById('birth_date').value  = s.birth_date  ?? '';
         document.getElementById('birth_place').value = s.birth_place ?? '';
-        document.getElementById('branch_id').value   = s.branch_id   ?? '';
+        document.getElementById('branch_id').value   = s.branch_id   ?? 'pusat';
         document.getElementById('school_name').value = s.school_name ?? '';
         document.getElementById('grade').value       = s.grade       ?? '';
         document.getElementById('phone').value       = s.phone       ?? '';
@@ -547,7 +549,7 @@ function showDetail(id) {
             </div>
             <div style="padding:0 24px 24px">
                 <table style="width:100%;border-collapse:collapse">
-                    ${row('Cabang', s.branch?.name ?? '–')}
+                    ${row('Cabang', s.branch?.name ?? 'Pusat')}
                     ${row('Kelas', s.grade ?? '–')}
                     ${row('Gender', s.gender==='L'?'👦 Laki-laki':'👧 Perempuan')}
                     ${row('Tgl Lahir', s.birth_date ?? '–')}

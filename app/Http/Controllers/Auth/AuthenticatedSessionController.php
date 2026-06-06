@@ -29,6 +29,18 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Prevent redirecting to an owner-only intended URL for non-owner users.
+        $user = Auth::user();
+        try {
+            $intended = $request->session()->get('url.intended');
+            if ($intended && str_starts_with($intended, url('/').'/owner') && ! method_exists($user, 'hasRole') || ($intended && str_starts_with($intended, url('/').'/owner') && method_exists($user, 'hasRole') && ! $user->hasRole('owner'))) {
+                // remove intended so redirect()->intended falls back to HOME
+                $request->session()->forget('url.intended');
+            }
+        } catch (	hrowable $e) {
+            // ignore and continue
+        }
+
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 
