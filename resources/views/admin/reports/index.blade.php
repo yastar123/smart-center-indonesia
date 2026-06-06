@@ -11,8 +11,8 @@ use Carbon\Carbon;
 
 $totalRevenue   = Payment::where('status','verified')->sum('jumlah');
 $monthRevenue   = Payment::where('status','verified')
-                    ->whereMonth('created_at', now()->month)
-                    ->whereYear('created_at',  now()->year)
+                    ->whereMonth('tanggal_pembayaran', now()->month)
+                    ->whereYear('tanggal_pembayaran',  now()->year)
                     ->sum('jumlah');
 $pendingCount   = Invoice::where('status','belum_bayar')->count();
 $pendingTotal   = Invoice::where('status','belum_bayar')->sum('total');

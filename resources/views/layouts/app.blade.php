@@ -413,7 +413,8 @@
            SCROLLBAR (webkit)
         ============================================================ */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; }
+        ::-webkit-scrollbar-thumb { background: rgba(200,77,223,.35); border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(200,77,223,.6); }
         ::-webkit-scrollbar-track { background: transparent; }
 
         /* ============================================================
@@ -638,19 +639,106 @@
         }
 
         /* ============================================================
-           STAT CARD — accent line animation on hover
+           STAT CARD — accent glow on hover
         ============================================================ */
         .stat-card::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 3px;
-            background: linear-gradient(90deg, #3b82f6, #6366f1);
+            background: linear-gradient(90deg, #68117e, #c84ddf, #f6af23);
             border-radius: var(--radius-card) var(--radius-card) 0 0;
             opacity: 0;
             transition: opacity var(--transition);
         }
         .stat-card:hover::before { opacity: 1; }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-card);
+            box-shadow: 0 0 0 0 rgba(200,77,223,0);
+            transition: box-shadow .35s ease;
+            pointer-events: none;
+        }
+        .stat-card:hover::after { box-shadow: 0 0 0 2px rgba(200,77,223,.12); }
+
+        /* ============================================================
+           RIPPLE EFFECT ON BUTTONS
+        ============================================================ */
+        .btn { position: relative; overflow: hidden; }
+        .btn .ripple-wave {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            animation: rippleAnim .55s linear;
+            background: rgba(255,255,255,.35);
+            pointer-events: none;
+        }
+        @keyframes rippleAnim {
+            to { transform: scale(4); opacity: 0; }
+        }
+
+        /* ============================================================
+           CARD HOVER — micro-lift with glow
+        ============================================================ */
+        .dashboard-card {
+            position: relative;
+        }
+        .dashboard-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-card);
+            box-shadow: 0 0 0 0 rgba(200,77,223,0);
+            transition: box-shadow .35s ease;
+            pointer-events: none;
+        }
+        .dashboard-card:hover::after { box-shadow: 0 0 0 1.5px rgba(200,77,223,.1); }
+
+        /* ============================================================
+           STAGGER FADE-UP (children auto-stagger)
+        ============================================================ */
+        .stagger-children > * { opacity: 0; transform: translateY(14px); }
+        .stagger-children.in-view > *:nth-child(1) { animation: fadeSlideUp .4s .00s ease both; }
+        .stagger-children.in-view > *:nth-child(2) { animation: fadeSlideUp .4s .06s ease both; }
+        .stagger-children.in-view > *:nth-child(3) { animation: fadeSlideUp .4s .12s ease both; }
+        .stagger-children.in-view > *:nth-child(4) { animation: fadeSlideUp .4s .18s ease both; }
+        .stagger-children.in-view > *:nth-child(5) { animation: fadeSlideUp .4s .24s ease both; }
+        .stagger-children.in-view > *:nth-child(6) { animation: fadeSlideUp .4s .30s ease both; }
+        @keyframes fadeSlideUp {
+            from { opacity:0; transform:translateY(14px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        /* ============================================================
+           SIDEBAR NAV LINK — active indicator stripe
+        ============================================================ */
+        .nav-link { position: relative; }
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: -10px; top: 50%; transform: translateY(-50%);
+            width: 4px; height: 60%;
+            background: #f6af23;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* ============================================================
+           NAV-ITEM hover — slide-in bg
+        ============================================================ */
+        .nav-link:not(.active) { overflow: hidden; }
+        .nav-link:not(.active)::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,.04);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform .22s ease;
+            border-radius: 10px;
+        }
+        .nav-link:not(.active):hover::after { transform: scaleX(1); }
 
         /* ============================================================
            BREADCRUMB IN TOPBAR
@@ -1122,7 +1210,7 @@ function updateDarkIcon(theme) {
     icon.className = theme === 'dark' ? 'bi bi-sun' : 'bi bi-moon';
 }
 
-// ---- INTERSECTION OBSERVER (fade-up) ----
+// ---- INTERSECTION OBSERVER (fade-up + stagger) ----
 document.addEventListener('DOMContentLoaded', function() {
     const io = new IntersectionObserver(entries => {
         entries.forEach(entry => {
@@ -1131,8 +1219,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 io.unobserve(entry.target);
             }
         });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.fade-up, .stagger-children').forEach(el => io.observe(el));
+});
+
+// ---- RIPPLE EFFECT ON ALL BUTTONS ----
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.btn');
+    if (!btn) return;
+    const circle = document.createElement('span');
+    const d = Math.max(btn.clientWidth, btn.clientHeight);
+    const r = btn.getBoundingClientRect();
+    circle.className = 'ripple-wave';
+    circle.style.cssText = `width:${d}px;height:${d}px;left:${e.clientX - r.left - d/2}px;top:${e.clientY - r.top - d/2}px`;
+    btn.appendChild(circle);
+    setTimeout(() => circle.remove(), 600);
+});
+
+// ---- HOVER SOUND-LIKE MICRO-FEEDBACK (scale on icon hover) ----
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.stat-card .stat-icon').forEach(icon => {
+        icon.style.transition = 'transform .25s cubic-bezier(.34,1.56,.64,1)';
+        const card = icon.closest('.stat-card');
+        if (!card) return;
+        card.addEventListener('mouseenter', () => { icon.style.transform = 'scale(1.12) rotate(-4deg)'; });
+        card.addEventListener('mouseleave', () => { icon.style.transform = ''; });
+    });
 });
 
 // ---- CLOSE SIDEBAR ON ESC ----

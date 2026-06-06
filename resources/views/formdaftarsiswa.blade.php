@@ -54,7 +54,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f3f0ff;min-height:10
 .success-box p{font-size:13px;color:#6b7280;line-height:1.6;margin-bottom:1.5rem}
 .success-box .no-reg{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:800;color:#c84ddf;margin-bottom:4px}
 .btn-ok{background:#c84ddf;color:#fff;border:none;border-radius:8px;padding:12px 32px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif}
-.btn-ok:hover{background:#6d28d9}
+.btn-ok:hover{background:#461256}
 @media(max-width:520px){.two-col{grid-template-columns:1fr}.checkbox-grid.three-col{grid-template-columns:1fr 1fr}.form-header h1{font-size:24px}}
 </style>
 </head>
