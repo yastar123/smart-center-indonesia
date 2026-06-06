@@ -46,7 +46,7 @@
                         <i class="bi {{ $sc['icon'] }}" style="font-size:1.3rem;color:{{ $sc['color'] }};"></i>
                     </div>
                     <div>
-                        <div class="fw-bold fs-4 count-up">{{ $sc['value'] }}</div>
+                        <div class="fw-bold fs-4 count-up" data-target="{{ $sc['value'] }}">{{ $sc['value'] }}</div>
                         <div class="text-muted" style="font-size:.78rem;">{{ $sc['label'] }}</div>
                     </div>
                 </div>

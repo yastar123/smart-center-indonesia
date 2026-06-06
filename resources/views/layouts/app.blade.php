@@ -793,11 +793,198 @@
         ============================================================ */
         @media print {
             .sidebar, .topbar, .sidebar-overlay, #pageLoader, #navProgress,
+            .mobile-bottom-nav, #scrollTop, #globalToastWrap,
             .btn, .dropdown, form[action*="logout"] { display: none !important; }
             .main-content { margin-left: 0 !important; }
             .content-wrapper { padding: 0 !important; }
             .stat-card, .dashboard-card { break-inside: avoid; box-shadow: none !important; border: 1px solid #ddd !important; }
             body { font-size: 12px; }
+        }
+
+        /* ============================================================
+           DARK MODE — BOOTSTRAP CARD COMPONENT
+        ============================================================ */
+        [data-theme="dark"] .card {
+            background: var(--card-bg) !important;
+            border-color: var(--card-border) !important;
+            color: var(--text-primary);
+        }
+
+        /* ============================================================
+           DARK MODE — INPUT GROUP TEXT
+        ============================================================ */
+        [data-theme="dark"] .input-group-text {
+            background: var(--input-bg);
+            border-color: var(--card-border);
+            color: var(--text-muted);
+        }
+
+        /* ============================================================
+           DARK MODE — ALERTS
+        ============================================================ */
+        [data-theme="dark"] .alert-success {
+            background: rgba(16,185,129,.1) !important;
+            color: #4ade80 !important;
+            border-color: rgba(16,185,129,.2) !important;
+        }
+        [data-theme="dark"] .alert-danger {
+            background: rgba(239,68,68,.1) !important;
+            color: #f87171 !important;
+            border-color: rgba(239,68,68,.2) !important;
+        }
+        [data-theme="dark"] .alert-warning {
+            background: rgba(246,175,35,.1) !important;
+            color: #fbbf24 !important;
+            border-color: rgba(246,175,35,.2) !important;
+        }
+        [data-theme="dark"] .alert-info {
+            background: rgba(200,77,223,.1) !important;
+            color: #e8b4f5 !important;
+            border-color: rgba(200,77,223,.2) !important;
+        }
+
+        /* ============================================================
+           DARK MODE — OUTLINE BUTTONS
+        ============================================================ */
+        [data-theme="dark"] .btn-outline-secondary {
+            border-color: var(--card-border);
+            color: var(--text-muted);
+        }
+        [data-theme="dark"] .btn-outline-secondary:hover {
+            background: var(--input-bg);
+            color: var(--text-primary);
+            border-color: var(--card-border);
+        }
+
+        /* ============================================================
+           DARK MODE — TABLE HOVER ROWS
+        ============================================================ */
+        [data-theme="dark"] .table-hover tbody tr:hover td {
+            background: rgba(200,77,223,.05);
+            color: var(--text-primary);
+        }
+        [data-theme="dark"] thead tr { background: rgba(200,77,223,.05) !important; }
+
+        /* ============================================================
+           DARK MODE — PAGINATION
+        ============================================================ */
+        [data-theme="dark"] .page-link {
+            background: var(--card-bg);
+            border-color: var(--card-border);
+            color: var(--text-primary);
+        }
+        [data-theme="dark"] .page-link:hover {
+            background: var(--input-bg);
+            color: var(--primary);
+            border-color: var(--card-border);
+        }
+        [data-theme="dark"] .page-item.active .page-link {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        [data-theme="dark"] .page-item.disabled .page-link {
+            background: var(--input-bg);
+            border-color: var(--card-border);
+            color: var(--text-muted);
+        }
+
+        /* ============================================================
+           DARK MODE — SELECT OPTIONS
+        ============================================================ */
+        [data-theme="dark"] option { background: #2d0a3e; color: #f0e8f5; }
+
+        /* ============================================================
+           DARK MODE — MOBILE BOTTOM NAV
+        ============================================================ */
+        [data-theme="dark"] .mobile-bottom-nav {
+            background: #2d0a3e;
+            border-top-color: rgba(200,77,223,.15);
+            box-shadow: 0 -8px 32px rgba(0,0,0,.4);
+        }
+
+        /* ============================================================
+           DARK MODE — TOPBAR DEPTH
+        ============================================================ */
+        [data-theme="dark"] .topbar {
+            box-shadow: 0 1px 0 rgba(200,77,223,.1), 0 4px 16px rgba(0,0,0,.2);
+        }
+
+        /* ============================================================
+           DARK MODE — PROGRESS BAR TRACK
+        ============================================================ */
+        [data-theme="dark"] .progress { background: rgba(255,255,255,.08); }
+
+        /* ============================================================
+           GRADIENT HERO BANNERS — suppress card hover lift
+           (banner cards have border:none in their inline style)
+        ============================================================ */
+        .dashboard-card[style*="border:none"]:hover {
+            transform: none;
+            box-shadow: var(--shadow-sm);
+        }
+        .dashboard-card[style*="border:none"]::after { display: none; }
+
+        /* ============================================================
+           INPUT GROUP — focus-within border highlight
+        ============================================================ */
+        .input-group-text {
+            background: var(--input-bg);
+            border-color: var(--card-border);
+            color: var(--text-muted);
+            transition: border-color var(--transition);
+        }
+        .input-group:focus-within .input-group-text {
+            border-color: var(--primary);
+        }
+        .input-group:focus-within .form-control {
+            border-color: var(--primary);
+        }
+
+        /* ============================================================
+           FOCUS RINGS — accessibility
+        ============================================================ */
+        :focus-visible {
+            outline: 2px solid rgba(200,77,223,.6);
+            outline-offset: 2px;
+        }
+        .btn:focus-visible { outline-offset: 3px; }
+        .nav-link:focus-visible { outline-color: rgba(255,255,255,.4); }
+
+        /* ============================================================
+           QUICK DASH ACTION CARDS
+        ============================================================ */
+        .quick-dash {
+            transition: transform var(--transition), box-shadow var(--transition);
+            border-radius: 12px;
+        }
+        .quick-dash:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0,0,0,.1) !important;
+        }
+
+        /* ============================================================
+           TABLE — prevent header text wrapping
+        ============================================================ */
+        .table th { white-space: nowrap; }
+
+        /* ============================================================
+           MOBILE ≤ 480PX — extra small phone polish
+        ============================================================ */
+        @media (max-width: 480px) {
+            .content-wrapper { padding: 12px !important; }
+            .dashboard-card { padding: 16px 14px; border-radius: 16px; }
+            .stat-card { padding: 14px; border-radius: 16px; }
+            .stat-value { font-size: 20px !important; }
+            .stat-icon { width: 42px !important; height: 42px !important; font-size: 17px !important; }
+            .topbar { height: 58px; padding: 0 12px; }
+            .topbar-left h4 { font-size: 16px; }
+            .topbar-right { gap: 6px; }
+            .top-btn { width: 36px; height: 36px; font-size: 14px; }
+            .modal-dialog { margin: 8px; }
+            .modal-content { border-radius: 16px; }
+            #globalToastWrap { right: 10px; left: 10px; max-width: 100%; }
+            .g-toast { max-width: 100%; min-width: 0; }
         }
     </style>
 

@@ -4,6 +4,30 @@
 
 @section('content')
 
+{{-- HEADER BANNER --}}
+<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
+    <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.04);border-radius:50%"></div>
+    <div class="row align-items-center g-3" style="position:relative">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">
+                    <i class="bi bi-building-fill"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0" style="color:white">Monitoring Cabang</h5>
+                    <span style="font-size:12px;opacity:.8">Pantau dan kelola performa seluruh cabang Smart Center Indonesia</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <button class="btn fw-semibold px-4" data-bs-toggle="modal" data-bs-target="#addModal"
+                style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
+                <i class="bi bi-plus-lg me-2"></i>Tambah Cabang
+            </button>
+        </div>
+    </div>
+</div>
+
 {{-- STATS --}}
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-4 fade-up">
