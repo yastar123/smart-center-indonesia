@@ -134,7 +134,23 @@
             box-shadow: 0 4px 12px rgba(200,77,223,.4);
         }
         .brand-title { color: white; font-size: 17px; font-weight: 700; line-height: 1.1; }
-        .brand-sub { color: #64748b; font-size: 11px; margin-top: 2px; }
+        .brand-sub { color: #ab8db2; font-size: 11px; margin-top: 2px; }
+
+        .sidebar-toggle {
+            width: 30px; height: 30px;
+            border: none;
+            background: rgba(255,255,255,.08);
+            border-radius: 8px;
+            color: #94a3b8;
+            display: none;
+            align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+        .sidebar-toggle:hover { background: rgba(255,255,255,.16); color: white; }
+        @media (max-width: 992px) { .sidebar-toggle { display: flex; } }
 
         /* User */
         .sidebar-user {
@@ -911,6 +927,10 @@
             <a href="{{ route('admin.payments.index') }}" class="nav-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
                 <i class="bi bi-wallet2"></i>
                 <span>Pembayaran</span>
+                @php $unpaidInvoices = \App\Models\Invoice::where('status','belum_bayar')->count() @endphp
+                @if($unpaidInvoices > 0)
+                    <span class="menu-badge">{{ $unpaidInvoices > 99 ? '99+' : $unpaidInvoices }}</span>
+                @endif
             </a>
         </div>
         <div class="nav-item">
@@ -1158,7 +1178,7 @@
 {{-- FLASH DATA FOR JS TOAST SYSTEM --}}
 <script id="__flash__" type="application/json">
 {
-    "success": "{{ addslashes(session('success') ?? session('status') ?? '') }}",
+    "success": "{{ addslashes(session('success') ?? '') }}",
     "error":   "{{ addslashes(session('error')   ?? '') }}",
     "warning": "{{ addslashes(session('warning') ?? '') }}",
     "info":    "{{ addslashes(session('info')    ?? '') }}"
@@ -1222,6 +1242,31 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, { threshold: 0.08 });
     document.querySelectorAll('.fade-up, .stagger-children').forEach(el => io.observe(el));
+});
+
+// ---- COUNT-UP ANIMATION ----
+document.addEventListener('DOMContentLoaded', function() {
+    const countEls = document.querySelectorAll('.count-up[data-target]');
+    if (!countEls.length) return;
+    const io2 = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const el = entry.target;
+            const target = parseInt(el.getAttribute('data-target'), 10);
+            if (isNaN(target)) return;
+            const duration = 900;
+            const step = 16;
+            const increment = target / (duration / step);
+            let current = 0;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) { current = target; clearInterval(timer); }
+                el.textContent = Math.floor(current).toLocaleString('id-ID');
+            }, step);
+            io2.unobserve(el);
+        });
+    }, { threshold: 0.3 });
+    countEls.forEach(el => io2.observe(el));
 });
 
 // ---- RIPPLE EFFECT ON ALL BUTTONS ----

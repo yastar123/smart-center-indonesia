@@ -322,17 +322,17 @@ function saveCert() {
         btn.innerHTML = isEdit ? '<i class="bi bi-check-circle me-2"></i>Simpan' : '<i class="bi bi-award me-2"></i>Terbitkan';
         if (res.success) {
             certModal.hide();
-            window.showToast && window.showToast('success', res.message);
+            window.showToast && window.showToast(res.message, 'success');
             setTimeout(() => location.reload(), 600);
         } else {
             const errs = res.errors ? Object.values(res.errors).flat().join(' | ') : res.message;
-            window.showToast && window.showToast('error', errs || 'Terjadi kesalahan.');
+            window.showToast && window.showToast(errs || 'Terjadi kesalahan.', 'error');
         }
     })
     .catch(() => {
         btn.disabled = false;
         btn.innerHTML = isEdit ? '<i class="bi bi-check-circle me-2"></i>Simpan' : '<i class="bi bi-award me-2"></i>Terbitkan';
-        window.showToast && window.showToast('error', 'Gagal menghubungi server.');
+        window.showToast && window.showToast('Gagal menghubungi server.', 'error');
     });
 }
 
@@ -355,7 +355,7 @@ function deleteCert(id, judul) {
         .then(r => r.json())
         .then(res => {
             if (res.success) {
-                window.showToast && window.showToast('success', res.message);
+                window.showToast && window.showToast(res.message, 'success');
                 setTimeout(() => location.reload(), 600);
             }
         });

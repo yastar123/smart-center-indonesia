@@ -1,12 +1,17 @@
 {{-- resources/views/layouts/sidebar.blade.php --}}
 <nav class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-        <a href="{{ route('dashboard') }}" class="brand-link">
-            <span class="brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
-            <span class="brand-text">Akademi<strong>Pro</strong></span>
+        <a href="{{ route('dashboard') }}" class="d-flex align-items-center text-decoration-none" style="gap:12px;flex:1;min-width:0;">
+            <div class="brand-logo">
+                <i class="bi bi-mortarboard-fill"></i>
+            </div>
+            <div style="min-width:0;">
+                <div class="brand-title">Akademi<strong>Pro</strong></div>
+                <div class="brand-sub">Smart Center</div>
+            </div>
         </a>
-        <button class="sidebar-toggle" id="sidebarToggle">
-            <i class="bi bi-list"></i>
+        <button class="sidebar-toggle" id="sidebarToggle" onclick="closeSidebar()">
+            <i class="bi bi-x-lg"></i>
         </button>
     </div>
 

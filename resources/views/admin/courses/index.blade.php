@@ -329,16 +329,16 @@ function saveCourse() {
         btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Simpan';
         if (res.success) {
             modal.hide();
-            window.showToast && window.showToast('success', res.message);
+            window.showToast && window.showToast(res.message, 'success');
             setTimeout(() => location.reload(), 600);
         } else {
-            window.showToast && window.showToast('error', res.message || 'Terjadi kesalahan.');
+            window.showToast && window.showToast(res.message || 'Terjadi kesalahan.', 'error');
         }
     })
     .catch(() => {
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Simpan';
-        window.showToast && window.showToast('error', 'Gagal menghubungi server.');
+        window.showToast && window.showToast('Gagal menghubungi server.', 'error');
     });
 }
 
@@ -352,7 +352,6 @@ function deleteCourse(id, nama) {
         cancelButtonText: 'Batal',
         confirmButtonColor: '#ef4444',
         cancelButtonColor: '#6b7280',
-        borderRadius: '16px',
     }).then(r => {
         if (!r.isConfirmed) return;
         fetch(`/admin/courses/${id}`, {
@@ -362,7 +361,7 @@ function deleteCourse(id, nama) {
         .then(r => r.json())
         .then(res => {
             if (res.success) {
-                window.showToast && window.showToast('success', res.message);
+                window.showToast && window.showToast(res.message, 'success');
                 setTimeout(() => location.reload(), 600);
             }
         });

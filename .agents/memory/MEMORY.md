@@ -10,3 +10,6 @@
 - [Dashboard redirects](dashboard-redirects.md) — guru/siswa must be redirected from DashboardController before the match expression; they have dedicated portals at guru.dashboard and siswa.dashboard routes.
 - [Bootstrap primary override](bootstrap-primary.md) — `--bs-primary` set to `#c84ddf` in :root so `.text-primary`, `.btn-primary`, `.btn-outline-primary` auto-render purple; no manual replace needed.
 - [Mobile bottom nav role links](mobile-nav-roles.md) — guru mobile nav had wrong `admin.schedules.index` link; corrected to `guru.attendance`. Mobile nav font-size bumped 9.5px→11px with min tap target 44×44px.
+- [Toast signature & flash toast pitfalls](toast-pitfalls.md) — showToast(msg, type) — message first, type second. Flash JSON must NOT fall back to session('status') or raw codes like 'profile-updated' show as toasts.
+- [Invoice status values](invoice-status.md) — Invoice statuses are `belum_bayar`/`sebagian`/`lunas` (not 'unpaid'/'paid'). Count-up elements with data-target animate; those without data-target render static.
+- [Sidebar orphan file](sidebar-orphan.md) — `resources/views/layouts/sidebar.blade.php` is never @include'd; real sidebar is inline in `layouts/app.blade.php` lines 815–1041. Also `resources/views/admin.blade.php` and `formdaftarsiswa.blade.php` are orphaned legacy files with no routes.

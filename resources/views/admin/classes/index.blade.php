@@ -345,17 +345,17 @@ function saveClass() {
         btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Simpan';
         if (res.success) {
             classModal.hide();
-            window.showToast && window.showToast('success', res.message);
+            window.showToast && window.showToast(res.message, 'success');
             setTimeout(() => location.reload(), 600);
         } else {
             const errs = res.errors ? Object.values(res.errors).flat().join(' | ') : res.message;
-            window.showToast && window.showToast('error', errs || 'Terjadi kesalahan.');
+            window.showToast && window.showToast(errs || 'Terjadi kesalahan.', 'error');
         }
     })
     .catch(() => {
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Simpan';
-        window.showToast && window.showToast('error', 'Gagal menghubungi server.');
+        window.showToast && window.showToast('Gagal menghubungi server.', 'error');
     });
 }
 
@@ -378,7 +378,7 @@ function deleteClass(id, nama) {
         .then(r => r.json())
         .then(res => {
             if (res.success) {
-                window.showToast && window.showToast('success', res.message);
+                window.showToast && window.showToast(res.message, 'success');
                 setTimeout(() => location.reload(), 600);
             }
         });
