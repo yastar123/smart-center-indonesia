@@ -139,7 +139,7 @@ $monthTotal = $teacher
                     <div class="fw-semibold" style="font-size:13.5px">{{ $sch->topik ?? 'Sesi Mengajar' }}</div>
                     <div class="text-muted" style="font-size:11.5px">
                         @if($sch->jenis === 'online')
-                            <i class="bi bi-camera-video text-info me-1"></i>Online
+                            <i class="bi bi-camera-video me-1" style="color:#c84ddf"></i>Online
                             @if($sch->link_meeting)
                                 · <a href="{{ $sch->link_meeting }}" target="_blank" class="text-primary" style="font-size:11px">Buka Link</a>
                             @endif

@@ -79,7 +79,7 @@
     <div class="col-lg-4">
         {{-- SYSTEM INFO --}}
         <div class="dashboard-card fade-up mb-4">
-            <h6 class="fw-bold mb-3"><i class="bi bi-info-circle me-2 text-info"></i>Info Sistem</h6>
+            <h6 class="fw-bold mb-3"><i class="bi bi-info-circle me-2" style="color:#68117e"></i>Info Sistem</h6>
             @php
                 $sysInfo = [
                     ['label'=>'Laravel', 'value'=>app()->version()],

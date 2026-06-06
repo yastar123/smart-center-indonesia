@@ -14,8 +14,8 @@
     $branches       = \App\Models\Branch::withCount('students')->latest()->limit(6)->get();
     $totalRevenue   = \App\Models\Payment::where('status','verified')->sum('jumlah');
     $monthRevenue   = \App\Models\Payment::where('status','verified')
-                        ->whereMonth('created_at', now()->month)
-                        ->whereYear('created_at',  now()->year)
+                        ->whereMonth('tanggal_pembayaran', now()->month)
+                        ->whereYear('tanggal_pembayaran',  now()->year)
                         ->sum('jumlah');
 @endphp
 
@@ -93,11 +93,11 @@
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.15s">
-        <div class="stat-card" style="border-top:3px solid #ef4444">
+        <div class="stat-card" style="border-top:3px solid #c84ddf">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Pendapatan Bulan Ini</div>
-                    <div class="stat-value" style="color:#dc2626;font-size:20px">
+                    <div class="stat-value" style="color:#68117e;font-size:20px">
                         Rp {{ number_format($monthRevenue, 0, ',', '.') }}
                     </div>
                     <div class="stat-label" style="font-size:11px;color:#6b7280">
@@ -105,8 +105,8 @@
                         Total: Rp {{ number_format($totalRevenue, 0, ',', '.') }}
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#dc2626,#ef4444)">
-                    <i class="bi bi-cash-coin"></i>
+                <div class="stat-icon" style="background:linear-gradient(135deg,#68117e,#c84ddf)">
+                    <i class="bi bi-cash-coin" style="color:white"></i>
                 </div>
             </div>
         </div>
@@ -186,7 +186,7 @@
                         <tr>
                             <td class="py-3">
                                 <div class="d-flex align-items-center gap-2">
-                                    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#c84ddf,#c84ddf);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
+                                    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#68117e,#c84ddf);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
                                         <i class="bi bi-building"></i>
                                     </div>
                                     <div>

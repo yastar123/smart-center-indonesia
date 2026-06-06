@@ -538,14 +538,16 @@
             justify-content: center;
             gap: 3px;
             flex: 1;
-            padding: 8px 2px;
+            padding: 8px 4px;
             cursor: pointer;
             border-radius: 10px;
             text-decoration: none;
             color: var(--text-muted);
             transition: color var(--transition), background var(--transition);
-            font-size: 9.5px;
+            font-size: 11px;
             font-weight: 600;
+            min-width: 44px;
+            min-height: 44px;
         }
         .mob-nav-item i { font-size: 20px; transition: transform .2s; }
         .mob-nav-item:hover, .mob-nav-item.active { color: #c84ddf; }
@@ -1118,9 +1120,9 @@
         <i class="bi bi-calendar2-week"></i>
         <span>Jadwal</span>
     </a>
-    <a href="{{ route('admin.schedules.index') }}" class="mob-nav-item {{ request()->routeIs('admin.schedules.*') ? 'active' : '' }}">
-        <i class="bi bi-table"></i>
-        <span>Semua</span>
+    <a href="{{ route('guru.attendance') }}" class="mob-nav-item {{ request()->routeIs('guru.attendance') ? 'active' : '' }}">
+        <i class="bi bi-clipboard-check"></i>
+        <span>Absensi</span>
     </a>
     @endrole
     @role('siswa')

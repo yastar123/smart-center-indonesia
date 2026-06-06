@@ -239,7 +239,7 @@ $weekSchedules = ($student && $student->branch_id)
                         <div style="font-size:11px;color:var(--text-muted)">
                             {{ \Carbon\Carbon::parse($sch->jam_mulai)->format('H:i') }}–{{ \Carbon\Carbon::parse($sch->jam_selesai)->format('H:i') }}
                             @if($sch->jenis === 'online')
-                                · <i class="bi bi-camera-video text-info me-1"></i>Online
+                                · <i class="bi bi-camera-video me-1" style="color:#c84ddf"></i>Online
                             @else
                                 · <i class="bi bi-building me-1"></i>{{ $sch->ruangan ?? 'Kelas' }}
                             @endif

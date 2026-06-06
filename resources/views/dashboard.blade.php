@@ -171,7 +171,7 @@
     <div class="col-lg-5 fade-up" style="animation-delay:.05s">
         <div class="dashboard-card h-100">
             <h6 class="fw-bold mb-3">
-                <i class="bi bi-pie-chart-fill text-info me-2"></i>Distribusi Gender
+                <i class="bi bi-pie-chart-fill me-2" style="color:#c84ddf"></i>Distribusi Gender
             </h6>
             <div id="chartGender" style="min-height:200px"></div>
         </div>

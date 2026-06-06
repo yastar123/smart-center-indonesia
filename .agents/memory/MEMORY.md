@@ -6,3 +6,5 @@
 - [Demo data seeding](demo-data-seeding.md) — DemoDataSeeder pitfalls: teachers.user_id was missing, admin.branch_id was NULL, Branch fillable excludes user_id/admin_id.
 - [Revenue date field](revenue-date-field.md) — Payment monthly revenue must filter on `tanggal_pembayaran` not `created_at`; seeded payments have tanggal_pembayaran set to historical dates, not created_at.
 - [Dashboard redirects](dashboard-redirects.md) — guru/siswa must be redirected from DashboardController before the match expression; they have dedicated portals at guru.dashboard and siswa.dashboard routes.
+- [Bootstrap primary override](bootstrap-primary.md) — `--bs-primary` set to `#c84ddf` in :root so `.text-primary`, `.btn-primary`, `.btn-outline-primary` auto-render purple; no manual replace needed.
+- [Mobile bottom nav role links](mobile-nav-roles.md) — guru mobile nav had wrong `admin.schedules.index` link; corrected to `guru.attendance`. Mobile nav font-size bumped 9.5px→11px with min tap target 44×44px.

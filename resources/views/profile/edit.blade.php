@@ -71,7 +71,7 @@
                 </div>
                 @endif
                 <div class="d-flex align-items-center gap-2 text-muted">
-                    <i class="bi bi-calendar3 text-info"></i>
+                    <i class="bi bi-calendar3" style="color:#68117e"></i>
                     <span>Bergabung {{ $user->created_at->format('M Y') }}</span>
                 </div>
             </div>
