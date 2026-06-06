@@ -18,6 +18,10 @@
            CSS CUSTOM PROPERTIES
         ============================================================ */
         :root {
+            --bs-primary: #c84ddf;
+            --bs-primary-rgb: 200, 77, 223;
+            --bs-link-color: #c84ddf;
+            --bs-link-hover-color: #68117e;
             --sidebar-width: 270px;
             --sidebar-bg: #260632;
             --sidebar-hover: #461256;
@@ -668,8 +672,8 @@
             animation: brandPulse 4s ease-in-out infinite;
         }
         @keyframes brandPulse {
-            0%, 100% { box-shadow: 0 4px 12px rgba(59,130,246,.4); }
-            50%       { box-shadow: 0 4px 22px rgba(99,102,241,.7); }
+            0%, 100% { box-shadow: 0 4px 12px rgba(200,77,223,.4); }
+            50%       { box-shadow: 0 4px 22px rgba(200,77,223,.7); }
         }
 
         /* ============================================================

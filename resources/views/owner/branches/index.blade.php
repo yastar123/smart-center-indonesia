@@ -96,7 +96,7 @@
                 <tr>
                     <td>
                         <div class="d-flex align-items-center gap-2">
-                            <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;color:white;font-size:15px;flex-shrink:0">
+                            <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#c84ddf,#c84ddf);display:flex;align-items:center;justify-content:center;color:white;font-size:15px;flex-shrink:0">
                                 <i class="bi bi-building"></i>
                             </div>
                             <div>
@@ -116,7 +116,7 @@
                     <td>
                         <div class="d-flex flex-wrap gap-1">
                             @if($branch->can_students)
-                                <span class="badge" style="background:#dbeafe;color:#1d4ed8;font-size:10px">Siswa</span>
+                                <span class="badge" style="background:#f3d6fa;color:#461256;font-size:10px">Siswa</span>
                             @endif
                             @if($branch->can_teachers)
                                 <span class="badge" style="background:#dcfce7;color:#15803d;font-size:10px">Guru</span>
@@ -171,7 +171,7 @@
                 <div class="modal fade" id="editModal{{ $branch->id }}" tabindex="-1">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content border-0 shadow">
-                            <div class="modal-header border-0" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white">
+                            <div class="modal-header border-0" style="background:linear-gradient(135deg,#f6af23,#e09000);color:white">
                                 <h6 class="modal-title fw-bold"><i class="bi bi-pencil me-2"></i>Edit Cabang — {{ $branch->name }}</h6>
                                 <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                             </div>
@@ -207,7 +207,7 @@
                 <div class="modal fade" id="resetModal{{ $branch->id }}" tabindex="-1">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content border-0 shadow">
-                            <div class="modal-header border-0" style="background:linear-gradient(135deg,#06b6d4,#0891b2);color:white">
+                            <div class="modal-header border-0" style="background:linear-gradient(135deg,#06b6d4,#68117e);color:white">
                                 <h6 class="modal-title fw-bold"><i class="bi bi-key me-2"></i>Reset Password — {{ $branch->name }}</h6>
                                 <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                             </div>
@@ -250,7 +250,7 @@
 <div class="modal fade" id="addModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow">
-            <div class="modal-header border-0" style="background:linear-gradient(135deg,#2563eb,#6366f1);color:white">
+            <div class="modal-header border-0" style="background:linear-gradient(135deg,#68117e,#c84ddf);color:white">
                 <h6 class="modal-title fw-bold"><i class="bi bi-plus-circle me-2"></i>Tambah Cabang Baru</h6>
                 <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>

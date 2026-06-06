@@ -46,7 +46,7 @@ $branches = Branch::withCount('students')
 
 {{-- HEADER --}}
 <div class="dashboard-card mb-4 fade-up"
-     style="background:linear-gradient(135deg,#0f172a 0%,#312e81 60%,#7c3aed 100%);color:white;border:none;overflow:hidden;position:relative">
+     style="background:linear-gradient(135deg,#260632 0%,#312e81 60%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
     <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.04);border-radius:50%"></div>
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative">
         <div>
@@ -69,16 +69,16 @@ $branches = Branch::withCount('students')
 {{-- KPI CARDS --}}
 <div class="row g-3 mb-4">
     <div class="col-6 col-lg-3 fade-up">
-        <div class="stat-card" style="border-top:3px solid #3b82f6">
+        <div class="stat-card" style="border-top:3px solid #c84ddf">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Total Siswa</div>
-                    <div class="stat-value" style="color:#2563eb">{{ $totalStudents }}</div>
+                    <div class="stat-value" style="color:#68117e">{{ $totalStudents }}</div>
                     <div class="stat-label" style="font-size:11px;color:#10b981">
                         <i class="bi bi-arrow-up-short"></i>+{{ $newThisMonth }} bulan ini
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#2563eb,#3b82f6)">
+                <div class="stat-icon" style="background:linear-gradient(135deg,#68117e,#c84ddf)">
                     <i class="bi bi-people-fill" style="color:white"></i>
                 </div>
             </div>
@@ -105,30 +105,30 @@ $branches = Branch::withCount('students')
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Cabang Aktif</div>
-                    <div class="stat-value" style="color:#7c3aed">{{ $activeBranches }}</div>
+                    <div class="stat-value" style="color:#c84ddf">{{ $activeBranches }}</div>
                     <div class="stat-label" style="font-size:11px;color:var(--text-muted)">
                         <i class="bi bi-building me-1"></i>Beroperasi
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)">
+                <div class="stat-icon" style="background:linear-gradient(135deg,#c84ddf,#8b5cf6)">
                     <i class="bi bi-building-fill" style="color:white"></i>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.15s">
-        <div class="stat-card" style="border-top:3px solid #f59e0b">
+        <div class="stat-card" style="border-top:3px solid #f6af23">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Revenue Bulan Ini</div>
-                    <div class="stat-value" style="color:#d97706;font-size:18px">
+                    <div class="stat-value" style="color:#e09000;font-size:18px">
                         Rp {{ number_format($monthRevenue, 0, ',', '.') }}
                     </div>
                     <div class="stat-label" style="font-size:11px;color:var(--text-muted)">
                         <i class="bi bi-cash me-1"></i>Terverifikasi
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#d97706,#f59e0b)">
+                <div class="stat-icon" style="background:linear-gradient(135deg,#e09000,#f6af23)">
                     <i class="bi bi-cash-coin" style="color:white"></i>
                 </div>
             </div>
@@ -145,7 +145,7 @@ $branches = Branch::withCount('students')
                     <h6 class="fw-bold mb-1" style="font-size:14px">Pertumbuhan Siswa</h6>
                     <p class="text-muted mb-0" style="font-size:12px">Pendaftaran 6 bulan terakhir</p>
                 </div>
-                <span class="badge" style="background:#eff6ff;color:#2563eb;padding:4px 10px;font-size:11px;border-radius:7px">
+                <span class="badge" style="background:#fdf4ff;color:#68117e;padding:4px 10px;font-size:11px;border-radius:7px">
                     +{{ array_sum($studentData) }} total
                 </span>
             </div>
@@ -195,7 +195,7 @@ $branches = Branch::withCount('students')
             <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="d-flex align-items-center gap-2">
-                        <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:700;flex-shrink:0">
+                        <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#c84ddf,#c84ddf);display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:700;flex-shrink:0">
                             {{ $i + 1 }}
                         </div>
                         <div>
@@ -204,12 +204,12 @@ $branches = Branch::withCount('students')
                         </div>
                     </div>
                     <div class="text-end">
-                        <div class="fw-bold" style="font-size:14px;color:#2563eb">{{ $b->students_count }}</div>
+                        <div class="fw-bold" style="font-size:14px;color:#68117e">{{ $b->students_count }}</div>
                         <div style="font-size:10px;color:var(--text-muted)">siswa</div>
                     </div>
                 </div>
                 <div style="height:5px;background:var(--card-border);border-radius:10px;overflow:hidden">
-                    <div style="width:{{ $pct }}%;height:100%;background:linear-gradient(90deg,#3b82f6,#6366f1);border-radius:10px;transition:width .8s ease"></div>
+                    <div style="width:{{ $pct }}%;height:100%;background:linear-gradient(90deg,#c84ddf,#c84ddf);border-radius:10px;transition:width .8s ease"></div>
                 </div>
                 <div class="d-flex justify-content-between mt-1" style="font-size:10.5px;color:var(--text-muted)">
                     <span>{{ $b->aktif_count }} aktif</span>
@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ...barOpts,
         series: [{ name:'Siswa Baru', data:{!! json_encode($studentData) !!} }],
         xaxis:  { ...barOpts.xaxis, categories:{!! json_encode($studentMonths) !!} },
-        colors: ['#3b82f6'],
+        colors: ['#c84ddf'],
     }).render();
 
     new ApexCharts(document.getElementById('chartRevTrend'), {

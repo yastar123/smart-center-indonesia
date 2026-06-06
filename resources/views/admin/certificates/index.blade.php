@@ -7,7 +7,7 @@
 <div class="fade-up">
 
     {{-- HEADER BANNER --}}
-    <div class="page-header mb-4" style="background:linear-gradient(135deg,#f59e0b 0%,#d97706 50%,#b45309 100%);border-radius:20px;padding:2rem 2.5rem;color:#fff;position:relative;overflow:hidden;">
+    <div class="page-header mb-4" style="background:linear-gradient(135deg,#f6af23 0%,#e09000 50%,#b45309 100%);border-radius:20px;padding:2rem 2.5rem;color:#fff;position:relative;overflow:hidden;">
         <div style="position:absolute;top:-30px;right:-30px;width:180px;height:180px;background:rgba(255,255,255,.07);border-radius:50%;"></div>
         <div style="position:absolute;bottom:-50px;right:80px;width:120px;height:120px;background:rgba(255,255,255,.05);border-radius:50%;"></div>
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative;z-index:1;">
@@ -31,8 +31,8 @@
     <div class="row g-3 mb-4">
         @php
             $statCards = [
-                ['label'=>'Total Sertifikat','value'=>$stats['total'],'icon'=>'bi-award','color'=>'#f59e0b','bg'=>'rgba(245,158,11,.12)'],
-                ['label'=>'Kompetensi','value'=>$stats['kompetensi'],'icon'=>'bi-patch-check','color'=>'#3b82f6','bg'=>'rgba(59,130,246,.12)'],
+                ['label'=>'Total Sertifikat','value'=>$stats['total'],'icon'=>'bi-award','color'=>'#f6af23','bg'=>'rgba(245,158,11,.12)'],
+                ['label'=>'Kompetensi','value'=>$stats['kompetensi'],'icon'=>'bi-patch-check','color'=>'#c84ddf','bg'=>'rgba(200,77,223,.12)'],
                 ['label'=>'Kelulusan','value'=>$stats['kelulusan'],'icon'=>'bi-mortarboard','color'=>'#10b981','bg'=>'rgba(16,185,129,.12)'],
                 ['label'=>'Prestasi','value'=>$stats['prestasi'],'icon'=>'bi-trophy','color'=>'#ef4444','bg'=>'rgba(239,68,68,.12)'],
             ];
@@ -134,7 +134,7 @@
                             <td class="d-none d-md-table-cell">
                                 @php
                                     $jenisColors = [
-                                        'kompetensi'  => ['#3b82f6','rgba(59,130,246,.15)'],
+                                        'kompetensi'  => ['#c84ddf','rgba(200,77,223,.15)'],
                                         'kelulusan'   => ['#10b981','rgba(16,185,129,.15)'],
                                         'prestasi'    => ['#ef4444','rgba(239,68,68,.15)'],
                                         'partisipasi' => ['#8b5cf6','rgba(139,92,246,.15)'],
@@ -172,7 +172,7 @@
                         <tr>
                             <td colspan="8" class="text-center py-5">
                                 <div style="opacity:.5;">
-                                    <i class="bi bi-award" style="font-size:2.5rem;display:block;margin-bottom:.5rem;color:#f59e0b;"></i>
+                                    <i class="bi bi-award" style="font-size:2.5rem;display:block;margin-bottom:.5rem;color:#f6af23;"></i>
                                     <div class="fw-semibold">Belum ada sertifikat</div>
                                     <small class="text-muted">Terbitkan sertifikat pertama untuk siswa Anda</small>
                                 </div>
@@ -254,7 +254,7 @@
             </div>
             <div class="modal-footer border-0 px-4 pb-4 pt-2 gap-2">
                 <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn px-4 fw-semibold" onclick="saveCert()" id="certSaveBtn" style="background:linear-gradient(135deg,#f59e0b,#b45309);color:#fff;">
+                <button type="button" class="btn px-4 fw-semibold" onclick="saveCert()" id="certSaveBtn" style="background:linear-gradient(135deg,#f6af23,#b45309);color:#fff;">
                     <i class="bi bi-award me-2"></i>Terbitkan
                 </button>
             </div>

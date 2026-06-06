@@ -10,8 +10,8 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#0f0f1a;--sidebar:#13131f;--card:#1a1a2e;--card2:#1e1e32;
-  --border:#2a2a45;--accent:#7c3aed;--accent2:#6366f1;--accent3:#a78bfa;
-  --text:#e2e8f0;--muted:#94a3b8;--green:#10b981;--yellow:#f59e0b;--red:#ef4444;--blue:#3b82f6;
+  --border:#2a2a45;--accent:#c84ddf;--accent2:#c84ddf;--accent3:#ab8db2;
+  --text:#e2e8f0;--muted:#94a3b8;--green:#10b981;--yellow:#f6af23;--red:#ef4444;--blue:#c84ddf;
 }
 body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;overflow-x:hidden}
 
@@ -85,7 +85,7 @@ tr:hover td{background:rgba(124,58,237,.05)}
 .badge-pending{background:rgba(245,158,11,.15);color:var(--yellow);border:1px solid rgba(245,158,11,.3)}
 .badge-approved{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3)}
 .badge-rejected{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
-.badge-scheduled{background:rgba(99,102,241,.15);color:#818cf8;border:1px solid rgba(99,102,241,.3)}
+.badge-scheduled{background:rgba(200,77,223,.15);color:#818cf8;border:1px solid rgba(200,77,223,.3)}
 .actions{display:flex;align-items:center;gap:6px}
 .name-cell{display:flex;align-items:center;gap:10px}
 .av-sm{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
@@ -534,7 +534,7 @@ function switchPage(id){
 function fmtDate(iso){if(!iso)return'-';const d=new Date(iso);return d.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});}
 function initials(name){return name.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();}
 function badgeStatus(s){const m={'Pending':'badge-pending','Approved':'badge-approved','Rejected':'badge-rejected','Scheduled':'badge-scheduled'};return`<span class="badge ${m[s]||'badge-pending'}">${s}</span>`;}
-const colors=['#7c3aed','#6366f1','#10b981','#3b82f6','#f59e0b','#ef4444','#06b6d4','#ec4899'];
+const colors=['#c84ddf','#c84ddf','#10b981','#c84ddf','#f6af23','#ef4444','#06b6d4','#ec4899'];
 function avColor(name){return colors[name.charCodeAt(0)%colors.length];}
 function showNotif(msg,isErr=false){const n=document.getElementById('notif');document.getElementById('notifMsg').textContent=msg;n.className='notif'+(isErr?' err':'');void n.offsetWidth;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),3000);}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
@@ -579,7 +579,7 @@ function renderDashboard(){
       <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
         <span style="color:var(--text)">${k}</span><span style="color:var(--muted)">${v}</span>
       </div>
-      <div class="progress-bar"><div class="fill" style="width:${(v/maxC*100).toFixed(0)}%;background:linear-gradient(90deg,#10b981,#3b82f6)"></div></div>
+      <div class="progress-bar"><div class="fill" style="width:${(v/maxC*100).toFixed(0)}%;background:linear-gradient(90deg,#10b981,#c84ddf)"></div></div>
     </div>`).join('')||'<p style="color:var(--muted);font-size:13px">Belum ada data</p>';
 }
 

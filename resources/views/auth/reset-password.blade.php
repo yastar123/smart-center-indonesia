@@ -11,14 +11,14 @@
         *{margin:0;padding:0;box-sizing:border-box;}
         body{
             min-height:100vh;
-            background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 40%,#1d4ed8 75%,#6c63ff 100%);
+            background:linear-gradient(135deg,#260632 0%,#461256 40%,#461256 75%,#c84ddf 100%);
             display:flex;align-items:center;justify-content:center;
             font-family:'Inter','Segoe UI',sans-serif;padding:2rem 1rem;
             position:relative;overflow:hidden;
         }
         body::before{
             content:'';position:fixed;width:500px;height:500px;
-            background:radial-gradient(circle,rgba(99,102,241,.25) 0%,transparent 70%);
+            background:radial-gradient(circle,rgba(200,77,223,.25) 0%,transparent 70%);
             top:-150px;right:-150px;border-radius:50%;pointer-events:none;
         }
         .card-wrap{
@@ -149,8 +149,8 @@ document.getElementById('newPwd').addEventListener('input', function() {
     if(val.length>=8)s++; if(/[A-Z]/.test(val))s++;
     if(/[0-9]/.test(val))s++; if(/[^A-Za-z0-9]/.test(val))s++;
     const cfgs=[
-        {p:'25%',c:'#ef4444',t:'Lemah'},{p:'50%',c:'#f59e0b',t:'Cukup'},
-        {p:'75%',c:'#3b82f6',t:'Kuat'},{p:'100%',c:'#10b981',t:'Sangat Kuat'}
+        {p:'25%',c:'#ef4444',t:'Lemah'},{p:'50%',c:'#f6af23',t:'Cukup'},
+        {p:'75%',c:'#c84ddf',t:'Kuat'},{p:'100%',c:'#10b981',t:'Sangat Kuat'}
     ];
     const cfg=cfgs[s-1]||cfgs[0];
     fill.style.width=cfg.p; fill.style.background=cfg.c;

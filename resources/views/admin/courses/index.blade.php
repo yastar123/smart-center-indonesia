@@ -34,7 +34,7 @@
         @php
             $statCards = [
                 ['label'=>'Total Mapel','value'=>$stats['total'],'icon'=>'bi-book','color'=>'#10b981','bg'=>'rgba(16,185,129,.12)'],
-                ['label'=>'Mapel Aktif','value'=>$stats['aktif'],'icon'=>'bi-check-circle','color'=>'#3b82f6','bg'=>'rgba(59,130,246,.12)'],
+                ['label'=>'Mapel Aktif','value'=>$stats['aktif'],'icon'=>'bi-check-circle','color'=>'#c84ddf','bg'=>'rgba(200,77,223,.12)'],
                 ['label'=>'Tidak Aktif','value'=>$stats['nonaktif'],'icon'=>'bi-x-circle','color'=>'#ef4444','bg'=>'rgba(239,68,68,.12)'],
             ];
         @endphp

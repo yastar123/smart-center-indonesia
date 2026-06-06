@@ -11,14 +11,14 @@
         *{margin:0;padding:0;box-sizing:border-box;}
         body{
             min-height:100vh;
-            background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 40%,#1d4ed8 75%,#6c63ff 100%);
+            background:linear-gradient(135deg,#260632 0%,#461256 40%,#461256 75%,#c84ddf 100%);
             display:flex;align-items:center;justify-content:center;
             font-family:'Inter','Segoe UI',sans-serif;padding:2rem 1rem;
             position:relative;overflow:hidden;
         }
         body::before{
             content:'';position:fixed;width:500px;height:500px;
-            background:radial-gradient(circle,rgba(99,102,241,.25) 0%,transparent 70%);
+            background:radial-gradient(circle,rgba(200,77,223,.25) 0%,transparent 70%);
             top:-150px;right:-150px;border-radius:50%;
             animation:orb 8s ease-in-out infinite alternate;pointer-events:none;
         }
@@ -30,7 +30,7 @@
         }
         @keyframes slideUp{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
         .card-header-band{
-            background:linear-gradient(135deg,#1e3a5f,#2563eb,#6366f1);
+            background:linear-gradient(135deg,#461256,#68117e,#c84ddf);
             padding:2rem 2.5rem 1.5rem;color:white;text-align:center;
         }
         .brand-icon{
@@ -44,13 +44,13 @@
             border:2px solid #e5e7eb;border-radius:11px;padding:.72rem 1rem;font-size:.9rem;
             background:#fafafa;transition:.25s;
         }
-        .form-control:focus{border-color:#4f8ef7;box-shadow:0 0 0 4px rgba(79,142,247,.12);background:#fff;outline:none;}
+        .form-control:focus{border-color:#c84ddf;box-shadow:0 0 0 4px rgba(200,77,223,.12);background:#fff;outline:none;}
         .btn-send{
-            background:linear-gradient(135deg,#2563eb,#4f8ef7 50%,#6c63ff);background-size:200% auto;
+            background:linear-gradient(135deg,#68117e,#c84ddf 50%,#c84ddf);background-size:200% auto;
             border:none;border-radius:12px;padding:.85rem;font-size:.95rem;font-weight:700;
             color:white;width:100%;margin-top:.5rem;transition:.4s;
         }
-        .btn-send:hover{background-position:right center;transform:translateY(-2px);box-shadow:0 10px 28px rgba(79,142,247,.45);color:white;}
+        .btn-send:hover{background-position:right center;transform:translateY(-2px);box-shadow:0 10px 28px rgba(200,77,223,.45);color:white;}
         @media(max-width:480px){.card-body-inner,.card-header-band{padding:1.5rem;}}
     </style>
 </head>
@@ -102,7 +102,7 @@
             </button>
 
             <div class="text-center mt-4" style="font-size:.875rem;color:#6b7280">
-                <a href="{{ route('login') }}" class="d-inline-flex align-items-center gap-1 fw-semibold text-decoration-none" style="color:#4f8ef7">
+                <a href="{{ route('login') }}" class="d-inline-flex align-items-center gap-1 fw-semibold text-decoration-none" style="color:#c84ddf">
                     <i class="bi bi-arrow-left"></i> Kembali ke Login
                 </a>
             </div>

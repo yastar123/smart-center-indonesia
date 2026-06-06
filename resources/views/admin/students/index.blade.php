@@ -48,7 +48,7 @@
                         <i class="bi bi-gender-male me-1"></i>Siswa putra
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#3b82f6,#60a5fa);color:white">
+                <div class="stat-icon" style="background:linear-gradient(135deg,#c84ddf,#e8b4f5);color:white">
                     <i class="bi bi-person-fill"></i>
                 </div>
             </div>
@@ -148,7 +148,7 @@
     @if(request()->hasAny(['search','status','gender','branch_id']))
     <div class="d-flex gap-2 mb-3 flex-wrap">
         @if(request('search'))
-        <span class="badge" style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;font-size:12px;padding:6px 12px;border-radius:8px">
+        <span class="badge" style="background:#fdf4ff;color:#461256;border:1px solid #e8b4f5;font-size:12px;padding:6px 12px;border-radius:8px">
             <i class="bi bi-search me-1"></i>{{ request('search') }}
         </span>
         @endif
@@ -188,7 +188,7 @@
                     $statusMap = [
                         'aktif'    => ['bg'=>'#dcfce7','color'=>'#15803d','label'=>'Aktif'],
                         'nonaktif' => ['bg'=>'#f3f4f6','color'=>'#6b7280','label'=>'Nonaktif'],
-                        'lulus'    => ['bg'=>'#dbeafe','color'=>'#1d4ed8','label'=>'Lulus'],
+                        'lulus'    => ['bg'=>'#f3d6fa','color'=>'#461256','label'=>'Lulus'],
                     ];
                     $badge = $statusMap[$s->status] ?? ['bg'=>'#f3f4f6','color'=>'#6b7280','label'=>ucfirst($s->status??'-')];
                 @endphp
@@ -202,7 +202,7 @@
                                 <img src="{{ $s->photo ? Storage::url($s->photo) : $avatar }}"
                                      class="rounded-circle"
                                      width="40" height="40"
-                                     style="object-fit:cover;border:2.5px solid {{ $s->gender==='P' ? '#f9a8d4':'#93c5fd' }}"
+                                     style="object-fit:cover;border:2.5px solid {{ $s->gender==='P' ? '#f9a8d4':'#e8b4f5' }}"
                                      loading="lazy">
                             </div>
                             <div>
@@ -305,7 +305,7 @@
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg">
 
-            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#2563eb,#6366f1);color:#fff">
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#68117e,#c84ddf);color:#fff">
                 <div>
                     <h6 class="modal-title fw-bold mb-0" id="modalTitle">
                         <i class="bi bi-person-plus me-2"></i>Tambah Siswa Baru
@@ -327,9 +327,9 @@
                                  src="https://ui-avatars.com/api/?name=Siswa&background=3b82f6&color=fff&size=120"
                                  class="rounded-circle"
                                  width="100" height="100"
-                                 style="object-fit:cover;border:3px solid #3b82f6;box-shadow:0 8px 24px rgba(59,130,246,.3)">
+                                 style="object-fit:cover;border:3px solid #c84ddf;box-shadow:0 8px 24px rgba(200,77,223,.3)">
                             <label class="position-absolute bottom-0 end-0 d-flex align-items-center justify-content-center"
-                                   style="width:32px;height:32px;background:#3b82f6;border-radius:50%;cursor:pointer;border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,.2)">
+                                   style="width:32px;height:32px;background:#c84ddf;border-radius:50%;cursor:pointer;border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,.2)">
                                 <i class="bi bi-camera-fill text-white" style="font-size:13px"></i>
                                 <input type="file" name="photo" id="photoInput" class="d-none" accept="image/*">
                             </label>
@@ -340,7 +340,7 @@
                     {{-- SECTION: DATA PRIBADI --}}
                     <div class="mb-4">
                         <div class="d-flex align-items-center gap-2 mb-3">
-                            <div style="width:4px;height:20px;background:linear-gradient(#3b82f6,#6366f1);border-radius:4px"></div>
+                            <div style="width:4px;height:20px;background:linear-gradient(#c84ddf,#c84ddf);border-radius:4px"></div>
                             <span class="fw-bold text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em">Data Pribadi</span>
                         </div>
                         <div class="row g-3">
@@ -412,7 +412,7 @@
                     {{-- SECTION: DATA ORANG TUA --}}
                     <div>
                         <div class="d-flex align-items-center gap-2 mb-3">
-                            <div style="width:4px;height:20px;background:linear-gradient(#f59e0b,#d97706);border-radius:4px"></div>
+                            <div style="width:4px;height:20px;background:linear-gradient(#f6af23,#e09000);border-radius:4px"></div>
                             <span class="fw-bold text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em">Data Orang Tua / Wali</span>
                         </div>
                         <div class="row g-3">
@@ -450,7 +450,7 @@
 <div class="modal fade" id="detailModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#2563eb,#6366f1);color:#fff">
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#68117e,#c84ddf);color:#fff">
                 <h6 class="modal-title fw-bold"><i class="bi bi-person-lines-fill me-2"></i>Detail Siswa</h6>
                 <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -507,14 +507,14 @@ function showDetail(id) {
     $.get('/admin/students/' + id, function(res) {
         const s = res.data;
         const avatar = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(s.name) + '&background=' + (s.gender==='P'?'ec4899':'3b82f6') + '&color=fff&size=120';
-        const statusMap = {aktif:'#dcfce7:#15803d:Aktif', nonaktif:'#f3f4f6:#6b7280:Nonaktif', lulus:'#dbeafe:#1d4ed8:Lulus'};
+        const statusMap = {aktif:'#dcfce7:#15803d:Aktif', nonaktif:'#f3f4f6:#6b7280:Nonaktif', lulus:'#f3d6fa:#461256:Lulus'};
         const [sbg,scol,slbl] = (statusMap[s.status]||'#f3f4f6:#6b7280:'+s.status).split(':');
         document.getElementById('detailBody').innerHTML = `
             <div style="text-align:center;padding:24px 24px 16px">
                 <img src="${s.photo ? '/storage/'+s.photo : avatar}" class="rounded-circle mb-3"
-                     width="90" height="90" style="object-fit:cover;border:3px solid #3b82f6;box-shadow:0 8px 24px rgba(59,130,246,.25)">
+                     width="90" height="90" style="object-fit:cover;border:3px solid #c84ddf;box-shadow:0 8px 24px rgba(200,77,223,.25)">
                 <h6 class="fw-bold mb-1" style="font-size:16px">${s.name}</h6>
-                <code style="background:#eff6ff;color:#1d4ed8;padding:3px 10px;border-radius:6px;font-size:12px">${s.nis}</code>
+                <code style="background:#fdf4ff;color:#461256;padding:3px 10px;border-radius:6px;font-size:12px">${s.nis}</code>
                 <div style="margin-top:10px">
                     <span style="background:${sbg};color:${scol};padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600">
                         ● ${slbl}
@@ -544,7 +544,7 @@ function showDetail(id) {
 function row(label, val) {
     return `<tr style="border-bottom:1px solid var(--card-border,#e2e8f0)">
         <td style="padding:9px 4px 9px 0;color:#6b7280;font-size:12.5px;width:38%">${label}</td>
-        <td style="padding:9px 0;font-size:13px;font-weight:600;color:var(--text-primary,#0f172a)">${val}</td>
+        <td style="padding:9px 0;font-size:13px;font-weight:600;color:var(--text-primary,#260632)">${val}</td>
     </tr>`;
 }
 

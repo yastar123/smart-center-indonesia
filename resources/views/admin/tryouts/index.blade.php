@@ -5,7 +5,7 @@
 @section('content')
 
 {{-- HEADER BANNER --}}
-<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#0f172a,#2e1065,#7c3aed);color:white;border:none">
+<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#260632,#2e1065,#c84ddf);color:white;border:none">
     <div class="row align-items-center g-3">
         <div class="col-md-8">
             <div class="d-flex align-items-center gap-3 mb-3">
@@ -34,9 +34,9 @@
     @php
     $types = [
         ['icon'=>'bi-mortarboard','color'=>'#8b5cf6','bg'=>'#f5f3ff','title'=>'SBMPTN / SNBT','desc'=>'Tryout persiapan masuk perguruan tinggi dengan soal sesuai kisi-kisi terbaru'],
-        ['icon'=>'bi-building','color'=>'#3b82f6','bg'=>'#eff6ff','title'=>'UTBK Saintek/Soshum','desc'=>'Simulasi ujian UTBK dengan timer, pengacak soal, dan koreksi otomatis'],
+        ['icon'=>'bi-building','color'=>'#c84ddf','bg'=>'#fdf4ff','title'=>'UTBK Saintek/Soshum','desc'=>'Simulasi ujian UTBK dengan timer, pengacak soal, dan koreksi otomatis'],
         ['icon'=>'bi-journal-text','color'=>'#10b981','bg'=>'#f0fdf4','title'=>'Ujian Sekolah','desc'=>'UTS, UAS, dan ujian harian terintegrasi dengan kurikulum per cabang'],
-        ['icon'=>'bi-trophy','color'=>'#f59e0b','bg'=>'#fffbeb','title'=>'Kompetisi Online','desc'=>'Olimpiade dan kompetisi antar cabang dengan papan peringkat real-time'],
+        ['icon'=>'bi-trophy','color'=>'#f6af23','bg'=>'#fffbeb','title'=>'Kompetisi Online','desc'=>'Olimpiade dan kompetisi antar cabang dengan papan peringkat real-time'],
     ];
     @endphp
     @foreach($types as $t)
@@ -62,12 +62,12 @@
             <div class="row g-3">
                 @php
                 $highlights = [
-                    ['icon'=>'bi-shuffle','label'=>'Pengacak Soal','color'=>'#6366f1'],
+                    ['icon'=>'bi-shuffle','label'=>'Pengacak Soal','color'=>'#c84ddf'],
                     ['icon'=>'bi-stopwatch','label'=>'Timer Otomatis','color'=>'#ef4444'],
-                    ['icon'=>'bi-eye-slash','label'=>'Anti-Cheat System','color'=>'#0f172a'],
+                    ['icon'=>'bi-eye-slash','label'=>'Anti-Cheat System','color'=>'#260632'],
                     ['icon'=>'bi-bar-chart-line','label'=>'Analisis Hasil','color'=>'#10b981'],
-                    ['icon'=>'bi-file-earmark-pdf','label'=>'Sertifikat PDF','color'=>'#f59e0b'],
-                    ['icon'=>'bi-phone','label'=>'Mobile Friendly','color'=>'#3b82f6'],
+                    ['icon'=>'bi-file-earmark-pdf','label'=>'Sertifikat PDF','color'=>'#f6af23'],
+                    ['icon'=>'bi-phone','label'=>'Mobile Friendly','color'=>'#c84ddf'],
                     ['icon'=>'bi-database','label'=>'Bank Soal','color'=>'#8b5cf6'],
                     ['icon'=>'bi-graph-up','label'=>'Progress Tracker','color'=>'#06b6d4'],
                 ];
@@ -91,8 +91,8 @@
     <div class="row g-3">
         @php $tasks = [
             ['label'=>'Desain UI/UX CBT','pct'=>75,'color'=>'#8b5cf6'],
-            ['label'=>'Bank Soal & Editor','pct'=>60,'color'=>'#3b82f6'],
-            ['label'=>'Engine Ujian','pct'=>35,'color'=>'#f59e0b'],
+            ['label'=>'Bank Soal & Editor','pct'=>60,'color'=>'#c84ddf'],
+            ['label'=>'Engine Ujian','pct'=>35,'color'=>'#f6af23'],
             ['label'=>'Anti-Cheat & Security','pct'=>15,'color'=>'#ef4444'],
             ['label'=>'Analisis & Laporan','pct'=>5,'color'=>'#10b981'],
             ['label'=>'Integrasi & Testing','pct'=>0,'color'=>'#94a3b8'],

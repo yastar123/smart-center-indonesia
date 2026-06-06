@@ -45,7 +45,7 @@
 
 {{-- WELCOME BANNER --}}
 <div class="dashboard-card mb-4 fade-up"
-     style="background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 55%,#6366f1 100%);color:white;border:none;overflow:hidden;position:relative">
+     style="background:linear-gradient(135deg,#461256 0%,#68117e 55%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
     <div style="position:absolute;right:-60px;top:-60px;width:220px;height:220px;background:rgba(255,255,255,.05);border-radius:50%;pointer-events:none"></div>
     <div style="position:absolute;right:40px;bottom:-70px;width:180px;height:180px;background:rgba(255,255,255,.04);border-radius:50%;pointer-events:none"></div>
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative">
@@ -75,7 +75,7 @@
 <div class="row g-3 mb-4">
 
     <div class="col-6 col-xl-3 fade-up">
-        <div class="stat-card" style="border-top:3px solid #3b82f6">
+        <div class="stat-card" style="border-top:3px solid #c84ddf">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Total Siswa</div>
@@ -111,7 +111,7 @@
     </div>
 
     <div class="col-6 col-xl-3 fade-up" style="animation-delay:.10s">
-        <div class="stat-card" style="border-top:3px solid #f59e0b">
+        <div class="stat-card" style="border-top:3px solid #f6af23">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Cabang Aktif</div>
@@ -161,7 +161,7 @@
                 <h6 class="fw-bold mb-0">
                     <i class="bi bi-graph-up-arrow text-primary me-2"></i>Tren Pendaftaran Siswa
                 </h6>
-                <span class="badge" style="background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;font-size:11px">6 Bulan Terakhir</span>
+                <span class="badge" style="background:#fdf4ff;color:#68117e;border:1px solid #e8b4f5;font-size:11px">6 Bulan Terakhir</span>
             </div>
             <div id="chartTrend" style="min-height:200px"></div>
         </div>
@@ -202,11 +202,11 @@
                 <div class="col-6">
                     <a href="{{ route('admin.students.index') }}"
                        class="d-flex align-items-center gap-2 p-3 rounded-3 text-decoration-none quick-dash"
-                       style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #bfdbfe">
-                        <i class="bi bi-person-plus-fill" style="font-size:1.4rem;color:#2563eb"></i>
+                       style="background:linear-gradient(135deg,#fdf4ff,#f3d6fa);border:1px solid #e8b4f5">
+                        <i class="bi bi-person-plus-fill" style="font-size:1.4rem;color:#68117e"></i>
                         <div>
-                            <div class="fw-semibold" style="font-size:12.5px;color:#1d4ed8">Tambah Siswa</div>
-                            <div style="font-size:11px;color:#93c5fd">Daftarkan siswa baru</div>
+                            <div class="fw-semibold" style="font-size:12.5px;color:#461256">Tambah Siswa</div>
+                            <div style="font-size:11px;color:#e8b4f5">Daftarkan siswa baru</div>
                         </div>
                     </a>
                 </div>
@@ -225,10 +225,10 @@
                     <a href="{{ route('admin.schedules.index') }}"
                        class="d-flex align-items-center gap-2 p-3 rounded-3 text-decoration-none quick-dash"
                        style="background:linear-gradient(135deg,#fdf4ff,#fae8ff);border:1px solid #e9d5ff">
-                        <i class="bi bi-calendar-week" style="font-size:1.4rem;color:#7c3aed"></i>
+                        <i class="bi bi-calendar-week" style="font-size:1.4rem;color:#c84ddf"></i>
                         <div>
-                            <div class="fw-semibold" style="font-size:12.5px;color:#5b21b6">Lihat Jadwal</div>
-                            <div style="font-size:11px;color:#c4b5fd">Kalender akademik</div>
+                            <div class="fw-semibold" style="font-size:12.5px;color:#461256">Lihat Jadwal</div>
+                            <div style="font-size:11px;color:#e8b4f5">Kalender akademik</div>
                         </div>
                     </a>
                 </div>
@@ -248,7 +248,7 @@
                     <a href="{{ route('owner.branches.index') }}"
                        class="d-flex align-items-center gap-2 p-3 rounded-3 text-decoration-none quick-dash"
                        style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fcd34d">
-                        <i class="bi bi-building" style="font-size:1.4rem;color:#d97706"></i>
+                        <i class="bi bi-building" style="font-size:1.4rem;color:#e09000"></i>
                         <div>
                             <div class="fw-semibold" style="font-size:12.5px;color:#92400e">Monitor Cabang</div>
                             <div style="font-size:11px;color:#fcd34d">Semua cabang</div>
@@ -300,8 +300,8 @@
             <tbody>
                 @forelse($recentStudents as $s)
                 @php
-                    $avatar = 'https://ui-avatars.com/api/?name='.urlencode($s->name).'&background='.($s->gender==='P'?'ec4899':'4f8ef7').'&color=fff&size=40';
-                    $statusColors = ['aktif'=>['#dcfce7','#15803d'],'nonaktif'=>['#f3f4f6','#6b7280'],'lulus'=>['#dbeafe','#1d4ed8']];
+                    $avatar = 'https://ui-avatars.com/api/?name='.urlencode($s->name).'&background='.($s->gender==='P'?'ec4899':'c84ddf').'&color=fff&size=40';
+                    $statusColors = ['aktif'=>['#dcfce7','#15803d'],'nonaktif'=>['#f3f4f6','#6b7280'],'lulus'=>['#f3d6fa','#461256']];
                     $sc = $statusColors[$s->status] ?? ['#f3f4f6','#6b7280'];
                 @endphp
                 <tr>
@@ -355,7 +355,7 @@
 <div class="row g-3">
     <div class="col-12 fade-up">
         <div class="dashboard-card text-center py-5">
-            <div style="width:80px;height:80px;border-radius:24px;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 12px 32px rgba(59,130,246,.35)">
+            <div style="width:80px;height:80px;border-radius:24px;background:linear-gradient(135deg,#68117e,#c84ddf);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 12px 32px rgba(200,77,223,.4)">
                 <i class="bi bi-mortarboard-fill text-white" style="font-size:36px"></i>
             </div>
             <h5 class="fw-bold mb-2">Halo, {{ $user->name }}!</h5>
@@ -425,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     const textColor  = isDark ? '#94a3b8' : '#64748b';
     const gridColor  = isDark ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.05)';
-    const bgTooltip  = isDark ? '#1e293b' : '#fff';
+    const bgTooltip  = isDark ? '#2d0a3e' : '#fff';
 
     // ── Trend Line ─────────────────────────────────────────────────────────
     const trendEl = document.getElementById('chartTrend');
@@ -452,7 +452,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 labels: { style: { colors: textColor, fontSize: '12px' } },
                 min: 0
             },
-            colors: ['#3b82f6'],
+            colors: ['#c84ddf'],
             fill: {
                 type: 'gradient',
                 gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 100] }
@@ -464,7 +464,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 theme: isDark ? 'dark' : 'light',
                 style: { fontFamily: 'Inter, sans-serif', fontSize: '12px' }
             },
-            markers: { size: 4, strokeWidth: 2, strokeColors: '#fff', colors: ['#3b82f6'] }
+            markers: { size: 4, strokeWidth: 2, strokeColors: '#fff', colors: ['#c84ddf'] }
         }).render();
     }
 
@@ -480,7 +480,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             series: [{{ $male }}, {{ $female }}],
             labels: ['Laki-laki', 'Perempuan'],
-            colors: ['#3b82f6', '#ec4899'],
+            colors: ['#c84ddf', '#ec4899'],
             legend: {
                 position: 'bottom', fontSize: '12px',
                 labels: { colors: textColor }
@@ -521,7 +521,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 axisBorder: { show: false }, axisTicks: { show: false }
             },
             yaxis: { labels: { style: { colors: textColor, fontSize: '12px' } }, min: 0 },
-            colors: ['#10b981', '#94a3b8', '#3b82f6'],
+            colors: ['#10b981', '#94a3b8', '#c84ddf'],
             plotOptions: { bar: { borderRadius: 7, distributed: true, columnWidth: '55%' } },
             legend: { show: false },
             dataLabels: { enabled: false },

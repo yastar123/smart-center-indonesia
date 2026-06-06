@@ -48,7 +48,7 @@ $outstanding = Invoice::with(['siswa','cabang'])
 
 {{-- HEADER --}}
 <div class="dashboard-card mb-4 fade-up"
-     style="background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 50%,#059669 100%);color:white;border:none;overflow:hidden;position:relative">
+     style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#059669 100%);color:white;border:none;overflow:hidden;position:relative">
     <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.04);border-radius:50%"></div>
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative">
         <div>
@@ -89,36 +89,36 @@ $outstanding = Invoice::with(['siswa','cabang'])
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.05s">
-        <div class="stat-card" style="border-top:3px solid #3b82f6">
+        <div class="stat-card" style="border-top:3px solid #c84ddf">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Bulan Ini</div>
-                    <div class="stat-value" style="color:#2563eb;font-size:20px">
+                    <div class="stat-value" style="color:#68117e;font-size:20px">
                         Rp {{ number_format($monthRevenue, 0, ',', '.') }}
                     </div>
                     <div class="stat-label" style="font-size:11px">
                         <i class="bi bi-calendar-month me-1 text-primary"></i>{{ now()->locale('id')->isoFormat('MMMM Y') }}
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#2563eb,#3b82f6)">
+                <div class="stat-icon" style="background:linear-gradient(135deg,#68117e,#c84ddf)">
                     <i class="bi bi-calendar-check" style="color:white"></i>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.10s">
-        <div class="stat-card" style="border-top:3px solid #f59e0b">
+        <div class="stat-card" style="border-top:3px solid #f6af23">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Tagihan Pending</div>
-                    <div class="stat-value" style="color:#d97706;font-size:20px">
+                    <div class="stat-value" style="color:#e09000;font-size:20px">
                         Rp {{ number_format($pendingTotal, 0, ',', '.') }}
                     </div>
                     <div class="stat-label" style="font-size:11px">
                         <i class="bi bi-hourglass-split text-warning me-1"></i>{{ $pendingCount }} invoice
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#d97706,#f59e0b)">
+                <div class="stat-icon" style="background:linear-gradient(135deg,#e09000,#f6af23)">
                     <i class="bi bi-receipt" style="color:white"></i>
                 </div>
             </div>
@@ -174,7 +174,7 @@ $outstanding = Invoice::with(['siswa','cabang'])
                 $totalInv = max($lunas + $belum + $sebagian, 1);
             @endphp
             <div class="mt-3 d-flex flex-column gap-2">
-                @foreach([['Lunas','#10b981',$lunas],['Belum Lunas','#f59e0b',$belum],['Sebagian','#3b82f6',$sebagian]] as [$lbl,$clr,$val])
+                @foreach([['Lunas','#10b981',$lunas],['Belum Lunas','#f6af23',$belum],['Sebagian','#c84ddf',$sebagian]] as [$lbl,$clr,$val])
                 <div class="d-flex align-items-center justify-content-between" style="font-size:12.5px">
                     <div class="d-flex align-items-center gap-2">
                         <div style="width:10px;height:10px;border-radius:3px;background:{{$clr}}"></div>
@@ -275,7 +275,7 @@ $outstanding = Invoice::with(['siswa','cabang'])
                         </div>
                     </div>
                     <div class="text-end flex-shrink-0">
-                        <div class="fw-bold" style="font-size:12.5px;color:{{ $overdue ? '#dc2626' : '#d97706' }}">
+                        <div class="fw-bold" style="font-size:12.5px;color:{{ $overdue ? '#dc2626' : '#e09000' }}">
                             Rp {{ number_format($inv->total, 0, ',', '.') }}
                         </div>
                         <div style="font-size:10px;color:var(--text-muted)">{{ $inv->nomor_invoice }}</div>
@@ -326,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
         chart: { type:'donut', height:160, fontFamily:'Inter, sans-serif', background:'transparent' },
         series: [{{ $lunas }}, {{ $belum }}, {{ $sebagian }}],
         labels: ['Lunas','Belum Lunas','Sebagian'],
-        colors: ['#10b981','#f59e0b','#3b82f6'],
+        colors: ['#10b981','#f6af23','#c84ddf'],
         legend: { show:false },
         plotOptions: { pie:{ donut:{ size:'70%', labels:{
             show:true, total:{ show:true, label:'Total', color:textColor, fontSize:'12px', fontWeight:600,

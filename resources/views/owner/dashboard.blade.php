@@ -21,7 +21,7 @@
 
 {{-- WELCOME BANNER --}}
 <div class="dashboard-card mb-4 fade-up"
-     style="background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 50%,#4338ca 100%);color:white;border:none;overflow:hidden;position:relative">
+     style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#68117e 100%);color:white;border:none;overflow:hidden;position:relative">
     <div style="position:absolute;right:-40px;top:-40px;width:200px;height:200px;background:rgba(255,255,255,.04);border-radius:50%"></div>
     <div style="position:absolute;right:40px;bottom:-60px;width:150px;height:150px;background:rgba(255,255,255,.04);border-radius:50%"></div>
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative">
@@ -45,16 +45,16 @@
 {{-- STAT CARDS --}}
 <div class="row g-3 mb-4">
     <div class="col-6 col-lg-3 fade-up">
-        <div class="stat-card" style="border-top:3px solid #3b82f6">
+        <div class="stat-card" style="border-top:3px solid #c84ddf">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Cabang Aktif</div>
-                    <div class="stat-value" style="color:#2563eb">{{ $activeBranches }}</div>
+                    <div class="stat-value" style="color:#68117e">{{ $activeBranches }}</div>
                     <div class="stat-label" style="font-size:11px;color:#6b7280">
                         <i class="bi bi-building me-1"></i>dari {{ $totalBranches }} total
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#2563eb,#3b82f6)">
+                <div class="stat-icon" style="background:linear-gradient(135deg,#68117e,#c84ddf)">
                     <i class="bi bi-building-fill-check"></i>
                 </div>
             </div>
@@ -77,16 +77,16 @@
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.10s">
-        <div class="stat-card" style="border-top:3px solid #f59e0b">
+        <div class="stat-card" style="border-top:3px solid #f6af23">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Total Guru</div>
-                    <div class="stat-value" style="color:#d97706">{{ $totalTeachers }}</div>
+                    <div class="stat-value" style="color:#e09000">{{ $totalTeachers }}</div>
                     <div class="stat-label" style="font-size:11px;color:#6b7280">
                         <i class="bi bi-person-badge me-1"></i>{{ $activeTeachers }} aktif
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#d97706,#f59e0b)">
+                <div class="stat-icon" style="background:linear-gradient(135deg,#e09000,#f6af23)">
                     <i class="bi bi-person-badge-fill"></i>
                 </div>
             </div>
@@ -124,11 +124,11 @@
             <div class="d-grid gap-2">
                 @php
                 $links = [
-                    ['route'=>'owner.branches.index','icon'=>'bi-building-fill','color'=>'#2563eb','bg'=>'#eff6ff','border'=>'#bfdbfe','label'=>'Monitoring Cabang','sub'=>'Pantau semua cabang','arrowColor'=>'#93c5fd'],
+                    ['route'=>'owner.branches.index','icon'=>'bi-building-fill','color'=>'#68117e','bg'=>'#fdf4ff','border'=>'#e8b4f5','label'=>'Monitoring Cabang','sub'=>'Pantau semua cabang','arrowColor'=>'#e8b4f5'],
                     ['route'=>'admin.students.index','icon'=>'bi-people-fill','color'=>'#059669','bg'=>'#f0fdf4','border'=>'#bbf7d0','label'=>'Data Siswa','sub'=>'Kelola seluruh siswa','arrowColor'=>'#6ee7b7'],
-                    ['route'=>'admin.teachers.index','icon'=>'bi-person-badge-fill','color'=>'#d97706','bg'=>'#fffbeb','border'=>'#fcd34d','label'=>'Data Guru','sub'=>'Manajemen pengajar','arrowColor'=>'#fcd34d'],
+                    ['route'=>'admin.teachers.index','icon'=>'bi-person-badge-fill','color'=>'#e09000','bg'=>'#fffbeb','border'=>'#fcd34d','label'=>'Data Guru','sub'=>'Manajemen pengajar','arrowColor'=>'#fcd34d'],
                     ['route'=>'admin.payments.index','icon'=>'bi-cash-stack','color'=>'#db2777','bg'=>'#fdf2f8','border'=>'#fbcfe8','label'=>'Keuangan','sub'=>'Laporan & invoice','arrowColor'=>'#f9a8d4'],
-                    ['route'=>'admin.tryouts.index','icon'=>'bi-journal-check','color'=>'#7c3aed','bg'=>'#f5f3ff','border'=>'#c4b5fd','label'=>'Tryout CBT','sub'=>'Monitoring ujian','arrowColor'=>'#c4b5fd'],
+                    ['route'=>'admin.tryouts.index','icon'=>'bi-journal-check','color'=>'#c84ddf','bg'=>'#f5f3ff','border'=>'#e8b4f5','label'=>'Tryout CBT','sub'=>'Monitoring ujian','arrowColor'=>'#e8b4f5'],
                 ];
                 @endphp
                 @foreach($links as $lnk)
@@ -186,7 +186,7 @@
                         <tr>
                             <td class="py-3">
                                 <div class="d-flex align-items-center gap-2">
-                                    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
+                                    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#c84ddf,#c84ddf);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
                                         <i class="bi bi-building"></i>
                                     </div>
                                     <div>
@@ -196,7 +196,7 @@
                                 </div>
                             </td>
                             <td class="text-center">
-                                <span class="badge" style="background:#eff6ff;color:#2563eb;font-weight:600;font-size:12px;padding:4px 10px;border-radius:20px">
+                                <span class="badge" style="background:#fdf4ff;color:#68117e;font-weight:600;font-size:12px;padding:4px 10px;border-radius:20px">
                                     {{ $b->students_count }}
                                 </span>
                             </td>

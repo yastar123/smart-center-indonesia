@@ -37,9 +37,9 @@
                 <img src="{{ $user->avatar ? asset('storage/'.$user->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=2563eb&color=fff&size=160' }}"
                      class="rounded-circle"
                      width="100" height="100"
-                     style="object-fit:cover;border:4px solid #3b82f6;box-shadow:0 8px 24px rgba(59,130,246,.3)"
+                     style="object-fit:cover;border:4px solid #c84ddf;box-shadow:0 8px 24px rgba(200,77,223,.3)"
                      id="avatarPreview">
-                <div style="position:absolute;bottom:4px;right:4px;width:30px;height:30px;background:#3b82f6;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2.5px solid white;cursor:pointer"
+                <div style="position:absolute;bottom:4px;right:4px;width:30px;height:30px;background:#c84ddf;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2.5px solid white;cursor:pointer"
                      onclick="document.getElementById('avatarFile').click()">
                     <i class="bi bi-camera-fill text-white" style="font-size:12px"></i>
                 </div>
@@ -47,7 +47,7 @@
             </div>
 
             <h6 class="fw-bold mb-1">{{ $user->name }}</h6>
-            <span class="badge" style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;font-size:12px;padding:5px 14px;border-radius:20px">
+            <span class="badge" style="background:#fdf4ff;color:#461256;border:1px solid #e8b4f5;font-size:12px;padding:5px 14px;border-radius:20px">
                 {{ ucfirst($user->getRoleNames()->first() ?? 'User') }}
             </span>
 
@@ -101,7 +101,7 @@
         {{-- SECTION 1: UPDATE PROFILE --}}
         <div class="dashboard-card mb-4 fade-up" id="section-profile">
             <div class="d-flex align-items-center gap-3 mb-4 pb-3" style="border-bottom:1px solid var(--card-border)">
-                <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#2563eb,#6366f1);display:flex;align-items:center;justify-content:center">
+                <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#68117e,#c84ddf);display:flex;align-items:center;justify-content:center">
                     <i class="bi bi-person-fill text-white" style="font-size:18px"></i>
                 </div>
                 <div>
@@ -342,8 +342,8 @@ if (newPwd) {
 
         const configs = [
             { pct:'25%', color:'#ef4444', text:'Lemah' },
-            { pct:'50%', color:'#f59e0b', text:'Cukup' },
-            { pct:'75%', color:'#3b82f6', text:'Kuat' },
+            { pct:'50%', color:'#f6af23', text:'Cukup' },
+            { pct:'75%', color:'#c84ddf', text:'Kuat' },
             { pct:'100%', color:'#10b981', text:'Sangat Kuat' },
         ];
         const cfg = configs[strength - 1] || configs[0];

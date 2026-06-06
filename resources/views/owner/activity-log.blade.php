@@ -5,7 +5,7 @@
 @section('content')
 
 {{-- HEADER --}}
-<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#1e1b4b,#4338ca,#6366f1);color:white;border:none">
+<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#1e1b4b,#68117e,#c84ddf);color:white;border:none">
     <div class="row align-items-center g-3">
         <div class="col-md-8">
             <div class="d-flex align-items-center gap-3 mb-2">
@@ -30,8 +30,8 @@
 <div class="dashboard-card fade-up">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h6 class="fw-bold mb-0">
-            <i class="bi bi-list-ul text-indigo me-2" style="color:#6366f1"></i>Riwayat Aktivitas
-            <span class="badge ms-2" style="background:#f0f0ff;color:#4338ca;font-size:11px">{{ $activities->total() }} entri</span>
+            <i class="bi bi-list-ul text-indigo me-2" style="color:#c84ddf"></i>Riwayat Aktivitas
+            <span class="badge ms-2" style="background:#f0f0ff;color:#68117e;font-size:11px">{{ $activities->total() }} entri</span>
         </h6>
     </div>
 
@@ -39,11 +39,11 @@
     @php
         $iconMap = [
             'created' => ['bi-plus-circle-fill','#f0fdf4','#16a34a'],
-            'updated' => ['bi-pencil-fill','#fffbeb','#d97706'],
+            'updated' => ['bi-pencil-fill','#fffbeb','#e09000'],
             'deleted' => ['bi-trash-fill','#fef2f2','#dc2626'],
         ];
         $event = $act->event ?? 'updated';
-        [$icon,$ibg,$icol] = $iconMap[$event] ?? ['bi-activity','#f0f0ff','#6366f1'];
+        [$icon,$ibg,$icol] = $iconMap[$event] ?? ['bi-activity','#f0f0ff','#c84ddf'];
         $causer = $act->causer;
         $changes = $act->properties['attributes'] ?? [];
         $subject = $act->subject_type ? class_basename($act->subject_type) : 'System';

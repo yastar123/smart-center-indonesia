@@ -163,7 +163,7 @@
         .login-right .greeting {
             font-size: clamp(1.4rem, 2.5vw, 1.8rem);
             font-weight: 800;
-            color: #0f172a;
+            color: #260632;
             margin-bottom: .3rem;
             letter-spacing: -0.01em;
         }

@@ -39,7 +39,7 @@ $weekSchedules = ($student && $student->branch_id)
 
 {{-- WELCOME BANNER --}}
 <div class="dashboard-card mb-4 fade-up"
-     style="background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 50%,#7c3aed 100%);color:white;border:none;overflow:hidden;position:relative">
+     style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
     <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.04);border-radius:50%"></div>
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative">
         <div class="d-flex align-items-center gap-4">
@@ -77,16 +77,16 @@ $weekSchedules = ($student && $student->branch_id)
 {{-- STATS --}}
 <div class="row g-3 mb-4">
     <div class="col-6 col-lg-3 fade-up">
-        <div class="stat-card" style="border-top:3px solid #3b82f6">
+        <div class="stat-card" style="border-top:3px solid #c84ddf">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Total Tagihan</div>
-                    <div class="stat-value" style="color:#2563eb;font-size:20px">
+                    <div class="stat-value" style="color:#68117e;font-size:20px">
                         Rp {{ number_format($totalTagihan, 0, ',', '.') }}
                     </div>
                     <div class="stat-label" style="font-size:11px">{{ $invoices->count() }} invoice</div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#2563eb,#3b82f6)">
+                <div class="stat-icon" style="background:linear-gradient(135deg,#68117e,#c84ddf)">
                     <i class="bi bi-receipt" style="color:white"></i>
                 </div>
             </div>
@@ -137,10 +137,10 @@ $weekSchedules = ($student && $student->branch_id)
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Jadwal Minggu Ini</div>
-                    <div class="stat-value" style="color:#7c3aed">{{ $weekSchedules->count() }}</div>
+                    <div class="stat-value" style="color:#c84ddf">{{ $weekSchedules->count() }}</div>
                     <div class="stat-label" style="font-size:11px">sesi belajar</div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)">
+                <div class="stat-icon" style="background:linear-gradient(135deg,#c84ddf,#8b5cf6)">
                     <i class="bi bi-calendar-week" style="color:white"></i>
                 </div>
             </div>
@@ -158,8 +158,8 @@ $weekSchedules = ($student && $student->branch_id)
             </h6>
             @forelse($invoices as $inv)
             @php
-                $stClr = ['lunas'=>'#10b981','belum_bayar'=>'#f59e0b','sebagian'=>'#3b82f6'][$inv->status] ?? '#94a3b8';
-                $stBg  = ['lunas'=>'#ecfdf5','belum_bayar'=>'#fffbeb','sebagian'=>'#eff6ff'][$inv->status] ?? '#f1f5f9';
+                $stClr = ['lunas'=>'#10b981','belum_bayar'=>'#f6af23','sebagian'=>'#c84ddf'][$inv->status] ?? '#94a3b8';
+                $stBg  = ['lunas'=>'#ecfdf5','belum_bayar'=>'#fffbeb','sebagian'=>'#fdf4ff'][$inv->status] ?? '#f1f5f9';
                 $stLbl = ['lunas'=>'Lunas','belum_bayar'=>'Belum Bayar','sebagian'=>'Sebagian'][$inv->status] ?? $inv->status;
                 $overdue = $inv->status !== 'lunas' && $inv->jatuh_tempo && \Carbon\Carbon::parse($inv->jatuh_tempo)->isPast();
             @endphp
@@ -217,12 +217,12 @@ $weekSchedules = ($student && $student->branch_id)
                 @foreach($weekSchedules as $sch)
                 @php
                     $isToday = $sch->tanggal->isToday();
-                    $statusClr = ['dijadwalkan'=>'#3b82f6','berlangsung'=>'#10b981','selesai'=>'#94a3b8'][$sch->status] ?? '#94a3b8';
+                    $statusClr = ['dijadwalkan'=>'#c84ddf','berlangsung'=>'#10b981','selesai'=>'#94a3b8'][$sch->status] ?? '#94a3b8';
                 @endphp
                 <div class="d-flex gap-3 align-items-center p-3 rounded-3"
-                     style="background:{{ $isToday ? 'rgba(59,130,246,.07)' : 'var(--input-bg)' }};border:1px solid {{ $isToday ? '#bfdbfe' : 'var(--card-border)' }}">
+                     style="background:{{ $isToday ? 'rgba(200,77,223,.07)' : 'var(--input-bg)' }};border:1px solid {{ $isToday ? '#e8b4f5' : 'var(--card-border)' }}">
                     <div class="text-center flex-shrink-0" style="min-width:48px">
-                        <div class="fw-bold" style="font-size:13px;color:{{ $isToday ? '#2563eb' : 'var(--text-primary)' }}">
+                        <div class="fw-bold" style="font-size:13px;color:{{ $isToday ? '#68117e' : 'var(--text-primary)' }}">
                             {{ $sch->tanggal->locale('id')->isoFormat('ddd') }}
                         </div>
                         <div style="font-size:11px;color:var(--text-muted)">
@@ -233,7 +233,7 @@ $weekSchedules = ($student && $student->branch_id)
                         <div class="fw-semibold text-truncate" style="font-size:13px">
                             {{ $sch->topik ?? 'Sesi Belajar' }}
                             @if($isToday)
-                                <span class="badge ms-1" style="background:#dbeafe;color:#1d4ed8;font-size:9px">Hari Ini</span>
+                                <span class="badge ms-1" style="background:#f3d6fa;color:#461256;font-size:9px">Hari Ini</span>
                             @endif
                         </div>
                         <div style="font-size:11px;color:var(--text-muted)">

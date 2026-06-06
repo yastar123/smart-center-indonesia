@@ -49,7 +49,7 @@
                     <div class="stat-value text-primary">{{ $stats['lunas'] }} Invoice</div>
                     <div class="stat-growth text-success"><i class="bi bi-check-circle me-1"></i>Terbayar</div>
                 </div>
-                <div class="stat-icon" style="background:#eff6ff;color:#2563eb"><i class="bi bi-check-circle-fill"></i></div>
+                <div class="stat-icon" style="background:#fdf4ff;color:#68117e"><i class="bi bi-check-circle-fill"></i></div>
             </div>
         </div>
     </div>
@@ -61,7 +61,7 @@
                     <div class="stat-value text-warning">{{ $stats['belum_bayar'] }} Invoice</div>
                     <div class="stat-growth text-warning"><i class="bi bi-exclamation-circle me-1"></i>Menunggak</div>
                 </div>
-                <div class="stat-icon" style="background:#fffbeb;color:#d97706"><i class="bi bi-clock-fill"></i></div>
+                <div class="stat-icon" style="background:#fffbeb;color:#e09000"><i class="bi bi-clock-fill"></i></div>
             </div>
         </div>
     </div>
@@ -155,7 +155,7 @@
                 @php
                     $statusMap = [
                         'lunas'       => ['bg'=>'#f0fdf4','color'=>'#16a34a','label'=>'Lunas'],
-                        'sebagian'    => ['bg'=>'#fffbeb','color'=>'#d97706','label'=>'Sebagian'],
+                        'sebagian'    => ['bg'=>'#fffbeb','color'=>'#e09000','label'=>'Sebagian'],
                         'belum_bayar' => ['bg'=>'#fef2f2','color'=>'#dc2626','label'=>'Belum Bayar'],
                     ];
                     $st = $statusMap[$inv->status] ?? ['bg'=>'#f1f5f9','color'=>'#64748b','label'=>$inv->status];
@@ -166,7 +166,7 @@
                     </td>
                     <td>
                         <div class="d-flex align-items-center gap-2">
-                            <div style="width:32px;height:32px;border-radius:50%;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#2563eb;flex-shrink:0">
+                            <div style="width:32px;height:32px;border-radius:50%;background:#fdf4ff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#68117e;flex-shrink:0">
                                 {{ strtoupper(substr($inv->siswa?->name ?? 'S', 0, 1)) }}
                             </div>
                             <div>
@@ -196,7 +196,7 @@
                     <td class="text-center">
                         <div class="d-flex justify-content-center gap-1">
                             <button onclick="showDetail({{ $inv->id }})" class="btn btn-sm" title="Detail"
-                                style="background:#eff6ff;color:#2563eb;border:none;border-radius:8px;width:32px;height:32px;padding:0">
+                                style="background:#fdf4ff;color:#68117e;border:none;border-radius:8px;width:32px;height:32px;padding:0">
                                 <i class="bi bi-eye-fill" style="font-size:13px"></i>
                             </button>
                             @if($inv->status !== 'lunas')
@@ -206,7 +206,7 @@
                             </button>
                             @endif
                             <button onclick="editInvoice({{ $inv->id }})" class="btn btn-sm" title="Edit"
-                                style="background:#fffbeb;color:#d97706;border:none;border-radius:8px;width:32px;height:32px;padding:0">
+                                style="background:#fffbeb;color:#e09000;border:none;border-radius:8px;width:32px;height:32px;padding:0">
                                 <i class="bi bi-pencil-fill" style="font-size:13px"></i>
                             </button>
                             <button onclick="deleteInvoice({{ $inv->id }}, '{{ addslashes($inv->nomor_invoice) }}')" class="btn btn-sm" title="Hapus"
@@ -335,7 +335,7 @@
 <div class="modal fade" id="detailModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="border-radius:18px;overflow:hidden">
-            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff">
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#461256,#68117e);color:#fff">
                 <h6 class="modal-title fw-bold"><i class="bi bi-file-earmark-text me-2"></i>Detail Invoice</h6>
                 <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -499,7 +499,7 @@ function showDetail(id) {
     new bootstrap.Modal('#detailModal').show();
     $.get('/admin/payments/' + id, function(res) {
         const inv = res.data;
-        const statusMap = {lunas:'#f0fdf4:#16a34a:Lunas', sebagian:'#fffbeb:#d97706:Sebagian', belum_bayar:'#fef2f2:#dc2626:Belum Bayar'};
+        const statusMap = {lunas:'#f0fdf4:#16a34a:Lunas', sebagian:'#fffbeb:#e09000:Sebagian', belum_bayar:'#fef2f2:#dc2626:Belum Bayar'};
         const [sbg,scol,slbl] = (statusMap[inv.status]||'#f1f5f9:#64748b:'+inv.status).split(':');
 
         let paymentsHtml = '';

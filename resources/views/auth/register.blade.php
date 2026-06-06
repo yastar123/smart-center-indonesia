@@ -14,7 +14,7 @@
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
             min-height: 100vh;
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 40%, #1d4ed8 75%, #6c63ff 100%);
+            background: linear-gradient(135deg, #260632 0%, #461256 40%, #461256 75%, #c84ddf 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -27,7 +27,7 @@
             content:'';
             position:fixed;
             width:500px;height:500px;
-            background:radial-gradient(circle,rgba(99,102,241,.25) 0%,transparent 70%);
+            background:radial-gradient(circle,rgba(200,77,223,.25) 0%,transparent 70%);
             top:-150px;right:-150px;border-radius:50%;
             animation:orb1 8s ease-in-out infinite alternate;pointer-events:none;
         }
@@ -35,7 +35,7 @@
             content:'';
             position:fixed;
             width:400px;height:400px;
-            background:radial-gradient(circle,rgba(59,130,246,.2) 0%,transparent 70%);
+            background:radial-gradient(circle,rgba(246,175,35,.15) 0%,transparent 70%);
             bottom:-120px;left:-120px;border-radius:50%;
             animation:orb2 10s ease-in-out infinite alternate;pointer-events:none;
         }
@@ -54,7 +54,7 @@
         @keyframes slideUp{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
 
         .card-header-band {
-            background: linear-gradient(135deg, #1e3a5f, #2563eb, #6366f1);
+            background: linear-gradient(135deg, #461256, #68117e, #c84ddf);
             padding: 2rem 2.5rem 1.5rem;
             color: white;
             text-align: center;
@@ -79,7 +79,7 @@
             border:2px solid #e5e7eb;border-radius:11px;padding:.7rem 1rem;font-size:.9rem;
             background:#fafafa;transition:border-color .25s,box-shadow .25s,background .25s;
         }
-        .form-control:focus { border-color:#4f8ef7;box-shadow:0 0 0 4px rgba(79,142,247,.12);background:#fff;outline:none; }
+        .form-control:focus { border-color:#c84ddf;box-shadow:0 0 0 4px rgba(200,77,223,.12);background:#fff;outline:none; }
         .form-control.is-invalid { border-color:#ef4444; }
         .invalid-feedback { font-size:.8rem;color:#ef4444;margin-top:4px; }
 
@@ -89,15 +89,15 @@
             border-radius:0 11px 11px 0;cursor:pointer;color:#6b7280;transition:.2s;
         }
         .input-group-text:hover { color:#374151;background:#f3f4f6; }
-        .form-control:focus + .input-group-text,.form-control:focus ~ .input-group-text { border-color:#4f8ef7; }
+        .form-control:focus + .input-group-text,.form-control:focus ~ .input-group-text { border-color:#c84ddf; }
 
         .btn-register {
-            background:linear-gradient(135deg,#2563eb,#4f8ef7 50%,#6c63ff);
+            background:linear-gradient(135deg,#68117e,#c84ddf 50%,#c84ddf);
             background-size:200% auto;border:none;border-radius:12px;padding:.85rem;
             font-size:.95rem;font-weight:700;color:white;width:100%;margin-top:.5rem;
             transition:background-position .4s,transform .2s,box-shadow .2s;
         }
-        .btn-register:hover { background-position:right center;transform:translateY(-2px);box-shadow:0 10px 28px rgba(79,142,247,.45);color:white; }
+        .btn-register:hover { background-position:right center;transform:translateY(-2px);box-shadow:0 10px 28px rgba(200,77,223,.45);color:white; }
         .btn-register:active { transform:translateY(0); }
 
         .strength-bar { height:5px;border-radius:10px;background:#e5e7eb;overflow:hidden;margin-top:8px; }
@@ -181,7 +181,7 @@
 
             <div class="text-center mt-4" style="font-size:.875rem;color:#6b7280">
                 Sudah punya akun?
-                <a href="{{ route('login') }}" class="fw-semibold text-decoration-none" style="color:#4f8ef7">
+                <a href="{{ route('login') }}" class="fw-semibold text-decoration-none" style="color:#c84ddf">
                     Masuk di sini
                 </a>
             </div>
@@ -215,8 +215,8 @@ document.getElementById('password').addEventListener('input', function() {
     if (/[^A-Za-z0-9]/.test(val)) s++;
     const cfgs = [
         {p:'25%',c:'#ef4444',t:'Lemah'},
-        {p:'50%',c:'#f59e0b',t:'Cukup'},
-        {p:'75%',c:'#3b82f6',t:'Kuat'},
+        {p:'50%',c:'#f6af23',t:'Cukup'},
+        {p:'75%',c:'#c84ddf',t:'Kuat'},
         {p:'100%',c:'#10b981',t:'Sangat Kuat'},
     ];
     const cfg = cfgs[s-1] || cfgs[0];

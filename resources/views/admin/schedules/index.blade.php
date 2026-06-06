@@ -5,7 +5,7 @@
 @section('content')
 
 {{-- HEADER BANNER --}}
-<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#1e3a5f,#1d4ed8,#2563eb);color:white;border:none">
+<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#461256,#461256,#68117e);color:white;border:none">
     <div class="row align-items-center g-3">
         <div class="col-md-8">
             <div class="d-flex align-items-center gap-3 mb-2">
@@ -37,7 +37,7 @@
                     <div class="stat-value">{{ $stats['total'] }}</div>
                     <div class="stat-growth text-muted"><i class="bi bi-calendar me-1"></i>Semua jadwal</div>
                 </div>
-                <div class="stat-icon" style="background:#eff6ff;color:#2563eb"><i class="bi bi-calendar-week"></i></div>
+                <div class="stat-icon" style="background:#fdf4ff;color:#68117e"><i class="bi bi-calendar-week"></i></div>
             </div>
         </div>
     </div>
@@ -49,7 +49,7 @@
                     <div class="stat-value text-warning">{{ $stats['hari_ini'] }}</div>
                     <div class="stat-growth text-warning"><i class="bi bi-sun me-1"></i>Jadwal hari ini</div>
                 </div>
-                <div class="stat-icon" style="background:#fffbeb;color:#d97706"><i class="bi bi-sun-fill"></i></div>
+                <div class="stat-icon" style="background:#fffbeb;color:#e09000"><i class="bi bi-sun-fill"></i></div>
             </div>
         </div>
     </div>
@@ -61,7 +61,7 @@
                     <div class="stat-value text-primary">{{ $stats['dijadwalkan'] }}</div>
                     <div class="stat-growth text-primary"><i class="bi bi-clock me-1"></i>Akan datang</div>
                 </div>
-                <div class="stat-icon" style="background:#eff6ff;color:#2563eb"><i class="bi bi-clock-history"></i></div>
+                <div class="stat-icon" style="background:#fdf4ff;color:#68117e"><i class="bi bi-clock-history"></i></div>
             </div>
         </div>
     </div>
@@ -149,7 +149,7 @@
 <div class="dashboard-card fade-up">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h6 class="fw-bold mb-0"><i class="bi bi-list-ul text-primary me-2"></i>Daftar Jadwal
-            <span class="badge ms-2" style="background:#eff6ff;color:#2563eb;font-size:11px">{{ $schedules->total() }} data</span>
+            <span class="badge ms-2" style="background:#fdf4ff;color:#68117e;font-size:11px">{{ $schedules->total() }} data</span>
         </h6>
     </div>
     <div class="table-responsive">
@@ -170,19 +170,19 @@
                 @forelse($schedules as $sc)
                 @php
                     $statusMap = [
-                        'dijadwalkan' => ['bg'=>'#eff6ff','color'=>'#2563eb','label'=>'Dijadwalkan'],
-                        'berlangsung' => ['bg'=>'#fffbeb','color'=>'#d97706','label'=>'Berlangsung'],
+                        'dijadwalkan' => ['bg'=>'#fdf4ff','color'=>'#68117e','label'=>'Dijadwalkan'],
+                        'berlangsung' => ['bg'=>'#fffbeb','color'=>'#e09000','label'=>'Berlangsung'],
                         'selesai'     => ['bg'=>'#f0fdf4','color'=>'#16a34a','label'=>'Selesai'],
                         'dibatalkan'  => ['bg'=>'#fef2f2','color'=>'#dc2626','label'=>'Dibatalkan'],
                     ];
                     $st = $statusMap[$sc->status] ?? ['bg'=>'#f1f5f9','color'=>'#64748b','label'=>$sc->status];
                     $isToday = $sc->tanggal && $sc->tanggal->isToday();
                 @endphp
-                <tr style="border-bottom:1px solid var(--card-border);transition:background .15s{{ $isToday ? ';background:rgba(37,99,235,.03)' : '' }}" onmouseover="this.style.background='var(--sidebar-hover)'" onmouseout="this.style.background='{{ $isToday ? 'rgba(37,99,235,.03)' : '' }}'">
+                <tr style="border-bottom:1px solid var(--card-border);transition:background .15s{{ $isToday ? ';background:rgba(104,17,126,.03)' : '' }}" onmouseover="this.style.background='var(--sidebar-hover)'" onmouseout="this.style.background='{{ $isToday ? 'rgba(104,17,126,.03)' : '' }}'">
                     <td class="ps-3">
                         <div class="fw-semibold" style="font-size:13px">
                             {{ $sc->tanggal ? $sc->tanggal->format('d M Y') : '–' }}
-                            @if($isToday)<span class="badge ms-1" style="background:#dbeafe;color:#1d4ed8;font-size:10px">Hari ini</span>@endif
+                            @if($isToday)<span class="badge ms-1" style="background:#f3d6fa;color:#461256;font-size:10px">Hari ini</span>@endif
                         </div>
                         <div style="font-size:11px;color:#6b7280">
                             <i class="bi bi-clock me-1"></i>{{ substr($sc->jam_mulai,0,5) ?? '–' }} – {{ substr($sc->jam_selesai,0,5) ?? '–' }}
@@ -207,7 +207,7 @@
                             <i class="bi bi-wifi me-1"></i>Online
                         </span>
                         @else
-                        <span style="background:#eff6ff;color:#2563eb;padding:3px 9px;border-radius:7px;font-size:11px;font-weight:600">
+                        <span style="background:#fdf4ff;color:#68117e;padding:3px 9px;border-radius:7px;font-size:11px;font-weight:600">
                             <i class="bi bi-building me-1"></i>Offline
                         </span>
                         @endif
@@ -221,11 +221,11 @@
                     <td class="text-center">
                         <div class="d-flex justify-content-center gap-1">
                             <button onclick="showDetail({{ $sc->id }})" class="btn btn-sm" title="Detail"
-                                style="background:#eff6ff;color:#2563eb;border:none;border-radius:8px;width:32px;height:32px;padding:0">
+                                style="background:#fdf4ff;color:#68117e;border:none;border-radius:8px;width:32px;height:32px;padding:0">
                                 <i class="bi bi-eye-fill" style="font-size:13px"></i>
                             </button>
                             <button onclick="editSchedule({{ $sc->id }})" class="btn btn-sm" title="Edit"
-                                style="background:#fffbeb;color:#d97706;border:none;border-radius:8px;width:32px;height:32px;padding:0">
+                                style="background:#fffbeb;color:#e09000;border:none;border-radius:8px;width:32px;height:32px;padding:0">
                                 <i class="bi bi-pencil-fill" style="font-size:13px"></i>
                             </button>
                             <button onclick="deleteSchedule({{ $sc->id }}, '{{ addslashes($sc->topik ?? 'Jadwal ini') }}')" class="btn btn-sm" title="Hapus"
@@ -260,7 +260,7 @@
 <div class="modal fade" id="scheduleModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg" style="border-radius:18px;overflow:hidden">
-            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff">
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#461256,#68117e);color:#fff">
                 <h6 class="modal-title fw-bold" id="modalTitle"><i class="bi bi-calendar-plus me-2"></i>Tambah Jadwal Baru</h6>
                 <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -364,7 +364,7 @@
 <div class="modal fade" id="detailModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="border-radius:18px;overflow:hidden">
-            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff">
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#461256,#68117e);color:#fff">
                 <h6 class="modal-title fw-bold"><i class="bi bi-calendar-event me-2"></i>Detail Jadwal</h6>
                 <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -476,8 +476,8 @@ function showDetail(id) {
     $.get('/admin/schedules/' + id, function(res) {
         const s = res.data;
         const statusMap = {
-            dijadwalkan:'#eff6ff:#2563eb:Dijadwalkan',
-            berlangsung:'#fffbeb:#d97706:Berlangsung',
+            dijadwalkan:'#fdf4ff:#68117e:Dijadwalkan',
+            berlangsung:'#fffbeb:#e09000:Berlangsung',
             selesai:'#f0fdf4:#16a34a:Selesai',
             dibatalkan:'#fef2f2:#dc2626:Dibatalkan'
         };

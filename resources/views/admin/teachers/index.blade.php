@@ -46,7 +46,7 @@
                     <div class="stat-value text-primary" id="statMale">–</div>
                     <div class="stat-growth text-muted"><i class="bi bi-gender-male me-1"></i>Guru putra</div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#3b82f6,#60a5fa);color:white">
+                <div class="stat-icon" style="background:linear-gradient(135deg,#c84ddf,#e8b4f5);color:white">
                     <i class="bi bi-person-fill"></i>
                 </div>
             </div>
@@ -235,7 +235,7 @@
                     {{-- DATA AKADEMIK --}}
                     <div class="mb-4">
                         <div class="d-flex align-items-center gap-2 mb-3">
-                            <div style="width:4px;height:20px;background:linear-gradient(#3b82f6,#2563eb);border-radius:4px"></div>
+                            <div style="width:4px;height:20px;background:linear-gradient(#c84ddf,#68117e);border-radius:4px"></div>
                             <span class="fw-bold text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em">Data Mengajar</span>
                         </div>
                         <div class="row g-3">

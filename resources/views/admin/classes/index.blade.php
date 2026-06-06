@@ -7,7 +7,7 @@
 <div class="fade-up">
 
     {{-- HEADER BANNER --}}
-    <div class="page-header mb-4" style="background:linear-gradient(135deg,#8b5cf6 0%,#7c3aed 50%,#6d28d9 100%);border-radius:20px;padding:2rem 2.5rem;color:#fff;position:relative;overflow:hidden;">
+    <div class="page-header mb-4" style="background:linear-gradient(135deg,#8b5cf6 0%,#c84ddf 50%,#6d28d9 100%);border-radius:20px;padding:2rem 2.5rem;color:#fff;position:relative;overflow:hidden;">
         <div style="position:absolute;top:-30px;right:-30px;width:180px;height:180px;background:rgba(255,255,255,.07);border-radius:50%;"></div>
         <div style="position:absolute;bottom:-50px;right:80px;width:120px;height:120px;background:rgba(255,255,255,.05);border-radius:50%;"></div>
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative;z-index:1;">
@@ -33,8 +33,8 @@
             $statCards = [
                 ['label'=>'Total Kelas','value'=>$stats['total'],'icon'=>'bi-building','color'=>'#8b5cf6','bg'=>'rgba(139,92,246,.12)'],
                 ['label'=>'Kelas Aktif','value'=>$stats['aktif'],'icon'=>'bi-check-circle','color'=>'#10b981','bg'=>'rgba(16,185,129,.12)'],
-                ['label'=>'Kelas Online','value'=>$stats['online'],'icon'=>'bi-wifi','color'=>'#3b82f6','bg'=>'rgba(59,130,246,.12)'],
-                ['label'=>'Kelas Offline','value'=>$stats['offline'],'icon'=>'bi-geo-alt','color'=>'#f59e0b','bg'=>'rgba(245,158,11,.12)'],
+                ['label'=>'Kelas Online','value'=>$stats['online'],'icon'=>'bi-wifi','color'=>'#c84ddf','bg'=>'rgba(200,77,223,.12)'],
+                ['label'=>'Kelas Offline','value'=>$stats['offline'],'icon'=>'bi-geo-alt','color'=>'#f6af23','bg'=>'rgba(245,158,11,.12)'],
             ];
         @endphp
         @foreach($statCards as $sc)
@@ -140,12 +140,12 @@
                                 @endif
                             </td>
                             <td>
-                                @php $jeниsBadge = ['online'=>['#3b82f6','rgba(59,130,246,.15)'],'offline'=>['#f59e0b','rgba(245,158,11,.15)'],'hybrid'=>['#8b5cf6','rgba(139,92,246,.15)']] @endphp
+                                @php $jeниsBadge = ['online'=>['#c84ddf','rgba(200,77,223,.15)'],'offline'=>['#f6af23','rgba(245,158,11,.15)'],'hybrid'=>['#8b5cf6','rgba(139,92,246,.15)']] @endphp
                                 @php $j = $jeниsBadge[$class->jenis] ?? ['#6b7280','rgba(107,114,128,.15)'] @endphp
                                 <span class="badge rounded-pill" style="background:{{ $j[1] }};color:{{ $j[0] }};font-size:.75rem;font-weight:600;padding:.35em .75em;text-transform:capitalize;">{{ $class->jenis }}</span>
                             </td>
                             <td>
-                                @php $sb = ['aktif'=>['#10b981','rgba(16,185,129,.15)'],'nonaktif'=>['#ef4444','rgba(239,68,68,.15)'],'penuh'=>['#f59e0b','rgba(245,158,11,.15)']] @endphp
+                                @php $sb = ['aktif'=>['#10b981','rgba(16,185,129,.15)'],'nonaktif'=>['#ef4444','rgba(239,68,68,.15)'],'penuh'=>['#f6af23','rgba(245,158,11,.15)']] @endphp
                                 @php $s = $sb[$class->status] ?? ['#6b7280','rgba(107,114,128,.15)'] @endphp
                                 <span class="badge rounded-pill" style="background:{{ $s[1] }};color:{{ $s[0] }};font-size:.75rem;font-weight:600;padding:.35em .75em;text-transform:capitalize;">{{ $class->status }}</span>
                             </td>
