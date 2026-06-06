@@ -15,7 +15,7 @@
 
         body {
             min-height: 100vh;
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 40%, #1d4ed8 75%, #6c63ff 100%);
+            background: linear-gradient(135deg, #260632 0%, #461256 40%, #68117e 75%, #c84ddf 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -30,7 +30,7 @@
             content: '';
             position: fixed;
             width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(99,102,241,0.25) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(200,77,223,0.25) 0%, transparent 70%);
             top: -200px; right: -200px;
             border-radius: 50%;
             animation: orb1 8s ease-in-out infinite alternate;
@@ -40,7 +40,7 @@
             content: '';
             position: fixed;
             width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(59,130,246,0.2) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(246,175,35,0.15) 0%, transparent 70%);
             bottom: -150px; left: -150px;
             border-radius: 50%;
             animation: orb2 10s ease-in-out infinite alternate;
@@ -68,7 +68,7 @@
         /* ===== LEFT PANEL ===== */
         .login-left {
             flex: 1.1;
-            background: linear-gradient(160deg, #0f172a 0%, #1e3a5f 50%, #4338ca 100%);
+            background: linear-gradient(160deg, #260632 0%, #461256 50%, #68117e 100%);
             padding: 3rem 2.5rem;
             display: flex;
             flex-direction: column;
@@ -99,7 +99,7 @@
         .brand-badge-icon {
             width: 36px; height: 36px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            background: linear-gradient(135deg, #c84ddf, #f6af23);
             display: flex; align-items: center; justify-content: center;
             font-size: 18px;
             animation: float 3s ease-in-out infinite;
@@ -191,8 +191,8 @@
             background: #fafafa;
         }
         .form-control:focus {
-            border-color: #4f8ef7;
-            box-shadow: 0 0 0 4px rgba(79,142,247,.12);
+            border-color: #c84ddf;
+            box-shadow: 0 0 0 4px rgba(200,77,223,.12);
             background: #fff;
             outline: none;
         }
@@ -211,11 +211,11 @@
         .input-group-text:hover { color: #374151; background: #f3f4f6; }
         .form-control:focus + .input-group-text,
         .form-control:focus ~ .input-group-text {
-            border-color: #4f8ef7;
+            border-color: #c84ddf;
         }
 
         .btn-login {
-            background: linear-gradient(135deg, #2563eb, #4f8ef7 50%, #6c63ff);
+            background: linear-gradient(135deg, #68117e, #c84ddf 50%, #f6af23);
             background-size: 200% auto;
             border: none;
             border-radius: 12px;
@@ -231,7 +231,7 @@
         .btn-login:hover {
             background-position: right center;
             transform: translateY(-2px);
-            box-shadow: 0 10px 28px rgba(79,142,247,.45);
+            box-shadow: 0 10px 28px rgba(200,77,223,.45);
             color: white;
         }
         .btn-login:active { transform: translateY(0); }
@@ -269,15 +269,15 @@
         }
 
         .demo-credentials {
-            background: #f0f9ff;
-            border: 1.5px solid #bae6fd;
+            background: #fdf4ff;
+            border: 1.5px solid #e8b4f5;
             border-radius: 12px;
             padding: 12px 14px;
             font-size: .78rem;
-            color: #0369a1;
+            color: #68117e;
             margin-top: 1.25rem;
         }
-        .demo-credentials strong { display: block; margin-bottom: 4px; color: #0c4a6e; }
+        .demo-credentials strong { display: block; margin-bottom: 4px; color: #461256; }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
@@ -306,33 +306,33 @@
             <span>Smart Center Indonesia</span>
         </div>
 
-        <h1>Platform Manajemen<br>Bimbel <span style="background:linear-gradient(90deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Terpadu</span></h1>
+        <h1>Platform Manajemen<br>Bimbel <span style="background:linear-gradient(90deg,#f6af23,#c84ddf);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Terpadu</span></h1>
 
         <p class="lead">Kelola siswa, guru, keuangan, dan jadwal belajar seluruh cabang dalam satu platform cerdas dan terintegrasi.</p>
 
         <div class="feature-grid">
             <div class="feature-item">
-                <i class="bi bi-people-fill" style="color:#60a5fa"></i>
+                <i class="bi bi-people-fill" style="color:#c84ddf"></i>
                 <span>Manajemen Siswa & Guru</span>
             </div>
             <div class="feature-item">
-                <i class="bi bi-calendar-week-fill" style="color:#a78bfa"></i>
+                <i class="bi bi-calendar-week-fill" style="color:#ab8db2"></i>
                 <span>Jadwal & Kehadiran</span>
             </div>
             <div class="feature-item">
-                <i class="bi bi-cash-stack" style="color:#34d399"></i>
+                <i class="bi bi-cash-stack" style="color:#f6af23"></i>
                 <span>Keuangan & Invoice</span>
             </div>
             <div class="feature-item">
-                <i class="bi bi-ui-checks-grid" style="color:#fb923c"></i>
+                <i class="bi bi-ui-checks-grid" style="color:#e8b4f5"></i>
                 <span>Tryout CBT Online</span>
             </div>
             <div class="feature-item">
-                <i class="bi bi-building-fill-check" style="color:#f472b6"></i>
+                <i class="bi bi-building-fill-check" style="color:#c84ddf"></i>
                 <span>Multi Cabang</span>
             </div>
             <div class="feature-item">
-                <i class="bi bi-graph-up-arrow" style="color:#fbbf24"></i>
+                <i class="bi bi-graph-up-arrow" style="color:#f6af23"></i>
                 <span>Laporan & Analitik</span>
             </div>
         </div>
@@ -402,7 +402,7 @@
                     <label class="form-check-label small text-muted" for="remember">Ingat saya</label>
                 </div>
                 @if (Route::has('password.request'))
-                <a href="{{ route('password.request') }}" class="small text-decoration-none fw-semibold" style="color:#4f8ef7">
+                <a href="{{ route('password.request') }}" class="small text-decoration-none fw-semibold" style="color:#c84ddf">
                     Lupa password?
                 </a>
                 @endif
@@ -419,7 +419,7 @@
 
             <div class="text-center small text-muted">
                 Belum punya akun?
-                <a href="{{ route('register') }}" class="text-decoration-none fw-semibold" style="color:#4f8ef7">
+                <a href="{{ route('register') }}" class="text-decoration-none fw-semibold" style="color:#c84ddf">
                     Daftar sekarang
                 </a>
             </div>
