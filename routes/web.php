@@ -12,10 +12,7 @@ use App\Http\Controllers\Admin\CertificateController;
 use App\Http\Controllers\Owner\BranchController;
 
 Route::get('/', function () {
-    if (auth()->check()) {
-        return redirect()->route('dashboard');
-    }
-    return view('welcome');
+    return redirect('/admin');
 });
 
 Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
