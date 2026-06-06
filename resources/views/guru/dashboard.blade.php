@@ -84,14 +84,14 @@ $monthTotal = $teacher
         </div>
     </div>
     <div class="col-4 fade-up" style="animation-delay:.05s">
-        <div class="stat-card" style="border-top:3px solid #8b5cf6">
+        <div class="stat-card" style="border-top:3px solid #68117e">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Minggu Ini</div>
                     <div class="stat-value" style="color:#c84ddf">{{ $weekSchedules->count() }}</div>
                     <div class="stat-label" style="font-size:11px">jadwal</div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#c84ddf,#8b5cf6)">
+                <div class="stat-icon" style="background:linear-gradient(135deg,#c84ddf,#68117e)">
                     <i class="bi bi-calendar-week" style="color:white"></i>
                 </div>
             </div>
@@ -168,7 +168,7 @@ $monthTotal = $teacher
         <div class="dashboard-card h-100">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h6 class="fw-bold mb-0" style="font-size:14px">
-                    <i class="bi bi-calendar-week text-purple me-2" style="color:#8b5cf6"></i>Minggu Ini
+                    <i class="bi bi-calendar-week text-purple me-2" style="color:#68117e"></i>Minggu Ini
                 </h6>
                 <span class="text-muted" style="font-size:11.5px">
                     {{ now()->startOfWeek()->locale('id')->isoFormat('D MMM') }} – {{ now()->endOfWeek()->locale('id')->isoFormat('D MMM Y') }}
@@ -212,7 +212,7 @@ $monthTotal = $teacher
                             <td class="py-3">{{ $sch->topik ?? 'Sesi Mengajar' }}</td>
                             <td class="py-3">
                                 @if($sch->jenis === 'online')
-                                    <span class="badge" style="background:#e0f2fe;color:#0369a1;font-size:10px;border-radius:6px">
+                                    <span class="badge" style="background:#fdf4ff;color:#68117e;font-size:10px;border-radius:6px">
                                         <i class="bi bi-camera-video me-1"></i>Online
                                     </span>
                                 @else

@@ -167,7 +167,7 @@
         .sidebar-nav { padding: 12px 10px 100px; }
 
         .nav-header {
-            color: #475569;
+            color: #ab8db2;
             font-size: 10px;
             font-weight: 700;
             margin: 18px 12px 8px;
@@ -607,7 +607,7 @@
             top: 0; left: 0;
             height: 3px;
             width: 0%;
-            background: linear-gradient(90deg, #3b82f6, #6366f1, #3b82f6);
+            background: linear-gradient(90deg, #c84ddf, #f6af23, #c84ddf);
             background-size: 200% 100%;
             z-index: 99999;
             transition: width .3s ease, opacity .4s ease;

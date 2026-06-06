@@ -46,7 +46,7 @@ $branches = Branch::withCount('students')
 
 {{-- HEADER --}}
 <div class="dashboard-card mb-4 fade-up"
-     style="background:linear-gradient(135deg,#260632 0%,#312e81 60%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
+     style="background:linear-gradient(135deg,#260632 0%,#68117e 60%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
     <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.04);border-radius:50%"></div>
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative">
         <div>
@@ -101,7 +101,7 @@ $branches = Branch::withCount('students')
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.10s">
-        <div class="stat-card" style="border-top:3px solid #8b5cf6">
+        <div class="stat-card" style="border-top:3px solid #68117e">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Cabang Aktif</div>
@@ -110,7 +110,7 @@ $branches = Branch::withCount('students')
                         <i class="bi bi-building me-1"></i>Beroperasi
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#c84ddf,#8b5cf6)">
+                <div class="stat-icon" style="background:linear-gradient(135deg,#c84ddf,#68117e)">
                     <i class="bi bi-building-fill" style="color:white"></i>
                 </div>
             </div>

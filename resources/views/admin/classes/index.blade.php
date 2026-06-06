@@ -7,7 +7,7 @@
 <div class="fade-up">
 
     {{-- HEADER BANNER --}}
-    <div class="page-header mb-4" style="background:linear-gradient(135deg,#8b5cf6 0%,#c84ddf 50%,#6d28d9 100%);border-radius:20px;padding:2rem 2.5rem;color:#fff;position:relative;overflow:hidden;">
+    <div class="page-header mb-4" style="background:linear-gradient(135deg,#68117e 0%,#c84ddf 50%,#461256 100%);border-radius:20px;padding:2rem 2.5rem;color:#fff;position:relative;overflow:hidden;">
         <div style="position:absolute;top:-30px;right:-30px;width:180px;height:180px;background:rgba(255,255,255,.07);border-radius:50%;"></div>
         <div style="position:absolute;bottom:-50px;right:80px;width:120px;height:120px;background:rgba(255,255,255,.05);border-radius:50%;"></div>
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative;z-index:1;">
@@ -31,7 +31,7 @@
     <div class="row g-3 mb-4">
         @php
             $statCards = [
-                ['label'=>'Total Kelas','value'=>$stats['total'],'icon'=>'bi-building','color'=>'#8b5cf6','bg'=>'rgba(139,92,246,.12)'],
+                ['label'=>'Total Kelas','value'=>$stats['total'],'icon'=>'bi-building','color'=>'#68117e','bg'=>'rgba(104,17,126,.12)'],
                 ['label'=>'Kelas Aktif','value'=>$stats['aktif'],'icon'=>'bi-check-circle','color'=>'#10b981','bg'=>'rgba(16,185,129,.12)'],
                 ['label'=>'Kelas Online','value'=>$stats['online'],'icon'=>'bi-wifi','color'=>'#c84ddf','bg'=>'rgba(200,77,223,.12)'],
                 ['label'=>'Kelas Offline','value'=>$stats['offline'],'icon'=>'bi-geo-alt','color'=>'#f6af23','bg'=>'rgba(245,158,11,.12)'],
@@ -103,7 +103,7 @@
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead style="background:rgba(139,92,246,.06);">
+                    <thead style="background:rgba(104,17,126,.06);">
                         <tr>
                             <th class="px-4 py-3" style="font-size:.78rem;font-weight:700;text-transform:uppercase;">#</th>
                             <th class="py-3" style="font-size:.78rem;font-weight:700;text-transform:uppercase;">Nama Kelas</th>
@@ -140,7 +140,7 @@
                                 @endif
                             </td>
                             <td>
-                                @php $jeниsBadge = ['online'=>['#c84ddf','rgba(200,77,223,.15)'],'offline'=>['#f6af23','rgba(245,158,11,.15)'],'hybrid'=>['#8b5cf6','rgba(139,92,246,.15)']] @endphp
+                                @php $jeниsBadge = ['online'=>['#c84ddf','rgba(200,77,223,.15)'],'offline'=>['#f6af23','rgba(245,158,11,.15)'],'hybrid'=>['#68117e','rgba(104,17,126,.15)']] @endphp
                                 @php $j = $jeниsBadge[$class->jenis] ?? ['#6b7280','rgba(107,114,128,.15)'] @endphp
                                 <span class="badge rounded-pill" style="background:{{ $j[1] }};color:{{ $j[0] }};font-size:.75rem;font-weight:600;padding:.35em .75em;text-transform:capitalize;">{{ $class->jenis }}</span>
                             </td>
@@ -164,7 +164,7 @@
                         <tr>
                             <td colspan="8" class="text-center py-5">
                                 <div style="opacity:.5;">
-                                    <i class="bi bi-building" style="font-size:2.5rem;display:block;margin-bottom:.5rem;color:#8b5cf6;"></i>
+                                    <i class="bi bi-building" style="font-size:2.5rem;display:block;margin-bottom:.5rem;color:#68117e;"></i>
                                     <div class="fw-semibold">Belum ada kelas</div>
                                     <small class="text-muted">Tambahkan kelas pertama Anda</small>
                                 </div>
@@ -267,7 +267,7 @@
             </div>
             <div class="modal-footer border-0 px-4 pb-4 pt-2 gap-2">
                 <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn px-4 fw-semibold" onclick="saveClass()" id="classSaveBtn" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;">
+                <button type="button" class="btn px-4 fw-semibold" onclick="saveClass()" id="classSaveBtn" style="background:linear-gradient(135deg,#68117e,#461256);color:#fff;">
                     <i class="bi bi-check-circle me-2"></i>Simpan
                 </button>
             </div>

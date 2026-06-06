@@ -137,7 +137,7 @@
                                         'kompetensi'  => ['#c84ddf','rgba(200,77,223,.15)'],
                                         'kelulusan'   => ['#10b981','rgba(16,185,129,.15)'],
                                         'prestasi'    => ['#ef4444','rgba(239,68,68,.15)'],
-                                        'partisipasi' => ['#8b5cf6','rgba(139,92,246,.15)'],
+                                        'partisipasi' => ['#68117e','rgba(104,17,126,.15)'],
                                     ];
                                     $jc = $jenisColors[$cert->jenis] ?? ['#6b7280','rgba(107,114,128,.15)'];
                                 @endphp

@@ -133,14 +133,14 @@ $weekSchedules = ($student && $student->branch_id)
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.15s">
-        <div class="stat-card" style="border-top:3px solid #8b5cf6">
+        <div class="stat-card" style="border-top:3px solid #68117e">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Jadwal Minggu Ini</div>
                     <div class="stat-value" style="color:#c84ddf">{{ $weekSchedules->count() }}</div>
                     <div class="stat-label" style="font-size:11px">sesi belajar</div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#c84ddf,#8b5cf6)">
+                <div class="stat-icon" style="background:linear-gradient(135deg,#c84ddf,#68117e)">
                     <i class="bi bi-calendar-week" style="color:white"></i>
                 </div>
             </div>
@@ -198,7 +198,7 @@ $weekSchedules = ($student && $student->branch_id)
         <div class="dashboard-card h-100">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h6 class="fw-bold mb-0" style="font-size:14px">
-                    <i class="bi bi-calendar-week me-2" style="color:#8b5cf6"></i>Jadwal Belajar Minggu Ini
+                    <i class="bi bi-calendar-week me-2" style="color:#68117e"></i>Jadwal Belajar Minggu Ini
                 </h6>
                 <span class="text-muted" style="font-size:11.5px">
                     {{ now()->startOfWeek()->locale('id')->isoFormat('D MMM') }} – {{ now()->endOfWeek()->locale('id')->isoFormat('D MMM') }}

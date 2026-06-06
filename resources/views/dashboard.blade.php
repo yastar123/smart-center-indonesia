@@ -259,7 +259,7 @@
                 <div class="col-6">
                     <a href="{{ route('admin.tryouts.index') }}"
                        class="d-flex align-items-center gap-2 p-3 rounded-3 text-decoration-none quick-dash"
-                       style="background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1px solid #bae6fd">
+                       style="background:linear-gradient(135deg,#fdf4ff,#f3d6fa);border:1px solid #e8b4f5">
                         <i class="bi bi-ui-checks-grid" style="font-size:1.4rem;color:#0284c7"></i>
                         <div>
                             <div class="fw-semibold" style="font-size:12.5px;color:#075985">Tryout Online</div>

@@ -122,7 +122,7 @@
                                 <span class="badge" style="background:#dcfce7;color:#15803d;font-size:10px">Guru</span>
                             @endif
                             @if($branch->can_schedules)
-                                <span class="badge" style="background:#e0f2fe;color:#0369a1;font-size:10px">Jadwal</span>
+                                <span class="badge" style="background:#fdf4ff;color:#68117e;font-size:10px">Jadwal</span>
                             @endif
                             @if($branch->can_payments)
                                 <span class="badge" style="background:#fef3c7;color:#92400e;font-size:10px">Keuangan</span>

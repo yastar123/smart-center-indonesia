@@ -33,7 +33,7 @@
 <div class="row g-3 mb-4">
     @php
     $types = [
-        ['icon'=>'bi-mortarboard','color'=>'#8b5cf6','bg'=>'#f5f3ff','title'=>'SBMPTN / SNBT','desc'=>'Tryout persiapan masuk perguruan tinggi dengan soal sesuai kisi-kisi terbaru'],
+        ['icon'=>'bi-mortarboard','color'=>'#68117e','bg'=>'#f5f3ff','title'=>'SBMPTN / SNBT','desc'=>'Tryout persiapan masuk perguruan tinggi dengan soal sesuai kisi-kisi terbaru'],
         ['icon'=>'bi-building','color'=>'#c84ddf','bg'=>'#fdf4ff','title'=>'UTBK Saintek/Soshum','desc'=>'Simulasi ujian UTBK dengan timer, pengacak soal, dan koreksi otomatis'],
         ['icon'=>'bi-journal-text','color'=>'#10b981','bg'=>'#f0fdf4','title'=>'Ujian Sekolah','desc'=>'UTS, UAS, dan ujian harian terintegrasi dengan kurikulum per cabang'],
         ['icon'=>'bi-trophy','color'=>'#f6af23','bg'=>'#fffbeb','title'=>'Kompetisi Online','desc'=>'Olimpiade dan kompetisi antar cabang dengan papan peringkat real-time'],
@@ -68,7 +68,7 @@
                     ['icon'=>'bi-bar-chart-line','label'=>'Analisis Hasil','color'=>'#10b981'],
                     ['icon'=>'bi-file-earmark-pdf','label'=>'Sertifikat PDF','color'=>'#f6af23'],
                     ['icon'=>'bi-phone','label'=>'Mobile Friendly','color'=>'#c84ddf'],
-                    ['icon'=>'bi-database','label'=>'Bank Soal','color'=>'#8b5cf6'],
+                    ['icon'=>'bi-database','label'=>'Bank Soal','color'=>'#68117e'],
                     ['icon'=>'bi-graph-up','label'=>'Progress Tracker','color'=>'#06b6d4'],
                 ];
                 @endphp
@@ -87,10 +87,10 @@
 
 {{-- PROGRESS --}}
 <div class="dashboard-card fade-up">
-    <h6 class="fw-bold mb-4"><i class="bi bi-kanban" style="color:#8b5cf6"></i> Status Pengembangan</h6>
+    <h6 class="fw-bold mb-4"><i class="bi bi-kanban" style="color:#68117e"></i> Status Pengembangan</h6>
     <div class="row g-3">
         @php $tasks = [
-            ['label'=>'Desain UI/UX CBT','pct'=>75,'color'=>'#8b5cf6'],
+            ['label'=>'Desain UI/UX CBT','pct'=>75,'color'=>'#68117e'],
             ['label'=>'Bank Soal & Editor','pct'=>60,'color'=>'#c84ddf'],
             ['label'=>'Engine Ujian','pct'=>35,'color'=>'#f6af23'],
             ['label'=>'Anti-Cheat & Security','pct'=>15,'color'=>'#ef4444'],

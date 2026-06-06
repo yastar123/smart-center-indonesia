@@ -36,13 +36,19 @@
                 <span>Cabang</span>
             </a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item {{ request()->routeIs('owner.analytics') ? 'active' : '' }}">
+            <a href="{{ route('owner.analytics') }}" class="nav-link">
+                <i class="nav-icon bi bi-graph-up-arrow"></i>
+                <span>Analytics</span>
+            </a>
+        </li>
+        <li class="nav-item {{ request()->routeIs('owner.activity-log') ? 'active' : '' }}">
             <a href="{{ route('owner.activity-log') }}" class="nav-link">
                 <i class="nav-icon bi bi-activity"></i>
                 <span>Activity Log</span>
             </a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item {{ request()->routeIs('owner.settings.*') ? 'active' : '' }}">
             <a href="{{ route('owner.settings.index') }}" class="nav-link">
                 <i class="nav-icon bi bi-gear"></i>
                 <span>Pengaturan</span>
@@ -65,12 +71,31 @@
                 <span>Guru</span>
             </a>
         </li>
+        <li class="nav-item {{ request()->routeIs('admin.classes.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.classes.index') }}" class="nav-link">
+                <i class="nav-icon bi bi-grid-3x3-gap"></i>
+                <span>Kelas</span>
+            </a>
+        </li>
+        <li class="nav-item {{ request()->routeIs('admin.courses.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.courses.index') }}" class="nav-link">
+                <i class="nav-icon bi bi-book"></i>
+                <span>Mata Pelajaran</span>
+            </a>
+        </li>
         <li class="nav-item {{ request()->routeIs('admin.schedules.*') ? 'active' : '' }}">
             <a href="{{ route('admin.schedules.index') }}" class="nav-link">
                 <i class="nav-icon bi bi-calendar3"></i>
                 <span>Jadwal</span>
             </a>
         </li>
+        <li class="nav-item {{ request()->routeIs('admin.certificates.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.certificates.index') }}" class="nav-link">
+                <i class="nav-icon bi bi-patch-check"></i>
+                <span>Sertifikat</span>
+            </a>
+        </li>
+
         <li class="nav-header">KEUANGAN</li>
         <li class="nav-item {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
             <a href="{{ route('admin.payments.index') }}" class="nav-link">
@@ -82,11 +107,18 @@
                 @endif
             </a>
         </li>
+        <li class="nav-item {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.reports.index') }}" class="nav-link">
+                <i class="nav-icon bi bi-file-earmark-bar-graph"></i>
+                <span>Laporan</span>
+            </a>
+        </li>
+
         <li class="nav-header">UJIAN</li>
         <li class="nav-item {{ request()->routeIs('admin.tryouts.*') ? 'active' : '' }}">
             <a href="{{ route('admin.tryouts.index') }}" class="nav-link">
                 <i class="nav-icon bi bi-clipboard-check"></i>
-                <span>Tryout</span>
+                <span>Tryout CBT</span>
             </a>
         </li>
         @endrole
@@ -94,20 +126,20 @@
         {{-- GURU MENU --}}
         @role('guru')
         <li class="nav-header">MENGAJAR</li>
-        <li class="nav-item">
-            <a href="{{ route('guru.schedule') }}" class="nav-link">
+        <li class="nav-item {{ request()->routeIs('guru.dashboard') ? 'active' : '' }}">
+            <a href="{{ route('guru.dashboard') }}#jadwal" class="nav-link">
                 <i class="nav-icon bi bi-calendar3"></i>
                 <span>Jadwal Mengajar</span>
             </a>
         </li>
-        <li class="nav-item">
-            <a href="{{ route('guru.attendance.index') }}" class="nav-link">
+        <li class="nav-item {{ request()->routeIs('guru.attendance') ? 'active' : '' }}">
+            <a href="{{ route('guru.attendance') }}" class="nav-link">
                 <i class="nav-icon bi bi-check2-square"></i>
                 <span>Absensi Siswa</span>
             </a>
         </li>
-        <li class="nav-item">
-            <a href="{{ route('guru.grades.index') }}" class="nav-link">
+        <li class="nav-item {{ request()->routeIs('guru.grades') ? 'active' : '' }}">
+            <a href="{{ route('guru.grades') }}" class="nav-link">
                 <i class="nav-icon bi bi-bar-chart"></i>
                 <span>Input Nilai</span>
             </a>
@@ -117,8 +149,20 @@
         {{-- SISWA MENU --}}
         @role('siswa')
         <li class="nav-header">BELAJAR</li>
-        <li class="nav-item">
-            <a href="{{ route('siswa.tryout.index') }}" class="nav-link">
+        <li class="nav-item {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
+            <a href="{{ route('siswa.dashboard') }}" class="nav-link">
+                <i class="nav-icon bi bi-house"></i>
+                <span>Beranda</span>
+            </a>
+        </li>
+        <li class="nav-item {{ request()->routeIs('siswa.schedule') ? 'active' : '' }}">
+            <a href="{{ route('siswa.schedule') }}" class="nav-link">
+                <i class="nav-icon bi bi-calendar-week"></i>
+                <span>Jadwal Belajar</span>
+            </a>
+        </li>
+        <li class="nav-item {{ request()->routeIs('siswa.tryout') ? 'active' : '' }}">
+            <a href="{{ route('siswa.tryout') }}" class="nav-link">
                 <i class="nav-icon bi bi-pencil-square"></i>
                 <span>Tryout Online</span>
             </a>
@@ -127,10 +171,10 @@
 
         {{-- COMMON --}}
         <li class="nav-header">LAINNYA</li>
-        <li class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="nav-icon bi bi-chat-dots"></i>
-                <span>Chat</span>
+        <li class="nav-item {{ request()->routeIs('profile.edit') ? 'active' : '' }}">
+            <a href="{{ route('profile.edit') }}" class="nav-link">
+                <i class="nav-icon bi bi-person-circle"></i>
+                <span>Profil Saya</span>
             </a>
         </li>
     </ul>
