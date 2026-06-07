@@ -1,0 +1,305 @@
+@extends('layouts.app')
+@section('title','Modul Belajar')
+@section('page-title','Modul Belajar')
+
+@section('content')
+<div class="fade-up">
+
+{{-- HEADER --}}
+<div class="dashboard-card mb-4" style="background:linear-gradient(135deg,#1e3a5f 0%,#1a56db 100%);color:white;border:none;overflow:hidden;position:relative">
+    <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%"></div>
+    <div class="row align-items-center g-3" style="position:relative">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">
+                    <i class="bi bi-book-half"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0" style="color:white">Kelola Modul Belajar</h5>
+                    <span style="font-size:12px;opacity:.8">Upload dan kelola materi pembelajaran per mata pelajaran</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <button onclick="openModal()" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px">
+                <i class="bi bi-plus-lg me-2"></i>Tambah Modul
+            </button>
+        </div>
+    </div>
+</div>
+
+{{-- STATS --}}
+<div class="row g-3 mb-4" id="statsRow">
+    @foreach([['id'=>'statTotal','title'=>'Total Modul','icon'=>'bi-book','color'=>'#1a56db'],['id'=>'statPdf','title'=>'PDF','icon'=>'bi-file-pdf','color'=>'#ef4444'],['id'=>'statVideo','title'=>'Video','icon'=>'bi-play-circle','color'=>'#10b981'],['id'=>'statGratis','title'=>'Gratis','icon'=>'bi-gift','color'=>'#f6af23']] as $s)
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-title">{{ $s['title'] }}</div>
+                    <div class="stat-value" id="{{ $s['id'] }}">–</div>
+                </div>
+                <div class="stat-icon" style="background:{{ $s['color'] }}22;color:{{ $s['color'] }}"><i class="bi {{ $s['icon'] }}"></i></div>
+            </div>
+        </div>
+    </div>
+    @endforeach
+</div>
+
+{{-- FILTERS --}}
+<div class="dashboard-card mb-4">
+    <div class="row g-2 align-items-center">
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" id="searchInput" class="form-control" placeholder="Cari modul...">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select id="filterJenis" class="form-select">
+                <option value="">Semua Jenis</option>
+                <option value="pdf">PDF</option>
+                <option value="video">Video</option>
+                <option value="materi">Materi</option>
+                <option value="link">Link</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select id="filterMapel" class="form-select">
+                <option value="">Semua Mata Pelajaran</option>
+                @foreach($courses as $c)
+                <option value="{{ $c->id }}">{{ $c->nama }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button onclick="loadData()" class="btn btn-primary w-100"><i class="bi bi-funnel me-1"></i>Filter</button>
+        </div>
+    </div>
+</div>
+
+{{-- TABLE --}}
+<div class="dashboard-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr style="background:rgba(200,77,223,.05)">
+                    <th>Modul</th><th>Mata Pelajaran</th><th>Jenis</th><th>Ukuran</th><th>Akses</th><th>Status</th><th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="7" class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Memuat...</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="paginationLinks" class="mt-3 d-flex justify-content-center"></div>
+</div>
+
+</div>
+
+{{-- MODAL --}}
+<div class="modal fade" id="moduleModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="border-radius:20px;border:none">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="modalTitle">Tambah Modul</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="moduleForm" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="_method" id="formMethod" value="POST">
+                <input type="hidden" name="moduleId" id="moduleId">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold">Judul Modul <span class="text-danger">*</span></label>
+                            <input type="text" name="judul" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Jenis <span class="text-danger">*</span></label>
+                            <select name="jenis" class="form-select" required id="jenisSelect">
+                                <option value="pdf">PDF</option>
+                                <option value="video">Video</option>
+                                <option value="materi">Materi</option>
+                                <option value="link">Link External</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Mata Pelajaran <span class="text-danger">*</span></label>
+                            <select name="mata_pelajaran_id" class="form-select" required>
+                                <option value="">Pilih Mata Pelajaran</option>
+                                @foreach($courses as $c)
+                                <option value="{{ $c->id }}">{{ $c->nama }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Urutan</label>
+                            <input type="number" name="urutan" class="form-control" value="1" min="1">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Status</label>
+                            <select name="status" class="form-select">
+                                <option value="aktif">Aktif</option>
+                                <option value="draft">Draft</option>
+                            </select>
+                        </div>
+                        <div class="col-12" id="fileSection">
+                            <label class="form-label fw-semibold">Upload File (PDF/Video)</label>
+                            <input type="file" name="file" class="form-control" accept=".pdf,.mp4,.mov,.avi">
+                            <div class="form-text">Maks 50 MB</div>
+                        </div>
+                        <div class="col-12" id="urlSection" style="display:none">
+                            <label class="form-label fw-semibold">URL Link</label>
+                            <input type="url" name="file_url" class="form-control" placeholder="https://...">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Deskripsi</label>
+                            <textarea name="deskripsi" class="form-control" rows="3" placeholder="Deskripsi singkat modul..."></textarea>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="is_gratis" id="isGratis" value="1">
+                                <label class="form-check-label" for="isGratis">Modul Gratis (dapat diakses semua siswa)</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary px-4" id="submitBtn"><i class="bi bi-floppy me-2"></i>Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+let currentPage = 1;
+
+function loadData(page = 1) {
+    currentPage = page;
+    const params = new URLSearchParams({
+        page,
+        search: document.getElementById('searchInput').value,
+        jenis: document.getElementById('filterJenis').value,
+        mata_pelajaran_id: document.getElementById('filterMapel').value,
+    });
+    fetch(`{{ route('admin.modules.index') }}?${params}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(r => r.json()).then(data => {
+            document.getElementById('statTotal').textContent = data.stats.total;
+            document.getElementById('statPdf').textContent   = data.stats.pdf;
+            document.getElementById('statVideo').textContent = data.stats.video;
+            document.getElementById('statGratis').textContent= data.stats.gratis;
+            renderTable(data.data);
+            renderPagination(data);
+        });
+}
+
+function renderTable(rows) {
+    const jenisMap = { pdf:'<span class="badge" style="background:#ef444422;color:#ef4444">PDF</span>', video:'<span class="badge" style="background:#10b98122;color:#10b981">Video</span>', materi:'<span class="badge" style="background:#6366f122;color:#6366f1">Materi</span>', link:'<span class="badge" style="background:#f6af2322;color:#b45309">Link</span>' };
+    if (!rows.length) {
+        document.getElementById('tableBody').innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted"><i class="bi bi-book" style="font-size:2rem;display:block;margin-bottom:8px"></i>Belum ada modul</td></tr>';
+        return;
+    }
+    document.getElementById('tableBody').innerHTML = rows.map(m => `
+        <tr>
+            <td>
+                <div class="fw-semibold">${m.judul}</div>
+                <div class="text-muted" style="font-size:11px">${m.deskripsi ? m.deskripsi.substring(0,60)+'...' : ''}</div>
+            </td>
+            <td><span class="badge bg-primary-subtle text-primary">${m.mata_pelajaran?.nama || '-'}</span></td>
+            <td>${jenisMap[m.jenis] || m.jenis}</td>
+            <td>${m.ukuran_file ? (m.ukuran_file/1024/1024).toFixed(1)+' MB' : '-'}</td>
+            <td>${m.is_gratis ? '<span class="badge bg-success-subtle text-success">Gratis</span>' : '<span class="badge bg-secondary-subtle text-secondary">Berbayar</span>'}</td>
+            <td>${m.status === 'aktif' ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-warning text-dark">Draft</span>'}</td>
+            <td>
+                <div class="d-flex gap-1">
+                    ${m.file_path ? `<a href="/storage/${m.file_path}" target="_blank" class="btn btn-sm btn-outline-info" title="Lihat"><i class="bi bi-eye"></i></a>` : ''}
+                    <button onclick="editModule(${m.id})" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></button>
+                    <button onclick="deleteModule(${m.id},'${m.judul}')" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                </div>
+            </td>
+        </tr>`).join('');
+}
+
+function renderPagination(data) {
+    const el = document.getElementById('paginationLinks');
+    if (data.last_page <= 1) { el.innerHTML = ''; return; }
+    let html = `<nav><ul class="pagination pagination-sm mb-0">`;
+    html += `<li class="page-item ${data.current_page==1?'disabled':''}"><a class="page-link" href="#" onclick="loadData(${data.current_page-1});return false">‹</a></li>`;
+    for (let i = 1; i <= data.last_page; i++) {
+        html += `<li class="page-item ${i==data.current_page?'active':''}"><a class="page-link" href="#" onclick="loadData(${i});return false">${i}</a></li>`;
+    }
+    html += `<li class="page-item ${data.current_page==data.last_page?'disabled':''}"><a class="page-link" href="#" onclick="loadData(${data.current_page+1});return false">›</a></li>`;
+    html += `</ul></nav>`;
+    el.innerHTML = html;
+}
+
+function openModal(reset = true) {
+    if (reset) {
+        document.getElementById('moduleForm').reset();
+        document.getElementById('moduleId').value = '';
+        document.getElementById('formMethod').value = 'POST';
+        document.getElementById('modalTitle').textContent = 'Tambah Modul';
+    }
+    new bootstrap.Modal(document.getElementById('moduleModal')).show();
+}
+
+function editModule(id) {
+    fetch(`{{ url('admin/modules') }}/${id}`, { headers:{'X-Requested-With':'XMLHttpRequest'} })
+        .then(r=>r.json()).then(res => {
+            const m = res.data;
+            const f = document.getElementById('moduleForm');
+            f.querySelector('[name=judul]').value = m.judul || '';
+            f.querySelector('[name=jenis]').value = m.jenis || 'pdf';
+            f.querySelector('[name=mata_pelajaran_id]').value = m.mata_pelajaran_id || '';
+            f.querySelector('[name=urutan]').value = m.urutan || 1;
+            f.querySelector('[name=status]').value = m.status || 'aktif';
+            f.querySelector('[name=deskripsi]').value = m.deskripsi || '';
+            f.querySelector('[name=is_gratis]').checked = !!m.is_gratis;
+            document.getElementById('moduleId').value = id;
+            document.getElementById('formMethod').value = 'PUT';
+            document.getElementById('modalTitle').textContent = 'Edit Modul';
+            toggleUrlSection();
+            openModal(false);
+        });
+}
+
+function deleteModule(id, name) {
+    Swal.fire({ title:'Hapus Modul?', text: name, icon:'warning', showCancelButton:true, confirmButtonColor:'#ef4444', confirmButtonText:'Hapus' })
+        .then(r => {
+            if (!r.isConfirmed) return;
+            fetch(`{{ url('admin/modules') }}/${id}`, { method:'DELETE', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'} })
+                .then(r=>r.json()).then(d => { showToast(d.message, d.success?'success':'error'); if(d.success) loadData(currentPage); });
+        });
+}
+
+document.getElementById('jenisSelect').addEventListener('change', toggleUrlSection);
+function toggleUrlSection() {
+    const jenis = document.getElementById('jenisSelect').value;
+    document.getElementById('fileSection').style.display = jenis === 'link' ? 'none' : '';
+    document.getElementById('urlSection').style.display  = jenis === 'link' ? '' : 'none';
+}
+
+document.getElementById('moduleForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const id = document.getElementById('moduleId').value;
+    const method = id ? 'PUT' : 'POST';
+    const url = id ? `{{ url('admin/modules') }}/${id}` : `{{ route('admin.modules.store') }}`;
+    const fd = new FormData(this);
+    if (id) fd.append('_method', 'PUT');
+    document.getElementById('submitBtn').disabled = true;
+    fetch(url, { method:'POST', body:fd, headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'} })
+        .then(r=>r.json()).then(d => {
+            document.getElementById('submitBtn').disabled = false;
+            showToast(d.message, d.success?'success':'error');
+            if (d.success) { bootstrap.Modal.getInstance(document.getElementById('moduleModal')).hide(); loadData(currentPage); }
+        }).catch(()=>{ document.getElementById('submitBtn').disabled = false; });
+});
+
+let st; document.getElementById('searchInput').addEventListener('input', () => { clearTimeout(st); st = setTimeout(()=>loadData(1), 400); });
+document.addEventListener('DOMContentLoaded', () => loadData());
+</script>
+@endpush

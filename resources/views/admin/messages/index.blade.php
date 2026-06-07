@@ -1,0 +1,227 @@
+@extends('layouts.app')
+@section('title','Pesan Aplikasi')
+@section('page-title','Pesan Aplikasi')
+
+@section('content')
+<div class="fade-up">
+
+{{-- HEADER --}}
+<div class="dashboard-card mb-4" style="background:linear-gradient(135deg,#0c4a6e 0%,#0284c7 100%);color:white;border:none;overflow:hidden;position:relative">
+    <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%"></div>
+    <div class="row align-items-center g-3" style="position:relative">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center gap-3">
+                <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0"><i class="bi bi-chat-dots"></i></div>
+                <div>
+                    <h5 class="fw-bold mb-0" style="color:white">Pesan Aplikasi</h5>
+                    <span style="font-size:12px;opacity:.8">Chat internal antar admin, guru, dan siswa</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <button onclick="openRoomModal()" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px">
+                <i class="bi bi-plus-lg me-2"></i>Room Baru
+            </button>
+        </div>
+    </div>
+</div>
+
+{{-- CHAT LAYOUT --}}
+<div class="row g-3" style="height:calc(100vh - 280px);min-height:500px">
+
+    {{-- ROOM LIST --}}
+    <div class="col-md-4 col-lg-3">
+        <div class="dashboard-card h-100 p-0 d-flex flex-column" style="overflow:hidden">
+            <div class="p-3 border-bottom">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" id="roomSearch" placeholder="Cari room...">
+                </div>
+            </div>
+            <div class="flex-grow-1 overflow-auto" id="roomList" style="padding:8px">
+                <div class="text-center py-4 text-muted" style="font-size:13px"><div class="spinner-border spinner-border-sm text-primary mb-2"></div><div>Memuat room...</div></div>
+            </div>
+        </div>
+    </div>
+
+    {{-- CHAT AREA --}}
+    <div class="col-md-8 col-lg-9">
+        <div class="dashboard-card h-100 p-0 d-flex flex-column" style="overflow:hidden" id="chatArea">
+            {{-- Empty state --}}
+            <div id="chatEmpty" class="flex-grow-1 d-flex align-items-center justify-content-center flex-column text-center">
+                <i class="bi bi-chat-square-text" style="font-size:3.5rem;color:#cbd5e1;margin-bottom:16px"></i>
+                <div class="fw-semibold" style="font-size:15px;color:var(--text-primary)">Pilih Percakapan</div>
+                <div class="text-muted" style="font-size:13px;margin-top:4px">Pilih room dari kiri atau buat room baru</div>
+            </div>
+
+            {{-- Active chat --}}
+            <div id="chatActive" style="display:none;flex:1;overflow:hidden;display:none;flex-direction:column">
+                <div class="p-3 border-bottom d-flex align-items-center gap-3">
+                    <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#c84ddf,#7c3aed);display:flex;align-items:center;justify-content:center;color:white;font-size:16px;flex-shrink:0"><i class="bi bi-chat-dots"></i></div>
+                    <div><div class="fw-bold" id="chatRoomName" style="font-size:14px">–</div><div class="text-muted" style="font-size:11px" id="chatRoomType">–</div></div>
+                </div>
+                <div class="flex-grow-1 overflow-auto p-3" id="chatMessages" style="display:flex;flex-direction:column;gap:10px;background:var(--body-bg)">
+                </div>
+                <div class="p-3 border-top">
+                    <form id="messageForm" class="d-flex gap-2">
+                        @csrf
+                        <input type="hidden" id="activeRoomId">
+                        <input type="text" name="pesan" class="form-control" id="messageInput" placeholder="Ketik pesan..." autocomplete="off">
+                        <button type="submit" class="btn btn-primary px-3"><i class="bi bi-send"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+{{-- MODAL ROOM BARU --}}
+<div class="modal fade" id="roomModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius:20px;border:none">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Buat Room Chat</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="roomForm">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3"><label class="form-label fw-semibold">Nama Room <span class="text-danger">*</span></label><input type="text" name="nama_room" class="form-control" required placeholder="Contoh: Diskusi Guru Fisika"></div>
+                    <div class="mb-3"><label class="form-label fw-semibold">Jenis Room</label>
+                        <select name="jenis_room" class="form-select">
+                            <option value="grup">Grup</option>
+                            <option value="personal">Personal (1-on-1)</option>
+                            <option value="broadcast">Broadcast</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Peserta</label>
+                        <select name="peserta_id[]" class="form-select" multiple style="height:120px">
+                            @foreach($users as $u)
+                            <option value="{{ $u->id }}">{{ $u->name }} ({{ $u->getRoleNames()->first() ?? 'user' }})</option>
+                            @endforeach
+                        </select>
+                        <div class="form-text">Ctrl+Click untuk pilih banyak</div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary px-4"><i class="bi bi-plus me-2"></i>Buat Room</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+let activeRoom = null, pollInterval = null;
+
+function loadRooms() {
+    fetch(`{{ route('admin.messages.index') }}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(r => r.text()).then(() => {});
+
+    // For now fetch rooms list via AJAX — re-use the page load data
+    const rooms = @json($rooms);
+    renderRooms(rooms);
+}
+
+function renderRooms(rooms) {
+    const el = document.getElementById('roomList');
+    const search = (document.getElementById('roomSearch').value || '').toLowerCase();
+    const filtered = rooms.filter(r => r.nama_room.toLowerCase().includes(search));
+    if (!filtered.length) { el.innerHTML = '<div class="text-center py-4 text-muted" style="font-size:13px">Tidak ada room ditemukan</div>'; return; }
+    el.innerHTML = filtered.map(r => {
+        const lastMsg = r.pesan && r.pesan[0] ? r.pesan[0].pesan : 'Belum ada pesan';
+        const isActive = activeRoom && activeRoom.id == r.id;
+        return `<div onclick="openRoom(${r.id},'${r.nama_room.replace(/'/g,"\\'").replace(/"/g,"&quot;")}','${r.jenis_room}')"
+            class="p-3 rounded-3 mb-1 cursor-pointer" style="cursor:pointer;transition:background .15s;${isActive?'background:rgba(200,77,223,.12);border:1px solid rgba(200,77,223,.3);':'border:1px solid transparent'}">
+            <div class="d-flex align-items-center gap-2">
+                <div style="width:36px;height:36px;border-radius:10px;background:${isActive?'linear-gradient(135deg,#c84ddf,#7c3aed)':'rgba(200,77,223,.1)'};display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;color:${isActive?'white':'#c84ddf'}">
+                    <i class="bi ${r.jenis_room==='broadcast'?'bi-megaphone':r.jenis_room==='personal'?'bi-person':'bi-people'}"></i>
+                </div>
+                <div class="flex-grow-1 min-width-0">
+                    <div class="fw-semibold" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.nama_room}</div>
+                    <div class="text-muted" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${lastMsg ? lastMsg.substring(0,35) : 'Belum ada pesan'}</div>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function openRoom(id, name, type) {
+    activeRoom = { id, name, type };
+    document.getElementById('chatRoomName').textContent = name;
+    document.getElementById('chatRoomType').textContent = { grup: 'Grup', personal: 'Personal', broadcast: 'Broadcast' }[type] || type;
+    document.getElementById('activeRoomId').value = id;
+    document.getElementById('chatEmpty').style.display = 'none';
+    document.getElementById('chatActive').style.display = 'flex';
+    document.getElementById('chatActive').style.flexDirection = 'column';
+    loadMessages(id);
+    if (pollInterval) clearInterval(pollInterval);
+    pollInterval = setInterval(() => loadMessages(id), 5000);
+
+    // Re-render rooms to highlight active
+    const rooms = @json($rooms);
+    renderRooms(rooms);
+}
+
+function loadMessages(roomId) {
+    fetch(`{{ url('admin/messages') }}/${roomId}/messages`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(r => r.json()).then(res => {
+            const myId = {{ auth()->id() }};
+            const el = document.getElementById('chatMessages');
+            if (!res.data.length) { el.innerHTML = '<div class="text-center text-muted" style="font-size:13px;padding:30px 0">Mulai percakapan!</div>'; return; }
+            el.innerHTML = res.data.map(m => {
+                const isMine = m.pengirim_id == myId;
+                return `<div class="d-flex ${isMine?'justify-content-end':'justify-content-start'}">
+                    <div style="max-width:70%">
+                        ${!isMine ? `<div style="font-size:11px;font-weight:600;color:#c84ddf;margin-bottom:3px">${m.pengirim?.name||'User'}</div>` : ''}
+                        <div style="background:${isMine?'linear-gradient(135deg,#c84ddf,#7c3aed)':'var(--card-bg)'};color:${isMine?'white':'var(--text-primary)'};border:${isMine?'none':'1px solid var(--card-border)'};padding:10px 14px;border-radius:${isMine?'16px 4px 16px 16px':'4px 16px 16px 16px'};font-size:13.5px;line-height:1.5;word-break:break-word">${m.pesan||''}</div>
+                        <div style="font-size:10px;color:var(--text-muted);margin-top:3px;text-align:${isMine?'right':'left'}">${(m.created_at||'').toString().substring(11,16)}</div>
+                    </div>
+                </div>`;
+            }).join('');
+            el.scrollTop = el.scrollHeight;
+        });
+}
+
+document.getElementById('messageForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const roomId = document.getElementById('activeRoomId').value;
+    const input  = document.getElementById('messageInput');
+    if (!input.value.trim() || !roomId) return;
+    const fd = new FormData(this);
+    fetch(`{{ url('admin/messages') }}/${roomId}/send`, { method: 'POST', body: fd, headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(r => r.json()).then(d => { if (d.success) { input.value = ''; loadMessages(roomId); } });
+});
+
+document.getElementById('roomSearch').addEventListener('input', () => {
+    const rooms = @json($rooms);
+    renderRooms(rooms);
+});
+
+function openRoomModal() {
+    document.getElementById('roomForm').reset();
+    new bootstrap.Modal(document.getElementById('roomModal')).show();
+}
+
+document.getElementById('roomForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const fd = new FormData(this);
+    fetch(`{{ route('admin.messages.createRoom') }}`, { method: 'POST', body: fd, headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(r => r.json()).then(d => {
+            showToast(d.message, d.success ? 'success' : 'error');
+            if (d.success) { bootstrap.Modal.getInstance(document.getElementById('roomModal')).hide(); location.reload(); }
+        });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const rooms = @json($rooms);
+    renderRooms(rooms);
+});
+</script>
+@endpush

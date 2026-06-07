@@ -1,0 +1,88 @@
+<?php
+
+namespace App\Http\Controllers\Siswa;
+
+use App\Http\Controllers\Controller;
+use App\Models\Schedule;
+use App\Models\Certificate;
+use App\Models\Student;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
+
+class SiswaController extends Controller
+{
+    public function schedule()
+    {
+        $student = Student::where('user_id', auth()->id())->first();
+
+        $schedules = Schedule::with('guru', 'kelas', 'cabang')
+            ->when($student && $student->branch_id, fn($q) => $q->where('cabang_id', $student->branch_id))
+            ->where('tanggal', '>=', now()->subDays(7))
+            ->where('tanggal', '<=', now()->addDays(30))
+            ->orderBy('tanggal')
+            ->orderBy('jam_mulai')
+            ->get()
+            ->groupBy(fn($s) => $s->tanggal->format('Y-m-d'));
+
+        return view('siswa.schedule', compact('schedules', 'student'));
+    }
+
+    public function certificates()
+    {
+        $student = Student::where('user_id', auth()->id())->first();
+
+        $certificates = Certificate::with('cabang')
+            ->when($student, fn($q) => $q->where('siswa_id', $student->id))
+            ->latest()
+            ->get();
+
+        return view('siswa.certificates', compact('certificates', 'student'));
+    }
+
+    public function downloadCertificate(Certificate $certificate)
+    {
+        // Only the owner can download
+        $student = Student::where('user_id', auth()->id())->first();
+        if (!$student || $certificate->siswa_id !== $student->id) {
+            abort(403);
+        }
+
+        if ($certificate->file_sertifikat && Storage::disk('public')->exists($certificate->file_sertifikat)) {
+            return Storage::disk('public')->download($certificate->file_sertifikat);
+        }
+
+        // Generate PDF on the fly
+        $pdf = Pdf::loadView('siswa.certificate-pdf', compact('certificate', 'student'))
+            ->setPaper('a4', 'landscape');
+        return $pdf->download('sertifikat-' . $certificate->nomor_sertifikat . '.pdf');
+    }
+
+    public function uploadCertificate(Request $request)
+    {
+        $student = Student::where('user_id', auth()->id())->first();
+        if (!$student) abort(403);
+
+        $data = $request->validate([
+            'judul'         => 'required|string|max:200',
+            'jenis'         => 'required|in:kompetensi,kelulusan,prestasi,partisipasi',
+            'tanggal_terbit'=> 'required|date',
+            'file'          => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+        ]);
+
+        $filePath = $request->file('file')->store('certificates/uploads', 'public');
+
+        Certificate::create([
+            'siswa_id'        => $student->id,
+            'cabang_id'       => $student->branch_id,
+            'diterbitkan_oleh'=> auth()->id(),
+            'nomor_sertifikat'=> 'UPLOAD-' . strtoupper(\Str::random(6)) . '-' . date('Y'),
+            'jenis'           => $data['jenis'],
+            'judul'           => $data['judul'],
+            'tanggal_terbit'  => $data['tanggal_terbit'],
+            'file_sertifikat' => $filePath,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Sertifikat berhasil diunggah!']);
+    }
+}

@@ -1133,10 +1133,15 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="{{ route('admin.modules.index') }}" class="nav-link {{ request()->routeIs('admin.modules.*') ? 'active' : '' }}">
                 <i class="bi bi-book-half"></i>
                 <span>Modul Belajar</span>
-                <span class="menu-badge" style="background:#6366f1">Soon</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('admin.packages.index') }}" class="nav-link {{ request()->routeIs('admin.packages.*') ? 'active' : '' }}">
+                <i class="bi bi-box-seam"></i>
+                <span>Paket Belajar</span>
             </a>
         </div>
         <div class="nav-item">
@@ -1177,9 +1182,36 @@
             </a>
         </div>
         <div class="nav-item">
+            <a href="{{ route('admin.salaries.index') }}" class="nav-link {{ request()->routeIs('admin.salaries.*') ? 'active' : '' }}">
+                <i class="bi bi-cash-stack"></i>
+                <span>Gaji Guru</span>
+            </a>
+        </div>
+        <div class="nav-item">
             <a href="{{ route('admin.reports.index') }}" class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
                 <i class="bi bi-bar-chart-line"></i>
                 <span>Laporan Keuangan</span>
+            </a>
+        </div>
+
+        <div class="nav-header">KOMUNIKASI</div>
+
+        <div class="nav-item">
+            <a href="{{ route('admin.announcements.index') }}" class="nav-link {{ request()->routeIs('admin.announcements.*') ? 'active' : '' }}">
+                <i class="bi bi-megaphone"></i>
+                <span>Pengumuman</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('admin.messages.index') }}" class="nav-link {{ request()->routeIs('admin.messages.*') ? 'active' : '' }}">
+                <i class="bi bi-chat-dots"></i>
+                <span>Pesan Aplikasi</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('admin.videocall.index') }}" class="nav-link {{ request()->routeIs('admin.videocall.*') ? 'active' : '' }}">
+                <i class="bi bi-camera-video"></i>
+                <span>Video Call</span>
             </a>
         </div>
 
@@ -1187,8 +1219,8 @@
 
         <div class="nav-item">
             <a href="{{ route('admin.tryouts.index') }}" class="nav-link {{ request()->routeIs('admin.tryouts.*') ? 'active' : '' }}">
-                <i class="bi bi-ui-checks-grid"></i>
-                <span>Tryout Online</span>
+                <i class="bi bi-journal-check"></i>
+                <span>Tryout UTBK/PTN</span>
             </a>
         </div>
         @endrole
@@ -1207,18 +1239,13 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.schedules.index') }}" class="nav-link {{ request()->routeIs('admin.schedules.*') ? 'active' : '' }}">
-                <i class="bi bi-table"></i><span>Semua Jadwal</span>
-            </a>
-        </div>
-        <div class="nav-item">
             <a href="{{ route('guru.attendance') }}" class="nav-link {{ request()->routeIs('guru.attendance') ? 'active' : '' }}">
-                <i class="bi bi-check2-square"></i><span>Absensi</span>
+                <i class="bi bi-check2-square"></i><span>Input Absensi</span>
             </a>
         </div>
         <div class="nav-item">
             <a href="{{ route('guru.grades') }}" class="nav-link {{ request()->routeIs('guru.grades') ? 'active' : '' }}">
-                <i class="bi bi-bar-chart-line"></i><span>Input Nilai</span>
+                <i class="bi bi-pencil-square"></i><span>Input Nilai</span>
             </a>
         </div>
         @endrole
@@ -1242,14 +1269,13 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.tryout') }}" class="nav-link {{ request()->routeIs('siswa.tryout') ? 'active' : '' }}">
-                <i class="bi bi-laptop"></i><span>Tryout CBT</span>
-                <span class="menu-badge" style="background:#6366f1">Soon</span>
+            <a href="{{ route('siswa.certificates.index') }}" class="nav-link {{ request()->routeIs('siswa.certificates.*') ? 'active' : '' }}">
+                <i class="bi bi-award"></i><span>Sertifikat Saya</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="bi bi-file-earmark-text"></i><span>Raport Digital</span>
+            <a href="{{ route('siswa.tryout') }}" class="nav-link {{ request()->routeIs('siswa.tryout') ? 'active' : '' }}">
+                <i class="bi bi-laptop"></i><span>Tryout CBT</span>
                 <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
         </div>
@@ -1262,14 +1288,6 @@
             <a href="{{ route('profile.edit') }}" class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
                 <i class="bi bi-person-circle"></i>
                 <span>Profil Saya</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="bi bi-chat-dots"></i>
-                <span>Chat Realtime</span>
-                <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
         </div>
 
