@@ -1,0 +1,87 @@
+Notifikasi / Pemberitahuan
+• Notifikasi/pemberitahuan realtime kepada guru, siswa, dan admin
+• Notifikasi jadwal belajar siswa dan jadwal mengajar guru (reminder hari H)
+• Notifikasi penagihan/tagihan siswa (jatuh tempo, status belum lunas, nominal, denda)
+• Notifikasi pendaftaran baru (siswa, guru, karyawan) beserta status approval
+• Notifikasi update aplikasi dan informasi terbaru
+
+Cetak Pembayaran & Gaji
+• Cetak invoice pembayaran siswa (detail transaksi, nominal, status)
+• Cetak slip gaji guru (rincian gaji, bonus, potongan, tanggal transaksi)
+• Export laporan dalam format PDF atau print langsung
+• Riwayat pembayaran dan penggajian
+
+Cetak Sertifikat & Piagam
+• Template sertifikat dan piagam untuk guru dan siswa
+• Input nama peserta, program belajar, dan nilai
+• Tanda tangan digital dan QR Code verifikasi
+• Upload, download PDF, dan cetak langsung dari aplikasi
+
+Pesan Aplikasi
+• Pesan internal antar admin, guru, dan siswa
+• Inbox pesan dan chat personal
+• Notifikasi pesan masuk realtime
+• Pengiriman file/foto dan riwayat percakapan
+
+Video Call Online
+• Fitur online meeting / video call langsung dari aplikasi
+
+Dashboard Iklan / Pemberitahuan
+• Tampilan pengumuman, informasi terbaru, dan jadwal kegiatan
+• Banner promo dan pemberitahuan penting dari admin
+• Informasi tryout dan notifikasi update aplikasi
+• Dashboard untuk guru, siswa, dan admin
+
+Tryout UTBK / PTN / Kedinasan
+• Pengerjaan soal UTBK/PTN/Kedinasan secara online
+• Timer ujian, bank soal, dan kategori mata pelajaran
+• Penilaian otomatis dan ranking siswa
+• Pembahasan soal dan riwayat tryout
+• Laporan hasil tryout realtime
+
+Admin Cabang – Kelola Modul
+• Tambah, edit, hapus modul pembelajaran
+• Upload file PDF/video/materi dan kategori mata pelajaran
+• Pengaturan akses modul per siswa
+• Download modul pembelajaran
+
+Admin Cabang – Kelola Paket
+• Tambah, edit, hapus paket belajar
+• Pengaturan harga, durasi belajar, dan jumlah pertemuan
+• Kategori program dan pengelompokan siswa per paket
+
+Admin Cabang – Kelola Guru
+• Tambah, edit, hapus data guru
+• Pengaturan mata pelajaran dan jadwal mengajar
+• Status guru aktif/nonaktif dan upload dokumen guru
+• Monitoring aktivitas dan absensi guru
+
+Guru – Input Absensi
+• Input absensi siswa (hadir/izin/sakit/alpa) dan absensi mengajar
+• Check-in kelas dan validasi kehadiran
+• Riwayat dan laporan absensi harian serta bulanan
+
+Guru – Input Nilai
+• Input nilai tugas, ujian, tryout, dan nilai harian
+• Rata-rata nilai, catatan guru, ranking, dan status kelulusan
+• Integrasi otomatis ke raport siswa
+
+Guru – Input Pembayaran Gaji
+• Input nominal gaji, honor per pertemuan, bonus, dan potongan
+• Status dan tanggal pembayaran
+• Riwayat penggajian dan cetak slip gaji
+
+Siswa – Lihat Jadwal
+• Tampilan jadwal belajar harian dan mingguan secara realtime
+• Info hari, jam, mata pelajaran, guru, dan ruang kelas
+• Notifikasi jadwal otomatis
+
+Siswa – Cetak Sertifikat
+• Lihat, download, dan cetak sertifikat program belajar
+• Sertifikat hasil tryout dan piagam penghargaan
+• QR Code verifikasi sertifikat dan export PDF
+
+Upload Sertifikat
+• Upload file sertifikat/piagam (PDF/JPG/PNG) untuk guru dan siswa
+• Validasi file, preview, dan penyimpanan ke akun masing-masing
+• Download sertifikat dan verifikasi melalui QR Code atau nomor sertifikat
