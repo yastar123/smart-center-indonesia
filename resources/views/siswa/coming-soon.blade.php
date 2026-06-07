@@ -21,7 +21,7 @@
             </p>
 
             <div class="row g-3 mb-5" style="max-width:380px;margin:0 auto">
-                <div class="col-4">
+                <div class="col-4 col-sm-4">
                     <div style="background:var(--input-bg);border-radius:12px;padding:16px 8px;border:1px solid var(--card-border)">
                         <div style="font-size:22px;margin-bottom:4px">🎨</div>
                         <div style="font-size:11px;color:var(--text-muted);font-weight:600">UI/UX<br>Design</div>
@@ -30,7 +30,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-4">
+                <div class="col-4 col-sm-4">
                     <div style="background:var(--input-bg);border-radius:12px;padding:16px 8px;border:1px solid var(--card-border)">
                         <div style="font-size:22px;margin-bottom:4px">⚙️</div>
                         <div style="font-size:11px;color:var(--text-muted);font-weight:600">Backend<br>Logic</div>
@@ -39,7 +39,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-4">
+                <div class="col-4 col-sm-4">
                     <div style="background:var(--input-bg);border-radius:12px;padding:16px 8px;border:1px solid var(--card-border)">
                         <div style="font-size:22px;margin-bottom:4px">🧪</div>
                         <div style="font-size:11px;color:var(--text-muted);font-weight:600">Testing<br>& QA</div>

@@ -320,8 +320,8 @@ function editCourse(id) {
     document.getElementById('saveBtn').disabled = true;
     // Ensure categories are loaded into the select first, then load course
     loadCategoriesForSelect().then(() => {
-        fetch(`/admin/courses/${id}`)
-            .then(r => r.json())
+        fetch(`/admin/courses/${id}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
             .then(d => {
                 document.getElementById('courseId').value = d.id;
                 document.getElementById('kode').value = d.kode || '';
@@ -347,6 +347,9 @@ function editCourse(id) {
                 document.getElementById('status').value = d.status || 'aktif';
                 document.getElementById('saveBtn').disabled = false;
                 modal.show();
+            }).catch(() => {
+                document.getElementById('saveBtn').disabled = false;
+                showToast('Gagal memuat data mata pelajaran', 'error');
             });
     });
 }
@@ -465,15 +468,18 @@ function deleteCourse(id, nama) {
         if (!r.isConfirmed) return;
         fetch(`/admin/courses/${id}`, {
             method: 'DELETE',
-            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
         })
-        .then(r => r.json())
+        .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
         .then(res => {
             if (res.success) {
                 window.showToast && window.showToast(res.message, 'success');
                 setTimeout(() => location.reload(), 600);
+            } else {
+                window.showToast && window.showToast(res.message || 'Gagal menghapus', 'error');
             }
-        });
+        })
+        .catch(() => { window.showToast && window.showToast('Gagal menghapus mata pelajaran', 'error'); });
     });
 }
 

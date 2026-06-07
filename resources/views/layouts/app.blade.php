@@ -1626,9 +1626,9 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         el.innerHTML = `
             <i class="bi ${cfg.icon}" style="font-size:20px;color:${cfg.color};flex-shrink:0;margin-top:1px"></i>
             <div style="flex:1;min-width:0">
-                <div style="font-size:13.5px;font-weight:600;color:#0f172a;line-height:1.3">${msg}</div>
+                <div style="font-size:13.5px;font-weight:600;color:var(--text-primary);line-height:1.3">${msg}</div>
             </div>
-            <button onclick="this.closest('.g-toast').remove()" style="border:none;background:none;color:#94a3b8;cursor:pointer;padding:0;font-size:16px;line-height:1;flex-shrink:0">&times;</button>`;
+            <button onclick="this.closest('.g-toast').remove()" style="border:none;background:none;color:var(--text-muted);cursor:pointer;padding:0;font-size:16px;line-height:1;flex-shrink:0">&times;</button>`;
         wrap.appendChild(el);
         setTimeout(() => {
             el.classList.add('hide');
@@ -1647,7 +1647,8 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
             if (data.error)   showToast(data.error,   'error');
             if (data.warning) showToast(data.warning, 'warning');
             if (data.info)    showToast(data.info,    'info');
-            if (data.status)  showToast(data.status,  'success');
+            // Only show data.status if it looks like a human-readable string (not a Laravel key like 'profile-updated')
+            if (data.status && !data.status.includes('-') && data.status.length > 4) showToast(data.status, 'success');
         } catch(e) {}
     });
 })();
@@ -1661,13 +1662,14 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         this.querySelector('.notif-badge')?.remove();
         const existing = document.getElementById('notifPanel');
         if (existing) { existing.remove(); return; }
+        const rect = btn.getBoundingClientRect();
         const panel = document.createElement('div');
         panel.id = 'notifPanel';
         panel.style.cssText = `
-            position:fixed; top:${btn.getBoundingClientRect().bottom + 8}px;
-            right:${document.documentElement.clientWidth - btn.getBoundingClientRect().right}px;
-            width:300px; background:var(--card-bg); border:1px solid var(--card-border);
-            border-radius:16px; box-shadow:0 12px 40px rgba(0,0,0,.12);
+            position:fixed; top:${rect.bottom + 8}px;
+            right:${Math.max(8, document.documentElement.clientWidth - rect.right)}px;
+            width:min(300px, calc(100vw - 16px)); background:var(--card-bg); border:1px solid var(--card-border);
+            border-radius:16px; box-shadow:0 12px 40px rgba(0,0,0,.15);
             z-index:9998; overflow:hidden; animation:fadeIn .2s ease both;
         `;
         panel.innerHTML = `
@@ -1684,7 +1686,6 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         setTimeout(() => document.addEventListener('click', close), 0);
     });
 })();
-</script>
 </script>
 
 <script src="{{ asset('js/modal-fallback.js') }}" defer></script>
@@ -1740,7 +1741,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     removeKnownChevrons();
-    new MutationObserver(removeKnownChevrons).observe(document.body, { childList:true, subtree:true });
+    // Scope MutationObserver to pagination containers only, not entire document.body
+    document.querySelectorAll('#paginationLinks, .pagination, nav.d-flex').forEach(el => {
+        if (el) new MutationObserver(removeKnownChevrons).observe(el, { childList:true, subtree:true });
+    });
 });
 </script>
 </html>
