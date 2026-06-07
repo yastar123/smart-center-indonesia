@@ -1033,6 +1033,151 @@
             #globalToastWrap { right: 10px; left: 10px; max-width: 100%; }
             .g-toast { max-width: 100%; min-width: 0; }
         }
+
+        /* ============================================================
+           TOPBAR — depth shadow when page is scrolled
+        ============================================================ */
+        .topbar { transition: box-shadow .25s ease, background var(--transition); }
+        .topbar.scrolled {
+            box-shadow: 0 4px 24px rgba(38,6,50,.1);
+        }
+        [data-theme="dark"] .topbar.scrolled {
+            box-shadow: 0 4px 24px rgba(0,0,0,.35);
+        }
+
+        /* ============================================================
+           MOBILE TOAST — move to bottom on small screens
+        ============================================================ */
+        @media (max-width: 576px) {
+            #globalToastWrap {
+                top: auto;
+                bottom: 74px;
+                right: 10px;
+                left: 10px;
+                flex-direction: column-reverse;
+            }
+        }
+
+        /* ============================================================
+           SKELETON ROWS — table loading state
+        ============================================================ */
+        .skeleton-row td {
+            padding: 12px 16px !important;
+        }
+        .skeleton-cell {
+            height: 14px;
+            border-radius: 6px;
+            background: linear-gradient(90deg,
+                var(--card-border) 25%,
+                var(--input-bg) 50%,
+                var(--card-border) 75%);
+            background-size: 200% 100%;
+            animation: skeletonShimmer 1.4s ease-in-out infinite;
+        }
+
+        /* ============================================================
+           TABLE-MODERN THEAD — unified gradient header
+        ============================================================ */
+        .table-modern thead tr,
+        .thead-modern {
+            background: linear-gradient(90deg, rgba(38,6,50,.04), rgba(200,77,223,.04)) !important;
+        }
+        .table-modern th {
+            border-bottom: 2px solid var(--card-border) !important;
+        }
+
+        /* ============================================================
+           TABLE — action button group
+        ============================================================ */
+        .btn-action-group { display: flex; gap: 6px; }
+        .btn-action-group .btn { transition: transform .18s, box-shadow .18s; }
+        .btn-action-group .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.12) !important; }
+
+        /* ============================================================
+           QUICK-ACTION GRID
+        ============================================================ */
+        .quick-action-card {
+            border-radius: 16px;
+            padding: 18px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            transition: transform var(--transition), box-shadow var(--transition);
+            background: var(--card-bg);
+            border: 1.5px solid var(--card-border);
+            cursor: pointer;
+        }
+        .quick-action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(200,77,223,.12);
+            border-color: rgba(200,77,223,.3);
+        }
+        .quick-action-icon {
+            width: 46px; height: 46px;
+            border-radius: 13px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .quick-action-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+        .quick-action-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ============================================================
+           TABLE RESPONSIVE — fade edge hint on mobile
+        ============================================================ */
+        .table-scroll-wrap {
+            position: relative;
+        }
+        .table-scroll-wrap::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; bottom: 0;
+            width: 32px;
+            background: linear-gradient(to left, var(--card-bg), transparent);
+            pointer-events: none;
+            border-radius: 0 var(--radius-card) var(--radius-card) 0;
+            opacity: 0;
+            transition: opacity .3s;
+        }
+        .table-scroll-wrap.can-scroll::after { opacity: 1; }
+
+        /* ============================================================
+           KEYBOARD SHORTCUT BADGE
+        ============================================================ */
+        .kbd {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            background: var(--input-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 5px;
+            padding: 1px 5px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        /* ============================================================
+           MODAL — slide-up entrance
+        ============================================================ */
+        .modal.fade .modal-dialog {
+            transform: translateY(20px) scale(.98);
+            transition: transform .3s cubic-bezier(.34,1.56,.64,1), opacity .25s ease;
+        }
+        .modal.show .modal-dialog {
+            transform: translateY(0) scale(1);
+        }
     </style>
 
     @stack('styles')
@@ -1554,9 +1699,38 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// ---- CLOSE SIDEBAR ON ESC ----
+// ---- CLOSE SIDEBAR ON ESC + KEYBOARD SEARCH SHORTCUT ----
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeSidebar();
+    // Ctrl+K / Cmd+K → focus first visible search input
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        const input = document.querySelector('#searchInput, input[placeholder*="Cari"], input[type="search"]');
+        if (input) { input.focus(); input.select(); }
+    }
+});
+
+// ---- TOPBAR SCROLL SHADOW ----
+(function() {
+    const topbar = document.querySelector('.topbar');
+    if (!topbar) return;
+    const mainContent = document.querySelector('.main-content') || window;
+    const scroller = mainContent === window ? document.documentElement : mainContent;
+    function onScroll() {
+        topbar.classList.toggle('scrolled', (mainContent === window ? window.pageYOffset : mainContent.scrollTop) > 10);
+    }
+    (mainContent === window ? window : mainContent).addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+})();
+
+// ---- TABLE SCROLL FADE HINT ----
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.table-responsive').forEach(wrap => {
+        wrap.classList.add('table-scroll-wrap');
+        function check() { wrap.classList.toggle('can-scroll', wrap.scrollWidth > wrap.clientWidth + 4); }
+        check();
+        new ResizeObserver(check).observe(wrap);
+    });
 });
 
 // ---- NAV PROGRESS BAR ----

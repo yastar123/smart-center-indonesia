@@ -48,9 +48,13 @@
 {{-- TABLE --}}
 <div class="dashboard-card">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead><tr style="background:rgba(200,77,223,.05)"><th>Guru</th><th>Periode</th><th>Gaji Pokok</th><th>Jam Mengajar</th><th>Bonus</th><th>Total Gaji</th><th>Status</th><th>Aksi</th></tr></thead>
-            <tbody id="tableBody"><tr><td colspan="8" class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Memuat...</td></tr></tbody>
+        <table class="table table-hover table-modern align-middle mb-0">
+            <thead class="thead-modern"><tr><th>Guru</th><th>Periode</th><th>Gaji Pokok</th><th>Jam Mengajar</th><th>Bonus</th><th>Total Gaji</th><th>Status</th><th class="text-center">Aksi</th></tr></thead>
+            <tbody id="tableBody">
+                @for($i=0;$i<5;$i++)
+                <tr class="skeleton-row"><td><div class="skeleton-cell" style="width:75%"></div></td><td><div class="skeleton-cell" style="width:70px"></div></td><td><div class="skeleton-cell" style="width:80px"></div></td><td><div class="skeleton-cell" style="width:50px"></div></td><td><div class="skeleton-cell" style="width:65px"></div></td><td><div class="skeleton-cell" style="width:90px"></div></td><td><div class="skeleton-cell" style="width:60px"></div></td><td><div class="skeleton-cell" style="width:90px;margin:0 auto"></div></td></tr>
+                @endfor
+            </tbody>
         </table>
     </div>
     <div id="paginationLinks" class="mt-3 d-flex justify-content-center"></div>

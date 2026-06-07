@@ -77,17 +77,15 @@
     </div>
 </div>
 
-{{-- TABLE --}}
+{{-- TABLE (full content below) --}}
 <div class="dashboard-card">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead>
-                <tr style="background:rgba(200,77,223,.05)">
-                    <th>Modul</th><th>Mata Pelajaran</th><th>Jenis</th><th>Ukuran</th><th>Akses</th><th>Status</th><th>Aksi</th>
-                </tr>
-            </thead>
+        <table class="table table-hover table-modern align-middle mb-0">
+            <thead class="thead-modern"><tr><th>Modul</th><th>Mata Pelajaran</th><th>Jenis</th><th>Ukuran</th><th>Akses</th><th>Status</th><th class="text-center">Aksi</th></tr></thead>
             <tbody id="tableBody">
-                <tr><td colspan="7" class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Memuat...</td></tr>
+                @for($i=0;$i<5;$i++)
+                <tr class="skeleton-row"><td><div class="d-flex align-items-center gap-2"><div class="skeleton-cell" style="width:36px;height:36px;border-radius:10px;flex-shrink:0"></div><div><div class="skeleton-cell mb-1" style="width:120px"></div><div class="skeleton-cell" style="width:80px;height:10px"></div></div></div></td><td><div class="skeleton-cell" style="width:90px"></div></td><td><div class="skeleton-cell" style="width:55px"></div></td><td><div class="skeleton-cell" style="width:50px"></div></td><td><div class="skeleton-cell" style="width:50px"></div></td><td><div class="skeleton-cell" style="width:55px"></div></td><td><div class="skeleton-cell" style="width:80px;margin:0 auto"></div></td></tr>
+                @endfor
             </tbody>
         </table>
     </div>

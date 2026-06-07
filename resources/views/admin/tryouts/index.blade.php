@@ -47,9 +47,13 @@
 {{-- TABLE --}}
 <div class="dashboard-card">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead><tr style="background:rgba(124,58,237,.06)"><th>Judul Tryout</th><th>Kategori</th><th>Durasi</th><th>Soal</th><th>Jadwal Mulai</th><th>Status</th><th>Aksi</th></tr></thead>
-            <tbody id="tableBody"><tr><td colspan="7" class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Memuat data...</td></tr></tbody>
+        <table class="table table-hover table-modern align-middle mb-0">
+            <thead class="thead-modern"><tr><th>Judul Tryout</th><th>Kategori</th><th>Durasi</th><th>Soal</th><th>Jadwal Mulai</th><th>Status</th><th class="text-center">Aksi</th></tr></thead>
+            <tbody id="tableBody">
+                @for($i=0;$i<5;$i++)
+                <tr class="skeleton-row"><td><div class="skeleton-cell" style="width:60%"></div></td><td><div class="skeleton-cell" style="width:70px"></div></td><td><div class="skeleton-cell" style="width:60px"></div></td><td><div class="skeleton-cell" style="width:40px"></div></td><td><div class="skeleton-cell" style="width:80%"></div></td><td><div class="skeleton-cell" style="width:55px"></div></td><td><div class="skeleton-cell" style="width:80px;margin:0 auto"></div></td></tr>
+                @endfor
+            </tbody>
         </table>
     </div>
     <div id="paginationLinks" class="mt-3 d-flex justify-content-center"></div>
