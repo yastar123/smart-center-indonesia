@@ -1089,6 +1089,26 @@
         }
 
         /* ============================================================
+           MICRO-ANIMATIONS — stat-card hover lift
+        ============================================================ */
+        .stat-card {
+            will-change: transform;
+            transition: transform .22s cubic-bezier(.4,0,.2,1), box-shadow .22s cubic-bezier(.4,0,.2,1);
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 28px rgba(200,77,223,.15), 0 2px 8px rgba(38,6,50,.08);
+        }
+        .dashboard-card.clickable, a.dashboard-card {
+            transition: transform .22s cubic-bezier(.4,0,.2,1), box-shadow .22s cubic-bezier(.4,0,.2,1);
+            will-change: transform;
+        }
+        .dashboard-card.clickable:hover, a.dashboard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(200,77,223,.12);
+        }
+
+        /* ============================================================
            TABLE — action button group
         ============================================================ */
         .btn-action-group { display: flex; gap: 6px; }
@@ -1359,8 +1379,22 @@
         [data-theme="dark"] .card .border-top,
         [data-theme="dark"] .card .border-bottom { border-color: var(--card-border) !important; }
         [data-theme="dark"] .card .text-muted { color: var(--text-muted) !important; }
+        [data-theme="dark"] .card { box-shadow: 0 2px 16px rgba(0,0,0,.35) !important; }
         [data-theme="dark"] .table { --bs-table-bg: transparent; --bs-table-hover-bg: rgba(200,77,223,.05); }
         [data-theme="dark"] table thead tr { background: rgba(200,77,223,.05) !important; }
+        [data-theme="dark"] .table td, [data-theme="dark"] .table th { border-color: var(--card-border); }
+        [data-theme="dark"] .input-group-text { background: var(--input-bg) !important; border-color: var(--card-border) !important; color: var(--text-muted) !important; }
+        [data-theme="dark"] .form-control, [data-theme="dark"] .form-select { background-color: var(--input-bg) !important; border-color: var(--card-border) !important; color: var(--text-primary) !important; }
+        [data-theme="dark"] .form-control::placeholder { color: var(--text-muted) !important; opacity: .7; }
+        [data-theme="dark"] .modal-content { background: var(--card-bg) !important; color: var(--text-primary); }
+        [data-theme="dark"] .modal-header { border-color: var(--card-border) !important; }
+        [data-theme="dark"] .modal-footer { border-color: var(--card-border) !important; }
+        [data-theme="dark"] .dropdown-menu { background: var(--card-bg); border-color: var(--card-border); }
+        [data-theme="dark"] .dropdown-item { color: var(--text-primary); }
+        [data-theme="dark"] .dropdown-item:hover { background: var(--sidebar-hover); color: white; }
+        [data-theme="dark"] .page-link { background: var(--card-bg); border-color: var(--card-border); color: var(--text-primary); }
+        [data-theme="dark"] .page-item.active .page-link { background: var(--primary); border-color: var(--primary); }
+        [data-theme="dark"] .pagination .page-link:hover { background: var(--input-bg); }
 
         /* ============================================================
            TOPBAR — breadcrumb separator icon
@@ -1860,6 +1894,7 @@ function toggleDark() {
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
     updateDarkIcon(next);
+    document.dispatchEvent(new CustomEvent('themechange', { detail: { theme: next } }));
 }
 
 function updateDarkIcon(theme) {

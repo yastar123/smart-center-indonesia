@@ -266,7 +266,7 @@ function editModule(id) {
 }
 
 function deleteModule(id, name) {
-    Swal.fire({ title:'Hapus Modul?', text: name, icon:'warning', showCancelButton:true, confirmButtonColor:'#ef4444', confirmButtonText:'Hapus' })
+    Swal.fire({ title:'Hapus Modul?', text: name, icon:'warning', showCancelButton:true, confirmButtonColor:'#c84ddf', confirmButtonText:'Hapus' })
         .then(r => {
             if (!r.isConfirmed) return;
             fetch(`{{ url('admin/modules') }}/${id}`, { method:'DELETE', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'} })

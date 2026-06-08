@@ -100,15 +100,15 @@
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead style="background:rgba(16,185,129,.06);">
+                    <thead class="thead-modern">
                         <tr>
-                            <th class="px-4 py-3" style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">#</th>
-                            <th class="py-3" style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Kode</th>
-                            <th class="py-3" style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Nama Mata Pelajaran</th>
-                            <th class="py-3 d-none d-md-table-cell" style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Kategori</th>
-                            <th class="py-3 d-none d-md-table-cell" style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Cabang</th>
-                            <th class="py-3" style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Status</th>
-                            <th class="py-3 text-end pe-4" style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Aksi</th>
+                            <th class="px-4">#</th>
+                            <th>Kode</th>
+                            <th>Nama Mata Pelajaran</th>
+                            <th class="d-none d-md-table-cell">Kategori</th>
+                            <th class="d-none d-md-table-cell">Cabang</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -271,29 +271,29 @@
     </div>
 </div>
 
-            <!-- CATEGORY MANAGER MODAL -->
-            <div class="modal fade" id="categoryModal" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered modal-md">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Kelola Kategori</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="mb-3 d-flex gap-2">
-                                <input type="text" id="catName" class="form-control" placeholder="Nama kategori">
-                                <button class="btn btn-primary" id="catAddBtn" onclick="saveCategory()">Tambah</button>
-                            </div>
-                            <div id="categoriesList">
-                                <div class="text-center text-muted py-3">Memuat...</div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Tutup</button>
-                        </div>
-                    </div>
+{{-- CATEGORY MANAGER MODAL --}}
+<div class="modal fade" id="categoryModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:20px;border:none">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold"><i class="bi bi-tags me-2 text-primary"></i>Kelola Kategori</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3 d-flex gap-2">
+                    <input type="text" id="catName" class="form-control" placeholder="Nama kategori baru...">
+                    <button class="btn btn-primary px-3" id="catAddBtn" onclick="saveCategory()"><i class="bi bi-plus-lg"></i></button>
+                </div>
+                <div id="categoriesList">
+                    <div class="text-center text-muted py-3"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Memuat...</div>
                 </div>
             </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @push('scripts')
 <script>
@@ -462,7 +462,7 @@ function deleteCourse(id, nama) {
         showCancelButton: true,
         confirmButtonText: 'Ya, Hapus',
         cancelButtonText: 'Batal',
-        confirmButtonColor: '#ef4444',
+        confirmButtonColor: '#c84ddf',
         cancelButtonColor: '#6b7280',
     }).then(r => {
         if (!r.isConfirmed) return;

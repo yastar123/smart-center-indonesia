@@ -590,7 +590,7 @@ function deleteInvoice(id, nomor) {
         html: `Invoice <b>${nomor}</b> akan dihapus secara permanen.`,
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#ef4444',
+        confirmButtonColor: '#c84ddf',
         cancelButtonColor: '#6b7280',
         confirmButtonText: '<i class="bi bi-trash me-1"></i>Ya, Hapus!',
         cancelButtonText: 'Batal'

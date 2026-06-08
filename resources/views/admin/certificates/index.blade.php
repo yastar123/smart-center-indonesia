@@ -96,16 +96,16 @@
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead style="background:rgba(245,158,11,.06);">
+                    <thead class="thead-modern">
                         <tr>
-                            <th class="px-4 py-3" style="font-size:.78rem;font-weight:700;text-transform:uppercase;">#</th>
-                            <th class="py-3" style="font-size:.78rem;font-weight:700;text-transform:uppercase;">No. Sertifikat</th>
-                            <th class="py-3" style="font-size:.78rem;font-weight:700;text-transform:uppercase;">Judul</th>
-                            <th class="py-3 d-none d-md-table-cell" style="font-size:.78rem;font-weight:700;text-transform:uppercase;">Penerima</th>
-                            <th class="py-3 d-none d-md-table-cell" style="font-size:.78rem;font-weight:700;text-transform:uppercase;">Jenis</th>
-                            <th class="py-3 d-none d-lg-table-cell" style="font-size:.78rem;font-weight:700;text-transform:uppercase;">Tgl Terbit</th>
-                            <th class="py-3 d-none d-lg-table-cell" style="font-size:.78rem;font-weight:700;text-transform:uppercase;">Tgl Expired</th>
-                            <th class="py-3 text-end pe-4" style="font-size:.78rem;font-weight:700;text-transform:uppercase;">Aksi</th>
+                            <th class="px-4">#</th>
+                            <th>No. Sertifikat</th>
+                            <th>Judul</th>
+                            <th class="d-none d-md-table-cell">Penerima</th>
+                            <th class="d-none d-md-table-cell">Jenis</th>
+                            <th class="d-none d-lg-table-cell">Tgl Terbit</th>
+                            <th class="d-none d-lg-table-cell">Tgl Expired</th>
+                            <th class="text-end pe-4">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -344,7 +344,7 @@ function deleteCert(id, judul) {
         showCancelButton: true,
         confirmButtonText: 'Ya, Hapus',
         cancelButtonText: 'Batal',
-        confirmButtonColor: '#ef4444',
+        confirmButtonColor: '#c84ddf',
         cancelButtonColor: '#6b7280',
     }).then(r => {
         if (!r.isConfirmed) return;

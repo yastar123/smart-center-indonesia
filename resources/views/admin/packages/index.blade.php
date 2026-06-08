@@ -171,7 +171,7 @@ function editPkg(id) {
 }
 
 function deletePkg(id, name) {
-    Swal.fire({ title:'Hapus Paket?', text:name, icon:'warning', showCancelButton:true, confirmButtonColor:'#ef4444', confirmButtonText:'Hapus' })
+    Swal.fire({ title:'Hapus Paket?', text:name, icon:'warning', showCancelButton:true, confirmButtonColor:'#c84ddf', confirmButtonText:'Hapus' })
         .then(r => {
             if (!r.isConfirmed) return;
             fetch(`{{ url('admin/packages') }}/${id}`, { method:'DELETE', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'} })

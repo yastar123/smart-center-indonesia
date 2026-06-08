@@ -103,16 +103,16 @@
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead style="background:rgba(104,17,126,.06);">
+                    <thead class="thead-modern">
                         <tr>
-                            <th class="px-4 py-3" style="font-size:.78rem;font-weight:700;text-transform:uppercase;">#</th>
-                            <th class="py-3" style="font-size:.78rem;font-weight:700;text-transform:uppercase;">Nama Kelas</th>
-                            <th class="py-3 d-none d-md-table-cell" style="font-size:.78rem;font-weight:700;text-transform:uppercase;">Mata Pelajaran</th>
-                            <th class="py-3 d-none d-md-table-cell" style="font-size:.78rem;font-weight:700;text-transform:uppercase;">Guru</th>
-                            <th class="py-3 d-none d-lg-table-cell" style="font-size:.78rem;font-weight:700;text-transform:uppercase;">Kapasitas</th>
-                            <th class="py-3" style="font-size:.78rem;font-weight:700;text-transform:uppercase;">Jenis</th>
-                            <th class="py-3" style="font-size:.78rem;font-weight:700;text-transform:uppercase;">Status</th>
-                            <th class="py-3 text-end pe-4" style="font-size:.78rem;font-weight:700;text-transform:uppercase;">Aksi</th>
+                            <th class="px-4">#</th>
+                            <th>Nama Kelas</th>
+                            <th class="d-none d-md-table-cell">Mata Pelajaran</th>
+                            <th class="d-none d-md-table-cell">Guru</th>
+                            <th class="d-none d-lg-table-cell">Kapasitas</th>
+                            <th>Jenis</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -369,7 +369,7 @@ function deleteClass(id, nama) {
         showCancelButton: true,
         confirmButtonText: 'Ya, Hapus',
         cancelButtonText: 'Batal',
-        confirmButtonColor: '#ef4444',
+        confirmButtonColor: '#c84ddf',
         cancelButtonColor: '#6b7280',
     }).then(r => {
         if (!r.isConfirmed) return;

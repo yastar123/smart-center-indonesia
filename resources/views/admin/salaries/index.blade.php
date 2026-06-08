@@ -173,7 +173,7 @@ function editSalary(id) {
 }
 
 function deleteSalary(id) {
-    Swal.fire({title:'Hapus data gaji?',icon:'warning',showCancelButton:true,confirmButtonColor:'#ef4444',confirmButtonText:'Hapus'})
+    Swal.fire({title:'Hapus data gaji?',icon:'warning',showCancelButton:true,confirmButtonColor:'#c84ddf',confirmButtonText:'Hapus'})
         .then(r => { if(!r.isConfirmed) return;
             fetch(`{{ url('admin/salaries') }}/${id}`, {method:'DELETE',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'}})
                 .then(r=>r.json()).then(d => { showToast(d.message, d.success?'success':'error'); if(d.success) loadData(currentPage); });

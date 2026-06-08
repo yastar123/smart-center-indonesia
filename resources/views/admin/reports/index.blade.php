@@ -297,13 +297,17 @@ $outstanding = Invoice::with(['siswa','cabang'])
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const isDark     = document.documentElement.getAttribute('data-theme') === 'dark';
-    const textColor  = isDark ? '#94a3b8' : '#64748b';
-    const gridColor  = isDark ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.05)';
+let _chartRevenue = null, _chartStatus = null;
 
-    // Revenue trend chart
-    new ApexCharts(document.getElementById('chartRevenue'), {
+function initReportCharts() {
+    const isDark    = document.documentElement.getAttribute('data-theme') === 'dark';
+    const textColor = isDark ? '#94a3b8' : '#64748b';
+    const gridColor = isDark ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.05)';
+
+    if (_chartRevenue) { _chartRevenue.destroy(); }
+    if (_chartStatus)  { _chartStatus.destroy();  }
+
+    _chartRevenue = new ApexCharts(document.getElementById('chartRevenue'), {
         chart: { type:'area', height:200, toolbar:{show:false}, background:'transparent',
                  fontFamily:'Inter, sans-serif', animations:{enabled:true,speed:800} },
         series: [{ name:'Pendapatan', data: {!! json_encode($monthlyData) !!} }],
@@ -318,11 +322,11 @@ document.addEventListener('DOMContentLoaded', function() {
         dataLabels: { enabled:false },
         grid: { borderColor:gridColor, strokeDashArray:4 },
         tooltip: { theme:isDark?'dark':'light', y:{ formatter: v => 'Rp '+Intl.NumberFormat('id').format(v) } },
-        markers: { size:4, strokeWidth:2, strokeColors:'#fff', colors:['#10b981'] }
-    }).render();
+        markers: { size:4, strokeWidth:2, strokeColors: isDark ? '#2d0a3e' : '#fff', colors:['#10b981'] }
+    });
+    _chartRevenue.render();
 
-    // Invoice status donut
-    new ApexCharts(document.getElementById('chartInvoiceStatus'), {
+    _chartStatus = new ApexCharts(document.getElementById('chartInvoiceStatus'), {
         chart: { type:'donut', height:160, fontFamily:'Inter, sans-serif', background:'transparent' },
         series: [{{ $lunas }}, {{ $belum }}, {{ $sebagian }}],
         labels: ['Lunas','Belum Lunas','Sebagian'],
@@ -335,7 +339,11 @@ document.addEventListener('DOMContentLoaded', function() {
         stroke: { show:false },
         dataLabels:{ enabled:false },
         tooltip: { theme:isDark?'dark':'light' }
-    }).render();
-});
+    });
+    _chartStatus.render();
+}
+
+document.addEventListener('DOMContentLoaded', initReportCharts);
+document.addEventListener('themechange', function() { setTimeout(initReportCharts, 60); });
 </script>
 @endpush
