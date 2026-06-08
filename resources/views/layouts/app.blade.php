@@ -86,13 +86,65 @@
         h3 { font-size: clamp(17px, 2vw, 22px); }
 
         /* ============================================================
-           ANIMATIONS
+           ANIMATIONS — full micro-animation system
         ============================================================ */
         .anim { transition: all .4s cubic-bezier(.22,1,.36,1); will-change: transform, opacity; }
-        .fade-up { opacity: 0; transform: translateY(16px); }
+
+        /* Keyframes */
+        @keyframes fadeUp    { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes scaleIn   { from{opacity:0;transform:scale(.94)}        to{opacity:1;transform:scale(1)} }
+        @keyframes fadeInLeft  { from{opacity:0;transform:translateX(-14px)} to{opacity:1;transform:translateX(0)} }
+        @keyframes fadeInRight { from{opacity:0;transform:translateX(14px)}  to{opacity:1;transform:translateX(0)} }
+        @keyframes fadeIn    { from{opacity:0;transform:translateY(8px);}  to{opacity:1;transform:translateY(0);} }
+
+        /* Utility classes */
+        .anim-fade-up    { animation: fadeUp      .45s cubic-bezier(.22,1,.36,1) both; }
+        .anim-scale-in   { animation: scaleIn     .30s cubic-bezier(.22,1,.36,1) both; }
+        .anim-fade-left  { animation: fadeInLeft  .40s cubic-bezier(.22,1,.36,1) both; }
+        .anim-fade-right { animation: fadeInRight .40s cubic-bezier(.22,1,.36,1) both; }
+        .fade-in         { animation: fadeIn      .40s ease both; }
+
+        /* Animation delay helpers */
+        .anim-d1 { animation-delay:.05s!important; }
+        .anim-d2 { animation-delay:.10s!important; }
+        .anim-d3 { animation-delay:.15s!important; }
+        .anim-d4 { animation-delay:.20s!important; }
+        .anim-d5 { animation-delay:.25s!important; }
+        .anim-d6 { animation-delay:.30s!important; }
+        .anim-d7 { animation-delay:.35s!important; }
+        .anim-d8 { animation-delay:.40s!important; }
+
+        /* Page wrapper entrance (IntersectionObserver adds .in-view) */
+        .fade-up { opacity: 0; transform: translateY(16px); transition: opacity .45s cubic-bezier(.22,1,.36,1), transform .45s cubic-bezier(.22,1,.36,1); }
         .fade-up.in-view { opacity: 1; transform: translateY(0); }
-        .fade-in { animation: fadeIn .4s ease both; }
-        @keyframes fadeIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+
+        /* ---- Staggered stat-card entrance (auto-applied globally) ---- */
+        .stat-card {
+            animation: fadeUp .5s cubic-bezier(.22,1,.36,1) both;
+        }
+        .row > [class*='col']:nth-child(1) .stat-card { animation-delay: .00s; }
+        .row > [class*='col']:nth-child(2) .stat-card { animation-delay: .08s; }
+        .row > [class*='col']:nth-child(3) .stat-card { animation-delay: .16s; }
+        .row > [class*='col']:nth-child(4) .stat-card { animation-delay: .24s; }
+        .row > [class*='col']:nth-child(5) .stat-card { animation-delay: .32s; }
+        .row > [class*='col']:nth-child(6) .stat-card { animation-delay: .40s; }
+
+        /* ---- Staggered dashboard-card sections ---- */
+        .fade-up.in-view > .row:nth-child(1),
+        .fade-up.in-view > .dashboard-card:nth-child(1),
+        .fade-up.in-view > .mb-4:nth-child(1) { animation: fadeUp .4s .05s cubic-bezier(.22,1,.36,1) both; }
+        .fade-up.in-view > .row:nth-child(2),
+        .fade-up.in-view > .dashboard-card:nth-child(2),
+        .fade-up.in-view > .mb-4:nth-child(2) { animation: fadeUp .4s .10s cubic-bezier(.22,1,.36,1) both; }
+        .fade-up.in-view > .row:nth-child(3),
+        .fade-up.in-view > .dashboard-card:nth-child(3),
+        .fade-up.in-view > .mb-4:nth-child(3) { animation: fadeUp .4s .15s cubic-bezier(.22,1,.36,1) both; }
+        .fade-up.in-view > .row:nth-child(4),
+        .fade-up.in-view > .dashboard-card:nth-child(4),
+        .fade-up.in-view > .mb-4:nth-child(4) { animation: fadeUp .4s .20s cubic-bezier(.22,1,.36,1) both; }
+        .fade-up.in-view > .row:nth-child(5),
+        .fade-up.in-view > .dashboard-card:nth-child(5),
+        .fade-up.in-view > .mb-4:nth-child(5) { animation: fadeUp .4s .25s cubic-bezier(.22,1,.36,1) both; }
 
         /* ============================================================
            SIDEBAR
@@ -478,6 +530,68 @@
         @media (max-width: 576px) {
             .stat-value { font-size: 22px; }
             .topbar-left h4 { font-size: 17px; }
+        }
+
+        /* ============================================================
+           MOBILE TABLE — compact + row-expand UX
+        ============================================================ */
+        @media (max-width: 767px) {
+            .table-responsive .table td,
+            .table-responsive .table th {
+                font-size: 12.5px;
+                padding: 10px 8px;
+            }
+            .table-responsive .table td:first-child,
+            .table-responsive .table th:first-child { padding-left: 14px; }
+            .table-responsive .table td:last-child,
+            .table-responsive .table th:last-child { padding-right: 10px; }
+
+            /* Expand toggle button */
+            .mobile-expand-btn {
+                display: inline-flex !important;
+                align-items: center;
+                justify-content: center;
+                width: 26px; height: 26px;
+                border-radius: 7px;
+                background: var(--input-bg);
+                border: 1px solid var(--card-border);
+                font-size: 11px;
+                cursor: pointer;
+                transition: all .2s;
+                color: var(--text-muted);
+                vertical-align: middle;
+                margin-left: 4px;
+                flex-shrink: 0;
+            }
+            .mobile-expand-btn.open {
+                background: var(--primary);
+                color: white;
+                border-color: var(--primary);
+            }
+
+            /* Expand detail row */
+            .expand-detail-row td {
+                background: var(--input-bg) !important;
+                border-top: none !important;
+                padding: 10px 14px !important;
+                font-size: 12.5px;
+            }
+            .expand-detail-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px 14px;
+            }
+            .expand-detail-item .expand-label {
+                font-size: 10px;
+                font-weight: 700;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: .06em;
+                margin-bottom: 3px;
+            }
+        }
+        @media (min-width: 768px) {
+            .mobile-expand-btn { display: none !important; }
         }
 
         /* ============================================================
@@ -1913,8 +2027,89 @@ document.addEventListener('DOMContentLoaded', function() {
                 io.unobserve(entry.target);
             }
         });
-    }, { threshold: 0.08 });
+    }, { threshold: 0.05 });
     document.querySelectorAll('.fade-up, .stagger-children').forEach(el => io.observe(el));
+});
+
+// ---- MOBILE TABLE ROW-EXPAND ----
+function initMobileRowExpand(scope) {
+    if (window.innerWidth >= 768) return;
+    const root = scope || document;
+    root.querySelectorAll('.table-hover tbody tr:not(.expand-detail-row)').forEach(row => {
+        if (row.querySelector('.mobile-expand-btn')) return; // already initialised
+        const hiddenCells = Array.from(row.querySelectorAll('td')).filter(td =>
+            td.className.includes('d-none') || getComputedStyle(td).display === 'none'
+        );
+        if (!hiddenCells.length) return;
+
+        // Get header labels for the hidden columns
+        const table   = row.closest('table');
+        const headers = table ? Array.from(table.querySelectorAll('thead th')) : [];
+        const allCells = Array.from(row.querySelectorAll('td'));
+
+        // Append expand button inside last cell
+        const lastTd = row.querySelector('td:last-child');
+        if (!lastTd) return;
+        const btn = document.createElement('button');
+        btn.className    = 'mobile-expand-btn';
+        btn.type         = 'button';
+        btn.setAttribute('aria-label', 'Lihat detail');
+        btn.innerHTML    = '<i class="bi bi-chevron-down"></i>';
+        lastTd.appendChild(btn);
+
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const open     = this.classList.toggle('open');
+            this.innerHTML = open ? '<i class="bi bi-chevron-up"></i>' : '<i class="bi bi-chevron-down"></i>';
+            this.setAttribute('aria-expanded', open);
+
+            // Remove existing detail row if any
+            const existing = row.nextElementSibling;
+            if (existing && existing.classList.contains('expand-detail-row')) {
+                existing.remove();
+                if (!open) return;
+            }
+
+            // Build detail row
+            const detailRow = document.createElement('tr');
+            detailRow.className = 'expand-detail-row';
+            const td = document.createElement('td');
+            td.colSpan = row.cells.length;
+
+            let innerHtml = '<div class="expand-detail-grid">';
+            hiddenCells.forEach(cell => {
+                const idx   = allCells.indexOf(cell);
+                const label = headers[idx] ? headers[idx].textContent.trim() : '';
+                if (!label || label === '#') return;
+                innerHtml += `<div class="expand-detail-item">
+                    <div class="expand-label">${label}</div>
+                    <div>${cell.innerHTML}</div>
+                </div>`;
+            });
+            innerHtml += '</div>';
+            td.innerHTML = innerHtml;
+            detailRow.appendChild(td);
+            row.after(detailRow);
+        });
+    });
+}
+
+// Run on DOM load for static tables; watch AJAX-populated tbodies
+document.addEventListener('DOMContentLoaded', function() {
+    initMobileRowExpand();
+    if (window.innerWidth < 768) {
+        const obs = new MutationObserver(mutations => {
+            mutations.forEach(m => {
+                if (m.type === 'childList' && m.addedNodes.length) {
+                    const tbody = m.target;
+                    if (tbody.tagName === 'TBODY') {
+                        setTimeout(() => initMobileRowExpand(tbody.closest('table')), 80);
+                    }
+                }
+            });
+        });
+        document.querySelectorAll('tbody').forEach(tb => obs.observe(tb, { childList: true }));
+    }
 });
 
 // ---- COUNT-UP ANIMATION ----
