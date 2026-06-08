@@ -877,6 +877,8 @@
             color: var(--text-primary);
         }
         [data-theme="dark"] thead tr { background: rgba(200,77,223,.05) !important; }
+        [data-theme="dark"] .table thead th,
+        [data-theme="dark"] .table-modern th { color: var(--text-muted); }
 
         /* ============================================================
            DARK MODE — PAGINATION
@@ -1011,9 +1013,9 @@
         }
 
         /* ============================================================
-           TABLE — prevent header text wrapping
+           TABLE — consistent header text
         ============================================================ */
-        .table th { white-space: nowrap; }
+        .table thead th { white-space: nowrap; color: var(--text-muted); font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
 
         /* ============================================================
            MOBILE ≤ 480PX — extra small phone polish
