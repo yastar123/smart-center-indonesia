@@ -381,11 +381,11 @@ document.getElementById('avatarFile').addEventListener('change', function() {
                 const topbarAvatar = document.getElementById('topbarAvatar');
                 if (topbarAvatar) topbarAvatar.src = res.avatar_url;
                 // Show success toast
-                Swal.fire({ icon:'success', title:'Foto Diperbarui!', text:res.message, timer:2000, showConfirmButton:false, iconColor:'#10b981' });
+                showToast(res.message || 'Foto profil berhasil diperbarui!', 'success');
             }
         })
         .catch(() => {
-            Swal.fire({ icon:'error', title:'Gagal', text:'Tidak dapat mengunggah foto. Coba lagi.' });
+            showToast('Tidak dapat mengunggah foto. Coba lagi.', 'error');
         });
 });
 

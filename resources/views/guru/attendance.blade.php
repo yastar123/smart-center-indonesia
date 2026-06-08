@@ -393,9 +393,15 @@ async function submitAttendance(e) {
     const filled = Object.keys(studentStatus).length;
     const total  = document.querySelectorAll('.student-row').length;
     if (filled < total) {
-        const proceed = confirm(`Baru ${filled} dari ${total} siswa yang diisi. Lanjutkan simpan?`);
-        if (!proceed) return;
+        confirmAction(`Baru ${filled} dari ${total} siswa yang diisi. Lanjutkan simpan absensi?`, function() {
+            doSubmitAttendance();
+        }, null, {title:'Konfirmasi Absensi', okText:'Ya, Simpan', type:'warning'});
+        return;
     }
+    doSubmitAttendance();
+}
+
+async function doSubmitAttendance() {
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';

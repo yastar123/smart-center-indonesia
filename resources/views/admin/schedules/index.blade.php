@@ -32,7 +32,7 @@
 {{-- STATS --}}
 <div class="row g-3 mb-4">
     <div class="col-6 col-lg-3 fade-up">
-        <div class="stat-card">
+        <div class="stat-card" style="border-top:3px solid #c84ddf">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Total Jadwal</div>
@@ -44,7 +44,7 @@
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.05s">
-        <div class="stat-card">
+        <div class="stat-card" style="border-top:3px solid #f6af23">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Hari Ini</div>
@@ -56,7 +56,7 @@
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.10s">
-        <div class="stat-card">
+        <div class="stat-card" style="border-top:3px solid #0284c7">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Dijadwalkan</div>
@@ -68,7 +68,7 @@
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.15s">
-        <div class="stat-card">
+        <div class="stat-card" style="border-top:3px solid #10b981">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Selesai</div>
@@ -426,7 +426,7 @@ function editSchedule(id) {
         document.getElementById('statusScField').style.display = 'block';
         toggleJenis();
         new bootstrap.Modal('#scheduleModal').show();
-    }).fail(() => Swal.fire({icon:'error', title:'Gagal', text:'Tidak dapat memuat data.'}));
+    }).fail(() => showToast('Tidak dapat memuat data jadwal.', 'error'));
 }
 
 function saveSchedule() {
@@ -457,16 +457,16 @@ function saveSchedule() {
         success(res) {
             if (res.success) {
                 bootstrap.Modal.getInstance(document.getElementById('scheduleModal'))?.hide();
-                Swal.fire({icon:'success', title:'Berhasil!', text:res.message, timer:2000, showConfirmButton:false})
-                    .then(() => location.reload());
+                showToast(res.message, 'success');
+                setTimeout(() => location.reload(), 1200);
             }
         },
         error(xhr) {
             const errors = xhr.responseJSON?.errors;
             const msg = errors
-                ? '<ul class="text-start mb-0">'+Object.values(errors).flat().map(e=>`<li>${e}</li>`).join('')+'</ul>'
+                ? Object.values(errors).flat().join('; ')
                 : (xhr.responseJSON?.message ?? 'Terjadi kesalahan.');
-            Swal.fire({icon:'error', title:'Gagal Menyimpan', html:msg});
+            showToast(msg, 'error');
         },
         complete() { btn.disabled=false; btn.innerHTML='<i class="bi bi-check-lg me-1"></i>Simpan Jadwal'; }
     });
@@ -514,28 +514,17 @@ function drow(label, val) {
 }
 
 function deleteSchedule(id, name) {
-    Swal.fire({
-        title: 'Hapus Jadwal?',
-        html: `Jadwal "<b>${name}</b>" akan dihapus secara permanen.`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#c84ddf',
-        cancelButtonColor: '#6b7280',
-        confirmButtonText: '<i class="bi bi-trash me-1"></i>Ya, Hapus!',
-        cancelButtonText: 'Batal'
-    }).then(r => {
-        if (r.isConfirmed) {
-            $.post('/admin/schedules/' + id, {
-                _method: 'DELETE',
-                _token:  document.querySelector('meta[name=csrf-token]').content
-            }, function(res) {
-                if (res.success) {
-                    Swal.fire({icon:'success', title:'Terhapus!', text:res.message, timer:2000, showConfirmButton:false})
-                        .then(() => location.reload());
-                }
-            }).fail(() => Swal.fire({icon:'error', title:'Gagal!', text:'Tidak dapat menghapus jadwal.'}));
-        }
-    });
+    confirmAction(`Hapus jadwal "${name}"? Data tidak dapat dikembalikan.`, function() {
+        $.post('/admin/schedules/' + id, {
+            _method: 'DELETE',
+            _token:  document.querySelector('meta[name=csrf-token]').content
+        }, function(res) {
+            if (res.success) {
+                showToast(res.message, 'success');
+                setTimeout(() => location.reload(), 1200);
+            }
+        }).fail(() => showToast('Tidak dapat menghapus jadwal.', 'error'));
+    }, null, {title:'Hapus Jadwal', okText:'Ya, Hapus'});
 }
 </script>
 @endpush

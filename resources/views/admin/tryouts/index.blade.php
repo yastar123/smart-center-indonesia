@@ -29,10 +29,10 @@
 
 {{-- STATS --}}
 <div class="row g-3 mb-4">
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Total Tryout</div><div class="stat-value" id="statTotal">–</div></div><div class="stat-icon" style="background:linear-gradient(135deg,#68117e,#c84ddf);color:white"><i class="bi bi-journal-check"></i></div></div></div></div>
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Aktif</div><div class="stat-value" id="statAktif">–</div></div><div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-check-circle"></i></div></div></div></div>
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Draft</div><div class="stat-value" id="statDraft">–</div></div><div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-pencil-square"></i></div></div></div></div>
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Total Peserta</div><div class="stat-value" id="statPeserta">–</div></div><div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-people"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card" style="border-top:3px solid #c84ddf"><div class="d-flex justify-content-between"><div><div class="stat-title">Total Tryout</div><div class="stat-value" id="statTotal">–</div></div><div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-journal-check"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card" style="border-top:3px solid #10b981"><div class="d-flex justify-content-between"><div><div class="stat-title">Aktif</div><div class="stat-value" id="statAktif">–</div></div><div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-check-circle"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card" style="border-top:3px solid #f6af23"><div class="d-flex justify-content-between"><div><div class="stat-title">Draft</div><div class="stat-value" id="statDraft">–</div></div><div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-pencil-square"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card" style="border-top:3px solid #c84ddf"><div class="d-flex justify-content-between"><div><div class="stat-title">Total Peserta</div><div class="stat-value" id="statPeserta">–</div></div><div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-people"></i></div></div></div></div>
 </div>
 
 {{-- FILTERS --}}
@@ -251,11 +251,10 @@ function editTryout(id) {
 }
 
 function deleteTryout(id, name) {
-    Swal.fire({ title: 'Hapus Tryout?', text: name, icon: 'warning', showCancelButton: true, confirmButtonColor: '#c84ddf', confirmButtonText: 'Hapus' })
-        .then(r => { if (!r.isConfirmed) return;
-            fetch(`{{ url('admin/tryouts') }}/${id}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
-                .then(r => r.json()).then(d => { showToast(d.message, d.success ? 'success' : 'error'); if (d.success) loadData(currentPage); });
-        });
+    confirmAction(`Hapus tryout "${name}"? Data tidak dapat dikembalikan.`, function() {
+        fetch(`{{ url('admin/tryouts') }}/${id}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(r => r.json()).then(d => { showToast(d.message, d.success ? 'success' : 'error'); if (d.success) loadData(currentPage); });
+    }, null, {title:'Hapus Tryout', okText:'Ya, Hapus'});
 }
 
 document.getElementById('tryoutForm').addEventListener('submit', function(e) {
@@ -324,8 +323,10 @@ document.getElementById('soalForm').addEventListener('submit', function(e) {
 });
 
 function deleteSoal(soalId) {
-    fetch(`{{ url('admin/tryouts') }}/${currentTryoutId}/soal/${soalId}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(r => r.json()).then(d => { showToast(d.message, d.success ? 'success' : 'error'); if (d.success) loadSoal(currentTryoutId); });
+    confirmAction('Hapus soal ini? Data tidak dapat dikembalikan.', function() {
+        fetch(`{{ url('admin/tryouts') }}/${currentTryoutId}/soal/${soalId}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(r => r.json()).then(d => { showToast(d.message, d.success ? 'success' : 'error'); if (d.success) loadSoal(currentTryoutId); });
+    }, null, {title:'Hapus Soal', okText:'Ya, Hapus'});
 }
 
 function lihatHasil(id) {

@@ -32,7 +32,7 @@
 {{-- STAT CARDS --}}
 <div class="row g-3 mb-4">
     <div class="col-6 col-lg-3 fade-up">
-        <div class="stat-card">
+        <div class="stat-card" style="border-top:3px solid #c84ddf">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Total Siswa</div>
@@ -48,7 +48,7 @@
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.05s">
-        <div class="stat-card">
+        <div class="stat-card" style="border-top:3px solid #10b981">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Siswa Aktif</div>
@@ -64,7 +64,7 @@
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.10s">
-        <div class="stat-card">
+        <div class="stat-card" style="border-top:3px solid #c84ddf">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Laki-laki</div>
@@ -73,14 +73,14 @@
                         <i class="bi bi-gender-male me-1"></i>Siswa putra
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#c84ddf,#e8b4f5);color:white">
+                <div class="stat-icon bg-primary-soft" style="color:white">
                     <i class="bi bi-person-fill"></i>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.15s">
-        <div class="stat-card">
+        <div class="stat-card" style="border-top:3px solid #ec4899">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Perempuan</div>
@@ -89,7 +89,7 @@
                         <i class="bi bi-gender-female me-1"></i>Siswa putri
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#ec4899,#f472b6);color:white">
+                <div class="stat-icon bg-danger-soft" style="color:white">
                     <i class="bi bi-person-fill"></i>
                 </div>
             </div>
@@ -523,7 +523,7 @@ function editStudent(id) {
         document.getElementById('photoPreview').src = s.photo ? '/storage/' + s.photo : avatar;
         new bootstrap.Modal('#studentModal').show();
     }).fail(function() {
-        Swal.fire({ icon:'error', title:'Gagal', text:'Tidak dapat memuat data siswa.' });
+        showToast('Tidak dapat memuat data siswa.', 'error');
     });
 }
 
@@ -591,19 +591,16 @@ function saveStudent() {
         success(res) {
             if (res.success) {
                 bootstrap.Modal.getInstance(document.getElementById('studentModal'))?.hide();
-                Swal.fire({
-                    icon: 'success', title: 'Berhasil!',
-                    text: res.message, timer: 2200,
-                    showConfirmButton: false,
-                    iconColor: '#10b981'
-                }).then(() => location.reload());
+                showToast(res.message, 'success');
+                setTimeout(() => location.reload(), 1200);
             }
         },
         error(xhr) {
             const errors = xhr.responseJSON?.errors;
-            const msg = errors ? '<ul class="text-start mb-0">' + Object.values(errors).flat().map(e=>`<li>${e}</li>`).join('') + '</ul>'
-                               : (xhr.responseJSON?.message ?? 'Terjadi kesalahan. Coba lagi.');
-            Swal.fire({ icon:'error', title:'Gagal Menyimpan', html: msg });
+            const msg = errors
+                ? Object.values(errors).flat().join('; ')
+                : (xhr.responseJSON?.message ?? 'Terjadi kesalahan. Coba lagi.');
+            showToast(msg, 'error');
         },
         complete() {
             btn.disabled = false;
@@ -614,30 +611,19 @@ function saveStudent() {
 
 // ---- DELETE ----
 function deleteStudent(id, name) {
-    Swal.fire({
-        title: `Hapus "${name}"?`,
-        text: 'Data siswa ini akan dihapus secara permanen!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#c84ddf',
-        cancelButtonColor: '#6b7280',
-        confirmButtonText: '<i class="bi bi-trash me-1"></i>Ya, Hapus!',
-        cancelButtonText: 'Batal'
-    }).then(r => {
-        if (r.isConfirmed) {
-            $.post('/admin/students/' + id, {
-                _method: 'DELETE',
-                _token: document.querySelector('meta[name=csrf-token]').content
-            }, function(res) {
-                if (res.success) {
-                    Swal.fire({ icon:'success', title:'Terhapus!', text:res.message, timer:2000, showConfirmButton:false })
-                        .then(() => location.reload());
-                }
-            }).fail(function() {
-                Swal.fire({ icon:'error', title:'Gagal!', text:'Tidak dapat menghapus data.' });
-            });
-        }
-    });
+    confirmAction(`Hapus siswa "${name}"? Data tidak dapat dikembalikan.`, function() {
+        $.post('/admin/students/' + id, {
+            _method: 'DELETE',
+            _token: document.querySelector('meta[name=csrf-token]').content
+        }, function(res) {
+            if (res.success) {
+                showToast(res.message, 'success');
+                setTimeout(() => location.reload(), 1200);
+            }
+        }).fail(function() {
+            showToast('Tidak dapat menghapus data siswa.', 'error');
+        });
+    }, null, {title:'Hapus Siswa', okText:'Ya, Hapus'});
 }
 
 // ---- PHOTO PREVIEW ----

@@ -366,17 +366,7 @@ function saveClass() {
 }
 
 function deleteClass(id, nama) {
-    Swal.fire({
-        title: 'Hapus Kelas?',
-        html: `Kelas <strong>"${nama}"</strong> akan dihapus.`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Ya, Hapus',
-        cancelButtonText: 'Batal',
-        confirmButtonColor: '#c84ddf',
-        cancelButtonColor: '#6b7280',
-    }).then(r => {
-        if (!r.isConfirmed) return;
+    confirmAction(`Hapus kelas "${nama}"? Data tidak dapat dikembalikan.`, function() {
         fetch(`/admin/classes/${id}`, {
             method: 'DELETE',
             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }

@@ -32,7 +32,7 @@
 {{-- STATS --}}
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-4 fade-up">
-        <div class="stat-card">
+        <div class="stat-card" style="border-top:3px solid #c84ddf">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Total Cabang</div>
@@ -44,7 +44,7 @@
         </div>
     </div>
     <div class="col-6 col-md-4 fade-up" style="animation-delay:.05s">
-        <div class="stat-card">
+        <div class="stat-card" style="border-top:3px solid #10b981">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Cabang Aktif</div>
@@ -56,7 +56,7 @@
         </div>
     </div>
     <div class="col-6 col-md-4 fade-up" style="animation-delay:.10s">
-        <div class="stat-card">
+        <div class="stat-card" style="border-top:3px solid #f6af23">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Total Siswa</div>
@@ -380,15 +380,9 @@
 function confirmDelete(e, name) {
     e.preventDefault();
     const form = e.target;
-    Swal.fire({
-        title: `Hapus cabang "${name}"?`,
-        text: 'Semua data terkait cabang ini akan dihapus!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#ef4444',
-        confirmButtonText: '<i class="bi bi-trash me-1"></i>Ya, Hapus!',
-        cancelButtonText: 'Batal'
-    }).then(r => { if (r.isConfirmed) form.submit(); });
+    confirmAction(`Hapus cabang "${name}"? Semua data terkait akan dihapus permanen.`, function() {
+        form.submit();
+    }, null, {title:'Hapus Cabang', okText:'Ya, Hapus'});
     return false;
 }
 </script>

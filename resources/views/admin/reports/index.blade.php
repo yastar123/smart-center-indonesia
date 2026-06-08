@@ -82,8 +82,8 @@ $outstanding = Invoice::with(['siswa','cabang'])
                         <i class="bi bi-check-circle-fill text-success me-1"></i>Semua waktu
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#059669,#10b981)">
-                    <i class="bi bi-cash-stack" style="color:white"></i>
+                <div class="stat-icon bg-success-soft" style="color:white">
+                    <i class="bi bi-cash-stack"></i>
                 </div>
             </div>
         </div>
@@ -100,8 +100,8 @@ $outstanding = Invoice::with(['siswa','cabang'])
                         <i class="bi bi-calendar-month me-1 text-primary"></i>{{ now()->locale('id')->isoFormat('MMMM Y') }}
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#68117e,#c84ddf)">
-                    <i class="bi bi-calendar-check" style="color:white"></i>
+                <div class="stat-icon bg-primary-soft" style="color:white">
+                    <i class="bi bi-calendar-check"></i>
                 </div>
             </div>
         </div>
@@ -118,8 +118,8 @@ $outstanding = Invoice::with(['siswa','cabang'])
                         <i class="bi bi-hourglass-split text-warning me-1"></i>{{ $pendingCount }} invoice
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#e09000,#f6af23)">
-                    <i class="bi bi-receipt" style="color:white"></i>
+                <div class="stat-icon bg-warning-soft" style="color:white">
+                    <i class="bi bi-receipt"></i>
                 </div>
             </div>
         </div>
@@ -134,8 +134,8 @@ $outstanding = Invoice::with(['siswa','cabang'])
                         <i class="bi bi-exclamation-triangle text-danger me-1"></i>Invoice terlambat
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#dc2626,#ef4444)">
-                    <i class="bi bi-exclamation-circle" style="color:white"></i>
+                <div class="stat-icon bg-danger-soft" style="color:white">
+                    <i class="bi bi-exclamation-circle"></i>
                 </div>
             </div>
         </div>

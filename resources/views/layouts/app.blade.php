@@ -699,6 +699,34 @@
         .mob-nav-item.active i { transform: scale(1.15); }
 
         /* ============================================================
+           CUSTOM CONFIRM DIALOG
+        ============================================================ */
+        #confirmOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 99998;
+            background: rgba(0,0,0,.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        #confirmOverlay.open {
+            display: flex;
+            animation: fadeIn .15s ease both;
+        }
+        #confirmBox {
+            background: var(--card-bg);
+            border-radius: 20px;
+            width: min(420px, 100%);
+            box-shadow: 0 24px 60px rgba(0,0,0,.25), 0 0 0 1px var(--card-border);
+            overflow: hidden;
+            animation: slideUp .25s cubic-bezier(.22,1,.36,1) both;
+        }
+
+        /* ============================================================
            GLOBAL FLASH TOAST
         ============================================================ */
         #globalToastWrap {
@@ -3011,6 +3039,23 @@
 {{-- GLOBAL TOAST WRAPPER --}}
 <div id="globalToastWrap"></div>
 
+{{-- CUSTOM CONFIRM DIALOG --}}
+<div id="confirmOverlay">
+    <div id="confirmBox">
+        <div style="padding:24px 24px 0">
+            <div id="confirmIconWrap" style="width:52px;height:52px;border-radius:16px;background:rgba(239,68,68,.12);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px;flex-shrink:0">
+                <i class="bi bi-exclamation-triangle-fill" id="confirmIconEl" style="color:#ef4444"></i>
+            </div>
+            <div id="confirmTitle" style="font-size:17px;font-weight:700;color:var(--text-primary);margin-bottom:6px;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-.02em">Konfirmasi</div>
+            <div id="confirmMessage" style="font-size:13.5px;color:var(--text-muted);line-height:1.6;margin-bottom:24px"></div>
+        </div>
+        <div style="padding:0 24px 24px;display:flex;gap:10px;justify-content:flex-end">
+            <button id="confirmCancelBtn" type="button" class="btn btn-light fw-semibold" style="border-radius:10px;font-size:13.5px">Batal</button>
+            <button id="confirmOkBtn" type="button" class="btn btn-danger fw-semibold" style="border-radius:10px;font-size:13.5px">Ya, Lanjutkan</button>
+        </div>
+    </div>
+</div>
+
 {{-- PAGE LOADER --}}
 <div id="pageLoader">
     <div class="text-center">
@@ -3032,8 +3077,6 @@
 {{-- SCRIPTS --}}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
 // ---- SIDEBAR TOGGLE ----
 function toggleSidebar() {
@@ -3284,10 +3327,42 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// ---- SMOOTH CONFIRM DIALOG HELPER ----
-window.confirmAction = function(message, onConfirm, onCancel) {
-    if (confirm(message)) { if (onConfirm) onConfirm(); }
-    else { if (onCancel) onCancel(); }
+// ---- CUSTOM CONFIRM DIALOG ----
+window.confirmAction = function(message, onConfirm, onCancel, opts) {
+    opts = opts || {};
+    const overlay = document.getElementById('confirmOverlay');
+    if (!overlay) {
+        if (confirm(message)) { if (onConfirm) onConfirm(); } else { if (onCancel) onCancel(); }
+        return;
+    }
+    document.getElementById('confirmMessage').textContent = message;
+    document.getElementById('confirmTitle').textContent = opts.title || 'Konfirmasi';
+    const okBtn = document.getElementById('confirmOkBtn');
+    const cancelBtn = document.getElementById('confirmCancelBtn');
+    okBtn.textContent = opts.okText || 'Ya, Lanjutkan';
+    okBtn.className = 'btn fw-semibold ' + (opts.btnClass || 'btn-danger');
+    okBtn.style.borderRadius = '10px'; okBtn.style.fontSize = '13.5px';
+    cancelBtn.textContent = opts.cancelText || 'Batal';
+    const iconEl   = document.getElementById('confirmIconEl');
+    const iconWrap = document.getElementById('confirmIconWrap');
+    if (opts.type === 'info') {
+        iconWrap.style.background = 'rgba(200,77,223,.12)';
+        iconEl.className = 'bi bi-info-circle-fill'; iconEl.style.color = '#c84ddf';
+    } else if (opts.type === 'warning') {
+        iconWrap.style.background = 'rgba(246,175,35,.12)';
+        iconEl.className = 'bi bi-exclamation-triangle-fill'; iconEl.style.color = '#f6af23';
+    } else {
+        iconWrap.style.background = 'rgba(239,68,68,.12)';
+        iconEl.className = 'bi bi-exclamation-triangle-fill'; iconEl.style.color = '#ef4444';
+    }
+    function doClose() {
+        overlay.classList.remove('open');
+        okBtn.onclick = null; cancelBtn.onclick = null; overlay.onclick = null;
+    }
+    okBtn.onclick     = function() { doClose(); if (onConfirm) onConfirm(); };
+    cancelBtn.onclick = function() { doClose(); if (onCancel) onCancel(); };
+    overlay.onclick   = function(e) { if (e.target === overlay) { doClose(); if (onCancel) onCancel(); } };
+    overlay.classList.add('open');
 };
 
 // ---- BUTTON LOADING STATE HELPER ----

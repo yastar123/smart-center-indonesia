@@ -31,10 +31,10 @@
 
 {{-- STATS --}}
 <div class="row g-3 mb-4">
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between align-items-start"><div><div class="stat-title">Total Paket</div><div class="stat-value" id="statTotal">–</div></div><div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-box-seam"></i></div></div></div></div>
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between align-items-start"><div><div class="stat-title">Paket Aktif</div><div class="stat-value" id="statAktif">–</div></div><div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-check-circle"></i></div></div></div></div>
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between align-items-start"><div><div class="stat-title">Paket Unggulan</div><div class="stat-value" id="statUnggulan">–</div></div><div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-star"></i></div></div></div></div>
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between align-items-start"><div><div class="stat-title">Rata-rata Harga</div><div class="stat-value" id="statAvg" style="font-size:18px">–</div></div><div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-cash"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card" style="border-top:3px solid #10b981"><div class="d-flex justify-content-between align-items-start"><div><div class="stat-title">Total Paket</div><div class="stat-value" id="statTotal">–</div></div><div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-box-seam"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card" style="border-top:3px solid #10b981"><div class="d-flex justify-content-between align-items-start"><div><div class="stat-title">Paket Aktif</div><div class="stat-value" id="statAktif">–</div></div><div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-check-circle"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card" style="border-top:3px solid #f6af23"><div class="d-flex justify-content-between align-items-start"><div><div class="stat-title">Paket Unggulan</div><div class="stat-value" id="statUnggulan">–</div></div><div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-star"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card" style="border-top:3px solid #c84ddf"><div class="d-flex justify-content-between align-items-start"><div><div class="stat-title">Rata-rata Harga</div><div class="stat-value" id="statAvg" style="font-size:18px">–</div></div><div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-cash"></i></div></div></div></div>
 </div>
 
 {{-- FILTERS --}}
@@ -173,12 +173,10 @@ function editPkg(id) {
 }
 
 function deletePkg(id, name) {
-    Swal.fire({ title:'Hapus Paket?', text:name, icon:'warning', showCancelButton:true, confirmButtonColor:'#c84ddf', confirmButtonText:'Hapus' })
-        .then(r => {
-            if (!r.isConfirmed) return;
-            fetch(`{{ url('admin/packages') }}/${id}`, { method:'DELETE', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'} })
-                .then(r=>r.json()).then(d => { showToast(d.message, d.success?'success':'error'); if(d.success) loadData(currentPage); });
-        });
+    confirmAction(`Hapus paket "${name}"? Data tidak dapat dikembalikan.`, function() {
+        fetch(`{{ url('admin/packages') }}/${id}`, { method:'DELETE', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'} })
+            .then(r=>r.json()).then(d => { showToast(d.message, d.success?'success':'error'); if(d.success) loadData(currentPage); });
+    }, null, {title:'Hapus Paket', okText:'Ya, Hapus'});
 }
 
 document.getElementById('packageForm').addEventListener('submit', function(e) {

@@ -78,7 +78,7 @@
             </div>
             <div class="mt-4 d-flex justify-content-end">
                 <button class="btn btn-primary px-4 fw-semibold" style="border-radius:10px"
-                        onclick="Swal.fire({icon:'info',title:'Segera Hadir',text:'Fitur simpan pengaturan akan tersedia di versi berikutnya.',confirmButtonColor:'#c84ddf'})">
+                        onclick="showToast('Fitur simpan pengaturan akan tersedia di versi berikutnya.','info')">
                     <i class="bi bi-save me-2"></i>Simpan Perubahan
                     <span class="badge ms-2" style="background:rgba(255,255,255,.25);font-size:9px;padding:2px 6px;border-radius:8px">Soon</span>
                 </button>
@@ -112,7 +112,7 @@
             @endforeach
             <div class="mt-3 d-flex justify-content-end">
                 <button class="btn btn-outline-secondary px-4 fw-semibold" style="border-radius:10px"
-                        onclick="Swal.fire({icon:'info',title:'Segera Hadir',text:'Pengaturan notifikasi akan tersedia di versi berikutnya.',confirmButtonColor:'#c84ddf'})">
+                        onclick="showToast('Pengaturan notifikasi akan tersedia di versi berikutnya.','info')">
                     <i class="bi bi-save me-2"></i>Simpan Notifikasi
                     <span class="badge ms-2" style="background:rgba(104,17,126,.15);color:#68117e;font-size:9px;padding:2px 6px;border-radius:8px">Soon</span>
                 </button>

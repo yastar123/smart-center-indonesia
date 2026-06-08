@@ -29,9 +29,9 @@
 
 {{-- STATS --}}
 <div class="row g-3 mb-4">
-    <div class="col-6 col-md-4"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Total</div><div class="stat-value" id="statTotal">–</div></div><div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-megaphone"></i></div></div></div></div>
-    <div class="col-6 col-md-4"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Aktif</div><div class="stat-value" id="statAktif">–</div></div><div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-check-circle"></i></div></div></div></div>
-    <div class="col-12 col-md-4"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Disematkan</div><div class="stat-value" id="statPinned">–</div></div><div class="stat-icon" style="background:linear-gradient(135deg,#68117e,#c84ddf);color:white"><i class="bi bi-pin"></i></div></div></div></div>
+    <div class="col-6 col-md-4"><div class="stat-card" style="border-top:3px solid #c84ddf"><div class="d-flex justify-content-between"><div><div class="stat-title">Total</div><div class="stat-value" id="statTotal">–</div></div><div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-megaphone"></i></div></div></div></div>
+    <div class="col-6 col-md-4"><div class="stat-card" style="border-top:3px solid #10b981"><div class="d-flex justify-content-between"><div><div class="stat-title">Aktif</div><div class="stat-value" id="statAktif">–</div></div><div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-check-circle"></i></div></div></div></div>
+    <div class="col-12 col-md-4"><div class="stat-card" style="border-top:3px solid #c84ddf"><div class="d-flex justify-content-between"><div><div class="stat-title">Disematkan</div><div class="stat-value" id="statPinned">–</div></div><div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-pin"></i></div></div></div></div>
 </div>
 
 {{-- FILTERS --}}
@@ -183,11 +183,10 @@ function editAnn(id) {
 }
 
 function deleteAnn(id, title) {
-    Swal.fire({title:'Hapus Pengumuman?',text:title,icon:'warning',showCancelButton:true,confirmButtonColor:'#c84ddf',confirmButtonText:'Hapus'})
-        .then(r => { if(!r.isConfirmed) return;
-            fetch(`{{ url('admin/announcements') }}/${id}`, {method:'DELETE',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'}})
-                .then(r=>r.json()).then(d => { showToast(d.message,d.success?'success':'error'); if(d.success) loadData(currentPage); });
-        });
+    confirmAction(`Hapus pengumuman "${title}"? Data tidak dapat dikembalikan.`, function() {
+        fetch(`{{ url('admin/announcements') }}/${id}`, {method:'DELETE',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'}})
+            .then(r=>r.json()).then(d => { showToast(d.message,d.success?'success':'error'); if(d.success) loadData(currentPage); });
+    }, null, {title:'Hapus Pengumuman', okText:'Ya, Hapus'});
 }
 
 document.getElementById('annForm').addEventListener('submit', function(e) {

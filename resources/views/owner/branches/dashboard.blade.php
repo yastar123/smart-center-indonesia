@@ -34,7 +34,7 @@
 {{-- STAT CARDS --}}
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-4 fade-up">
-        <div class="stat-card">
+        <div class="stat-card" style="border-top:3px solid #c84ddf">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Total Siswa</div>
@@ -46,7 +46,7 @@
         </div>
     </div>
     <div class="col-6 col-md-4 fade-up" style="animation-delay:.05s">
-        <div class="stat-card">
+        <div class="stat-card" style="border-top:3px solid {{ $branch->status === 'active' ? '#10b981' : '#f6af23' }}">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Status Cabang</div>
@@ -64,7 +64,7 @@
         </div>
     </div>
     <div class="col-6 col-md-4 fade-up" style="animation-delay:.10s">
-        <div class="stat-card">
+        <div class="stat-card" style="border-top:3px solid #0284c7">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Kontak</div>

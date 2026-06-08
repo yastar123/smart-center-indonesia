@@ -453,17 +453,7 @@ function saveCourse() {
 }
 
 function deleteCourse(id, nama) {
-    Swal.fire({
-        title: 'Hapus Mata Pelajaran?',
-        html: `Mata pelajaran <strong>"${nama}"</strong> akan dihapus.`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Ya, Hapus',
-        cancelButtonText: 'Batal',
-        confirmButtonColor: '#c84ddf',
-        cancelButtonColor: '#6b7280',
-    }).then(r => {
-        if (!r.isConfirmed) return;
+    confirmAction(`Hapus mata pelajaran "${nama}"? Data tidak dapat dikembalikan.`, function() {
         fetch(`/admin/courses/${id}`, {
             method: 'DELETE',
             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
@@ -478,7 +468,7 @@ function deleteCourse(id, nama) {
             }
         })
         .catch(() => { window.showToast && window.showToast('Gagal menghapus mata pelajaran', 'error'); });
-    });
+    }, null, {title:'Hapus Mata Pelajaran', okText:'Ya, Hapus'});
 }
 
 // ---- CATEGORY MANAGER ----
@@ -513,7 +503,7 @@ function loadCategories() {
 let editingCatId = null;
 function saveCategory() {
     const name = document.getElementById('catName').value.trim();
-    if (!name) return Swal.fire({icon:'warning', title:'Nama diperlukan'});
+    if (!name) return showToast('Nama kategori tidak boleh kosong.', 'warning');
     const btn = document.getElementById('catAddBtn');
     btn.disabled = true;
     const url = editingCatId ? `/admin/categories/${editingCatId}` : '/admin/categories';
@@ -531,9 +521,9 @@ function saveCategory() {
             loadCategories();
             window.showToast && window.showToast(res.message, 'success');
         } else {
-            Swal.fire({ icon:'error', title:'Gagal', text: res.message || 'Terjadi kesalahan' });
+            showToast(res.message || 'Terjadi kesalahan', 'error');
         }
-    }).catch(() => { btn.disabled = false; Swal.fire({icon:'error', title:'Gagal', text:'Tidak dapat menghubungi server'}); });
+    }).catch(() => { btn.disabled = false; showToast('Tidak dapat menghubungi server.', 'error'); });
 }
 
 function editCategory(id, name) {
@@ -542,12 +532,11 @@ function editCategory(id, name) {
 }
 
 function removeCategory(id) {
-    Swal.fire({ title:'Hapus kategori?', icon:'warning', showCancelButton:true }).then(r => {
-        if (!r.isConfirmed) return;
+    confirmAction('Hapus kategori ini? Data tidak dapat dikembalikan.', function() {
         fetch(`/admin/categories/${id}`, { method:'DELETE', headers:{ 'X-CSRF-TOKEN':'{{ csrf_token() }}', 'Accept':'application/json' } })
             .then(r => r.json())
-            .then(res => { if (res.success) { loadCategories(); window.showToast && window.showToast(res.message,'success'); } });
-    });
+            .then(res => { if (res.success) { loadCategories(); showToast(res.message, 'success'); } });
+    }, null, {title:'Hapus Kategori', okText:'Ya, Hapus'});
 }
 </script>
 @endpush

@@ -79,8 +79,8 @@ $branches = Branch::withCount('students')
                         <i class="bi bi-arrow-up-short"></i>+{{ $newThisMonth }} bulan ini
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#68117e,#c84ddf)">
-                    <i class="bi bi-people-fill" style="color:white"></i>
+                <div class="stat-icon bg-primary-soft" style="color:white">
+                    <i class="bi bi-people-fill"></i>
                 </div>
             </div>
         </div>
@@ -95,8 +95,8 @@ $branches = Branch::withCount('students')
                         <i class="bi bi-person-badge me-1"></i>Semua cabang
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#059669,#10b981)">
-                    <i class="bi bi-person-badge-fill" style="color:white"></i>
+                <div class="stat-icon bg-success-soft" style="color:white">
+                    <i class="bi bi-person-badge-fill"></i>
                 </div>
             </div>
         </div>
@@ -111,8 +111,8 @@ $branches = Branch::withCount('students')
                         <i class="bi bi-building me-1"></i>Beroperasi
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#c84ddf,#68117e)">
-                    <i class="bi bi-building-fill" style="color:white"></i>
+                <div class="stat-icon bg-primary-soft" style="color:white">
+                    <i class="bi bi-building-fill"></i>
                 </div>
             </div>
         </div>
@@ -129,8 +129,8 @@ $branches = Branch::withCount('students')
                         <i class="bi bi-cash me-1"></i>Terverifikasi
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#e09000,#f6af23)">
-                    <i class="bi bi-cash-coin" style="color:white"></i>
+                <div class="stat-icon bg-warning-soft" style="color:white">
+                    <i class="bi bi-cash-coin"></i>
                 </div>
             </div>
         </div>

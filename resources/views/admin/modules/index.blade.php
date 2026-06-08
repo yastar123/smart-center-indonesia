@@ -32,13 +32,13 @@
 {{-- STATS --}}
 <div class="row g-3 mb-4" id="statsRow">
     @foreach([
-        ['id'=>'statTotal','title'=>'Total Modul','icon'=>'bi-book','cls'=>'bg-info-soft'],
-        ['id'=>'statPdf','title'=>'PDF','icon'=>'bi-file-pdf','cls'=>'bg-danger-soft'],
-        ['id'=>'statVideo','title'=>'Video','icon'=>'bi-play-circle','cls'=>'bg-success-soft'],
-        ['id'=>'statGratis','title'=>'Gratis','icon'=>'bi-gift','cls'=>'bg-warning-soft']
+        ['id'=>'statTotal','title'=>'Total Modul','icon'=>'bi-book','cls'=>'bg-info-soft','top'=>'#0284c7'],
+        ['id'=>'statPdf','title'=>'PDF','icon'=>'bi-file-pdf','cls'=>'bg-danger-soft','top'=>'#ef4444'],
+        ['id'=>'statVideo','title'=>'Video','icon'=>'bi-play-circle','cls'=>'bg-success-soft','top'=>'#10b981'],
+        ['id'=>'statGratis','title'=>'Gratis','icon'=>'bi-gift','cls'=>'bg-warning-soft','top'=>'#f6af23']
     ] as $s)
     <div class="col-6 col-lg-3">
-        <div class="stat-card">
+        <div class="stat-card" style="border-top:3px solid {{ $s['top'] }}">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">{{ $s['title'] }}</div>
@@ -275,12 +275,10 @@ function editModule(id) {
 }
 
 function deleteModule(id, name) {
-    Swal.fire({ title:'Hapus Modul?', text: name, icon:'warning', showCancelButton:true, confirmButtonColor:'#c84ddf', confirmButtonText:'Hapus' })
-        .then(r => {
-            if (!r.isConfirmed) return;
-            fetch(`{{ url('admin/modules') }}/${id}`, { method:'DELETE', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'} })
-                .then(r=>r.json()).then(d => { showToast(d.message, d.success?'success':'error'); if(d.success) loadData(currentPage); });
-        });
+    confirmAction(`Hapus modul "${name}"? Data tidak dapat dikembalikan.`, function() {
+        fetch(`{{ url('admin/modules') }}/${id}`, { method:'DELETE', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'} })
+            .then(r=>r.json()).then(d => { showToast(d.message, d.success?'success':'error'); if(d.success) loadData(currentPage); });
+    }, null, {title:'Hapus Modul', okText:'Ya, Hapus'});
 }
 
 document.getElementById('jenisSelect').addEventListener('change', toggleUrlSection);

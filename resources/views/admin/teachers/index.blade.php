@@ -32,7 +32,7 @@
 {{-- STAT CARDS (populated by AJAX) --}}
 <div class="row g-3 mb-4">
     <div class="col-6 col-lg-3 fade-up">
-        <div class="stat-card">
+        <div class="stat-card" style="border-top:3px solid #10b981">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Total Guru</div>
@@ -48,7 +48,7 @@
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.05s">
-        <div class="stat-card">
+        <div class="stat-card" style="border-top:3px solid #c84ddf">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Guru Aktif</div>
@@ -64,28 +64,28 @@
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.10s">
-        <div class="stat-card">
+        <div class="stat-card" style="border-top:3px solid #c84ddf">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Laki-laki</div>
                     <div class="stat-value text-primary" id="statMale">–</div>
                     <div class="stat-growth text-muted"><i class="bi bi-gender-male me-1"></i>Guru putra</div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#c84ddf,#e8b4f5);color:white">
+                <div class="stat-icon bg-primary-soft" style="color:white">
                     <i class="bi bi-person-fill"></i>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.15s">
-        <div class="stat-card">
+        <div class="stat-card" style="border-top:3px solid #ec4899">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Perempuan</div>
                     <div class="stat-value" style="color:#ec4899" id="statFemale">–</div>
                     <div class="stat-growth text-muted"><i class="bi bi-gender-female me-1"></i>Guru putri</div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#ec4899,#f472b6);color:white">
+                <div class="stat-icon bg-danger-soft" style="color:white">
                     <i class="bi bi-person-fill"></i>
                 </div>
             </div>
@@ -470,7 +470,7 @@ function editTeacher(id) {
         document.getElementById('photoPreview').src = t.photo ? '/storage/' + t.photo : avatar;
         new bootstrap.Modal('#teacherModal').show();
     }).fail(function() {
-        Swal.fire({ icon:'error', title:'Gagal', text:'Tidak dapat memuat data guru.' });
+        showToast('Tidak dapat memuat data guru.', 'error');
     });
 }
 
@@ -490,16 +490,16 @@ function saveTeacher() {
         success(res) {
             if (res.success) {
                 bootstrap.Modal.getInstance(document.getElementById('teacherModal'))?.hide();
-                Swal.fire({ icon:'success', title:'Berhasil!', text:res.message, timer:2200, showConfirmButton:false, iconColor:'#10b981' });
+                showToast(res.message, 'success');
                 loadTeachers(currentPage);
             }
         },
         error(xhr) {
             const errors = xhr.responseJSON?.errors;
             const msg = errors
-                ? '<ul class="text-start mb-0">' + Object.values(errors).flat().map(e=>`<li>${e}</li>`).join('') + '</ul>'
+                ? Object.values(errors).flat().join('; ')
                 : (xhr.responseJSON?.message ?? 'Terjadi kesalahan.');
-            Swal.fire({ icon:'error', title:'Gagal!', html:msg });
+            showToast(msg, 'error');
         },
         complete() {
             btn.disabled = false;
@@ -510,28 +510,17 @@ function saveTeacher() {
 
 // ---- DELETE ----
 function deleteTeacher(id, name) {
-    Swal.fire({
-        title: `Hapus "${name}"?`,
-        text: 'Data guru ini akan dihapus secara permanen!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#c84ddf',
-        cancelButtonColor: '#6b7280',
-        confirmButtonText: '<i class="bi bi-trash me-1"></i>Ya, Hapus!',
-        cancelButtonText: 'Batal'
-    }).then(r => {
-        if (r.isConfirmed) {
-            $.post('/admin/teachers/' + id, {
-                _method: 'DELETE',
-                _token: document.querySelector('meta[name=csrf-token]').content
-            }, function(res) {
-                Swal.fire({ icon:'success', title:'Terhapus!', text:res.message, timer:2000, showConfirmButton:false });
-                loadTeachers(currentPage);
-            }).fail(function() {
-                Swal.fire({ icon:'error', title:'Gagal!', text:'Tidak dapat menghapus data.' });
-            });
-        }
-    });
+    confirmAction(`Hapus guru "${name}"? Data tidak dapat dikembalikan.`, function() {
+        $.post('/admin/teachers/' + id, {
+            _method: 'DELETE',
+            _token: document.querySelector('meta[name=csrf-token]').content
+        }, function(res) {
+            showToast(res.message, 'success');
+            loadTeachers(currentPage);
+        }).fail(function() {
+            showToast('Tidak dapat menghapus data guru.', 'error');
+        });
+    }, null, {title:'Hapus Guru', okText:'Ya, Hapus'});
 }
 
 // ---- PHOTO PREVIEW ----
