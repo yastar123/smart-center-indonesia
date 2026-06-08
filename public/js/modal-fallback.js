@@ -2,52 +2,54 @@
 document.addEventListener("DOMContentLoaded", function () {
     var pageLoader = document.getElementById("pageLoader");
     var sidebarOverlay = document.getElementById("sidebarOverlay");
-    // Aggressive backdrop remover (handles injected overlays from extensions)
-    function removeAllBackdrops() {
+
+    // Safe backdrop remover — only removes backdrops when no Bootstrap modal is active
+    function removeStaleBackdrops() {
+        if (document.body.classList.contains("modal-open")) return;
         try {
             document.querySelectorAll(".modal-backdrop").forEach(function (el) {
                 el.remove();
             });
         } catch (e) {}
-        try {
-            document.querySelectorAll(".modal-backdrop").forEach(function (el) {
-                el.style.pointerEvents = "none";
-            });
-        } catch (e) {}
     }
 
-    // Run immediately to clear any existing injected backdrops
-    removeAllBackdrops();
+    // Run immediately to clear any pre-existing stale backdrops
+    removeStaleBackdrops();
 
-    // Observe DOM mutations to remove any newly injected backdrops/overlays
+    // Observe DOM mutations — only remove backdrops that appear while no modal is open
     try {
         new MutationObserver(function (mutations) {
+            if (document.body.classList.contains("modal-open")) return;
             mutations.forEach(function (m) {
                 m.addedNodes.forEach(function (n) {
                     try {
                         if (n && n.nodeType === 1) {
+                            // Remove extension-injected overlays
                             if (
                                 n.matches &&
-                                (n.matches(".modal-backdrop") ||
-                                    n.matches(".injected-overlay") ||
+                                (n.matches(".injected-overlay") ||
                                     n.matches(".extension-overlay"))
                             ) {
                                 n.remove();
                                 return;
                             }
+                            // Remove backdrop only when no modal is currently active
+                            if (n.matches && n.matches(".modal-backdrop") && !document.body.classList.contains("modal-open")) {
+                                n.remove();
+                                return;
+                            }
                             // If a node has an extremely high z-index and covers the screen, disable pointer events
                             var z = window.getComputedStyle(n).zIndex;
-                            if (z && !isNaN(Number(z)) && Number(z) > 1500) {
+                            if (z && !isNaN(Number(z)) && Number(z) > 9000) {
                                 n.style.pointerEvents = "none";
                             }
                         }
                     } catch (e) {}
                 });
             });
-            // also ensure no leftover backdrops
-            removeAllBackdrops();
-        }).observe(document.body, { childList: true, subtree: true });
+        }).observe(document.body, { childList: true, subtree: false });
     } catch (e) {}
+
     function hideLoader() {
         if (!pageLoader) return;
         pageLoader.classList.remove("show");
@@ -61,7 +63,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.querySelectorAll(".modal").forEach(function (modalEl) {
         modalEl.addEventListener("show.bs.modal", function () {
-            // hide any global loader or overlay that may intercept clicks
             hideLoader();
             if (sidebarOverlay && sidebarOverlay.classList.contains("show")) {
                 sidebarOverlay.classList.remove("show");
@@ -69,19 +70,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (sidebar) sidebar.classList.remove("show");
                 document.body.style.overflow = "";
             }
-            // ensure backdrop above any leftover overlays
-            setTimeout(function () {
-                var backdrop = document.querySelector(".modal-backdrop");
-                if (backdrop) backdrop.style.zIndex = 1060;
-                var modals = document.querySelectorAll(".modal");
-                modals.forEach(function (m) {
-                    m.style.zIndex = 1065;
-                });
-            }, 1);
         });
         modalEl.addEventListener("hidden.bs.modal", function () {
-            // restore loader display (but keep it non-blocking)
             showLoader();
+            // Clean up any stale backdrops after modal closes
+            setTimeout(removeStaleBackdrops, 50);
         });
     });
 
@@ -147,7 +140,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         return r.text();
                     })
                     .then(function () {
-                        // success: close modal and reload to refresh list
                         try {
                             var bm = bootstrap.Modal.getInstance(
                                 document.getElementById("addModal"),

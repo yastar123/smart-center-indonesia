@@ -1064,21 +1064,16 @@
             /* Strong rule to protect pagination icons from extension font replacement */
             #paginationLinks svg, .pagination .page-link svg { width: 1rem !important; height: 1rem !important; max-width:1rem !important; max-height:1rem !important; }
 
-            /* If icons keep getting injected by extensions, hide them entirely in pagination areas */
-            .pagination .bi, #paginationLinks .bi, .pagination svg, #paginationLinks svg, .pagination img, #paginationLinks img { display: none !important; }
+            /* Hide ONLY extension-injected oversized SVGs — never Bootstrap Icons (.bi) */
+            .pagination svg.w-5, .pagination svg.h-5, .pagination svg[class*="tailwind"],
+            #paginationLinks svg.w-5, #paginationLinks svg.h-5, #paginationLinks svg[class*="tailwind"] { display: none !important; }
 
             /* Target common Heroicon path used in injected chevrons and hide it */
             .pagination svg path[d*="M12.707 5.293"], #paginationLinks svg path[d*="M12.707 5.293"] { display: none !important; }
             /* Also hide svg elements using Tailwind-like size classes if present */
             .pagination svg.w-5.h-5, #paginationLinks svg.w-5.h-5 { display: none !important; }
-
-            /* Also neutralize pseudo-element content inside pagination */
-            .pagination::before, .pagination::after,
-            .pagination *::before, .pagination *::after,
-            #paginationLinks::before, #paginationLinks::after,
-            #paginationLinks *::before, #paginationLinks *::after {
-                content: none !important; display: none !important; width:0; height:0; overflow:hidden; visibility:hidden;
-            }
+            /* Hide extension-injected images inside pagination */
+            #paginationLinks img { display: none !important; }
         #paginationLinks .btn { display: inline-flex; align-items: center; justify-content: center; }
         /* ensure prev/next custom buttons don't expand vertically */
         #paginationLinks .btn { height: auto; padding-top: .25rem; padding-bottom: .25rem; }
@@ -2921,8 +2916,19 @@
                 <i class="bi bi-moon" id="darkIcon"></i>
             </button>
 
+            @php
+            $notifAnnouncements = \App\Models\Announcement::where('status','aktif')
+                ->where(function($q){ $q->whereNull('tanggal_mulai')->orWhere('tanggal_mulai','<=',now()); })
+                ->where(function($q){ $q->whereNull('tanggal_selesai')->orWhere('tanggal_selesai','>=',now()); })
+                ->orderByDesc('is_pinned')->orderByDesc('created_at')
+                ->limit(6)->get(['id','judul','jenis','konten','is_pinned','created_at']);
+            $notifCount = $notifAnnouncements->count();
+            @endphp
             <button class="top-btn position-relative" title="Notifikasi" id="notifBtn" aria-label="Notifikasi">
                 <i class="bi bi-bell"></i>
+                @if($notifCount > 0)
+                <span id="notifDot" style="position:absolute;top:5px;right:5px;width:8px;height:8px;background:#ef4444;border-radius:50%;border:1.5px solid var(--card-bg);pointer-events:none"></span>
+                @endif
             </button>
 
             <div class="dropdown">
@@ -3533,13 +3539,31 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
     });
 })();
 
-// ---- NOTIFICATION DROPDOWN (click → show simple panel) ----
+// ---- NOTIFICATION DROPDOWN (click → show panel with real announcements) ----
 (function() {
     const btn = document.getElementById('notifBtn');
     if (!btn) return;
+
+    const notifData = @json($notifAnnouncements ?? collect());
+    const jenisMap = {
+        info:   { icon:'bi-info-circle-fill', color:'#2563eb' },
+        promo:  { icon:'bi-tag-fill',         color:'#f6af23' },
+        penting:{ icon:'bi-exclamation-triangle-fill', color:'#ef4444' },
+        update: { icon:'bi-arrow-up-circle-fill',       color:'#10b981' },
+    };
+
+    function timeAgo(ts) {
+        const d = new Date(ts);
+        const diff = Math.floor((Date.now() - d)/1000);
+        if (diff < 60) return 'Baru saja';
+        if (diff < 3600) return Math.floor(diff/60) + ' mnt lalu';
+        if (diff < 86400) return Math.floor(diff/3600) + ' jam lalu';
+        return Math.floor(diff/86400) + ' hari lalu';
+    }
+
     btn.addEventListener('click', function(e) {
         e.stopPropagation();
-        this.querySelector('.notif-badge')?.remove();
+        document.getElementById('notifDot')?.remove();
         const existing = document.getElementById('notifPanel');
         if (existing) { existing.remove(); return; }
         const rect = btn.getBoundingClientRect();
@@ -3548,19 +3572,44 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         panel.style.cssText = `
             position:fixed; top:${rect.bottom + 8}px;
             right:${Math.max(8, document.documentElement.clientWidth - rect.right)}px;
-            width:min(300px, calc(100vw - 16px)); background:var(--card-bg); border:1px solid var(--card-border);
-            border-radius:16px; box-shadow:0 12px 40px rgba(0,0,0,.15);
+            width:min(320px, calc(100vw - 16px)); background:var(--card-bg); border:1px solid var(--card-border);
+            border-radius:16px; box-shadow:0 12px 40px rgba(0,0,0,.18);
             z-index:9998; overflow:hidden; animation:fadeIn .2s ease both;
         `;
-        panel.innerHTML = `
-            <div style="padding:14px 16px;border-bottom:1px solid var(--card-border);display:flex;justify-content:space-between;align-items:center">
-                <span style="font-size:14px;font-weight:700;color:var(--text-primary)"><i class="bi bi-bell-fill me-2 text-primary"></i>Notifikasi</span>
-                <span style="font-size:11px;color:var(--text-muted)">Hari ini</span>
-            </div>
-            <div style="padding:20px 16px;text-align:center">
+
+        let itemsHtml = '';
+        if (notifData.length === 0) {
+            itemsHtml = `<div style="padding:24px 16px;text-align:center">
                 <i class="bi bi-bell-slash" style="font-size:2.5rem;color:#cbd5e1;display:block;margin-bottom:8px"></i>
-                <div style="font-size:13px;color:var(--text-muted)">Tidak ada notifikasi baru</div>
+                <div style="font-size:13px;color:var(--text-muted)">Tidak ada pengumuman aktif</div>
             </div>`;
+        } else {
+            notifData.forEach(n => {
+                const j = jenisMap[n.jenis] || { icon:'bi-megaphone-fill', color:'#68117e' };
+                const pin = n.is_pinned ? '<i class="bi bi-pin-fill" style="color:#f6af23;font-size:10px;margin-left:4px"></i>' : '';
+                const preview = (n.konten || '').replace(/<[^>]+>/g,'').slice(0, 60);
+                itemsHtml += `<div style="padding:11px 16px;border-bottom:1px solid var(--card-border);display:flex;gap:12px;align-items:flex-start">
+                    <div style="width:34px;height:34px;border-radius:10px;background:${j.color}18;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                        <i class="bi ${j.icon}" style="color:${j.color};font-size:15px"></i>
+                    </div>
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:13px;font-weight:600;color:var(--text-primary);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n.judul}${pin}</div>
+                        ${preview ? `<div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${preview}</div>` : ''}
+                        <div style="font-size:10.5px;color:var(--text-muted);margin-top:3px">${timeAgo(n.created_at)}</div>
+                    </div>
+                </div>`;
+            });
+        }
+
+        panel.innerHTML = `
+            <div style="padding:13px 16px;border-bottom:1px solid var(--card-border);display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:14px;font-weight:700;color:var(--text-primary)"><i class="bi bi-bell-fill me-2" style="color:#c84ddf"></i>Pengumuman</span>
+                <span style="font-size:11px;color:var(--text-muted)">${notifData.length} aktif</span>
+            </div>
+            <div style="max-height:340px;overflow-y:auto">${itemsHtml}</div>
+            ${notifData.length > 0 ? `<div style="padding:10px 16px;border-top:1px solid var(--card-border);text-align:center">
+                <a href="{{ route('admin.announcements.index') }}" style="font-size:12px;color:var(--primary);font-weight:600;text-decoration:none">Lihat semua pengumuman →</a>
+            </div>` : ''}`;
         document.body.appendChild(panel);
         const close = e2 => { if (!panel.contains(e2.target) && e2.target !== btn) { panel.remove(); document.removeEventListener('click', close); } };
         setTimeout(() => document.addEventListener('click', close), 0);
@@ -3717,55 +3766,26 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
 @stack('scripts')
 </body>
 <script>
-// Sanitize pagination UI: hide or shrink unexpected oversized elements
-function sanitizePaginationArea(selector) {
-    document.querySelectorAll(selector).forEach(root => {
-        function clean() {
-            // Remove icons (svg, i, img) and large injected nodes
-            root.querySelectorAll('svg,i,img').forEach(e => e.remove());
-            root.querySelectorAll('*').forEach(el => {
-                try {
-                    const rect = el.getBoundingClientRect();
-                    const tag = el.tagName || '';
-                    // Hide any element that's clearly oversized inside pagination
-                    if ((rect.width > 48 || rect.height > 48) && !['BUTTON','A','UL','LI','NAV','SPAN'].includes(tag)) {
-                        el.style.display = 'none';
-                    }
-                    // Ensure buttons/links show text, not icons
-                    if ((tag === 'A' || tag === 'BUTTON' || tag === 'SPAN') && el.querySelectorAll && el.querySelectorAll('svg,i,img').length) {
-                        el.querySelectorAll('svg,i,img').forEach(x=>x.remove());
-                        if (!el.textContent.trim()) {
-                            // set sensible fallback
-                            if (el.getAttribute('aria-label') && /previous/i.test(el.getAttribute('aria-label'))) el.textContent = '‹';
-                            else if (el.getAttribute('aria-label') && /next/i.test(el.getAttribute('aria-label'))) el.textContent = '›';
-                        }
-                    }
-                } catch (e) {
-                    // ignore
-                }
-            });
-        }
-        clean();
-        const mo = new MutationObserver(clean);
-        mo.observe(root, { childList: true, subtree: true, attributes: true });
+// Sanitize pagination UI: remove ONLY extension-injected SVG chevrons, not Bootstrap Icons
+function removeKnownChevrons() {
+    const targetPath = 'M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z';
+    document.querySelectorAll('#paginationLinks svg, .pagination svg, nav.d-flex svg').forEach(s => {
+        try {
+            const inner = s.innerHTML || '';
+            if (inner.includes(targetPath) || s.classList.contains('w-5') || s.classList.contains('h-5')) s.remove();
+        } catch(e) {}
+    });
+    // Remove oversized SVGs injected by extensions (width > 24px is suspicious in pagination)
+    document.querySelectorAll('#paginationLinks svg, .pagination svg').forEach(s => {
+        try {
+            const w = parseFloat(s.getAttribute('width') || '0');
+            const h = parseFloat(s.getAttribute('height') || '0');
+            if ((w > 24 || h > 24) && !s.closest('.bi')) s.remove();
+        } catch(e) {}
     });
 }
 document.addEventListener('DOMContentLoaded', function() {
-    sanitizePaginationArea('#paginationLinks');
-    sanitizePaginationArea('.pagination');
-    sanitizePaginationArea('nav.d-flex');
-    // Remove specific SVGs matching known chevron path or tailwind classes inside pagination
-    function removeKnownChevrons() {
-        const targetPath = 'M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z';
-        document.querySelectorAll('#paginationLinks svg, .pagination svg, nav.d-flex svg').forEach(s => {
-            try {
-                const inner = s.innerHTML || '';
-                if (inner.includes(targetPath) || s.classList.contains('w-5') || s.classList.contains('h-5')) s.remove();
-            } catch(e) {}
-        });
-    }
     removeKnownChevrons();
-    // Scope MutationObserver to pagination containers only, not entire document.body
     document.querySelectorAll('#paginationLinks, .pagination, nav.d-flex').forEach(el => {
         if (el) new MutationObserver(removeKnownChevrons).observe(el, { childList:true, subtree:true });
     });
