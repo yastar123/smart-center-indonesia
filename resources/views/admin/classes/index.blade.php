@@ -7,7 +7,7 @@
 <div class="fade-up">
 
     {{-- HEADER BANNER --}}
-    <div class="page-header mb-4" style="background:linear-gradient(135deg,#68117e 0%,#c84ddf 50%,#461256 100%);border-radius:20px;padding:2rem 2.5rem;color:#fff;position:relative;overflow:hidden;">
+    <div class="page-header mb-4" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);border-radius:20px;padding:2rem 2.5rem;color:#fff;position:relative;overflow:hidden;">
         <div style="position:absolute;top:-30px;right:-30px;width:180px;height:180px;background:rgba(255,255,255,.07);border-radius:50%;"></div>
         <div style="position:absolute;bottom:-50px;right:80px;width:120px;height:120px;background:rgba(255,255,255,.05);border-radius:50%;"></div>
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative;z-index:1;">

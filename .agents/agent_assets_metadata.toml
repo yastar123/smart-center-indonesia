@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "tshw39QfURnW2nOiCwEjg"
+uri = "file://LAPORAN_AUDIT_UI_UX.md"
+type = "text"
+title = "Laporan Audit UI/UX — Smart Center Indonesia"

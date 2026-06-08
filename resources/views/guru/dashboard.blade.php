@@ -35,8 +35,9 @@ $monthTotal = $teacher
 
 {{-- WELCOME BANNER --}}
 <div class="dashboard-card mb-4 fade-up"
-     style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#68117e 100%);color:white;border:none;overflow:hidden;position:relative">
-    <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.04);border-radius:50%"></div>
+     style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
+    <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%;pointer-events:none"></div>
+    <div style="position:absolute;right:80px;bottom:-50px;width:120px;height:120px;background:rgba(255,255,255,.03);border-radius:50%;pointer-events:none"></div>
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative">
         <div class="d-flex align-items-center gap-4">
             @if($teacher?->photo)

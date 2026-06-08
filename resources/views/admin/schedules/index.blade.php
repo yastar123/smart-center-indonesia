@@ -5,8 +5,10 @@
 @section('content')
 
 {{-- HEADER BANNER --}}
-<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#461256,#461256,#68117e);color:white;border:none">
-    <div class="row align-items-center g-3">
+<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
+    <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%;pointer-events:none"></div>
+    <div style="position:absolute;right:80px;bottom:-50px;width:120px;height:120px;background:rgba(255,255,255,.03);border-radius:50%;pointer-events:none"></div>
+    <div class="row align-items-center g-3" style="position:relative">
         <div class="col-md-8">
             <div class="d-flex align-items-center gap-3 mb-2">
                 <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px">

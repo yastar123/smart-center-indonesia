@@ -1962,6 +1962,175 @@
             font-weight: 500;
             color: #dc2626;
         }
+
+        /* ============================================================
+           FILTER CARD — unified look for filter panels
+        ============================================================ */
+        .filter-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-card);
+            padding: 18px 20px;
+            margin-bottom: 20px;
+        }
+        .filter-card .input-group-text {
+            border-radius: 10px 0 0 10px;
+            font-size: 13px;
+        }
+        .filter-card .form-control,
+        .filter-card .form-select {
+            font-size: 13px;
+        }
+
+        /* ============================================================
+           PROGRESS BAR — brand gradient
+        ============================================================ */
+        .progress-brand .progress-bar {
+            background: linear-gradient(90deg, #260632, #c84ddf);
+        }
+
+        /* ============================================================
+           CHIP / FILTER TAG
+        ============================================================ */
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(200,77,223,.1);
+            color: var(--primary);
+            border: 1px solid rgba(200,77,223,.2);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        .chip:hover { background: rgba(200,77,223,.18); }
+        .chip.active { background: var(--primary); color: white; border-color: transparent; }
+
+        /* ============================================================
+           DIVIDER WITH LABEL
+        ============================================================ */
+        .divider-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
+        .divider-label::before, .divider-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--card-border);
+        }
+
+        /* ============================================================
+           AVATAR STACK
+        ============================================================ */
+        .avatar-stack { display: flex; }
+        .avatar-stack img, .avatar-stack .avatar-item {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            border: 2px solid var(--card-bg);
+            margin-left: -8px;
+            object-fit: cover;
+        }
+        .avatar-stack img:first-child, .avatar-stack .avatar-item:first-child { margin-left: 0; }
+
+        /* ============================================================
+           VERTICAL TIMELINE — activity log style
+        ============================================================ */
+        .timeline { position: relative; }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 16px; top: 0; bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--primary), transparent);
+            opacity: .2;
+        }
+        .timeline-item {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .timeline-dot {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            z-index: 1;
+            background: rgba(200,77,223,.1);
+            border: 2px solid rgba(200,77,223,.2);
+            color: var(--primary);
+        }
+        .timeline-content { flex: 1; min-width: 0; }
+
+        /* ============================================================
+           DATA LABEL — key:value pairs in detail panels
+        ============================================================ */
+        .data-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: var(--text-muted);
+            margin-bottom: 3px;
+        }
+        .data-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* ============================================================
+           ICON BADGE — round icon with brand glow
+        ============================================================ */
+        .icon-badge {
+            width: 44px; height: 44px;
+            border-radius: 13px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .icon-badge-primary { background: rgba(200,77,223,.12); color: var(--primary); }
+        .icon-badge-success { background: rgba(16,185,129,.12); color: #10b981; }
+        .icon-badge-warning { background: rgba(246,175,35,.12); color: #e09000; }
+        .icon-badge-danger  { background: rgba(239,68,68,.12);  color: #ef4444; }
+        .icon-badge-info    { background: rgba(2,132,199,.12);  color: #0284c7; }
+
+        /* ============================================================
+           SMOOTH PAGE TRANSITIONS
+        ============================================================ */
+        a:not([href^="#"]):not([href^="javascript"]):not([download]):not([target="_blank"]) {
+            transition: color var(--transition);
+        }
+
+        /* ============================================================
+           MOBILE — improve stat cards on very small screens
+        ============================================================ */
+        @media (max-width: 360px) {
+            .stat-value { font-size: 17px !important; }
+            .stat-icon { width: 38px !important; height: 38px !important; font-size: 15px !important; }
+        }
+
+        /* ============================================================
+           DARK MODE — Filter card
+        ============================================================ */
+        [data-theme="dark"] .filter-card {
+            background: var(--card-bg);
+            border-color: var(--card-border);
+        }
     </style>
 
     @stack('styles')

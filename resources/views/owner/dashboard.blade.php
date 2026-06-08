@@ -21,7 +21,7 @@
 
 {{-- WELCOME BANNER --}}
 <div class="dashboard-card mb-4 fade-up"
-     style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#68117e 100%);color:white;border:none;overflow:hidden;position:relative">
+     style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
     <div style="position:absolute;right:-40px;top:-40px;width:200px;height:200px;background:rgba(255,255,255,.04);border-radius:50%"></div>
     <div style="position:absolute;right:40px;bottom:-60px;width:150px;height:150px;background:rgba(255,255,255,.04);border-radius:50%"></div>
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative">
