@@ -2131,6 +2131,458 @@
             background: var(--card-bg);
             border-color: var(--card-border);
         }
+
+        /* ============================================================
+           QUICK DASH LINK — shared across views
+        ============================================================ */
+        .quick-dash, .quick-owner-link, .quick-link-card {
+            transition: transform .22s cubic-bezier(.22,1,.36,1), box-shadow .22s cubic-bezier(.22,1,.36,1);
+        }
+        .quick-dash:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0,0,0,.10);
+        }
+        .quick-owner-link:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,.08);
+        }
+        .quick-link-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(200,77,223,.15);
+        }
+
+        /* ============================================================
+           ENHANCED CARD HOVER — lift + glow
+        ============================================================ */
+        .dashboard-card {
+            transition: box-shadow .3s cubic-bezier(.22,1,.36,1), transform .3s cubic-bezier(.22,1,.36,1), border-color .3s;
+        }
+        .dashboard-card:hover {
+            box-shadow: 0 12px 40px rgba(200,77,223,.12), 0 2px 8px rgba(0,0,0,.06);
+            transform: translateY(-2px);
+        }
+        /* Cards that are header banners (gradient bg) should not lift */
+        .dashboard-card[style*="linear-gradient"]:hover {
+            transform: none;
+            box-shadow: var(--shadow-card);
+        }
+
+        /* ============================================================
+           STAT CARD — enhanced hover
+        ============================================================ */
+        .stat-card {
+            transition: box-shadow .3s cubic-bezier(.22,1,.36,1), transform .3s cubic-bezier(.22,1,.36,1);
+        }
+        .stat-card:hover {
+            box-shadow: 0 10px 32px rgba(200,77,223,.13);
+            transform: translateY(-2px);
+        }
+
+        /* ============================================================
+           GRADIENT TEXT UTILITY
+        ============================================================ */
+        .text-gradient {
+            background: linear-gradient(135deg, #c84ddf, #68117e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .text-gradient-gold {
+            background: linear-gradient(135deg, #f6af23, #e09000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ============================================================
+           STAGGERED TABLE ROW ENTRANCE
+        ============================================================ */
+        @keyframes rowSlideIn {
+            from { opacity: 0; transform: translateX(-8px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        .table-animate tbody tr {
+            animation: rowSlideIn .3s cubic-bezier(.22,1,.36,1) both;
+        }
+        .table-animate tbody tr:nth-child(1)  { animation-delay: .02s; }
+        .table-animate tbody tr:nth-child(2)  { animation-delay: .05s; }
+        .table-animate tbody tr:nth-child(3)  { animation-delay: .08s; }
+        .table-animate tbody tr:nth-child(4)  { animation-delay: .11s; }
+        .table-animate tbody tr:nth-child(5)  { animation-delay: .14s; }
+        .table-animate tbody tr:nth-child(6)  { animation-delay: .17s; }
+        .table-animate tbody tr:nth-child(7)  { animation-delay: .20s; }
+        .table-animate tbody tr:nth-child(8)  { animation-delay: .23s; }
+        .table-animate tbody tr:nth-child(9)  { animation-delay: .26s; }
+        .table-animate tbody tr:nth-child(10) { animation-delay: .29s; }
+
+        /* ============================================================
+           FLOATING LABEL INPUT GROUP
+        ============================================================ */
+        .form-floating-brand {
+            position: relative;
+        }
+        .form-floating-brand label {
+            position: absolute;
+            top: 50%;
+            left: 14px;
+            transform: translateY(-50%);
+            font-size: 13px;
+            color: var(--text-muted);
+            pointer-events: none;
+            transition: all .2s cubic-bezier(.22,1,.36,1);
+            background: transparent;
+            padding: 0 4px;
+        }
+        .form-floating-brand .form-control:focus ~ label,
+        .form-floating-brand .form-control:not(:placeholder-shown) ~ label {
+            top: 0;
+            font-size: 10.5px;
+            color: var(--primary);
+            background: var(--card-bg);
+            font-weight: 600;
+        }
+
+        /* ============================================================
+           BUTTON LOADING STATE
+        ============================================================ */
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+            color: transparent !important;
+        }
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 16px; height: 16px;
+            margin: -8px 0 0 -8px;
+            border: 2px solid rgba(255,255,255,.4);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: btnSpin .6s linear infinite;
+        }
+        @keyframes btnSpin { to { transform: rotate(360deg); } }
+
+        /* ============================================================
+           BADGE PULSE — for notification/alert badges
+        ============================================================ */
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,.4); }
+            50%       { box-shadow: 0 0 0 6px rgba(239,68,68,.0); }
+        }
+        .badge-pulse { animation: badgePulse 2s ease-in-out infinite; }
+
+        /* ============================================================
+           MODAL — slide from bottom on mobile
+        ============================================================ */
+        @media (max-width: 576px) {
+            .modal-dialog {
+                margin: 0 !important;
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                max-width: 100% !important;
+                transform: translateY(20px) !important;
+                transition: transform .35s cubic-bezier(.22,1,.36,1) !important;
+            }
+            .modal.show .modal-dialog {
+                transform: translateY(0) !important;
+            }
+            .modal-content {
+                border-radius: 20px 20px 0 0 !important;
+            }
+            .modal-header {
+                border-radius: 20px 20px 0 0 !important;
+            }
+        }
+
+        /* ============================================================
+           FORM VALIDATION STATES — visual feedback
+        ============================================================ */
+        .form-control.is-valid, .form-select.is-valid {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 3px rgba(16,185,129,.12) !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='%2310b981' d='M10.28 1.28L3.989 7.575 1.695 5.28A1 1 0 00.28 6.695l3 3a1 1 0 001.414 0l7-7A1 1 0 0010.28 1.28z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px;
+            padding-right: 36px;
+        }
+        .form-control.is-invalid, .form-select.is-invalid {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 3px rgba(239,68,68,.12) !important;
+        }
+        .invalid-feedback {
+            font-size: 12px;
+            font-weight: 600;
+            color: #ef4444;
+        }
+
+        /* ============================================================
+           AUTO-DISMISS ALERT PROGRESS BAR
+        ============================================================ */
+        .alert-auto-dismiss {
+            position: relative;
+            overflow: hidden;
+        }
+        .alert-auto-dismiss::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            height: 3px;
+            background: currentColor;
+            opacity: .3;
+            animation: alertProgress 5s linear forwards;
+        }
+        @keyframes alertProgress { from { width: 100%; } to { width: 0%; } }
+
+        /* ============================================================
+           EMPTY STATE — universal empty state component
+        ============================================================ */
+        .empty-state {
+            text-align: center;
+            padding: 60px 24px;
+        }
+        .empty-state-icon {
+            font-size: 3.5rem;
+            opacity: .18;
+            display: block;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        .empty-state-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            letter-spacing: -.01em;
+        }
+        .empty-state-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            max-width: 320px;
+            margin: 0 auto 20px;
+            line-height: 1.6;
+        }
+
+        /* ============================================================
+           SELECT — custom arrow
+        ============================================================ */
+        .form-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23c84ddf' d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 01.753 1.659l-4.796 5.48a1 1 0 01-1.506 0z'/%3E%3C/svg%3E");
+            background-size: 12px;
+        }
+
+        /* ============================================================
+           BREADCRUMB — brand style
+        ============================================================ */
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: "›";
+            color: var(--text-muted);
+        }
+        .breadcrumb-item a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 12.5px;
+        }
+        .breadcrumb-item.active { color: var(--text-muted); font-size: 12.5px; }
+
+        /* ============================================================
+           TOOLTIP — custom brand style
+        ============================================================ */
+        [data-bs-toggle="tooltip"] { cursor: default; }
+        .tooltip-inner {
+            background: #260632 !important;
+            color: white !important;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+        .tooltip .tooltip-arrow::before { border-top-color: #260632 !important; }
+
+        /* ============================================================
+           PRINT STYLES
+        ============================================================ */
+        @media print {
+            .sidebar, .topbar, .mobile-bottom-nav, #scrollTop,
+            #globalToastWrap, #navProgress, .no-print { display: none !important; }
+            .main-content { margin: 0 !important; }
+            .dashboard-card { box-shadow: none !important; break-inside: avoid; }
+        }
+
+        /* ============================================================
+           PREFERS-REDUCED-MOTION — accessibility
+        ============================================================ */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+            }
+            .fade-up { opacity: 1 !important; transform: none !important; }
+        }
+
+        /* ============================================================
+           LARGE SCREEN (1441px+) — max content width + generous padding
+        ============================================================ */
+        @media (min-width: 1441px) {
+            .content-wrapper { padding: 28px 36px; }
+            .dashboard-card  { padding: 28px; }
+            .stat-card       { padding: 24px; }
+        }
+
+        /* ============================================================
+           TABLET (481px – 1024px) — tighter layout adjustments
+        ============================================================ */
+        @media (min-width: 481px) and (max-width: 1024px) {
+            .stat-value { font-size: 24px; }
+            .row.g-3 > [class*='col-6'] { margin-bottom: 2px; }
+        }
+
+        /* ============================================================
+           CARD GRID — equal height helper
+        ============================================================ */
+        .card-grid { display: grid; gap: 16px; }
+        .card-grid-2 { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+        .card-grid-3 { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+        .card-grid-4 { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+
+        /* ============================================================
+           SCROLL SNAP — horizontal card scroll on mobile
+        ============================================================ */
+        .scroll-snap-x {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 8px;
+        }
+        .scroll-snap-x::-webkit-scrollbar { height: 3px; }
+        .scroll-snap-x > * {
+            scroll-snap-align: start;
+            flex-shrink: 0;
+        }
+
+        /* ============================================================
+           NAV LINK ACTIVE INDICATOR — animated underline
+        ============================================================ */
+        .nav-link-underline {
+            position: relative;
+            padding-bottom: 6px;
+        }
+        .nav-link-underline::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            height: 2px;
+            width: 0;
+            background: var(--primary);
+            border-radius: 2px;
+            transition: width .3s cubic-bezier(.22,1,.36,1);
+        }
+        .nav-link-underline.active::after,
+        .nav-link-underline:hover::after { width: 100%; }
+
+        /* ============================================================
+           GLASSMORPHISM CARD — premium variant
+        ============================================================ */
+        .glass-card {
+            background: rgba(255,255,255,.07);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: var(--radius-card);
+        }
+        [data-theme="dark"] .glass-card {
+            background: rgba(255,255,255,.04);
+            border-color: rgba(255,255,255,.08);
+        }
+
+        /* ============================================================
+           PAGINATION — brand-themed page links
+        ============================================================ */
+        .pagination { gap: 4px; }
+        .page-item .page-link {
+            border-radius: 10px !important;
+            border: 1.5px solid var(--card-border);
+            color: var(--text-muted);
+            background: var(--card-bg);
+            font-weight: 600;
+            font-size: 13px;
+            padding: 6px 13px;
+            transition: all var(--transition);
+            min-width: 36px;
+            text-align: center;
+        }
+        .page-item .page-link:hover {
+            background: rgba(200,77,223,.08);
+            border-color: rgba(200,77,223,.3);
+            color: var(--primary);
+        }
+        .page-item.active .page-link {
+            background: linear-gradient(135deg, #68117e, #c84ddf);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 4px 12px rgba(200,77,223,.35);
+        }
+        .page-item.disabled .page-link {
+            opacity: .4;
+            pointer-events: none;
+        }
+        [data-theme="dark"] .page-item .page-link {
+            background: var(--card-bg);
+            color: var(--text-muted);
+        }
+
+        /* ============================================================
+           INPUT GROUP — seamless search bar look
+        ============================================================ */
+        .input-group .input-group-text {
+            background: var(--input-bg);
+            border: 1.5px solid var(--card-border);
+            color: var(--text-muted);
+        }
+        .input-group .form-control:focus ~ .input-group-text,
+        .input-group:focus-within .input-group-text {
+            border-color: var(--primary);
+        }
+        .input-group:focus-within .form-control,
+        .input-group:focus-within .input-group-text {
+            border-color: var(--primary);
+        }
+
+        /* ============================================================
+           TABLE HOVER ROW — CSS only, removes inline onmouseover need
+        ============================================================ */
+        .table-hover tbody tr { transition: background var(--transition); }
+        .table-hover tbody tr:hover { background: rgba(104,17,126,.04) !important; }
+
+        /* ============================================================
+           CARD — top colour strip via data-topcolor
+        ============================================================ */
+        .stat-card[data-topcolor] {
+            border-top: 3px solid;
+        }
+        .stat-card[data-topcolor="primary"]  { border-top-color: var(--primary); }
+        .stat-card[data-topcolor="success"]  { border-top-color: var(--success); }
+        .stat-card[data-topcolor="warning"]  { border-top-color: var(--warning); }
+        .stat-card[data-topcolor="danger"]   { border-top-color: var(--danger); }
+        .stat-card[data-topcolor="info"]     { border-top-color: #0284c7; }
+
+        /* ============================================================
+           MODAL HEADER GRADIENT — auto white close btn
+        ============================================================ */
+        .modal-header-gradient {
+            background: linear-gradient(135deg, #260632, #461256, #c84ddf);
+            border-radius: 20px 20px 0 0;
+            padding: 20px 24px;
+        }
+        .modal-header-gradient .modal-title { color: white; font-weight: 700; }
+        .modal-header-gradient .btn-close { filter: brightness(0) invert(1); opacity: .85; }
     </style>
 
     @stack('styles')
@@ -2771,6 +3223,127 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') { closeSidebar(); closeCmdPalette(); }
     if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openCmdPalette(); }
+});
+
+// ---- STAGGERED TABLE ROW ANIMATION ----
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.table-responsive table, table.table').forEach(tbl => {
+        tbl.classList.add('table-animate');
+    });
+});
+
+// ---- AUTO-DISMISS ALERTS ----
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.alert:not(.alert-permanent)').forEach(function(el) {
+        el.classList.add('alert-auto-dismiss');
+        setTimeout(function() {
+            el.classList.add('fade');
+            el.style.transition = 'opacity .5s, max-height .5s, margin .5s, padding .5s';
+            el.style.opacity = '0';
+            el.style.maxHeight = '0';
+            el.style.margin = '0';
+            el.style.padding = '0';
+            setTimeout(() => el.remove(), 500);
+        }, 6000);
+    });
+});
+
+// ---- FORM VALIDATION ENHANCEMENT ----
+document.addEventListener('DOMContentLoaded', function() {
+    // Add real-time validation visual feedback
+    document.querySelectorAll('form .form-control[required], form .form-select[required]').forEach(function(input) {
+        input.addEventListener('blur', function() {
+            if (this.value.trim()) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            }
+        });
+        input.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid') && this.value.trim()) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+    });
+
+    // Textarea character counter
+    document.querySelectorAll('textarea[maxlength]').forEach(function(ta) {
+        const max = parseInt(ta.getAttribute('maxlength'));
+        const counter = document.createElement('div');
+        counter.style.cssText = 'text-align:right;font-size:11px;color:var(--text-muted);margin-top:4px';
+        counter.textContent = `0 / ${max}`;
+        ta.after(counter);
+        ta.addEventListener('input', function() {
+            const len = this.value.length;
+            counter.textContent = `${len} / ${max}`;
+            counter.style.color = len > max * .85 ? '#ef4444' : 'var(--text-muted)';
+        });
+    });
+});
+
+// ---- SMOOTH CONFIRM DIALOG HELPER ----
+window.confirmAction = function(message, onConfirm, onCancel) {
+    if (confirm(message)) { if (onConfirm) onConfirm(); }
+    else { if (onCancel) onCancel(); }
+};
+
+// ---- BUTTON LOADING STATE HELPER ----
+window.setButtonLoading = function(btn, loading) {
+    if (!btn) return;
+    if (loading) {
+        btn.setAttribute('data-original-text', btn.innerHTML);
+        btn.classList.add('btn-loading');
+        btn.disabled = true;
+    } else {
+        const orig = btn.getAttribute('data-original-text');
+        if (orig) btn.innerHTML = orig;
+        btn.classList.remove('btn-loading');
+        btn.disabled = false;
+    }
+};
+
+// ---- ENHANCED FADE-UP OBSERVER (individual elements with stagger) ----
+(function() {
+    const allFadeUps = document.querySelectorAll('.fade-up');
+    if (!allFadeUps.length) return;
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, idx) => {
+            if (entry.isIntersecting) {
+                // Stagger siblings with same parent
+                const siblings = entry.target.parentElement
+                    ? Array.from(entry.target.parentElement.children).filter(el => el.classList.contains('fade-up'))
+                    : [];
+                const sibIdx = siblings.indexOf(entry.target);
+                const delay = sibIdx >= 0 ? sibIdx * 0.05 : 0;
+                setTimeout(() => entry.target.classList.add('in-view'), delay * 1000);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    allFadeUps.forEach(el => observer.observe(el));
+})();
+
+// ---- TOOLTIP INIT ----
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el) {
+            new bootstrap.Tooltip(el, { trigger: 'hover' });
+        });
+    }
+});
+
+// ---- STICKY TABLE HEADER (scroll-aware) ----
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.table-responsive').forEach(function(wrap) {
+        const thead = wrap.querySelector('thead');
+        if (!thead) return;
+        thead.style.position = 'sticky';
+        thead.style.top = '0';
+        thead.style.zIndex = '2';
+    });
 });
 
 // ---- TOPBAR SCROLL SHADOW ----

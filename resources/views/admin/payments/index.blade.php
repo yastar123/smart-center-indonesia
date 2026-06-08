@@ -139,17 +139,17 @@
         </h6>
     </div>
     <div class="table-responsive">
-        <table class="table align-middle mb-0" style="font-size:13px">
-            <thead>
-                <tr style="background:var(--input-bg);border-bottom:2px solid var(--card-border)">
-                    <th class="ps-3" style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">No. Invoice</th>
-                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Siswa</th>
-                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Cabang</th>
-                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Periode</th>
-                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Total</th>
-                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Jatuh Tempo</th>
-                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Status</th>
-                    <th class="text-center" style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Aksi</th>
+        <table class="table table-hover table-modern align-middle mb-0">
+            <thead class="thead-modern">
+                <tr>
+                    <th class="ps-3">No. Invoice</th>
+                    <th>Siswa</th>
+                    <th class="d-none d-md-table-cell">Cabang</th>
+                    <th class="d-none d-md-table-cell">Periode</th>
+                    <th>Total</th>
+                    <th class="d-none d-lg-table-cell">Jatuh Tempo</th>
+                    <th>Status</th>
+                    <th class="text-center">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -177,14 +177,14 @@
                             </div>
                         </div>
                     </td>
-                    <td style="color:#6b7280">{{ $inv->cabang?->name ?? '–' }}</td>
-                    <td style="color:#6b7280">{{ $inv->periode ?? '–' }}</td>
-                    <td class="fw-bold" style="color:#059669">Rp {{ number_format($inv->total,0,',','.') }}</td>
-                    <td style="color:#6b7280">
+                    <td class="d-none d-md-table-cell text-muted" style="font-size:.85rem">{{ $inv->cabang?->name ?? '–' }}</td>
+                    <td class="d-none d-md-table-cell text-muted" style="font-size:.85rem">{{ $inv->periode ?? '–' }}</td>
+                    <td class="fw-bold" style="color:#059669;font-size:.9rem">Rp {{ number_format($inv->total,0,',','.') }}</td>
+                    <td class="d-none d-lg-table-cell text-muted" style="font-size:.85rem">
                         @if($inv->jatuh_tempo)
                             {{ $inv->jatuh_tempo->format('d M Y') }}
                             @if($inv->jatuh_tempo->isPast() && $inv->status !== 'lunas')
-                                <span class="ms-1" style="font-size:10px;color:#dc2626">● Terlambat</span>
+                                <span class="ms-1 badge rounded-pill" style="background:#fef2f2;color:#dc2626;font-size:10px">Terlambat</span>
                             @endif
                         @else
                             –

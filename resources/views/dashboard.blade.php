@@ -286,15 +286,15 @@
         </a>
     </div>
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0" style="font-size:13px">
-            <thead style="background:var(--input-bg)">
+        <table class="table table-hover table-modern align-middle mb-0">
+            <thead class="thead-modern">
                 <tr>
-                    <th class="small text-muted fw-semibold py-3">SISWA</th>
-                    <th class="small text-muted fw-semibold py-3">NIS</th>
-                    <th class="small text-muted fw-semibold py-3 d-none d-md-table-cell">CABANG</th>
-                    <th class="small text-muted fw-semibold py-3 d-none d-lg-table-cell">KELAS</th>
-                    <th class="small text-muted fw-semibold py-3">STATUS</th>
-                    <th class="small text-muted fw-semibold py-3 d-none d-md-table-cell">BERGABUNG</th>
+                    <th>Siswa</th>
+                    <th>NIS</th>
+                    <th class="d-none d-md-table-cell">Cabang</th>
+                    <th class="d-none d-lg-table-cell">Kelas</th>
+                    <th>Status</th>
+                    <th class="d-none d-md-table-cell">Bergabung</th>
                 </tr>
             </thead>
             <tbody>
@@ -350,8 +350,207 @@
 </div>
 @endif
 
-{{-- GURU/SISWA/KARYAWAN WELCOME --}}
-@if(!$isOwnerAdmin)
+{{-- GURU REDIRECT CARD --}}
+@if($role === 'guru')
+@php $teacher = \App\Models\Teacher::where('user_id', auth()->id())->first(); @endphp
+<div class="row g-3">
+    <div class="col-12 fade-up">
+        <div class="dashboard-card" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
+            <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%;pointer-events:none"></div>
+            <div style="position:absolute;right:80px;bottom:-50px;width:120px;height:120px;background:rgba(255,255,255,.03);border-radius:50%;pointer-events:none"></div>
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative">
+                <div class="d-flex align-items-center gap-4">
+                    @if($teacher?->photo)
+                        <img src="{{ asset('storage/'.$teacher->photo) }}" alt="Foto Guru"
+                             style="width:72px;height:72px;border-radius:18px;object-fit:cover;border:3px solid rgba(255,255,255,.3);flex-shrink:0">
+                    @else
+                        <div style="width:72px;height:72px;border-radius:18px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">
+                            <i class="bi bi-person-workspace"></i>
+                        </div>
+                    @endif
+                    <div>
+                        <div style="font-size:11px;opacity:.6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Portal Guru</div>
+                        <h4 class="fw-bold mb-1" style="color:white;font-size:clamp(16px,2vw,22px)">Selamat datang, {{ explode(' ',$user->name)[0] }}!</h4>
+                        <p style="opacity:.7;margin:0;font-size:13px">{{ $teacher ? 'NIP: '.$teacher->nip.' · '.$teacher->bidang_studi : 'Profil guru belum dilengkapi' }}</p>
+                    </div>
+                </div>
+                <div class="d-flex flex-column gap-2 flex-shrink-0">
+                    <a href="{{ route('guru.dashboard') }}" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
+                        <i class="bi bi-grid-fill me-2"></i>Buka Portal Guru
+                    </a>
+                    <a href="{{ route('guru.attendance') }}" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);border-radius:10px">
+                        <i class="bi bi-calendar-check me-2"></i>Input Absensi
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- QUICK STATS for guru --}}
+    @php
+        $guruSchedulesToday = $teacher ? \App\Models\Schedule::where('guru_id', $teacher->id)->whereDate('tanggal', today())->count() : 0;
+        $guruSchedulesWeek  = $teacher ? \App\Models\Schedule::where('guru_id', $teacher->id)->whereBetween('tanggal',[now()->startOfWeek(), now()->endOfWeek()])->count() : 0;
+    @endphp
+    <div class="col-6 col-md-3 fade-up" style="animation-delay:.05s">
+        <div class="stat-card" style="border-top:3px solid #c84ddf">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-title">Sesi Hari Ini</div>
+                    <div class="stat-value text-primary">{{ $guruSchedulesToday }}</div>
+                    <div class="stat-growth text-muted"><i class="bi bi-calendar-day me-1"></i>Jadwal mengajar</div>
+                </div>
+                <div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-calendar-day"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 fade-up" style="animation-delay:.10s">
+        <div class="stat-card" style="border-top:3px solid #10b981">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-title">Sesi Minggu Ini</div>
+                    <div class="stat-value text-success">{{ $guruSchedulesWeek }}</div>
+                    <div class="stat-growth text-muted"><i class="bi bi-calendar-week me-1"></i>Total sesi</div>
+                </div>
+                <div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-calendar-week"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 fade-up" style="animation-delay:.15s">
+        <div class="stat-card" style="border-top:3px solid #f6af23">
+            <a href="{{ route('guru.grades') }}" class="text-decoration-none d-block">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-title">Input Nilai</div>
+                        <div class="stat-value text-warning" style="font-size:16px">Input Sekarang</div>
+                        <div class="stat-growth text-muted"><i class="bi bi-bar-chart me-1"></i>Nilai siswa</div>
+                    </div>
+                    <div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-bar-chart-fill"></i></div>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 fade-up" style="animation-delay:.20s">
+        <div class="stat-card" style="border-top:3px solid #68117e">
+            <a href="{{ route('profile.edit') }}" class="text-decoration-none d-block">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-title">Profil Saya</div>
+                        <div class="stat-value" style="font-size:16px;color:#68117e">Edit Profil</div>
+                        <div class="stat-growth text-muted"><i class="bi bi-person me-1"></i>Data akun</div>
+                    </div>
+                    <div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-person-fill"></i></div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+@endif
+
+{{-- SISWA REDIRECT CARD --}}
+@if($role === 'siswa')
+@php $student = \App\Models\Student::where('user_id', auth()->id())->first(); @endphp
+<div class="row g-3">
+    <div class="col-12 fade-up">
+        <div class="dashboard-card" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
+            <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%;pointer-events:none"></div>
+            <div style="position:absolute;right:80px;bottom:-50px;width:120px;height:120px;background:rgba(255,255,255,.03);border-radius:50%;pointer-events:none"></div>
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative">
+                <div class="d-flex align-items-center gap-4">
+                    @if($student?->photo)
+                        <img src="{{ asset('storage/'.$student->photo) }}" alt="Foto Siswa"
+                             style="width:72px;height:72px;border-radius:18px;object-fit:cover;border:3px solid rgba(255,255,255,.3);flex-shrink:0">
+                    @else
+                        <div style="width:72px;height:72px;border-radius:18px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">
+                            <i class="bi bi-mortarboard-fill"></i>
+                        </div>
+                    @endif
+                    <div>
+                        <div style="font-size:11px;opacity:.6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Portal Siswa</div>
+                        <h4 class="fw-bold mb-1" style="color:white;font-size:clamp(16px,2vw,22px)">Halo, {{ explode(' ',$user->name)[0] }}! 👋</h4>
+                        <p style="opacity:.7;margin:0;font-size:13px">{{ $student ? 'NIS: '.$student->nis.' · Kelas: '.($student->grade ?? '-').' · '.$student->branch?->name : 'Profil siswa belum tersambung ke akun ini' }}</p>
+                    </div>
+                </div>
+                <div class="d-flex flex-column gap-2 flex-shrink-0">
+                    <a href="{{ route('siswa.dashboard') }}" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
+                        <i class="bi bi-grid-fill me-2"></i>Buka Portal Siswa
+                    </a>
+                    <a href="{{ route('siswa.schedule') }}" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);border-radius:10px">
+                        <i class="bi bi-calendar-event me-2"></i>Lihat Jadwal
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- QUICK STATS for siswa --}}
+    @php
+        $jadwalHariIni = $student ? \App\Models\Schedule::where('cabang_id', $student->branch_id)->whereDate('tanggal', today())->count() : 0;
+        $jadwalMingguIni = $student ? \App\Models\Schedule::where('cabang_id', $student->branch_id)->whereBetween('tanggal',[now()->startOfWeek(), now()->endOfWeek()])->count() : 0;
+        $sertifikatCount = $student ? \App\Models\Certificate::where('student_id', $student->id)->count() : 0;
+        $invoiceBelum = $student ? \App\Models\Invoice::where('siswa_id', $student->id)->where('status','belum_bayar')->count() : 0;
+    @endphp
+    <div class="col-6 col-md-3 fade-up" style="animation-delay:.05s">
+        <div class="stat-card" style="border-top:3px solid #c84ddf">
+            <a href="{{ route('siswa.schedule') }}" class="text-decoration-none d-block">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-title">Jadwal Hari Ini</div>
+                        <div class="stat-value text-primary">{{ $jadwalHariIni }}</div>
+                        <div class="stat-growth text-muted"><i class="bi bi-calendar-day me-1"></i>Sesi belajar</div>
+                    </div>
+                    <div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-calendar-day"></i></div>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 fade-up" style="animation-delay:.10s">
+        <div class="stat-card" style="border-top:3px solid #10b981">
+            <a href="{{ route('siswa.schedule') }}" class="text-decoration-none d-block">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-title">Jadwal Minggu Ini</div>
+                        <div class="stat-value text-success">{{ $jadwalMingguIni }}</div>
+                        <div class="stat-growth text-muted"><i class="bi bi-calendar-week me-1"></i>Total sesi</div>
+                    </div>
+                    <div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-calendar-week"></i></div>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 fade-up" style="animation-delay:.15s">
+        <div class="stat-card" style="border-top:3px solid #f6af23">
+            <a href="{{ route('siswa.certificates.index') }}" class="text-decoration-none d-block">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-title">Sertifikat</div>
+                        <div class="stat-value text-warning">{{ $sertifikatCount }}</div>
+                        <div class="stat-growth text-muted"><i class="bi bi-award me-1"></i>Diperoleh</div>
+                    </div>
+                    <div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-award"></i></div>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 fade-up" style="animation-delay:.20s">
+        <div class="stat-card" style="{{ $invoiceBelum > 0 ? 'border-top:3px solid #ef4444' : 'border-top:3px solid #10b981' }}">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-title">Tagihan Belum Bayar</div>
+                    <div class="stat-value {{ $invoiceBelum > 0 ? 'text-danger' : 'text-success' }}">{{ $invoiceBelum }}</div>
+                    <div class="stat-growth {{ $invoiceBelum > 0 ? 'text-danger' : 'text-success' }}">
+                        <i class="bi {{ $invoiceBelum > 0 ? 'bi-exclamation-circle' : 'bi-check-circle' }} me-1"></i>
+                        {{ $invoiceBelum > 0 ? 'Harap segera dibayar' : 'Semua lunas!' }}
+                    </div>
+                </div>
+                <div class="stat-icon {{ $invoiceBelum > 0 ? 'bg-danger-soft' : 'bg-success-soft' }}" style="color:white">
+                    <i class="bi {{ $invoiceBelum > 0 ? 'bi-exclamation-circle-fill' : 'bi-check-circle-fill' }}"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+{{-- OTHER ROLES --}}
+@if(!in_array($role, ['owner','admin','guru','siswa']))
 <div class="row g-3">
     <div class="col-12 fade-up">
         <div class="dashboard-card text-center py-5">
@@ -360,7 +559,7 @@
             </div>
             <h5 class="fw-bold mb-2">Halo, {{ $user->name }}!</h5>
             <p class="text-muted mb-4" style="max-width:340px;margin:0 auto">
-                Panel <strong>{{ ucfirst($role) }}</strong> sedang dalam pengembangan. Fitur lengkap akan segera hadir.
+                Selamat datang di Smart Center Indonesia.
             </p>
             <div class="d-flex gap-2 justify-content-center flex-wrap">
                 <a href="{{ route('profile.edit') }}" class="btn btn-outline-primary btn-sm">
@@ -380,12 +579,6 @@
 
 @endsection
 
-@push('styles')
-<style>
-.quick-dash { transition: transform .2s, box-shadow .2s; }
-.quick-dash:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.10); }
-</style>
-@endpush
 
 @push('scripts')
 <script>

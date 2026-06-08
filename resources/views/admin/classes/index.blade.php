@@ -7,23 +7,26 @@
 <div class="fade-up">
 
     {{-- HEADER BANNER --}}
-    <div class="page-header mb-4" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);border-radius:20px;padding:2rem 2.5rem;color:#fff;position:relative;overflow:hidden;">
-        <div style="position:absolute;top:-30px;right:-30px;width:180px;height:180px;background:rgba(255,255,255,.07);border-radius:50%;"></div>
-        <div style="position:absolute;bottom:-50px;right:80px;width:120px;height:120px;background:rgba(255,255,255,.05);border-radius:50%;"></div>
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative;z-index:1;">
-            <div>
-                <nav aria-label="breadcrumb" class="mb-1">
-                    <ol class="breadcrumb mb-0" style="font-size:.8rem;opacity:.8;">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-white text-decoration-none">Dashboard</a></li>
-                        <li class="breadcrumb-item active text-white">Kelas</li>
-                    </ol>
-                </nav>
-                <h1 class="mb-1 fw-bold" style="font-size:1.8rem;">Manajemen Kelas</h1>
-                <p class="mb-0 opacity-75">Atur kelas belajar, kapasitas, dan penugasan guru di semua cabang</p>
+    <div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
+        <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%;pointer-events:none"></div>
+        <div style="position:absolute;right:80px;bottom:-50px;width:120px;height:120px;background:rgba(255,255,255,.03);border-radius:50%;pointer-events:none"></div>
+        <div class="row align-items-center g-3" style="position:relative">
+            <div class="col-md-8">
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">
+                        <i class="bi bi-building-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0" style="color:white">Manajemen Kelas</h5>
+                        <span style="font-size:12px;opacity:.8">Atur kelas belajar, kapasitas, dan penugasan guru di semua cabang</span>
+                    </div>
+                </div>
             </div>
-            <button class="btn btn-light fw-semibold px-4 py-2" onclick="openModal()">
-                <i class="bi bi-plus-circle me-2"></i>Tambah Kelas
-            </button>
+            <div class="col-md-4 text-md-end">
+                <button onclick="openModal()" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
+                    <i class="bi bi-plus-lg me-2"></i>Tambah Kelas
+                </button>
+            </div>
         </div>
     </div>
 
@@ -31,22 +34,22 @@
     <div class="row g-3 mb-4">
         @php
             $statCards = [
-                ['label'=>'Total Kelas','value'=>$stats['total'],'icon'=>'bi-building','color'=>'#68117e','bg'=>'rgba(104,17,126,.12)'],
-                ['label'=>'Kelas Aktif','value'=>$stats['aktif'],'icon'=>'bi-check-circle','color'=>'#10b981','bg'=>'rgba(16,185,129,.12)'],
-                ['label'=>'Kelas Online','value'=>$stats['online'],'icon'=>'bi-wifi','color'=>'#c84ddf','bg'=>'rgba(200,77,223,.12)'],
-                ['label'=>'Kelas Offline','value'=>$stats['offline'],'icon'=>'bi-geo-alt','color'=>'#f6af23','bg'=>'rgba(245,158,11,.12)'],
+                ['label'=>'Total Kelas',  'value'=>$stats['total'],  'icon'=>'bi-building',      'color'=>'text-primary', 'topColor'=>'#c84ddf', 'iconBg'=>'bg-primary-soft'],
+                ['label'=>'Kelas Aktif',  'value'=>$stats['aktif'],  'icon'=>'bi-check-circle',  'color'=>'text-success', 'topColor'=>'#10b981', 'iconBg'=>'bg-success-soft'],
+                ['label'=>'Kelas Online', 'value'=>$stats['online'], 'icon'=>'bi-wifi',           'color'=>'text-primary', 'topColor'=>'#c84ddf', 'iconBg'=>'bg-primary-soft'],
+                ['label'=>'Kelas Offline','value'=>$stats['offline'],'icon'=>'bi-geo-alt-fill',  'color'=>'text-warning', 'topColor'=>'#f6af23', 'iconBg'=>'bg-warning-soft'],
             ];
         @endphp
-        @foreach($statCards as $sc)
-        <div class="col-6 col-lg-3">
-            <div class="card border-0 h-100" style="border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);">
-                <div class="card-body p-3 d-flex align-items-center gap-3">
-                    <div style="width:48px;height:48px;border-radius:14px;background:{{ $sc['bg'] }};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="bi {{ $sc['icon'] }}" style="font-size:1.3rem;color:{{ $sc['color'] }};"></i>
-                    </div>
+        @foreach($statCards as $i => $sc)
+        <div class="col-6 col-lg-3 fade-up" style="animation-delay:{{ $i * 0.05 }}s">
+            <div class="stat-card" style="border-top:3px solid {{ $sc['topColor'] }}">
+                <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <div class="fw-bold fs-4 count-up" data-target="{{ $sc['value'] }}">{{ $sc['value'] }}</div>
-                        <div class="text-muted" style="font-size:.78rem;">{{ $sc['label'] }}</div>
+                        <div class="stat-title">{{ $sc['label'] }}</div>
+                        <div class="stat-value {{ $sc['color'] }} count-up" data-target="{{ $sc['value'] }}">{{ $sc['value'] }}</div>
+                    </div>
+                    <div class="stat-icon {{ $sc['iconBg'] }}" style="color:white">
+                        <i class="bi {{ $sc['icon'] }}"></i>
                     </div>
                 </div>
             </div>
@@ -55,8 +58,8 @@
     </div>
 
     {{-- FILTERS --}}
-    <div class="card border-0 mb-3" style="border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);">
-        <div class="card-body p-3">
+    <div class="dashboard-card mb-4 fade-up">
+        <div>
             <form method="GET" class="row g-2 align-items-end">
                 <div class="col-12 col-md-4">
                     <div class="input-group">
@@ -99,9 +102,8 @@
     </div>
 
     {{-- TABLE --}}
-    <div class="card border-0" style="border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);">
-        <div class="card-body p-0">
-            <div class="table-responsive">
+    <div class="dashboard-card fade-up">
+        <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="thead-modern">
                         <tr>
@@ -175,9 +177,8 @@
                 </table>
             </div>
             @if($classes->hasPages())
-            <div class="px-4 py-3 border-top">{{ $classes->links() }}</div>
+            <div class="mt-4 pt-3 d-flex justify-content-center" style="border-top:1px solid var(--card-border)">{{ $classes->links() }}</div>
             @endif
-        </div>
     </div>
 </div>
 

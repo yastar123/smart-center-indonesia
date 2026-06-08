@@ -226,8 +226,4 @@
 @endsection
 
 @push('scripts')
-<style>
-.quick-owner-link { transition: transform .2s, box-shadow .2s; }
-.quick-owner-link:hover { transform: translateX(4px); box-shadow: 0 4px 16px rgba(0,0,0,.08); }
-</style>
 @endpush

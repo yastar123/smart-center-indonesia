@@ -483,9 +483,9 @@ $jenisIcon = ['online' => 'bi-camera-video-fill', 'offline' => 'bi-building-fill
 <div class="modal fade" id="scheduleModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius:20px;border:none">
-            <div class="modal-header" style="border-bottom:1px solid var(--card-border);border-radius:20px 20px 0 0;background:var(--card-bg)">
-                <h6 class="modal-title fw-bold" id="modalTopic" style="font-size:16px">Detail Sesi</h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#260632,#461256,#c84ddf);border-radius:20px 20px 0 0">
+                <h6 class="modal-title fw-bold text-white" id="modalTopic"><i class="bi bi-calendar-event me-2"></i>Detail Sesi</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-4" style="background:var(--card-bg);border-radius:0 0 20px 20px">
                 <div class="d-flex flex-column gap-3" id="modalBody"></div>

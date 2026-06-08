@@ -57,9 +57,9 @@
 <div class="modal fade" id="annModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content" style="border-radius:20px;border:none">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold" id="modalTitle">Buat Pengumuman</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header border-0 pb-0" style="background:linear-gradient(135deg,#260632,#461256,#c84ddf);border-radius:20px 20px 0 0;padding:20px 24px">
+                <h5 class="modal-title fw-bold text-white" id="modalTitle"><i class="bi bi-megaphone me-2"></i>Buat Pengumuman</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form id="annForm" enctype="multipart/form-data">
                 @csrf

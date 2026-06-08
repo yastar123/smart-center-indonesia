@@ -155,17 +155,17 @@
         </h6>
     </div>
     <div class="table-responsive">
-        <table class="table align-middle mb-0" style="font-size:13px">
-            <thead>
-                <tr style="background:var(--input-bg);border-bottom:2px solid var(--card-border)">
-                    <th class="ps-3" style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Tanggal & Waktu</th>
-                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Topik</th>
-                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Guru</th>
-                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Kelas</th>
-                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Jenis</th>
-                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Cabang</th>
-                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Status</th>
-                    <th class="text-center" style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Aksi</th>
+        <table class="table table-hover table-modern align-middle mb-0">
+            <thead class="thead-modern">
+                <tr>
+                    <th class="ps-3">Tanggal &amp; Waktu</th>
+                    <th>Topik</th>
+                    <th class="d-none d-md-table-cell">Guru</th>
+                    <th class="d-none d-lg-table-cell">Kelas</th>
+                    <th class="d-none d-md-table-cell">Jenis</th>
+                    <th class="d-none d-lg-table-cell">Cabang</th>
+                    <th>Status</th>
+                    <th class="text-center">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -194,27 +194,27 @@
                         <div class="fw-semibold" style="font-size:13px">{{ $sc->topik ?: '–' }}</div>
                         @if($sc->ruangan)<div style="font-size:11px;color:#6b7280"><i class="bi bi-door-open me-1"></i>{{ $sc->ruangan }}</div>@endif
                     </td>
-                    <td>
+                    <td class="d-none d-md-table-cell">
                         <div class="d-flex align-items-center gap-2">
                             <div style="width:30px;height:30px;border-radius:50%;background:#f0fdf4;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#16a34a;flex-shrink:0">
                                 {{ strtoupper(substr($sc->guru?->name ?? 'G', 0, 1)) }}
                             </div>
-                            <span>{{ $sc->guru?->name ?? '–' }}</span>
+                            <span style="font-size:.85rem">{{ $sc->guru?->name ?? '–' }}</span>
                         </div>
                     </td>
-                    <td style="color:#6b7280">{{ $sc->kelas?->nama ?? '–' }}</td>
-                    <td>
+                    <td class="d-none d-lg-table-cell text-muted" style="font-size:.85rem">{{ $sc->kelas?->nama ?? '–' }}</td>
+                    <td class="d-none d-md-table-cell">
                         @if($sc->jenis === 'online')
-                        <span style="background:#f0fdf4;color:#16a34a;padding:3px 9px;border-radius:7px;font-size:11px;font-weight:600">
+                        <span class="badge rounded-pill" style="background:#f0fdf4;color:#16a34a;font-size:11px;font-weight:600">
                             <i class="bi bi-wifi me-1"></i>Online
                         </span>
                         @else
-                        <span style="background:#fdf4ff;color:#68117e;padding:3px 9px;border-radius:7px;font-size:11px;font-weight:600">
+                        <span class="badge rounded-pill" style="background:#fdf4ff;color:#68117e;font-size:11px;font-weight:600">
                             <i class="bi bi-building me-1"></i>Offline
                         </span>
                         @endif
                     </td>
-                    <td style="color:#6b7280">{{ $sc->cabang?->name ?? '–' }}</td>
+                    <td class="d-none d-lg-table-cell text-muted" style="font-size:.85rem">{{ $sc->cabang?->name ?? '–' }}</td>
                     <td>
                         <span style="background:{{ $st['bg'] }};color:{{ $st['color'] }};padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600">
                             {{ $st['label'] }}

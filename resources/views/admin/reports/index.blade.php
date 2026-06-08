@@ -204,13 +204,13 @@ $outstanding = Invoice::with(['siswa','cabang'])
                 </a>
             </div>
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0" style="font-size:12.5px">
-                    <thead>
-                        <tr style="background:var(--input-bg)">
-                            <th class="py-2" style="color:var(--text-muted);font-weight:600;font-size:11px;text-transform:uppercase">Siswa</th>
-                            <th class="py-2 d-none d-md-table-cell" style="color:var(--text-muted);font-weight:600;font-size:11px;text-transform:uppercase">Metode</th>
-                            <th class="py-2" style="color:var(--text-muted);font-weight:600;font-size:11px;text-transform:uppercase">Jumlah</th>
-                            <th class="py-2" style="color:var(--text-muted);font-weight:600;font-size:11px;text-transform:uppercase">Tanggal</th>
+                <table class="table table-hover table-modern align-middle mb-0">
+                    <thead class="thead-modern">
+                        <tr>
+                            <th>Siswa</th>
+                            <th class="d-none d-md-table-cell">Metode</th>
+                            <th>Jumlah</th>
+                            <th>Tanggal</th>
                         </tr>
                     </thead>
                     <tbody>

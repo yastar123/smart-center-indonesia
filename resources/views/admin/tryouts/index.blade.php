@@ -65,11 +65,11 @@
 
 {{-- MODAL TRYOUT --}}
 <div class="modal fade" id="tryoutModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content" style="border-radius:20px;border:none">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold" id="modalTitle">Buat Tryout</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#260632,#68117e);color:#fff">
+                <h6 class="modal-title fw-bold" id="modalTitle"><i class="bi bi-journal-check me-2"></i>Buat Tryout</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form id="tryoutForm">
                 @csrf
@@ -108,9 +108,12 @@
 <div class="modal fade" id="soalModal" tabindex="-1">
     <div class="modal-dialog modal-xl">
         <div class="modal-content" style="border-radius:20px;border:none">
-            <div class="modal-header border-0 pb-0">
-                <div><h5 class="modal-title fw-bold" id="soalTitle">Kelola Soal</h5><small class="text-muted" id="soalSubtitle"></small></div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#260632,#461256,#c84ddf);border-radius:20px 20px 0 0">
+                <div>
+                    <h5 class="modal-title fw-bold text-white" id="soalTitle"><i class="bi bi-list-check me-2"></i>Kelola Soal</h5>
+                    <small style="color:rgba(255,255,255,.65)" id="soalSubtitle"></small>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div class="row g-3">
@@ -161,7 +164,7 @@
 <div class="modal fade" id="hasilModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content" style="border-radius:20px;border:none">
-            <div class="modal-header border-0 pb-0"><h5 class="modal-title fw-bold">Hasil Tryout</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#260632,#461256,#c84ddf);border-radius:20px 20px 0 0"><h5 class="modal-title fw-bold text-white"><i class="bi bi-bar-chart me-2"></i>Hasil Tryout</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
             <div class="modal-body">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">

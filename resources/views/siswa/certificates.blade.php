@@ -86,9 +86,9 @@
 <div class="modal fade" id="uploadModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content" style="border-radius:20px;border:none">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold"><i class="bi bi-upload me-2 text-primary"></i>Upload Sertifikat</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#260632,#461256,#c84ddf);border-radius:20px 20px 0 0">
+                <h5 class="modal-title fw-bold text-white"><i class="bi bi-upload me-2"></i>Upload Sertifikat</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form id="uploadForm" enctype="multipart/form-data">
                 @csrf

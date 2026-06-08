@@ -93,9 +93,9 @@
 <div class="modal fade" id="roomModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content" style="border-radius:20px;border:none">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">Buat Room Chat</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#260632,#461256,#c84ddf);border-radius:20px 20px 0 0">
+                <h5 class="modal-title fw-bold text-white"><i class="bi bi-chat-dots me-2"></i>Buat Room Chat</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form id="roomForm">
                 @csrf
