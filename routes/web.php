@@ -210,12 +210,13 @@ Route::middleware(['auth'])
         Route::get('/attendance/report',                 [AttendanceController::class, 'report'])     ->name('attendance.report');
 
         // Nilai
-        Route::get('/grades',          [GradeController::class, 'index'])  ->name('grades');
-        Route::post('/grades',         [GradeController::class, 'store'])  ->name('grades.store');
-        Route::get('/grades/{grade}',  [GradeController::class, 'show'])   ->name('grades.show');
-        Route::put('/grades/{grade}',  [GradeController::class, 'update']) ->name('grades.update');
-        Route::delete('/grades/{grade}',[GradeController::class,'destroy'])->name('grades.destroy');
-        Route::get('/grades/rekap',    [GradeController::class, 'rekap'])  ->name('grades.rekap');
+        Route::get('/grades',               [GradeController::class, 'index'])      ->name('grades');
+        Route::post('/grades',              [GradeController::class, 'store'])      ->name('grades.store');
+        Route::post('/grades/batch',        [GradeController::class, 'storeBatch']) ->name('grades.storeBatch');
+        Route::get('/grades/rekap',         [GradeController::class, 'rekap'])      ->name('grades.rekap');
+        Route::get('/grades/{grade}',       [GradeController::class, 'show'])       ->name('grades.show');
+        Route::put('/grades/{grade}',       [GradeController::class, 'update'])     ->name('grades.update');
+        Route::delete('/grades/{grade}',    [GradeController::class, 'destroy'])    ->name('grades.destroy');
     });
 
 /*

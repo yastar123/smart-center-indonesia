@@ -431,10 +431,10 @@ function clearAll() {
     });
 }
 
-function submitGrades(e) {
+async function submitGrades(e) {
     e.preventDefault();
-    const filled = [...document.querySelectorAll('.grade-input')].filter(i=>i.value!=='').length;
-    const total  = document.querySelectorAll('.grade-input').length;
+    const inputs = [...document.querySelectorAll('.grade-input')];
+    const filled = inputs.filter(i => i.value !== '').length;
     if (filled === 0) {
         window.showToast('Belum ada nilai yang diisi!', 'warning');
         return;
@@ -442,11 +442,32 @@ function submitGrades(e) {
     const btn = document.getElementById('submitGradeBtn');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';
-    setTimeout(() => {
+
+    const fd = new FormData();
+    fd.append('_token', document.querySelector('meta[name=csrf-token]').content);
+    fd.append('course_id', document.querySelector('[name=course_id]').value);
+    fd.append('jenis',     document.querySelector('[name=jenis]').value);
+    inputs.forEach(inp => {
+        if (inp.value !== '') {
+            const sid = inp.id.replace('grade_', '');
+            fd.append(`grades[${sid}]`, inp.value);
+        }
+    });
+
+    try {
+        const res  = await fetch('{{ route("guru.grades.storeBatch") }}', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (data.success) {
+            window.showToast(data.message || 'Nilai berhasil disimpan!', 'success');
+        } else {
+            window.showToast(data.message || 'Gagal menyimpan nilai.', 'error');
+        }
+    } catch (err) {
+        window.showToast('Terjadi kesalahan jaringan. Coba lagi.', 'error');
+    } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-save me-2"></i>Simpan Nilai';
-        window.showToast(`Nilai berhasil disimpan untuk ${filled} siswa!`, 'success');
-    }, 900);
+    }
 }
 
 // Init stats on page load

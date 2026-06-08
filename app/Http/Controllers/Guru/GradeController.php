@@ -54,6 +54,47 @@ class GradeController extends Controller
         return response()->json(['success' => true, 'message' => 'Nilai berhasil disimpan!']);
     }
 
+    public function storeBatch(Request $request)
+    {
+        $request->validate([
+            'course_id' => 'required|exists:courses,id',
+            'jenis'     => 'required|string',
+            'grades'    => 'required|array',
+        ]);
+
+        $teacher       = Teacher::where('user_id', auth()->id())->first();
+        $courseId      = $request->course_id;
+        $jenis         = $request->jenis;
+        $today         = now()->toDateString();
+        $saved         = 0;
+
+        foreach ($request->grades as $siswaId => $nilai) {
+            if ($nilai === null || $nilai === '') continue;
+            $nilai = max(0, min(100, (float) $nilai));
+
+            Grade::updateOrCreate(
+                [
+                    'siswa_id'         => $siswaId,
+                    'mata_pelajaran_id' => $courseId,
+                    'jenis_penilaian'  => $jenis,
+                ],
+                [
+                    'nilai'            => $nilai,
+                    'guru_id'          => $teacher?->id,
+                    'nama_penilaian'   => ucfirst($jenis),
+                    'tanggal'          => $today,
+                ]
+            );
+            $saved++;
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => "Nilai berhasil disimpan untuk {$saved} siswa!",
+            'saved'   => $saved,
+        ]);
+    }
+
     public function show(Grade $grade)
     {
         return response()->json(['success' => true, 'data' => $grade->load('siswa', 'mataPelajaran')]);

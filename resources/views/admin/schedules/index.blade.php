@@ -155,15 +155,15 @@
     <div class="table-responsive">
         <table class="table align-middle mb-0" style="font-size:13px">
             <thead>
-                <tr style="background:var(--sidebar-hover);border-bottom:2px solid var(--card-border)">
-                    <th class="ps-3" style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Tanggal & Waktu</th>
-                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Topik</th>
-                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Guru</th>
-                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Kelas</th>
-                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Jenis</th>
-                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Cabang</th>
-                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Status</th>
-                    <th class="text-center" style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Aksi</th>
+                <tr style="background:var(--input-bg);border-bottom:2px solid var(--card-border)">
+                    <th class="ps-3" style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Tanggal & Waktu</th>
+                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Topik</th>
+                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Guru</th>
+                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Kelas</th>
+                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Jenis</th>
+                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Cabang</th>
+                    <th style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Status</th>
+                    <th class="text-center" style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);padding:12px 8px">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -178,7 +178,7 @@
                     $st = $statusMap[$sc->status] ?? ['bg'=>'#f1f5f9','color'=>'#64748b','label'=>$sc->status];
                     $isToday = $sc->tanggal && $sc->tanggal->isToday();
                 @endphp
-                <tr style="border-bottom:1px solid var(--card-border);transition:background .15s{{ $isToday ? ';background:rgba(104,17,126,.03)' : '' }}" onmouseover="this.style.background='var(--sidebar-hover)'" onmouseout="this.style.background='{{ $isToday ? 'rgba(104,17,126,.03)' : '' }}'">
+                <tr style="border-bottom:1px solid var(--card-border);transition:background .15s{{ $isToday ? ';background:rgba(104,17,126,.03)' : '' }}" onmouseover="this.style.background='rgba(104,17,126,.05)'" onmouseout="this.style.background='{{ $isToday ? 'rgba(104,17,126,.03)' : '' }}'">
                     <td class="ps-3">
                         <div class="fw-semibold" style="font-size:13px">
                             {{ $sc->tanggal ? $sc->tanggal->format('d M Y') : '–' }}

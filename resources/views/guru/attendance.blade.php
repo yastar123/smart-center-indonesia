@@ -387,7 +387,7 @@ function updateSummary() {
     document.getElementById('countAlpha').textContent  = counts.alpha;
 }
 
-function submitAttendance(e) {
+async function submitAttendance(e) {
     e.preventDefault();
     const filled = Object.keys(studentStatus).length;
     const total  = document.querySelectorAll('.student-row').length;
@@ -398,11 +398,33 @@ function submitAttendance(e) {
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';
-    setTimeout(() => {
+
+    const jadwalId = document.querySelector('[name=schedule_id]').value;
+    const statusMap = { alpha: 'alpa' };
+    const fd = new FormData();
+    fd.append('_token', document.querySelector('meta[name=csrf-token]').content);
+    fd.append('jadwal_id', jadwalId);
+    let i = 0;
+    for (const [siswaId, status] of Object.entries(studentStatus)) {
+        fd.append(`absensi[${i}][siswa_id]`, siswaId);
+        fd.append(`absensi[${i}][status]`, statusMap[status] || status);
+        i++;
+    }
+
+    try {
+        const res  = await fetch('{{ route("guru.attendance.store") }}', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (data.success) {
+            window.showToast(data.message || 'Absensi berhasil disimpan!', 'success');
+        } else {
+            window.showToast(data.message || 'Gagal menyimpan absensi.', 'error');
+        }
+    } catch (err) {
+        window.showToast('Terjadi kesalahan jaringan. Coba lagi.', 'error');
+    } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-save me-2"></i>Simpan Absensi';
-        window.showToast('Absensi berhasil disimpan! ({{ $classStudents->count() }} siswa)', 'success');
-    }, 900);
+    }
 }
 </script>
 @endpush
