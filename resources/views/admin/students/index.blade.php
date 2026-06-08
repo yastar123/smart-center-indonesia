@@ -174,17 +174,17 @@
     @if(request()->hasAny(['search','status','gender','branch_id']))
     <div class="d-flex gap-2 mb-3 flex-wrap">
         @if(request('search'))
-        <span class="badge" style="background:#fdf4ff;color:#461256;border:1px solid #e8b4f5;font-size:12px;padding:6px 12px;border-radius:8px">
+        <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);border:1px solid var(--soft-primary-border);font-size:12px;padding:6px 12px;border-radius:8px">
             <i class="bi bi-search me-1"></i>{{ request('search') }}
         </span>
         @endif
         @if(request('status'))
-        <span class="badge" style="background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;font-size:12px;padding:6px 12px;border-radius:8px">
+        <span class="badge" style="background:var(--soft-success-bg);color:var(--soft-success-text);border:1px solid var(--soft-success-border);font-size:12px;padding:6px 12px;border-radius:8px">
             <i class="bi bi-circle-fill me-1" style="font-size:8px"></i>{{ ucfirst(request('status')) }}
         </span>
         @endif
         @if(request('gender'))
-        <span class="badge" style="background:#fdf2f8;color:#be185d;border:1px solid #fbcfe8;font-size:12px;padding:6px 12px;border-radius:8px">
+        <span class="badge" style="background:var(--soft-danger-bg);color:var(--soft-danger-text);border:1px solid var(--soft-danger-border);font-size:12px;padding:6px 12px;border-radius:8px">
             <i class="bi bi-person me-1"></i>{{ request('gender')==='L' ? 'Laki-laki':'Perempuan' }}
         </span>
         @endif
@@ -212,11 +212,11 @@
                 @php
                     $avatar = 'https://ui-avatars.com/api/?name='.urlencode($s->name).'&background='.($s->gender==='P'?'ec4899':'68117e').'&color=fff&size=80';
                     $statusMap = [
-                        'aktif'    => ['bg'=>'#dcfce7','color'=>'#15803d','label'=>'Aktif'],
-                        'nonaktif' => ['bg'=>'#f3f4f6','color'=>'#6b7280','label'=>'Nonaktif'],
-                        'lulus'    => ['bg'=>'#f3d6fa','color'=>'#461256','label'=>'Lulus'],
+                        'aktif'    => ['bg'=>'var(--soft-success-bg)','color'=>'var(--soft-success-text)','label'=>'Aktif'],
+                        'nonaktif' => ['bg'=>'var(--soft-muted-bg)','color'=>'var(--soft-muted-text)','label'=>'Nonaktif'],
+                        'lulus'    => ['bg'=>'var(--soft-primary-bg)','color'=>'var(--soft-primary-text)','label'=>'Lulus'],
                     ];
-                    $badge = $statusMap[$s->status] ?? ['bg'=>'#f3f4f6','color'=>'#6b7280','label'=>ucfirst($s->status??'-')];
+                    $badge = $statusMap[$s->status] ?? ['bg'=>'var(--soft-muted-bg)','color'=>'var(--soft-muted-text)','label'=>ucfirst($s->status??'-')];
                 @endphp
                 <tr>
                     <td class="text-muted small fw-semibold">
@@ -534,14 +534,14 @@ function showDetail(id) {
     $.get('/admin/students/' + id, function(res) {
         const s = res.data;
         const avatar = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(s.name) + '&background=' + (s.gender==='P'?'ec4899':'68117e') + '&color=fff&size=120';
-        const statusMap = {aktif:'#dcfce7:#15803d:Aktif', nonaktif:'#f3f4f6:#6b7280:Nonaktif', lulus:'#f3d6fa:#461256:Lulus'};
-        const [sbg,scol,slbl] = (statusMap[s.status]||'#f3f4f6:#6b7280:'+s.status).split(':');
+        const statusMap = {aktif:'var(--soft-success-bg):var(--soft-success-text):Aktif', nonaktif:'var(--soft-muted-bg):var(--soft-muted-text):Nonaktif', lulus:'var(--soft-primary-bg):var(--soft-primary-text):Lulus'};
+        const [sbg,scol,slbl] = (statusMap[s.status]||'var(--soft-muted-bg):var(--soft-muted-text):'+s.status).split(':');
         document.getElementById('detailBody').innerHTML = `
             <div style="text-align:center;padding:24px 24px 16px">
                 <img src="${s.photo ? '/storage/'+s.photo : avatar}" class="rounded-circle mb-3"
                      width="90" height="90" style="object-fit:cover;border:3px solid #c84ddf;box-shadow:0 8px 24px rgba(200,77,223,.25)">
                 <h6 class="fw-bold mb-1" style="font-size:16px">${s.name}</h6>
-                <code style="background:#fdf4ff;color:#461256;padding:3px 10px;border-radius:6px;font-size:12px">${s.nis}</code>
+                <code style="background:var(--soft-primary-bg);color:var(--soft-primary-text);padding:3px 10px;border-radius:6px;font-size:12px">${s.nis}</code>
                 <div style="margin-top:10px">
                     <span style="background:${sbg};color:${scol};padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600">
                         ● ${slbl}
@@ -569,9 +569,9 @@ function showDetail(id) {
 }
 
 function row(label, val) {
-    return `<tr style="border-bottom:1px solid var(--card-border,#e2e8f0)">
-        <td style="padding:9px 4px 9px 0;color:#6b7280;font-size:12.5px;width:38%">${label}</td>
-        <td style="padding:9px 0;font-size:13px;font-weight:600;color:var(--text-primary,#260632)">${val}</td>
+    return `<tr style="border-bottom:1px solid var(--card-border)">
+        <td style="padding:9px 4px 9px 0;color:var(--text-muted);font-size:12.5px;width:38%">${label}</td>
+        <td style="padding:9px 0;font-size:13px;font-weight:600;color:var(--text-primary)">${val}</td>
     </tr>`;
 }
 

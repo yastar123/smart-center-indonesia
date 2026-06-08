@@ -2,7 +2,7 @@
 <html lang="id" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title','Dashboard') | Smart Center</title>
@@ -51,6 +51,25 @@
             --transition: .25s cubic-bezier(.4,0,.2,1);
             --overdue-bg: #fef2f2;
             --overdue-border: #fecaca;
+            /* soft status colors for summary boxes & inline badges */
+            --soft-primary-bg:      #fdf4ff;
+            --soft-primary-border:  #e8b4f5;
+            --soft-primary-text:    #68117e;
+            --soft-success-bg:      #dcfce7;
+            --soft-success-border:  #bbf7d0;
+            --soft-success-text:    #15803d;
+            --soft-warning-bg:      #fef3c7;
+            --soft-warning-border:  #fcd34d;
+            --soft-warning-text:    #92400e;
+            --soft-info-bg:         #e0f2fe;
+            --soft-info-border:     #7dd3fc;
+            --soft-info-text:       #075985;
+            --soft-danger-bg:       #fee2e2;
+            --soft-danger-border:   #fecaca;
+            --soft-danger-text:     #991b1b;
+            --soft-muted-bg:        #f1f5f9;
+            --soft-muted-border:    #e2e8f0;
+            --soft-muted-text:      #64748b;
         }
 
         [data-theme="dark"] {
@@ -63,6 +82,25 @@
             --input-bg: #1a0425;
             --overdue-bg: #2d1515;
             --overdue-border: #7f1d1d;
+            /* soft status colors — dark mode */
+            --soft-primary-bg:      rgba(200,77,223,.12);
+            --soft-primary-border:  rgba(200,77,223,.25);
+            --soft-primary-text:    #d68eef;
+            --soft-success-bg:      rgba(16,185,129,.12);
+            --soft-success-border:  rgba(16,185,129,.25);
+            --soft-success-text:    #34d399;
+            --soft-warning-bg:      rgba(246,175,35,.12);
+            --soft-warning-border:  rgba(246,175,35,.25);
+            --soft-warning-text:    #fbbf24;
+            --soft-info-bg:         rgba(14,165,233,.12);
+            --soft-info-border:     rgba(14,165,233,.25);
+            --soft-info-text:       #38bdf8;
+            --soft-danger-bg:       rgba(239,68,68,.12);
+            --soft-danger-border:   rgba(239,68,68,.25);
+            --soft-danger-text:     #f87171;
+            --soft-muted-bg:        rgba(255,255,255,.06);
+            --soft-muted-border:    rgba(255,255,255,.1);
+            --soft-muted-text:      #94a3b8;
         }
 
         /* ============================================================
@@ -70,7 +108,7 @@
         ============================================================ */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        html { scroll-behavior: smooth; }
+        html { scroll-behavior: smooth; scroll-padding-top: 84px; }
 
         body {
             font-family: var(--font-sans);
@@ -663,18 +701,18 @@
             display: none;
             position: fixed;
             bottom: 0; left: 0; right: 0;
-            height: 62px;
+            height: calc(62px + env(safe-area-inset-bottom, 0px));
             background: var(--card-bg);
             border-top: 1px solid var(--card-border);
             z-index: 1048;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-around;
-            padding: 0 4px;
+            padding: 0 4px env(safe-area-inset-bottom, 0px);
             box-shadow: 0 -4px 24px rgba(0,0,0,.08);
         }
         @media (max-width: 992px) {
             .mobile-bottom-nav { display: flex; }
-            .content-wrapper { padding-bottom: 78px !important; }
+            .content-wrapper { padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px)) !important; }
         }
         .mob-nav-item {
             display: flex;
@@ -1254,6 +1292,41 @@
         .btn-action-group { display: flex; gap: 6px; }
         .btn-action-group .btn { transition: transform .18s, box-shadow .18s; }
         .btn-action-group .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.12) !important; }
+
+        /* ============================================================
+           SEMANTIC ACTION ICON BUTTONS — dark-mode aware
+           Use: btn btn-sm btn-act-view / btn-act-edit / btn-act-del /
+                btn-act-pay / btn-act-info
+        ============================================================ */
+        .btn-act-view, .btn-act-edit, .btn-act-del, .btn-act-pay, .btn-act-info {
+            border: none;
+            border-radius: 8px;
+            width: 32px; height: 32px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            transition: transform .18s, box-shadow .18s, opacity .15s;
+            flex-shrink: 0;
+        }
+        .btn-act-view:hover, .btn-act-edit:hover, .btn-act-del:hover,
+        .btn-act-pay:hover, .btn-act-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,.12);
+        }
+        /* light mode */
+        .btn-act-view  { background: #fdf4ff; color: #68117e; }
+        .btn-act-pay   { background: #f0fdf4; color: #16a34a; }
+        .btn-act-edit  { background: #fffbeb; color: #e09000; }
+        .btn-act-del   { background: #fef2f2; color: #dc2626; }
+        .btn-act-info  { background: #eff6ff; color: #1d4ed8; }
+        /* dark mode */
+        [data-theme="dark"] .btn-act-view  { background: rgba(200,77,223,.14); color: #d68eef; }
+        [data-theme="dark"] .btn-act-pay   { background: rgba(16,185,129,.14); color: #34d399; }
+        [data-theme="dark"] .btn-act-edit  { background: rgba(246,175,35,.14); color: #fbbf24; }
+        [data-theme="dark"] .btn-act-del   { background: rgba(239,68,68,.14);  color: #f87171; }
+        [data-theme="dark"] .btn-act-info  { background: rgba(59,130,246,.14); color: #60a5fa; }
 
         /* ============================================================
            QUICK-ACTION GRID
@@ -3183,10 +3256,10 @@
 {{-- FLASH DATA FOR JS TOAST SYSTEM --}}
 <script id="__flash__" type="application/json">
 {
-    "success": "{{ addslashes(session('success') ?? '') }}",
-    "error":   "{{ addslashes(session('error')   ?? '') }}",
-    "warning": "{{ addslashes(session('warning') ?? '') }}",
-    "info":    "{{ addslashes(session('info')    ?? '') }}"
+    "success": {!! json_encode(session('success') ?? '') !!},
+    "error":   {!! json_encode(session('error')   ?? '') !!},
+    "warning": {!! json_encode(session('warning') ?? '') !!},
+    "info":    {!! json_encode(session('info')    ?? '') !!}
 }
 </script>
 

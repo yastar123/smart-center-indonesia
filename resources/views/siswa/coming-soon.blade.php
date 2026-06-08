@@ -11,7 +11,7 @@
                 <i class="bi {{ $icon ?? 'bi-tools' }} text-white" style="font-size:40px"></i>
             </div>
 
-            <div class="badge mb-3" style="background:#fdf4ff;color:#68117e;font-size:12px;padding:6px 14px;border-radius:20px;border:1px solid #e8b4f5">
+            <div class="badge mb-3" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:12px;padding:6px 14px;border-radius:20px;border:1px solid var(--soft-primary-border)">
                 <i class="bi bi-hammer me-1"></i>Dalam Pengembangan
             </div>
 
@@ -25,7 +25,7 @@
                     <div style="background:var(--input-bg);border-radius:12px;padding:16px 8px;border:1px solid var(--card-border)">
                         <div style="font-size:22px;margin-bottom:4px">🎨</div>
                         <div style="font-size:11px;color:var(--text-muted);font-weight:600">UI/UX<br>Design</div>
-                        <div class="progress mt-2" style="height:4px;border-radius:4px;background:#f3d6fa">
+                        <div class="progress mt-2" style="height:4px;border-radius:4px;background:var(--soft-primary-bg)">
                             <div class="progress-bar" style="width:80%;background:#c84ddf;border-radius:4px"></div>
                         </div>
                     </div>
@@ -34,7 +34,7 @@
                     <div style="background:var(--input-bg);border-radius:12px;padding:16px 8px;border:1px solid var(--card-border)">
                         <div style="font-size:22px;margin-bottom:4px">⚙️</div>
                         <div style="font-size:11px;color:var(--text-muted);font-weight:600">Backend<br>Logic</div>
-                        <div class="progress mt-2" style="height:4px;border-radius:4px;background:#f3d6fa">
+                        <div class="progress mt-2" style="height:4px;border-radius:4px;background:var(--soft-primary-bg)">
                             <div class="progress-bar" style="width:45%;background:#f6af23;border-radius:4px"></div>
                         </div>
                     </div>
@@ -43,7 +43,7 @@
                     <div style="background:var(--input-bg);border-radius:12px;padding:16px 8px;border:1px solid var(--card-border)">
                         <div style="font-size:22px;margin-bottom:4px">🧪</div>
                         <div style="font-size:11px;color:var(--text-muted);font-weight:600">Testing<br>& QA</div>
-                        <div class="progress mt-2" style="height:4px;border-radius:4px;background:#f3d6fa">
+                        <div class="progress mt-2" style="height:4px;border-radius:4px;background:var(--soft-primary-bg)">
                             <div class="progress-bar" style="width:20%;background:#10b981;border-radius:4px"></div>
                         </div>
                     </div>

@@ -74,7 +74,7 @@ $branches = Branch::withCount('students')
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Total Siswa</div>
-                    <div class="stat-value" style="color:#68117e">{{ $totalStudents }}</div>
+                    <div class="stat-value text-primary">{{ $totalStudents }}</div>
                     <div class="stat-label" style="font-size:11px;color:#10b981">
                         <i class="bi bi-arrow-up-short"></i>+{{ $newThisMonth }} bulan ini
                     </div>
@@ -146,7 +146,7 @@ $branches = Branch::withCount('students')
                     <h6 class="fw-bold mb-1" style="font-size:14px">Pertumbuhan Siswa</h6>
                     <p class="text-muted mb-0" style="font-size:12px">Pendaftaran 6 bulan terakhir</p>
                 </div>
-                <span class="badge" style="background:#fdf4ff;color:#68117e;padding:4px 10px;font-size:11px;border-radius:7px">
+                <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);padding:4px 10px;font-size:11px;border-radius:7px">
                     +{{ array_sum($studentData) }} total
                 </span>
             </div>
@@ -160,7 +160,7 @@ $branches = Branch::withCount('students')
                     <h6 class="fw-bold mb-1" style="font-size:14px">Tren Pendapatan</h6>
                     <p class="text-muted mb-0" style="font-size:12px">Revenue 6 bulan terakhir</p>
                 </div>
-                <span class="badge" style="background:#ecfdf5;color:#059669;padding:4px 10px;font-size:11px;border-radius:7px">
+                <span class="badge" style="background:var(--soft-success-bg);color:var(--soft-success-text);padding:4px 10px;font-size:11px;border-radius:7px">
                     Rp {{ number_format(array_sum($revData), 0, ',', '.') }}
                 </span>
             </div>
@@ -205,7 +205,7 @@ $branches = Branch::withCount('students')
                         </div>
                     </div>
                     <div class="text-end">
-                        <div class="fw-bold" style="font-size:14px;color:#68117e">{{ $b->students_count }}</div>
+                        <div class="fw-bold text-primary" style="font-size:14px">{{ $b->students_count }}</div>
                         <div style="font-size:10px;color:var(--text-muted)">siswa</div>
                     </div>
                 </div>

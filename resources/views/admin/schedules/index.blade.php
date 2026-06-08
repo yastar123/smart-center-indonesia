@@ -151,7 +151,7 @@
 <div class="dashboard-card fade-up">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h6 class="fw-bold mb-0"><i class="bi bi-list-ul text-primary me-2"></i>Daftar Jadwal
-            <span class="badge ms-2" style="background:#fdf4ff;color:#68117e;font-size:11px">{{ $schedules->total() }} data</span>
+            <span class="badge ms-2" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:11px">{{ $schedules->total() }} data</span>
         </h6>
     </div>
     <div class="table-responsive">
@@ -172,31 +172,31 @@
                 @forelse($schedules as $sc)
                 @php
                     $statusMap = [
-                        'dijadwalkan' => ['bg'=>'#fdf4ff','color'=>'#68117e','label'=>'Dijadwalkan'],
-                        'berlangsung' => ['bg'=>'#fffbeb','color'=>'#e09000','label'=>'Berlangsung'],
-                        'selesai'     => ['bg'=>'#f0fdf4','color'=>'#16a34a','label'=>'Selesai'],
-                        'dibatalkan'  => ['bg'=>'#fef2f2','color'=>'#dc2626','label'=>'Dibatalkan'],
+                        'dijadwalkan' => ['bg'=>'var(--soft-primary-bg)','color'=>'var(--soft-primary-text)','label'=>'Dijadwalkan'],
+                        'berlangsung' => ['bg'=>'var(--soft-warning-bg)','color'=>'var(--soft-warning-text)','label'=>'Berlangsung'],
+                        'selesai'     => ['bg'=>'var(--soft-success-bg)','color'=>'var(--soft-success-text)','label'=>'Selesai'],
+                        'dibatalkan'  => ['bg'=>'var(--soft-danger-bg)','color'=>'var(--soft-danger-text)','label'=>'Dibatalkan'],
                     ];
-                    $st = $statusMap[$sc->status] ?? ['bg'=>'#f1f5f9','color'=>'#64748b','label'=>$sc->status];
+                    $st = $statusMap[$sc->status] ?? ['bg'=>'var(--soft-muted-bg)','color'=>'var(--soft-muted-text)','label'=>$sc->status];
                     $isToday = $sc->tanggal && $sc->tanggal->isToday();
                 @endphp
                 <tr style="border-bottom:1px solid var(--card-border);transition:background .15s{{ $isToday ? ';background:rgba(104,17,126,.03)' : '' }}" onmouseover="this.style.background='rgba(104,17,126,.05)'" onmouseout="this.style.background='{{ $isToday ? 'rgba(104,17,126,.03)' : '' }}'">
                     <td class="ps-3">
                         <div class="fw-semibold" style="font-size:13px">
                             {{ $sc->tanggal ? $sc->tanggal->format('d M Y') : '–' }}
-                            @if($isToday)<span class="badge ms-1" style="background:#f3d6fa;color:#461256;font-size:10px">Hari ini</span>@endif
+                            @if($isToday)<span class="badge ms-1" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:10px">Hari ini</span>@endif
                         </div>
-                        <div style="font-size:11px;color:#6b7280">
+                        <div class="text-muted" style="font-size:11px">
                             <i class="bi bi-clock me-1"></i>{{ substr($sc->jam_mulai,0,5) ?? '–' }} – {{ substr($sc->jam_selesai,0,5) ?? '–' }}
                         </div>
                     </td>
                     <td>
                         <div class="fw-semibold" style="font-size:13px">{{ $sc->topik ?: '–' }}</div>
-                        @if($sc->ruangan)<div style="font-size:11px;color:#6b7280"><i class="bi bi-door-open me-1"></i>{{ $sc->ruangan }}</div>@endif
+                        @if($sc->ruangan)<div class="text-muted" style="font-size:11px"><i class="bi bi-door-open me-1"></i>{{ $sc->ruangan }}</div>@endif
                     </td>
                     <td class="d-none d-md-table-cell">
                         <div class="d-flex align-items-center gap-2">
-                            <div style="width:30px;height:30px;border-radius:50%;background:#f0fdf4;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#16a34a;flex-shrink:0">
+                            <div style="width:30px;height:30px;border-radius:50%;background:var(--soft-success-bg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--soft-success-text);flex-shrink:0">
                                 {{ strtoupper(substr($sc->guru?->name ?? 'G', 0, 1)) }}
                             </div>
                             <span style="font-size:.85rem">{{ $sc->guru?->name ?? '–' }}</span>
@@ -205,11 +205,11 @@
                     <td class="d-none d-lg-table-cell text-muted" style="font-size:.85rem">{{ $sc->kelas?->nama ?? '–' }}</td>
                     <td class="d-none d-md-table-cell">
                         @if($sc->jenis === 'online')
-                        <span class="badge rounded-pill" style="background:#f0fdf4;color:#16a34a;font-size:11px;font-weight:600">
+                        <span class="badge rounded-pill" style="background:var(--soft-success-bg);color:var(--soft-success-text);font-size:11px;font-weight:600">
                             <i class="bi bi-wifi me-1"></i>Online
                         </span>
                         @else
-                        <span class="badge rounded-pill" style="background:#fdf4ff;color:#68117e;font-size:11px;font-weight:600">
+                        <span class="badge rounded-pill" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:11px;font-weight:600">
                             <i class="bi bi-building me-1"></i>Offline
                         </span>
                         @endif
@@ -222,17 +222,14 @@
                     </td>
                     <td class="text-center">
                         <div class="d-flex justify-content-center gap-1">
-                            <button onclick="showDetail({{ $sc->id }})" class="btn btn-sm" title="Detail"
-                                style="background:#fdf4ff;color:#68117e;border:none;border-radius:8px;width:32px;height:32px;padding:0">
-                                <i class="bi bi-eye-fill" style="font-size:13px"></i>
+                            <button onclick="showDetail({{ $sc->id }})" class="btn btn-sm btn-act-view" title="Detail">
+                                <i class="bi bi-eye-fill"></i>
                             </button>
-                            <button onclick="editSchedule({{ $sc->id }})" class="btn btn-sm" title="Edit"
-                                style="background:#fffbeb;color:#e09000;border:none;border-radius:8px;width:32px;height:32px;padding:0">
-                                <i class="bi bi-pencil-fill" style="font-size:13px"></i>
+                            <button onclick="editSchedule({{ $sc->id }})" class="btn btn-sm btn-act-edit" title="Edit">
+                                <i class="bi bi-pencil-fill"></i>
                             </button>
-                            <button onclick="deleteSchedule({{ $sc->id }}, '{{ addslashes($sc->topik ?? 'Jadwal ini') }}')" class="btn btn-sm" title="Hapus"
-                                style="background:#fef2f2;color:#dc2626;border:none;border-radius:8px;width:32px;height:32px;padding:0">
-                                <i class="bi bi-trash-fill" style="font-size:13px"></i>
+                            <button onclick="deleteSchedule({{ $sc->id }}, '{{ addslashes($sc->topik ?? 'Jadwal ini') }}')" class="btn btn-sm btn-act-del" title="Hapus">
+                                <i class="bi bi-trash-fill"></i>
                             </button>
                         </div>
                     </td>
@@ -240,7 +237,7 @@
                 @empty
                 <tr>
                     <td colspan="8" class="text-center py-5">
-                        <div style="color:#9ca3af">
+                        <div class="text-muted">
                             <i class="bi bi-calendar-x" style="font-size:40px;display:block;margin-bottom:12px;opacity:.4"></i>
                             <div class="fw-semibold mb-1">Belum ada jadwal</div>
                             <div style="font-size:12px">Klik "Tambah Jadwal" untuk membuat jadwal pertama</div>
@@ -489,7 +486,7 @@ function showDetail(id) {
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
                         <div class="fw-bold" style="font-size:15px">${s.topik ?? 'Jadwal #'+s.id}</div>
-                        <div style="font-size:12px;color:#6b7280">${s.tanggal ? s.tanggal.substr(0,10) : '–'} · ${(s.jam_mulai||'–').substr(0,5)} – ${(s.jam_selesai||'–').substr(0,5)}</div>
+                        <div style="font-size:12px;color:var(--text-muted)">${s.tanggal ? s.tanggal.substr(0,10) : '–'} · ${(s.jam_mulai||'–').substr(0,5)} – ${(s.jam_selesai||'–').substr(0,5)}</div>
                     </div>
                     <span style="background:${sbg};color:${scol};padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600">${slbl}</span>
                 </div>
@@ -507,9 +504,9 @@ function showDetail(id) {
 }
 
 function drow(label, val) {
-    return `<tr style="border-bottom:1px solid #f1f5f9">
-        <td style="padding:7px 4px 7px 0;color:#6b7280;font-size:12px;width:36%">${label}</td>
-        <td style="padding:7px 0;font-size:13px;font-weight:500">${val}</td>
+    return `<tr style="border-bottom:1px solid var(--card-border)">
+        <td style="padding:7px 4px 7px 0;color:var(--text-muted);font-size:12px;width:36%">${label}</td>
+        <td style="padding:7px 0;font-size:13px;font-weight:500;color:var(--text-primary)">${val}</td>
     </tr>`;
 }
 

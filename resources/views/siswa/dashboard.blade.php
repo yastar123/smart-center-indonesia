@@ -82,13 +82,13 @@ $weekSchedules = ($student && $student->branch_id)
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Total Tagihan</div>
-                    <div class="stat-value" style="color:#68117e;font-size:20px">
+                    <div class="stat-value text-primary" style="font-size:20px">
                         Rp {{ number_format($totalTagihan, 0, ',', '.') }}
                     </div>
                     <div class="stat-label" style="font-size:11px">{{ $invoices->count() }} invoice</div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#68117e,#c84ddf)">
-                    <i class="bi bi-receipt" style="color:white"></i>
+                <div class="stat-icon bg-primary-soft" style="color:white">
+                    <i class="bi bi-receipt"></i>
                 </div>
             </div>
         </div>
@@ -105,8 +105,8 @@ $weekSchedules = ($student && $student->branch_id)
                         <i class="bi bi-check-circle-fill me-1"></i>Terverifikasi
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#059669,#10b981)">
-                    <i class="bi bi-check-circle" style="color:white"></i>
+                <div class="stat-icon bg-success-soft" style="color:white">
+                    <i class="bi bi-check-circle"></i>
                 </div>
             </div>
         </div>
@@ -127,8 +127,8 @@ $weekSchedules = ($student && $student->branch_id)
                         @endif
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,{{ $sisaTunggakan > 0 ? '#dc2626,#ef4444' : '#059669,#10b981' }})">
-                    <i class="bi bi-wallet2" style="color:white"></i>
+                <div class="stat-icon {{ $sisaTunggakan > 0 ? 'bg-danger-soft' : 'bg-success-soft' }}" style="color:white">
+                    <i class="bi bi-wallet2"></i>
                 </div>
             </div>
         </div>
@@ -141,8 +141,8 @@ $weekSchedules = ($student && $student->branch_id)
                     <div class="stat-value" style="color:#c84ddf">{{ $weekSchedules->count() }}</div>
                     <div class="stat-label" style="font-size:11px">sesi belajar</div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#c84ddf,#68117e)">
-                    <i class="bi bi-calendar-week" style="color:white"></i>
+                <div class="stat-icon bg-primary-soft" style="color:white">
+                    <i class="bi bi-calendar-week"></i>
                 </div>
             </div>
         </div>
@@ -199,7 +199,7 @@ $weekSchedules = ($student && $student->branch_id)
         <div class="dashboard-card h-100">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h6 class="fw-bold mb-0" style="font-size:14px">
-                    <i class="bi bi-calendar-week me-2" style="color:#68117e"></i>Jadwal Belajar Minggu Ini
+                    <i class="bi bi-calendar-week text-primary me-2"></i>Jadwal Belajar Minggu Ini
                 </h6>
                 <span class="text-muted" style="font-size:11.5px">
                     {{ now()->startOfWeek()->locale('id')->isoFormat('D MMM') }} – {{ now()->endOfWeek()->locale('id')->isoFormat('D MMM') }}
@@ -234,7 +234,7 @@ $weekSchedules = ($student && $student->branch_id)
                         <div class="fw-semibold text-truncate" style="font-size:13px">
                             {{ $sch->topik ?? 'Sesi Belajar' }}
                             @if($isToday)
-                                <span class="badge ms-1" style="background:#f3d6fa;color:#461256;font-size:9px">Hari Ini</span>
+                                <span class="badge ms-1" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:9px">Hari Ini</span>
                             @endif
                         </div>
                         <div style="font-size:11px;color:var(--text-muted)">
@@ -259,7 +259,7 @@ $weekSchedules = ($student && $student->branch_id)
 </div>
 
 @if(!$student)
-<div class="alert d-flex gap-3 align-items-start mt-4 fade-up" style="border-radius:14px;border:none;background:#fef3c7;color:#78350f">
+<div class="alert alert-warning d-flex gap-3 align-items-start mt-4 fade-up" style="border-radius:14px;border:none">
     <i class="bi bi-exclamation-triangle-fill text-warning mt-1" style="font-size:18px;flex-shrink:0"></i>
     <div>
         <div class="fw-bold mb-1">Profil Siswa Belum Terhubung</div>

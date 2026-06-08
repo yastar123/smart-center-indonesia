@@ -4,7 +4,7 @@
 @section('page-title', 'Sertifikat')
 
 @section('content')
-<div class="fade-up">
+<div>
 
     {{-- HEADER BANNER --}}
     <div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
@@ -159,11 +159,11 @@
                             </td>
                             <td class="text-end pe-4">
                                 <div class="d-flex gap-1 justify-content-end">
-                                    <button class="btn btn-sm btn-light" onclick="editCert({{ $cert->id }})" style="border-radius:8px;width:32px;height:32px;padding:0;" title="Edit">
-                                        <i class="bi bi-pencil" style="font-size:.78rem;"></i>
+                                    <button class="btn btn-sm btn-act-edit" onclick="editCert({{ $cert->id }})" title="Edit">
+                                        <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-light text-danger" onclick="deleteCert({{ $cert->id }}, '{{ addslashes($cert->judul) }}')" style="border-radius:8px;width:32px;height:32px;padding:0;" title="Hapus">
-                                        <i class="bi bi-trash" style="font-size:.78rem;"></i>
+                                    <button class="btn btn-sm btn-act-del" onclick="deleteCert({{ $cert->id }}, '{{ addslashes($cert->judul) }}')" title="Hapus">
+                                        <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
                             </td>

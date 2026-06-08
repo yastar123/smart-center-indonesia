@@ -96,7 +96,7 @@ if ($students->isNotEmpty() && $selCourse) {
 </div>
 
 @if(!$teacher)
-<div class="alert d-flex gap-3 align-items-start mb-4 fade-up" style="border-radius:14px;border:none;background:#fef3c7;color:#78350f">
+<div class="alert alert-warning d-flex gap-3 align-items-start mb-4 fade-up" style="border-radius:14px;border:none">
     <i class="bi bi-exclamation-triangle-fill text-warning mt-1" style="font-size:18px;flex-shrink:0"></i>
     <div>
         <div class="fw-bold mb-1">Profil Guru Belum Terhubung</div>

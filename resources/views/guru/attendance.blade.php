@@ -69,7 +69,7 @@ $weekSchedules = $teacher
 </div>
 
 @if(!$teacher)
-<div class="alert d-flex gap-3 align-items-start mb-4 fade-up" style="border-radius:14px;border:none;background:#fef3c7;color:#78350f">
+<div class="alert alert-warning d-flex gap-3 align-items-start mb-4 fade-up" style="border-radius:14px;border:none">
     <i class="bi bi-exclamation-triangle-fill text-warning mt-1" style="font-size:18px;flex-shrink:0"></i>
     <div>
         <div class="fw-bold mb-1">Profil Guru Belum Terhubung</div>
@@ -261,27 +261,27 @@ $weekSchedules = $teacher
             {{-- Summary Bar --}}
             <div class="row g-2 mb-4" id="summaryBar">
                 <div class="col-3">
-                    <div class="text-center p-2 rounded-3" style="background:#dcfce7;border:1px solid #bbf7d0">
-                        <div class="fw-bold" style="font-size:20px;color:#15803d" id="countHadir">0</div>
-                        <div style="font-size:11px;color:#15803d">Hadir</div>
+                    <div class="text-center p-2 rounded-3" style="background:var(--soft-success-bg);border:1px solid var(--soft-success-border)">
+                        <div class="fw-bold" style="font-size:20px;color:var(--soft-success-text)" id="countHadir">0</div>
+                        <div style="font-size:11px;color:var(--soft-success-text)">Hadir</div>
                     </div>
                 </div>
                 <div class="col-3">
-                    <div class="text-center p-2 rounded-3" style="background:#fef3c7;border:1px solid #fcd34d">
-                        <div class="fw-bold" style="font-size:20px;color:#92400e" id="countSakit">0</div>
-                        <div style="font-size:11px;color:#92400e">Sakit</div>
+                    <div class="text-center p-2 rounded-3" style="background:var(--soft-warning-bg);border:1px solid var(--soft-warning-border)">
+                        <div class="fw-bold" style="font-size:20px;color:var(--soft-warning-text)" id="countSakit">0</div>
+                        <div style="font-size:11px;color:var(--soft-warning-text)">Sakit</div>
                     </div>
                 </div>
                 <div class="col-3">
-                    <div class="text-center p-2 rounded-3" style="background:#e0f2fe;border:1px solid #7dd3fc">
-                        <div class="fw-bold" style="font-size:20px;color:#075985" id="countIzin">0</div>
-                        <div style="font-size:11px;color:#075985">Izin</div>
+                    <div class="text-center p-2 rounded-3" style="background:var(--soft-info-bg);border:1px solid var(--soft-info-border)">
+                        <div class="fw-bold" style="font-size:20px;color:var(--soft-info-text)" id="countIzin">0</div>
+                        <div style="font-size:11px;color:var(--soft-info-text)">Izin</div>
                     </div>
                 </div>
                 <div class="col-3">
-                    <div class="text-center p-2 rounded-3" style="background:#fee2e2;border:1px solid #fecaca">
-                        <div class="fw-bold" style="font-size:20px;color:#991b1b" id="countAlpha">0</div>
-                        <div style="font-size:11px;color:#991b1b">Alpha</div>
+                    <div class="text-center p-2 rounded-3" style="background:var(--soft-danger-bg);border:1px solid var(--soft-danger-border)">
+                        <div class="fw-bold" style="font-size:20px;color:var(--soft-danger-text)" id="countAlpha">0</div>
+                        <div style="font-size:11px;color:var(--soft-danger-text)">Alpha</div>
                     </div>
                 </div>
             </div>

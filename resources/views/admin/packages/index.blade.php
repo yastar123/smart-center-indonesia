@@ -3,7 +3,7 @@
 @section('page-title','Kelola Paket Belajar')
 
 @section('content')
-<div class="fade-up">
+<div>
 
 {{-- HEADER --}}
 <div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">

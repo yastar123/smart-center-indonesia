@@ -45,7 +45,7 @@
         <div class="dashboard-card fade-up mb-4" style="opacity:.9">
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <h6 class="fw-bold mb-0"><i class="bi bi-building me-2 text-primary"></i>Informasi Lembaga</h6>
-                <span class="badge" style="background:#fdf4ff;color:#68117e;border:1px solid #e8b4f5;font-size:10.5px;padding:4px 10px;border-radius:12px">
+                <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);border:1px solid var(--soft-primary-border);font-size:10.5px;padding:4px 10px;border-radius:12px">
                     <i class="bi bi-lock me-1"></i>Hanya Baca
                 </span>
             </div>
@@ -89,7 +89,7 @@
         <div class="dashboard-card fade-up" style="opacity:.85" id="section-notif">
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <h6 class="fw-bold mb-0"><i class="bi bi-bell me-2 text-warning"></i>Pengaturan Notifikasi</h6>
-                <span class="badge" style="background:#fdf4ff;color:#68117e;border:1px solid #e8b4f5;font-size:10.5px;padding:4px 10px;border-radius:12px">
+                <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);border:1px solid var(--soft-primary-border);font-size:10.5px;padding:4px 10px;border-radius:12px">
                     <i class="bi bi-lock me-1"></i>Hanya Baca
                 </span>
             </div>
@@ -114,7 +114,7 @@
                 <button class="btn btn-outline-secondary px-4 fw-semibold" style="border-radius:10px"
                         onclick="showToast('Pengaturan notifikasi akan tersedia di versi berikutnya.','info')">
                     <i class="bi bi-save me-2"></i>Simpan Notifikasi
-                    <span class="badge ms-2" style="background:rgba(104,17,126,.15);color:#68117e;font-size:9px;padding:2px 6px;border-radius:8px">Soon</span>
+                    <span class="badge ms-2" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:9px;padding:2px 6px;border-radius:8px">Soon</span>
                 </button>
             </div>
         </div>
@@ -124,7 +124,7 @@
     <div class="col-lg-4">
         {{-- SYSTEM INFO --}}
         <div class="dashboard-card fade-up mb-4">
-            <h6 class="fw-bold mb-3"><i class="bi bi-cpu me-2" style="color:#68117e"></i>Info Sistem</h6>
+            <h6 class="fw-bold mb-3"><i class="bi bi-cpu text-primary me-2"></i>Info Sistem</h6>
             @php
                 $sysInfo = [
                     ['label'=>'Laravel','value'=>app()->version(),'icon'=>'bi-code-slash','color'=>'#ef4444'],

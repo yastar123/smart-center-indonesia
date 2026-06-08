@@ -92,7 +92,7 @@
     </div>
 
     @if(session('success'))
-    <div class="alert alert-success border-0 rounded-3 mb-3 d-flex align-items-center gap-2" style="background:#f0fdf4;color:#15803d">
+    <div class="alert alert-success border-0 rounded-3 mb-3 d-flex align-items-center gap-2">
         <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
     </div>
     @endif
@@ -141,29 +141,29 @@
                     <td>
                         <div class="d-flex flex-wrap gap-1">
                             @if($branch->can_students)
-                                <span class="badge" style="background:#f3d6fa;color:#461256;font-size:10px">Siswa</span>
+                                <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:10px">Siswa</span>
                             @endif
                             @if($branch->can_teachers)
-                                <span class="badge" style="background:#dcfce7;color:#15803d;font-size:10px">Guru</span>
+                                <span class="badge" style="background:var(--soft-success-bg);color:var(--soft-success-text);font-size:10px">Guru</span>
                             @endif
                             @if($branch->can_schedules)
-                                <span class="badge" style="background:#fdf4ff;color:#68117e;font-size:10px">Jadwal</span>
+                                <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:10px">Jadwal</span>
                             @endif
                             @if($branch->can_payments)
-                                <span class="badge" style="background:#fef3c7;color:#92400e;font-size:10px">Keuangan</span>
+                                <span class="badge" style="background:var(--soft-warning-bg);color:var(--soft-warning-text);font-size:10px">Keuangan</span>
                             @endif
                             @if($branch->can_tryouts)
-                                <span class="badge" style="background:#f3e8ff;color:#6b21a8;font-size:10px">Tryout</span>
+                                <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:10px">Tryout</span>
                             @endif
                         </div>
                     </td>
                     <td class="text-center">
                         @if($branch->status === 'active')
-                            <span class="badge" style="background:#dcfce7;color:#15803d">
+                            <span class="badge" style="background:var(--soft-success-bg);color:var(--soft-success-text)">
                                 <i class="bi bi-circle-fill me-1" style="font-size:8px"></i>Aktif
                             </span>
                         @else
-                            <span class="badge" style="background:#fee2e2;color:#991b1b">
+                            <span class="badge" style="background:var(--soft-danger-bg);color:var(--soft-danger-text)">
                                 <i class="bi bi-circle-fill me-1" style="font-size:8px"></i>Nonaktif
                             </span>
                         @endif

@@ -3,7 +3,6 @@
 @section('page-title','Pesan Aplikasi')
 
 @section('content')
-<div class="fade-up">
 
 {{-- HEADER --}}
 <div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#0c4a6e 0%,#0284c7 100%);color:white;border:none;overflow:hidden;position:relative">
@@ -28,7 +27,7 @@
 </div>
 
 {{-- CHAT LAYOUT --}}
-<div class="row g-3" style="height:calc(100vh - 280px);min-height:500px">
+<div class="row g-3 chat-layout" style="height:calc(100vh - 280px);min-height:500px">
 
     {{-- ROOM LIST --}}
     <div class="col-md-4 col-lg-3">
@@ -87,7 +86,6 @@
     </div>
 </div>
 
-</div>
 
 {{-- MODAL ROOM BARU --}}
 <div class="modal fade" id="roomModal" tabindex="-1">
@@ -127,6 +125,17 @@
     </div>
 </div>
 @endsection
+
+@push('styles')
+<style>
+@media (max-width: 991.98px) {
+    .chat-layout {
+        height: calc(100vh - 360px) !important;
+        min-height: 360px !important;
+    }
+}
+</style>
+@endpush
 
 @push('scripts')
 <script>

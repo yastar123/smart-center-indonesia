@@ -49,12 +49,12 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Cabang Aktif</div>
-                    <div class="stat-value" style="color:#68117e">{{ $activeBranches }}</div>
-                    <div class="stat-label" style="font-size:11px;color:#6b7280">
+                    <div class="stat-value text-primary">{{ $activeBranches }}</div>
+                    <div class="stat-label text-muted" style="font-size:11px">
                         <i class="bi bi-building me-1"></i>dari {{ $totalBranches }} total
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#68117e,#c84ddf)">
+                <div class="stat-icon bg-primary-soft" style="color:white">
                     <i class="bi bi-building-fill-check"></i>
                 </div>
             </div>
@@ -70,7 +70,7 @@
                         <i class="bi bi-person-check me-1"></i>{{ $activeStudents }} aktif
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#059669,#10b981)">
+                <div class="stat-icon bg-success-soft" style="color:white">
                     <i class="bi bi-people-fill"></i>
                 </div>
             </div>
@@ -82,11 +82,11 @@
                 <div>
                     <div class="stat-title">Total Guru</div>
                     <div class="stat-value" style="color:#e09000">{{ $totalTeachers }}</div>
-                    <div class="stat-label" style="font-size:11px;color:#6b7280">
+                    <div class="stat-label text-muted" style="font-size:11px">
                         <i class="bi bi-person-badge me-1"></i>{{ $activeTeachers }} aktif
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#e09000,#f6af23)">
+                <div class="stat-icon bg-warning-soft" style="color:white">
                     <i class="bi bi-person-badge-fill"></i>
                 </div>
             </div>
@@ -97,16 +97,16 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Pendapatan Bulan Ini</div>
-                    <div class="stat-value" style="color:#68117e;font-size:20px">
+                    <div class="stat-value text-primary" style="font-size:20px">
                         Rp {{ number_format($monthRevenue, 0, ',', '.') }}
                     </div>
-                    <div class="stat-label" style="font-size:11px;color:#6b7280">
+                    <div class="stat-label text-muted" style="font-size:11px">
                         <i class="bi bi-arrow-up-circle me-1 text-success"></i>
                         Total: Rp {{ number_format($totalRevenue, 0, ',', '.') }}
                     </div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#68117e,#c84ddf)">
-                    <i class="bi bi-cash-coin" style="color:white"></i>
+                <div class="stat-icon bg-primary-soft" style="color:white">
+                    <i class="bi bi-cash-coin"></i>
                 </div>
             </div>
         </div>
@@ -196,18 +196,18 @@
                                 </div>
                             </td>
                             <td class="text-center">
-                                <span class="badge" style="background:#fdf4ff;color:#68117e;font-weight:600;font-size:12px;padding:4px 10px;border-radius:20px">
+                                <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-weight:600;font-size:12px;padding:4px 10px;border-radius:20px">
                                     {{ $b->students_count }}
                                 </span>
                             </td>
                             <td class="text-center d-none d-md-table-cell text-muted">{{ $b->city ?? '–' }}</td>
                             <td class="text-center">
                                 @if($b->status === 'active')
-                                <span class="badge" style="background:#dcfce7;color:#15803d;font-size:11px;padding:4px 10px;border-radius:20px">
+                                <span class="badge" style="background:var(--soft-success-bg);color:var(--soft-success-text);font-size:11px;padding:4px 10px;border-radius:20px">
                                     <i class="bi bi-circle-fill me-1" style="font-size:6px"></i>Aktif
                                 </span>
                                 @else
-                                <span class="badge" style="background:#fee2e2;color:#991b1b;font-size:11px;padding:4px 10px;border-radius:20px">
+                                <span class="badge" style="background:var(--soft-danger-bg);color:var(--soft-danger-text);font-size:11px;padding:4px 10px;border-radius:20px">
                                     <i class="bi bi-circle-fill me-1" style="font-size:6px"></i>Nonaktif
                                 </span>
                                 @endif

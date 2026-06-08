@@ -33,7 +33,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h6 class="fw-bold mb-0">
             <i class="bi bi-list-ul text-indigo me-2" style="color:#c84ddf"></i>Riwayat Aktivitas
-            <span class="badge ms-2" style="background:#f0f0ff;color:#68117e;font-size:11px">{{ $activities->total() }} entri</span>
+            <span class="badge ms-2" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:11px">{{ $activities->total() }} entri</span>
         </h6>
     </div>
 
@@ -60,19 +60,19 @@
                     <span class="fw-semibold" style="font-size:13px">
                         {{ $causer?->name ?? 'System' }}
                     </span>
-                    <span style="font-size:13px;color:#6b7280"> — {{ $act->description }}</span>
+                    <span class="text-muted" style="font-size:13px"> — {{ $act->description }}</span>
                     <span class="badge ms-1" style="background:{{ $ibg }};color:{{ $icol }};font-size:10px;border-radius:6px">
                         {{ ucfirst($event) }}
                     </span>
                 </div>
-                <span style="font-size:11px;color:#9ca3af;white-space:nowrap">
+                <span class="text-muted" style="font-size:11px;white-space:nowrap">
                     <i class="bi bi-clock me-1"></i>{{ $act->created_at->diffForHumans() }}
                 </span>
             </div>
-            <div style="font-size:12px;color:#6b7280;margin-top:3px">
-                <span style="background:#f1f5f9;padding:2px 8px;border-radius:5px">{{ $subject }}</span>
+            <div class="text-muted" style="font-size:12px;margin-top:3px">
+                <span style="background:var(--soft-muted-bg);padding:2px 8px;border-radius:5px">{{ $subject }}</span>
                 @if($act->subject_id)
-                    <span class="ms-1" style="color:#9ca3af">#{{ $act->subject_id }}</span>
+                    <span class="ms-1 text-muted">#{{ $act->subject_id }}</span>
                 @endif
                 @if($causer?->email)
                     <span class="ms-2"><i class="bi bi-envelope me-1"></i>{{ $causer->email }}</span>
@@ -81,8 +81,8 @@
             @if(count($changes) > 0)
             <div class="mt-2 d-flex flex-wrap gap-1">
                 @foreach(array_slice($changes, 0, 5) as $field => $value)
-                <span style="background:#f8fafc;border:1px solid #e2e8f0;padding:2px 8px;border-radius:5px;font-size:11px;color:#475569">
-                    <span style="color:#94a3b8">{{ $field }}:</span>
+                <span style="background:var(--soft-muted-bg);border:1px solid var(--soft-muted-border);padding:2px 8px;border-radius:5px;font-size:11px;color:var(--text-primary)">
+                    <span class="text-muted">{{ $field }}:</span>
                     {{ is_array($value) ? json_encode($value) : (strlen((string)$value) > 40 ? substr($value, 0, 40).'…' : $value) }}
                 </span>
                 @endforeach
@@ -92,9 +92,9 @@
     </div>
     @empty
     <div class="text-center py-5">
-        <i class="bi bi-journal-x" style="font-size:48px;color:#d1d5db;display:block;margin-bottom:12px"></i>
+        <i class="bi bi-journal-x text-muted" style="font-size:48px;display:block;margin-bottom:12px;opacity:.4"></i>
         <div class="fw-semibold text-muted mb-1">Belum ada log aktivitas</div>
-        <div style="font-size:12px;color:#9ca3af">Semua perubahan data sistem akan tercatat di sini</div>
+        <div class="text-muted" style="font-size:12px">Semua perubahan data sistem akan tercatat di sini</div>
     </div>
     @endforelse
 

@@ -90,7 +90,7 @@ $jenisIcon = ['online' => 'bi-camera-video-fill', 'offline' => 'bi-building-fill
 </div>
 
 @if(!$student)
-<div class="alert d-flex gap-3 align-items-start mb-4 fade-up" style="border-radius:14px;border:none;background:#fef3c7;color:#78350f">
+<div class="alert alert-warning d-flex gap-3 align-items-start mb-4 fade-up" style="border-radius:14px;border:none">
     <i class="bi bi-exclamation-triangle-fill text-warning mt-1" style="font-size:18px;flex-shrink:0"></i>
     <div>
         <div class="fw-bold mb-1">Profil Siswa Belum Terhubung</div>
@@ -130,9 +130,9 @@ $jenisIcon = ['online' => 'bi-camera-video-fill', 'offline' => 'bi-building-fill
                         <i class="bi bi-broadcast me-1"></i>Live
                     </span>
                     @elseif($isPast)
-                    <span class="badge" style="background:#e2e8f0;color:#64748b;font-size:10px">Selesai</span>
+                    <span class="badge" style="background:var(--soft-muted-bg);color:var(--soft-muted-text);font-size:10px">Selesai</span>
                     @else
-                    <span class="badge" style="background:#fef3c7;color:#92400e;font-size:10px">Akan datang</span>
+                    <span class="badge" style="background:var(--soft-warning-bg);color:var(--soft-warning-text);font-size:10px">Akan datang</span>
                     @endif
                 </div>
                 <div class="d-flex flex-wrap gap-3" style="font-size:12px;color:{{ $isOngoing ? 'rgba(255,255,255,.8)' : 'var(--text-muted)' }}">

@@ -3,7 +3,6 @@
 @section('page-title','Tryout UTBK / PTN')
 
 @section('content')
-<div class="fade-up">
 
 {{-- HEADER --}}
 <div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
@@ -61,7 +60,6 @@
     <div id="paginationLinks" class="mt-3 d-flex justify-content-center"></div>
 </div>
 
-</div>
 
 {{-- MODAL TRYOUT --}}
 <div class="modal fade" id="tryoutModal" tabindex="-1">

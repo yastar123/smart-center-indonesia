@@ -93,7 +93,7 @@ $outstanding = Invoice::with(['siswa','cabang'])
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Bulan Ini</div>
-                    <div class="stat-value" style="color:#68117e;font-size:20px">
+                    <div class="stat-value text-primary" style="font-size:20px">
                         Rp {{ number_format($monthRevenue, 0, ',', '.') }}
                     </div>
                     <div class="stat-label" style="font-size:11px">
@@ -152,7 +152,7 @@ $outstanding = Invoice::with(['siswa','cabang'])
                     <h6 class="fw-bold mb-1" style="font-size:14px">Tren Pendapatan</h6>
                     <p class="text-muted mb-0" style="font-size:12px">6 bulan terakhir (pembayaran terverifikasi)</p>
                 </div>
-                <span class="badge" style="background:#ecfdf5;color:#059669;font-size:12px;padding:5px 12px;border-radius:8px">
+                <span class="badge" style="background:var(--soft-success-bg);color:var(--soft-success-text);font-size:12px;padding:5px 12px;border-radius:8px">
                     <i class="bi bi-graph-up me-1"></i>Live
                 </span>
             </div>
@@ -253,7 +253,7 @@ $outstanding = Invoice::with(['siswa','cabang'])
                 <h6 class="fw-bold mb-0" style="font-size:14px">
                     <i class="bi bi-hourglass-split text-warning me-2"></i>Tagihan Belum Lunas
                 </h6>
-                <span class="badge" style="background:#fef3c7;color:#92400e;font-size:11px">{{ $pendingCount }} item</span>
+                <span class="badge" style="background:var(--soft-warning-bg);color:var(--soft-warning-text);font-size:11px">{{ $pendingCount }} item</span>
             </div>
             <div class="d-flex flex-column gap-2">
                 @forelse($outstanding as $inv)

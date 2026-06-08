@@ -75,11 +75,11 @@ $monthTotal = $teacher
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Hari Ini</div>
-                    <div class="stat-value" style="color:#68117e">{{ $todaySchedules->count() }}</div>
+                    <div class="stat-value text-primary">{{ $todaySchedules->count() }}</div>
                     <div class="stat-label" style="font-size:11px">sesi</div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#68117e,#c84ddf)">
-                    <i class="bi bi-calendar-day" style="color:white"></i>
+                <div class="stat-icon bg-primary-soft" style="color:white">
+                    <i class="bi bi-calendar-day"></i>
                 </div>
             </div>
         </div>
@@ -92,8 +92,8 @@ $monthTotal = $teacher
                     <div class="stat-value" style="color:#c84ddf">{{ $weekSchedules->count() }}</div>
                     <div class="stat-label" style="font-size:11px">jadwal</div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#c84ddf,#68117e)">
-                    <i class="bi bi-calendar-week" style="color:white"></i>
+                <div class="stat-icon bg-primary-soft" style="color:white">
+                    <i class="bi bi-calendar-week"></i>
                 </div>
             </div>
         </div>
@@ -106,8 +106,8 @@ $monthTotal = $teacher
                     <div class="stat-value" style="color:#059669">{{ $monthTotal }}</div>
                     <div class="stat-label" style="font-size:11px">total</div>
                 </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#059669,#10b981)">
-                    <i class="bi bi-calendar-month" style="color:white"></i>
+                <div class="stat-icon bg-success-soft" style="color:white">
+                    <i class="bi bi-calendar-month"></i>
                 </div>
             </div>
         </div>
@@ -169,7 +169,7 @@ $monthTotal = $teacher
         <div class="dashboard-card h-100">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h6 class="fw-bold mb-0" style="font-size:14px">
-                    <i class="bi bi-calendar-week text-purple me-2" style="color:#68117e"></i>Minggu Ini
+                    <i class="bi bi-calendar-week text-primary me-2"></i>Minggu Ini
                 </h6>
                 <span class="text-muted" style="font-size:11.5px">
                     {{ now()->startOfWeek()->locale('id')->isoFormat('D MMM') }} – {{ now()->endOfWeek()->locale('id')->isoFormat('D MMM Y') }}
@@ -202,9 +202,9 @@ $monthTotal = $teacher
                         @endphp
                         <tr style="{{ $isToday ? 'background:rgba(200,77,223,.05)' : '' }}">
                             <td class="py-3">
-                                <div class="fw-semibold" style="font-size:12.5px;{{ $isToday ? 'color:#68117e' : '' }}">
+                                <div class="fw-semibold {{ $isToday ? 'text-primary' : '' }}" style="font-size:12.5px">
                                     {{ $sch->tanggal->locale('id')->isoFormat('ddd, D MMM') }}
-                                    @if($isToday) <span class="badge ms-1" style="background:#f3d6fa;color:#461256;font-size:9px">Hari Ini</span> @endif
+                                    @if($isToday) <span class="badge ms-1" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:9px">Hari Ini</span> @endif
                                 </div>
                                 <div class="text-muted" style="font-size:11px">
                                     {{ \Carbon\Carbon::parse($sch->jam_mulai)->format('H:i') }} – {{ \Carbon\Carbon::parse($sch->jam_selesai)->format('H:i') }}
@@ -213,11 +213,11 @@ $monthTotal = $teacher
                             <td class="py-3">{{ $sch->topik ?? 'Sesi Mengajar' }}</td>
                             <td class="py-3">
                                 @if($sch->jenis === 'online')
-                                    <span class="badge" style="background:#fdf4ff;color:#68117e;font-size:10px;border-radius:6px">
+                                    <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:10px;border-radius:6px">
                                         <i class="bi bi-camera-video me-1"></i>Online
                                     </span>
                                 @else
-                                    <span class="badge" style="background:#f0fdf4;color:#166534;font-size:10px;border-radius:6px">
+                                    <span class="badge" style="background:var(--soft-success-bg);color:var(--soft-success-text);font-size:10px;border-radius:6px">
                                         <i class="bi bi-building me-1"></i>Offline
                                     </span>
                                 @endif
@@ -239,11 +239,11 @@ $monthTotal = $teacher
 </div>
 
 @if(!$teacher)
-<div class="alert alert-warning d-flex gap-3 align-items-start mt-4 fade-up" style="border-radius:14px;border:none;background:#fef3c7">
+<div class="alert alert-warning d-flex gap-3 align-items-start mt-4 fade-up" style="border-radius:14px;border:none">
     <i class="bi bi-exclamation-triangle-fill text-warning mt-1" style="font-size:18px;flex-shrink:0"></i>
     <div>
         <div class="fw-bold mb-1">Profil Guru Belum Terhubung</div>
-        <div style="font-size:13px;color:#78350f">
+        <div style="font-size:13px">
             Akun Anda belum terhubung ke profil guru. Minta administrator untuk menghubungkan akun ini ke data guru yang sesuai.
         </div>
     </div>

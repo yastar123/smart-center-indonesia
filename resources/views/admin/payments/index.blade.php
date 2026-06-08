@@ -135,7 +135,7 @@
 <div class="dashboard-card fade-up">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h6 class="fw-bold mb-0"><i class="bi bi-list-ul text-success me-2"></i>Daftar Invoice
-            <span class="badge ms-2" style="background:#f0fdf4;color:#16a34a;font-size:11px">{{ $invoices->total() }} data</span>
+            <span class="badge ms-2" style="background:var(--soft-success-bg);color:var(--soft-success-text);font-size:11px">{{ $invoices->total() }} data</span>
         </h6>
     </div>
     <div class="table-responsive">
@@ -156,35 +156,35 @@
                 @forelse($invoices as $inv)
                 @php
                     $statusMap = [
-                        'lunas'       => ['bg'=>'#f0fdf4','color'=>'#16a34a','label'=>'Lunas'],
-                        'sebagian'    => ['bg'=>'#fffbeb','color'=>'#e09000','label'=>'Sebagian'],
-                        'belum_bayar' => ['bg'=>'#fef2f2','color'=>'#dc2626','label'=>'Belum Bayar'],
+                        'lunas'       => ['bg'=>'var(--soft-success-bg)','color'=>'var(--soft-success-text)','label'=>'Lunas'],
+                        'sebagian'    => ['bg'=>'var(--soft-warning-bg)','color'=>'var(--soft-warning-text)','label'=>'Sebagian'],
+                        'belum_bayar' => ['bg'=>'var(--soft-danger-bg)','color'=>'var(--soft-danger-text)','label'=>'Belum Bayar'],
                     ];
-                    $st = $statusMap[$inv->status] ?? ['bg'=>'#f1f5f9','color'=>'#64748b','label'=>$inv->status];
+                    $st = $statusMap[$inv->status] ?? ['bg'=>'var(--soft-muted-bg)','color'=>'var(--soft-muted-text)','label'=>$inv->status];
                 @endphp
                 <tr style="border-bottom:1px solid var(--card-border);transition:background .15s" onmouseover="this.style.background='rgba(104,17,126,.05)'" onmouseout="this.style.background=''">
                     <td class="ps-3">
-                        <code style="background:#fdf4ff;color:#68117e;padding:3px 8px;border-radius:6px;font-size:11px">{{ $inv->nomor_invoice }}</code>
+                        <code style="background:var(--soft-primary-bg);color:var(--soft-primary-text);padding:3px 8px;border-radius:6px;font-size:11px">{{ $inv->nomor_invoice }}</code>
                     </td>
                     <td>
                         <div class="d-flex align-items-center gap-2">
-                            <div style="width:32px;height:32px;border-radius:50%;background:#fdf4ff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#68117e;flex-shrink:0">
+                            <div style="width:32px;height:32px;border-radius:50%;background:var(--soft-primary-bg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--soft-primary-text);flex-shrink:0">
                                 {{ strtoupper(substr($inv->siswa?->name ?? 'S', 0, 1)) }}
                             </div>
                             <div>
                                 <div class="fw-semibold" style="font-size:13px">{{ $inv->siswa?->name ?? '–' }}</div>
-                                <div style="font-size:11px;color:#6b7280">{{ $inv->siswa?->nis ?? '' }}</div>
+                                <div class="text-muted" style="font-size:11px">{{ $inv->siswa?->nis ?? '' }}</div>
                             </div>
                         </div>
                     </td>
                     <td class="d-none d-md-table-cell text-muted" style="font-size:.85rem">{{ $inv->cabang?->name ?? '–' }}</td>
                     <td class="d-none d-md-table-cell text-muted" style="font-size:.85rem">{{ $inv->periode ?? '–' }}</td>
-                    <td class="fw-bold" style="color:#059669;font-size:.9rem">Rp {{ number_format($inv->total,0,',','.') }}</td>
+                    <td class="fw-bold text-success" style="font-size:.9rem">Rp {{ number_format($inv->total,0,',','.') }}</td>
                     <td class="d-none d-lg-table-cell text-muted" style="font-size:.85rem">
                         @if($inv->jatuh_tempo)
                             {{ $inv->jatuh_tempo->format('d M Y') }}
                             @if($inv->jatuh_tempo->isPast() && $inv->status !== 'lunas')
-                                <span class="ms-1 badge rounded-pill" style="background:#fef2f2;color:#dc2626;font-size:10px">Terlambat</span>
+                                <span class="ms-1 badge rounded-pill" style="background:var(--soft-danger-bg);color:var(--soft-danger-text);font-size:10px">Terlambat</span>
                             @endif
                         @else
                             –
@@ -197,23 +197,19 @@
                     </td>
                     <td class="text-center">
                         <div class="d-flex justify-content-center gap-1">
-                            <button onclick="showDetail({{ $inv->id }})" class="btn btn-sm" title="Detail"
-                                style="background:#fdf4ff;color:#68117e;border:none;border-radius:8px;width:32px;height:32px;padding:0">
-                                <i class="bi bi-eye-fill" style="font-size:13px"></i>
+                            <button onclick="showDetail({{ $inv->id }})" class="btn btn-sm btn-act-view" title="Detail">
+                                <i class="bi bi-eye-fill"></i>
                             </button>
                             @if($inv->status !== 'lunas')
-                            <button onclick="openPayModal({{ $inv->id }}, '{{ addslashes($inv->siswa?->name ?? '') }}', {{ $inv->total }})" class="btn btn-sm" title="Bayar"
-                                style="background:#f0fdf4;color:#16a34a;border:none;border-radius:8px;width:32px;height:32px;padding:0">
-                                <i class="bi bi-cash-stack" style="font-size:13px"></i>
+                            <button onclick="openPayModal({{ $inv->id }}, '{{ addslashes($inv->siswa?->name ?? '') }}', {{ $inv->total }})" class="btn btn-sm btn-act-pay" title="Bayar">
+                                <i class="bi bi-cash-stack"></i>
                             </button>
                             @endif
-                            <button onclick="editInvoice({{ $inv->id }})" class="btn btn-sm" title="Edit"
-                                style="background:#fffbeb;color:#e09000;border:none;border-radius:8px;width:32px;height:32px;padding:0">
-                                <i class="bi bi-pencil-fill" style="font-size:13px"></i>
+                            <button onclick="editInvoice({{ $inv->id }})" class="btn btn-sm btn-act-edit" title="Edit">
+                                <i class="bi bi-pencil-fill"></i>
                             </button>
-                            <button onclick="deleteInvoice({{ $inv->id }}, '{{ addslashes($inv->nomor_invoice) }}')" class="btn btn-sm" title="Hapus"
-                                style="background:#fef2f2;color:#dc2626;border:none;border-radius:8px;width:32px;height:32px;padding:0">
-                                <i class="bi bi-trash-fill" style="font-size:13px"></i>
+                            <button onclick="deleteInvoice({{ $inv->id }}, '{{ addslashes($inv->nomor_invoice) }}')" class="btn btn-sm btn-act-del" title="Hapus">
+                                <i class="bi bi-trash-fill"></i>
                             </button>
                         </div>
                     </td>
@@ -221,7 +217,7 @@
                 @empty
                 <tr>
                     <td colspan="8" class="text-center py-5">
-                        <div style="color:#9ca3af">
+                        <div class="text-muted">
                             <i class="bi bi-receipt" style="font-size:40px;display:block;margin-bottom:12px;opacity:.4"></i>
                             <div class="fw-semibold mb-1">Belum ada invoice</div>
                             <div style="font-size:12px">Klik "Buat Invoice" untuk membuat invoice pertama</div>
@@ -289,7 +285,7 @@
                     <div class="col-md-6">
                         <label class="form-label fw-semibold" style="font-size:12px">Total (Rp) <span class="text-danger">*</span></label>
                         <input type="number" id="inv_total" class="form-control fw-bold" placeholder="0" min="0" readonly
-                            style="border-radius:10px;border-color:#059669;background:#f0fdf4;color:#065f46;font-weight:700">
+                            style="border-radius:10px;border-color:var(--soft-success-border);background:var(--soft-success-bg);color:var(--soft-success-text);font-weight:700">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-semibold" style="font-size:12px">Periode (contoh: Juli 2025)</label>
@@ -360,8 +356,8 @@
                 <input type="hidden" id="payInvoiceId">
                 <div class="row g-3">
                     <div class="col-12">
-                        <div class="p-3 rounded-3 mb-2" style="background:#fdf4ff;border:1px solid #e9d5ff">
-                            <div class="fw-semibold" style="font-size:12px;color:#68117e" id="payStudentName"></div>
+                        <div class="p-3 rounded-3 mb-2" style="background:var(--soft-primary-bg);border:1px solid var(--soft-primary-border)">
+                            <div class="fw-semibold" style="font-size:12px;color:var(--soft-primary-text)" id="payStudentName"></div>
                             <div style="font-size:20px;font-weight:700;color:#c84ddf" id="payTotalLabel"></div>
                         </div>
                     </div>
@@ -501,14 +497,14 @@ function showDetail(id) {
     new bootstrap.Modal('#detailModal').show();
     $.get('/admin/payments/' + id, function(res) {
         const inv = res.data;
-        const statusMap = {lunas:'#f0fdf4:#16a34a:Lunas', sebagian:'#fffbeb:#e09000:Sebagian', belum_bayar:'#fef2f2:#dc2626:Belum Bayar'};
-        const [sbg,scol,slbl] = (statusMap[inv.status]||'#f1f5f9:#64748b:'+inv.status).split(':');
+        const statusMap = {lunas:'var(--soft-success-bg):var(--soft-success-text):Lunas', sebagian:'var(--soft-warning-bg):var(--soft-warning-text):Sebagian', belum_bayar:'var(--soft-danger-bg):var(--soft-danger-text):Belum Bayar'};
+        const [sbg,scol,slbl] = (statusMap[inv.status]||'var(--soft-muted-bg):var(--soft-muted-text):'+inv.status).split(':');
 
         let paymentsHtml = '';
         if (inv.pembayaran && inv.pembayaran.length > 0) {
-            paymentsHtml = `<div style="padding:0 20px 16px"><div class="fw-semibold mb-2" style="font-size:12px;color:#6b7280">Riwayat Pembayaran</div>`;
+            paymentsHtml = `<div style="padding:0 20px 16px"><div class="fw-semibold mb-2" style="font-size:12px;color:var(--text-muted)">Riwayat Pembayaran</div>`;
             inv.pembayaran.forEach(p => {
-                paymentsHtml += `<div class="d-flex justify-content-between align-items-center p-2 mb-1 rounded-2" style="background:#f8fafc;font-size:12px">
+                paymentsHtml += `<div class="d-flex justify-content-between align-items-center p-2 mb-1 rounded-2" style="background:var(--input-bg);font-size:12px">
                     <div><span class="fw-semibold">${p.nomor_pembayaran}</span> · ${p.metode}</div>
                     <div class="fw-bold text-success">Rp ${Number(p.jumlah).toLocaleString('id-ID')}</div>
                 </div>`;
@@ -521,7 +517,7 @@ function showDetail(id) {
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
                         <div class="fw-bold" style="font-size:15px">${inv.siswa?.name ?? '–'}</div>
-                        <div style="font-size:12px;color:#6b7280">${inv.nomor_invoice}</div>
+                        <div style="font-size:12px;color:var(--text-muted)">${inv.nomor_invoice}</div>
                     </div>
                     <span style="background:${sbg};color:${scol};padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600">${slbl}</span>
                 </div>
@@ -532,7 +528,7 @@ function showDetail(id) {
                     ${drow('Subtotal', 'Rp ' + Number(inv.subtotal).toLocaleString('id-ID'))}
                     ${drow('Diskon', 'Rp ' + Number(inv.diskon||0).toLocaleString('id-ID'))}
                     ${drow('Pajak', 'Rp ' + Number(inv.pajak||0).toLocaleString('id-ID'))}
-                    ${drow('Total', '<span style="font-weight:700;color:#059669">Rp ' + Number(inv.total).toLocaleString('id-ID') + '</span>')}
+                    ${drow('Total', '<span class="text-success fw-bold">Rp ' + Number(inv.total).toLocaleString('id-ID') + '</span>')}
                     ${drow('Jatuh Tempo', inv.jatuh_tempo ? inv.jatuh_tempo.substr(0,10) : '–')}
                     ${drow('Catatan', inv.catatan ?? '–')}
                 </table>
@@ -543,9 +539,9 @@ function showDetail(id) {
 }
 
 function drow(label, val) {
-    return `<tr style="border-bottom:1px solid #f1f5f9">
-        <td style="padding:7px 4px 7px 0;color:#6b7280;font-size:12px;width:36%">${label}</td>
-        <td style="padding:7px 0;font-size:13px;font-weight:500">${val}</td>
+    return `<tr style="border-bottom:1px solid var(--card-border)">
+        <td style="padding:7px 4px 7px 0;color:var(--text-muted);font-size:12px;width:36%">${label}</td>
+        <td style="padding:7px 0;font-size:13px;font-weight:500;color:var(--text-primary)">${val}</td>
     </tr>`;
 }
 

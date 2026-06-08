@@ -4,7 +4,7 @@
 @section('page-title', 'Kelas')
 
 @section('content')
-<div class="fade-up">
+<div>
 
     {{-- HEADER BANNER --}}
     <div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
@@ -153,11 +153,11 @@
                             </td>
                             <td class="text-end pe-4">
                                 <div class="d-flex gap-1 justify-content-end">
-                                    <button class="btn btn-sm btn-light" onclick="editClass({{ $class->id }})" style="border-radius:8px;width:32px;height:32px;padding:0;">
-                                        <i class="bi bi-pencil" style="font-size:.78rem;"></i>
+                                    <button class="btn btn-sm btn-act-edit" onclick="editClass({{ $class->id }})">
+                                        <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-light text-danger" onclick="deleteClass({{ $class->id }}, '{{ addslashes($class->nama_kelas) }}')" style="border-radius:8px;width:32px;height:32px;padding:0;">
-                                        <i class="bi bi-trash" style="font-size:.78rem;"></i>
+                                    <button class="btn btn-sm btn-act-del" onclick="deleteClass({{ $class->id }}, '{{ addslashes($class->nama_kelas) }}')">
+                                        <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
                             </td>
@@ -166,7 +166,7 @@
                         <tr>
                             <td colspan="8" class="text-center py-5">
                                 <div style="opacity:.5;">
-                                    <i class="bi bi-building" style="font-size:2.5rem;display:block;margin-bottom:.5rem;color:#68117e;"></i>
+                                    <i class="bi bi-building text-primary" style="font-size:2.5rem;display:block;margin-bottom:.5rem"></i>
                                     <div class="fw-semibold">Belum ada kelas</div>
                                     <small class="text-muted">Tambahkan kelas pertama Anda</small>
                                 </div>

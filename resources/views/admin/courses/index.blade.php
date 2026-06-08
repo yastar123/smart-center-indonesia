@@ -4,7 +4,7 @@
 @section('page-title', 'Mata Pelajaran')
 
 @section('content')
-<div class="fade-up">
+<div>
 
     {{-- HEADER BANNER --}}
     <div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
@@ -151,11 +151,11 @@
                             </td>
                             <td class="text-end pe-4">
                                 <div class="d-flex gap-1 justify-content-end">
-                                    <button class="btn btn-sm btn-light" onclick="editCourse({{ $course->id }})" title="Edit" style="border-radius:8px;width:32px;height:32px;padding:0;">
-                                        <i class="bi bi-pencil" style="font-size:.78rem;"></i>
+                                    <button class="btn btn-sm btn-act-edit" onclick="editCourse({{ $course->id }})" title="Edit">
+                                        <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-light text-danger" onclick="deleteCourse({{ $course->id }}, '{{ addslashes($course->nama) }}')" title="Hapus" style="border-radius:8px;width:32px;height:32px;padding:0;">
-                                        <i class="bi bi-trash" style="font-size:.78rem;"></i>
+                                    <button class="btn btn-sm btn-act-del" onclick="deleteCourse({{ $course->id }}, '{{ addslashes($course->nama) }}')" title="Hapus">
+                                        <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
                             </td>
@@ -230,9 +230,9 @@
                         <div class="col-md-6">
                             <label class="form-label fw-semibold" style="font-size:.85rem;">Gambar Mata Pelajaran</label>
                             <div class="d-flex align-items-center gap-2">
-                                <div style="width:48px;height:48px;border-radius:8px;overflow:hidden;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <div style="width:48px;height:48px;border-radius:8px;overflow:hidden;background:var(--soft-muted-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                     <img id="iconPreviewImg" src="" alt="preview" style="width:100%;height:100%;object-fit:cover;display:none;">
-                                    <i id="iconPreviewPlaceholder" class="bi bi-book" style="font-size:1.1rem;color:#9ca3af"></i>
+                                    <i id="iconPreviewPlaceholder" class="bi bi-book text-muted" style="font-size:1.1rem"></i>
                                 </div>
                                 <input type="file" class="form-control" id="iconFile" accept="image/*">
                             </div>

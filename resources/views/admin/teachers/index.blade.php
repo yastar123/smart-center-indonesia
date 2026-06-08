@@ -379,7 +379,7 @@ function loadTeachers(page) {
                                 </div>
                             </div>
                         </td>
-                        <td><code style="background:var(--input-bg);padding:3px 8px;border-radius:6px;font-size:12px;color:#68117e">${t.nig}</code></td>
+                        <td><code style="background:var(--input-bg);padding:3px 8px;border-radius:6px;font-size:12px;color:var(--bs-primary)">${t.nig}</code></td>
                         <td class="d-none d-md-table-cell">
                             <span style="background:var(--input-bg);color:var(--text-muted);border:1px solid var(--card-border);padding:3px 10px;border-radius:6px;font-size:11px">
                                 <i class="bi bi-building me-1"></i>${t.branch?.name ?? 'Pusat'}

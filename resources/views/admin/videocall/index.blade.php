@@ -3,7 +3,6 @@
 @section('page-title','Video Call Online')
 
 @section('content')
-<div class="fade-up">
 
 {{-- HEADER --}}
 <div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#134e4a 0%,#0d9488 100%);color:white;border:none;overflow:hidden;position:relative">
@@ -92,7 +91,6 @@
     </div>
 </div>
 
-</div>
 @endsection
 
 @push('scripts')
