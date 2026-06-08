@@ -47,7 +47,7 @@ $weekSchedules = $teacher
 
 {{-- HEADER BANNER --}}
 <div class="dashboard-card mb-4 fade-up"
-     style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#2563eb 100%);color:white;border:none;overflow:hidden;position:relative">
+     style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#68117e 100%);color:white;border:none;overflow:hidden;position:relative">
     <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.04);border-radius:50%"></div>
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative">
         <div>
@@ -202,10 +202,10 @@ $weekSchedules = $teacher
             $sStatusClr = ['dijadwalkan'=>'#c84ddf','berlangsung'=>'#10b981','selesai'=>'#94a3b8','dibatalkan'=>'#ef4444'][$selectedSchedule->status] ?? '#94a3b8';
         @endphp
         <div class="dashboard-card mb-4"
-             style="border-left:4px solid #2563eb;background:linear-gradient(135deg,var(--card-bg),rgba(37,99,235,.03))">
+             style="border-left:4px solid #c84ddf;background:linear-gradient(135deg,var(--card-bg),rgba(200,77,223,.03))">
             <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
                 <div>
-                    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#2563eb;font-weight:700;margin-bottom:6px">
+                    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#c84ddf;font-weight:700;margin-bottom:6px">
                         Detail Sesi
                     </div>
                     <h5 class="fw-bold mb-1" style="font-size:17px">{{ $selectedSchedule->topik ?? 'Sesi Mengajar' }}</h5>
@@ -219,7 +219,7 @@ $weekSchedules = $teacher
                             {{ $selectedSchedule->jenis==='online' ? 'Online' : ($selectedSchedule->ruangan ?? 'Offline') }}
                         </span>
                         @if($selectedSchedule->jenis==='online' && $selectedSchedule->link_meeting)
-                        <a href="{{ $selectedSchedule->link_meeting }}" target="_blank" style="font-size:12.5px;color:#2563eb">
+                        <a href="{{ $selectedSchedule->link_meeting }}" target="_blank" style="font-size:12.5px;color:#c84ddf">
                             <i class="bi bi-link me-1"></i>Buka Link Meeting
                         </a>
                         @endif
@@ -290,7 +290,7 @@ $weekSchedules = $teacher
                 <div class="d-flex flex-column gap-2" id="studentList">
                     @foreach($classStudents as $i => $s)
                     @php
-                        $avatar = 'https://ui-avatars.com/api/?name='.urlencode($s->name).'&background='.($s->gender==='P'?'ec4899':'3b82f6').'&color=fff&size=64';
+                        $avatar = 'https://ui-avatars.com/api/?name='.urlencode($s->name).'&background='.($s->gender==='P'?'ec4899':'68117e').'&color=fff&size=64';
                     @endphp
                     <div class="d-flex align-items-center gap-3 p-3 rounded-3 student-row"
                          style="background:var(--input-bg);border:1.5px solid var(--card-border);transition:.2s"

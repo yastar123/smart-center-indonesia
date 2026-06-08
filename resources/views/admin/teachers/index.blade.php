@@ -5,7 +5,7 @@
 @section('content')
 
 {{-- HEADER BANNER --}}
-<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#064e3b 0%,#065f46 50%,#059669 100%);color:white;border:none;overflow:hidden;position:relative">
+<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
     <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.04);border-radius:50%"></div>
     <div class="row align-items-center g-3" style="position:relative">
         <div class="col-md-8">
@@ -182,7 +182,7 @@
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg">
 
-            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#059669,#10b981);color:#fff">
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#260632,#68117e);color:#fff">
                 <div>
                     <h6 class="modal-title fw-bold mb-0" id="modalTitle">
                         <i class="bi bi-person-plus me-2"></i>Tambah Guru Baru
@@ -201,11 +201,11 @@
                     <div class="text-center mb-4 pb-4" style="border-bottom:1px solid var(--card-border)">
                         <div class="position-relative d-inline-block">
                             <img id="photoPreview"
-                                 src="https://ui-avatars.com/api/?name=Guru&background=059669&color=fff&size=120"
+                                 src="https://ui-avatars.com/api/?name=Guru&background=68117e&color=fff&size=120"
                                  class="rounded-circle" width="100" height="100"
-                                 style="object-fit:cover;border:3px solid #10b981;box-shadow:0 8px 24px rgba(16,185,129,.3)">
+                                 style="object-fit:cover;border:3px solid #c84ddf;box-shadow:0 8px 24px rgba(200,77,223,.3)">
                             <label class="position-absolute bottom-0 end-0 d-flex align-items-center justify-content-center"
-                                   style="width:32px;height:32px;background:#10b981;border-radius:50%;cursor:pointer;border:2.5px solid white">
+                                   style="width:32px;height:32px;background:#68117e;border-radius:50%;cursor:pointer;border:2.5px solid white">
                                 <i class="bi bi-camera-fill text-white" style="font-size:13px"></i>
                                 <input type="file" name="photo" id="photoInput" class="d-none" accept="image/*">
                             </label>
@@ -216,7 +216,7 @@
                     {{-- DATA PRIBADI --}}
                     <div class="mb-4">
                         <div class="d-flex align-items-center gap-2 mb-3">
-                            <div style="width:4px;height:20px;background:linear-gradient(#10b981,#059669);border-radius:4px"></div>
+                            <div style="width:4px;height:20px;background:linear-gradient(135deg,#68117e,#c84ddf);border-radius:4px"></div>
                             <span class="fw-bold text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em">Data Pribadi</span>
                         </div>
                         <div class="row g-3">
@@ -363,7 +363,7 @@ function loadTeachers(page) {
                     const badgeBg  = t.status === 'aktif' ? '#dcfce7' : '#f3f4f6';
                     const badgeCol = t.status === 'aktif' ? '#15803d' : '#6b7280';
                     const badgeLbl = t.status === 'aktif' ? 'Aktif' : 'Nonaktif';
-                    const avatar   = `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=${t.gender==='P'?'ec4899':'10b981'}&color=fff&size=80`;
+                    const avatar   = `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=${t.gender==='P'?'ec4899':'68117e'}&color=fff&size=80`;
                     const num      = (res.from || ((page - 1) * 10 + 1)) + i;
                     html += `<tr>
                         <td class="text-muted small fw-semibold">${num}</td>
@@ -371,14 +371,14 @@ function loadTeachers(page) {
                             <div class="d-flex align-items-center gap-2">
                                 <img src="${t.photo ? '/storage/'+t.photo : avatar}"
                                      class="rounded-circle flex-shrink-0" width="40" height="40"
-                                     style="object-fit:cover;border:2.5px solid ${t.gender==='P'?'#f9a8d4':'#6ee7b7'}" loading="lazy">
+                                     style="object-fit:cover;border:2.5px solid ${t.gender==='P'?'#f9a8d4':'#e9d5ff'}" loading="lazy">
                                 <div>
                                     <div class="fw-semibold" style="font-size:13.5px">${t.name}</div>
                                     <div class="text-muted" style="font-size:11px">${t.gender==='L'?'👦':'👧'} ${t.education ?? ''}</div>
                                 </div>
                             </div>
                         </td>
-                        <td><code style="background:var(--input-bg);padding:3px 8px;border-radius:6px;font-size:12px;color:#10b981">${t.nig}</code></td>
+                        <td><code style="background:var(--input-bg);padding:3px 8px;border-radius:6px;font-size:12px;color:#68117e">${t.nig}</code></td>
                         <td class="d-none d-md-table-cell">
                             <span style="background:var(--input-bg);color:var(--text-muted);border:1px solid var(--card-border);padding:3px 10px;border-radius:6px;font-size:11px">
                                 <i class="bi bi-building me-1"></i>${t.branch?.name ?? 'Pusat'}
@@ -445,7 +445,7 @@ function openModal() {
     document.getElementById('teacherForm').reset();
     document.getElementById('teacherId').value = '';
     document.getElementById('modalTitle').innerHTML = '<i class="bi bi-person-plus me-2"></i>Tambah Guru Baru';
-    document.getElementById('photoPreview').src = 'https://ui-avatars.com/api/?name=Guru&background=059669&color=fff&size=120';
+    document.getElementById('photoPreview').src = 'https://ui-avatars.com/api/?name=Guru&background=68117e&color=fff&size=120';
     new bootstrap.Modal('#teacherModal').show();
 }
 
@@ -465,7 +465,7 @@ function editTeacher(id) {
         document.getElementById('education').value   = t.education   ?? '';
         document.getElementById('subjects').value    = t.subjects    ?? '';
         document.getElementById('address').value     = t.address     ?? '';
-        const avatar = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(t.name) + '&background=059669&color=fff&size=120';
+        const avatar = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(t.name) + '&background=68117e&color=fff&size=120';
         document.getElementById('photoPreview').src = t.photo ? '/storage/' + t.photo : avatar;
         new bootstrap.Modal('#teacherModal').show();
     }).fail(function() {

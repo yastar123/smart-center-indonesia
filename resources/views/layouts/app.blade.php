@@ -8,7 +8,7 @@
     <title>@yield('title','Dashboard') | Smart Center</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -42,6 +42,7 @@
             --topbar-bg: #ffffff;
             --input-bg: #faf7fc;
             --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --font-display: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
             --radius-card: 20px;
             --radius-btn: 12px;
             --shadow-sm: 0 1px 3px rgba(38,6,50,.06), 0 1px 2px rgba(38,6,50,.04);
@@ -81,6 +82,7 @@
             transition: background var(--transition), color var(--transition);
         }
 
+        h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -.025em; }
         h1 { font-size: clamp(26px, 3.5vw, 40px); }
         h2 { font-size: clamp(20px, 2.8vw, 30px); }
         h3 { font-size: clamp(17px, 2vw, 22px); }
@@ -1704,6 +1706,262 @@
             background: linear-gradient(135deg, #68117e, #c84ddf);
             flex-shrink: 0;
         }
+
+        /* ============================================================
+           PREMIUM ENHANCEMENTS — Typography, Depth & Polish
+        ============================================================ */
+
+        /* Stat values use display font with tabular nums */
+        .stat-value {
+            font-family: var(--font-display);
+            font-feature-settings: 'tnum' 1, 'kern' 1;
+            letter-spacing: -.04em;
+        }
+
+        /* Topbar title uses display font */
+        .topbar-left h4 {
+            font-family: var(--font-display);
+            font-weight: 800;
+            letter-spacing: -.03em;
+        }
+
+        /* Brand title uses display font */
+        .brand-title { font-family: var(--font-display); font-weight: 800; }
+
+        /* User name in sidebar */
+        .user-name { font-family: var(--font-display); font-weight: 700; }
+
+        /* fw-bold / fw-semibold headings use display font too */
+        .fw-bold, .fw-semibold { font-family: var(--font-display); }
+
+        /* ============================================================
+           GLASSMORPHISM TOPBAR — pronounced blur on scroll
+        ============================================================ */
+        .topbar.scrolled {
+            background: rgba(255,255,255,.88) !important;
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            box-shadow: 0 8px 32px rgba(38,6,50,.08), 0 1px 0 rgba(200,77,223,.07) !important;
+        }
+        [data-theme="dark"] .topbar.scrolled {
+            background: rgba(45,10,62,.92) !important;
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 1px 0 rgba(200,77,223,.15) !important;
+        }
+
+        /* ============================================================
+           AMBIENT GLOW — subtle purple radial on content bg
+        ============================================================ */
+        .main-content::before {
+            content: '';
+            position: fixed;
+            top: -15%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(200,77,223,.055) 0%, transparent 68%);
+            pointer-events: none;
+            z-index: 0;
+            border-radius: 50%;
+        }
+        .main-content { position: relative; z-index: 1; }
+        .content-wrapper { position: relative; z-index: 1; }
+
+        /* ============================================================
+           SIDEBAR — glowing right border accent
+        ============================================================ */
+        .sidebar::after {
+            content: '';
+            position: absolute;
+            right: 0; top: 10%; bottom: 10%;
+            width: 1px;
+            background: linear-gradient(180deg, transparent, rgba(200,77,223,.45) 40%, rgba(200,77,223,.45) 60%, transparent);
+            pointer-events: none;
+        }
+
+        /* ============================================================
+           NAV LINK — stronger active glow
+        ============================================================ */
+        .nav-link.active {
+            box-shadow: 0 6px 20px rgba(200,77,223,.4), inset 0 1px 0 rgba(255,255,255,.12) !important;
+        }
+
+        /* ============================================================
+           SIDEBAR USER SECTION — glass card feel
+        ============================================================ */
+        .sidebar-user {
+            background: rgba(255,255,255,.04);
+            margin: 8px 10px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,.07) !important;
+        }
+
+        /* ============================================================
+           CARD HOVER — inset shine on hover
+        ============================================================ */
+        .dashboard-card, .stat-card {
+            isolation: isolate;
+        }
+        .stat-card::before {
+            background: linear-gradient(90deg, var(--primary), #f6af23, var(--primary));
+            background-size: 200% 100%;
+            transition: opacity var(--transition), background-position .8s ease;
+        }
+        .stat-card:hover::before {
+            opacity: 1;
+            background-position: right center;
+        }
+
+        /* ============================================================
+           TOPBAR — user dropdown button polish
+        ============================================================ */
+        .topbar .dropdown > button.btn-light {
+            background: var(--input-bg) !important;
+            border-color: var(--card-border) !important;
+            transition: all var(--transition);
+        }
+        .topbar .dropdown > button.btn-light:hover {
+            background: var(--card-border) !important;
+            border-color: rgba(200,77,223,.3) !important;
+        }
+        [data-theme="dark"] .topbar .dropdown > button.btn-light {
+            background: rgba(255,255,255,.06) !important;
+            border-color: rgba(200,77,223,.15) !important;
+        }
+
+        /* ============================================================
+           TOPBAR BUTTONS — consistent hover ring
+        ============================================================ */
+        .top-btn:hover {
+            background: var(--input-bg);
+            color: var(--primary);
+            border-color: rgba(200,77,223,.3);
+            box-shadow: 0 0 0 3px rgba(200,77,223,.1);
+        }
+
+        /* ============================================================
+           SCROLLBAR — thinner and more subtle
+        ============================================================ */
+        .sidebar::-webkit-scrollbar { width: 3px; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(200,77,223,.3); }
+
+        /* ============================================================
+           NAV LINK LABELS — slightly tighter tracking
+        ============================================================ */
+        .nav-link span { letter-spacing: .005em; }
+
+        /* ============================================================
+           MOBILE BOTTOM NAV — active icon glow
+        ============================================================ */
+        .mob-nav-item.active i {
+            filter: drop-shadow(0 0 5px rgba(200,77,223,.6));
+        }
+        .mob-nav-item.active {
+            background: rgba(200,77,223,.08);
+            border-radius: 10px;
+        }
+
+        /* ============================================================
+           GRADIENT BANNER CARDS — top shimmer highlight line
+        ============================================================ */
+        .dashboard-card[style*="border:none"] {
+            position: relative;
+        }
+        .dashboard-card[style*="border:none"]::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 10%; right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* ============================================================
+           PAGE ENTRANCE — smoother fade-in
+        ============================================================ */
+        .content-wrapper.fade-in {
+            animation: pageEntrance .35s cubic-bezier(.22,1,.36,1) both;
+        }
+        @keyframes pageEntrance {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============================================================
+           SECTION HEADERS — table card headers
+        ============================================================ */
+        .card-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--text-muted);
+            font-family: var(--font-sans);
+        }
+
+        /* ============================================================
+           MODAL CONTENT — subtle top border accent
+        ============================================================ */
+        .modal-content {
+            border-top: 3px solid;
+            border-image: linear-gradient(90deg, #68117e, #c84ddf, #f6af23) 1;
+        }
+
+        /* ============================================================
+           FORM INPUTS — slightly taller touch target
+        ============================================================ */
+        .form-control, .form-select {
+            min-height: 42px;
+        }
+
+        /* ============================================================
+           DARK MODE — ambient glow tint
+        ============================================================ */
+        [data-theme="dark"] .main-content::before {
+            background: radial-gradient(circle, rgba(200,77,223,.08) 0%, transparent 68%);
+        }
+
+        /* ============================================================
+           BADGE — improved legibility
+        ============================================================ */
+        .badge { font-family: var(--font-sans); font-size: 11px; }
+
+        /* ============================================================
+           PAGE LOADER — dark mode aware
+        ============================================================ */
+        [data-theme="dark"] #pageLoader {
+            background: rgba(26,4,37,.85);
+            backdrop-filter: blur(6px);
+        }
+
+        /* ============================================================
+           SCROLL TOP — float from bottom-right clear of nav
+        ============================================================ */
+        @media (max-width: 992px) { #scrollTop { bottom: 82px; right: 16px; } }
+
+        /* ============================================================
+           TABLE — sticky first column helper
+        ============================================================ */
+        .table-sticky-col td:first-child,
+        .table-sticky-col th:first-child {
+            position: sticky; left: 0; z-index: 1;
+            background: var(--card-bg);
+        }
+
+        /* ============================================================
+           IMPERSONATE BANNER — improved style
+        ============================================================ */
+        .impersonate-banner {
+            background: linear-gradient(90deg, #fef2f2, #fff4f4);
+            border-bottom: 1px solid #fecaca;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 500;
+            color: #dc2626;
+        }
     </style>
 
     @stack('styles')
@@ -1742,7 +2000,7 @@
     </a>
 
     <div class="sidebar-user">
-        <img src="{{ auth()->user()->avatar ? asset('storage/'.auth()->user()->avatar) : 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&background=2563eb&color=fff&size=80' }}"
+        <img src="{{ auth()->user()->avatar ? asset('storage/'.auth()->user()->avatar) : 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&background=68117e&color=fff&size=80' }}"
              class="sidebar-avatar" alt="Avatar" id="sidebarAvatar">
         <div>
             <div class="user-name">{{ auth()->user()->name }}</div>
@@ -1950,7 +2208,7 @@
         <div class="nav-item">
             <a href="{{ route('siswa.tryout') }}" class="nav-link {{ request()->routeIs('siswa.tryout') ? 'active' : '' }}" data-label="Tryout CBT">
                 <i class="bi bi-laptop"></i><span>Tryout CBT</span>
-                <span class="menu-badge" style="background:#6366f1">Soon</span>
+                <span class="menu-badge" style="background:#68117e">Soon</span>
             </a>
         </div>
         @endrole
@@ -2022,7 +2280,7 @@
                 <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border"
                         data-bs-toggle="dropdown" style="border-radius:12px;padding:6px 12px 6px 8px;font-size:13px">
                     <img id="topbarAvatar"
-                         src="{{ auth()->user()->avatar ? asset('storage/'.auth()->user()->avatar) : 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&background=2563eb&color=fff&size=64' }}"
+                         src="{{ auth()->user()->avatar ? asset('storage/'.auth()->user()->avatar) : 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&background=68117e&color=fff&size=64' }}"
                          width="32" height="32" class="rounded-circle" style="object-fit:cover">
                     <div class="text-start d-none d-md-block">
                         <div class="fw-semibold" style="font-size:13px;line-height:1.2">{{ Str::limit(auth()->user()->name, 16) }}</div>
@@ -2504,19 +2762,19 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         { label:'Dashboard', desc:'Halaman utama', href:'{{ route("dashboard") }}', icon:'bi-grid-fill', color:'#c84ddf', group:'Navigasi' },
         { label:'Data Siswa', desc:'Kelola siswa', href:'{{ route("admin.students.index") }}', icon:'bi-mortarboard', color:'#c84ddf', group:'Akademik' },
         { label:'Data Guru', desc:'Kelola guru & pengajar', href:'{{ route("admin.teachers.index") }}', icon:'bi-person-workspace', color:'#10b981', group:'Akademik' },
-        { label:'Modul Belajar', desc:'Upload & kelola materi', href:'{{ route("admin.modules.index") }}', icon:'bi-book-half', color:'#1a56db', group:'Akademik' },
+        { label:'Modul Belajar', desc:'Upload & kelola materi', href:'{{ route("admin.modules.index") }}', icon:'bi-book-half', color:'#68117e', group:'Akademik' },
         { label:'Paket Belajar', desc:'Atur paket & harga', href:'{{ route("admin.packages.index") }}', icon:'bi-box-seam', color:'#059669', group:'Akademik' },
         { label:'Mata Pelajaran', desc:'Kelola mapel', href:'{{ route("admin.courses.index") }}', icon:'bi-journal-bookmark', color:'#10b981', group:'Akademik' },
         { label:'Kelas', desc:'Manajemen kelas belajar', href:'{{ route("admin.classes.index") }}', icon:'bi-diagram-3', color:'#68117e', group:'Akademik' },
         { label:'Jadwal', desc:'Jadwal mengajar & sesi', href:'{{ route("admin.schedules.index") }}', icon:'bi-calendar-week', color:'#461256', group:'Akademik' },
         { label:'Sertifikat', desc:'Terbitkan sertifikat siswa', href:'{{ route("admin.certificates.index") }}', icon:'bi-award', color:'#f6af23', group:'Akademik' },
         { label:'Pembayaran', desc:'Invoice & tagihan siswa', href:'{{ route("admin.payments.index") }}', icon:'bi-wallet2', color:'#059669', group:'Keuangan' },
-        { label:'Gaji Guru', desc:'Kelola gaji & slip', href:'{{ route("admin.salaries.index") }}', icon:'bi-cash-stack', color:'#4338ca', group:'Keuangan' },
+        { label:'Gaji Guru', desc:'Kelola gaji & slip', href:'{{ route("admin.salaries.index") }}', icon:'bi-cash-stack', color:'#68117e', group:'Keuangan' },
         { label:'Laporan Keuangan', desc:'Rekap & analitik keuangan', href:'{{ route("admin.reports.index") }}', icon:'bi-bar-chart-line', color:'#260632', group:'Keuangan' },
-        { label:'Pengumuman', desc:'Buat & kelola pengumuman', href:'{{ route("admin.announcements.index") }}', icon:'bi-megaphone', color:'#c2410c', group:'Komunikasi' },
+        { label:'Pengumuman', desc:'Buat & kelola pengumuman', href:'{{ route("admin.announcements.index") }}', icon:'bi-megaphone', color:'#68117e', group:'Komunikasi' },
         { label:'Pesan Aplikasi', desc:'Chat internal', href:'{{ route("admin.messages.index") }}', icon:'bi-chat-dots', color:'#0284c7', group:'Komunikasi' },
         { label:'Video Call', desc:'Kelas virtual online', href:'{{ route("admin.videocall.index") }}', icon:'bi-camera-video', color:'#0d9488', group:'Komunikasi' },
-        { label:'Tryout UTBK/PTN', desc:'Kelola soal & ujian CBT', href:'{{ route("admin.tryouts.index") }}', icon:'bi-journal-check', color:'#7c3aed', group:'Tryout CBT' },
+        { label:'Tryout UTBK/PTN', desc:'Kelola soal & ujian CBT', href:'{{ route("admin.tryouts.index") }}', icon:'bi-journal-check', color:'#c84ddf', group:'Tryout CBT' },
         { label:'Profil Saya', desc:'Edit akun & password', href:'{{ route("profile.edit") }}', icon:'bi-person-circle', color:'#c84ddf', group:'Akun' },
     ];
 

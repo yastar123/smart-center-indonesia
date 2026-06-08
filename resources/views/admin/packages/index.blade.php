@@ -6,7 +6,7 @@
 <div class="fade-up">
 
 {{-- HEADER --}}
-<div class="dashboard-card mb-4" style="background:linear-gradient(135deg,#065f46 0%,#059669 100%);color:white;border:none;overflow:hidden;position:relative">
+<div class="dashboard-card mb-4" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
     <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%"></div>
     <div class="row align-items-center g-3" style="position:relative">
         <div class="col-md-8">

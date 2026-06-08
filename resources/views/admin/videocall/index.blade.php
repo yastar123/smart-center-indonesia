@@ -31,7 +31,7 @@
     @foreach([
         ['icon'=>'bi-camera-video','color'=>'#0d9488','bg'=>'rgba(13,148,136,.1)','title'=>'Kelas Virtual','desc'=>'Buat room kelas virtual untuk pembelajaran online real-time'],
         ['icon'=>'bi-person-check','color'=>'#c84ddf','bg'=>'rgba(200,77,223,.1)','title'=>'Konsultasi 1-on-1','desc'=>'Sesi konsultasi privat antara guru dan siswa'],
-        ['icon'=>'bi-people','color'=>'#1a56db','bg'=>'rgba(26,86,219,.1)','title'=>'Meeting Guru','desc'=>'Rapat virtual tim pengajar lintas cabang'],
+        ['icon'=>'bi-people','color'=>'#68117e','bg'=>'rgba(104,17,126,.1)','title'=>'Meeting Guru','desc'=>'Rapat virtual tim pengajar lintas cabang'],
         ['icon'=>'bi-link-45deg','color'=>'#f6af23','bg'=>'rgba(246,175,35,.1)','title'=>'Share Link','desc'=>'Bagikan link meeting dengan mudah via tombol copy'],
     ] as $t)
     <div class="col-6 col-md-3">

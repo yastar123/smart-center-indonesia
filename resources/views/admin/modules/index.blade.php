@@ -6,7 +6,7 @@
 <div class="fade-up">
 
 {{-- HEADER --}}
-<div class="dashboard-card mb-4" style="background:linear-gradient(135deg,#1e3a5f 0%,#1a56db 100%);color:white;border:none;overflow:hidden;position:relative">
+<div class="dashboard-card mb-4" style="background:linear-gradient(135deg,#260632 0%,#461256 40%,#68117e 100%);color:white;border:none;overflow:hidden;position:relative">
     <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%"></div>
     <div class="row align-items-center g-3" style="position:relative">
         <div class="col-md-8">
@@ -204,7 +204,7 @@ function loadData(page = 1) {
 }
 
 function renderTable(rows) {
-    const jenisMap = { pdf:'<span class="badge" style="background:#ef444422;color:#ef4444">PDF</span>', video:'<span class="badge" style="background:#10b98122;color:#10b981">Video</span>', materi:'<span class="badge" style="background:#6366f122;color:#6366f1">Materi</span>', link:'<span class="badge" style="background:#f6af2322;color:#b45309">Link</span>' };
+    const jenisMap = { pdf:'<span class="badge" style="background:#ef444422;color:#ef4444">PDF</span>', video:'<span class="badge" style="background:#10b98122;color:#10b981">Video</span>', materi:'<span class="badge" style="background:#68117e22;color:#68117e">Materi</span>', link:'<span class="badge" style="background:#f6af2322;color:#b45309">Link</span>' };
     if (!rows.length) {
         document.getElementById('tableBody').innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted"><i class="bi bi-book" style="font-size:2rem;display:block;margin-bottom:8px"></i>Belum ada modul</td></tr>';
         return;

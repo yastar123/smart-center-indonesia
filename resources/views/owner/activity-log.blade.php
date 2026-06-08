@@ -5,7 +5,7 @@
 @section('content')
 
 {{-- HEADER --}}
-<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#1e1b4b,#68117e,#c84ddf);color:white;border:none">
+<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
     <div class="row align-items-center g-3">
         <div class="col-md-8">
             <div class="d-flex align-items-center gap-3 mb-2">

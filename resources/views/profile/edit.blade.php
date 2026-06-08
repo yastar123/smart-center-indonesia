@@ -34,7 +34,7 @@
 
         <div class="dashboard-card text-center fade-up">
             <div class="position-relative d-inline-block mb-3">
-                <img src="{{ $user->avatar ? asset('storage/'.$user->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=2563eb&color=fff&size=160' }}"
+                <img src="{{ $user->avatar ? asset('storage/'.$user->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=68117e&color=fff&size=160' }}"
                      class="rounded-circle"
                      width="100" height="100"
                      style="object-fit:cover;border:4px solid #c84ddf;box-shadow:0 8px 24px rgba(200,77,223,.3)"

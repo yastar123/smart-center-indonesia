@@ -5,7 +5,7 @@
 @section('content')
 
 {{-- HEADER BANNER --}}
-<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#2563eb 100%);color:white;border:none;overflow:hidden;position:relative">
+<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
     <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.04);border-radius:50%"></div>
     <div class="row align-items-center g-3" style="position:relative">
         <div class="col-md-8">
@@ -209,7 +209,7 @@
             <tbody>
                 @forelse($students as $i => $s)
                 @php
-                    $avatar = 'https://ui-avatars.com/api/?name='.urlencode($s->name).'&background='.($s->gender==='P'?'ec4899':'3b82f6').'&color=fff&size=80';
+                    $avatar = 'https://ui-avatars.com/api/?name='.urlencode($s->name).'&background='.($s->gender==='P'?'ec4899':'68117e').'&color=fff&size=80';
                     $statusMap = [
                         'aktif'    => ['bg'=>'#dcfce7','color'=>'#15803d','label'=>'Aktif'],
                         'nonaktif' => ['bg'=>'#f3f4f6','color'=>'#6b7280','label'=>'Nonaktif'],
@@ -349,7 +349,7 @@
                     <div class="text-center mb-4 pb-4" style="border-bottom:1px solid var(--card-border)">
                         <div class="position-relative d-inline-block">
                             <img id="photoPreview"
-                                 src="https://ui-avatars.com/api/?name=Siswa&background=3b82f6&color=fff&size=120"
+                                 src="https://ui-avatars.com/api/?name=Siswa&background=68117e&color=fff&size=120"
                                  class="rounded-circle"
                                  width="100" height="100"
                                  style="object-fit:cover;border:3px solid #c84ddf;box-shadow:0 8px 24px rgba(200,77,223,.3)">
@@ -403,7 +403,7 @@
                     {{-- SECTION: DATA AKADEMIK --}}
                     <div class="mb-4">
                         <div class="d-flex align-items-center gap-2 mb-3">
-                            <div style="width:4px;height:20px;background:linear-gradient(#10b981,#059669);border-radius:4px"></div>
+                            <div style="width:4px;height:20px;background:linear-gradient(135deg,#68117e,#c84ddf);border-radius:4px"></div>
                             <span class="fw-bold text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em">Data Akademik</span>
                         </div>
                         <div class="row g-3">
@@ -496,7 +496,7 @@ function openModal() {
     document.getElementById('studentForm').reset();
     document.getElementById('studentId').value = '';
     document.getElementById('modalTitle').innerHTML = '<i class="bi bi-person-plus me-2"></i>Tambah Siswa Baru';
-    document.getElementById('photoPreview').src = 'https://ui-avatars.com/api/?name=Siswa&background=3b82f6&color=fff&size=120';
+    document.getElementById('photoPreview').src = 'https://ui-avatars.com/api/?name=Siswa&background=68117e&color=fff&size=120';
     new bootstrap.Modal('#studentModal').show();
 }
 
@@ -518,7 +518,7 @@ function editStudent(id) {
         document.getElementById('parent_name').value  = s.parent_name  ?? '';
         document.getElementById('parent_phone').value = s.parent_phone ?? '';
         document.getElementById('address').value     = s.address     ?? '';
-        const avatar = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(s.name) + '&background=3b82f6&color=fff&size=120';
+        const avatar = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(s.name) + '&background=68117e&color=fff&size=120';
         document.getElementById('photoPreview').src = s.photo ? '/storage/' + s.photo : avatar;
         new bootstrap.Modal('#studentModal').show();
     }).fail(function() {
@@ -532,7 +532,7 @@ function showDetail(id) {
     new bootstrap.Modal('#detailModal').show();
     $.get('/admin/students/' + id, function(res) {
         const s = res.data;
-        const avatar = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(s.name) + '&background=' + (s.gender==='P'?'ec4899':'3b82f6') + '&color=fff&size=120';
+        const avatar = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(s.name) + '&background=' + (s.gender==='P'?'ec4899':'68117e') + '&color=fff&size=120';
         const statusMap = {aktif:'#dcfce7:#15803d:Aktif', nonaktif:'#f3f4f6:#6b7280:Nonaktif', lulus:'#f3d6fa:#461256:Lulus'};
         const [sbg,scol,slbl] = (statusMap[s.status]||'#f3f4f6:#6b7280:'+s.status).split(':');
         document.getElementById('detailBody').innerHTML = `

@@ -8,7 +8,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
@@ -103,6 +103,7 @@
         .strength-bar { height:5px;border-radius:10px;background:#e5e7eb;overflow:hidden;margin-top:8px; }
         .strength-fill { height:100%;border-radius:10px;transition:.3s; }
 
+        h1,h2,h3,h4,h5,h6 { font-family:'Plus Jakarta Sans','Inter',sans-serif; letter-spacing:-.02em; }
         @media(max-width:480px){ .card-body-inner{padding:1.5rem;} .card-header-band{padding:1.5rem;} }
     </style>
 </head>

@@ -8,7 +8,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -24,6 +24,7 @@
             position: relative;
             overflow: hidden;
         }
+        h1, h2, h3, h4, h5, h6, .greeting { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; letter-spacing: -.02em; }
 
         /* Animated background orbs */
         body::before {
@@ -271,13 +272,36 @@
         .demo-credentials {
             background: #fdf4ff;
             border: 1.5px solid #e8b4f5;
-            border-radius: 12px;
-            padding: 12px 14px;
+            border-radius: 14px;
+            padding: 14px 16px;
             font-size: .78rem;
             color: #68117e;
             margin-top: 1.25rem;
         }
-        .demo-credentials strong { display: block; margin-bottom: 4px; color: #461256; }
+        .demo-credentials strong { display: block; margin-bottom: 8px; color: #461256; font-size: .82rem; }
+        .demo-grid { display: flex; flex-direction: column; gap: 5px; }
+        .demo-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .76rem;
+            color: #4b2063;
+        }
+        .demo-role {
+            font-size: .68rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            flex-shrink: 0;
+            min-width: 44px;
+            text-align: center;
+        }
+        .demo-role.owner { background: linear-gradient(135deg,#68117e,#c84ddf); color: white; }
+        .demo-role.admin { background: linear-gradient(135deg,#461256,#68117e); color: white; }
+        .demo-role.guru  { background: linear-gradient(135deg,#059669,#10b981); color: white; }
+        .demo-role.siswa { background: linear-gradient(135deg,#d97706,#f6af23); color: white; }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
@@ -427,8 +451,24 @@
 
         <div class="demo-credentials">
             <strong><i class="bi bi-info-circle me-1"></i> Akun Demo</strong>
-            Owner: adminpusatsci@akademi.com / password<br>
-            Admin: admincabangsci@akademi.com / password
+            <div class="demo-grid mt-1">
+                <div class="demo-row">
+                    <span class="demo-role owner">Owner</span>
+                    <span>adminpusatsci@akademi.com / <b>password</b></span>
+                </div>
+                <div class="demo-row">
+                    <span class="demo-role admin">Admin</span>
+                    <span>admincabangsci@akademi.com / <b>password</b></span>
+                </div>
+                <div class="demo-row">
+                    <span class="demo-role guru">Guru</span>
+                    <span>gurusci@gmail.com / <b>password123</b></span>
+                </div>
+                <div class="demo-row">
+                    <span class="demo-role siswa">Siswa</span>
+                    <span>siswasci@gmail.com / <b>password12</b></span>
+                </div>
+            </div>
         </div>
 
     </div>

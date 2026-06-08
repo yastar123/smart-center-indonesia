@@ -5,7 +5,7 @@
 @section('content')
 
 {{-- HEADER BANNER --}}
-<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#064e3b,#065f46,#059669);color:white;border:none">
+<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
     <div class="row align-items-center g-3">
         <div class="col-md-8">
             <div class="d-flex align-items-center gap-3 mb-2">
@@ -162,7 +162,7 @@
                 @endphp
                 <tr style="border-bottom:1px solid var(--card-border);transition:background .15s" onmouseover="this.style.background='rgba(104,17,126,.05)'" onmouseout="this.style.background=''">
                     <td class="ps-3">
-                        <code style="background:#f0fdf4;color:#065f46;padding:3px 8px;border-radius:6px;font-size:11px">{{ $inv->nomor_invoice }}</code>
+                        <code style="background:#fdf4ff;color:#68117e;padding:3px 8px;border-radius:6px;font-size:11px">{{ $inv->nomor_invoice }}</code>
                     </td>
                     <td>
                         <div class="d-flex align-items-center gap-2">
@@ -241,7 +241,7 @@
 <div class="modal fade" id="invoiceModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg" style="border-radius:18px;overflow:hidden">
-            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#065f46,#059669);color:#fff">
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#260632,#68117e);color:#fff">
                 <h6 class="modal-title fw-bold" id="modalTitle"><i class="bi bi-receipt-cutoff me-2"></i>Buat Invoice Baru</h6>
                 <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -350,7 +350,7 @@
 <div class="modal fade" id="payModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="border-radius:18px;overflow:hidden">
-            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#14532d,#16a34a);color:#fff">
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#260632,#68117e);color:#fff">
                 <h6 class="modal-title fw-bold" id="payModalTitle"><i class="bi bi-cash-stack me-2"></i>Catat Pembayaran</h6>
                 <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -358,9 +358,9 @@
                 <input type="hidden" id="payInvoiceId">
                 <div class="row g-3">
                     <div class="col-12">
-                        <div class="p-3 rounded-3 mb-2" style="background:#f0fdf4;border:1px solid #bbf7d0">
-                            <div class="fw-semibold" style="font-size:12px;color:#065f46" id="payStudentName"></div>
-                            <div style="font-size:20px;font-weight:700;color:#059669" id="payTotalLabel"></div>
+                        <div class="p-3 rounded-3 mb-2" style="background:#fdf4ff;border:1px solid #e9d5ff">
+                            <div class="fw-semibold" style="font-size:12px;color:#68117e" id="payStudentName"></div>
+                            <div style="font-size:20px;font-weight:700;color:#c84ddf" id="payTotalLabel"></div>
                         </div>
                     </div>
                     <div class="col-12">

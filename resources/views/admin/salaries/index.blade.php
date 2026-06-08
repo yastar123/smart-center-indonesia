@@ -6,7 +6,7 @@
 <div class="fade-up">
 
 {{-- HEADER --}}
-<div class="dashboard-card mb-4" style="background:linear-gradient(135deg,#1e1b4b 0%,#4338ca 100%);color:white;border:none;overflow:hidden;position:relative">
+<div class="dashboard-card mb-4" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#68117e 100%);color:white;border:none;overflow:hidden;position:relative">
     <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%"></div>
     <div class="row align-items-center g-3" style="position:relative">
         <div class="col-md-8">
@@ -28,7 +28,7 @@
 
 {{-- STATS --}}
 <div class="row g-3 mb-4">
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Total Record</div><div class="stat-value" id="statTotal">–</div></div><div class="stat-icon" style="background:linear-gradient(135deg,#4338ca,#818cf8);color:white"><i class="bi bi-receipt"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Total Record</div><div class="stat-value" id="statTotal">–</div></div><div class="stat-icon" style="background:linear-gradient(135deg,#68117e,#c84ddf);color:white"><i class="bi bi-receipt"></i></div></div></div></div>
     <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Sudah Dibayar</div><div class="stat-value" id="statDibayar">–</div></div><div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-check-circle"></i></div></div></div></div>
     <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Pending</div><div class="stat-value" id="statPending">–</div></div><div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-clock"></i></div></div></div></div>
     <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Total Dibayarkan</div><div class="stat-value text-success" id="statNominal" style="font-size:16px">–</div></div><div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-cash"></i></div></div></div></div>

@@ -213,11 +213,11 @@
                 <div class="col-6">
                     <a href="{{ route('admin.teachers.index') }}"
                        class="d-flex align-items-center gap-2 p-3 rounded-3 text-decoration-none quick-dash"
-                       style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #bbf7d0">
-                        <i class="bi bi-person-workspace" style="font-size:1.4rem;color:#059669"></i>
+                       style="background:linear-gradient(135deg,#fdf4ff,#fae8ff);border:1px solid #e9d5ff">
+                        <i class="bi bi-person-workspace" style="font-size:1.4rem;color:#68117e"></i>
                         <div>
-                            <div class="fw-semibold" style="font-size:12.5px;color:#065f46">Kelola Guru</div>
-                            <div style="font-size:11px;color:#6ee7b7">Manajemen pengajar</div>
+                            <div class="fw-semibold" style="font-size:12.5px;color:#461256">Kelola Guru</div>
+                            <div style="font-size:11px;color:#c084fc">Manajemen pengajar</div>
                         </div>
                     </a>
                 </div>
@@ -235,11 +235,11 @@
                 <div class="col-6">
                     <a href="{{ route('admin.payments.index') }}"
                        class="d-flex align-items-center gap-2 p-3 rounded-3 text-decoration-none quick-dash"
-                       style="background:linear-gradient(135deg,#fff7ed,#ffedd5);border:1px solid #fed7aa">
-                        <i class="bi bi-wallet2" style="font-size:1.4rem;color:#ea580c"></i>
+                       style="background:linear-gradient(135deg,#fdf4ff,#fae8ff);border:1px solid #e9d5ff">
+                        <i class="bi bi-wallet2" style="font-size:1.4rem;color:#c84ddf"></i>
                         <div>
-                            <div class="fw-semibold" style="font-size:12.5px;color:#9a3412">Cek Pembayaran</div>
-                            <div style="font-size:11px;color:#fdba74">Tagihan & invoice</div>
+                            <div class="fw-semibold" style="font-size:12.5px;color:#461256">Cek Pembayaran</div>
+                            <div style="font-size:11px;color:#c084fc">Tagihan & invoice</div>
                         </div>
                     </a>
                 </div>
@@ -250,8 +250,8 @@
                        style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fcd34d">
                         <i class="bi bi-building" style="font-size:1.4rem;color:#e09000"></i>
                         <div>
-                            <div class="fw-semibold" style="font-size:12.5px;color:#92400e">Monitor Cabang</div>
-                            <div style="font-size:11px;color:#fcd34d">Semua cabang</div>
+                            <div class="fw-semibold" style="font-size:12.5px;color:#78350f">Monitor Cabang</div>
+                            <div style="font-size:11px;color:#d97706">Semua cabang</div>
                         </div>
                     </a>
                 </div>
@@ -260,10 +260,10 @@
                     <a href="{{ route('admin.tryouts.index') }}"
                        class="d-flex align-items-center gap-2 p-3 rounded-3 text-decoration-none quick-dash"
                        style="background:linear-gradient(135deg,#fdf4ff,#f3d6fa);border:1px solid #e8b4f5">
-                        <i class="bi bi-ui-checks-grid" style="font-size:1.4rem;color:#0284c7"></i>
+                        <i class="bi bi-ui-checks-grid" style="font-size:1.4rem;color:#68117e"></i>
                         <div>
-                            <div class="fw-semibold" style="font-size:12.5px;color:#075985">Tryout Online</div>
-                            <div style="font-size:11px;color:#7dd3fc">CBT & penilaian</div>
+                            <div class="fw-semibold" style="font-size:12.5px;color:#461256">Tryout Online</div>
+                            <div style="font-size:11px;color:#c084fc">CBT & penilaian</div>
                         </div>
                     </a>
                 </div>

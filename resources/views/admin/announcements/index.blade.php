@@ -6,7 +6,7 @@
 <div class="fade-up">
 
 {{-- HEADER --}}
-<div class="dashboard-card mb-4" style="background:linear-gradient(135deg,#7c2d12 0%,#c2410c 100%);color:white;border:none;overflow:hidden;position:relative">
+<div class="dashboard-card mb-4" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
     <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%"></div>
     <div class="row align-items-center g-3" style="position:relative">
         <div class="col-md-8">
@@ -28,9 +28,9 @@
 
 {{-- STATS --}}
 <div class="row g-3 mb-4">
-    <div class="col-6 col-md-4"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Total</div><div class="stat-value" id="statTotal">–</div></div><div class="stat-icon" style="background:linear-gradient(135deg,#c2410c,#f97316);color:white"><i class="bi bi-megaphone"></i></div></div></div></div>
+    <div class="col-6 col-md-4"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Total</div><div class="stat-value" id="statTotal">–</div></div><div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-megaphone"></i></div></div></div></div>
     <div class="col-6 col-md-4"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Aktif</div><div class="stat-value" id="statAktif">–</div></div><div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-check-circle"></i></div></div></div></div>
-    <div class="col-12 col-md-4"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Disematkan</div><div class="stat-value" id="statPinned">–</div></div><div class="stat-icon" style="background:linear-gradient(135deg,#6366f1,#a5b4fc);color:white"><i class="bi bi-pin"></i></div></div></div></div>
+    <div class="col-12 col-md-4"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Disematkan</div><div class="stat-value" id="statPinned">–</div></div><div class="stat-icon" style="background:linear-gradient(135deg,#68117e,#c84ddf);color:white"><i class="bi bi-pin"></i></div></div></div></div>
 </div>
 
 {{-- FILTERS --}}
