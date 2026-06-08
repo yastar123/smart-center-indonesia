@@ -193,9 +193,12 @@
 <div class="modal fade" id="certModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0" style="border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.15);">
-            <div class="modal-header border-0 pb-0 px-4 pt-4">
-                <h5 class="modal-title fw-bold" id="certModalTitle">Terbitkan Sertifikat</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#f6af23,#b45309);border-radius:20px 20px 0 0">
+                <div>
+                    <h5 class="modal-title fw-bold mb-0 text-white" id="certModalTitle"><i class="bi bi-award me-2"></i>Terbitkan Sertifikat</h5>
+                    <div style="font-size:12px;opacity:.75;color:white;margin-top:3px">Isi data sertifikat yang akan diterbitkan</div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body px-4 py-3">
                 <form id="certForm">
@@ -238,8 +241,15 @@
                             <input type="date" class="form-control" id="tanggal_terbit" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold" style="font-size:.85rem;">Tanggal Expired <span class="text-muted">(opsional)</span></label>
+                            <label class="form-label fw-semibold d-flex align-items-center justify-content-between" style="font-size:.85rem;">
+                                <span>Tanggal Expired <span class="text-muted fw-normal">(opsional)</span></span>
+                                <span class="d-flex align-items-center gap-1" style="font-size:.78rem;font-weight:400">
+                                    <input type="checkbox" id="seumurHidup" class="form-check-input" style="margin-top:0">
+                                    <label for="seumurHidup" class="mb-0" style="cursor:pointer">Seumur Hidup</label>
+                                </span>
+                            </label>
                             <input type="date" class="form-control" id="tanggal_expired">
+                            <div class="invalid-feedback" id="expiredError">Tanggal expired harus setelah tanggal terbit.</div>
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-semibold" style="font-size:.85rem;">Diterbitkan Oleh</label>
@@ -266,16 +276,38 @@
 <script>
 const certModal = new bootstrap.Modal(document.getElementById('certModal'));
 
+// ---- Date validation helpers ----
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('tanggal_terbit').addEventListener('change', function() {
+        const exp = document.getElementById('tanggal_expired');
+        if (this.value) {
+            const d = new Date(this.value); d.setDate(d.getDate() + 1);
+            exp.min = d.toISOString().split('T')[0];
+            if (exp.value && exp.value <= this.value) { exp.value = ''; }
+        }
+        exp.classList.remove('is-invalid');
+    });
+    document.getElementById('seumurHidup').addEventListener('change', function() {
+        const exp = document.getElementById('tanggal_expired');
+        exp.disabled = this.checked;
+        if (this.checked) { exp.value = ''; exp.classList.remove('is-invalid'); }
+    });
+});
+
 function openCertModal() {
-    document.getElementById('certModalTitle').textContent = 'Terbitkan Sertifikat';
+    document.getElementById('certModalTitle').innerHTML = '<i class="bi bi-award me-2"></i>Terbitkan Sertifikat';
     document.getElementById('certId').value = '';
     document.getElementById('certForm').reset();
+    document.getElementById('seumurHidup').checked = false;
+    document.getElementById('tanggal_expired').disabled = false;
     document.getElementById('tanggal_terbit').value = new Date().toISOString().split('T')[0];
     certModal.show();
 }
 
 function editCert(id) {
-    document.getElementById('certModalTitle').textContent = 'Edit Sertifikat';
+    document.getElementById('certModalTitle').innerHTML = '<i class="bi bi-pencil-square me-2"></i>Edit Sertifikat';
+    document.getElementById('seumurHidup').checked = false;
+    document.getElementById('tanggal_expired').disabled = false;
     document.getElementById('certSaveBtn').disabled = true;
     fetch(`/admin/certificates/${id}`)
         .then(r => r.json())
@@ -299,6 +331,18 @@ function saveCert() {
     const id = document.getElementById('certId').value;
     const isEdit = id !== '';
     const btn = document.getElementById('certSaveBtn');
+
+    // Validate expiry date
+    const terbit  = document.getElementById('tanggal_terbit').value;
+    const expired = document.getElementById('tanggal_expired').value;
+    const expEl   = document.getElementById('tanggal_expired');
+    expEl.classList.remove('is-invalid');
+    if (!document.getElementById('seumurHidup').checked && expired && terbit && expired <= terbit) {
+        expEl.classList.add('is-invalid');
+        expEl.focus();
+        return;
+    }
+
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan…';
 

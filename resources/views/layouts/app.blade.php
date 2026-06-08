@@ -238,11 +238,12 @@
             inset: 0;
             background: rgba(0,0,0,.55);
             z-index: 1029;
-            backdrop-filter: blur(2px);
-            animation: fadeOverlay .2s ease both;
+            backdrop-filter: blur(8px) saturate(120%);
+            -webkit-backdrop-filter: blur(8px) saturate(120%);
+            animation: fadeOverlay .22s ease both;
         }
         .sidebar-overlay.show { display: block; }
-        @keyframes fadeOverlay { from{opacity:0;} to{opacity:1;} }
+        @keyframes fadeOverlay { from{opacity:0;backdrop-filter:blur(0);} to{opacity:1;backdrop-filter:blur(8px);} }
 
         /* ============================================================
            MAIN CONTENT
@@ -271,8 +272,8 @@
         }
 
         .topbar-left { display: flex; align-items: center; gap: 12px; }
-        .topbar-left h4 { margin: 0; font-size: 20px; font-weight: 700; color: var(--text-primary); }
-        .topbar-left p { margin: 0; color: var(--text-muted); font-size: 12px; }
+        .topbar-left h4 { margin: 0; font-size: clamp(16px, 2vw, 20px); font-weight: 700; color: var(--text-primary); }
+        .topbar-left p { margin: 0; color: var(--text-muted); font-size: clamp(10px, 1.2vw, 12px); }
 
         .topbar-right { display: flex; align-items: center; gap: 10px; }
 
@@ -338,9 +339,9 @@
             display: flex; align-items: center; justify-content: center;
             font-size: 22px;
         }
-        .stat-title { color: var(--text-muted); font-size: 13px; font-weight: 500; margin-bottom: 6px; }
-        .stat-label { color: var(--text-muted); font-size: 13px; font-weight: 500; margin-top: 6px; }
-        .stat-value { font-size: 28px; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
+        .stat-title { color: var(--text-muted); font-size: clamp(11px, 1.1vw, 13px); font-weight: 500; margin-bottom: 6px; }
+        .stat-label { color: var(--text-muted); font-size: clamp(11px, 1.1vw, 13px); font-weight: 500; margin-top: 6px; }
+        .stat-value { font-size: clamp(22px, 2.5vw, 28px); font-weight: 800; color: var(--text-primary); line-height: 1.1; }
         .stat-growth { font-size: 12px; margin-top: 8px; display: flex; align-items: center; gap: 4px; }
 
         .bg-primary-soft   { background: linear-gradient(135deg, #c84ddf, #68117e); }
@@ -1716,11 +1717,11 @@
                 <i class="bi bi-search"></i>
             </button>
 
-            <button class="top-btn" id="darkToggle" onclick="toggleDark()" title="Toggle dark mode">
+            <button class="top-btn" id="darkToggle" onclick="toggleDark()" title="Toggle dark mode" aria-label="Toggle dark mode">
                 <i class="bi bi-moon" id="darkIcon"></i>
             </button>
 
-            <button class="top-btn position-relative" title="Notifikasi" id="notifBtn">
+            <button class="top-btn position-relative" title="Notifikasi" id="notifBtn" aria-label="Notifikasi">
                 <i class="bi bi-bell"></i>
             </button>
 

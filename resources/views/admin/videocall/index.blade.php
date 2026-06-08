@@ -120,12 +120,16 @@ function showMeeting(roomName) {
     document.getElementById('roomLinkBox').classList.remove('d-none');
     document.getElementById('roomLink').textContent = fullLink;
 
-    const frame = document.getElementById('meetingFrame');
-    frame.innerHTML = `<div style="position:relative;width:100%;padding-top:56.25%;border-radius:16px;overflow:hidden">
-        <iframe src="${fullLink}" allow="camera; microphone; display-capture; autoplay"
-            style="position:absolute;top:0;left:0;width:100%;height:100%;border:none"
-            allowfullscreen></iframe>
-    </div>`;
+    const isMobile = window.innerWidth < 768;
+    const frameH   = isMobile ? 'calc(100vh - 200px)' : '620px';
+    const frame    = document.getElementById('meetingFrame');
+    frame.innerHTML = `<iframe src="${fullLink}"
+        allow="camera; microphone; display-capture; autoplay"
+        style="width:100%;height:${frameH};min-height:400px;border:none;display:block"
+        allowfullscreen loading="lazy"></iframe>`;
+    frame.style.minHeight = isMobile ? '400px' : '620px';
+    frame.style.display   = 'block';
+    frame.style.padding   = '0';
 }
 
 function createRoom() {

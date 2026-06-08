@@ -145,7 +145,7 @@
     {{-- TABLE --}}
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
-            <thead style="background:var(--input-bg)">
+            <thead class="thead-modern">
                 <tr>
                     <th class="small text-muted fw-semibold py-3" style="width:46px">#</th>
                     <th class="small text-muted fw-semibold py-3">GURU</th>

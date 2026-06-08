@@ -37,10 +37,11 @@
 {{-- FILTERS --}}
 <div class="dashboard-card mb-4">
     <div class="row g-2">
-        <div class="col-md-4"><div class="input-group"><span class="input-group-text"><i class="bi bi-search"></i></span><input type="text" id="searchInput" class="form-control" placeholder="Cari tryout..."></div></div>
-        <div class="col-md-3"><select id="filterKategori" class="form-select"><option value="">Semua Kategori</option><option>UTBK</option><option>PTN</option><option>Matematika</option><option>Bahasa Inggris</option><option>IPA</option><option>IPS</option></select></div>
-        <div class="col-md-3"><select id="filterStatus" class="form-select"><option value="">Semua Status</option><option value="aktif">Aktif</option><option value="draft">Draft</option><option value="selesai">Selesai</option></select></div>
-        <div class="col-md-2"><button onclick="loadData()" class="btn btn-primary w-100"><i class="bi bi-funnel me-1"></i>Filter</button></div>
+        <div class="col-12 col-md-4"><div class="input-group"><span class="input-group-text"><i class="bi bi-search"></i></span><input type="text" id="searchInput" class="form-control" placeholder="Cari tryout..."></div></div>
+        <div class="col-6 col-md-3"><select id="filterKategori" class="form-select"><option value="">Semua Kategori</option><option>UTBK</option><option>PTN</option><option>Matematika</option><option>Bahasa Inggris</option><option>IPA</option><option>IPS</option></select></div>
+        <div class="col-6 col-md-2"><select id="filterStatus" class="form-select"><option value="">Semua Status</option><option value="aktif">Aktif</option><option value="draft">Draft</option><option value="selesai">Selesai</option></select></div>
+        <div class="col-6 col-md-2"><button onclick="loadData()" class="btn btn-primary w-100"><i class="bi bi-funnel me-1"></i>Filter</button></div>
+        <div class="col-6 col-md-1"><button onclick="resetFilter()" class="btn btn-outline-secondary w-100" title="Reset filter" aria-label="Reset filter"><i class="bi bi-x-lg"></i></button></div>
     </div>
 </div>
 
@@ -341,6 +342,13 @@ function lihatHasil(id) {
                     </tr>`).join('');
             }
         });
+}
+
+function resetFilter() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('filterKategori').value = '';
+    document.getElementById('filterStatus').value = '';
+    loadData(1);
 }
 
 let st; document.getElementById('searchInput').addEventListener('input', () => { clearTimeout(st); st = setTimeout(() => loadData(1), 400); });

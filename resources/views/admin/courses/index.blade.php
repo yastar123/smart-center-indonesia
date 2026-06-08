@@ -189,9 +189,12 @@
 <div class="modal fade" id="courseModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0" style="border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.15);">
-            <div class="modal-header border-0 pb-0 px-4 pt-4">
-                <h5 class="modal-title fw-bold" id="modalTitle">Tambah Mata Pelajaran</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#059669,#10b981);border-radius:20px 20px 0 0">
+                <div>
+                    <h5 class="modal-title fw-bold mb-0 text-white" id="modalTitle"><i class="bi bi-book me-2"></i>Tambah Mata Pelajaran</h5>
+                    <div style="font-size:12px;opacity:.75;color:white;margin-top:3px">Isi data mata pelajaran di bawah ini</div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body px-4 py-3">
                 <form id="courseForm">

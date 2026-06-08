@@ -37,11 +37,12 @@
 {{-- FILTERS --}}
 <div class="dashboard-card mb-4">
     <div class="row g-2">
-        <div class="col-md-3"><div class="input-group"><span class="input-group-text"><i class="bi bi-search"></i></span><input type="text" id="searchInput" class="form-control" placeholder="Cari nama guru..."></div></div>
-        <div class="col-md-2"><select id="filterStatus" class="form-select"><option value="">Semua Status</option><option value="dibayar">Dibayar</option><option value="pending">Pending</option><option value="batal">Batal</option></select></div>
-        <div class="col-md-3"><input type="month" id="filterPeriode" class="form-control"></div>
-        <div class="col-md-2"><select id="filterCabang" class="form-select"><option value="">Semua Cabang</option>@foreach($branches as $b)<option value="{{ $b->id }}">{{ $b->name }}</option>@endforeach</select></div>
-        <div class="col-md-2"><button onclick="loadData()" class="btn btn-primary w-100"><i class="bi bi-funnel me-1"></i>Filter</button></div>
+        <div class="col-12 col-md-3"><div class="input-group"><span class="input-group-text"><i class="bi bi-search"></i></span><input type="text" id="searchInput" class="form-control" placeholder="Cari nama guru..."></div></div>
+        <div class="col-6 col-md-2"><select id="filterStatus" class="form-select"><option value="">Semua Status</option><option value="dibayar">Dibayar</option><option value="pending">Pending</option><option value="batal">Batal</option></select></div>
+        <div class="col-6 col-md-2"><input type="month" id="filterPeriode" class="form-control"></div>
+        <div class="col-6 col-md-2"><select id="filterCabang" class="form-select"><option value="">Semua Cabang</option>@foreach($branches as $b)<option value="{{ $b->id }}">{{ $b->name }}</option>@endforeach</select></div>
+        <div class="col-4 col-md-2"><button onclick="loadData()" class="btn btn-primary w-100"><i class="bi bi-funnel me-1"></i>Filter</button></div>
+        <div class="col-2 col-md-1"><button onclick="resetFilter()" class="btn btn-outline-secondary w-100" title="Reset filter" aria-label="Reset filter"><i class="bi bi-x-lg"></i></button></div>
     </div>
 </div>
 
@@ -194,6 +195,14 @@ document.getElementById('salaryForm').addEventListener('submit', function(e) {
             if(d.success){ bootstrap.Modal.getInstance(document.getElementById('salaryModal')).hide(); loadData(currentPage); }
         }).catch(()=>{ document.getElementById('submitBtn').disabled = false; });
 });
+
+function resetFilter() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('filterStatus').value = '';
+    document.getElementById('filterPeriode').value = '';
+    document.getElementById('filterCabang').value = '';
+    loadData(1);
+}
 
 let st; document.getElementById('searchInput').addEventListener('input', ()=>{ clearTimeout(st); st=setTimeout(()=>loadData(1),400); });
 document.addEventListener('DOMContentLoaded', ()=>loadData());

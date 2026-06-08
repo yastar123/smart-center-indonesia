@@ -71,8 +71,11 @@
                 @endforeach
             </select>
         </div>
-        <div class="col-md-2">
+        <div class="col-6 col-md-2">
             <button onclick="loadData()" class="btn btn-primary w-100"><i class="bi bi-funnel me-1"></i>Filter</button>
+        </div>
+        <div class="col-6 col-md-1">
+            <button onclick="resetFilter()" class="btn btn-outline-secondary w-100" title="Reset filter" aria-label="Reset filter"><i class="bi bi-x-lg"></i></button>
         </div>
     </div>
 </div>
@@ -296,6 +299,13 @@ document.getElementById('moduleForm').addEventListener('submit', function(e) {
             if (d.success) { bootstrap.Modal.getInstance(document.getElementById('moduleModal')).hide(); loadData(currentPage); }
         }).catch(()=>{ document.getElementById('submitBtn').disabled = false; });
 });
+
+function resetFilter() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('filterJenis').value = '';
+    document.getElementById('filterMapel').value = '';
+    loadData(1);
+}
 
 let st; document.getElementById('searchInput').addEventListener('input', () => { clearTimeout(st); st = setTimeout(()=>loadData(1), 400); });
 document.addEventListener('DOMContentLoaded', () => loadData());

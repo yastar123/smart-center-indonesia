@@ -56,18 +56,29 @@
 
             {{-- Active chat --}}
             <div id="chatActive" style="display:none;flex:1;overflow:hidden;flex-direction:column">
-                <div class="p-3 border-bottom d-flex align-items-center gap-3">
-                    <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#c84ddf,#7c3aed);display:flex;align-items:center;justify-content:center;color:white;font-size:16px;flex-shrink:0"><i class="bi bi-chat-dots"></i></div>
-                    <div><div class="fw-bold" id="chatRoomName" style="font-size:14px">–</div><div class="text-muted" style="font-size:11px" id="chatRoomType">–</div></div>
+                <div class="p-3 border-bottom d-flex align-items-center justify-content-between gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#c84ddf,#7c3aed);display:flex;align-items:center;justify-content:center;color:white;font-size:16px;flex-shrink:0"><i class="bi bi-chat-dots"></i></div>
+                        <div><div class="fw-bold" id="chatRoomName" style="font-size:14px">–</div><div class="text-muted" style="font-size:11px" id="chatRoomType">–</div></div>
+                    </div>
+                    <div id="chatOnlineDot" class="d-flex align-items-center gap-1" style="font-size:11px;color:var(--text-muted)">
+                        <span style="width:7px;height:7px;border-radius:50%;background:#10b981;display:inline-block"></span>Online
+                    </div>
                 </div>
-                <div class="flex-grow-1 overflow-auto p-3" id="chatMessages" style="display:flex;flex-direction:column;gap:10px;background:var(--body-bg)">
+                <div class="position-relative flex-grow-1 overflow-hidden">
+                    <div class="overflow-auto p-3 h-100" id="chatMessages" style="display:flex;flex-direction:column;gap:10px;background:var(--body-bg)">
+                    </div>
+                    <button id="scrollBottomBtn" onclick="scrollToBottom()" title="Scroll ke bawah"
+                        style="position:absolute;bottom:12px;right:12px;width:34px;height:34px;border-radius:50%;background:#c84ddf;color:white;border:none;box-shadow:0 2px 10px rgba(200,77,223,.45);display:none;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:opacity .2s">
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
                 </div>
                 <div class="p-3 border-top">
                     <form id="messageForm" class="d-flex gap-2">
                         @csrf
                         <input type="hidden" id="activeRoomId">
                         <input type="text" name="pesan" class="form-control" id="messageInput" placeholder="Ketik pesan..." autocomplete="off">
-                        <button type="submit" class="btn btn-primary px-3"><i class="bi bi-send"></i></button>
+                        <button type="submit" class="btn btn-primary px-3" aria-label="Kirim pesan"><i class="bi bi-send"></i></button>
                     </form>
                 </div>
             </div>
@@ -169,24 +180,40 @@ function openRoom(id, name, type) {
     renderRooms(rooms);
 }
 
+function scrollToBottom() {
+    const el = document.getElementById('chatMessages');
+    el.scrollTop = el.scrollHeight;
+    document.getElementById('scrollBottomBtn').style.display = 'none';
+}
+
 function loadMessages(roomId) {
     fetch(`{{ url('admin/messages') }}/${roomId}/messages`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
         .then(r => r.json()).then(res => {
             const myId = {{ auth()->id() }};
             const el = document.getElementById('chatMessages');
-            if (!res.data.length) { el.innerHTML = '<div class="text-center text-muted" style="font-size:13px;padding:30px 0">Mulai percakapan!</div>'; return; }
+            if (!res.data || !res.data.length) {
+                el.innerHTML = '<div class="text-center text-muted d-flex flex-column align-items-center justify-content-center h-100"><i class="bi bi-chat-square-dots" style="font-size:2.5rem;opacity:.25;margin-bottom:10px"></i><div>Mulai percakapan pertama!</div></div>';
+                return;
+            }
+            const wasAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
             el.innerHTML = res.data.map(m => {
                 const isMine = m.pengirim_id == myId;
+                const time = (m.created_at||'').toString().substring(11,16);
                 return `<div class="d-flex ${isMine?'justify-content-end':'justify-content-start'}">
-                    <div style="max-width:70%">
-                        ${!isMine ? `<div style="font-size:11px;font-weight:600;color:#c84ddf;margin-bottom:3px">${m.pengirim?.name||'User'}</div>` : ''}
-                        <div style="background:${isMine?'linear-gradient(135deg,#c84ddf,#7c3aed)':'var(--card-bg)'};color:${isMine?'white':'var(--text-primary)'};border:${isMine?'none':'1px solid var(--card-border)'};padding:10px 14px;border-radius:${isMine?'16px 4px 16px 16px':'4px 16px 16px 16px'};font-size:13.5px;line-height:1.5;word-break:break-word">${m.pesan||''}</div>
-                        <div style="font-size:10px;color:var(--text-muted);margin-top:3px;text-align:${isMine?'right':'left'}">${(m.created_at||'').toString().substring(11,16)}</div>
+                    <div style="max-width:72%">
+                        ${!isMine ? `<div style="font-size:11px;font-weight:600;color:#c84ddf;margin-bottom:3px;padding-left:4px">${m.pengirim?.name||'User'}</div>` : ''}
+                        <div style="background:${isMine?'linear-gradient(135deg,#c84ddf,#7c3aed)':'var(--card-bg)'};color:${isMine?'white':'var(--text-primary)'};border:${isMine?'none':'1px solid var(--card-border)'};padding:9px 14px;border-radius:${isMine?'18px 4px 18px 18px':'4px 18px 18px 18px'};font-size:13.5px;line-height:1.5;word-break:break-word;box-shadow:${isMine?'0 2px 8px rgba(200,77,223,.25)':'0 1px 4px rgba(0,0,0,.07)'}">${m.pesan||''}</div>
+                        <div style="font-size:10px;color:var(--text-muted);margin-top:3px;text-align:${isMine?'right':'left'};padding:0 4px">${time}</div>
                     </div>
                 </div>`;
             }).join('');
-            el.scrollTop = el.scrollHeight;
-        });
+            if (wasAtBottom || !pollInterval) { el.scrollTop = el.scrollHeight; }
+            else {
+                const btn = document.getElementById('scrollBottomBtn');
+                btn.style.display = 'flex';
+            }
+        })
+        .catch(() => {});
 }
 
 document.getElementById('messageForm').addEventListener('submit', function(e) {

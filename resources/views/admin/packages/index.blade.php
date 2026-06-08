@@ -39,10 +39,11 @@
 {{-- FILTERS --}}
 <div class="dashboard-card mb-4">
     <div class="row g-2">
-        <div class="col-md-4"><div class="input-group"><span class="input-group-text"><i class="bi bi-search"></i></span><input type="text" id="searchInput" class="form-control" placeholder="Cari paket..."></div></div>
-        <div class="col-md-3"><select id="filterJenis" class="form-select"><option value="">Semua Jenis</option><option>reguler</option><option>intensif</option><option>privat</option><option>online</option></select></div>
-        <div class="col-md-3"><select id="filterStatus" class="form-select"><option value="">Semua Status</option><option value="aktif">Aktif</option><option value="nonaktif">Nonaktif</option></select></div>
-        <div class="col-md-2"><button onclick="loadData()" class="btn btn-primary w-100"><i class="bi bi-funnel me-1"></i>Filter</button></div>
+        <div class="col-12 col-md-4"><div class="input-group"><span class="input-group-text"><i class="bi bi-search"></i></span><input type="text" id="searchInput" class="form-control" placeholder="Cari paket..."></div></div>
+        <div class="col-6 col-md-3"><select id="filterJenis" class="form-select"><option value="">Semua Jenis</option><option>reguler</option><option>intensif</option><option>privat</option><option>online</option></select></div>
+        <div class="col-6 col-md-2"><select id="filterStatus" class="form-select"><option value="">Semua Status</option><option value="aktif">Aktif</option><option value="nonaktif">Nonaktif</option></select></div>
+        <div class="col-6 col-md-2"><button onclick="loadData()" class="btn btn-primary w-100"><i class="bi bi-funnel me-1"></i>Filter</button></div>
+        <div class="col-6 col-md-1"><button onclick="resetFilter()" class="btn btn-outline-secondary w-100" title="Reset filter" aria-label="Reset filter"><i class="bi bi-x-lg"></i></button></div>
     </div>
 </div>
 
@@ -193,6 +194,13 @@ document.getElementById('packageForm').addEventListener('submit', function(e) {
             if(d.success){ bootstrap.Modal.getInstance(document.getElementById('packageModal')).hide(); loadData(currentPage); }
         }).catch(()=>{ document.getElementById('submitBtn').disabled = false; });
 });
+
+function resetFilter() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('filterJenis').value = '';
+    document.getElementById('filterStatus').value = '';
+    loadData(1);
+}
 
 let st; document.getElementById('searchInput').addEventListener('input', ()=>{ clearTimeout(st); st=setTimeout(()=>loadData(1),400); });
 document.addEventListener('DOMContentLoaded', ()=>loadData());
