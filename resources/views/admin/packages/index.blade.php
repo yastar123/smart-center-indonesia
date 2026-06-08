@@ -30,10 +30,10 @@
 
 {{-- STATS --}}
 <div class="row g-3 mb-4">
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between align-items-start"><div><div class="stat-title">Total Paket</div><div class="stat-value" id="statTotal">–</div></div><div class="stat-icon" style="background:#05966922;color:#059669"><i class="bi bi-box-seam"></i></div></div></div></div>
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between align-items-start"><div><div class="stat-title">Paket Aktif</div><div class="stat-value" id="statAktif">–</div></div><div class="stat-icon" style="background:#10b98122;color:#10b981"><i class="bi bi-check-circle"></i></div></div></div></div>
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between align-items-start"><div><div class="stat-title">Paket Unggulan</div><div class="stat-value" id="statUnggulan">–</div></div><div class="stat-icon" style="background:#f6af2322;color:#b45309"><i class="bi bi-star"></i></div></div></div></div>
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between align-items-start"><div><div class="stat-title">Rata-rata Harga</div><div class="stat-value" id="statAvg" style="font-size:18px">–</div></div><div class="stat-icon" style="background:#c84ddf22;color:#c84ddf"><i class="bi bi-cash"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between align-items-start"><div><div class="stat-title">Total Paket</div><div class="stat-value" id="statTotal">–</div></div><div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-box-seam"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between align-items-start"><div><div class="stat-title">Paket Aktif</div><div class="stat-value" id="statAktif">–</div></div><div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-check-circle"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between align-items-start"><div><div class="stat-title">Paket Unggulan</div><div class="stat-value" id="statUnggulan">–</div></div><div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-star"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between align-items-start"><div><div class="stat-title">Rata-rata Harga</div><div class="stat-value" id="statAvg" style="font-size:18px">–</div></div><div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-cash"></i></div></div></div></div>
 </div>
 
 {{-- FILTERS --}}

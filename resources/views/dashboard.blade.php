@@ -141,7 +141,7 @@
                         Total: Rp {{ number_format($revenueTotal/1000000, 1, ',', '.') }}Jt
                     </div>
                 </div>
-                <div class="stat-icon" style="background:#f0fdf4;color:#16a34a">
+                <div class="stat-icon" style="background:linear-gradient(135deg,#059669,#10b981);color:white">
                     <i class="bi bi-cash-coin"></i>
                 </div>
             </div>

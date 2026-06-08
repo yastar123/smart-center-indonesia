@@ -28,10 +28,10 @@
 
 {{-- STATS --}}
 <div class="row g-3 mb-4">
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Total Record</div><div class="stat-value" id="statTotal">–</div></div><div class="stat-icon" style="background:#4338ca22;color:#4338ca"><i class="bi bi-receipt"></i></div></div></div></div>
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Sudah Dibayar</div><div class="stat-value" id="statDibayar">–</div></div><div class="stat-icon" style="background:#10b98122;color:#10b981"><i class="bi bi-check-circle"></i></div></div></div></div>
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Pending</div><div class="stat-value" id="statPending">–</div></div><div class="stat-icon" style="background:#f6af2322;color:#b45309"><i class="bi bi-clock"></i></div></div></div></div>
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Total Dibayarkan</div><div class="stat-value text-success" id="statNominal" style="font-size:16px">–</div></div><div class="stat-icon" style="background:#10b98122;color:#10b981"><i class="bi bi-cash"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Total Record</div><div class="stat-value" id="statTotal">–</div></div><div class="stat-icon" style="background:linear-gradient(135deg,#4338ca,#818cf8);color:white"><i class="bi bi-receipt"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Sudah Dibayar</div><div class="stat-value" id="statDibayar">–</div></div><div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-check-circle"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Pending</div><div class="stat-value" id="statPending">–</div></div><div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-clock"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Total Dibayarkan</div><div class="stat-value text-success" id="statNominal" style="font-size:16px">–</div></div><div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-cash"></i></div></div></div></div>
 </div>
 
 {{-- FILTERS --}}

@@ -28,10 +28,10 @@
 
 {{-- STATS --}}
 <div class="row g-3 mb-4">
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Total Tryout</div><div class="stat-value" id="statTotal">–</div></div><div class="stat-icon" style="background:#7c3aed22;color:#7c3aed"><i class="bi bi-journal-check"></i></div></div></div></div>
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Aktif</div><div class="stat-value" id="statAktif">–</div></div><div class="stat-icon" style="background:#10b98122;color:#10b981"><i class="bi bi-check-circle"></i></div></div></div></div>
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Draft</div><div class="stat-value" id="statDraft">–</div></div><div class="stat-icon" style="background:#f6af2322;color:#b45309"><i class="bi bi-pencil-square"></i></div></div></div></div>
-    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Total Peserta</div><div class="stat-value" id="statPeserta">–</div></div><div class="stat-icon" style="background:#c84ddf22;color:#c84ddf"><i class="bi bi-people"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Total Tryout</div><div class="stat-value" id="statTotal">–</div></div><div class="stat-icon" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);color:white"><i class="bi bi-journal-check"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Aktif</div><div class="stat-value" id="statAktif">–</div></div><div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-check-circle"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Draft</div><div class="stat-value" id="statDraft">–</div></div><div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-pencil-square"></i></div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Total Peserta</div><div class="stat-value" id="statPeserta">–</div></div><div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-people"></i></div></div></div></div>
 </div>
 
 {{-- FILTERS --}}

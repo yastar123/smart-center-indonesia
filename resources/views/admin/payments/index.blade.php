@@ -37,7 +37,7 @@
                     <div class="stat-value text-success">Rp {{ number_format($stats['total_tagihan'],0,',','.') }}</div>
                     <div class="stat-growth text-muted"><i class="bi bi-receipt me-1"></i>Semua invoice</div>
                 </div>
-                <div class="stat-icon" style="background:#f0fdf4;color:#16a34a"><i class="bi bi-receipt-cutoff"></i></div>
+                <div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-receipt-cutoff"></i></div>
             </div>
         </div>
     </div>
@@ -49,7 +49,7 @@
                     <div class="stat-value text-primary">{{ $stats['lunas'] }} Invoice</div>
                     <div class="stat-growth text-success"><i class="bi bi-check-circle me-1"></i>Terbayar</div>
                 </div>
-                <div class="stat-icon" style="background:#fdf4ff;color:#68117e"><i class="bi bi-check-circle-fill"></i></div>
+                <div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-check-circle-fill"></i></div>
             </div>
         </div>
     </div>
@@ -61,7 +61,7 @@
                     <div class="stat-value text-warning">{{ $stats['belum_bayar'] }} Invoice</div>
                     <div class="stat-growth text-warning"><i class="bi bi-exclamation-circle me-1"></i>Menunggak</div>
                 </div>
-                <div class="stat-icon" style="background:#fffbeb;color:#e09000"><i class="bi bi-clock-fill"></i></div>
+                <div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-clock-fill"></i></div>
             </div>
         </div>
     </div>
@@ -73,7 +73,7 @@
                     <div class="stat-value text-success">Rp {{ number_format($stats['pendapatan'],0,',','.') }}</div>
                     <div class="stat-growth text-success"><i class="bi bi-graph-up me-1"></i>Terverifikasi</div>
                 </div>
-                <div class="stat-icon" style="background:#f0fdf4;color:#16a34a"><i class="bi bi-cash-coin"></i></div>
+                <div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-cash-coin"></i></div>
             </div>
         </div>
     </div>

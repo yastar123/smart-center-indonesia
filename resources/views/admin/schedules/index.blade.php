@@ -37,7 +37,7 @@
                     <div class="stat-value">{{ $stats['total'] }}</div>
                     <div class="stat-growth text-muted"><i class="bi bi-calendar me-1"></i>Semua jadwal</div>
                 </div>
-                <div class="stat-icon" style="background:#fdf4ff;color:#68117e"><i class="bi bi-calendar-week"></i></div>
+                <div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-calendar-week"></i></div>
             </div>
         </div>
     </div>
@@ -49,7 +49,7 @@
                     <div class="stat-value text-warning">{{ $stats['hari_ini'] }}</div>
                     <div class="stat-growth text-warning"><i class="bi bi-sun me-1"></i>Jadwal hari ini</div>
                 </div>
-                <div class="stat-icon" style="background:#fffbeb;color:#e09000"><i class="bi bi-sun-fill"></i></div>
+                <div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-sun-fill"></i></div>
             </div>
         </div>
     </div>
@@ -61,7 +61,7 @@
                     <div class="stat-value text-primary">{{ $stats['dijadwalkan'] }}</div>
                     <div class="stat-growth text-primary"><i class="bi bi-clock me-1"></i>Akan datang</div>
                 </div>
-                <div class="stat-icon" style="background:#fdf4ff;color:#68117e"><i class="bi bi-clock-history"></i></div>
+                <div class="stat-icon bg-info-soft" style="color:white"><i class="bi bi-clock-history"></i></div>
             </div>
         </div>
     </div>
@@ -73,7 +73,7 @@
                     <div class="stat-value text-success">{{ $stats['selesai'] }}</div>
                     <div class="stat-growth text-success"><i class="bi bi-check-circle me-1"></i>Telah berlangsung</div>
                 </div>
-                <div class="stat-icon" style="background:#f0fdf4;color:#16a34a"><i class="bi bi-check-circle-fill"></i></div>
+                <div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-check-circle-fill"></i></div>
             </div>
         </div>
     </div>

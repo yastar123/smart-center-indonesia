@@ -400,7 +400,7 @@
         .bg-success-soft   { background: linear-gradient(135deg, #10b981, #059669); }
         .bg-warning-soft   { background: linear-gradient(135deg, #f6af23, #e09000); }
         .bg-danger-soft    { background: linear-gradient(135deg, #ef4444, #dc2626); }
-        .bg-info-soft      { background: linear-gradient(135deg, #ab8db2, #68117e); }
+        .bg-info-soft      { background: linear-gradient(135deg, #0284c7, #38bdf8); }
         .bg-purple-soft    { background: linear-gradient(135deg, #c84ddf, #461256); }
 
         /* ============================================================
@@ -1525,6 +1525,185 @@
         .topbar-sub a { color: var(--text-muted); text-decoration: none; transition: color .15s; }
         .topbar-sub a:hover { color: var(--primary); }
         .topbar-sub .sep { opacity: .35; font-size: 10px; }
+
+        /* ============================================================
+           BUTTON VARIANTS — gradient danger & warning
+        ============================================================ */
+        .btn-danger {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            border: none;
+            box-shadow: 0 4px 14px rgba(239,68,68,.3);
+        }
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #b91c1c, #dc2626);
+            box-shadow: 0 6px 20px rgba(239,68,68,.4);
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #e09000, #f6af23);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 14px rgba(246,175,35,.3);
+        }
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #c47d00, #e09000);
+            color: white;
+            box-shadow: 0 6px 20px rgba(246,175,35,.4);
+        }
+        .btn-info {
+            background: linear-gradient(135deg, #0284c7, #38bdf8);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 14px rgba(2,132,199,.25);
+        }
+        .btn-info:hover {
+            background: linear-gradient(135deg, #0369a1, #0284c7);
+            color: white;
+        }
+
+        /* ============================================================
+           TEXTAREA — min-height and resize control
+        ============================================================ */
+        textarea.form-control {
+            min-height: 90px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        /* ============================================================
+           FORM LABEL — consistent micro-label style
+        ============================================================ */
+        .form-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .form-label.label-xs {
+            font-size: 10.5px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: var(--text-muted);
+        }
+
+        /* ============================================================
+           BADGE — status variants
+        ============================================================ */
+        .badge-success { background: linear-gradient(135deg,#059669,#10b981); color:white; }
+        .badge-danger  { background: linear-gradient(135deg,#dc2626,#ef4444); color:white; }
+        .badge-warning { background: linear-gradient(135deg,#e09000,#f6af23); color:white; }
+        .badge-info    { background: linear-gradient(135deg,#0284c7,#38bdf8); color:white; }
+        .badge-purple  { background: linear-gradient(135deg,#68117e,#c84ddf); color:white; }
+
+        /* ============================================================
+           TEXT CLAMP UTILITIES
+        ============================================================ */
+        .text-clamp-1 { overflow:hidden; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; }
+        .text-clamp-2 { overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+        .text-clamp-3 { overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; }
+
+        /* ============================================================
+           EMPTY STATE — improved icon glow
+        ============================================================ */
+        .empty-state { padding: 3.5rem 2rem; text-align: center; }
+        .empty-state i {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #c84ddf, #68117e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
+            margin-bottom: 1rem;
+            opacity: .35;
+        }
+        .empty-state h6 { font-weight: 700; color: var(--text-primary); margin-bottom: .25rem; }
+        .empty-state p { color: var(--text-muted); font-size: 13.5px; max-width: 320px; margin: 0 auto; }
+
+        /* ============================================================
+           CARD — clickable state (links that wrap a card)
+        ============================================================ */
+        a.stat-card { text-decoration: none; display: block; }
+        a.stat-card:hover { transform: translateY(-4px); }
+
+        /* ============================================================
+           TABLE — zebra stripe (light mode only)
+        ============================================================ */
+        .table-striped > tbody > tr:nth-child(odd) > td,
+        .table-striped > tbody > tr:nth-child(odd) > th {
+            background-color: rgba(200,77,223,.025);
+        }
+        [data-theme="dark"] .table-striped > tbody > tr:nth-child(odd) > td,
+        [data-theme="dark"] .table-striped > tbody > tr:nth-child(odd) > th {
+            background-color: rgba(200,77,223,.04);
+        }
+
+        /* ============================================================
+           MODAL HEADER — gradient helper class
+        ============================================================ */
+        .modal-header-gradient {
+            background: linear-gradient(135deg, #68117e, #c84ddf);
+            color: white;
+            border: none;
+        }
+        .modal-header-gradient .btn-close { filter: invert(1); }
+
+        /* ============================================================
+           SELECT — custom dropdown arrow color
+        ============================================================ */
+        .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23c84ddf' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        }
+        [data-theme="dark"] .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23e8b4f5' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        }
+
+        /* ============================================================
+           OUTLINE BUTTON — primary hover fill
+        ============================================================ */
+        .btn-outline-primary {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .btn-outline-primary:hover {
+            background: linear-gradient(135deg,#68117e,#c84ddf);
+            border-color: transparent;
+            color: white;
+        }
+
+        /* ============================================================
+           STAT VALUE — responsive font size cap
+        ============================================================ */
+        .stat-value { min-width: 0; word-break: break-word; }
+
+        /* ============================================================
+           IMPERSONATE BANNER — dark mode aware
+        ============================================================ */
+        [data-theme="dark"] .impersonate-banner {
+            background: rgba(254,226,226,.08);
+            border-color: rgba(239,68,68,.2);
+            color: #fca5a5;
+        }
+
+        /* ============================================================
+           CARD SECTION HEADER — consistent left accent bar
+        ============================================================ */
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .section-title::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 18px;
+            border-radius: 2px;
+            background: linear-gradient(135deg, #68117e, #c84ddf);
+            flex-shrink: 0;
+        }
     </style>
 
     @stack('styles')
@@ -2171,12 +2350,10 @@ document.addEventListener('keydown', e => {
 (function() {
     const topbar = document.querySelector('.topbar');
     if (!topbar) return;
-    const mainContent = document.querySelector('.main-content') || window;
-    const scroller = mainContent === window ? document.documentElement : mainContent;
     function onScroll() {
-        topbar.classList.toggle('scrolled', (mainContent === window ? window.pageYOffset : mainContent.scrollTop) > 10);
+        topbar.classList.toggle('scrolled', window.pageYOffset > 10);
     }
-    (mainContent === window ? window : mainContent).addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
 })();
 
@@ -2228,13 +2405,10 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
 (function() {
     const btn = document.getElementById('scrollTop');
     if (!btn) return;
-    const mainEl = document.querySelector('.main-content') || window;
-    const scroller = document.querySelector('.main-content') || document.documentElement;
     function checkScroll() {
-        const top = (mainEl === window ? window.pageYOffset : mainEl.scrollTop);
-        btn.classList.toggle('visible', top > 220);
+        btn.classList.toggle('visible', window.pageYOffset > 220);
     }
-    (mainEl === window ? window : mainEl).addEventListener('scroll', checkScroll, { passive: true });
+    window.addEventListener('scroll', checkScroll, { passive: true });
     checkScroll();
 })();
 

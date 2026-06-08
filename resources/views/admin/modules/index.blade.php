@@ -30,7 +30,12 @@
 
 {{-- STATS --}}
 <div class="row g-3 mb-4" id="statsRow">
-    @foreach([['id'=>'statTotal','title'=>'Total Modul','icon'=>'bi-book','color'=>'#1a56db'],['id'=>'statPdf','title'=>'PDF','icon'=>'bi-file-pdf','color'=>'#ef4444'],['id'=>'statVideo','title'=>'Video','icon'=>'bi-play-circle','color'=>'#10b981'],['id'=>'statGratis','title'=>'Gratis','icon'=>'bi-gift','color'=>'#f6af23']] as $s)
+    @foreach([
+        ['id'=>'statTotal','title'=>'Total Modul','icon'=>'bi-book','cls'=>'bg-info-soft'],
+        ['id'=>'statPdf','title'=>'PDF','icon'=>'bi-file-pdf','cls'=>'bg-danger-soft'],
+        ['id'=>'statVideo','title'=>'Video','icon'=>'bi-play-circle','cls'=>'bg-success-soft'],
+        ['id'=>'statGratis','title'=>'Gratis','icon'=>'bi-gift','cls'=>'bg-warning-soft']
+    ] as $s)
     <div class="col-6 col-lg-3">
         <div class="stat-card">
             <div class="d-flex justify-content-between align-items-start">
@@ -38,7 +43,7 @@
                     <div class="stat-title">{{ $s['title'] }}</div>
                     <div class="stat-value" id="{{ $s['id'] }}">–</div>
                 </div>
-                <div class="stat-icon" style="background:{{ $s['color'] }}22;color:{{ $s['color'] }}"><i class="bi {{ $s['icon'] }}"></i></div>
+                <div class="stat-icon {{ $s['cls'] }}" style="color:white"><i class="bi {{ $s['icon'] }}"></i></div>
             </div>
         </div>
     </div>

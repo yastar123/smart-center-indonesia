@@ -28,9 +28,9 @@
 
 {{-- STATS --}}
 <div class="row g-3 mb-4">
-    <div class="col-6 col-md-4"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Total</div><div class="stat-value" id="statTotal">–</div></div><div class="stat-icon" style="background:#c2410c22;color:#c2410c"><i class="bi bi-megaphone"></i></div></div></div></div>
-    <div class="col-6 col-md-4"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Aktif</div><div class="stat-value" id="statAktif">–</div></div><div class="stat-icon" style="background:#10b98122;color:#10b981"><i class="bi bi-check-circle"></i></div></div></div></div>
-    <div class="col-12 col-md-4"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Disematkan</div><div class="stat-value" id="statPinned">–</div></div><div class="stat-icon" style="background:#6366f122;color:#6366f1"><i class="bi bi-pin"></i></div></div></div></div>
+    <div class="col-6 col-md-4"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Total</div><div class="stat-value" id="statTotal">–</div></div><div class="stat-icon" style="background:linear-gradient(135deg,#c2410c,#f97316);color:white"><i class="bi bi-megaphone"></i></div></div></div></div>
+    <div class="col-6 col-md-4"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Aktif</div><div class="stat-value" id="statAktif">–</div></div><div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-check-circle"></i></div></div></div></div>
+    <div class="col-12 col-md-4"><div class="stat-card"><div class="d-flex justify-content-between"><div><div class="stat-title">Disematkan</div><div class="stat-value" id="statPinned">–</div></div><div class="stat-icon" style="background:linear-gradient(135deg,#6366f1,#a5b4fc);color:white"><i class="bi bi-pin"></i></div></div></div></div>
 </div>
 
 {{-- FILTERS --}}
