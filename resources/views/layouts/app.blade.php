@@ -1180,6 +1180,202 @@
         .modal.show .modal-dialog {
             transform: translateY(0) scale(1);
         }
+
+        /* ============================================================
+           SIDEBAR MINI MODE (desktop-only collapse to icons)
+        ============================================================ */
+        .sidebar.mini { width: 72px; }
+        .sidebar.mini .brand-title,
+        .sidebar.mini .brand-sub,
+        .sidebar.mini .user-name,
+        .sidebar.mini .user-role,
+        .sidebar.mini .sidebar-nav span,
+        .sidebar.mini .nav-header,
+        .sidebar.mini .menu-badge { display: none !important; }
+        .sidebar.mini .sidebar-brand { justify-content: center; padding: 0; }
+        .sidebar.mini .brand-logo { margin-right: 0; }
+        .sidebar.mini .sidebar-user { justify-content: center; padding: 12px; }
+        .sidebar.mini .sidebar-avatar { border: 2px solid rgba(255,255,255,.2); }
+        .sidebar.mini .sidebar-nav { padding: 8px 8px 100px; }
+        .sidebar.mini .nav-link { justify-content: center; padding: 12px; border-radius: 14px; gap: 0; overflow: visible; }
+        .sidebar.mini .nav-link i { font-size: 20px; }
+        .sidebar.mini .nav-link.active::before { left: -8px; }
+        /* Tooltip on mini hover */
+        .sidebar.mini .nav-link[data-label]:hover::after {
+            content: attr(data-label);
+            position: absolute;
+            left: calc(100% + 14px);
+            top: 50%; transform: translateY(-50%);
+            background: #260632;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            pointer-events: none;
+            box-shadow: 0 4px 16px rgba(0,0,0,.25);
+            z-index: 2000;
+            border: 1px solid rgba(200,77,223,.25);
+        }
+        .main-content.mini { margin-left: 72px; }
+        @media (max-width: 992px) {
+            .sidebar.mini { transform: translateX(-100%); width: var(--sidebar-width); }
+            .sidebar.mini.show { transform: translateX(0); }
+            .main-content.mini { margin-left: 0; }
+        }
+
+        /* Mini toggle button */
+        .mini-toggle {
+            width: 26px; height: 26px;
+            border: none;
+            background: rgba(255,255,255,.08);
+            border-radius: 7px;
+            color: #94a3b8;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+            font-size: 13px;
+            margin-left: auto;
+        }
+        .mini-toggle:hover { background: rgba(255,255,255,.18); color: white; }
+        @media (max-width: 992px) { .mini-toggle { display: none !important; } }
+        .sidebar.mini .mini-toggle { margin: 0; }
+
+        /* ============================================================
+           COMMAND PALETTE
+        ============================================================ */
+        #cmdOverlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.55);
+            backdrop-filter: blur(6px);
+            z-index: 9900;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: clamp(60px, 14vh, 140px);
+            animation: fadeOverlay .15s ease both;
+        }
+        #cmdOverlay.open { display: flex; }
+        #cmdBox {
+            width: min(600px, calc(100vw - 32px));
+            background: var(--card-bg);
+            border: 1.5px solid rgba(200,77,223,.25);
+            border-radius: 20px;
+            box-shadow: 0 24px 64px rgba(0,0,0,.35), 0 0 0 1px rgba(200,77,223,.08);
+            overflow: hidden;
+            animation: cmdSlideIn .22s cubic-bezier(.34,1.56,.64,1) both;
+        }
+        @keyframes cmdSlideIn {
+            from { opacity:0; transform:translateY(-16px) scale(.97); }
+            to   { opacity:1; transform:translateY(0) scale(1); }
+        }
+        #cmdInputWrap {
+            display: flex; align-items: center; gap: 12px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--card-border);
+        }
+        #cmdInputWrap i { font-size: 18px; color: var(--text-muted); flex-shrink: 0; }
+        #cmdInput {
+            flex: 1; border: none; outline: none;
+            background: transparent;
+            font-size: 15px; font-weight: 500;
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+        }
+        #cmdInput::placeholder { color: var(--text-muted); }
+        .cmd-shortcut {
+            font-size: 11px; color: var(--text-muted);
+            background: var(--input-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 5px;
+            padding: 2px 7px;
+            font-family: monospace;
+            flex-shrink: 0;
+        }
+        #cmdResults {
+            max-height: 360px;
+            overflow-y: auto;
+            padding: 8px;
+        }
+        #cmdResults::-webkit-scrollbar { width: 4px; }
+        #cmdResults::-webkit-scrollbar-thumb { background: rgba(200,77,223,.3); border-radius: 4px; }
+        .cmd-section {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--text-muted);
+            padding: 8px 12px 4px;
+        }
+        .cmd-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: background .12s;
+        }
+        .cmd-item:hover, .cmd-item.cmd-active {
+            background: rgba(200,77,223,.1);
+            color: var(--text-primary);
+        }
+        .cmd-item.cmd-active { background: rgba(200,77,223,.15); }
+        .cmd-icon {
+            width: 34px; height: 34px;
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            background: rgba(200,77,223,.1);
+            color: #c84ddf;
+        }
+        .cmd-label { font-size: 13.5px; font-weight: 600; flex: 1; }
+        .cmd-desc { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+        .cmd-arrow { font-size: 12px; color: var(--text-muted); opacity: .5; }
+        #cmdEmpty {
+            text-align: center; padding: 32px 16px;
+            color: var(--text-muted); font-size: 13.5px;
+        }
+        #cmdEmpty i { font-size: 2rem; display: block; margin-bottom: 8px; opacity: .4; }
+        #cmdFooter {
+            padding: 10px 16px;
+            border-top: 1px solid var(--card-border);
+            display: flex; gap: 16px; align-items: center;
+            background: var(--input-bg);
+        }
+        .cmd-hint { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-muted); }
+        .cmd-hint kbd {
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: 4px; padding: 1px 5px; font-size: 10px; font-family: monospace;
+        }
+
+        /* ============================================================
+           DARK MODE — Bootstrap .card-body full coverage
+        ============================================================ */
+        [data-theme="dark"] .card-body { color: var(--text-primary); }
+        [data-theme="dark"] .card .border-top,
+        [data-theme="dark"] .card .border-bottom { border-color: var(--card-border) !important; }
+        [data-theme="dark"] .card .text-muted { color: var(--text-muted) !important; }
+        [data-theme="dark"] .table { --bs-table-bg: transparent; --bs-table-hover-bg: rgba(200,77,223,.05); }
+        [data-theme="dark"] table thead tr { background: rgba(200,77,223,.05) !important; }
+
+        /* ============================================================
+           TOPBAR — breadcrumb separator icon
+        ============================================================ */
+        .topbar-sub {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 1px;
+        }
+        .topbar-sub a { color: var(--text-muted); text-decoration: none; transition: color .15s; }
+        .topbar-sub a:hover { color: var(--primary); }
+        .topbar-sub .sep { opacity: .35; font-size: 10px; }
     </style>
 
     @stack('styles')
@@ -1208,10 +1404,13 @@
         <div class="brand-logo">
             <i class="bi bi-mortarboard-fill"></i>
         </div>
-        <div>
+        <div style="flex:1;min-width:0">
             <div class="brand-title">Smart Center</div>
             <div class="brand-sub">Enterprise System</div>
         </div>
+        <button class="mini-toggle" id="miniToggle" onclick="toggleMini(event)" title="Perkecil sidebar">
+            <i class="bi bi-layout-sidebar-reverse" id="miniIcon"></i>
+        </button>
     </a>
 
     <div class="sidebar-user">
@@ -1227,7 +1426,7 @@
 
         {{-- DASHBOARD --}}
         <div class="nav-item">
-            <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+            <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" data-label="Dashboard">
                 <i class="bi bi-grid-fill"></i>
                 <span>Dashboard</span>
             </a>
@@ -1238,25 +1437,25 @@
         <div class="nav-header">OWNER PANEL</div>
 
         <div class="nav-item">
-            <a href="{{ route('owner.branches.index') }}" class="nav-link {{ request()->routeIs('owner.branches.*') ? 'active' : '' }}">
+            <a href="{{ route('owner.branches.index') }}" class="nav-link {{ request()->routeIs('owner.branches.*') ? 'active' : '' }}" data-label="Monitoring Cabang">
                 <i class="bi bi-building"></i>
                 <span>Monitoring Cabang</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('owner.activity-log') }}" class="nav-link {{ request()->routeIs('owner.activity-log') ? 'active' : '' }}">
+            <a href="{{ route('owner.activity-log') }}" class="nav-link {{ request()->routeIs('owner.activity-log') ? 'active' : '' }}" data-label="Log Aktivitas">
                 <i class="bi bi-journal-text"></i>
                 <span>Log Aktivitas</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('owner.settings.index') }}" class="nav-link {{ request()->routeIs('owner.settings.*') ? 'active' : '' }}">
+            <a href="{{ route('owner.settings.index') }}" class="nav-link {{ request()->routeIs('owner.settings.*') ? 'active' : '' }}" data-label="Pengaturan">
                 <i class="bi bi-gear"></i>
                 <span>Pengaturan</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('owner.analytics') }}" class="nav-link {{ request()->routeIs('owner.analytics') ? 'active' : '' }}">
+            <a href="{{ route('owner.analytics') }}" class="nav-link {{ request()->routeIs('owner.analytics') ? 'active' : '' }}" data-label="Analytics">
                 <i class="bi bi-graph-up-arrow"></i>
                 <span>Analytics</span>
             </a>
@@ -1268,49 +1467,49 @@
         <div class="nav-header">AKADEMIK</div>
 
         <div class="nav-item">
-            <a href="{{ route('admin.students.index') }}" class="nav-link {{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.students.index') }}" class="nav-link {{ request()->routeIs('admin.students.*') ? 'active' : '' }}" data-label="Siswa">
                 <i class="bi bi-mortarboard"></i>
                 <span>Siswa</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.teachers.index') }}" class="nav-link {{ request()->routeIs('admin.teachers.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.teachers.index') }}" class="nav-link {{ request()->routeIs('admin.teachers.*') ? 'active' : '' }}" data-label="Guru">
                 <i class="bi bi-person-workspace"></i>
                 <span>Guru</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.modules.index') }}" class="nav-link {{ request()->routeIs('admin.modules.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.modules.index') }}" class="nav-link {{ request()->routeIs('admin.modules.*') ? 'active' : '' }}" data-label="Modul Belajar">
                 <i class="bi bi-book-half"></i>
                 <span>Modul Belajar</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.packages.index') }}" class="nav-link {{ request()->routeIs('admin.packages.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.packages.index') }}" class="nav-link {{ request()->routeIs('admin.packages.*') ? 'active' : '' }}" data-label="Paket Belajar">
                 <i class="bi bi-box-seam"></i>
                 <span>Paket Belajar</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.courses.index') }}" class="nav-link {{ request()->routeIs('admin.courses.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.courses.index') }}" class="nav-link {{ request()->routeIs('admin.courses.*') ? 'active' : '' }}" data-label="Mata Pelajaran">
                 <i class="bi bi-journal-bookmark"></i>
                 <span>Mata Pelajaran</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.classes.index') }}" class="nav-link {{ request()->routeIs('admin.classes.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.classes.index') }}" class="nav-link {{ request()->routeIs('admin.classes.*') ? 'active' : '' }}" data-label="Kelas">
                 <i class="bi bi-diagram-3"></i>
                 <span>Kelas</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.schedules.index') }}" class="nav-link {{ request()->routeIs('admin.schedules.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.schedules.index') }}" class="nav-link {{ request()->routeIs('admin.schedules.*') ? 'active' : '' }}" data-label="Jadwal">
                 <i class="bi bi-calendar-week"></i>
                 <span>Jadwal</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.certificates.index') }}" class="nav-link {{ request()->routeIs('admin.certificates.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.certificates.index') }}" class="nav-link {{ request()->routeIs('admin.certificates.*') ? 'active' : '' }}" data-label="Sertifikat">
                 <i class="bi bi-award"></i>
                 <span>Sertifikat</span>
             </a>
@@ -1319,7 +1518,7 @@
         <div class="nav-header">KEUANGAN</div>
 
         <div class="nav-item">
-            <a href="{{ route('admin.payments.index') }}" class="nav-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.payments.index') }}" class="nav-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}" data-label="Pembayaran">
                 <i class="bi bi-wallet2"></i>
                 <span>Pembayaran</span>
                 @php $unpaidInvoices = \App\Models\Invoice::where('status','belum_bayar')->count() @endphp
@@ -1329,13 +1528,13 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.salaries.index') }}" class="nav-link {{ request()->routeIs('admin.salaries.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.salaries.index') }}" class="nav-link {{ request()->routeIs('admin.salaries.*') ? 'active' : '' }}" data-label="Gaji Guru">
                 <i class="bi bi-cash-stack"></i>
                 <span>Gaji Guru</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.reports.index') }}" class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.reports.index') }}" class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}" data-label="Laporan Keuangan">
                 <i class="bi bi-bar-chart-line"></i>
                 <span>Laporan Keuangan</span>
             </a>
@@ -1344,19 +1543,19 @@
         <div class="nav-header">KOMUNIKASI</div>
 
         <div class="nav-item">
-            <a href="{{ route('admin.announcements.index') }}" class="nav-link {{ request()->routeIs('admin.announcements.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.announcements.index') }}" class="nav-link {{ request()->routeIs('admin.announcements.*') ? 'active' : '' }}" data-label="Pengumuman">
                 <i class="bi bi-megaphone"></i>
                 <span>Pengumuman</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.messages.index') }}" class="nav-link {{ request()->routeIs('admin.messages.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.messages.index') }}" class="nav-link {{ request()->routeIs('admin.messages.*') ? 'active' : '' }}" data-label="Pesan">
                 <i class="bi bi-chat-dots"></i>
                 <span>Pesan Aplikasi</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.videocall.index') }}" class="nav-link {{ request()->routeIs('admin.videocall.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.videocall.index') }}" class="nav-link {{ request()->routeIs('admin.videocall.*') ? 'active' : '' }}" data-label="Video Call">
                 <i class="bi bi-camera-video"></i>
                 <span>Video Call</span>
             </a>
@@ -1365,7 +1564,7 @@
         <div class="nav-header">TRYOUT CBT</div>
 
         <div class="nav-item">
-            <a href="{{ route('admin.tryouts.index') }}" class="nav-link {{ request()->routeIs('admin.tryouts.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.tryouts.index') }}" class="nav-link {{ request()->routeIs('admin.tryouts.*') ? 'active' : '' }}" data-label="Tryout">
                 <i class="bi bi-journal-check"></i>
                 <span>Tryout UTBK/PTN</span>
             </a>
@@ -1376,22 +1575,22 @@
         @role('guru')
         <div class="nav-header">GURU PANEL</div>
         <div class="nav-item">
-            <a href="{{ route('guru.dashboard') }}" class="nav-link {{ request()->routeIs('guru.dashboard') ? 'active' : '' }}">
+            <a href="{{ route('guru.dashboard') }}" class="nav-link {{ request()->routeIs('guru.dashboard') ? 'active' : '' }}" data-label="Dashboard Guru">
                 <i class="bi bi-speedometer2"></i><span>Dashboard Guru</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('guru.dashboard') }}#jadwal" class="nav-link">
+            <a href="{{ route('guru.dashboard') }}#jadwal" class="nav-link" data-label="Jadwal Mengajar">
                 <i class="bi bi-calendar2-week"></i><span>Jadwal Mengajar</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('guru.attendance') }}" class="nav-link {{ request()->routeIs('guru.attendance') ? 'active' : '' }}">
+            <a href="{{ route('guru.attendance') }}" class="nav-link {{ request()->routeIs('guru.attendance') ? 'active' : '' }}" data-label="Input Absensi">
                 <i class="bi bi-check2-square"></i><span>Input Absensi</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('guru.grades') }}" class="nav-link {{ request()->routeIs('guru.grades') ? 'active' : '' }}">
+            <a href="{{ route('guru.grades') }}" class="nav-link {{ request()->routeIs('guru.grades') ? 'active' : '' }}" data-label="Input Nilai">
                 <i class="bi bi-pencil-square"></i><span>Input Nilai</span>
             </a>
         </div>
@@ -1401,27 +1600,27 @@
         @role('siswa')
         <div class="nav-header">SISWA PANEL</div>
         <div class="nav-item">
-            <a href="{{ route('siswa.dashboard') }}" class="nav-link {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
+            <a href="{{ route('siswa.dashboard') }}" class="nav-link {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}" data-label="Dashboard">
                 <i class="bi bi-speedometer2"></i><span>Dashboard</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.schedule') }}" class="nav-link {{ request()->routeIs('siswa.schedule') ? 'active' : '' }}">
+            <a href="{{ route('siswa.schedule') }}" class="nav-link {{ request()->routeIs('siswa.schedule') ? 'active' : '' }}" data-label="Jadwal Belajar">
                 <i class="bi bi-calendar-event"></i><span>Jadwal Belajar</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.dashboard') }}#pembayaran" class="nav-link">
+            <a href="{{ route('siswa.dashboard') }}#pembayaran" class="nav-link" data-label="Tagihan">
                 <i class="bi bi-credit-card"></i><span>Tagihan & Bayar</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.certificates.index') }}" class="nav-link {{ request()->routeIs('siswa.certificates.*') ? 'active' : '' }}">
+            <a href="{{ route('siswa.certificates.index') }}" class="nav-link {{ request()->routeIs('siswa.certificates.*') ? 'active' : '' }}" data-label="Sertifikat Saya">
                 <i class="bi bi-award"></i><span>Sertifikat Saya</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.tryout') }}" class="nav-link {{ request()->routeIs('siswa.tryout') ? 'active' : '' }}">
+            <a href="{{ route('siswa.tryout') }}" class="nav-link {{ request()->routeIs('siswa.tryout') ? 'active' : '' }}" data-label="Tryout CBT">
                 <i class="bi bi-laptop"></i><span>Tryout CBT</span>
                 <span class="menu-badge" style="background:#6366f1">Soon</span>
             </a>
@@ -1432,7 +1631,7 @@
         <div class="nav-header">SYSTEM</div>
 
         <div class="nav-item">
-            <a href="{{ route('profile.edit') }}" class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
+            <a href="{{ route('profile.edit') }}" class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" data-label="Profil Saya">
                 <i class="bi bi-person-circle"></i>
                 <span>Profil Saya</span>
             </a>
@@ -1441,7 +1640,7 @@
         <div class="nav-item">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button class="nav-link border-0 bg-transparent w-100 text-start" style="color:#94a3b8">
+                <button class="nav-link border-0 bg-transparent w-100 text-start" style="color:#94a3b8" data-label="Logout">
                     <i class="bi bi-box-arrow-left" style="color:#ef4444"></i>
                     <span>Logout</span>
                 </button>
@@ -1470,6 +1669,18 @@
         </div>
 
         <div class="topbar-right">
+
+            {{-- Command palette trigger --}}
+            <button class="top-btn d-none d-md-flex align-items-center gap-1" onclick="openCmdPalette()" title="Cari (Ctrl+K)"
+                style="width:auto;padding:0 12px;gap:8px;font-size:12.5px;color:var(--text-muted)">
+                <i class="bi bi-search" style="font-size:14px"></i>
+                <span>Cari</span>
+                <span style="display:inline-flex;align-items:center;gap:2px;background:var(--card-border);border-radius:5px;padding:1px 6px;font-size:10px;font-family:monospace;margin-left:4px">⌘K</span>
+            </button>
+            {{-- Mobile search icon --}}
+            <button class="top-btn d-md-none" onclick="openCmdPalette()" title="Cari">
+                <i class="bi bi-search"></i>
+            </button>
 
             <button class="top-btn" id="darkToggle" onclick="toggleDark()" title="Toggle dark mode">
                 <i class="bi bi-moon" id="darkIcon"></i>
@@ -1571,6 +1782,24 @@
         <span>Menu</span>
     </button>
 </nav>
+
+{{-- COMMAND PALETTE --}}
+<div id="cmdOverlay" onclick="closeCmdPalette(event)">
+    <div id="cmdBox" role="dialog" aria-label="Command Palette">
+        <div id="cmdInputWrap">
+            <i class="bi bi-search"></i>
+            <input id="cmdInput" type="text" placeholder="Cari halaman, menu, atau fitur..." autocomplete="off" spellcheck="false">
+            <span class="cmd-shortcut">ESC</span>
+        </div>
+        <div id="cmdResults"></div>
+        <div id="cmdFooter">
+            <div class="cmd-hint"><kbd>↑</kbd><kbd>↓</kbd> Navigasi</div>
+            <div class="cmd-hint"><kbd>↵</kbd> Buka</div>
+            <div class="cmd-hint"><kbd>Esc</kbd> Tutup</div>
+            <div class="cmd-hint" style="margin-left:auto"><kbd>Ctrl</kbd><kbd>K</kbd> Buka palette</div>
+        </div>
+    </div>
+</div>
 
 {{-- GLOBAL TOAST WRAPPER --}}
 <div id="globalToastWrap"></div>
@@ -1701,15 +1930,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// ---- CLOSE SIDEBAR ON ESC + KEYBOARD SEARCH SHORTCUT ----
+// ---- CLOSE SIDEBAR ON ESC ----
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeSidebar();
-    // Ctrl+K / Cmd+K → focus first visible search input
-    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        const input = document.querySelector('#searchInput, input[placeholder*="Cari"], input[type="search"]');
-        if (input) { input.focus(); input.select(); }
-    }
+    if (e.key === 'Escape') { closeSidebar(); closeCmdPalette(); }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openCmdPalette(); }
 });
 
 // ---- TOPBAR SCROLL SHADOW ----
@@ -1865,6 +2089,150 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
 </script>
 
 <script src="{{ asset('js/modal-fallback.js') }}" defer></script>
+
+<script>
+// ================================================================
+// COMMAND PALETTE
+// ================================================================
+(function() {
+    const cmdPages = [
+        { label:'Dashboard', desc:'Halaman utama', href:'{{ route("dashboard") }}', icon:'bi-grid-fill', color:'#c84ddf', group:'Navigasi' },
+        { label:'Data Siswa', desc:'Kelola siswa', href:'{{ route("admin.students.index") }}', icon:'bi-mortarboard', color:'#c84ddf', group:'Akademik' },
+        { label:'Data Guru', desc:'Kelola guru & pengajar', href:'{{ route("admin.teachers.index") }}', icon:'bi-person-workspace', color:'#10b981', group:'Akademik' },
+        { label:'Modul Belajar', desc:'Upload & kelola materi', href:'{{ route("admin.modules.index") }}', icon:'bi-book-half', color:'#1a56db', group:'Akademik' },
+        { label:'Paket Belajar', desc:'Atur paket & harga', href:'{{ route("admin.packages.index") }}', icon:'bi-box-seam', color:'#059669', group:'Akademik' },
+        { label:'Mata Pelajaran', desc:'Kelola mapel', href:'{{ route("admin.courses.index") }}', icon:'bi-journal-bookmark', color:'#10b981', group:'Akademik' },
+        { label:'Kelas', desc:'Manajemen kelas belajar', href:'{{ route("admin.classes.index") }}', icon:'bi-diagram-3', color:'#68117e', group:'Akademik' },
+        { label:'Jadwal', desc:'Jadwal mengajar & sesi', href:'{{ route("admin.schedules.index") }}', icon:'bi-calendar-week', color:'#461256', group:'Akademik' },
+        { label:'Sertifikat', desc:'Terbitkan sertifikat siswa', href:'{{ route("admin.certificates.index") }}', icon:'bi-award', color:'#f6af23', group:'Akademik' },
+        { label:'Pembayaran', desc:'Invoice & tagihan siswa', href:'{{ route("admin.payments.index") }}', icon:'bi-wallet2', color:'#059669', group:'Keuangan' },
+        { label:'Gaji Guru', desc:'Kelola gaji & slip', href:'{{ route("admin.salaries.index") }}', icon:'bi-cash-stack', color:'#4338ca', group:'Keuangan' },
+        { label:'Laporan Keuangan', desc:'Rekap & analitik keuangan', href:'{{ route("admin.reports.index") }}', icon:'bi-bar-chart-line', color:'#260632', group:'Keuangan' },
+        { label:'Pengumuman', desc:'Buat & kelola pengumuman', href:'{{ route("admin.announcements.index") }}', icon:'bi-megaphone', color:'#c2410c', group:'Komunikasi' },
+        { label:'Pesan Aplikasi', desc:'Chat internal', href:'{{ route("admin.messages.index") }}', icon:'bi-chat-dots', color:'#0284c7', group:'Komunikasi' },
+        { label:'Video Call', desc:'Kelas virtual online', href:'{{ route("admin.videocall.index") }}', icon:'bi-camera-video', color:'#0d9488', group:'Komunikasi' },
+        { label:'Tryout UTBK/PTN', desc:'Kelola soal & ujian CBT', href:'{{ route("admin.tryouts.index") }}', icon:'bi-journal-check', color:'#7c3aed', group:'Tryout CBT' },
+        { label:'Profil Saya', desc:'Edit akun & password', href:'{{ route("profile.edit") }}', icon:'bi-person-circle', color:'#c84ddf', group:'Akun' },
+    ];
+
+    let cmdActive = -1;
+    let cmdFiltered = [];
+
+    function buildResults(query) {
+        const q = (query || '').toLowerCase().trim();
+        cmdFiltered = q
+            ? cmdPages.filter(p => p.label.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q) || p.group.toLowerCase().includes(q))
+            : cmdPages;
+
+        const res = document.getElementById('cmdResults');
+        if (!cmdFiltered.length) {
+            res.innerHTML = '<div id="cmdEmpty"><i class="bi bi-search"></i>Tidak ada hasil untuk "<strong>' + q + '</strong>"</div>';
+            return;
+        }
+
+        // Group by category
+        const groups = {};
+        cmdFiltered.forEach(p => { (groups[p.group] = groups[p.group] || []).push(p); });
+
+        let html = '';
+        Object.entries(groups).forEach(([g, items]) => {
+            if (!q) html += `<div class="cmd-section">${g}</div>`;
+            items.forEach((p, i) => {
+                const idx = cmdFiltered.indexOf(p);
+                html += `<a href="${p.href}" class="cmd-item" data-idx="${idx}" tabindex="-1">
+                    <div class="cmd-icon" style="background:${p.color}18;color:${p.color}"><i class="bi ${p.icon}"></i></div>
+                    <div style="flex:1;min-width:0">
+                        <div class="cmd-label">${p.label}</div>
+                        <div class="cmd-desc">${p.desc}</div>
+                    </div>
+                    <i class="bi bi-arrow-right-short cmd-arrow"></i>
+                </a>`;
+            });
+        });
+        res.innerHTML = html;
+        cmdActive = -1;
+    }
+
+    function setActive(idx) {
+        const items = document.querySelectorAll('#cmdResults .cmd-item');
+        items.forEach(el => el.classList.remove('cmd-active'));
+        if (idx >= 0 && idx < items.length) {
+            items[idx].classList.add('cmd-active');
+            items[idx].scrollIntoView({ block: 'nearest' });
+        }
+        cmdActive = idx;
+    }
+
+    window.openCmdPalette = function() {
+        const overlay = document.getElementById('cmdOverlay');
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        const input = document.getElementById('cmdInput');
+        input.value = '';
+        buildResults('');
+        setTimeout(() => input.focus(), 60);
+    };
+
+    window.closeCmdPalette = function(e) {
+        if (e && document.getElementById('cmdBox').contains(e.target)) return;
+        document.getElementById('cmdOverlay').classList.remove('open');
+        document.body.style.overflow = '';
+        cmdActive = -1;
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const input = document.getElementById('cmdInput');
+        if (!input) return;
+
+        input.addEventListener('input', () => { buildResults(input.value); cmdActive = -1; });
+
+        input.addEventListener('keydown', e => {
+            const items = document.querySelectorAll('#cmdResults .cmd-item');
+            if (e.key === 'ArrowDown') { e.preventDefault(); setActive(Math.min(cmdActive + 1, items.length - 1)); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(Math.max(cmdActive - 1, 0)); }
+            else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (cmdActive >= 0 && items[cmdActive]) { items[cmdActive].click(); }
+                else if (cmdFiltered[0]) { window.location.href = cmdFiltered[0].href; }
+            }
+        });
+
+        // Delegate clicks
+        document.getElementById('cmdResults').addEventListener('click', () => {
+            document.getElementById('cmdOverlay').classList.remove('open');
+            document.body.style.overflow = '';
+        });
+    });
+})();
+
+// ================================================================
+// SIDEBAR MINI MODE
+// ================================================================
+(function() {
+    const KEY = 'sidebar_mini';
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.querySelector('.main-content');
+
+    function applyMini(mini) {
+        if (!sidebar) return;
+        sidebar.classList.toggle('mini', mini);
+        mainContent && mainContent.classList.toggle('mini', mini);
+        const icon = document.getElementById('miniIcon');
+        if (icon) icon.className = mini ? 'bi bi-layout-sidebar' : 'bi bi-layout-sidebar-reverse';
+    }
+
+    // Restore from localStorage
+    const saved = localStorage.getItem(KEY) === '1';
+    applyMini(saved);
+
+    window.toggleMini = function(e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        const isMini = sidebar.classList.contains('mini');
+        applyMini(!isMini);
+        localStorage.setItem(KEY, isMini ? '0' : '1');
+    };
+})();
+</script>
 
 @stack('scripts')
 </body>

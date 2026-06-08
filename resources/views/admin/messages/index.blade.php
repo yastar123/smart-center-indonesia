@@ -55,7 +55,7 @@
             </div>
 
             {{-- Active chat --}}
-            <div id="chatActive" style="display:none;flex:1;overflow:hidden;display:none;flex-direction:column">
+            <div id="chatActive" style="display:none;flex:1;overflow:hidden;flex-direction:column">
                 <div class="p-3 border-bottom d-flex align-items-center gap-3">
                     <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#c84ddf,#7c3aed);display:flex;align-items:center;justify-content:center;color:white;font-size:16px;flex-shrink:0"><i class="bi bi-chat-dots"></i></div>
                     <div><div class="fw-bold" id="chatRoomName" style="font-size:14px">–</div><div class="text-muted" style="font-size:11px" id="chatRoomType">–</div></div>
