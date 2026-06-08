@@ -106,12 +106,16 @@ function loadData(page=1) {
     currentPage = page;
     const params = new URLSearchParams({ page, search:document.getElementById('searchInput').value, jenis:document.getElementById('filterJenis').value, status:document.getElementById('filterStatus').value });
     fetch(`{{ route('admin.announcements.index') }}?${params}`, { headers:{'X-Requested-With':'XMLHttpRequest'} })
-        .then(r=>r.json()).then(data => {
+        .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+        .then(data => {
             document.getElementById('statTotal').textContent  = data.stats.total;
             document.getElementById('statAktif').textContent  = data.stats.aktif;
             document.getElementById('statPinned').textContent = data.stats.pinned;
             renderCards(data.data);
             renderPagination(data);
+        })
+        .catch(() => {
+            document.getElementById('announcementsGrid').innerHTML = `<div class="col-12 text-center py-5"><i class="bi bi-wifi-off" style="font-size:2.5rem;color:#ef4444;display:block;margin-bottom:12px"></i><div class="fw-semibold mb-2">Gagal memuat pengumuman</div><button onclick="loadData(${page})" class="btn btn-sm btn-outline-primary"><i class="bi bi-arrow-clockwise me-1"></i>Coba lagi</button></div>`;
         });
 }
 
@@ -166,7 +170,8 @@ function openModal(reset=true) {
 
 function editAnn(id) {
     fetch(`{{ url('admin/announcements') }}/${id}`, { headers:{'X-Requested-With':'XMLHttpRequest'} })
-        .then(r=>r.json()).then(res => {
+        .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+        .then(res => {
             const a=res.data, f=document.getElementById('annForm');
             f.querySelector('[name=judul]').value=a.judul||'';
             f.querySelector('[name=konten]').value=a.konten||'';
@@ -179,13 +184,15 @@ function editAnn(id) {
             document.getElementById('annId').value=id;
             document.getElementById('modalTitle').textContent='Edit Pengumuman';
             openModal(false);
-        });
+        }).catch(()=>showToast('Gagal memuat data pengumuman.', 'error'));
 }
 
 function deleteAnn(id, title) {
     confirmAction(`Hapus pengumuman "${title}"? Data tidak dapat dikembalikan.`, function() {
         fetch(`{{ url('admin/announcements') }}/${id}`, {method:'DELETE',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'}})
-            .then(r=>r.json()).then(d => { showToast(d.message,d.success?'success':'error'); if(d.success) loadData(currentPage); });
+            .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+            .then(d => { showToast(d.message,d.success?'success':'error'); if(d.success) loadData(currentPage); })
+            .catch(()=>showToast('Gagal menghubungi server.', 'error'));
     }, null, {title:'Hapus Pengumuman', okText:'Ya, Hapus'});
 }
 

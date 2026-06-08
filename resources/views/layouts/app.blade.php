@@ -2606,6 +2606,116 @@
         }
         .modal-header-gradient .modal-title { color: white; font-weight: 700; }
         .modal-header-gradient .btn-close { filter: brightness(0) invert(1); opacity: .85; }
+
+        /* ============================================================
+           SELECTION HIGHLIGHT — brand-tinted text selection
+        ============================================================ */
+        ::selection { background: rgba(200,77,223,.22); color: inherit; }
+
+        /* ============================================================
+           SIDEBAR SCROLLBAR — thin custom track
+        ============================================================ */
+        .sidebar-nav::-webkit-scrollbar { width: 3px; }
+        .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 3px; }
+        .sidebar-nav::-webkit-scrollbar-thumb:hover { background: rgba(200,77,223,.35); }
+
+        /* ============================================================
+           DARK MODE — placeholder text visibility
+        ============================================================ */
+        [data-theme="dark"] .form-control::placeholder,
+        [data-theme="dark"] .form-select::placeholder { color: rgba(180,140,200,.45); }
+
+        /* ============================================================
+           BADGE — consistent soft variants matching icon classes
+        ============================================================ */
+        .badge.bg-primary-subtle { background: rgba(200,77,223,.15) !important; color: #9b1ab5 !important; }
+        .badge.bg-success-subtle { background: rgba(16,185,129,.15) !important; color: #059669 !important; }
+        .badge.bg-warning-subtle { background: rgba(246,175,35,.15)  !important; color: #b45309 !important; }
+        .badge.bg-danger-subtle  { background: rgba(239,68,68,.15)   !important; color: #dc2626 !important; }
+        .badge.bg-info-subtle    { background: rgba(2,132,199,.15)   !important; color: #0369a1 !important; }
+        [data-theme="dark"] .badge.bg-primary-subtle { background: rgba(200,77,223,.2) !important; color: #d97df5 !important; }
+        [data-theme="dark"] .badge.bg-success-subtle { background: rgba(16,185,129,.2) !important; color: #34d399 !important; }
+        [data-theme="dark"] .badge.bg-warning-subtle { background: rgba(246,175,35,.2) !important; color: #fcd34d !important; }
+        [data-theme="dark"] .badge.bg-danger-subtle  { background: rgba(239,68,68,.2)  !important; color: #f87171 !important; }
+        [data-theme="dark"] .badge.bg-info-subtle    { background: rgba(2,132,199,.2)  !important; color: #38bdf8 !important; }
+
+        /* ============================================================
+           EMPTY STATE — reusable utility class
+        ============================================================ */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        .empty-state-icon {
+            width: 72px; height: 72px;
+            border-radius: 20px;
+            background: rgba(200,77,223,.08);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem;
+            color: #c84ddf;
+            margin-bottom: 1.25rem;
+        }
+        .empty-state-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: .4rem;
+        }
+        .empty-state-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            max-width: 280px;
+            line-height: 1.55;
+        }
+
+        /* ============================================================
+           LOADING BUTTON STATE
+        ============================================================ */
+        .btn.is-loading {
+            pointer-events: none;
+            opacity: .75;
+        }
+        .btn.is-loading::after {
+            content: '';
+            display: inline-block;
+            width: .8em; height: .8em;
+            border: 2px solid rgba(255,255,255,.6);
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spin .6s linear infinite;
+            margin-left: .5em;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ============================================================
+           PRINT — hide sidebar, topbar, bottom-nav; full width content
+        ============================================================ */
+        @media print {
+            .sidebar, .topbar, .mobile-bottom-nav,
+            #globalToastWrap, #cmdOverlay,
+            .btn-action-group, .filters-bar { display: none !important; }
+            .main-content { margin-left: 0 !important; }
+            .content-wrapper { padding: 0 !important; }
+            .dashboard-card { box-shadow: none !important; border: 1px solid #e5e7eb !important; }
+            body { background: white !important; }
+        }
+
+        /* ============================================================
+           TRANSITION — reduce motion for accessibility
+        ============================================================ */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+            }
+        }
     </style>
 
     @stack('styles')

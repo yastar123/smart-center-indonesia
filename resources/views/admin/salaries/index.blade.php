@@ -118,13 +118,17 @@ function loadData(page=1) {
     currentPage = page;
     const params = new URLSearchParams({ page, search: document.getElementById('searchInput').value, status: document.getElementById('filterStatus').value, periode: document.getElementById('filterPeriode').value, cabang_id: document.getElementById('filterCabang').value });
     fetch(`{{ route('admin.salaries.index') }}?${params}`, { headers:{'X-Requested-With':'XMLHttpRequest'} })
-        .then(r=>r.json()).then(data => {
+        .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+        .then(data => {
             document.getElementById('statTotal').textContent   = data.stats.total;
             document.getElementById('statDibayar').textContent = data.stats.dibayar;
             document.getElementById('statPending').textContent = data.stats.pending;
             document.getElementById('statNominal').textContent = 'Rp ' + parseInt(data.stats.total_nominal||0).toLocaleString('id-ID');
             renderTable(data.data);
             renderPagination(data);
+        })
+        .catch(() => {
+            document.getElementById('tableBody').innerHTML = `<tr><td colspan="8" class="text-center py-5"><i class="bi bi-wifi-off" style="font-size:2rem;color:#ef4444;display:block;margin-bottom:10px"></i><div class="fw-semibold mb-2">Gagal memuat data</div><button onclick="loadData(${page})" class="btn btn-sm btn-outline-primary"><i class="bi bi-arrow-clockwise me-1"></i>Coba lagi</button></td></tr>`;
         });
 }
 
@@ -165,19 +169,22 @@ function openModal(reset=true) {
 
 function editSalary(id) {
     fetch(`{{ url('admin/salaries') }}/${id}`, { headers:{'X-Requested-With':'XMLHttpRequest'} })
-        .then(r=>r.json()).then(res => {
+        .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+        .then(res => {
             const s=res.data, f=document.getElementById('salaryForm');
             ['guru_id','periode','gaji_pokok','jam_mengajar','tarif_per_jam','bonus','potongan','status','metode_pembayaran','tanggal_pembayaran','nama_bank','nomor_rekening','catatan'].forEach(k => { if(f.querySelector(`[name=${k}]`)) f.querySelector(`[name=${k}]`).value=s[k]||''; });
             document.getElementById('salId').value = id;
             document.getElementById('modalTitle').textContent = 'Edit Data Gaji';
             openModal(false);
-        });
+        }).catch(()=>showToast('Gagal memuat data gaji.', 'error'));
 }
 
 function deleteSalary(id) {
     confirmAction('Hapus data gaji ini? Data tidak dapat dikembalikan.', function() {
         fetch(`{{ url('admin/salaries') }}/${id}`, {method:'DELETE',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'}})
-            .then(r=>r.json()).then(d => { showToast(d.message, d.success?'success':'error'); if(d.success) loadData(currentPage); });
+            .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+            .then(d => { showToast(d.message, d.success?'success':'error'); if(d.success) loadData(currentPage); })
+            .catch(()=>showToast('Gagal menghubungi server.', 'error'));
     }, null, {title:'Hapus Data Gaji', okText:'Ya, Hapus'});
 }
 

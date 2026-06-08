@@ -186,13 +186,17 @@ function loadData(page = 1) {
     currentPage = page;
     const params = new URLSearchParams({ page, search: document.getElementById('searchInput').value, kategori: document.getElementById('filterKategori').value, status: document.getElementById('filterStatus').value });
     fetch(`{{ route('admin.tryouts.index') }}?${params}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(r => r.json()).then(data => {
+        .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+        .then(data => {
             document.getElementById('statTotal').textContent    = data.stats.total;
             document.getElementById('statAktif').textContent    = data.stats.aktif;
             document.getElementById('statDraft').textContent    = data.stats.draft;
             document.getElementById('statPeserta').textContent  = data.stats.peserta;
             renderTable(data.data);
             renderPagination(data);
+        })
+        .catch(() => {
+            document.getElementById('tableBody').innerHTML = `<tr><td colspan="7" class="text-center py-5"><i class="bi bi-wifi-off" style="font-size:2rem;color:#ef4444;display:block;margin-bottom:10px"></i><div class="fw-semibold mb-2">Gagal memuat data</div><button onclick="loadData(${page})" class="btn btn-sm btn-outline-primary"><i class="bi bi-arrow-clockwise me-1"></i>Coba lagi</button></td></tr>`;
         });
 }
 
@@ -235,7 +239,8 @@ function openModal(reset = true) {
 
 function editTryout(id) {
     fetch(`{{ url('admin/tryouts') }}/${id}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(r => r.json()).then(res => {
+        .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+        .then(res => {
             const t = res.data, f = document.getElementById('tryoutForm');
             ['judul','kategori','durasi_menit','nilai_kelulusan','maksimal_percobaan','status','deskripsi'].forEach(k => { if (f.querySelector(`[name=${k}]`)) f.querySelector(`[name=${k}]`).value = t[k] || ''; });
             if (f.querySelector('[name=cabang_id]')) f.querySelector('[name=cabang_id]').value = t.cabang_id || '';
@@ -247,13 +252,15 @@ function editTryout(id) {
             document.getElementById('tryId').value = id;
             document.getElementById('modalTitle').textContent = 'Edit Tryout';
             openModal(false);
-        });
+        }).catch(()=>showToast('Gagal memuat data tryout.', 'error'));
 }
 
 function deleteTryout(id, name) {
     confirmAction(`Hapus tryout "${name}"? Data tidak dapat dikembalikan.`, function() {
         fetch(`{{ url('admin/tryouts') }}/${id}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
-            .then(r => r.json()).then(d => { showToast(d.message, d.success ? 'success' : 'error'); if (d.success) loadData(currentPage); });
+            .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+            .then(d => { showToast(d.message, d.success ? 'success' : 'error'); if (d.success) loadData(currentPage); })
+            .catch(()=>showToast('Gagal menghubungi server.', 'error'));
     }, null, {title:'Hapus Tryout', okText:'Ya, Hapus'});
 }
 
@@ -284,7 +291,8 @@ function openSoal(id, judul) {
 function loadSoal(id) {
     document.getElementById('soalList').innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div></div>';
     fetch(`{{ url('admin/tryouts') }}/${id}/soal`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(r => r.json()).then(res => {
+        .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+        .then(res => {
             document.getElementById('soalSubtitle').textContent = res.soal.length + ' soal terdaftar';
             const diffBadge = { mudah: 'bg-success', sedang: 'bg-warning text-dark', sulit: 'bg-danger' };
             if (!res.soal.length) {
@@ -302,6 +310,8 @@ function loadSoal(id) {
                     </div>
                     <small class="text-muted">${s.poin} poin &middot; ${s.jenis}</small>
                 </div>`).join('');
+        }).catch(() => {
+            document.getElementById('soalList').innerHTML = '<div class="text-center py-4 text-danger"><i class="bi bi-wifi-off" style="font-size:2rem;display:block;margin-bottom:8px"></i>Gagal memuat soal. <a href="javascript:loadSoal('+id+')">Coba lagi</a></div>';
         });
 }
 
@@ -325,7 +335,9 @@ document.getElementById('soalForm').addEventListener('submit', function(e) {
 function deleteSoal(soalId) {
     confirmAction('Hapus soal ini? Data tidak dapat dikembalikan.', function() {
         fetch(`{{ url('admin/tryouts') }}/${currentTryoutId}/soal/${soalId}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
-            .then(r => r.json()).then(d => { showToast(d.message, d.success ? 'success' : 'error'); if (d.success) loadSoal(currentTryoutId); });
+            .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+            .then(d => { showToast(d.message, d.success ? 'success' : 'error'); if (d.success) loadSoal(currentTryoutId); })
+            .catch(()=>showToast('Gagal menghapus soal.', 'error'));
     }, null, {title:'Hapus Soal', okText:'Ya, Hapus'});
 }
 
@@ -333,7 +345,8 @@ function lihatHasil(id) {
     document.getElementById('hasilBody').innerHTML = '<tr><td colspan="5" class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Loading...</td></tr>';
     new bootstrap.Modal(document.getElementById('hasilModal')).show();
     fetch(`{{ url('admin/tryouts') }}/${id}/results`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(r => r.json()).then(res => {
+        .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+        .then(res => {
             if (!res.data.length) {
                 document.getElementById('hasilBody').innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Belum ada peserta</td></tr>';
             } else {
@@ -346,6 +359,8 @@ function lihatHasil(id) {
                         <td style="font-size:11px">${(a.created_at||'').toString().substring(0,16).replace('T',' ')}</td>
                     </tr>`).join('');
             }
+        }).catch(() => {
+            document.getElementById('hasilBody').innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger"><i class="bi bi-wifi-off me-2"></i>Gagal memuat hasil.</td></tr>';
         });
 }
 

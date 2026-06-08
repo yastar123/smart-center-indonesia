@@ -194,13 +194,17 @@ function loadData(page = 1) {
         mata_pelajaran_id: document.getElementById('filterMapel').value,
     });
     fetch(`{{ route('admin.modules.index') }}?${params}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(r => r.json()).then(data => {
+        .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+        .then(data => {
             document.getElementById('statTotal').textContent = data.stats.total;
             document.getElementById('statPdf').textContent   = data.stats.pdf;
             document.getElementById('statVideo').textContent = data.stats.video;
             document.getElementById('statGratis').textContent= data.stats.gratis;
             renderTable(data.data);
             renderPagination(data);
+        })
+        .catch(() => {
+            document.getElementById('tableBody').innerHTML = `<tr><td colspan="7" class="text-center py-5"><i class="bi bi-wifi-off" style="font-size:2rem;color:#ef4444;display:block;margin-bottom:10px"></i><div class="fw-semibold mb-2">Gagal memuat data</div><button onclick="loadData(${page})" class="btn btn-sm btn-outline-primary"><i class="bi bi-arrow-clockwise me-1"></i>Coba lagi</button></td></tr>`;
         });
 }
 
@@ -256,7 +260,8 @@ function openModal(reset = true) {
 
 function editModule(id) {
     fetch(`{{ url('admin/modules') }}/${id}`, { headers:{'X-Requested-With':'XMLHttpRequest'} })
-        .then(r=>r.json()).then(res => {
+        .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+        .then(res => {
             const m = res.data;
             const f = document.getElementById('moduleForm');
             f.querySelector('[name=judul]').value = m.judul || '';
@@ -271,13 +276,15 @@ function editModule(id) {
             document.getElementById('modalTitle').textContent = 'Edit Modul';
             toggleUrlSection();
             openModal(false);
-        });
+        }).catch(()=>showToast('Gagal memuat data modul.', 'error'));
 }
 
 function deleteModule(id, name) {
     confirmAction(`Hapus modul "${name}"? Data tidak dapat dikembalikan.`, function() {
         fetch(`{{ url('admin/modules') }}/${id}`, { method:'DELETE', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'} })
-            .then(r=>r.json()).then(d => { showToast(d.message, d.success?'success':'error'); if(d.success) loadData(currentPage); });
+            .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+            .then(d => { showToast(d.message, d.success?'success':'error'); if(d.success) loadData(currentPage); })
+            .catch(()=>showToast('Gagal menghubungi server.', 'error'));
     }, null, {title:'Hapus Modul', okText:'Ya, Hapus'});
 }
 

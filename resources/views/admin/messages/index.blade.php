@@ -189,7 +189,8 @@ function scrollToBottom() {
 
 function loadMessages(roomId) {
     fetch(`{{ url('admin/messages') }}/${roomId}/messages`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(r => r.json()).then(res => {
+        .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+        .then(res => {
             const myId = {{ auth()->id() }};
             const el = document.getElementById('chatMessages');
             if (!res.data || !res.data.length) {

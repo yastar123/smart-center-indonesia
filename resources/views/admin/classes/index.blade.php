@@ -302,7 +302,7 @@ function editClass(id) {
     document.getElementById('classModalTitle').textContent = 'Edit Kelas';
     document.getElementById('classSaveBtn').disabled = true;
     fetch(`/admin/classes/${id}`)
-        .then(r => r.json())
+        .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
         .then(d => {
             document.getElementById('classId').value = d.id;
             document.getElementById('nama_kelas').value = d.nama_kelas || '';
@@ -319,6 +319,9 @@ function editClass(id) {
             toggleZoom();
             document.getElementById('classSaveBtn').disabled = false;
             classModal.show();
+        }).catch(() => {
+            document.getElementById('classSaveBtn').disabled = false;
+            window.showToast && window.showToast('Gagal memuat data kelas.', 'error');
         });
 }
 
@@ -371,12 +374,16 @@ function deleteClass(id, nama) {
             method: 'DELETE',
             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
         })
-        .then(r => r.json())
+        .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
         .then(res => {
             if (res.success) {
                 window.showToast && window.showToast(res.message, 'success');
                 setTimeout(() => location.reload(), 600);
+            } else {
+                window.showToast && window.showToast(res.message || 'Gagal menghapus kelas.', 'error');
             }
+        }).catch(() => {
+            window.showToast && window.showToast('Gagal menghubungi server.', 'error');
         });
     });
 }

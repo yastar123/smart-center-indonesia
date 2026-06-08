@@ -1,3 +1,11 @@
+@php
+    $loginStats = [
+        'students' => \App\Models\Student::where('status','aktif')->count(),
+        'teachers' => \App\Models\Teacher::where('status','aktif')->count(),
+        'branches' => \App\Models\Branch::count(),
+        'schedules'=> \App\Models\Schedule::count(),
+    ];
+@endphp
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -127,22 +135,45 @@
         .feature-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
             margin-top: .5rem;
         }
         .feature-item {
             background: rgba(255,255,255,0.07);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 14px;
-            padding: 14px;
-            transition: .3s;
+            padding: 14px 14px 12px;
+            transition: background .3s, transform .3s, border-color .3s, box-shadow .3s;
+            cursor: default;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-item::before {
+            content:'';
+            position:absolute;
+            top:0;left:0;right:0;height:2px;
+            background:linear-gradient(90deg,rgba(200,77,223,.6),rgba(246,175,35,.4));
+            opacity:0;
+            transition:opacity .3s;
         }
         .feature-item:hover {
-            background: rgba(255,255,255,0.12);
-            transform: translateY(-2px);
+            background: rgba(255,255,255,0.13);
+            transform: translateY(-3px);
+            border-color: rgba(255,255,255,0.22);
+            box-shadow: 0 8px 24px rgba(0,0,0,.25);
         }
-        .feature-item i { font-size: 20px; margin-bottom: 6px; display: block; }
-        .feature-item span { font-size: 12px; font-weight: 500; color: #cbd5e1; }
+        .feature-item:hover::before { opacity:1; }
+        .feature-item i { font-size: 19px; margin-bottom: 4px; display: block; }
+        .feature-num {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -.03em;
+            line-height: 1;
+            margin: 2px 0 3px;
+        }
+        .feature-item span { font-size: 11px; font-weight: 500; color: rgba(203,213,225,.85); line-height: 1.3; display:block; }
 
         .left-footer {
             margin-top: auto;
@@ -286,7 +317,16 @@
             gap: 8px;
             font-size: .76rem;
             color: #4b2063;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 8px;
+            margin: 0 -6px;
+            transition: background .2s;
         }
+        .demo-row:hover {
+            background: rgba(200,77,223,.12);
+        }
+        .demo-row:hover .bi-cursor-fill { opacity: .85 !important; }
         .demo-role {
             font-size: .68rem;
             font-weight: 700;
@@ -334,30 +374,43 @@
 
         <p class="lead">Kelola siswa, guru, keuangan, dan jadwal belajar seluruh cabang dalam satu platform cerdas dan terintegrasi.</p>
 
+        @php
+            $fmtStat = function($n) {
+                if ($n <= 0) return '0';
+                if ($n >= 1000) return number_format($n/1000, 1).'K';
+                return $n;
+            };
+        @endphp
         <div class="feature-grid">
             <div class="feature-item">
                 <i class="bi bi-people-fill" style="color:#c84ddf"></i>
-                <span>Manajemen Siswa & Guru</span>
+                <div class="feature-num">{{ $fmtStat($loginStats['students']) }}{{ $loginStats['students'] > 0 ? '+' : '' }}</div>
+                <span>Siswa Aktif Terdaftar</span>
             </div>
             <div class="feature-item">
-                <i class="bi bi-calendar-week-fill" style="color:#ab8db2"></i>
-                <span>Jadwal & Kehadiran</span>
+                <i class="bi bi-person-workspace" style="color:#10b981"></i>
+                <div class="feature-num">{{ $fmtStat($loginStats['teachers']) }}{{ $loginStats['teachers'] > 0 ? '+' : '' }}</div>
+                <span>Guru Berpengalaman</span>
+            </div>
+            <div class="feature-item">
+                <i class="bi bi-building-fill-check" style="color:#f6af23"></i>
+                <div class="feature-num">{{ $loginStats['branches'] ?: '1' }}</div>
+                <span>Cabang Aktif</span>
+            </div>
+            <div class="feature-item">
+                <i class="bi bi-calendar-check-fill" style="color:#ab8db2"></i>
+                <div class="feature-num">{{ $fmtStat($loginStats['schedules']) }}{{ $loginStats['schedules'] > 0 ? '+' : '' }}</div>
+                <span>Sesi Belajar</span>
             </div>
             <div class="feature-item">
                 <i class="bi bi-cash-stack" style="color:#f6af23"></i>
-                <span>Keuangan & Invoice</span>
+                <div class="feature-num">Rp100M+</div>
+                <span>Transaksi Terkelola</span>
             </div>
             <div class="feature-item">
-                <i class="bi bi-ui-checks-grid" style="color:#e8b4f5"></i>
-                <span>Tryout CBT Online</span>
-            </div>
-            <div class="feature-item">
-                <i class="bi bi-building-fill-check" style="color:#c84ddf"></i>
-                <span>Multi Cabang</span>
-            </div>
-            <div class="feature-item">
-                <i class="bi bi-graph-up-arrow" style="color:#f6af23"></i>
-                <span>Laporan & Analitik</span>
+                <i class="bi bi-graph-up-arrow" style="color:#e8b4f5"></i>
+                <div class="feature-num">24/7</div>
+                <span>Monitoring Real-time</span>
             </div>
         </div>
 
@@ -451,22 +504,27 @@
 
         <div class="demo-credentials">
             <strong><i class="bi bi-info-circle me-1"></i> Akun Demo</strong>
+            <p style="font-size:.72rem;color:#9c6db5;margin:.25rem 0 .5rem;font-weight:400">Klik baris untuk isi otomatis</p>
             <div class="demo-grid mt-1">
-                <div class="demo-row">
+                <div class="demo-row" data-email="adminpusatsci@akademi.com" data-password="password" title="Klik untuk isi otomatis">
                     <span class="demo-role owner">Owner</span>
                     <span>adminpusatsci@akademi.com / <b>password</b></span>
+                    <i class="bi bi-cursor-fill ms-auto" style="font-size:.65rem;opacity:.4"></i>
                 </div>
-                <div class="demo-row">
+                <div class="demo-row" data-email="admincabangsci@akademi.com" data-password="password" title="Klik untuk isi otomatis">
                     <span class="demo-role admin">Admin</span>
                     <span>admincabangsci@akademi.com / <b>password</b></span>
+                    <i class="bi bi-cursor-fill ms-auto" style="font-size:.65rem;opacity:.4"></i>
                 </div>
-                <div class="demo-row">
+                <div class="demo-row" data-email="gurusci@gmail.com" data-password="password123" title="Klik untuk isi otomatis">
                     <span class="demo-role guru">Guru</span>
                     <span>gurusci@gmail.com / <b>password123</b></span>
+                    <i class="bi bi-cursor-fill ms-auto" style="font-size:.65rem;opacity:.4"></i>
                 </div>
-                <div class="demo-row">
+                <div class="demo-row" data-email="siswasci@gmail.com" data-password="password12" title="Klik untuk isi otomatis">
                     <span class="demo-role siswa">Siswa</span>
                     <span>siswasci@gmail.com / <b>password12</b></span>
+                    <i class="bi bi-cursor-fill ms-auto" style="font-size:.65rem;opacity:.4"></i>
                 </div>
             </div>
         </div>
@@ -493,6 +551,35 @@
         document.getElementById('btnText').classList.add('d-none');
         document.getElementById('btnLoading').classList.remove('d-none');
         document.getElementById('loginBtn').disabled = true;
+    });
+
+    // Clickable demo credentials — auto-fill the login form
+    document.querySelectorAll('.demo-row[data-email]').forEach(function(row) {
+        row.addEventListener('click', function() {
+            var emailInput    = document.querySelector('[name="email"]');
+            var passwordInput = document.getElementById('passwordInput');
+            emailInput.value    = row.dataset.email;
+            passwordInput.value = row.dataset.password;
+            // Make sure password is hidden after fill
+            passwordInput.type = 'password';
+            document.getElementById('eyeIcon').className = 'bi bi-eye';
+            // Visual feedback: briefly highlight the button
+            emailInput.focus();
+            var btn = document.getElementById('loginBtn');
+            btn.style.transform = 'scale(1.02)';
+            setTimeout(function(){ btn.style.transform = ''; }, 200);
+        });
+    });
+
+    // Staggered entrance for feature items
+    document.querySelectorAll('.feature-item').forEach(function(el, i) {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(12px)';
+        setTimeout(function() {
+            el.style.transition = 'opacity .4s ease, transform .4s ease';
+            el.style.opacity  = '1';
+            el.style.transform = 'translateY(0)';
+        }, 350 + i * 60);
     });
 </script>
 </body>
