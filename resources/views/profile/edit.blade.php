@@ -372,7 +372,7 @@ document.getElementById('avatarFile').addEventListener('change', function() {
     fd.append('_token', document.querySelector('meta[name=csrf-token]').content);
 
     fetch('{{ route("profile.avatar") }}', { method: 'POST', body: fd })
-        .then(r => r.json())
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(res => {
             if (res.success) {
                 // Update sidebar avatar too

@@ -603,7 +603,6 @@ if (countEls.length) {
     const countIO = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.querySelectorAll ? null : animateCount(entry.target);
                 animateCount(entry.target);
                 countIO.unobserve(entry.target);
             }
