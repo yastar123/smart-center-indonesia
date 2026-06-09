@@ -9,7 +9,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -230,6 +229,12 @@ document.getElementById('registerForm').addEventListener('submit', function() {
     document.getElementById('regLoading').classList.remove('d-none');
     document.getElementById('regBtn').disabled = true;
 });
+(function(){
+    var t = localStorage.getItem('theme');
+    if (t === 'dark') {
+        document.body.style.background = 'linear-gradient(135deg, #1a0426 0%, #2d0840 40%, #3d0f54 75%, #8b2faa 100%)';
+    }
+})();
 </script>
 </body>
 </html>

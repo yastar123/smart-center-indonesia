@@ -2260,7 +2260,7 @@
         /* Cards that are header banners (gradient bg) should not lift */
         .dashboard-card[style*="linear-gradient"]:hover {
             transform: none;
-            box-shadow: var(--shadow-card);
+            box-shadow: var(--shadow-md);
         }
 
         /* ============================================================
@@ -2896,27 +2896,21 @@
             body { background: white !important; }
         }
 
-        /* ============================================================
-           TRANSITION — reduce motion for accessibility
-        ============================================================ */
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: .01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: .01ms !important;
-            }
-        }
     </style>
 
     @stack('styles')
+    <script>!function(){var t=localStorage.getItem('theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}();</script>
 </head>
 <body>
     @if(session()->has('impersonate.original_user'))
-        <div style="background:#fff4f4;border-bottom:1px solid #fecaca;padding:8px;text-align:center;z-index:1200">
-            Anda sedang <strong>mengakses sebagai admin cabang</strong>. 
-            <form method="POST" action="{{ route('impersonate.leave') }}" style="display:inline;margin-left:8px">
+        <div class="impersonate-banner">
+            <i class="bi bi-person-fill-gear me-2"></i>
+            Anda sedang <strong>mengakses sebagai admin cabang</strong>.
+            <form method="POST" action="{{ route('impersonate.leave') }}" style="display:inline;margin-left:10px">
                 @csrf
-                <button class="btn btn-sm btn-danger">Kembali ke Pusat</button>
+                <button class="btn btn-sm btn-danger" style="border-radius:8px;font-size:12px;padding:3px 12px">
+                    <i class="bi bi-arrow-left-circle me-1"></i>Kembali ke Pusat
+                </button>
             </form>
         </div>
     @endif
@@ -3963,6 +3957,7 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
 (function() {
     const cmdPages = [
         { label:'Dashboard', desc:'Halaman utama', href:'{{ route("dashboard") }}', icon:'bi-grid-fill', color:'#c84ddf', group:'Navigasi' },
+        @role('admin|owner')
         { label:'Data Siswa', desc:'Kelola siswa', href:'{{ route("admin.students.index") }}', icon:'bi-mortarboard', color:'#c84ddf', group:'Akademik' },
         { label:'Data Guru', desc:'Kelola guru & pengajar', href:'{{ route("admin.teachers.index") }}', icon:'bi-person-workspace', color:'#10b981', group:'Akademik' },
         { label:'Modul Belajar', desc:'Upload & kelola materi', href:'{{ route("admin.modules.index") }}', icon:'bi-book-half', color:'#68117e', group:'Akademik' },
@@ -3978,6 +3973,22 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         { label:'Pesan Aplikasi', desc:'Chat internal', href:'{{ route("admin.messages.index") }}', icon:'bi-chat-dots', color:'#0284c7', group:'Komunikasi' },
         { label:'Video Call', desc:'Kelas virtual online', href:'{{ route("admin.videocall.index") }}', icon:'bi-camera-video', color:'#0d9488', group:'Komunikasi' },
         { label:'Tryout UTBK/PTN', desc:'Kelola soal & ujian CBT', href:'{{ route("admin.tryouts.index") }}', icon:'bi-journal-check', color:'#c84ddf', group:'Tryout CBT' },
+        @endrole
+        @role('guru')
+        { label:'Dashboard Guru', desc:'Portal guru & jadwal', href:'{{ route("guru.dashboard") }}', icon:'bi-speedometer2', color:'#c84ddf', group:'Guru' },
+        { label:'Input Absensi', desc:'Catat kehadiran siswa', href:'{{ route("guru.attendance") }}', icon:'bi-check2-square', color:'#10b981', group:'Guru' },
+        { label:'Input Nilai', desc:'Masukkan nilai siswa', href:'{{ route("guru.grades") }}', icon:'bi-pencil-square', color:'#f6af23', group:'Guru' },
+        @endrole
+        @role('siswa')
+        { label:'Dashboard Siswa', desc:'Portal siswa & tagihan', href:'{{ route("siswa.dashboard") }}', icon:'bi-speedometer2', color:'#c84ddf', group:'Siswa' },
+        { label:'Jadwal Belajar', desc:'Lihat jadwal sesi belajar', href:'{{ route("siswa.schedule") }}', icon:'bi-calendar-event', color:'#10b981', group:'Siswa' },
+        { label:'Sertifikat Saya', desc:'Lihat sertifikat yang diterbitkan', href:'{{ route("siswa.certificates.index") }}', icon:'bi-award', color:'#f6af23', group:'Siswa' },
+        @endrole
+        @role('owner')
+        { label:'Monitoring Cabang', desc:'Pantau semua cabang', href:'{{ route("owner.branches.index") }}', icon:'bi-building', color:'#c84ddf', group:'Owner' },
+        { label:'Analytics', desc:'Laporan performa bisnis', href:'{{ route("owner.analytics") }}', icon:'bi-graph-up-arrow', color:'#10b981', group:'Owner' },
+        { label:'Log Aktivitas', desc:'Riwayat aktivitas sistem', href:'{{ route("owner.activity-log") }}', icon:'bi-journal-text', color:'#68117e', group:'Owner' },
+        @endrole
         { label:'Profil Saya', desc:'Edit akun & password', href:'{{ route("profile.edit") }}', icon:'bi-person-circle', color:'#c84ddf', group:'Akun' },
     ];
 

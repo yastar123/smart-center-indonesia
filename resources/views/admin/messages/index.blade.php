@@ -142,10 +142,6 @@
 let activeRoom = null, pollInterval = null;
 
 function loadRooms() {
-    fetch(`{{ route('admin.messages.index') }}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(r => r.text()).then(() => {});
-
-    // For now fetch rooms list via AJAX — re-use the page load data
     const rooms = @json($rooms);
     renderRooms(rooms);
 }

@@ -615,5 +615,13 @@
         }, 350 + i * 60);
     });
 </script>
+<script>
+(function(){
+    var t = localStorage.getItem('theme');
+    if (t === 'dark') {
+        document.body.style.background = 'linear-gradient(135deg, #1a0426 0%, #2d0840 40%, #3d0f54 75%, #8b2faa 100%)';
+    }
+})();
+</script>
 </body>
 </html>
