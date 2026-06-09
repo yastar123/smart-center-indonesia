@@ -11,18 +11,25 @@
         *{margin:0;padding:0;box-sizing:border-box;}
         body{
             min-height:100vh;
-            background:linear-gradient(135deg,#1e1b4b 0%,#312e81 40%,#4338ca 100%);
+            background:linear-gradient(135deg,#260632 0%,#461256 40%,#461256 75%,#c84ddf 100%);
             display:flex;align-items:center;justify-content:center;
             font-family:'Inter','Segoe UI',sans-serif;
             padding:2rem 1rem;position:relative;overflow:hidden;
         }
         body::before{
             content:'';position:fixed;width:500px;height:500px;
-            background:radial-gradient(circle,rgba(99,102,241,.25) 0%,transparent 70%);
+            background:radial-gradient(circle,rgba(200,77,223,.25) 0%,transparent 70%);
             top:-150px;right:-150px;border-radius:50%;
             animation:orb 8s ease-in-out infinite alternate;pointer-events:none;
         }
+        body::after{
+            content:'';position:fixed;width:400px;height:400px;
+            background:radial-gradient(circle,rgba(246,175,35,.1) 0%,transparent 70%);
+            bottom:-120px;left:-120px;border-radius:50%;
+            animation:orb2 10s ease-in-out infinite alternate;pointer-events:none;
+        }
         @keyframes orb{from{transform:translate(0,0);}to{transform:translate(30px,20px);}}
+        @keyframes orb2{from{transform:translate(0,0);}to{transform:translate(-20px,-30px);}}
 
         .error-card{
             width:min(560px,100%);
@@ -34,15 +41,16 @@
         @keyframes slideUp{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
 
         .error-band{
-            background:linear-gradient(135deg,#1e1b4b,#4338ca,#6366f1);
+            background:linear-gradient(135deg,#260632,#461256,#c84ddf);
             padding:2.5rem 2.5rem 2rem;
             text-align:center;color:white;position:relative;overflow:hidden;
         }
         .error-band::before{content:'';position:absolute;right:-40px;top:-40px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%;}
+        .error-band::after{content:'';position:absolute;left:-40px;bottom:-40px;width:140px;height:140px;background:rgba(246,175,35,.06);border-radius:50%;}
         .error-num{
             font-family:'Plus Jakarta Sans',sans-serif;
             font-size:clamp(80px,14vw,120px);font-weight:900;line-height:1;
-            letter-spacing:-.04em;color:rgba(255,255,255,.12);
+            letter-spacing:-.04em;color:rgba(255,255,255,.1);
             position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
             user-select:none;pointer-events:none;
         }
@@ -56,20 +64,20 @@
         }
         .error-body{padding:2.5rem;}
         .back-btn{
-            background:linear-gradient(135deg,#4338ca,#6366f1 50%,#818cf8);
+            background:linear-gradient(135deg,#68117e,#c84ddf 50%,#c84ddf);
             background-size:200% auto;border:none;border-radius:12px;
             padding:.85rem 2rem;font-size:.95rem;font-weight:700;
             color:white;transition:.4s;text-decoration:none;display:inline-flex;
             align-items:center;gap:8px;
         }
-        .back-btn:hover{background-position:right center;transform:translateY(-2px);box-shadow:0 10px 28px rgba(99,102,241,.45);color:white;}
+        .back-btn:hover{background-position:right center;transform:translateY(-2px);box-shadow:0 10px 28px rgba(200,77,223,.45);color:white;}
         .home-btn{
             background:transparent;border:2px solid #e5e7eb;border-radius:12px;
             padding:.85rem 2rem;font-size:.95rem;font-weight:600;
-            color:#4338ca;transition:.25s;text-decoration:none;display:inline-flex;
+            color:#68117e;transition:.25s;text-decoration:none;display:inline-flex;
             align-items:center;gap:8px;
         }
-        .home-btn:hover{border-color:#6366f1;color:#6366f1;background:#eef2ff;}
+        .home-btn:hover{border-color:#c84ddf;color:#68117e;background:#fdf4ff;}
         @media(max-width:480px){.error-body,.error-band{padding:1.5rem;}.error-body .d-flex{flex-direction:column;}}
     </style>
 </head>

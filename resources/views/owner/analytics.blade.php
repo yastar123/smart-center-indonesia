@@ -191,13 +191,27 @@ $branches = Branch::withCount('students')
     @else
     <div class="row g-3">
         @foreach($branches as $i => $b)
-        @php $pct = $branches->first()->students_count > 0 ? round($b->students_count / $branches->first()->students_count * 100) : 0; @endphp
+        @php
+            $pct = $branches->first()->students_count > 0 ? round($b->students_count / $branches->first()->students_count * 100) : 0;
+            $rankBadge = match(true) {
+                $i === 0 => ['bg' => 'linear-gradient(135deg,#f6af23,#e09000)', 'label' => '🥇'],
+                $i === 1 => ['bg' => 'linear-gradient(135deg,#94a3b8,#64748b)', 'label' => '🥈'],
+                $i === 2 => ['bg' => 'linear-gradient(135deg,#cd7f32,#a0522d)', 'label' => '🥉'],
+                default  => ['bg' => 'linear-gradient(135deg,#68117e,#c84ddf)', 'label' => (string)($i+1)],
+            };
+            $barColor = match(true) {
+                $i === 0 => 'linear-gradient(90deg,#f6af23,#e09000)',
+                $i === 1 => 'linear-gradient(90deg,#94a3b8,#64748b)',
+                $i === 2 => 'linear-gradient(90deg,#cd7f32,#a06020)',
+                default  => 'linear-gradient(90deg,#68117e,#c84ddf)',
+            };
+        @endphp
         <div class="col-12 col-md-6">
             <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="d-flex align-items-center gap-2">
-                        <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#c84ddf,#c84ddf);display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:700;flex-shrink:0">
-                            {{ $i + 1 }}
+                        <div style="width:30px;height:30px;border-radius:9px;background:{{ $rankBadge['bg'] }};display:flex;align-items:center;justify-content:center;color:white;font-size:{{ $i < 3 ? '14px' : '12px' }};font-weight:700;flex-shrink:0;box-shadow:0 3px 8px rgba(0,0,0,.15)">
+                            {{ $rankBadge['label'] }}
                         </div>
                         <div>
                             <div class="fw-semibold" style="font-size:13px">{{ $b->name }}</div>
@@ -205,12 +219,12 @@ $branches = Branch::withCount('students')
                         </div>
                     </div>
                     <div class="text-end">
-                        <div class="fw-bold text-primary" style="font-size:14px">{{ $b->students_count }}</div>
+                        <div class="fw-bold" style="font-size:14px;color:{{ $i === 0 ? '#e09000' : ($i === 1 ? '#64748b' : ($i === 2 ? '#a0522d' : '#c84ddf')) }}">{{ $b->students_count }}</div>
                         <div style="font-size:10px;color:var(--text-muted)">siswa</div>
                     </div>
                 </div>
                 <div style="height:5px;background:var(--card-border);border-radius:10px;overflow:hidden">
-                    <div style="width:{{ $pct }}%;height:100%;background:linear-gradient(90deg,#c84ddf,#c84ddf);border-radius:10px;transition:width .8s ease"></div>
+                    <div style="width:{{ $pct }}%;height:100%;background:{{ $barColor }};border-radius:10px;transition:width .8s ease"></div>
                 </div>
                 <div class="d-flex justify-content-between mt-1" style="font-size:10.5px;color:var(--text-muted)">
                     <span>{{ $b->aktif_count }} aktif</span>

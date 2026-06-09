@@ -352,7 +352,20 @@
         }
         @media (max-width: 480px) {
             .login-wrapper { border-radius: 16px; }
-            .feature-grid { grid-template-columns: 1fr; }
+            .login-left { padding: 1.5rem; }
+            .login-left h1 { font-size: 1.5rem; }
+            .login-left .lead { font-size: .85rem; margin-bottom: 1rem; }
+            .feature-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .feature-item { padding: 10px 10px 8px; }
+            .feature-num { font-size: 1.15rem; }
+            .feature-item span { font-size: 10px; }
+            .feature-item i { font-size: 16px; }
+            .login-right { padding: 1.5rem; }
+        }
+        @media (max-width: 360px) {
+            .feature-grid { gap: 6px; }
+            .feature-item { padding: 8px; }
+            .feature-num { font-size: 1rem; }
         }
     </style>
 </head>
@@ -571,7 +584,7 @@
         });
     });
 
-    // Staggered entrance for feature items
+    // Staggered entrance + count-up for feature items
     document.querySelectorAll('.feature-item').forEach(function(el, i) {
         el.style.opacity = '0';
         el.style.transform = 'translateY(12px)';
@@ -579,6 +592,26 @@
             el.style.transition = 'opacity .4s ease, transform .4s ease';
             el.style.opacity  = '1';
             el.style.transform = 'translateY(0)';
+            // Count-up for numeric feature stats
+            var numEl = el.querySelector('.feature-num');
+            if (!numEl) return;
+            var rawText = numEl.textContent.trim();
+            var numMatch = rawText.match(/^([\d,.]+)/);
+            if (!numMatch) return; // skip non-numeric (e.g. "Rp100M+", "24/7")
+            var target = parseInt(numMatch[1].replace(/[,.]/g, ''), 10);
+            if (!target || target < 2) return;
+            var suffix = rawText.replace(numMatch[0], '');
+            var duration = 900;
+            var startTime = null;
+            numEl.textContent = '0' + suffix;
+            function step(ts) {
+                if (!startTime) startTime = ts;
+                var progress = Math.min((ts - startTime) / duration, 1);
+                var ease = 1 - Math.pow(1 - progress, 3);
+                numEl.textContent = Math.round(ease * target).toLocaleString('id') + suffix;
+                if (progress < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
         }, 350 + i * 60);
     });
 </script>
