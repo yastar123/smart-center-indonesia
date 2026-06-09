@@ -120,9 +120,9 @@ function loadData(page=1) {
     fetch(`{{ route('admin.salaries.index') }}?${params}`, { headers:{'X-Requested-With':'XMLHttpRequest'} })
         .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
         .then(data => {
-            document.getElementById('statTotal').textContent   = data.stats.total;
-            document.getElementById('statDibayar').textContent = data.stats.dibayar;
-            document.getElementById('statPending').textContent = data.stats.pending;
+            countUpValue(document.getElementById('statTotal'),   data.stats.total);
+            countUpValue(document.getElementById('statDibayar'), data.stats.dibayar);
+            countUpValue(document.getElementById('statPending'), data.stats.pending);
             document.getElementById('statNominal').textContent = 'Rp ' + parseInt(data.stats.total_nominal||0).toLocaleString('id-ID');
             renderTable(data.data);
             renderPagination(data);

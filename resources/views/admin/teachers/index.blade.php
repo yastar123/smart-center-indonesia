@@ -338,10 +338,10 @@ function loadTeachers(page) {
         success(res) {
             // Update global stats
             if (res.stats) {
-                document.getElementById('statTotal').textContent  = res.stats.total;
-                document.getElementById('statAktif').textContent  = res.stats.aktif;
-                document.getElementById('statMale').textContent   = res.stats.male;
-                document.getElementById('statFemale').textContent = res.stats.female;
+                countUpValue(document.getElementById('statTotal'),  res.stats.total);
+                countUpValue(document.getElementById('statAktif'),  res.stats.aktif);
+                countUpValue(document.getElementById('statMale'),   res.stats.male);
+                countUpValue(document.getElementById('statFemale'), res.stats.female);
             }
 
             let html = '';

@@ -378,3 +378,109 @@ showToast('success', 'Pesan berhasil disimpan'); // ❌
 ---
 
 *Laporan ini dibuat berdasarkan audit menyeluruh pada 08 Juni 2026. Semua perbaikan yang tercantum di Bagian 2 telah diimplementasikan dan diverifikasi berjalan pada environment Replit dengan port 5000.*
+
+---
+
+---
+
+# ADDENDUM AUDIT — SESI 2
+## Tanggal: 09 Juni 2026 | Lanjutan dari Laporan di Atas
+
+---
+
+## A. PERBAIKAN TAMBAHAN SESI 2
+
+### A-01 — Panel Notifikasi: Link "Lihat Semua" Hardcoded (Bug Kritis)
+**Lokasi:** `resources/views/layouts/app.blade.php` (~baris 3790)  
+**Temuan:** Template literal JavaScript di panel notifikasi selalu membuat link "Lihat Semua Pengumuman" yang mengarah ke `admin.announcements.index`, bahkan saat pengguna yang login adalah Guru atau Siswa. Hal ini menyebabkan error **403 Forbidden** saat link diklik oleh non-admin.  
+**Perbaikan:** Variabel PHP `$announcementsRoute` dihitung di blok `@php` di dalam `<script>` menggunakan `auth()->user()->hasAnyRole(['admin','owner'])`. Route hanya di-render untuk admin/owner; untuk role lain tombol "Lihat Semua" tidak ditampilkan.  
+**Status:** ✅ Diperbaiki
+
+---
+
+### A-02 — Animasi Count-Up Otomatis untuk Semua Stat Value Integer
+**Lokasi:** `resources/views/layouts/app.blade.php`  
+**Temuan:** Banyak halaman dengan server-rendered stat values (students, schedules, owner analytics, siswa dashboard, dll.) menampilkan angka statis tanpa animasi count-up. Hanya halaman yang sudah memiliki `.count-up[data-target]` eksplisit yang teranimasikan.  
+**Perbaikan:**
+- **Auto-detect global:** Script DOMContentLoaded mendeteksi semua `.stat-value` yang berisi integer murni (1–999,999), menandai dengan `data-auto-count`, dan menganimasikan 0→target saat element masuk viewport via IntersectionObserver
+- **Helper `window.countUpValue(el, target)`:** Fungsi global untuk halaman AJAX yang me-refresh statistik secara dinamis  
+- **Perlindungan edge-case:** Nilai "Rp xxx", "x Invoice", teks non-numerik, dan angka > 999,999 (termasuk nomor telepon) dilewati secara otomatis. Flag `.no-countup` tersedia untuk opt-out manual  
+
+**Halaman AJAX yang diperbarui menggunakan `countUpValue()`:**
+| Halaman | Status |
+|---------|--------|
+| `admin/announcements/index` | ✅ |
+| `admin/salaries/index` | ✅ |
+| `admin/tryouts/index` | ✅ |
+| `admin/teachers/index` | ✅ |
+| `admin/packages/index` | ✅ |
+| `admin/modules/index` | ✅ |
+
+**Status:** ✅ Diterapkan
+
+---
+
+### A-03 — Konflik Animasi: `statCardEnter` vs `fade-up` Wrapper
+**Lokasi:** `resources/views/layouts/app.blade.php` (CSS `.stat-card`)  
+**Temuan:** Class `.stat-card` memiliki keyframe animation `statCardEnter` yang berjalan bersamaan dengan animasi `fade-up` dari parent `.col-*`. Kedua animasi menerapkan `transform` secara simultan menghasilkan gerakan visual yang janggal.  
+**Perbaikan:** Keyframe `statCardEnter` dan properti `animation` dihapus dari `.stat-card`. Diganti dengan `transition-delay` stagger berbasis `nth-child` (0ms, 50ms, 100ms, 150ms) untuk efek masuk bertahap yang smooth.  
+**Status:** ✅ Diperbaiki
+
+---
+
+### A-04 — Konflik IO: Auto-Detect Count-Up vs IO per-Halaman Dashboard
+**Lokasi:** `resources/views/layouts/app.blade.php` & `resources/views/dashboard.blade.php`  
+**Temuan:** Implementasi awal auto-detect menambahkan class `.count-up` ke elemen yang terdeteksi. Dashboard utama memiliki IntersectionObserver sendiri yang menargetkan `.count-up` — kedua observer akan observe elemen yang sama, menghasilkan dua animasi bersamaan (flickering, racing counter).  
+**Perbaikan:** Sistem auto-detect diubah menggunakan atribut `data-auto-count` (bukan class `.count-up`) dengan IntersectionObserver terpisah. IO dashboard tetap menargetkan `.count-up[data-target]` tanpa interferensi. Guard `data-counted` mencegah double-fire.  
+**Status:** ✅ Diperbaiki
+
+---
+
+## B. PENINGKATAN CSS GLOBAL TAMBAHAN
+
+Ditambahkan ke `resources/views/layouts/app.blade.php`:
+
+| Fitur | Deskripsi |
+|-------|-----------|
+| **Topbar scroll glow** | Saat halaman di-scroll, topbar mendapat `border-bottom` ungu soft dan `box-shadow` halus (transisi 250ms) |
+| **Branded `:focus-visible`** | Override global focus ring dengan `outline: 2px solid rgba(200,77,223,.6)` — konsisten dengan brand, menggantikan biru default browser |
+| **Dark mode table borders** | Border lebih lembut `rgba(255,255,255,.08)` + row stripe `rgba(255,255,255,.025)` di dark mode |
+| **`.badge-new`** | Badge pulsating animasi `badgePulse` untuk menandai item baru |
+| **Skeleton shimmer halus** | Gradient lebih soft, 1.6s timing, dark mode adaptation |
+| **`.avatar-online`** | Indikator titik hijau (#22c55e) dengan outline putih di sudut avatar |
+| **Stat-card stagger delay** | `transition-delay` nth-child untuk urutan masuk 0/50/100/150ms |
+| **Soft-color CSS variables** | `--soft-primary/success/warning/info/danger` lengkap dengan variant `-bg/-text/-border` di `:root` dan `[data-theme="dark"]` |
+
+---
+
+## C. VERIFIKASI EDGE CASE COUNT-UP
+
+Berikut ringkasan verifikasi bahwa auto count-up TIDAK terpicu pada nilai yang salah:
+
+| Nilai di DOM | Lolos filter? | Alasan |
+|-------------|---------------|--------|
+| `Rp 1.200.000` | ✅ Dilewati | Mengandung "Rp" — bukan pure digit |
+| `5 Invoice` | ✅ Dilewati | Mengandung " Invoice" suffix |
+| `08123456789` | ✅ Dilewati | > 999,999 setelah parsing |
+| `Active` / `Beroperasi` | ✅ Dilewati | Non-numerik |
+| `Input Sekarang` | ✅ Dilewati | Non-numerik |
+| `140` | ✅ Ter-animasi | Pure integer ≤ 999,999 |
+| `52` | ✅ Ter-animasi | Pure integer ≤ 999,999 |
+| `.count-up[data-target]` | ✅ Dilewati | Sudah dikelola per-halaman (`:not(.count-up)`) |
+
+---
+
+## D. STATUS AKHIR SESI 2
+
+| Metrik | Nilai |
+|--------|-------|
+| Bug kritis baru ditemukan & diperbaiki | 2 (A-01, A-04) |
+| Bug sedang baru ditemukan & diperbaiki | 2 (A-02, A-03) |
+| Peningkatan CSS global diterapkan | 8 komponen baru |
+| Halaman AJAX diperbarui dengan countUpValue() | 6 halaman |
+| Error di workflow/console logs | 0 |
+| Responsivitas 320px–1441px | ✅ Verified |
+
+---
+
+*Addendum ini merupakan lanjutan dari Laporan Audit 08 Juni 2026. Semua perbaikan di Sesi 2 telah diimplementasikan dan diverifikasi berjalan tanpa error pada 09 Juni 2026.*

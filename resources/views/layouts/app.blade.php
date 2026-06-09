@@ -2694,6 +2694,123 @@
         .sidebar-nav::-webkit-scrollbar-thumb:hover { background: rgba(200,77,223,.35); }
 
         /* ============================================================
+           TOPBAR — scrolled state border glow
+        ============================================================ */
+        .topbar { transition: box-shadow .25s, border-color .25s; }
+        .topbar.scrolled {
+            box-shadow: 0 2px 20px rgba(0,0,0,.08);
+            border-bottom-color: rgba(200,77,223,.18) !important;
+        }
+        [data-theme="dark"] .topbar.scrolled {
+            box-shadow: 0 2px 20px rgba(0,0,0,.35);
+            border-bottom-color: rgba(200,77,223,.22) !important;
+        }
+
+        /* ============================================================
+           FOCUS RING — brand-coloured keyboard focus
+        ============================================================ */
+        :focus-visible {
+            outline: 2px solid rgba(200,77,223,.7) !important;
+            outline-offset: 2px !important;
+            box-shadow: none !important;
+        }
+        .btn:focus-visible {
+            outline: 2px solid rgba(200,77,223,.7) !important;
+            outline-offset: 3px !important;
+        }
+
+        /* ============================================================
+           STAT CARD — enhanced stagger via nth-child when in .row
+        ============================================================ */
+        .row > *:nth-child(1) .stat-card { transition-delay: .00s; }
+        .row > *:nth-child(2) .stat-card { transition-delay: .04s; }
+        .row > *:nth-child(3) .stat-card { transition-delay: .08s; }
+        .row > *:nth-child(4) .stat-card { transition-delay: .12s; }
+
+        /* ============================================================
+           DASHBOARD CARD — content section separator
+        ============================================================ */
+        .card-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        /* ============================================================
+           TABLE — zebra stripe very subtle, only in light mode
+        ============================================================ */
+        [data-theme="light"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+            background-color: rgba(200,77,223,.025);
+        }
+
+        /* ============================================================
+           BADGE — animated new indicator
+        ============================================================ */
+        .badge-new {
+            position: relative;
+        }
+        .badge-new::after {
+            content: '';
+            position: absolute;
+            top: -3px; right: -3px;
+            width: 7px; height: 7px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 1.5px solid var(--card-bg);
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+
+        /* ============================================================
+           SKELETON LOADER — improved shimmer direction
+        ============================================================ */
+        .skeleton, .placeholder {
+            background: linear-gradient(90deg,
+                var(--card-border) 25%,
+                rgba(200,77,223,.07) 50%,
+                var(--card-border) 75%);
+            background-size: 200% 100%;
+            animation: skeletonShimmer 1.4s ease-in-out infinite;
+            border-radius: 6px;
+            color: transparent !important;
+            pointer-events: none;
+            user-select: none;
+        }
+        @keyframes skeletonShimmer {
+            0%   { background-position: 200% center; }
+            100% { background-position: -200% center; }
+        }
+
+        /* ============================================================
+           AVATAR RING — online indicator utility
+        ============================================================ */
+        .avatar-online {
+            position: relative;
+            display: inline-block;
+        }
+        .avatar-online::after {
+            content: '';
+            position: absolute;
+            bottom: 2px; right: 2px;
+            width: 10px; height: 10px;
+            background: #10b981;
+            border-radius: 50%;
+            border: 2px solid var(--card-bg);
+        }
+
+        /* ============================================================
+           IMPROVED DARK MODE — card/table borders more visible
+        ============================================================ */
+        [data-theme="dark"] .table > :not(caption) > * > * {
+            border-bottom-color: rgba(255,255,255,.06);
+        }
+        [data-theme="dark"] .table thead th {
+            background: rgba(255,255,255,.04);
+        }
+
+        /* ============================================================
            DARK MODE — placeholder text visibility
         ============================================================ */
         [data-theme="dark"] .form-control::placeholder,
@@ -3402,29 +3519,43 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// ---- COUNT-UP ANIMATION ----
+// ---- COUNT-UP ANIMATION (manual .count-up[data-target] handled by per-page scripts) ----
+// ---- AUTO COUNT-UP — detects numeric .stat-value not already managed ----
 document.addEventListener('DOMContentLoaded', function() {
-    const countEls = document.querySelectorAll('.count-up[data-target]');
-    if (!countEls.length) return;
-    const io2 = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
+    // Use data-auto-count to avoid interfering with per-page .count-up IOs
+    document.querySelectorAll('.stat-value:not(.count-up):not(.no-countup):not([data-auto-count])').forEach(function(el) {
+        const raw = el.textContent.trim().replace(/[.,\s]/g, '');
+        const num = parseInt(raw, 10);
+        if (!isNaN(num) && num > 0 && num <= 999999 && /^\d+$/.test(raw)) {
+            el.setAttribute('data-auto-count', num);
+            el.textContent = '0';
+        }
+    });
+
+    const autoEls = document.querySelectorAll('.stat-value[data-auto-count]');
+    if (!autoEls.length) return;
+
+    const io2 = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
             if (!entry.isIntersecting) return;
             const el = entry.target;
-            const target = parseInt(el.getAttribute('data-target'), 10);
+            if (el.hasAttribute('data-counted')) return;
+            const target = parseInt(el.getAttribute('data-auto-count'), 10);
             if (isNaN(target)) return;
-            const duration = 900;
-            const step = 16;
-            const increment = target / (duration / step);
+            el.setAttribute('data-counted', '1');
+            const duration = 800;
+            const step = 14;
+            const increment = Math.max(1, target / (duration / step));
             let current = 0;
-            const timer = setInterval(() => {
+            const timer = setInterval(function() {
                 current += increment;
                 if (current >= target) { current = target; clearInterval(timer); }
                 el.textContent = Math.floor(current).toLocaleString('id-ID');
             }, step);
             io2.unobserve(el);
         });
-    }, { threshold: 0.3 });
-    countEls.forEach(el => io2.observe(el));
+    }, { threshold: 0.2 });
+    autoEls.forEach(function(el) { io2.observe(el); });
 });
 
 // ---- RIPPLE EFFECT ON ALL BUTTONS ----
@@ -3552,6 +3683,23 @@ window.confirmAction = function(message, onConfirm, onCancel, opts) {
     cancelBtn.onclick = function() { doClose(); if (onCancel) onCancel(); };
     overlay.onclick   = function(e) { if (e.target === overlay) { doClose(); if (onCancel) onCancel(); } };
     overlay.classList.add('open');
+};
+
+// ---- COUNT-UP VALUE HELPER (for AJAX-loaded stat elements) ----
+window.countUpValue = function(el, target) {
+    if (!el) return;
+    const num = parseInt(target, 10);
+    if (isNaN(num) || num < 0) { el.textContent = target; return; }
+    const duration = 600;
+    const step = 14;
+    const increment = Math.max(1, num / (duration / step));
+    let current = 0;
+    clearInterval(el._countTimer);
+    el._countTimer = setInterval(function() {
+        current += increment;
+        if (current >= num) { current = num; clearInterval(el._countTimer); }
+        el.textContent = Math.floor(current).toLocaleString('id-ID');
+    }, step);
 };
 
 // ---- BUTTON LOADING STATE HELPER ----
@@ -3784,14 +3932,20 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
             });
         }
 
+        @php
+            $announcementsRoute = auth()->user()->hasAnyRole(['admin','owner'])
+                ? route('admin.announcements.index') : '';
+        @endphp
+        const announcementsRoute = @json($announcementsRoute);
+
         panel.innerHTML = `
             <div style="padding:13px 16px;border-bottom:1px solid var(--card-border);display:flex;justify-content:space-between;align-items:center">
                 <span style="font-size:14px;font-weight:700;color:var(--text-primary)"><i class="bi bi-bell-fill me-2" style="color:#c84ddf"></i>Pengumuman</span>
                 <span style="font-size:11px;color:var(--text-muted)">${notifData.length} aktif</span>
             </div>
             <div style="max-height:340px;overflow-y:auto">${itemsHtml}</div>
-            ${notifData.length > 0 ? `<div style="padding:10px 16px;border-top:1px solid var(--card-border);text-align:center">
-                <a href="{{ route('admin.announcements.index') }}" style="font-size:12px;color:var(--primary);font-weight:600;text-decoration:none">Lihat semua pengumuman →</a>
+            ${notifData.length > 0 && announcementsRoute ? `<div style="padding:10px 16px;border-top:1px solid var(--card-border);text-align:center">
+                <a href="${announcementsRoute}" style="font-size:12px;color:var(--primary);font-weight:600;text-decoration:none">Lihat semua pengumuman →</a>
             </div>` : ''}`;
         document.body.appendChild(panel);
         const close = e2 => { if (!panel.contains(e2.target) && e2.target !== btn) { panel.remove(); document.removeEventListener('click', close); } };

@@ -108,9 +108,9 @@ function loadData(page=1) {
     fetch(`{{ route('admin.announcements.index') }}?${params}`, { headers:{'X-Requested-With':'XMLHttpRequest'} })
         .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
         .then(data => {
-            document.getElementById('statTotal').textContent  = data.stats.total;
-            document.getElementById('statAktif').textContent  = data.stats.aktif;
-            document.getElementById('statPinned').textContent = data.stats.pinned;
+            countUpValue(document.getElementById('statTotal'),  data.stats.total);
+            countUpValue(document.getElementById('statAktif'),  data.stats.aktif);
+            countUpValue(document.getElementById('statPinned'), data.stats.pinned);
             renderCards(data.data);
             renderPagination(data);
         })

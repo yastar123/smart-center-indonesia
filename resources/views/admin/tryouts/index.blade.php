@@ -186,10 +186,10 @@ function loadData(page = 1) {
     fetch(`{{ route('admin.tryouts.index') }}?${params}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
         .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
         .then(data => {
-            document.getElementById('statTotal').textContent    = data.stats.total;
-            document.getElementById('statAktif').textContent    = data.stats.aktif;
-            document.getElementById('statDraft').textContent    = data.stats.draft;
-            document.getElementById('statPeserta').textContent  = data.stats.peserta;
+            countUpValue(document.getElementById('statTotal'),   data.stats.total);
+            countUpValue(document.getElementById('statAktif'),   data.stats.aktif);
+            countUpValue(document.getElementById('statDraft'),   data.stats.draft);
+            countUpValue(document.getElementById('statPeserta'), data.stats.peserta);
             renderTable(data.data);
             renderPagination(data);
         })

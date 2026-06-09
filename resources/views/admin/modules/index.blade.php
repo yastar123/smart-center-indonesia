@@ -196,10 +196,10 @@ function loadData(page = 1) {
     fetch(`{{ route('admin.modules.index') }}?${params}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
         .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
         .then(data => {
-            document.getElementById('statTotal').textContent = data.stats.total;
-            document.getElementById('statPdf').textContent   = data.stats.pdf;
-            document.getElementById('statVideo').textContent = data.stats.video;
-            document.getElementById('statGratis').textContent= data.stats.gratis;
+            countUpValue(document.getElementById('statTotal'),  data.stats.total);
+            countUpValue(document.getElementById('statPdf'),    data.stats.pdf);
+            countUpValue(document.getElementById('statVideo'),  data.stats.video);
+            countUpValue(document.getElementById('statGratis'), data.stats.gratis);
             renderTable(data.data);
             renderPagination(data);
         })
