@@ -52,6 +52,12 @@ class DemoDataSeeder extends Seeder
         $b2 = $branches->skip(1)->first() ?? $b1;
         $b3 = $branches->skip(2)->first() ?? $b1;
 
+        // Assign admin user to first branch if not already set
+        if ($adminUser && !$adminUser->branch_id && $b1) {
+            $adminUser->update(['branch_id' => $b1->id]);
+            $this->command->info("Admin branch_id assigned to: {$b1->name}");
+        }
+
         // ── TEACHERS ─────────────────────────────────────────────────────
         if (\App\Models\Teacher::count() === 0) {
             $t1 = \App\Models\Teacher::create([

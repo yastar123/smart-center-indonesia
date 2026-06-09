@@ -57,15 +57,4 @@ class Schedule extends Model
         return $this->belongsTo(Branch::class, 'cabang_id');
     }
 
-    // Relasi absensi siswa
-    public function absensiSiswa()
-    {
-        return $this->hasMany(StudentAttendance::class, 'schedule_id');
-    }
-
-    // Relasi absensi guru
-    public function absensiGuru()
-    {
-        return $this->hasMany(TeacherAttendance::class, 'schedule_id');
-    }
 }

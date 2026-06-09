@@ -51,11 +51,6 @@ class User extends Authenticatable
         return $this->hasOne(Teacher::class);
     }
 
-    public function employee()
-    {
-        return $this->hasOne(Employee::class);
-    }
-
     // Helpers
     public function isOwner(): bool    { return $this->hasRole('owner'); }
     public function isAdmin(): bool    { return $this->hasRole('admin'); }

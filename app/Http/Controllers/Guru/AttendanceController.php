@@ -33,10 +33,10 @@ class AttendanceController extends Controller
 
     public function getStudents(Schedule $schedule)
     {
+        // Filter by branch if the schedule has a branch assigned
         $students = Student::where('status', 'aktif')
-            ->when($schedule->kelas_id, function ($q) use ($schedule) {
-                $q->whereHas('enrollments', fn($e) => $e->where('kelas_id', $schedule->kelas_id));
-            })
+            ->when($schedule->cabang_id, fn($q) => $q->where('branch_id', $schedule->cabang_id))
+            ->orderBy('name')
             ->get();
 
         // Get existing attendance for this schedule
