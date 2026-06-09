@@ -40,12 +40,12 @@
     @forelse($activities as $act)
     @php
         $iconMap = [
-            'created' => ['bi-plus-circle-fill','#f0fdf4','#16a34a'],
-            'updated' => ['bi-pencil-fill','#fffbeb','#e09000'],
-            'deleted' => ['bi-trash-fill','#fef2f2','#dc2626'],
+            'created' => ['bi-plus-circle-fill','var(--soft-success-bg)','#16a34a'],
+            'updated' => ['bi-pencil-fill','var(--soft-warning-bg)','#e09000'],
+            'deleted' => ['bi-trash-fill','var(--soft-danger-bg)','#dc2626'],
         ];
         $event = $act->event ?? 'updated';
-        [$icon,$ibg,$icol] = $iconMap[$event] ?? ['bi-activity','#f0f0ff','#c84ddf'];
+        [$icon,$ibg,$icol] = $iconMap[$event] ?? ['bi-activity','var(--soft-primary-bg)','#c84ddf'];
         $causer = $act->causer;
         $changes = $act->properties['attributes'] ?? [];
         $subject = $act->subject_type ? class_basename($act->subject_type) : 'System';

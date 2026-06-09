@@ -188,7 +188,7 @@ $weekSchedules = $teacher
 
         @if(!$selectedSchedule)
         <div class="dashboard-card h-100 d-flex flex-column align-items-center justify-content-center text-center py-5">
-            <div style="width:80px;height:80px;border-radius:24px;background:linear-gradient(135deg,#f0e8f5,#fdf4ff);display:flex;align-items:center;justify-content:center;margin-bottom:20px">
+            <div style="width:80px;height:80px;border-radius:24px;background:var(--soft-primary-bg);display:flex;align-items:center;justify-content:center;margin-bottom:20px">
                 <i class="bi bi-arrow-left-circle-fill" style="font-size:2.5rem;color:#c84ddf;opacity:.4"></i>
             </div>
             <h6 class="fw-bold mb-2">Pilih Jadwal</h6>
@@ -308,7 +308,7 @@ $weekSchedules = $teacher
                             </div>
                         </div>
                         <div class="d-flex gap-1 flex-shrink-0">
-                            @foreach(['hadir'=>['green','#15803d','#dcfce7','bi-check-lg'],'sakit'=>['yellow','#92400e','#fef3c7','bi-thermometer-half'],'izin'=>['blue','#075985','#e0f2fe','bi-file-text'],'alpha'=>['red','#991b1b','#fee2e2','bi-x-lg']] as $status => [$color,$textClr,$bgClr,$icon])
+                            @foreach(['hadir'=>['green','var(--soft-success-text)','var(--soft-success-bg)','bi-check-lg'],'sakit'=>['yellow','var(--soft-warning-text)','var(--soft-warning-bg)','bi-thermometer-half'],'izin'=>['blue','var(--soft-info-text)','var(--soft-info-bg)','bi-file-text'],'alpha'=>['red','var(--soft-danger-text)','var(--soft-danger-bg)','bi-x-lg']] as $status => [$color,$textClr,$bgClr,$icon])
                             <button type="button"
                                 class="att-btn btn btn-sm"
                                 data-status="{{ $status }}"

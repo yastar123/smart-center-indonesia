@@ -124,11 +124,11 @@
             <div class="d-grid gap-2">
                 @php
                 $links = [
-                    ['route'=>'owner.branches.index','icon'=>'bi-building-fill','color'=>'#68117e','bg'=>'#fdf4ff','border'=>'#e8b4f5','label'=>'Monitoring Cabang','sub'=>'Pantau semua cabang','arrowColor'=>'#e8b4f5'],
-                    ['route'=>'admin.students.index','icon'=>'bi-people-fill','color'=>'#059669','bg'=>'#f0fdf4','border'=>'#bbf7d0','label'=>'Data Siswa','sub'=>'Kelola seluruh siswa','arrowColor'=>'#6ee7b7'],
-                    ['route'=>'admin.teachers.index','icon'=>'bi-person-badge-fill','color'=>'#e09000','bg'=>'#fffbeb','border'=>'#fcd34d','label'=>'Data Guru','sub'=>'Manajemen pengajar','arrowColor'=>'#fcd34d'],
-                    ['route'=>'admin.payments.index','icon'=>'bi-cash-stack','color'=>'#db2777','bg'=>'#fdf2f8','border'=>'#fbcfe8','label'=>'Keuangan','sub'=>'Laporan & invoice','arrowColor'=>'#f9a8d4'],
-                    ['route'=>'admin.tryouts.index','icon'=>'bi-journal-check','color'=>'#c84ddf','bg'=>'#f5f3ff','border'=>'#e8b4f5','label'=>'Tryout CBT','sub'=>'Monitoring ujian','arrowColor'=>'#e8b4f5'],
+                    ['route'=>'owner.branches.index','icon'=>'bi-building-fill','color'=>'#c84ddf','bg'=>'var(--soft-primary-bg)','border'=>'var(--soft-primary-border)','label'=>'Monitoring Cabang','sub'=>'Pantau semua cabang'],
+                    ['route'=>'admin.students.index','icon'=>'bi-people-fill','color'=>'#059669','bg'=>'var(--soft-success-bg)','border'=>'var(--soft-success-border)','label'=>'Data Siswa','sub'=>'Kelola seluruh siswa'],
+                    ['route'=>'admin.teachers.index','icon'=>'bi-person-badge-fill','color'=>'#e09000','bg'=>'var(--soft-warning-bg)','border'=>'var(--soft-warning-border)','label'=>'Data Guru','sub'=>'Manajemen pengajar'],
+                    ['route'=>'admin.payments.index','icon'=>'bi-cash-stack','color'=>'#db2777','bg'=>'var(--soft-danger-bg)','border'=>'var(--soft-danger-border)','label'=>'Keuangan','sub'=>'Laporan & invoice'],
+                    ['route'=>'admin.tryouts.index','icon'=>'bi-journal-check','color'=>'#c84ddf','bg'=>'var(--soft-primary-bg)','border'=>'var(--soft-primary-border)','label'=>'Tryout CBT','sub'=>'Monitoring ujian'],
                 ];
                 @endphp
                 @foreach($links as $lnk)
@@ -139,10 +139,10 @@
                         <i class="bi {{ $lnk['icon'] }}"></i>
                     </div>
                     <div style="min-width:0">
-                        <div class="fw-semibold" style="font-size:13px;color:{{ $lnk['color'] }}">{{ $lnk['label'] }}</div>
-                        <div style="font-size:11px;color:{{ $lnk['arrowColor'] }}">{{ $lnk['sub'] }}</div>
+                        <div class="fw-semibold" style="font-size:13px;color:var(--text-primary)">{{ $lnk['label'] }}</div>
+                        <div style="font-size:11px;color:var(--text-muted)">{{ $lnk['sub'] }}</div>
                     </div>
-                    <i class="bi bi-chevron-right ms-auto flex-shrink-0" style="color:{{ $lnk['arrowColor'] }};font-size:12px"></i>
+                    <i class="bi bi-chevron-right ms-auto flex-shrink-0" style="color:var(--text-muted);font-size:12px"></i>
                 </a>
                 @endforeach
             </div>

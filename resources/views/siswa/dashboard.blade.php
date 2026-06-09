@@ -160,7 +160,7 @@ $weekSchedules = ($student && $student->branch_id)
             @forelse($invoices as $inv)
             @php
                 $stClr = ['lunas'=>'#10b981','belum_bayar'=>'#f6af23','sebagian'=>'#c84ddf'][$inv->status] ?? '#94a3b8';
-                $stBg  = ['lunas'=>'#ecfdf5','belum_bayar'=>'#fffbeb','sebagian'=>'#fdf4ff'][$inv->status] ?? '#f1f5f9';
+                $stBg  = ['lunas'=>'var(--soft-success-bg)','belum_bayar'=>'var(--soft-warning-bg)','sebagian'=>'var(--soft-primary-bg)'][$inv->status] ?? 'var(--soft-muted-bg)';
                 $stLbl = ['lunas'=>'Lunas','belum_bayar'=>'Belum Bayar','sebagian'=>'Sebagian'][$inv->status] ?? $inv->status;
                 $overdue = $inv->status !== 'lunas' && $inv->jatuh_tempo && \Carbon\Carbon::parse($inv->jatuh_tempo)->isPast();
             @endphp

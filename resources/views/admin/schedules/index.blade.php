@@ -475,12 +475,12 @@ function showDetail(id) {
     $.get('/admin/schedules/' + id, function(res) {
         const s = res.data;
         const statusMap = {
-            dijadwalkan:'#fdf4ff:#68117e:Dijadwalkan',
-            berlangsung:'#fffbeb:#e09000:Berlangsung',
-            selesai:'#f0fdf4:#16a34a:Selesai',
-            dibatalkan:'#fef2f2:#dc2626:Dibatalkan'
+            dijadwalkan:'rgba(200,77,223,.15):#c84ddf:Dijadwalkan',
+            berlangsung:'rgba(246,175,35,.15):#e09000:Berlangsung',
+            selesai:'rgba(16,185,129,.15):#16a34a:Selesai',
+            dibatalkan:'rgba(239,68,68,.15):#dc2626:Dibatalkan'
         };
-        const [sbg,scol,slbl] = (statusMap[s.status]||'#f1f5f9:#64748b:'+s.status).split(':');
+        const [sbg,scol,slbl] = (statusMap[s.status]||'rgba(148,163,184,.15):#64748b:'+s.status).split(':');
         document.getElementById('detailBody').innerHTML = `
             <div style="padding:20px">
                 <div class="d-flex justify-content-between align-items-start mb-3">

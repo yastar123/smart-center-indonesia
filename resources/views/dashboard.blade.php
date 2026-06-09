@@ -161,7 +161,7 @@
                 <h6 class="fw-bold mb-0">
                     <i class="bi bi-graph-up-arrow text-primary me-2"></i>Tren Pendaftaran Siswa
                 </h6>
-                <span class="badge" style="background:#fdf4ff;color:#68117e;border:1px solid #e8b4f5;font-size:11px">6 Bulan Terakhir</span>
+                <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);border:1px solid var(--soft-primary-border);font-size:11px">6 Bulan Terakhir</span>
             </div>
             <div id="chartTrend" style="min-height:200px"></div>
         </div>
@@ -202,44 +202,44 @@
                 <div class="col-6">
                     <a href="{{ route('admin.students.index') }}"
                        class="d-flex align-items-center gap-2 p-3 rounded-3 text-decoration-none quick-dash"
-                       style="background:linear-gradient(135deg,#fdf4ff,#f3d6fa);border:1px solid #e8b4f5">
-                        <i class="bi bi-person-plus-fill" style="font-size:1.4rem;color:#68117e"></i>
+                       style="background:var(--soft-primary-bg);border:1px solid var(--soft-primary-border)">
+                        <i class="bi bi-person-plus-fill" style="font-size:1.4rem;color:#c84ddf"></i>
                         <div>
-                            <div class="fw-semibold" style="font-size:12.5px;color:#461256">Tambah Siswa</div>
-                            <div style="font-size:11px;color:#e8b4f5">Daftarkan siswa baru</div>
+                            <div class="fw-semibold" style="font-size:12.5px;color:var(--text-primary)">Tambah Siswa</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Daftarkan siswa baru</div>
                         </div>
                     </a>
                 </div>
                 <div class="col-6">
                     <a href="{{ route('admin.teachers.index') }}"
                        class="d-flex align-items-center gap-2 p-3 rounded-3 text-decoration-none quick-dash"
-                       style="background:linear-gradient(135deg,#fdf4ff,#fae8ff);border:1px solid #e9d5ff">
-                        <i class="bi bi-person-workspace" style="font-size:1.4rem;color:#68117e"></i>
+                       style="background:var(--soft-primary-bg);border:1px solid var(--soft-primary-border)">
+                        <i class="bi bi-person-workspace" style="font-size:1.4rem;color:#c84ddf"></i>
                         <div>
-                            <div class="fw-semibold" style="font-size:12.5px;color:#461256">Kelola Guru</div>
-                            <div style="font-size:11px;color:#c084fc">Manajemen pengajar</div>
+                            <div class="fw-semibold" style="font-size:12.5px;color:var(--text-primary)">Kelola Guru</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Manajemen pengajar</div>
                         </div>
                     </a>
                 </div>
                 <div class="col-6">
                     <a href="{{ route('admin.schedules.index') }}"
                        class="d-flex align-items-center gap-2 p-3 rounded-3 text-decoration-none quick-dash"
-                       style="background:linear-gradient(135deg,#fdf4ff,#fae8ff);border:1px solid #e9d5ff">
+                       style="background:var(--soft-primary-bg);border:1px solid var(--soft-primary-border)">
                         <i class="bi bi-calendar-week" style="font-size:1.4rem;color:#c84ddf"></i>
                         <div>
-                            <div class="fw-semibold" style="font-size:12.5px;color:#461256">Lihat Jadwal</div>
-                            <div style="font-size:11px;color:#e8b4f5">Kalender akademik</div>
+                            <div class="fw-semibold" style="font-size:12.5px;color:var(--text-primary)">Lihat Jadwal</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Kalender akademik</div>
                         </div>
                     </a>
                 </div>
                 <div class="col-6">
                     <a href="{{ route('admin.payments.index') }}"
                        class="d-flex align-items-center gap-2 p-3 rounded-3 text-decoration-none quick-dash"
-                       style="background:linear-gradient(135deg,#fdf4ff,#fae8ff);border:1px solid #e9d5ff">
+                       style="background:var(--soft-primary-bg);border:1px solid var(--soft-primary-border)">
                         <i class="bi bi-wallet2" style="font-size:1.4rem;color:#c84ddf"></i>
                         <div>
-                            <div class="fw-semibold" style="font-size:12.5px;color:#461256">Cek Pembayaran</div>
-                            <div style="font-size:11px;color:#c084fc">Tagihan & invoice</div>
+                            <div class="fw-semibold" style="font-size:12.5px;color:var(--text-primary)">Cek Pembayaran</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Tagihan & invoice</div>
                         </div>
                     </a>
                 </div>
@@ -247,11 +247,11 @@
                 <div class="col-6">
                     <a href="{{ route('owner.branches.index') }}"
                        class="d-flex align-items-center gap-2 p-3 rounded-3 text-decoration-none quick-dash"
-                       style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fcd34d">
+                       style="background:var(--soft-warning-bg);border:1px solid var(--soft-warning-border)">
                         <i class="bi bi-building" style="font-size:1.4rem;color:#e09000"></i>
                         <div>
-                            <div class="fw-semibold" style="font-size:12.5px;color:#78350f">Monitor Cabang</div>
-                            <div style="font-size:11px;color:#d97706">Semua cabang</div>
+                            <div class="fw-semibold" style="font-size:12.5px;color:var(--text-primary)">Monitor Cabang</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Semua cabang</div>
                         </div>
                     </a>
                 </div>
@@ -259,11 +259,11 @@
                 <div class="col-6">
                     <a href="{{ route('admin.tryouts.index') }}"
                        class="d-flex align-items-center gap-2 p-3 rounded-3 text-decoration-none quick-dash"
-                       style="background:linear-gradient(135deg,#fdf4ff,#f3d6fa);border:1px solid #e8b4f5">
-                        <i class="bi bi-ui-checks-grid" style="font-size:1.4rem;color:#68117e"></i>
+                       style="background:var(--soft-primary-bg);border:1px solid var(--soft-primary-border)">
+                        <i class="bi bi-ui-checks-grid" style="font-size:1.4rem;color:#c84ddf"></i>
                         <div>
-                            <div class="fw-semibold" style="font-size:12.5px;color:#461256">Tryout Online</div>
-                            <div style="font-size:11px;color:#c084fc">CBT & penilaian</div>
+                            <div class="fw-semibold" style="font-size:12.5px;color:var(--text-primary)">Tryout Online</div>
+                            <div style="font-size:11px;color:var(--text-muted)">CBT & penilaian</div>
                         </div>
                     </a>
                 </div>
@@ -371,7 +371,7 @@
                     <div>
                         <div style="font-size:11px;opacity:.6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Portal Guru</div>
                         <h4 class="fw-bold mb-1" style="color:white;font-size:clamp(16px,2vw,22px)">Selamat datang, {{ explode(' ',$user->name)[0] }}!</h4>
-                        <p style="opacity:.7;margin:0;font-size:13px">{{ $teacher ? 'NIP: '.$teacher->nip.' · '.$teacher->bidang_studi : 'Profil guru belum dilengkapi' }}</p>
+                        <p style="opacity:.7;margin:0;font-size:13px">{{ $teacher ? 'NIG: '.$teacher->nig.' · '.(is_array($teacher->subjects) ? implode(', ', $teacher->subjects) : ($teacher->subjects ?? 'Semua Mapel')) : 'Profil guru belum dilengkapi' }}</p>
                     </div>
                 </div>
                 <div class="d-flex flex-column gap-2 flex-shrink-0">

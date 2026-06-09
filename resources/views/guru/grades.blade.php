@@ -50,10 +50,10 @@ if ($teacher && $selCourse) {
 }
 
 $gradeTypes = [
-    'tugas'   => ['label'=>'Tugas Harian',  'icon'=>'bi-pencil-square',     'color'=>'#2563eb', 'bg'=>'#eff6ff'],
-    'uts'     => ['label'=>'UTS',           'icon'=>'bi-file-earmark-text', 'color'=>'#c84ddf', 'bg'=>'#fdf4ff'],
-    'uas'     => ['label'=>'UAS',           'icon'=>'bi-journal-check',     'color'=>'#e09000', 'bg'=>'#fffbeb'],
-    'praktek' => ['label'=>'Praktikum',     'icon'=>'bi-tools',             'color'=>'#059669', 'bg'=>'#f0fdf4'],
+    'tugas'   => ['label'=>'Tugas Harian',  'icon'=>'bi-pencil-square',     'color'=>'#2563eb', 'bg'=>'var(--soft-info-bg)'],
+    'uts'     => ['label'=>'UTS',           'icon'=>'bi-file-earmark-text', 'color'=>'#c84ddf', 'bg'=>'var(--soft-primary-bg)'],
+    'uas'     => ['label'=>'UAS',           'icon'=>'bi-journal-check',     'color'=>'#e09000', 'bg'=>'var(--soft-warning-bg)'],
+    'praktek' => ['label'=>'Praktikum',     'icon'=>'bi-tools',             'color'=>'#059669', 'bg'=>'var(--soft-success-bg)'],
     'lainnya' => ['label'=>'Lainnya',       'icon'=>'bi-three-dots',        'color'=>'#64748b', 'bg'=>'var(--input-bg)'],
 ];
 
@@ -192,7 +192,7 @@ if ($students->isNotEmpty() && $selCourse) {
 
         @if(!$selCourse)
         <div class="dashboard-card h-100 d-flex flex-column align-items-center justify-content-center text-center py-5">
-            <div style="width:80px;height:80px;border-radius:24px;background:linear-gradient(135deg,#f0fdf4,#d1fae5);display:flex;align-items:center;justify-content:center;margin-bottom:20px">
+            <div style="width:80px;height:80px;border-radius:24px;background:var(--soft-success-bg);display:flex;align-items:center;justify-content:center;margin-bottom:20px">
                 <i class="bi bi-journal-bookmark-fill" style="font-size:2.5rem;color:#059669;opacity:.4"></i>
             </div>
             <h6 class="fw-bold mb-2">Pilih Mata Pelajaran</h6>

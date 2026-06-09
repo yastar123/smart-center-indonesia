@@ -9,7 +9,7 @@
 {{-- SUCCESS FLASH --}}
 @if(session('status') === 'profile-updated')
 <div class="alert border-0 rounded-3 mb-4 d-flex align-items-center gap-2 fade show"
-     style="background:#f0fdf4;color:#15803d;border-left:4px solid #10b981!important"
+     style="background:var(--soft-success-bg);color:var(--soft-success-text);border-left:4px solid #10b981!important"
      role="alert" id="profileAlert">
     <i class="bi bi-check-circle-fill fs-5"></i>
     <span class="fw-semibold">Profil berhasil diperbarui!</span>
@@ -19,7 +19,7 @@
 
 @if(session('status') === 'password-updated')
 <div class="alert border-0 rounded-3 mb-4 d-flex align-items-center gap-2 fade show"
-     style="background:#f0fdf4;color:#15803d;border-left:4px solid #10b981!important"
+     style="background:var(--soft-success-bg);color:var(--soft-success-text);border-left:4px solid #10b981!important"
      role="alert">
     <i class="bi bi-shield-check-fill fs-5"></i>
     <span class="fw-semibold">Password berhasil diperbarui!</span>
@@ -47,7 +47,7 @@
             </div>
 
             <h6 class="fw-bold mb-1">{{ $user->name }}</h6>
-            <span class="badge" style="background:#fdf4ff;color:#461256;border:1px solid #e8b4f5;font-size:12px;padding:5px 14px;border-radius:20px">
+            <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);border:1px solid var(--soft-primary-border);font-size:12px;padding:5px 14px;border-radius:20px">
                 {{ ucfirst($user->getRoleNames()->first() ?? 'User') }}
             </span>
 
@@ -111,7 +111,7 @@
             </div>
 
             @if($errors->any() && !$errors->updatePassword->any() && !$errors->userDeletion->any())
-            <div class="alert alert-danger rounded-3 border-0 mb-3" style="background:#fef2f2;color:#dc2626">
+            <div class="alert alert-danger rounded-3 border-0 mb-3" style="background:var(--soft-danger-bg);color:var(--soft-danger-text)">
                 <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ $errors->first() }}
             </div>
             @endif
@@ -129,7 +129,7 @@
                         <label class="form-label small fw-semibold">Alamat Email <span class="text-danger">*</span></label>
                         <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}" required>
                         @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
-                        <div class="mt-2 p-2 rounded-2" style="background:#fffbeb;border:1px solid #fcd34d">
+                        <div class="mt-2 p-2 rounded-2" style="background:var(--soft-warning-bg);border:1px solid var(--soft-warning-border)">
                             <small class="text-warning">
                                 <i class="bi bi-exclamation-triangle-fill me-1"></i>Email belum diverifikasi.
                                 <button form="send-verification" class="btn btn-link btn-sm p-0 ms-1 text-warning fw-semibold text-decoration-underline">
@@ -164,7 +164,7 @@
             </div>
 
             @if($errors->updatePassword->any())
-            <div class="alert alert-danger rounded-3 border-0 mb-3" style="background:#fef2f2;color:#dc2626">
+            <div class="alert alert-danger rounded-3 border-0 mb-3" style="background:var(--soft-danger-bg);color:var(--soft-danger-text)">
                 <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ $errors->updatePassword->first() }}
             </div>
             @endif
@@ -264,7 +264,7 @@
             </div>
             <div class="modal-body p-4">
                 <div class="text-center mb-4">
-                    <div style="width:64px;height:64px;border-radius:50%;background:#fef2f2;display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
+                    <div style="width:64px;height:64px;border-radius:50%;background:var(--soft-danger-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
                         <i class="bi bi-trash-fill text-danger" style="font-size:28px"></i>
                     </div>
                     <p class="text-muted" style="font-size:14px">
@@ -277,7 +277,7 @@
                     @method('DELETE')
 
                     @if($errors->userDeletion->any())
-                    <div class="alert alert-danger rounded-3 border-0 mb-3" style="background:#fef2f2;color:#dc2626;font-size:13px">
+                    <div class="alert alert-danger rounded-3 border-0 mb-3" style="background:var(--soft-danger-bg);color:var(--soft-danger-text);font-size:13px">
                         <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ $errors->userDeletion->first() }}
                     </div>
                     @endif

@@ -50,10 +50,10 @@ $upcomingSchedules = $schedules->filter(
 )->take(5);
 
 $statusColors = [
-    'dijadwalkan' => ['#c84ddf','#fdf4ff','#e8b4f5'],
-    'berlangsung' => ['#059669','#f0fdf4','#bbf7d0'],
-    'selesai'     => ['#94a3b8','#f8fafc','#e2e8f0'],
-    'dibatalkan'  => ['#ef4444','#fef2f2','#fecaca'],
+    'dijadwalkan' => ['#c84ddf','var(--soft-primary-bg)','var(--soft-primary-border)'],
+    'berlangsung' => ['#059669','var(--soft-success-bg)','var(--soft-success-border)'],
+    'selesai'     => ['#94a3b8','var(--soft-muted-bg)','var(--soft-muted-border)'],
+    'dibatalkan'  => ['#ef4444','var(--soft-danger-bg)','var(--soft-danger-border)'],
 ];
 $jenisIcon = ['online' => 'bi-camera-video-fill', 'offline' => 'bi-building-fill', 'hybrid' => 'bi-laptop'];
 @endphp
