@@ -238,6 +238,24 @@ Route::middleware(['auth'])
         Route::get('/certificates/{certificate}/download',    [SiswaController::class, 'downloadCertificate'])->name('certificates.download');
         Route::post('/certificates/upload',                   [SiswaController::class, 'uploadCertificate']) ->name('certificates.upload');
 
+        // Pengumuman
+        Route::get('/announcements', function () {
+            $student = \App\Models\Student::where('user_id', auth()->id())->first();
+            $announcements = \App\Models\Announcement::where('status', 'aktif')
+                ->where(function ($q) use ($student) {
+                    $q->whereNull('cabang_id');
+                    if ($student) {
+                        $q->orWhere('cabang_id', $student->branch_id);
+                    }
+                })
+                ->where(function ($q) { $q->whereNull('tanggal_mulai')->orWhere('tanggal_mulai', '<=', now()); })
+                ->where(function ($q) { $q->whereNull('tanggal_selesai')->orWhere('tanggal_selesai', '>=', now()); })
+                ->orderByDesc('is_pinned')
+                ->orderByDesc('created_at')
+                ->paginate(12);
+            return view('siswa.announcements', compact('announcements', 'student'));
+        })->name('announcements');
+
         // Tryout
         Route::get('/tryout', fn() => view('siswa.coming-soon', [
             'title' => 'Tryout Online',

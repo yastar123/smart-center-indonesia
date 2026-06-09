@@ -637,6 +637,23 @@
         /* ============================================================
            DARK MODE OVERRIDES
         ============================================================ */
+
+        /* Quick-dash cards (dashboard quick actions) — neutralise hardcoded light colours */
+        [data-theme="dark"] .quick-dash {
+            background: rgba(200,77,223,.08) !important;
+            border-color: rgba(200,77,223,.18) !important;
+        }
+        [data-theme="dark"] .quick-dash div[style*="color:#461256"],
+        [data-theme="dark"] .quick-dash div[style*="color:#78350f"] {
+            color: var(--text-primary) !important;
+        }
+        [data-theme="dark"] .quick-dash div[style*="color:#e8b4f5"],
+        [data-theme="dark"] .quick-dash div[style*="color:#c084fc"],
+        [data-theme="dark"] .quick-dash div[style*="color:#d97706"] {
+            color: var(--text-muted) !important;
+        }
+        [data-theme="dark"] .quick-dash i { opacity: .85; }
+
         [data-theme="dark"] .table { color: var(--text-primary); }
         [data-theme="dark"] .table-light { background: rgba(200,77,223,.04) !important; }
         [data-theme="dark"] .modal-header { border-color: var(--card-border); }
@@ -3144,6 +3161,11 @@
             </a>
         </div>
         <div class="nav-item">
+            <a href="{{ route('siswa.announcements') }}" class="nav-link {{ request()->routeIs('siswa.announcements') ? 'active' : '' }}" data-label="Pengumuman">
+                <i class="bi bi-megaphone"></i><span>Pengumuman</span>
+            </a>
+        </div>
+        <div class="nav-item">
             <a href="{{ route('siswa.tryout') }}" class="nav-link {{ request()->routeIs('siswa.tryout') ? 'active' : '' }}" data-label="Tryout CBT">
                 <i class="bi bi-laptop"></i><span>Tryout CBT</span>
                 <span class="menu-badge" style="background:#68117e">Soon</span>
@@ -3303,9 +3325,9 @@
         <i class="bi bi-calendar-event{{ request()->routeIs('siswa.schedule') ? '-fill' : '' }}"></i>
         <span>Jadwal</span>
     </a>
-    <a href="{{ route('siswa.dashboard') }}#pembayaran" class="mob-nav-item">
-        <i class="bi bi-credit-card"></i>
-        <span>Tagihan</span>
+    <a href="{{ route('siswa.announcements') }}" class="mob-nav-item {{ request()->routeIs('siswa.announcements') ? 'active' : '' }}">
+        <i class="bi bi-megaphone{{ request()->routeIs('siswa.announcements') ? '-fill' : '' }}"></i>
+        <span>Pengumuman</span>
     </a>
     @endrole
     <a href="{{ route('profile.edit') }}" class="mob-nav-item {{ request()->routeIs('profile.*') ? 'active' : '' }}">
@@ -3928,7 +3950,8 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
 
         @php
             $announcementsRoute = auth()->user()->hasAnyRole(['admin','owner'])
-                ? route('admin.announcements.index') : '';
+                ? route('admin.announcements.index')
+                : (auth()->user()->hasRole('siswa') ? route('siswa.announcements') : '');
         @endphp
         const announcementsRoute = @json($announcementsRoute);
 
@@ -3983,6 +4006,7 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         { label:'Dashboard Siswa', desc:'Portal siswa & tagihan', href:'{{ route("siswa.dashboard") }}', icon:'bi-speedometer2', color:'#c84ddf', group:'Siswa' },
         { label:'Jadwal Belajar', desc:'Lihat jadwal sesi belajar', href:'{{ route("siswa.schedule") }}', icon:'bi-calendar-event', color:'#10b981', group:'Siswa' },
         { label:'Sertifikat Saya', desc:'Lihat sertifikat yang diterbitkan', href:'{{ route("siswa.certificates.index") }}', icon:'bi-award', color:'#f6af23', group:'Siswa' },
+        { label:'Pengumuman', desc:'Informasi & pengumuman terbaru', href:'{{ route("siswa.announcements") }}', icon:'bi-megaphone', color:'#c84ddf', group:'Siswa' },
         @endrole
         @role('owner')
         { label:'Monitoring Cabang', desc:'Pantau semua cabang', href:'{{ route("owner.branches.index") }}', icon:'bi-building', color:'#c84ddf', group:'Owner' },

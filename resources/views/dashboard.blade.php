@@ -301,7 +301,7 @@
                 @forelse($recentStudents as $s)
                 @php
                     $avatar = 'https://ui-avatars.com/api/?name='.urlencode($s->name).'&background='.($s->gender==='P'?'ec4899':'c84ddf').'&color=fff&size=40';
-                    $statusColors = ['aktif'=>['#dcfce7','#15803d'],'nonaktif'=>['#f3f4f6','#6b7280'],'lulus'=>['#f3d6fa','#461256']];
+                    $statusColors = ['aktif'=>['var(--soft-success-bg)','var(--soft-success-text)'],'nonaktif'=>['var(--soft-muted-bg)','var(--text-muted)'],'lulus'=>['var(--soft-primary-bg)','var(--soft-primary-text)']];
                     $sc = $statusColors[$s->status] ?? ['#f3f4f6','#6b7280'];
                 @endphp
                 <tr>
