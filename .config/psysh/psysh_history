@@ -1,2 +1,30 @@
-$cols = \Illuminate\Support\Facades\DB::select("SELECT column_name FROM information_schema.columns WHERE table_name='chat_rooms' ORDER BY ordinal_position");
-foreach($cols as $c) echo $c->column_name . "\n";
+// Check if any admin view tries to use ->student instead of ->siswa on Invoice
+$files = [];
+foreach (['admin','guru','siswa','owner'] as $dir) {
+    $found = glob(resource_path("views/$dir/**/*.blade.php"));
+    $found2 = glob(resource_path("views/$dir/*.blade.php"));
+    $files = array_merge($files, $found ?: [], $found2 ?: []);
+}
+$issues = [];
+foreach ($files as $f) {
+    $c = file_get_contents($f);
+    // Check for ->student on invoice
+    if (preg_match('/invoice.*->student\b|->student\b.*invoice/i', $c)) {
+        $issues[] = basename($f) . ": uses invoice->student (should be siswa)";
+    }
+    // Check for potential null not handled  
+    if (preg_match('/\$\w+->first\(\)->\w+/', $c) && !preg_match('/\$\w+->first\(\)\?->/', $c)) {
+        $matches = [];
+        preg_match_all('/\$(\w+)->first\(\)->(\w+)/', $c, $matches);
+        if ($matches[0]) {
+            foreach ($matches[0] as $m) {
+                $issues[] = basename($f) . ": potential null->prop: $m";
+            }
+        }
+    }
+}
+if ($issues) {
+    echo implode("\n", array_unique($issues)) . "\n";
+} else {
+    echo "No issues found in views.\n";
+}
