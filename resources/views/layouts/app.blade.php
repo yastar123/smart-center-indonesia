@@ -129,6 +129,9 @@
         h1 { font-size: clamp(26px, 3.5vw, 40px); }
         h2 { font-size: clamp(20px, 2.8vw, 30px); }
         h3 { font-size: clamp(17px, 2vw, 22px); }
+        h4 { font-size: clamp(15px, 1.6vw, 19px); }
+        h5 { font-size: clamp(14px, 1.3vw, 17px); }
+        h6 { font-size: clamp(13px, 1.1vw, 15px); }
 
         /* ============================================================
            ANIMATIONS — full micro-animation system

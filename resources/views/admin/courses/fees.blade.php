@@ -5,19 +5,36 @@
 @section('content')
 
 @if(session('success'))
-<div class="alert alert-success">{{ session('success') }}</div>
+<div class="alert alert-dismissible d-flex align-items-center gap-2 mb-4 fade show"
+     style="border-radius:12px;border:none;background:rgba(16,185,129,.1);border-left:4px solid #10b981 !important">
+    <i class="bi bi-check-circle-fill text-success"></i>
+    <span>{{ session('success') }}</span>
+    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+</div>
 @endif
 
 <div class="dashboard-card mb-4 fade-up"
-     style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-        <div>
-            <h5 class="fw-bold mb-0" style="color:white">Kelola Biaya Mata Pelajaran</h5>
-            <p class="mb-0 mt-1" style="opacity:.75;font-size:13px">Atur harga per mata pelajaran (CRUD)</p>
+     style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
+    <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%;pointer-events:none"></div>
+    <div style="position:absolute;right:80px;bottom:-50px;width:120px;height:120px;background:rgba(255,255,255,.03);border-radius:50%;pointer-events:none"></div>
+    <div class="row align-items-center g-3" style="position:relative">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center gap-3">
+                <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">
+                    <i class="bi bi-cash-coin"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0" style="color:white">Kelola Biaya Mata Pelajaran</h5>
+                    <p class="mb-0 mt-1" style="opacity:.75;font-size:13px">Atur harga per mata pelajaran yang harus dibayar siswa</p>
+                </div>
+            </div>
         </div>
-        <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addFeeModal">
-            <i class="bi bi-plus-lg me-1"></i>Tambah Biaya
-        </button>
+        <div class="col-md-4 text-md-end">
+            <button class="btn fw-semibold px-4" data-bs-toggle="modal" data-bs-target="#addFeeModal"
+                    style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
+                <i class="bi bi-plus-lg me-2"></i>Tambah Biaya
+            </button>
+        </div>
     </div>
 </div>
 
@@ -69,9 +86,9 @@
     <div class="modal-dialog">
         <form action="{{ route('admin.courses.fees.store') }}" method="POST" class="modal-content">
             @csrf
-            <div class="modal-header">
-                <h6 class="modal-title">Tambah Biaya Mapel</h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#260632,#68117e);color:white">
+                <h6 class="modal-title fw-bold" style="color:white"><i class="bi bi-cash-coin me-2"></i>Tambah Biaya Mapel</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
