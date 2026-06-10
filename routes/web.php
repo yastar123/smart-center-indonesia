@@ -21,8 +21,8 @@ use App\Http\Controllers\Guru\GradeController;
 use App\Http\Controllers\Siswa\SiswaController;
 
 Route::get('/', function () {
-    return redirect('/login');
-});
+    return view('landing');
+})->name('landing');
 
 Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
