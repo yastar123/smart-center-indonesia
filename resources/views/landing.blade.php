@@ -476,8 +476,13 @@
             /* hamburger at tablet — 6 links + 2 CTA don't fit in pill nav */
             .nav-links, .nav-cta { display:none; }
             .nav-toggle { display:flex; }
-            .lp-nav.scrolled { padding:.6rem 0; }
-            .lp-nav.scrolled .nav-inner { background:rgba(255,255,255,.97); border-radius:0; padding:0 1rem; max-width:none; box-shadow:0 2px 16px rgba(0,0,0,.1); }
+            /* ── Non-sticky navbar on mobile ── */
+            .lp-nav { position:relative; top:auto; left:auto; right:auto; background:linear-gradient(135deg,var(--deep) 0%,var(--mid) 100%); padding:.75rem 0; }
+            .lp-nav.scrolled { padding:.75rem 0; }
+            .lp-nav.scrolled .nav-inner { background:transparent; backdrop-filter:none; -webkit-backdrop-filter:none; border-radius:0; padding:0 1.25rem; max-width:none; box-shadow:none; }
+            .lp-nav.scrolled .nav-brand-text { color:white; }
+            /* Hero no longer needs top padding to clear fixed nav */
+            .hero-inner { padding:5rem 1.5rem 5rem; }
         }
         @media (max-width:768px) {
             .lp-nav.scrolled { padding:.6rem 0; }
