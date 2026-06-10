@@ -616,10 +616,10 @@ $waNumbersJson     = $waNumbers->keyBy('id')->toJson();
 
 <style>
 .lp-tabs .nav-link { color: var(--text-muted,#6b7280); border-radius: 10px 10px 0 0; font-weight: 600; font-size: .875rem; padding: .6rem 1.1rem; }
-.lp-tabs .nav-link.active { color: var(--bs-primary,#c84ddf); background: white; border-color: #dee2e6 #dee2e6 white; }
+.lp-tabs .nav-link.active { color: var(--bs-primary,#c84ddf); background: var(--card-bg,white); border-color: var(--card-border,#dee2e6) var(--card-border,#dee2e6) var(--card-bg,white); }
 .lp-card { border: 1px solid rgba(200,77,223,.15); border-radius: 16px; overflow: hidden; box-shadow: 0 2px 16px rgba(38,6,50,.06); }
 .lp-card-header { background: linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%); color: white; font-weight: 700; font-size: .925rem; padding: .9rem 1.25rem; }
-.page-header-card { background: white; border-radius: 16px; padding: 1.25rem 1.5rem; display: flex; align-items: center; box-shadow: 0 2px 16px rgba(38,6,50,.06); border: 1px solid rgba(200,77,223,.1); }
+.page-header-card { background: var(--card-bg,white); border-radius: 16px; padding: 1.25rem 1.5rem; display: flex; align-items: center; box-shadow: 0 2px 16px rgba(38,6,50,.06); border: 1px solid var(--card-border,rgba(200,77,223,.1)); }
 .lp-list-item { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; border-bottom: 1px solid rgba(200,77,223,.08); transition: background .2s; }
 .lp-list-item:last-child { border-bottom: none; }
 .lp-list-item:hover { background: rgba(200,77,223,.04); }

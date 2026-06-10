@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="row">
-    <div class="col-lg-3">
+    <div class="col-md-4 col-lg-3">
         <div class="dashboard-card mb-4">
             <h6 class="fw-bold mb-2">Daftar Guru</h6>
             <div class="list-group" id="teacherList" style="max-height:70vh;overflow:auto">
@@ -20,7 +20,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-9">
+    <div class="col-md-8 col-lg-9">
 
 {{-- HEADER --}}
 <div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
