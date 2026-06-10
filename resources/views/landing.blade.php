@@ -477,10 +477,11 @@
             .nav-links, .nav-cta { display:none; }
             .nav-toggle { display:flex; }
             /* ── Non-sticky navbar on mobile ── */
-            .lp-nav { position:relative; top:auto; left:auto; right:auto; background:linear-gradient(135deg,var(--deep) 0%,var(--mid) 100%); padding:.75rem 0; }
-            .lp-nav.scrolled { padding:.75rem 0; }
-            .lp-nav.scrolled .nav-inner { background:transparent; backdrop-filter:none; -webkit-backdrop-filter:none; border-radius:0; padding:0 1.25rem; max-width:none; box-shadow:none; }
-            .lp-nav.scrolled .nav-brand-text { color:white; }
+            .lp-nav { position:relative !important; top:auto !important; left:auto !important; right:auto !important; background:#260632 !important; padding:.75rem 0 !important; }
+            .lp-nav.scrolled { padding:.75rem 0 !important; }
+            .lp-nav.scrolled .nav-inner { background:transparent !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; border-radius:0 !important; padding:0 1.25rem !important; max-width:none !important; box-shadow:none !important; }
+            .lp-nav.scrolled .nav-brand-text,
+            .lp-nav .nav-brand-text { color:white !important; }
             /* Hero no longer needs top padding to clear fixed nav */
             .hero-inner { padding:5rem 1.5rem 5rem; }
         }
