@@ -460,10 +460,10 @@
                                 <textarea name="settings[footer.brand_desc]" class="form-control" rows="3">{{ $settings['footer.brand_desc']->value ?? '' }}</textarea>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Nomor WhatsApp <small class="text-muted">(tanpa + atau 00, contoh: 6281234567890)</small></label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-whatsapp text-success"></i></span>
-                                    <input type="text" name="settings[footer.wa_number]" class="form-control" value="{{ $settings['footer.wa_number']->value ?? '628001234567' }}" placeholder="628001234567">
+                                <label class="form-label fw-semibold">Nomor WhatsApp Utama</label>
+                                <div class="alert py-2 px-3 mb-0 d-flex align-items-center gap-2" style="background:rgba(37,211,102,.07);border:1px solid rgba(37,211,102,.2);border-radius:10px;font-size:12.5px">
+                                    <i class="bi bi-info-circle" style="color:#25d366;flex-shrink:0"></i>
+                                    <span class="text-muted">Kelola nomor WA di tab <strong class="text-success" style="cursor:pointer" onclick="document.querySelector('[data-bs-target=\'#tab-wa\']').click()">WhatsApp <i class="bi bi-arrow-right" style="font-size:10px"></i></strong></span>
                                 </div>
                             </div>
                             <div class="col-md-6">

@@ -205,7 +205,29 @@ Route::middleware(['auth'])
             return view('owner.activity-log', compact('activities'));
         })->name('activity-log');
 
-        Route::get('/settings',  fn() => view('owner.settings'))->name('settings.index');
+        Route::get('/settings', function () {
+            $ss = \App\Models\SystemSetting::bulk(
+                ['inst.name','inst.acronym','inst.email','inst.phone','inst.address'],
+                ['inst.name'=>'Smart Center Indonesia','inst.acronym'=>'SCI','inst.email'=>'','inst.phone'=>'','inst.address'=>'']
+            );
+            return view('owner.settings', ['ss' => $ss]);
+        })->name('settings.index');
+        Route::put('/settings', function (\Illuminate\Http\Request $request) {
+            $request->validate([
+                'inst.name'    => 'required|string|max:150',
+                'inst.acronym' => 'required|string|max:20',
+                'inst.email'   => 'nullable|email|max:150',
+                'inst.phone'   => 'nullable|string|max:30',
+                'inst.address' => 'nullable|string|max:500',
+            ]);
+            $inst = $request->input('inst', []);
+            \App\Models\SystemSetting::set('inst.name',    $inst['name']    ?? '');
+            \App\Models\SystemSetting::set('inst.acronym', $inst['acronym'] ?? '');
+            \App\Models\SystemSetting::set('inst.email',   $inst['email']   ?? '');
+            \App\Models\SystemSetting::set('inst.phone',   $inst['phone']   ?? '');
+            \App\Models\SystemSetting::set('inst.address', $inst['address'] ?? '');
+            return back()->with('success', 'Pengaturan sistem berhasil disimpan.');
+        })->name('settings.update');
         Route::get('/analytics', fn() => view('owner.analytics'))->name('analytics');
     });
 

@@ -16,81 +16,80 @@
             <h5 class="fw-bold mb-0" style="color:white">Pengaturan Sistem</h5>
             <span style="font-size:12px;opacity:.75">Konfigurasi global platform Smart Center Indonesia</span>
         </div>
-        <div class="ms-auto">
-            <span class="badge" style="background:rgba(246,175,35,.2);color:#f6af23;border:1px solid rgba(246,175,35,.3);padding:6px 14px;border-radius:20px;font-size:11px">
-                <i class="bi bi-hammer me-1"></i>Dalam Pengembangan
-            </span>
-        </div>
     </div>
 </div>
 
-{{-- COMING SOON NOTICE --}}
-<div class="fade-up mb-4">
-    <div class="d-flex align-items-start gap-3 p-3 rounded-3" style="background:rgba(246,175,35,.08);border:1.5px solid rgba(246,175,35,.25)">
-        <i class="bi bi-info-circle-fill text-warning mt-1" style="font-size:18px;flex-shrink:0"></i>
-        <div>
-            <div class="fw-semibold" style="font-size:13px;color:var(--text-primary)">Fitur Pengaturan Sedang Dikembangkan</div>
-            <p class="mb-0 text-muted" style="font-size:12px;line-height:1.6;margin-top:2px">
-                Halaman ini menampilkan pratinjau konfigurasi sistem. Kemampuan menyimpan perubahan akan tersedia pada versi berikutnya.
-                Untuk sekarang, gunakan <a href="{{ route('owner.branches.index') }}" class="fw-semibold text-decoration-none" style="color:#c84ddf">Kelola Cabang</a> dan
-                <a href="{{ route('profile.edit') }}" class="fw-semibold text-decoration-none" style="color:#c84ddf">Profil Akun</a> untuk pengaturan yang tersedia.
-            </p>
-        </div>
-    </div>
+@if(session('success'))
+<div class="alert alert-success alert-dismissible d-flex align-items-center gap-2 mb-4" style="border-radius:12px;border:none;background:rgba(16,185,129,.1);border-left:4px solid #10b981 !important">
+    <i class="bi bi-check-circle-fill text-success"></i>
+    <span>{{ session('success') }}</span>
+    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
 </div>
+@endif
 
 <div class="row g-4">
     {{-- GENERAL SETTINGS --}}
     <div class="col-lg-8">
-        <div class="dashboard-card fade-up mb-4" style="opacity:.9">
+        <div class="dashboard-card fade-up mb-4">
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <h6 class="fw-bold mb-0"><i class="bi bi-building me-2 text-primary"></i>Informasi Lembaga</h6>
-                <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);border:1px solid var(--soft-primary-border);font-size:10.5px;padding:4px 10px;border-radius:12px">
-                    <i class="bi bi-lock me-1"></i>Hanya Baca
-                </span>
             </div>
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label">Nama Lembaga</label>
-                    <input type="text" class="form-control" value="Smart Center Indonesia" readonly
-                           style="background:var(--input-bg);opacity:.75;cursor:not-allowed">
+            <form action="{{ route('owner.settings.update') }}" method="POST">
+                @csrf @method('PUT')
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Nama Lembaga <span class="text-danger">*</span></label>
+                        <input type="text" name="inst[name]" class="form-control @error('inst.name') is-invalid @enderror"
+                               value="{{ old('inst.name', $ss['inst.name']) }}" required maxlength="150"
+                               placeholder="Smart Center Indonesia">
+                        @error('inst.name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Singkatan <span class="text-danger">*</span></label>
+                        <input type="text" name="inst[acronym]" class="form-control @error('inst.acronym') is-invalid @enderror"
+                               value="{{ old('inst.acronym', $ss['inst.acronym']) }}" required maxlength="20"
+                               placeholder="SCI">
+                        @error('inst.acronym')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Email Utama</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input type="email" name="inst[email]" class="form-control @error('inst.email') is-invalid @enderror"
+                                   value="{{ old('inst.email', $ss['inst.email']) }}"
+                                   placeholder="admin@smartcenter.id" maxlength="150">
+                        </div>
+                        @error('inst.email')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Nomor Telepon</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                            <input type="text" name="inst[phone]" class="form-control"
+                                   value="{{ old('inst.phone', $ss['inst.phone']) }}"
+                                   placeholder="08xxx" maxlength="30">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Alamat Pusat</label>
+                        <textarea name="inst[address]" class="form-control" rows="3"
+                                  placeholder="Alamat kantor pusat..." maxlength="500" style="resize:vertical">{{ old('inst.address', $ss['inst.address']) }}</textarea>
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Singkatan</label>
-                    <input type="text" class="form-control" value="SCI" readonly
-                           style="background:var(--input-bg);opacity:.75;cursor:not-allowed">
+                <div class="mt-4 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary px-4 fw-semibold" style="border-radius:10px">
+                        <i class="bi bi-save me-2"></i>Simpan Perubahan
+                    </button>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Email Utama</label>
-                    <input type="email" class="form-control" placeholder="admin@smartcenter.id" disabled
-                           style="background:var(--input-bg);opacity:.6;cursor:not-allowed">
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Nomor Telepon</label>
-                    <input type="text" class="form-control" placeholder="08xxx" disabled
-                           style="background:var(--input-bg);opacity:.6;cursor:not-allowed">
-                </div>
-                <div class="col-12">
-                    <label class="form-label">Alamat Pusat</label>
-                    <textarea class="form-control" rows="2" placeholder="Alamat kantor pusat..." disabled
-                              style="background:var(--input-bg);opacity:.6;cursor:not-allowed;resize:none"></textarea>
-                </div>
-            </div>
-            <div class="mt-4 d-flex justify-content-end">
-                <button class="btn btn-primary px-4 fw-semibold" style="border-radius:10px"
-                        onclick="showToast('Fitur simpan pengaturan akan tersedia di versi berikutnya.','info')">
-                    <i class="bi bi-save me-2"></i>Simpan Perubahan
-                    <span class="badge ms-2" style="background:rgba(255,255,255,.25);font-size:9px;padding:2px 6px;border-radius:8px">Soon</span>
-                </button>
-            </div>
+            </form>
         </div>
 
         {{-- NOTIFIKASI SECTION --}}
-        <div class="dashboard-card fade-up" style="opacity:.85" id="section-notif">
+        <div class="dashboard-card fade-up" id="section-notif">
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <h6 class="fw-bold mb-0"><i class="bi bi-bell me-2 text-warning"></i>Pengaturan Notifikasi</h6>
                 <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);border:1px solid var(--soft-primary-border);font-size:10.5px;padding:4px 10px;border-radius:12px">
-                    <i class="bi bi-lock me-1"></i>Hanya Baca
+                    <i class="bi bi-tools me-1"></i>Segera Hadir
                 </span>
             </div>
             @foreach([
@@ -106,13 +105,12 @@
                 </div>
                 <div class="form-check form-switch" style="margin:0;padding-left:2.5em">
                     <input class="form-check-input" type="checkbox" {{ $notif['checked'] ? 'checked' : '' }} disabled
-                           style="cursor:not-allowed;opacity:.6;width:2.5em;height:1.25em">
+                           style="cursor:not-allowed;opacity:.5;width:2.5em;height:1.25em">
                 </div>
             </div>
             @endforeach
             <div class="mt-3 d-flex justify-content-end">
-                <button class="btn btn-outline-secondary px-4 fw-semibold" style="border-radius:10px"
-                        onclick="showToast('Pengaturan notifikasi akan tersedia di versi berikutnya.','info')">
+                <button class="btn btn-outline-secondary px-4 fw-semibold" style="border-radius:10px" disabled>
                     <i class="bi bi-save me-2"></i>Simpan Notifikasi
                     <span class="badge ms-2" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:9px;padding:2px 6px;border-radius:8px">Soon</span>
                 </button>

@@ -385,13 +385,16 @@ function deleteCert(id, judul) {
             method: 'DELETE',
             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
         })
-        .then(r => r.json())
+        .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
         .then(res => {
             if (res.success) {
                 window.showToast && window.showToast(res.message, 'success');
                 setTimeout(() => location.reload(), 600);
+            } else {
+                window.showToast && window.showToast(res.message || 'Gagal menghapus sertifikat.', 'error');
             }
-        });
+        })
+        .catch(() => window.showToast && window.showToast('Gagal menghubungi server.', 'error'));
     });
 }
 </script>
