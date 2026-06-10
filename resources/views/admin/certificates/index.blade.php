@@ -286,6 +286,26 @@
     </div>
 </div>
 
+{{-- MODAL: Daftar Mata Pelajaran Siswa + Upload oleh Admin --}}
+<div class="modal fade" id="studentCoursesModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="studentCoursesTitle">Mata Pelajaran Siswa</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="studentCoursesBody">Memuat…</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@endsection
+
 @push('scripts')
 <script>
 const certModal = new bootstrap.Modal(document.getElementById('certModal'));
@@ -324,7 +344,7 @@ function editCert(id) {
     document.getElementById('tanggal_expired').disabled = false;
     document.getElementById('certSaveBtn').disabled = true;
     fetch(`/admin/certificates/${id}`)
-        .then(r => r.json())
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(d => {
             document.getElementById('certId').value = d.id;
             document.getElementById('siswa_id').value = d.siswa_id || '';
@@ -374,7 +394,7 @@ function saveCert() {
             deskripsi:        document.getElementById('cert_deskripsi').value,
         })
     })
-    .then(r => r.json())
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
     .then(res => {
         btn.disabled = false;
         btn.innerHTML = isEdit ? '<i class="bi bi-check-circle me-2"></i>Simpan' : '<i class="bi bi-award me-2"></i>Terbitkan';
@@ -402,108 +422,80 @@ function deleteCert(id, judul) {
         })
         .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
         .then(res => {
-        {{-- MODAL: Daftar Mata Pelajaran Siswa + Upload oleh Admin --}}
-        <div class="modal fade" id="studentCoursesModal" tabindex="-1">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h6 class="modal-title" id="studentCoursesTitle">Mata Pelajaran Siswa</h6>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div id="studentCoursesBody">Memuat…</div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Tutup</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        @endpush
-
-        @push('scripts')
-        <script>
-        function openStudentCourses(studentId, studentName) {
-            const modal = new bootstrap.Modal(document.getElementById('studentCoursesModal'));
-            document.getElementById('studentCoursesTitle').innerText = 'Mata Pelajaran: ' + studentName;
-            const body = document.getElementById('studentCoursesBody');
-            body.innerHTML = '<div class="text-center py-4">Memuat mata pelajaran…</div>';
-
-            fetch(`/admin/students/${studentId}/courses`)
-                .then(r => r.json())
-                .then(res => {
-                    if (!res.success) { body.innerHTML = '<div class="text-danger">Gagal memuat data.</div>'; return; }
-                    const courses = res.data;
-                    if (!courses.length) { body.innerHTML = '<div class="text-muted">Siswa belum terdaftar pada mata pelajaran apa pun.</div>'; return; }
-
-                    let html = '<div class="list-group">';
-                    courses.forEach(c => {
-                        html += `<div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="fw-semibold">${c.nama}</div>
-                                <div class="small text-muted">Cabang: ${c.cabang_id ? c.cabang_id : 'Pusat'}</div>
-                            </div>
-                            <div>
-                                <button class="btn btn-sm btn-outline-primary me-2" onclick="openUploadForStudent(${studentId}, ${c.id}, '${escapeHtml(c.nama)}')">Upload Bukti</button>
-                            </div>
-                        </div>`;
-                    });
-                    html += '</div>';
-                    body.innerHTML = html;
-                    modal.show();
-                }).catch(() => { body.innerHTML = '<div class="text-danger">Gagal menghubungi server.</div>'; });
-        }
-
-        function openUploadForStudent(studentId, courseId, courseName) {
-            // Buat modal kecil untuk upload
-            const html = `
-                <form id="adminUploadForm" enctype="multipart/form-data">
-                    <input type="hidden" name="siswa_id" value="${studentId}">
-                    <input type="hidden" name="course_id" value="${courseId}">
-                    <div class="mb-2"><label class="form-label">Mata Pelajaran</label><div class="fw-semibold">${courseName}</div></div>
-                    <div class="mb-2"><label class="form-label">Judul Sertifikat</label><input name="judul" class="form-control" required></div>
-                    <div class="mb-2"><label class="form-label">Jenis</label>
-                        <select name="jenis" class="form-select">
-                            <option value="kompetensi">Kompetensi</option>
-                            <option value="kelulusan">Kelulusan</option>
-                            <option value="prestasi">Prestasi</option>
-                            <option value="partisipasi">Partisipasi</option>
-                        </select>
-                    </div>
-                    <div class="mb-2"><label class="form-label">Tanggal Terbit</label><input type="date" name="tanggal_terbit" class="form-control" value="${new Date().toISOString().split('T')[0]}" required></div>
-                    <div class="mb-2"><label class="form-label">File Sertifikat</label><input type="file" name="file_sertifikat" class="form-control" accept=".pdf,.jpg,.jpeg,.png" required></div>
-                    <div class="text-end mt-2"><button type="submit" class="btn btn-primary">Upload</button></div>
-                </form>`;
-
-            const body = document.getElementById('studentCoursesBody');
-            body.innerHTML = html;
-
-            document.getElementById('adminUploadForm').addEventListener('submit', function(e){
-                e.preventDefault();
-                const fd = new FormData(this);
-                fd.append('_token', '{{ csrf_token() }}');
-                fetch('/admin/certificates', { method: 'POST', body: fd })
-                    .then(r => r.json())
-                    .then(res => {
-                        if (res.success) { showToast(res.message, 'success'); setTimeout(() => location.reload(), 800); }
-                        else showToast(res.message || 'Gagal', 'error');
-                    }).catch(() => showToast('Gagal menghubungi server','error'));
-            });
-        }
-
-        function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-        </script>
-        @endpush
-                window.showToast && window.showToast(res.message, 'success');
-                setTimeout(() => location.reload(), 600);
-            } else {
-                window.showToast && window.showToast(res.message || 'Gagal menghapus sertifikat.', 'error');
-            }
+            window.showToast && window.showToast(res.message, res.success ? 'success' : 'error');
+            if (res.success) setTimeout(() => location.reload(), 600);
         })
         .catch(() => window.showToast && window.showToast('Gagal menghubungi server.', 'error'));
     });
 }
+
+function openStudentCourses(studentId, studentName) {
+    const modal = new bootstrap.Modal(document.getElementById('studentCoursesModal'));
+    document.getElementById('studentCoursesTitle').innerText = 'Mata Pelajaran: ' + studentName;
+    const body = document.getElementById('studentCoursesBody');
+    body.innerHTML = '<div class="text-center py-4">Memuat mata pelajaran…</div>';
+
+    fetch(`/admin/students/${studentId}/courses`)
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(res => {
+            if (!res.success) { body.innerHTML = '<div class="text-danger">Gagal memuat data.</div>'; return; }
+            const courses = res.data;
+            if (!courses.length) { body.innerHTML = '<div class="text-muted">Siswa belum terdaftar pada mata pelajaran apa pun.</div>'; return; }
+
+            let html = '<div class="list-group">';
+            courses.forEach(c => {
+                html += `<div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="fw-semibold">${c.nama}</div>
+                        <div class="small text-muted">Cabang: ${c.cabang_id ? c.cabang_id : 'Pusat'}</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary me-2" onclick="openUploadForStudent(${studentId}, ${c.id}, '${escapeHtml(c.nama)}')">Upload Bukti</button>
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+            body.innerHTML = html;
+            modal.show();
+        }).catch(() => { body.innerHTML = '<div class="text-danger">Gagal menghubungi server.</div>'; });
+}
+
+function openUploadForStudent(studentId, courseId, courseName) {
+    const html = `
+        <form id="adminUploadForm" enctype="multipart/form-data">
+            <input type="hidden" name="siswa_id" value="${studentId}">
+            <input type="hidden" name="course_id" value="${courseId}">
+            <div class="mb-2"><label class="form-label">Mata Pelajaran</label><div class="fw-semibold">${courseName}</div></div>
+            <div class="mb-2"><label class="form-label">Judul Sertifikat</label><input name="judul" class="form-control" required></div>
+            <div class="mb-2"><label class="form-label">Jenis</label>
+                <select name="jenis" class="form-select">
+                    <option value="kompetensi">Kompetensi</option>
+                    <option value="kelulusan">Kelulusan</option>
+                    <option value="prestasi">Prestasi</option>
+                    <option value="partisipasi">Partisipasi</option>
+                </select>
+            </div>
+            <div class="mb-2"><label class="form-label">Tanggal Terbit</label><input type="date" name="tanggal_terbit" class="form-control" value="${new Date().toISOString().split('T')[0]}" required></div>
+            <div class="mb-2"><label class="form-label">File Sertifikat</label><input type="file" name="file_sertifikat" class="form-control" accept=".pdf,.jpg,.jpeg,.png" required></div>
+            <div class="text-end mt-2"><button type="submit" class="btn btn-primary">Upload</button></div>
+        </form>`;
+
+    const body = document.getElementById('studentCoursesBody');
+    body.innerHTML = html;
+
+    document.getElementById('adminUploadForm').addEventListener('submit', function(e){
+        e.preventDefault();
+        const fd = new FormData(this);
+        fd.append('_token', '{{ csrf_token() }}');
+        fetch('/admin/certificates', { method: 'POST', body: fd })
+            .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(res => {
+                if (res.success) { showToast(res.message, 'success'); setTimeout(() => location.reload(), 800); }
+                else showToast(res.message || 'Gagal', 'error');
+            }).catch(() => showToast('Gagal menghubungi server','error'));
+    });
+}
+
+function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 </script>
 @endpush
-@endsection

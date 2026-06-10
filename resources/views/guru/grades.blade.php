@@ -457,6 +457,7 @@ async function submitGrades(e) {
 
     try {
         const res  = await fetch('{{ route("guru.grades.storeBatch") }}', { method: 'POST', body: fd });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
         if (data.success) {
             window.showToast(data.message || 'Nilai berhasil disimpan!', 'success');

@@ -336,7 +336,7 @@ function saveClass() {
             link_zoom:         document.getElementById('link_zoom').value || null,
         })
     })
-    .then(r => r.json())
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
     .then(res => {
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Simpan';

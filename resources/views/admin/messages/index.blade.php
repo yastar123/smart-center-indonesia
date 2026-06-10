@@ -242,7 +242,9 @@ document.getElementById('messageForm').addEventListener('submit', function(e) {
     if (!input.value.trim() || !roomId) return;
     const fd = new FormData(this);
     fetch(`${baseUrl}/${roomId}/send`, { method: 'POST', body: fd, headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(r => r.json()).then(d => { if (d.success) { input.value = ''; loadMessages(roomId); } });
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(d => { if (d.success) { input.value = ''; loadMessages(roomId); } else showToast(d.message || 'Gagal mengirim pesan.', 'error'); })
+        .catch(() => showToast('Gagal mengirim pesan. Coba lagi.', 'error'));
 });
 
 document.getElementById('roomSearch').addEventListener('input', () => {
@@ -259,10 +261,11 @@ document.getElementById('roomForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const fd = new FormData(this);
     fetch(createRoomRoute, { method: 'POST', body: fd, headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(r => r.json()).then(d => {
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(d => {
             showToast(d.message, d.success ? 'success' : 'error');
             if (d.success) { bootstrap.Modal.getInstance(document.getElementById('roomModal')).hide(); location.reload(); }
-        });
+        }).catch(() => showToast('Gagal membuat ruang. Coba lagi.', 'error'));
 });
 @endif
 

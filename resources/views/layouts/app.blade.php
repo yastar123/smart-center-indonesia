@@ -70,10 +70,15 @@
             --soft-muted-bg:        #f1f5f9;
             --soft-muted-border:    #e2e8f0;
             --soft-muted-text:      #64748b;
+            /* aliases for convenience */
+            --body-bg:    #f8f5fa;
+            --text-main:  #260632;
         }
 
         [data-theme="dark"] {
             --content-bg: #1a0425;
+            --body-bg:    #1a0425;
+            --text-main:  #f0e8f5;
             --card-bg: #2d0a3e;
             --card-border: rgba(200,77,223,.12);
             --text-primary: #f0e8f5;
@@ -3233,6 +3238,16 @@
             </a>
         </div>
         <div class="nav-item">
+            <a href="{{ route('guru.attendance.history') }}" class="nav-link {{ request()->routeIs('guru.attendance.*') ? 'active' : '' }}" data-label="Riwayat Absensi">
+                <i class="bi bi-clipboard2-check"></i><span>Riwayat Absensi</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('guru.payments.index') }}" class="nav-link {{ request()->routeIs('guru.payments.*') ? 'active' : '' }}" data-label="Gaji Saya">
+                <i class="bi bi-cash-coin"></i><span>Gaji Saya</span>
+            </a>
+        </div>
+        <div class="nav-item">
             <a href="{{ route('guru.messages.index') }}" class="nav-link {{ request()->routeIs('guru.messages.*') ? 'active' : '' }}" data-label="Pesan">
                 <i class="bi bi-chat-dots"></i><span>Pesan</span>
             </a>
@@ -3259,7 +3274,7 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.billing.index') }}" class="nav-link" data-label="Tagihan">
+            <a href="{{ route('siswa.billing.index') }}" class="nav-link {{ request()->routeIs('siswa.billing.*') ? 'active' : '' }}" data-label="Tagihan">
                 <i class="bi bi-credit-card"></i><span>Tagihan & Bayar</span>
             </a>
         </div>
@@ -3274,9 +3289,8 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.tryout') }}" class="nav-link {{ request()->routeIs('siswa.tryout') ? 'active' : '' }}" data-label="Tryout CBT">
+            <a href="{{ route('siswa.tryout') }}" class="nav-link {{ request()->routeIs('siswa.tryout*') ? 'active' : '' }}" data-label="Tryout CBT">
                 <i class="bi bi-laptop"></i><span>Tryout CBT</span>
-                <span class="menu-badge" style="background:#68117e">Soon</span>
             </a>
         </div>
         <div class="nav-item">
@@ -3790,11 +3804,11 @@ window.confirmAction = function(message, onConfirm, onCancel, opts) {
         if (confirm(message)) { if (onConfirm) onConfirm(); } else { if (onCancel) onCancel(); }
         return;
     }
-    document.getElementById('confirmMessage').textContent = message;
+    document.getElementById('confirmMessage').innerHTML = message;
     document.getElementById('confirmTitle').textContent = opts.title || 'Konfirmasi';
     const okBtn = document.getElementById('confirmOkBtn');
     const cancelBtn = document.getElementById('confirmCancelBtn');
-    okBtn.textContent = opts.okText || 'Ya, Lanjutkan';
+    okBtn.innerHTML = opts.okText || 'Ya, Lanjutkan';
     okBtn.className = 'btn fw-semibold ' + (opts.btnClass || 'btn-danger');
     okBtn.style.borderRadius = '10px'; okBtn.style.fontSize = '13.5px';
     cancelBtn.textContent = opts.cancelText || 'Batal';
@@ -3842,12 +3856,12 @@ window.setButtonLoading = function(btn, loading) {
     if (!btn) return;
     if (loading) {
         btn.setAttribute('data-original-text', btn.innerHTML);
-        btn.classList.add('btn-loading');
+        btn.classList.add('is-loading');
         btn.disabled = true;
     } else {
         const orig = btn.getAttribute('data-original-text');
         if (orig) btn.innerHTML = orig;
-        btn.classList.remove('btn-loading');
+        btn.classList.remove('is-loading');
         btn.disabled = false;
     }
 };
@@ -4127,6 +4141,7 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         // Jadwal Belajar (siswa) dihapus — entri command palette dihilangkan
         { label:'Sertifikat Saya', desc:'Lihat sertifikat yang diterbitkan', href:'{{ route("siswa.certificates.index") }}', icon:'bi-award', color:'#f6af23', group:'Siswa' },
         { label:'Pengumuman', desc:'Informasi & pengumuman terbaru', href:'{{ route("siswa.announcements") }}', icon:'bi-megaphone', color:'#c84ddf', group:'Siswa' },
+        { label:'Tryout CBT', desc:'Ujian online UTBK/PTN', href:'{{ route("siswa.tryout") }}', icon:'bi-laptop', color:'#461256', group:'Siswa' },
         @endrole
         @role('owner')
         { label:'Monitoring Cabang', desc:'Pantau semua cabang', href:'{{ route("owner.branches.index") }}', icon:'bi-building', color:'#c84ddf', group:'Owner' },

@@ -124,10 +124,10 @@ document.querySelectorAll('.confirm-schedule-form').forEach(form => {
                 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
                 'X-Requested-With': 'XMLHttpRequest'
             }
-        }).then(r => r.json()).then(d => {
+        }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(d => {
             if (d.success) { location.reload(); }
-            else alert(d.message || 'Gagal konfirmasi');
-        }).catch(() => alert('Terjadi kesalahan'));
+            else showToast(d.message || 'Gagal konfirmasi', 'error');
+        }).catch(() => showToast('Terjadi kesalahan. Coba lagi.', 'error'));
     });
 });
 </script>

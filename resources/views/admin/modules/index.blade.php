@@ -298,11 +298,12 @@ document.getElementById('moduleForm').addEventListener('submit', function(e) {
     if (id) fd.append('_method', 'PUT');
     document.getElementById('submitBtn').disabled = true;
     fetch(url, { method:'POST', body:fd, headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'} })
-        .then(r=>r.json()).then(d => {
+        .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+        .then(d => {
             document.getElementById('submitBtn').disabled = false;
             showToast(d.message, d.success?'success':'error');
             if (d.success) { bootstrap.Modal.getInstance(document.getElementById('moduleModal')).hide(); loadData(currentPage); }
-        }).catch(()=>{ document.getElementById('submitBtn').disabled = false; });
+        }).catch(()=>{ document.getElementById('submitBtn').disabled = false; showToast('Gagal menyimpan. Coba lagi.', 'error'); });
 });
 
 function resetFilter() {

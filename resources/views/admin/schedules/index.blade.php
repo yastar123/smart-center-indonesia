@@ -410,7 +410,7 @@ function onKelasChange(kelasId, currentPertemuan) {
 
     // Load already scheduled pertemuan for this class
     fetch(`/admin/schedules?kelas_id=${kelasId}&all=1`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(r => r.json())
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
             const used = (data.data || []).map(s => s.pertemuan_ke);
             document.getElementById('classInfoCount').textContent = used.length + ' / ' + k.jumlah;

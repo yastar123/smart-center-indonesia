@@ -133,7 +133,8 @@ document.getElementById('uploadForm').addEventListener('submit', function(e) {
     document.getElementById('uploadBtn').disabled = true;
     document.getElementById('uploadBtn').innerHTML = '<div class="spinner-border spinner-border-sm me-2"></div>Mengupload...';
     fetch(`{{ route('siswa.certificates.upload') }}`, { method: 'POST', body: fd, headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(r => r.json()).then(d => {
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(d => {
             document.getElementById('uploadBtn').disabled = false;
             document.getElementById('uploadBtn').innerHTML = '<i class="bi bi-upload me-2"></i>Upload';
             showToast(d.message, d.success ? 'success' : 'error');

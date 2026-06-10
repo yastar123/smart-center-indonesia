@@ -47,10 +47,12 @@
                     </td>
                     <td class="text-end">
                         @if($c->fee)
-                        <form action="{{ route('admin.courses.fees.destroy', $c->fee->id) }}" method="POST" class="d-inline"
-                              onsubmit="return confirm('Hapus biaya untuk mapel ini?')">
+                        <form action="{{ route('admin.courses.fees.destroy', $c->fee->id) }}" method="POST" class="d-inline">
                             @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                    onclick="confirmAction('Hapus biaya mata pelajaran ini?', () => this.closest(\'form\').submit(), null, {title:\'Hapus Biaya\', okText:\'Ya, Hapus\'})">
+                                <i class="bi bi-trash"></i>
+                            </button>
                         </form>
                         @else
                         <span class="text-muted small">Belum diatur</span>

@@ -12,9 +12,9 @@
 .q-num-btn.answered { background:var(--bs-primary);border-color:var(--bs-primary);color:white }
 .q-num-btn.current  { outline:2.5px solid var(--bs-primary);outline-offset:2px }
 .option-label { display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:2px solid var(--card-border);border-radius:12px;cursor:pointer;transition:.15s;margin-bottom:10px;background:var(--card-bg) }
-.option-label:hover { border-color:var(--bs-primary);background:var(--soft-primary) }
+.option-label:hover { border-color:var(--bs-primary);background:var(--soft-primary-bg) }
 .option-label input[type=radio]:checked ~ * { color:var(--bs-primary) }
-.option-label:has(input:checked) { border-color:var(--bs-primary);background:var(--soft-primary) }
+.option-label:has(input:checked) { border-color:var(--bs-primary);background:var(--soft-primary-bg) }
 .option-key { width:32px;height:32px;border-radius:8px;background:var(--body-bg);border:1.5px solid var(--card-border);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;transition:.15s }
 .option-label:has(input:checked) .option-key { background:var(--bs-primary);border-color:var(--bs-primary);color:white }
 .timer-bar { height:6px;border-radius:3px;background:linear-gradient(90deg,#10b981,#c84ddf);transition:width .5s ease }
@@ -78,7 +78,7 @@ $opts          = ['A','B','C','D','E','F'];
                 <div class="d-flex align-items-center gap-2 flex-wrap">
                     @php $diffColor = ['mudah'=>'success','sedang'=>'warning','sulit'=>'danger'] @endphp
                     <span class="badge bg-{{ $diffColor[$s->tingkat_kesulitan] ?? 'secondary' }}">{{ ucfirst($s->tingkat_kesulitan) }}</span>
-                    <span class="badge" style="background:var(--soft-primary);color:var(--bs-primary);border:1px solid rgba(200,77,223,.2)">{{ $s->poin }} poin</span>
+                    <span class="badge" style="background:var(--soft-primary-bg);color:var(--bs-primary);border:1px solid rgba(200,77,223,.2)">{{ $s->poin }} poin</span>
                 </div>
             </div>
 
@@ -248,7 +248,7 @@ function confirmSubmit() {
             : 'Semua soal sudah dijawab. Kumpulkan jawaban?',
         function() { document.getElementById('cbtForm').submit(); },
         null,
-        { title: 'Kumpulkan Jawaban', okText: '<i class="bi bi-send-fill me-1"></i>Ya, Kumpulkan', okClass: 'btn-success' }
+        { title: 'Kumpulkan Jawaban', okText: '<i class="bi bi-send-fill me-1"></i>Ya, Kumpulkan', btnClass: 'btn-success' }
     );
 }
 </script>

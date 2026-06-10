@@ -294,10 +294,10 @@ function loadAttendance(id, areaEl) {
 
 function guruConfirmSchedule(scheduleId, areaEl) {
     fetch('/guru/attendance/' + scheduleId + '/students')
-        .then(r => r.json())
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(res => {
             const students = res.students || [];
-            if (!students.length) { alert('Tidak ada siswa.'); return; }
+            if (!students.length) { showToast('Tidak ada siswa di jadwal ini.', 'warning'); return; }
             let done = 0;
             students.forEach(s => {
                 fetch('/guru/schedules/' + scheduleId + '/confirm', {

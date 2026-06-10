@@ -216,9 +216,12 @@
                         </div>
                         <div class="lp-item-actions">
                             <button class="btn btn-sm btn-outline-primary" onclick="openEditProgram({{ $prog->id }})"><i class="bi bi-pencil"></i></button>
-                            <form action="{{ route('admin.landing.programs.destroy', $prog) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus program ini?')">
+                            <form action="{{ route('admin.landing.programs.destroy', $prog) }}" method="POST" class="d-inline">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                        onclick="confirmAction('Hapus program ini?', () => this.closest(\'form\').submit(), null, {title:\'Hapus Program\', okText:\'Ya, Hapus\'})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -291,9 +294,12 @@
                         </div>
                         <div class="lp-item-actions">
                             <button class="btn btn-sm btn-outline-primary" onclick="openEditTesti({{ $testi->id }})"><i class="bi bi-pencil"></i></button>
-                            <form action="{{ route('admin.landing.testimonials.destroy', $testi) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus testimoni ini?')">
+                            <form action="{{ route('admin.landing.testimonials.destroy', $testi) }}" method="POST" class="d-inline">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                        onclick="confirmAction('Hapus testimoni ini?', () => this.closest(\'form\').submit(), null, {title:\'Hapus Testimoni\', okText:\'Ya, Hapus\'})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -401,10 +407,12 @@
                             <button class="btn btn-sm btn-outline-success" onclick="openEditWa({{ $wa->id }})">
                                 <i class="bi bi-pencil"></i>
                             </button>
-                            <form action="{{ route('admin.landing.wa.destroy', $wa) }}" method="POST" class="d-inline"
-                                  onsubmit="return confirm('Hapus nomor {{ addslashes($wa->label) }}?')">
+                            <form action="{{ route('admin.landing.wa.destroy', $wa) }}" method="POST" class="d-inline">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                        onclick="confirmAction('Hapus nomor {{ addslashes($wa->label) }}?', () => this.closest(\'form\').submit(), null, {title:\'Hapus Nomor WA\', okText:\'Ya, Hapus\'})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
                             </form>
                         </div>
                     </div>
