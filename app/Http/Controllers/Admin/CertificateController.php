@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Certificate;
 use App\Models\Student;
 use App\Models\Branch;
+use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class CertificateController extends Controller
 {
@@ -53,9 +55,15 @@ class CertificateController extends Controller
             'tanggal_terbit'    => 'required|date',
             'tanggal_expired'   => 'nullable|date|after:tanggal_terbit',
             'diterbitkan_oleh'  => 'nullable|string|max:100',
+            'file_sertifikat'   => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
 
         $data['nomor_sertifikat'] = 'SCI-' . strtoupper(Str::random(3)) . '-' . date('Ymd') . '-' . rand(100, 999);
+
+        if ($request->hasFile('file_sertifikat')) {
+            $path = $request->file('file_sertifikat')->store('certificates', 'public');
+            $data['file_sertifikat'] = $path;
+        }
 
         Certificate::create($data);
 
@@ -78,7 +86,15 @@ class CertificateController extends Controller
             'tanggal_terbit'    => 'required|date',
             'tanggal_expired'   => 'nullable|date|after:tanggal_terbit',
             'diterbitkan_oleh'  => 'nullable|string|max:100',
+            'file_sertifikat'   => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
+        if ($request->hasFile('file_sertifikat')) {
+            // remove old file if exists
+            if ($certificate->file_sertifikat && Storage::disk('public')->exists($certificate->file_sertifikat)) {
+                Storage::disk('public')->delete($certificate->file_sertifikat);
+            }
+            $data['file_sertifikat'] = $request->file('file_sertifikat')->store('certificates', 'public');
+        }
 
         $certificate->update($data);
 
@@ -87,8 +103,25 @@ class CertificateController extends Controller
 
     public function destroy(Certificate $certificate)
     {
+        // delete file if exists
+        if ($certificate->file_sertifikat && Storage::disk('public')->exists($certificate->file_sertifikat)) {
+            Storage::disk('public')->delete($certificate->file_sertifikat);
+        }
         $certificate->delete();
 
         return response()->json(['success' => true, 'message' => 'Sertifikat berhasil dihapus.']);
+    }
+
+    // Mengembalikan daftar mata pelajaran yang diambil siswa
+    public function studentCourses(Student $student)
+    {
+        $courses = Course::whereIn('id', function ($q) use ($student) {
+            $q->select('mata_pelajaran_id')->from('school_classes')
+                ->whereIn('id', function ($q2) use ($student) {
+                    $q2->select('class_id')->from('class_students')->where('student_id', $student->id);
+                })->whereNull('deleted_at');
+        })->get();
+
+        return response()->json(['success' => true, 'data' => $courses]);
     }
 }

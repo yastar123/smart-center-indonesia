@@ -79,16 +79,22 @@ Route::middleware(['auth'])
         Route::put('/schedules/{schedule}',    [ScheduleController::class, 'update'])  ->name('schedules.update');
         Route::delete('/schedules/{schedule}', [ScheduleController::class, 'destroy']) ->name('schedules.destroy');
 
-        // COURSES (Mata Pelajaran)
+        // COURSES (Mata Pelajaran) — fees routes MUST be before {course} wildcard
+        Route::get('/courses/fees', [\App\Http\Controllers\Admin\CourseFeeController::class, 'index'])->name('courses.fees')->middleware('role:admin|owner');
+        Route::post('/courses/fees', [\App\Http\Controllers\Admin\CourseFeeController::class, 'store'])->name('courses.fees.store')->middleware('role:admin|owner');
+        Route::delete('/courses/fees/{fee}', [\App\Http\Controllers\Admin\CourseFeeController::class, 'destroy'])->name('courses.fees.destroy')->middleware('role:admin|owner');
+
         Route::get('/courses',            [CourseController::class, 'index'])   ->name('courses.index');
         Route::post('/courses',           [CourseController::class, 'store'])   ->name('courses.store');
         Route::get('/courses/{course}',   [CourseController::class, 'show'])    ->name('courses.show');
         Route::put('/courses/{course}',   [CourseController::class, 'update'])  ->name('courses.update');
         Route::delete('/courses/{course}',[CourseController::class, 'destroy']) ->name('courses.destroy');
+        Route::post('/courses/{course}/fees', [\App\Http\Controllers\Admin\CourseFeeController::class, 'update'])->name('courses.fees.update')->middleware('role:admin|owner');
 
-        // COURSE FEES
-        Route::get('/courses/fees', [\App\Http\Controllers\Admin\CourseFeeController::class, 'index'])->name('courses.fees');
-        Route::post('/courses/{course}/fees', [\App\Http\Controllers\Admin\CourseFeeController::class, 'update'])->name('courses.fees.update');
+        // VERIFIKASI PEMBAYARAN MAPEL SISWA
+        Route::get('/course-payments', [\App\Http\Controllers\Admin\CoursePaymentController::class, 'index'])->name('course-payments.index');
+        Route::post('/course-payments/{payment}/verify', [\App\Http\Controllers\Admin\CoursePaymentController::class, 'verify'])->name('course-payments.verify');
+        Route::post('/course-payments/{payment}/reject', [\App\Http\Controllers\Admin\CoursePaymentController::class, 'reject'])->name('course-payments.reject');
 
         // CATEGORIES
         Route::get('/categories',              [\App\Http\Controllers\Admin\CategoryController::class, 'index']) ->name('categories.index');
@@ -110,6 +116,8 @@ Route::middleware(['auth'])
         Route::get('/certificates/{certificate}',    [CertificateController::class, 'show'])    ->name('certificates.show');
         Route::put('/certificates/{certificate}',    [CertificateController::class, 'update'])  ->name('certificates.update');
         Route::delete('/certificates/{certificate}', [CertificateController::class, 'destroy']) ->name('certificates.destroy');
+        // API untuk ambil mata pelajaran yang diambil siswa (dipakai di UI admin)
+        Route::get('/students/{student}/courses',    [CertificateController::class, 'studentCourses']) ->name('students.courses');
 
         // MODULES (Modul Belajar)
         Route::get('/modules',             [ModuleController::class, 'index'])   ->name('modules.index');
@@ -126,12 +134,14 @@ Route::middleware(['auth'])
         Route::delete('/packages/{package}', [PackageController::class, 'destroy']) ->name('packages.destroy');
 
         // SALARIES (Gaji Guru)
-        Route::get('/salaries',             [SalaryController::class, 'index'])    ->name('salaries.index');
-        Route::post('/salaries',            [SalaryController::class, 'store'])    ->name('salaries.store');
-        Route::get('/salaries/{salary}',    [SalaryController::class, 'show'])     ->name('salaries.show');
-        Route::put('/salaries/{salary}',    [SalaryController::class, 'update'])   ->name('salaries.update');
-        Route::delete('/salaries/{salary}', [SalaryController::class, 'destroy'])  ->name('salaries.destroy');
-        Route::get('/salaries/{salary}/slip', [SalaryController::class, 'printSlip'])->name('salaries.slip');
+        Route::middleware('role:admin|owner')->group(function () {
+            Route::get('/salaries',             [SalaryController::class, 'index'])    ->name('salaries.index');
+            Route::post('/salaries',            [SalaryController::class, 'store'])    ->name('salaries.store');
+            Route::get('/salaries/{salary}',    [SalaryController::class, 'show'])     ->name('salaries.show');
+            Route::put('/salaries/{salary}',    [SalaryController::class, 'update'])   ->name('salaries.update');
+            Route::delete('/salaries/{salary}', [SalaryController::class, 'destroy'])  ->name('salaries.destroy');
+            Route::get('/salaries/{salary}/slip', [SalaryController::class, 'printSlip'])->name('salaries.slip');
+        });
 
         // ANNOUNCEMENTS (Pengumuman)
         Route::get('/announcements',                    [AnnouncementController::class, 'index'])   ->name('announcements.index');
@@ -161,7 +171,7 @@ Route::middleware(['auth'])
         Route::get('/videocall', fn() => view('admin.videocall.index'))->name('videocall.index');
 
         // REPORTS
-        Route::get('/reports', fn() => view('admin.reports.index'))->name('reports.index');
+        Route::get('/reports', fn() => view('admin.reports.index'))->middleware('role:admin|owner')->name('reports.index');
 
         // LANDING PAGE CONTENT
         Route::get('/landing',                                          [\App\Http\Controllers\Admin\LandingContentController::class, 'index'])             ->name('landing.index');
@@ -242,6 +252,9 @@ Route::middleware(['auth'])
     ->group(function () {
         Route::get('/dashboard', fn() => view('guru.dashboard'))->name('dashboard');
 
+        // GURU — Payments (view payments made by admin)
+        Route::get('/payments', [\App\Http\Controllers\Guru\SalaryController::class, 'index'])->name('payments.index');
+
         // MESSAGES (Guru)
         Route::get('/messages', [\App\Http\Controllers\Guru\MessageController::class, 'index'])->name('messages.index');
         Route::get('/messages/{room}/messages',    [\App\Http\Controllers\Admin\MessageController::class, 'getMessages']) ->name('messages.get');
@@ -273,9 +286,13 @@ Route::middleware(['auth'])
         })->name('announcements');
 
         // Absensi: keep API endpoints used by class attendance, remove standalone index page
+        Route::get('/attendance/history', [\App\Http\Controllers\Guru\AttendanceHistoryController::class, 'index'])->name('attendance.history');
+        Route::get('/attendance/history/{course}', [\App\Http\Controllers\Guru\AttendanceHistoryController::class, 'show'])->name('attendance.history.show');
         Route::get('/attendance/{schedule}/students',    [AttendanceController::class, 'getStudents'])->name('attendance.students');
         Route::post('/attendance',                       [AttendanceController::class, 'store'])      ->name('attendance.store');
         Route::get('/attendance/report',                 [AttendanceController::class, 'report'])     ->name('attendance.report');
+        Route::post('/schedules/{schedule}/confirm',     [\App\Http\Controllers\Guru\ScheduleAgreementController::class, 'confirm'])->name('schedules.confirm');
+        Route::get('/schedules/{schedule}/info',         [\App\Http\Controllers\Guru\ScheduleAgreementController::class, 'scheduleInfo'])->name('schedules.info');
 
         // Nilai
         Route::get('/grades',               [GradeController::class, 'index'])      ->name('grades');
@@ -329,9 +346,14 @@ Route::middleware(['auth'])
             return view('siswa.announcements', compact('announcements', 'student'));
         })->name('announcements');
 
-        // Absensi (Siswa)
+        // Absensi (Siswa) — Riwayat Absensi
         Route::get('/attendance', [\App\Http\Controllers\Siswa\AttendanceController::class, 'index'])->name('attendance');
         Route::get('/attendance/{course}', [\App\Http\Controllers\Siswa\AttendanceController::class, 'show'])->name('attendance.show');
+        Route::post('/schedules/{schedule}/confirm', [\App\Http\Controllers\Siswa\ScheduleAgreementController::class, 'confirm'])->name('schedules.confirm');
+
+        // List Mata Pelajaran
+        Route::get('/courses', [\App\Http\Controllers\Siswa\CourseController::class, 'index'])->name('courses.index');
+
         // Tagihan (Siswa)
         Route::get('/billing', [\App\Http\Controllers\Siswa\BillingController::class, 'index'])->name('billing.index');
         Route::post('/billing/{course}/pay', [\App\Http\Controllers\Siswa\BillingController::class, 'pay'])->name('billing.pay');

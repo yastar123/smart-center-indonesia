@@ -3102,9 +3102,15 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.courses.index') }}" class="nav-link {{ request()->routeIs('admin.courses.*') ? 'active' : '' }}" data-label="Mata Pelajaran">
+            <a href="{{ route('admin.courses.index') }}" class="nav-link {{ (request()->routeIs('admin.courses.*') && !request()->routeIs('admin.courses.fees*')) ? 'active' : '' }}" data-label="Mata Pelajaran">
                 <i class="bi bi-journal-bookmark"></i>
                 <span>Mata Pelajaran</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('admin.courses.fees') }}" class="nav-link {{ request()->routeIs('admin.courses.fees*') ? 'active' : '' }}" data-label="Biaya Mapel">
+                <i class="bi bi-tag"></i>
+                <span>Biaya Mapel</span>
             </a>
         </div>
         <div class="nav-item">
@@ -3138,6 +3144,7 @@
                 @endif
             </a>
         </div>
+        @if(auth()->check() && auth()->user()->hasAnyRole(['admin','owner']))
         <div class="nav-item">
             <a href="{{ route('admin.salaries.index') }}" class="nav-link {{ request()->routeIs('admin.salaries.*') ? 'active' : '' }}" data-label="Gaji Guru">
                 <i class="bi bi-cash-stack"></i>
@@ -3150,6 +3157,7 @@
                 <span>Laporan Keuangan</span>
             </a>
         </div>
+        @endif
 
         <div class="nav-header">LANDING PAGE</div>
         <div class="nav-item">

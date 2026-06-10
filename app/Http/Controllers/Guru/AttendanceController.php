@@ -7,6 +7,8 @@ use App\Models\Schedule;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\SchoolClass;
+use App\Services\ScheduleAgreementService;
+use App\Services\ScheduleLockService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -33,6 +35,13 @@ class AttendanceController extends Controller
 
     public function getStudents(Schedule $schedule)
     {
+        $lockService = app(ScheduleLockService::class);
+        $agreementService = app(ScheduleAgreementService::class);
+
+        if ($schedule->agreements()->count() === 0) {
+            $agreementService->syncForSchedule($schedule);
+        }
+
         // Filter by branch if the schedule has a branch assigned
         $students = Student::where('status', 'aktif')
             ->when($schedule->cabang_id, fn($q) => $q->where('branch_id', $schedule->cabang_id))
@@ -44,15 +53,39 @@ class AttendanceController extends Controller
             ->where('jadwal_id', $schedule->id)
             ->pluck('status', 'siswa_id');
 
+        $agreements = $schedule->agreements()->get()->keyBy('student_id');
+
         return response()->json([
-            'success'  => true,
-            'students' => $students,
-            'existing' => $existing,
+            'success'            => true,
+            'students'           => $students,
+            'existing'           => $existing,
+            'attendance_locked'  => $lockService->isAttendanceLocked($schedule),
+            'schedule_locked'    => $lockService->isScheduleLocked($schedule),
+            'all_agreed'         => $agreementService->allStudentsAgreed($schedule),
+            'agreements'         => $agreements,
         ]);
     }
 
     public function store(Request $request)
     {
+        $schedule = Schedule::findOrFail($request->input('jadwal_id'));
+        $lockService = app(ScheduleLockService::class);
+        $agreementService = app(ScheduleAgreementService::class);
+
+        if ($lockService->isAttendanceLocked($schedule)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Absensi tidak dapat diubah karena jadwal pertemuan sudah selesai.',
+            ], 422);
+        }
+
+        if (! $agreementService->allStudentsAgreed($schedule)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Absensi hanya dapat diisi setelah guru dan siswa sepakat pada jadwal.',
+            ], 422);
+        }
+
         $data = $request->validate([
             'jadwal_id'   => 'required|exists:schedules,id',
             'absensi'     => 'required|array',

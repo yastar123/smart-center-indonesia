@@ -8,6 +8,7 @@ use App\Models\Teacher;
 use App\Models\Branch;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 
 class SalaryController extends Controller
 {
@@ -16,18 +17,21 @@ class SalaryController extends Controller
         if ($request->ajax()) {
             $q = Salary::with('guru', 'cabang')
                 ->when($request->search,    fn($q) => $q->whereHas('guru', fn($g) => $g->where('name', 'like', "%{$request->search}%")))
+                ->when($request->guru_id,   fn($q) => $q->where('guru_id', $request->guru_id))
                 ->when($request->status,    fn($q) => $q->where('status', $request->status))
                 ->when($request->cabang_id, fn($q) => $q->where('cabang_id', $request->cabang_id))
-                ->when($request->periode,   fn($q) => $q->where('periode', $request->periode))
-                ->latest();
+                ->when($request->periode,   fn($q) => $q->where('periode', $request->periode));
 
-            $salaries = $q->paginate(15);
+            $base = clone $q;
+            $salaries = $q->latest()->paginate(15);
+
             $stats = [
-                'total'   => Salary::count(),
-                'dibayar' => Salary::where('status', 'dibayar')->count(),
-                'pending' => Salary::where('status', 'pending')->count(),
-                'total_nominal' => Salary::where('status', 'dibayar')->sum('total_gaji'),
+                'total'   => $base->count(),
+                'dibayar' => (clone $base)->where('status', 'dibayar')->count(),
+                'pending' => (clone $base)->where('status', 'pending')->count(),
+                'total_nominal' => (clone $base)->where('status', 'dibayar')->sum('total_gaji'),
             ];
+
             return response()->json(array_merge($salaries->toArray(), ['stats' => $stats]));
         }
 
@@ -41,6 +45,7 @@ class SalaryController extends Controller
         $data = $request->validate([
             'guru_id'              => 'required|exists:teachers,id',
             'cabang_id'            => 'nullable|exists:branches,id',
+            'tipe_gaji'            => 'required|in:bulanan,freelance',
             'periode'              => 'required|string|max:20',
             'gaji_pokok'           => 'required|numeric|min:0',
             'jam_mengajar'         => 'nullable|numeric|min:0',
@@ -51,6 +56,7 @@ class SalaryController extends Controller
             'nama_bank'            => 'nullable|string|max:50',
             'nomor_rekening'       => 'nullable|string|max:50',
             'tanggal_pembayaran'   => 'nullable|date',
+            'bukti_pembayaran'     => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
             'status'               => 'required|in:pending,dibayar,batal',
             'catatan'              => 'nullable|string',
         ]);
@@ -63,6 +69,13 @@ class SalaryController extends Controller
             + (float)($data['bonus'] ?? 0)
             - (float)($data['potongan'] ?? 0);
         $data['dibayar_oleh'] = auth()->id();
+
+        if ($request->hasFile('bukti_pembayaran')) {
+            $path = $request->file('bukti_pembayaran')->store('salaries/bukti', 'public');
+            $data['bukti_pembayaran'] = $path;
+            if (empty($data['tanggal_pembayaran'])) $data['tanggal_pembayaran'] = now()->toDateString();
+            $data['status'] = 'dibayar';
+        }
 
         Salary::create($data);
         return response()->json(['success' => true, 'message' => 'Data gaji berhasil disimpan!']);
@@ -78,6 +91,7 @@ class SalaryController extends Controller
         $data = $request->validate([
             'guru_id'            => 'required|exists:teachers,id',
             'cabang_id'          => 'nullable|exists:branches,id',
+            'tipe_gaji'          => 'required|in:bulanan,freelance',
             'periode'            => 'required|string|max:20',
             'gaji_pokok'         => 'required|numeric|min:0',
             'jam_mengajar'       => 'nullable|numeric|min:0',
@@ -88,6 +102,7 @@ class SalaryController extends Controller
             'nama_bank'          => 'nullable|string|max:50',
             'nomor_rekening'     => 'nullable|string|max:50',
             'tanggal_pembayaran' => 'nullable|date',
+            'bukti_pembayaran'   => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
             'status'             => 'required|in:pending,dibayar,batal',
             'catatan'            => 'nullable|string',
         ]);
@@ -99,6 +114,14 @@ class SalaryController extends Controller
             + $data['total_gaji_mengajar']
             + (float)($data['bonus'] ?? 0)
             - (float)($data['potongan'] ?? 0);
+
+        if ($request->hasFile('bukti_pembayaran')) {
+            if ($salary->bukti_pembayaran) Storage::disk('public')->delete($salary->bukti_pembayaran);
+            $path = $request->file('bukti_pembayaran')->store('salaries/bukti', 'public');
+            $data['bukti_pembayaran'] = $path;
+            if (empty($data['tanggal_pembayaran'])) $data['tanggal_pembayaran'] = now()->toDateString();
+            $data['status'] = 'dibayar';
+        }
 
         $salary->update($data);
         return response()->json(['success' => true, 'message' => 'Data gaji berhasil diperbarui!']);

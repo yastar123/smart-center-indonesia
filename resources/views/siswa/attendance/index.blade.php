@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title','Absensi Saya')
-@section('page-title','Absensi')
+@section('title','Riwayat Absensi')
+@section('page-title','Riwayat Absensi')
 
 @section('content')
 
@@ -19,10 +19,10 @@
                     Rekap Kehadiran
                 </div>
                 <h4 style="font-weight:800;margin-bottom:3px;color:white;letter-spacing:-.02em">
-                    Absensi Saya
+                    Riwayat Absensi
                 </h4>
                 <p style="opacity:.65;margin:0;font-size:13px">
-                    Lihat catatan kehadiran per mata pelajaran
+                    Lihat riwayat kehadiran per mata pelajaran dan pertemuan
                 </p>
             </div>
         </div>
@@ -110,7 +110,7 @@
             <h6 class="fw-bold mb-1" style="color:var(--text-primary)">
                 <i class="bi bi-clipboard2-check text-primary me-2"></i>Mata Pelajaran Saya
             </h6>
-            <p class="text-muted mb-0" style="font-size:12px">Klik mata pelajaran untuk melihat detail kehadiran</p>
+            <p class="text-muted mb-0" style="font-size:12px">Klik mata pelajaran untuk melihat riwayat per pertemuan</p>
         </div>
     </div>
 
@@ -131,6 +131,8 @@
         @php
             $colors = ['#c84ddf','#10b981','#0284c7','#f6af23','#68117e','#059669','#461256','#e09000'];
             $clr = $colors[$i % count($colors)];
+            $meetings = $meetingCounts[$c->id] ?? 0;
+            $summary = $attendanceSummary[$c->id] ?? null;
         @endphp
         <div class="col-md-6 col-lg-4">
             <a href="{{ route('siswa.attendance.show', $c->id) }}"
@@ -160,7 +162,10 @@
                 <div class="d-flex align-items-center justify-content-between mt-3 pt-3"
                      style="border-top:1px solid var(--card-border)">
                     <span style="font-size:11.5px;color:{{ $clr }};font-weight:600">
-                        <i class="bi bi-clipboard2-check me-1"></i>Lihat Absensi
+                        <i class="bi bi-calendar-event me-1"></i>{{ $meetings }} Pertemuan
+                        @if($summary)
+                        · Hadir {{ $summary->hadir }}/{{ $summary->total }}
+                        @endif
                     </span>
                     <i class="bi bi-arrow-right" style="color:{{ $clr }};font-size:13px"></i>
                 </div>

@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Schedule;
 use App\Models\SchoolClass;
 use App\Models\Branch;
+use App\Services\ScheduleAgreementService;
+use App\Services\ScheduleLockService;
 use Illuminate\Http\Request;
 
 class ScheduleController extends Controller
@@ -68,6 +70,8 @@ class ScheduleController extends Controller
         $schedule = Schedule::create($data);
         $schedule->load(['kelas.guru', 'kelas.cabang', 'kelas.mataPelajaran']);
 
+        app(ScheduleAgreementService::class)->syncForSchedule($schedule);
+
         return response()->json(['success' => true, 'message' => 'Jadwal berhasil ditambahkan', 'data' => $schedule]);
     }
 
@@ -79,6 +83,14 @@ class ScheduleController extends Controller
 
     public function update(Request $request, Schedule $schedule)
     {
+        $lockService = app(ScheduleLockService::class);
+        if (! $lockService->canEditSchedule($schedule)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Jadwal tidak dapat diubah (H-1 jam sebelum pertemuan atau sudah selesai).',
+            ], 422);
+        }
+
         $data = $request->validate([
             'kelas_id'    => 'required|exists:school_classes,id',
             'pertemuan_ke'=> 'required|integer|min:1',
@@ -104,11 +116,21 @@ class ScheduleController extends Controller
 
         $schedule->update($data);
 
+        app(ScheduleAgreementService::class)->syncForSchedule($schedule->fresh());
+
         return response()->json(['success' => true, 'message' => 'Jadwal berhasil diperbarui']);
     }
 
     public function destroy(Schedule $schedule)
     {
+        $lockService = app(ScheduleLockService::class);
+        if (! $lockService->canEditSchedule($schedule)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Jadwal tidak dapat dihapus (H-1 jam sebelum pertemuan atau sudah selesai).',
+            ], 422);
+        }
+
         $schedule->delete();
         return response()->json(['success' => true, 'message' => 'Jadwal berhasil dihapus']);
     }

@@ -131,6 +131,7 @@
         @php
             $payment  = $payments[$course->id] ?? null;
             $fee      = $fees[$course->id] ?? 0;
+            $isSelected = $selectedCourse && $selectedCourse->id === $course->id;
             $statusMap = [
                 'verified' => ['bg'=>'var(--soft-success-bg)','color'=>'var(--soft-success-text)','icon'=>'bi-check-circle-fill','label'=>'Lunas'],
                 'pending'  => ['bg'=>'var(--soft-warning-bg)','color'=>'var(--soft-warning-text)','icon'=>'bi-hourglass-split','label'=>'Menunggu Verifikasi'],
@@ -139,7 +140,8 @@
             $badge = $payment ? ($statusMap[$payment->status] ?? $statusMap['pending']) : null;
         @endphp
         <div class="col-md-6">
-            <div class="p-4 rounded-3 h-100" style="background:var(--input-bg);border:1.5px solid var(--card-border);transition:border-color .2s">
+            <div class="p-4 rounded-3 h-100" id="billing-card-{{ $course->id }}"
+                 style="background:var(--input-bg);border:1.5px solid {{ $isSelected ? '#c84ddf' : 'var(--card-border)' }};{{ $isSelected ? 'box-shadow:0 0 0 3px rgba(200,77,223,.15)' : '' }}">
                 <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
                     <div class="d-flex align-items-center gap-3">
                         <div style="width:44px;height:44px;border-radius:12px;background:rgba(200,77,223,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
@@ -248,6 +250,14 @@
 
                             <div class="mb-3">
                                 <label class="form-label fw-semibold" style="font-size:13px">
+                                    Catatan Transfer <span class="text-muted">(opsional)</span>
+                                </label>
+                                <input type="text" name="catatan" class="form-control" placeholder="Nama pengirim / bank / no. ref"
+                                       style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" style="font-size:13px">
                                     Bukti Pembayaran <span class="text-danger">*</span>
                                 </label>
                                 <input type="file" name="proof" class="form-control" required
@@ -282,5 +292,16 @@
     @endif
 
 </div>
+
+@if($selectedCourse)
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const el = document.getElementById('billing-card-{{ $selectedCourse->id }}');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+</script>
+@endpush
+@endif
 
 @endsection

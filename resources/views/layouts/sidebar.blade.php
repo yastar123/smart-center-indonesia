@@ -62,7 +62,7 @@
         @endrole
 
         {{-- ADMIN MENU --}}
-        @role('admin|owner')
+        @hasanyrole('owner|admin')
         <li class="nav-header">AKADEMIK</li>
         <li class="nav-item {{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
             <a href="{{ route('admin.students.index') }}" class="nav-link">
@@ -82,13 +82,13 @@
                 <span>Kelas</span>
             </a>
         </li>
-        <li class="nav-item {{ request()->routeIs('admin.courses.*') ? 'active' : '' }}">
+        <li class="nav-item {{ (request()->routeIs('admin.courses.*') && !request()->routeIs('admin.courses.fees*')) ? 'active' : '' }}">
             <a href="{{ route('admin.courses.index') }}" class="nav-link">
                 <i class="nav-icon bi bi-book"></i>
                 <span>Mata Pelajaran</span>
             </a>
         </li>
-        <li class="nav-item {{ request()->routeIs('admin.courses.fees') ? 'active' : '' }}">
+        <li class="nav-item {{ request()->routeIs('admin.courses.fees*') ? 'active' : '' }}">
             <a href="{{ route('admin.courses.fees') }}" class="nav-link">
                 <i class="nav-icon bi bi-tag"></i>
                 <span>Biaya Mapel</span>
@@ -111,10 +111,16 @@
         <li class="nav-item {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
             <a href="{{ route('admin.payments.index') }}" class="nav-link">
                 <i class="nav-icon bi bi-cash-coin"></i>
-                <span>Pembayaran</span>
-                @php $pending = \App\Models\Invoice::where('status','unpaid')->count() @endphp
-                @if($pending > 0)
-                    <span class="badge bg-danger ms-auto">{{ $pending }}</span>
+                <span>Pembayaran Invoice</span>
+            </a>
+        </li>
+        <li class="nav-item {{ request()->routeIs('admin.course-payments.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.course-payments.index') }}" class="nav-link">
+                <i class="nav-icon bi bi-credit-card"></i>
+                <span>Verifikasi Bayar Mapel</span>
+                @php $pendingPay = \App\Models\StudentCoursePayment::where('status','pending')->count() @endphp
+                @if($pendingPay > 0)
+                    <span class="badge bg-danger ms-auto">{{ $pendingPay }}</span>
                 @endif
             </a>
         </li>
@@ -132,18 +138,29 @@
                 <span>Tryout CBT</span>
             </a>
         </li>
-        @endrole
+        @endhasanyrole
 
         {{-- GURU MENU --}}
         @role('guru')
         <li class="nav-header">MENGAJAR</li>
+        <li class="nav-item {{ request()->routeIs('guru.classes.*') ? 'active' : '' }}">
+            <a href="{{ route('guru.classes.index') }}" class="nav-link">
+                <i class="nav-icon bi bi-grid-3x3-gap"></i>
+                <span>Kelas Saya</span>
+            </a>
+        </li>
+        <li class="nav-item {{ request()->routeIs('guru.attendance.history*') ? 'active' : '' }}">
+            <a href="{{ route('guru.attendance.history') }}" class="nav-link">
+                <i class="nav-icon bi bi-clock-history"></i>
+                <span>Riwayat Absensi</span>
+            </a>
+        </li>
         <li class="nav-item {{ request()->routeIs('guru.dashboard') ? 'active' : '' }}">
             <a href="{{ route('guru.dashboard') }}#jadwal" class="nav-link">
                 <i class="nav-icon bi bi-calendar3"></i>
                 <span>Jadwal Mengajar</span>
             </a>
         </li>
-        
         <li class="nav-item {{ request()->routeIs('guru.grades') ? 'active' : '' }}">
             <a href="{{ route('guru.grades') }}" class="nav-link">
                 <i class="nav-icon bi bi-bar-chart"></i>
@@ -168,10 +185,16 @@
             </a>
         </li>
         {{-- Jadwal Belajar (siswa) dihapus — link dihilangkan sesuai permintaan pengguna --}}
+        <li class="nav-item {{ request()->routeIs('siswa.courses*') ? 'active' : '' }}">
+            <a href="{{ route('siswa.courses.index') }}" class="nav-link">
+                <i class="nav-icon bi bi-journal-bookmark"></i>
+                <span>List Mata Pelajaran</span>
+            </a>
+        </li>
         <li class="nav-item {{ request()->routeIs('siswa.attendance*') ? 'active' : '' }}">
             <a href="{{ route('siswa.attendance') }}" class="nav-link">
-                <i class="nav-icon bi bi-clipboard-check"></i>
-                <span>Absensi</span>
+                <i class="nav-icon bi bi-clock-history"></i>
+                <span>Riwayat Absensi</span>
             </a>
         </li>
         <li class="nav-item {{ request()->routeIs('siswa.billing*') ? 'active' : '' }}">

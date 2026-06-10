@@ -60,4 +60,9 @@ class Schedule extends Model
         return $this->belongsTo(Branch::class, 'cabang_id');
     }
 
+    public function agreements()
+    {
+        return $this->hasMany(ScheduleStudentAgreement::class);
+    }
+
 }

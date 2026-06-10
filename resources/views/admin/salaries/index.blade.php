@@ -3,7 +3,24 @@
 @section('page-title','Manajemen Gaji Guru')
 
 @section('content')
-<div>
+<div class="row">
+    <div class="col-lg-3">
+        <div class="dashboard-card mb-4">
+            <h6 class="fw-bold mb-2">Daftar Guru</h6>
+            <div class="list-group" id="teacherList" style="max-height:70vh;overflow:auto">
+                @foreach($teachers as $t)
+                <button type="button" class="list-group-item list-group-item-action d-flex align-items-start justify-content-between" onclick="openTeacher({{ $t->id }})">
+                    <div>
+                        <div class="fw-semibold">{{ $t->name }}</div>
+                        <div class="text-muted small">{{ $t->subjects ? (is_array($t->subjects) ? implode(', ', $t->subjects) : $t->subjects) : ($t->courses->pluck('nama')->implode(', ') ?? '-') }}</div>
+                    </div>
+                    <span class="badge bg-secondary align-self-center">{{ $t->branch?->name ?? 'Pusat' }}</span>
+                </button>
+                @endforeach
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-9">
 
 {{-- HEADER --}}
 <div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
@@ -51,15 +68,16 @@
 <div class="dashboard-card">
     <div class="table-responsive">
         <table class="table table-hover table-modern align-middle mb-0">
-            <thead class="thead-modern"><tr><th>Guru</th><th>Periode</th><th>Gaji Pokok</th><th>Jam Mengajar</th><th>Bonus</th><th>Total Gaji</th><th>Status</th><th class="text-center">Aksi</th></tr></thead>
+            <thead class="thead-modern"><tr><th>Guru</th><th>Periode</th><th>Tipe</th><th>Gaji Pokok</th><th>Total Gaji</th><th>Status</th><th class="text-center">Aksi</th></tr></thead>
             <tbody id="tableBody">
                 @for($i=0;$i<5;$i++)
-                <tr class="skeleton-row"><td><div class="skeleton-cell" style="width:75%"></div></td><td><div class="skeleton-cell" style="width:70px"></div></td><td><div class="skeleton-cell" style="width:80px"></div></td><td><div class="skeleton-cell" style="width:50px"></div></td><td><div class="skeleton-cell" style="width:65px"></div></td><td><div class="skeleton-cell" style="width:90px"></div></td><td><div class="skeleton-cell" style="width:60px"></div></td><td><div class="skeleton-cell" style="width:90px;margin:0 auto"></div></td></tr>
+                <tr class="skeleton-row"><td><div class="skeleton-cell" style="width:75%"></div></td><td><div class="skeleton-cell" style="width:70px"></div></td><td><div class="skeleton-cell" style="width:60px"></div></td><td><div class="skeleton-cell" style="width:80px"></div></td><td><div class="skeleton-cell" style="width:90px"></div></td><td><div class="skeleton-cell" style="width:60px"></div></td><td><div class="skeleton-cell" style="width:90px;margin:0 auto"></div></td></tr>
                 @endfor
             </tbody>
         </table>
     </div>
     <div id="paginationLinks" class="mt-3 d-flex justify-content-center"></div>
+</div>
 </div>
 </div>
 
@@ -71,7 +89,7 @@
                 <h5 class="modal-title fw-bold text-white" id="modalTitle"><i class="bi bi-cash-stack me-2"></i>Input Gaji Guru</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form id="salaryForm">
+            <form id="salaryForm" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" id="salId">
                 <div class="modal-body">
@@ -85,10 +103,13 @@
                             <input type="month" name="periode" class="form-control" required value="{{ date('Y-m') }}">
                         </div>
                         <div class="col-md-4"><label class="form-label fw-semibold">Gaji Pokok (Rp)</label><input type="number" name="gaji_pokok" class="form-control" value="0" min="0" required></div>
-                        <div class="col-md-4"><label class="form-label fw-semibold">Jam Mengajar</label><input type="number" name="jam_mengajar" class="form-control" value="0" min="0" step="0.5"></div>
-                        <div class="col-md-4"><label class="form-label fw-semibold">Tarif per Jam (Rp)</label><input type="number" name="tarif_per_jam" class="form-control" value="0" min="0"></div>
-                        <div class="col-md-4"><label class="form-label fw-semibold">Bonus (Rp)</label><input type="number" name="bonus" class="form-control" value="0" min="0"></div>
-                        <div class="col-md-4"><label class="form-label fw-semibold">Potongan (Rp)</label><input type="number" name="potongan" class="form-control" value="0" min="0"></div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Tipe Gaji</label>
+                            <select name="tipe_gaji" class="form-select">
+                                <option value="bulanan">Gaji Bulanan</option>
+                                <option value="freelance">Gaji Freelance</option>
+                            </select>
+                        </div>
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">Status</label>
                             <select name="status" class="form-select"><option value="pending">Pending</option><option value="dibayar">Dibayar</option><option value="batal">Batal</option></select>
@@ -97,7 +118,12 @@
                         <div class="col-md-6"><label class="form-label fw-semibold">Tanggal Pembayaran</label><input type="date" name="tanggal_pembayaran" class="form-control"></div>
                         <div class="col-md-6"><label class="form-label fw-semibold">Nama Bank</label><input type="text" name="nama_bank" class="form-control" placeholder="BCA, Mandiri, dll"></div>
                         <div class="col-md-6"><label class="form-label fw-semibold">Nomor Rekening</label><input type="text" name="nomor_rekening" class="form-control"></div>
-                        <div class="col-12"><label class="form-label fw-semibold">Catatan</label><textarea name="catatan" class="form-control" rows="2"></textarea></div>
+                        <!-- Catatan dihilangkan sesuai permintaan -->
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Bukti Pembayaran (jpg,png,pdf)</label>
+                            <input type="file" name="bukti_pembayaran" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
+                            <div class="form-text">Opsional. Unggah bukti pembayaran yang dapat diunduh oleh guru.</div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer border-0">
@@ -108,16 +134,45 @@
         </div>
     </div>
 </div>
+
+{{-- TEACHER DETAIL / UPLOAD MODAL --}}
+<div class="modal fade" id="teacherModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="border-radius:14px;border:none">
+            <div class="modal-header border-0 p-3">
+                <h5 class="modal-title fw-bold" id="teacherModalTitle"><i class="bi bi-person-badge me-2"></i>Detail Guru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="teacherModalBody">
+                <!-- filled by JS -->
+            </div>
+            <div class="modal-footer border-0 p-3">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" id="openUploadBtn">Upload Bukti Pembayaran</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
 <script>
 let currentPage = 1;
 
-function loadData(page=1) {
+function loadData(page=1, guru_id=null) {
     currentPage = page;
-    const params = new URLSearchParams({ page, search: document.getElementById('searchInput').value, status: document.getElementById('filterStatus').value, periode: document.getElementById('filterPeriode').value, cabang_id: document.getElementById('filterCabang').value });
-    fetch(`{{ route('admin.salaries.index') }}?${params}`, { headers:{'X-Requested-With':'XMLHttpRequest'} })
+    const params = new URLSearchParams();
+    params.append('page', page);
+    const search = document.getElementById('searchInput').value;
+    if (search) params.append('search', search);
+    const status = document.getElementById('filterStatus').value;
+    if (status) params.append('status', status);
+    const periode = document.getElementById('filterPeriode').value;
+    if (periode) params.append('periode', periode);
+    const cabang = document.getElementById('filterCabang').value;
+    if (cabang) params.append('cabang_id', cabang);
+    if (guru_id) params.append('guru_id', guru_id);
+    fetch(`{{ route('admin.salaries.index') }}?${params.toString()}`, { headers:{'X-Requested-With':'XMLHttpRequest'} })
         .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
         .then(data => {
             countUpValue(document.getElementById('statTotal'),   data.stats.total);
@@ -134,14 +189,15 @@ function loadData(page=1) {
 
 function renderTable(rows) {
     const statusMap = { dibayar:'<span class="badge bg-success">Dibayar</span>', pending:'<span class="badge bg-warning text-dark">Pending</span>', batal:'<span class="badge bg-danger">Batal</span>' };
-    if (!rows.length) { document.getElementById('tableBody').innerHTML = '<tr><td colspan="8" class="text-center py-5 text-muted">Belum ada data gaji</td></tr>'; return; }
-    document.getElementById('tableBody').innerHTML = rows.map(s => `
+    if (!rows.length) { document.getElementById('tableBody').innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted">Belum ada data gaji</td></tr>'; return; }
+    document.getElementById('tableBody').innerHTML = rows.map(s => {
+        const tipe = s.tipe_gaji === 'freelance' ? 'Freelance' : 'Bulanan';
+        return `
         <tr>
             <td><div class="fw-semibold">${s.guru?.name||'-'}</div></td>
             <td>${s.periode}</td>
+            <td>${tipe}</td>
             <td>Rp ${parseInt(s.gaji_pokok||0).toLocaleString('id-ID')}</td>
-            <td>${s.jam_mengajar||0} jam</td>
-            <td>${s.bonus ? 'Rp '+parseInt(s.bonus).toLocaleString('id-ID') : '-'}</td>
             <td class="fw-bold text-success">Rp ${parseInt(s.total_gaji||0).toLocaleString('id-ID')}</td>
             <td>${statusMap[s.status]||s.status}</td>
             <td><div class="d-flex gap-1">
@@ -149,7 +205,8 @@ function renderTable(rows) {
                 <button onclick="editSalary(${s.id})" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></button>
                 <button onclick="deleteSalary(${s.id})" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
             </div></td>
-        </tr>`).join('');
+        </tr>`;
+    }).join('');
 }
 
 function renderPagination(data) {
@@ -170,9 +227,9 @@ function openModal(reset=true) {
 function editSalary(id) {
     fetch(`{{ url('admin/salaries') }}/${id}`, { headers:{'X-Requested-With':'XMLHttpRequest'} })
         .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
-        .then(res => {
+            .then(res => {
             const s=res.data, f=document.getElementById('salaryForm');
-            ['guru_id','periode','gaji_pokok','jam_mengajar','tarif_per_jam','bonus','potongan','status','metode_pembayaran','tanggal_pembayaran','nama_bank','nomor_rekening','catatan'].forEach(k => { if(f.querySelector(`[name=${k}]`)) f.querySelector(`[name=${k}]`).value=s[k]||''; });
+            ['guru_id','periode','gaji_pokok','tarif_per_jam','tipe_gaji','status','metode_pembayaran','tanggal_pembayaran','nama_bank','nomor_rekening'].forEach(k => { if(f.querySelector(`[name=${k}]`)) f.querySelector(`[name=${k}]`).value=s[k]||''; });
             document.getElementById('salId').value = id;
             document.getElementById('modalTitle').textContent = 'Edit Data Gaji';
             openModal(false);
@@ -213,5 +270,46 @@ function resetFilter() {
 
 let st; document.getElementById('searchInput').addEventListener('input', ()=>{ clearTimeout(st); st=setTimeout(()=>loadData(1),400); });
 document.addEventListener('DOMContentLoaded', ()=>loadData());
+
+// Open teacher detail modal and prepare upload action
+function openTeacher(id){
+    // load salary list filtered by selected teacher
+    loadData(1, id);
+    fetch(`{{ url('admin/teachers') }}/${id}`, { headers:{'X-Requested-With':'XMLHttpRequest'} })
+        .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+        .then(res=>{
+            const t = res.data;
+            const subjects = (t.subjects && t.subjects.length) ? (Array.isArray(t.subjects) ? t.subjects : [t.subjects]) : (t.courses ? t.courses.map(c=>c.nama) : []);
+            const photo = t.photo ? (t.photo.startsWith('http') ? t.photo : ('/storage/'+t.photo)) : (`https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=68117e&color=fff`);
+            document.getElementById('teacherModalTitle').textContent = t.name;
+            document.getElementById('teacherModalBody').innerHTML = `
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="fw-semibold mb-1">${t.name}</div>
+                        <div class="text-muted small mb-3">${t.branch? t.branch.name : 'Pusat'}</div>
+                        <div><strong>Mapel / Subjects</strong><ul>${subjects.map(s=>`<li>${s}</li>`).join('') || '<li>-</li>'}</ul></div>
+                    </div>
+                    <div class="col-md-4 text-end"><img src="${photo}" alt="Foto" style="width:96px;height:96px;border-radius:8px;object-fit:cover"></div>
+                </div>
+            `;
+
+            // open modal
+            new bootstrap.Modal(document.getElementById('teacherModal')).show();
+
+            // wire upload button
+            const btn = document.getElementById('openUploadBtn');
+            btn.onclick = function(){
+                // prefill salary form and open salary modal
+                const f = document.getElementById('salaryForm');
+                if(f.querySelector('[name=guru_id]')) f.querySelector('[name=guru_id]').value = t.id;
+                if(f.querySelector('[name=gaji_pokok]')) f.querySelector('[name=gaji_pokok]').value = (t.salary_base || 0);
+                if(f.querySelector('[name=periode]')) f.querySelector('[name=periode]').value = new Date().toISOString().slice(0,7);
+                if(f.querySelector('[name=status]')) f.querySelector('[name=status]').value = 'dibayar';
+                if(f.querySelector('[name=tipe_gaji]')) f.querySelector('[name=tipe_gaji]').value = 'bulanan';
+                bootstrap.Modal.getInstance(document.getElementById('teacherModal')).hide();
+                openModal(false);
+            };
+        }).catch(()=>showToast('Gagal memuat data guru.', 'error'));
+}
 </script>
 @endpush

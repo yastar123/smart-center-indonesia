@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Course;
 
 class Certificate extends Model
 {
@@ -15,6 +16,7 @@ class Certificate extends Model
     protected $fillable = [
         'siswa_id',
         'cabang_id',
+        'course_id',
         'diterbitkan_oleh',
         'nomor_sertifikat',
         'jenis',
@@ -53,5 +55,11 @@ class Certificate extends Model
     public function penerbit()
     {
         return $this->belongsTo(User::class, 'diterbitkan_oleh');
+    }
+
+    // Relasi ke mata pelajaran (opsional)
+    public function course()
+    {
+        return $this->belongsTo(Course::class, 'course_id');
     }
 }

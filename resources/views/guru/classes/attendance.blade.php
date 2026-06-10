@@ -154,6 +154,28 @@ function loadAttendance(id, areaEl) {
             if (!res.success) { area.innerHTML = '<div class="mt-3 text-muted">Gagal memuat data siswa.</div>'; return; }
             const students = res.students;
             const existing = res.existing || {};
+            const attendanceLocked = res.attendance_locked;
+            const allAgreed = res.all_agreed;
+
+            if (!allAgreed) {
+                area.innerHTML = `<div class="mt-3 p-3 rounded-3" style="background:var(--soft-warning-bg);border:1px solid var(--soft-warning-border)">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    Absensi hanya dapat diisi setelah guru dan siswa sepakat pada jadwal pertemuan ini.
+                    <button type="button" class="btn btn-sm btn-warning ms-2" onclick="guruConfirmSchedule(${id}, area)">
+                        Konfirmasi Jadwal (Guru)
+                    </button>
+                </div>`;
+                return;
+            }
+
+            if (attendanceLocked) {
+                if (!Object.keys(existing).length) {
+                    area.innerHTML = `<div class="mt-3 p-3 rounded-3 text-muted" style="background:var(--input-bg)">
+                        <i class="bi bi-lock me-1"></i>Pertemuan sudah selesai. Absensi tidak dapat diubah.
+                    </div>`;
+                    return;
+                }
+            }
 
             if (!students.length) {
                 area.innerHTML = `<div class="mt-3 p-3 rounded-3 text-center" style="background:var(--input-bg)">
@@ -173,10 +195,11 @@ function loadAttendance(id, areaEl) {
             let rows = students.map((s, i) => {
                 const cur = existing[s.id] || '';
                 const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(s.name)}&background=68117e&color=fff&size=40`;
+                const disabled = attendanceLocked ? 'disabled' : '';
                 const radios = statusOpts.map(opt => `
                     <td class="text-center" style="min-width:64px">
-                        <label style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer">
-                            <input type="radio" name="status_${s.id}" value="${opt.val}" ${cur === opt.val ? 'checked' : ''}
+                        <label style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:${attendanceLocked?'default':'pointer'}">
+                            <input type="radio" name="status_${s.id}" value="${opt.val}" ${cur === opt.val ? 'checked' : ''} ${disabled}
                                    class="abs-radio" data-sid="${s.id}"
                                    style="width:16px;height:16px;accent-color:${opt.clr};cursor:pointer">
                             <span style="font-size:10.5px;color:${opt.clr};font-weight:600">${opt.label}</span>
@@ -214,9 +237,11 @@ function loadAttendance(id, areaEl) {
                         </div>
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <div id="absCount-${id}" class="text-muted" style="font-size:12px"></div>
-                            <button type="submit" class="btn btn-primary" style="border-radius:10px">
-                                <i class="bi bi-save me-2"></i>Simpan Absensi
-                            </button>
+                            ${attendanceLocked
+                                ? '<span class="text-muted small"><i class="bi bi-lock me-1"></i>Absensi terkunci (pertemuan selesai)</span>'
+                                : `<button type="submit" class="btn btn-primary" style="border-radius:10px">
+                                    <i class="bi bi-save me-2"></i>Simpan Absensi
+                                   </button>`}
                         </div>
                     </form>
                 </div>`;
@@ -234,6 +259,7 @@ function loadAttendance(id, areaEl) {
 
             area.querySelector('.absForm').addEventListener('submit', function(e) {
                 e.preventDefault();
+                if (attendanceLocked) return;
                 const abs = [];
                 students.forEach(s => {
                     const v = area.querySelector(`input[name="status_${s.id}"]:checked`);
@@ -264,6 +290,30 @@ function loadAttendance(id, areaEl) {
             });
         })
         .catch(() => { area.innerHTML = '<div class="mt-3 text-muted p-3">Gagal memuat data. Coba lagi.</div>'; });
+}
+
+function guruConfirmSchedule(scheduleId, areaEl) {
+    fetch('/guru/attendance/' + scheduleId + '/students')
+        .then(r => r.json())
+        .then(res => {
+            const students = res.students || [];
+            if (!students.length) { alert('Tidak ada siswa.'); return; }
+            let done = 0;
+            students.forEach(s => {
+                fetch('/guru/schedules/' + scheduleId + '/confirm', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ student_id: s.id })
+                }).then(() => {
+                    done++;
+                    if (done === students.length) loadAttendance(scheduleId, areaEl);
+                });
+            });
+        });
 }
 
 function updateCount(id, students, existing) {

@@ -16,6 +16,7 @@ class Salary extends Model
         'guru_id',
         'cabang_id',
         'periode',
+        'tipe_gaji',
         'gaji_pokok',
         'jam_mengajar',
         'tarif_per_jam',
@@ -29,6 +30,7 @@ class Salary extends Model
         'tanggal_pembayaran',
         'status',
         'catatan',
+        'bukti_pembayaran',
         'dibayar_oleh',
     ];
 

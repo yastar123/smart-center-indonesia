@@ -32,6 +32,11 @@ class Course extends Model
         return $this->belongsTo(Branch::class, 'cabang_id');
     }
 
+    public function fee()
+    {
+        return $this->hasOne(CourseFee::class);
+    }
+
     // Relasi ke paket belajar
     public function paket()
     {
