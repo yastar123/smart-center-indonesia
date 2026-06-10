@@ -6,7 +6,9 @@
     <title>Lupa Password | Smart Center Indonesia</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
         body{
@@ -39,6 +41,7 @@
             font-size:26px;margin:0 auto 12px;border:1px solid rgba(255,255,255,.25);
         }
         .card-body-inner{padding:2rem 2.5rem;}
+        h5,h6{font-family:'Plus Jakarta Sans','Inter',sans-serif;}
         .form-label{font-weight:600;font-size:.8rem;color:#374151;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem;}
         .form-control{
             border:2px solid #e5e7eb;border-radius:11px;padding:.72rem 1rem;font-size:.9rem;

@@ -190,6 +190,35 @@
         .scroll-wheel { width:4px; height:8px; background:rgba(255,255,255,.6); border-radius:2px; animation:scroll-down 1.5s ease-in-out infinite; }
         @keyframes scroll-down { 0% { transform:translateY(0); opacity:1; } 100% { transform:translateY(8px); opacity:0; } }
 
+        /* ─── SCROLL PROGRESS BAR ─────────────────────────────── */
+        #scroll-progress {
+            position:fixed; top:0; left:0; width:0%; height:3px;
+            background:linear-gradient(90deg,#68117e,#c84ddf,#f6af23);
+            z-index:2000; transition:width .1s linear;
+            border-radius:0 3px 3px 0;
+            box-shadow:0 0 8px rgba(200,77,223,.5);
+        }
+
+        /* ─── FLOAT CARDS — hide on mobile ───────────────────── */
+        @media (max-width:900px) { .float-card { display:none !important; } }
+
+        /* ─── MOBILE MENU — stagger entrance ─────────────────── */
+        .mobile-menu a, .mobile-menu .mobile-divider {
+            opacity:0; transform:translateY(20px);
+            transition:opacity .45s var(--ease-out), transform .45s var(--ease-out);
+        }
+        .mobile-menu.open a:nth-child(1)  { opacity:1; transform:none; transition-delay:.06s; }
+        .mobile-menu.open a:nth-child(2)  { opacity:1; transform:none; transition-delay:.11s; }
+        .mobile-menu.open a:nth-child(3)  { opacity:1; transform:none; transition-delay:.16s; }
+        .mobile-menu.open a:nth-child(4)  { opacity:1; transform:none; transition-delay:.21s; }
+        .mobile-menu.open a:nth-child(5)  { opacity:1; transform:none; transition-delay:.26s; }
+        .mobile-menu.open a:nth-child(6)  { opacity:1; transform:none; transition-delay:.31s; }
+        .mobile-menu.open .mobile-divider { opacity:1; transform:none; transition-delay:.34s; }
+        .mobile-menu.open a:nth-child(8)  { opacity:1; transform:none; transition-delay:.38s; }
+        .mobile-menu.open a:nth-child(9)  { opacity:1; transform:none; transition-delay:.43s; }
+        /* close button always visible */
+        .mobile-menu .mobile-close { opacity:1 !important; transform:none !important; }
+
         /* ─── STATS STRIP ─────────────────────────────────────────── */
         .stats-strip { background:var(--off-white); border-top:1px solid rgba(200,77,223,.08); border-bottom:1px solid rgba(200,77,223,.08); padding:2.5rem 0; }
         .stats-strip-inner { max-width:1100px; margin:0 auto; padding:0 1.5rem; display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
@@ -605,6 +634,7 @@
     </style>
 </head>
 <body>
+<div id="scroll-progress" role="progressbar" aria-hidden="true"></div>
 
 {{-- ─────────────────────────────── NAVBAR ────────────────────────────────── --}}
 <nav class="lp-nav" id="navbar">
@@ -639,6 +669,9 @@
 
 {{-- Mobile Menu --}}
 <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <button class="mobile-close" onclick="closeMobile()" aria-label="Tutup menu">
+        <i class="bi bi-x-lg"></i>
+    </button>
     <a href="#program"      onclick="closeMobile()">Program</a>
     <a href="#jenjang"      onclick="closeMobile()">Jenjang</a>
     <a href="#mengapa-sci"  onclick="closeMobile()">Mengapa SCI</a>
@@ -1486,6 +1519,44 @@ if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         el.style.animationPlayState = 'paused';
     });
 }
+
+/* ── Scroll progress bar ── */
+(function() {
+    const bar = document.getElementById('scroll-progress');
+    if (!bar) return;
+    function updateBar() {
+        const scrolled = window.scrollY;
+        const total    = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.width = total > 0 ? Math.min((scrolled / total) * 100, 100) + '%' : '0%';
+    }
+    window.addEventListener('scroll', updateBar, { passive: true });
+    updateBar();
+})();
+
+/* ── Float card mouse parallax ── */
+(function() {
+    const fc1  = document.querySelector('.float-card-1');
+    const fc2  = document.querySelector('.float-card-2');
+    const hero = document.querySelector('.hero');
+    if (!fc1 || !fc2 || !hero) return;
+    if (window.matchMedia('(max-width:900px)').matches) return;
+    let rafId = null;
+    hero.addEventListener('mousemove', e => {
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+            const rect = hero.getBoundingClientRect();
+            const cx   = (e.clientX - rect.left) / rect.width  - 0.5;
+            const cy   = (e.clientY - rect.top)  / rect.height - 0.5;
+            fc1.style.transform = `translate(${cx * -16}px, ${cy * -11}px) rotate(-1deg)`;
+            fc2.style.transform = `translate(${cx *  14}px, ${cy *  9}px)  rotate(1deg)`;
+        });
+    });
+    hero.addEventListener('mouseleave', () => {
+        if (rafId) cancelAnimationFrame(rafId);
+        fc1.style.transform = '';
+        fc2.style.transform = '';
+    });
+})();
 </script>
 </body>
 </html>

@@ -3003,6 +3003,135 @@
             border-color: var(--card-border);
         }
 
+        /* ============================================================
+           INPUT[TYPE=NUMBER] — remove browser spin arrows for clean UI
+        ============================================================ */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="number"] { -moz-appearance: textfield; }
+
+        /* ============================================================
+           AUTOFILL — override browser yellow background on inputs
+        ============================================================ */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        textarea:-webkit-autofill,
+        select:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 1000px var(--input-bg) inset !important;
+            -webkit-text-fill-color: var(--text-primary) !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        /* ============================================================
+           MOBILE TOUCH TARGETS — minimum 44×44px interactive areas
+        ============================================================ */
+        @media (max-width: 992px) {
+            .nav-link { min-height: 44px; }
+            .mob-nav-item { min-height: 56px; }
+            .btn-sm { min-height: 36px; }
+        }
+
+        /* ============================================================
+           CARD LINK DECORATION — remove underline on card anchors
+        ============================================================ */
+        a.dashboard-card, a.stat-card, a.quick-action-card {
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        /* ============================================================
+           DROPDOWN MENU — improved shadow & border
+        ============================================================ */
+        .dropdown-menu {
+            border: 1px solid var(--card-border) !important;
+            box-shadow: 0 8px 32px rgba(0,0,0,.12), 0 2px 8px rgba(38,6,50,.06) !important;
+            border-radius: 14px !important;
+            padding: 6px !important;
+            font-size: 13.5px;
+        }
+        .dropdown-item {
+            border-radius: 10px !important;
+            padding: 8px 14px !important;
+            font-weight: 500;
+            transition: background var(--transition), color var(--transition);
+        }
+        .dropdown-item:hover {
+            background: rgba(200,77,223,.08) !important;
+            color: var(--primary) !important;
+        }
+        .dropdown-item.text-danger:hover {
+            background: rgba(239,68,68,.08) !important;
+            color: #dc2626 !important;
+        }
+        [data-theme="dark"] .dropdown-menu {
+            box-shadow: 0 8px 32px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.2) !important;
+        }
+
+        /* ============================================================
+           NAV PROGRESS BAR — brand gradient
+        ============================================================ */
+        #navProgress {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #68117e, #c84ddf, #f6af23);
+            z-index: 9999;
+            width: 0%;
+            opacity: 0;
+            transition: opacity .2s, width .1s linear;
+            border-radius: 0 3px 3px 0;
+            box-shadow: 0 0 8px rgba(200,77,223,.5);
+            pointer-events: none;
+        }
+        #navProgress.active { opacity: 1; }
+
+        /* ============================================================
+           SIDEBAR LINK — active item left bar with rounded cap
+        ============================================================ */
+        .nav-link.active::before {
+            border-radius: 0 3px 3px 0 !important;
+        }
+
+        /* ============================================================
+           INPUT GROUP TEXT — seamless with form-control border
+        ============================================================ */
+        .form-control + .input-group-text,
+        .input-group-text + .form-control {
+            border-radius: 0;
+        }
+        .input-group .form-control:last-child,
+        .input-group .input-group-text:last-child {
+            border-radius: 0 var(--radius-input) var(--radius-input) 0;
+        }
+        .input-group .form-control:first-child,
+        .input-group .input-group-text:first-child {
+            border-radius: var(--radius-input) 0 0 var(--radius-input);
+        }
+
+        /* ============================================================
+           RESPONSIVE TABLE — improved horizontal scroll on mobile
+        ============================================================ */
+        @media (max-width: 768px) {
+            .table-responsive { border-radius: var(--radius-card); }
+            .table-responsive .table { margin-bottom: 0; }
+            .table td, .table th { white-space: nowrap; }
+            /* Exceptions: allow wrapping for description columns */
+            .table td.text-wrap, .table th.text-wrap { white-space: normal; }
+        }
+
+        /* ============================================================
+           CARD FOOTER — consistent border + background
+        ============================================================ */
+        .card-footer-subtle {
+            background: var(--input-bg);
+            border-top: 1px solid var(--card-border);
+            border-radius: 0 0 var(--radius-card) var(--radius-card);
+            padding: 12px 20px;
+            font-size: 12.5px;
+            color: var(--text-muted);
+        }
+
     </style>
 
     @stack('styles')
