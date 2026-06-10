@@ -34,6 +34,13 @@
     <meta name="description" content="Smart Center Indonesia — Lembaga bimbingan belajar, kursus, dan les privat terbaik di Indonesia. Melayani TK hingga umum dengan tutor profesional, metode modern, dan hasil terukur.">
     <title>Smart Center Indonesia | Bimbel & Kursus Terbaik #1 di Indonesia</title>
 
+    <meta property="og:title" content="Smart Center Indonesia | Bimbel & Kursus Terbaik #1">
+    <meta property="og:description" content="Lembaga bimbingan belajar, kursus, dan les privat terbaik di Indonesia. Tutor profesional, metode modern, hasil terukur.">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#260632">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
@@ -115,11 +122,19 @@
         .nav-toggle.open span:nth-child(2) { opacity:0; transform:scaleX(0); }
         .nav-toggle.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
 
-        .mobile-menu { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(38,6,50,.97); backdrop-filter:blur(20px); z-index:999; flex-direction:column; align-items:center; justify-content:center; gap:1.5rem; opacity:0; transform:scale(.96); transition:opacity .3s, transform .3s; }
-        .mobile-menu.open { display:flex; opacity:1; transform:scale(1); }
-        .mobile-menu a { color:white; text-decoration:none; font-size:1.4rem; font-family:var(--font-display); font-weight:700; letter-spacing:-.02em; transition:color .2s; }
-        .mobile-menu a:hover { color:var(--primary); }
-        .mobile-close { position:absolute; top:1.5rem; right:1.5rem; background:rgba(255,255,255,.1); border:none; color:white; width:40px; height:40px; border-radius:50%; font-size:1.2rem; cursor:pointer; }
+        .mobile-menu {
+            display:flex; position:fixed; top:0; left:0; right:0; bottom:0;
+            background:rgba(38,6,50,.97); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+            z-index:999; flex-direction:column; align-items:center; justify-content:center; gap:1.5rem;
+            opacity:0; transform:scale(.96); visibility:hidden; pointer-events:none;
+            transition:opacity .35s var(--ease-out), transform .35s var(--ease-out), visibility .35s;
+        }
+        .mobile-menu.open { opacity:1; transform:scale(1); visibility:visible; pointer-events:auto; }
+        .mobile-menu a { color:rgba(255,255,255,.85); text-decoration:none; font-size:1.35rem; font-family:var(--font-display); font-weight:700; letter-spacing:-.02em; transition:color .2s, transform .2s; }
+        .mobile-menu a:hover { color:white; transform:translateX(4px); }
+        .mobile-menu .mobile-divider { width:40px; height:2px; background:rgba(255,255,255,.1); border-radius:2px; margin:.25rem 0; }
+        .mobile-close { position:absolute; top:1.5rem; right:1.5rem; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.12); color:white; width:42px; height:42px; border-radius:50%; font-size:1.1rem; cursor:pointer; transition:background .2s; display:flex; align-items:center; justify-content:center; }
+        .mobile-close:hover { background:rgba(255,255,255,.2); }
 
         /* ─── HERO ─────────────────────────────────────────────────── */
         .hero { position:relative; min-height:100vh; overflow:hidden; display:flex; align-items:center; justify-content:center; }
@@ -384,6 +399,53 @@
         .footer-bottom-links a { font-size:.78rem; color:rgba(255,255,255,.4); text-decoration:none; transition:color .2s; }
         .footer-bottom-links a:hover { color:var(--primary); }
 
+        /* ─── CABANG CARD EXTRAS ──────────────────────────────────── */
+        .cabang-phone { font-size:.8rem; color:var(--text-muted); margin-top:.4rem; display:flex; align-items:center; gap:5px; }
+        .btn-cabang-wa { display:inline-flex; align-items:center; gap:6px; margin-top:1rem; padding:.45rem 1rem; border-radius:10px; font-size:.78rem; font-weight:700; color:#128C7E; background:rgba(37,211,102,.1); border:1px solid rgba(37,211,102,.2); text-decoration:none; transition:background .2s, color .2s, transform .2s; }
+        .btn-cabang-wa:hover { background:rgba(37,211,102,.18); color:#128C7E; transform:translateY(-1px); }
+
+        /* ─── FLOATING WA BUTTON ──────────────────────────────────── */
+        .wa-float {
+            position:fixed; bottom:1.75rem; right:1.75rem; z-index:9000;
+            width:58px; height:58px; border-radius:50%;
+            background:linear-gradient(135deg,#25D366,#128C7E);
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.6rem; color:white; text-decoration:none;
+            box-shadow:0 8px 28px rgba(37,211,102,.5), 0 0 0 0 rgba(37,211,102,.3);
+            animation:wa-pulse 2.5s ease-in-out infinite;
+            transition:transform .25s var(--ease-out), box-shadow .25s;
+        }
+        .wa-float:hover { transform:scale(1.12) translateY(-2px); box-shadow:0 16px 44px rgba(37,211,102,.6), 0 0 0 8px rgba(37,211,102,.1); color:white; }
+        .wa-float-label {
+            position:absolute; right:68px; top:50%; transform:translateY(-50%);
+            background:rgba(38,6,50,.88); backdrop-filter:blur(10px);
+            color:white; font-size:.78rem; font-weight:700; white-space:nowrap;
+            padding:.38rem .85rem; border-radius:50px;
+            opacity:0; pointer-events:none;
+            transition:opacity .25s, transform .25s;
+            transform:translateY(-50%) translateX(6px);
+        }
+        .wa-float:hover .wa-float-label { opacity:1; transform:translateY(-50%) translateX(0); }
+        @keyframes wa-pulse {
+            0%,100% { box-shadow:0 8px 28px rgba(37,211,102,.5), 0 0 0 0 rgba(37,211,102,.25); }
+            50%      { box-shadow:0 8px 28px rgba(37,211,102,.5), 0 0 0 14px rgba(37,211,102,0); }
+        }
+
+        /* ─── SCROLL-TO-TOP ───────────────────────────────────────── */
+        .scroll-top {
+            position:fixed; bottom:1.75rem; left:1.75rem; z-index:9000;
+            width:46px; height:46px; border-radius:14px;
+            background:rgba(38,6,50,.82); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+            border:1px solid rgba(200,77,223,.22);
+            display:flex; align-items:center; justify-content:center;
+            color:white; font-size:1rem; cursor:pointer;
+            opacity:0; visibility:hidden;
+            transition:opacity .3s, visibility .3s, transform .3s var(--ease-out), background .2s;
+            transform:translateY(10px);
+        }
+        .scroll-top.visible { opacity:1; visibility:visible; transform:translateY(0); }
+        .scroll-top:hover { background:var(--primary); transform:translateY(-2px); }
+
         /* ─── SCROLL-REVEAL ──────────────────────────────────────── */
         .reveal { opacity:0; transform:translateY(32px); transition:opacity .7s var(--ease-out), transform .7s var(--ease-out); }
         .reveal.visible { opacity:1; transform:none; }
@@ -392,18 +454,24 @@
         .reveal-delay-3 { transition-delay:.3s; }
         .reveal-delay-4 { transition-delay:.4s; }
         .reveal-delay-5 { transition-delay:.5s; }
+        /* Fallback: show content if JS is disabled */
+        @media (scripting: none) { .reveal { opacity:1; transform:none; } }
 
         /* ─── RESPONSIVE ─────────────────────────────────────────── */
+        @media (max-width:1200px) {
+            .why-grid { grid-template-columns:repeat(3,1fr); }
+        }
         @media (max-width:1024px) {
             .float-card-1 { bottom:8rem; left:1.5rem; }
             .float-card-2 { top:7rem; right:1.5rem; }
+            .section-pad { padding:4.5rem 0; }
             .jenjang-grid { grid-template-columns:1fr 1fr; }
             .program-grid { grid-template-columns:1fr 1fr; }
             .why-grid { grid-template-columns:1fr 1fr; }
-            .tutor-grid { grid-template-columns:1fr 1fr; }
             .cabang-grid { grid-template-columns:1fr 1fr; }
             .how-inner { grid-template-columns:1fr; }
             .how-visual { order:-1; max-width:480px; margin:0 auto; }
+            .how-visual-badge { bottom:.75rem; left:.75rem; }
             .footer-grid { grid-template-columns:1fr 1fr; gap:2rem; }
             .lp-nav.scrolled { padding:.75rem 1rem; }
         }
@@ -412,6 +480,7 @@
             .nav-toggle { display:flex; }
             .lp-nav.scrolled { padding:.6rem 0; }
             .lp-nav.scrolled .nav-inner { background:rgba(255,255,255,.97); border-radius:0; padding:0 1rem; max-width:none; box-shadow:0 2px 16px rgba(0,0,0,.1); }
+            .section-pad { padding:3.75rem 0; }
             .stats-strip-inner { grid-template-columns:1fr 1fr; }
             .stat-item { border-right:none; border-bottom:1px solid rgba(200,77,223,.1); }
             .stat-item:nth-child(odd) { border-right:1px solid rgba(200,77,223,.1); }
@@ -419,27 +488,40 @@
             .jenjang-grid { grid-template-columns:1fr 1fr; }
             .program-grid { grid-template-columns:1fr; }
             .why-grid { grid-template-columns:1fr 1fr; }
-            .testi-grid { grid-template-columns:1fr; }
             .galeri-grid { grid-template-columns:1fr 1fr; }
             .galeri-item.large { grid-row:auto; min-height:220px; }
-            .tutor-grid { grid-template-columns:1fr 1fr; }
             .cabang-grid { grid-template-columns:1fr; }
             .footer-grid { grid-template-columns:1fr; gap:2rem; }
             .footer-bottom { flex-direction:column; text-align:center; }
-            .cta-box { padding:3rem 1.5rem; }
+            .cta-box { padding:3rem 1.5rem; border-radius:24px; }
             .float-card { display:none; }
+            .scroll-indicator { display:none; }
+            .wa-float { width:52px; height:52px; font-size:1.4rem; bottom:1.25rem; right:1.25rem; }
+            .scroll-top { bottom:1.25rem; left:1.25rem; }
         }
         @media (max-width:480px) {
-            .hero-inner { padding:7rem 1.25rem 6rem; }
-            .hero-title { font-size:2rem; }
+            .section-pad { padding:3rem 0; }
+            .hero-inner { padding:6.5rem 1.25rem 5.5rem; }
+            .hero-title { font-size:clamp(1.9rem,8vw,2.4rem); }
             .btn-hero-primary, .btn-hero-secondary { width:100%; justify-content:center; }
             .cta-btns > * { width:100%; justify-content:center; }
             .hero-dots { bottom:4.5rem; }
-            .jenjang-grid { grid-template-columns:1fr; }
-            .why-grid { grid-template-columns:1fr; }
-            .tutor-grid { grid-template-columns:1fr; }
+            .jenjang-grid { grid-template-columns:1fr 1fr; gap:1rem; }
+            .why-grid { grid-template-columns:1fr 1fr; }
             .galeri-grid { grid-template-columns:1fr; }
             .galeri-item.large { min-height:240px; }
+            .testi-card { width:300px; }
+            .tutor-card { width:200px; }
+            .tutor-avatar-wrap { height:170px; }
+            .section-title { font-size:clamp(1.55rem,6vw,2rem); }
+            .how-inner { gap:2.5rem; }
+            .footer-grid { gap:1.5rem; }
+            .cta-box { padding:2.5rem 1.25rem; }
+        }
+        @media (max-width:360px) {
+            .testi-card { width:260px; }
+            .tutor-card { width:175px; }
+            .jenjang-grid { grid-template-columns:1fr; }
         }
     </style>
 </head>
@@ -462,6 +544,7 @@
             <li><a href="#mengapa-sci"  class="nav-link-item">Mengapa SCI</a></li>
             <li><a href="#tutor"        class="nav-link-item">Tutor</a></li>
             <li><a href="#testimonials" class="nav-link-item">Testimoni</a></li>
+            <li><a href="#cabang"       class="nav-link-item">Cabang</a></li>
         </ul>
 
         <div class="nav-cta">
@@ -476,15 +559,17 @@
 </nav>
 
 {{-- Mobile Menu --}}
-<div class="mobile-menu" id="mobileMenu">
-    <button class="mobile-close" id="mobileClose"><i class="bi bi-x-lg"></i></button>
+<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <button class="mobile-close" id="mobileClose" aria-label="Tutup menu"><i class="bi bi-x-lg"></i></button>
     <a href="#program"      onclick="closeMobile()">Program</a>
     <a href="#jenjang"      onclick="closeMobile()">Jenjang</a>
     <a href="#mengapa-sci"  onclick="closeMobile()">Mengapa SCI</a>
     <a href="#tutor"        onclick="closeMobile()">Tutor</a>
     <a href="#testimonials" onclick="closeMobile()">Testimoni</a>
-    <a href="{{ route('login') }}"    style="color:rgba(255,255,255,.7);font-size:1.1rem;font-weight:600">Masuk</a>
-    <a href="{{ route('register') }}" style="background:linear-gradient(135deg,var(--primary-dark),var(--primary));padding:.8rem 2.5rem;border-radius:14px;font-size:1rem">Daftar Sekarang</a>
+    <a href="#cabang"       onclick="closeMobile()">Cabang</a>
+    <div class="mobile-divider"></div>
+    <a href="{{ route('login') }}"    onclick="closeMobile()" style="color:rgba(255,255,255,.65);font-size:1.05rem;font-weight:600"><i class="bi bi-box-arrow-in-right" style="font-size:.9rem"></i> Masuk</a>
+    <a href="{{ route('register') }}" onclick="closeMobile()" style="background:linear-gradient(135deg,var(--primary-dark),var(--primary));padding:.8rem 2.5rem;border-radius:14px;font-size:1rem;color:white">Daftar Sekarang</a>
 </div>
 
 {{-- ─────────────────────────────── HERO ──────────────────────────────────── --}}
@@ -666,70 +751,70 @@
 
         <div class="program-grid">
             {{-- Bimbel --}}
-            <div class="program-card reveal reveal-delay-1">
+            <a href="{{ route('register') }}" class="program-card reveal reveal-delay-1" style="text-decoration:none;color:inherit">
                 <div class="pc-badge" style="background:rgba(200,77,223,.1);color:var(--primary-dark);">SEMUA JENJANG</div>
                 <div class="pc-icon-wrap" style="background:rgba(200,77,223,.1);">
                     <span style="font-size:1.5rem">📖</span>
                 </div>
                 <div class="pc-title">Bimbel Mata Pelajaran</div>
                 <div class="pc-desc">Bimbingan semua mata pelajaran sekolah dengan metode efektif dan menyenangkan untuk meningkatkan nilai secara signifikan.</div>
-                <div class="pc-link">Lihat Detail <i class="bi bi-chevron-down"></i></div>
-            </div>
+                <div class="pc-link">Daftar Sekarang <i class="bi bi-arrow-right"></i></div>
+            </a>
 
             {{-- Ujian --}}
-            <div class="program-card reveal reveal-delay-2">
+            <a href="{{ route('register') }}" class="program-card reveal reveal-delay-2" style="text-decoration:none;color:inherit">
                 <div class="pc-badge" style="background:rgba(99,102,241,.1);color:#4f46e5;">SMP · SMA</div>
                 <div class="pc-icon-wrap" style="background:rgba(99,102,241,.1);">
                     <span style="font-size:1.5rem">📝</span>
                 </div>
                 <div class="pc-title">Persiapan Ujian</div>
                 <div class="pc-desc">Persiapan UTS, UAS & Ujian Sekolah agar nilai meningkat pesat dan lulus dengan hasil terbaik.</div>
-                <div class="pc-link">Lihat Detail <i class="bi bi-chevron-down"></i></div>
-            </div>
+                <div class="pc-link">Daftar Sekarang <i class="bi bi-arrow-right"></i></div>
+            </a>
 
             {{-- Tes Masuk --}}
-            <div class="program-card reveal reveal-delay-3">
+            <a href="{{ route('register') }}" class="program-card reveal reveal-delay-3" style="text-decoration:none;color:inherit">
                 <div class="pc-badge" style="background:rgba(239,68,68,.1);color:#dc2626;">INTENSIF</div>
                 <div class="pc-icon-wrap" style="background:rgba(239,68,68,.1);">
                     <span style="font-size:1.5rem">🎯</span>
                 </div>
                 <div class="pc-title">Persiapan Tes & SBMPTN</div>
                 <div class="pc-desc">Persiapan masuk sekolah favorit, PTN, CPNS & tes lainnya secara intensif dengan mentor berpengalaman.</div>
-                <div class="pc-link">Lihat Detail <i class="bi bi-chevron-down"></i></div>
-            </div>
+                <div class="pc-link">Daftar Sekarang <i class="bi bi-arrow-right"></i></div>
+            </a>
 
             {{-- Bahasa --}}
-            <div class="program-card reveal reveal-delay-1">
+            <a href="{{ route('register') }}" class="program-card reveal reveal-delay-1" style="text-decoration:none;color:inherit">
                 <div class="pc-badge" style="background:rgba(20,184,166,.1);color:#0f766e;">SEMUA LEVEL</div>
                 <div class="pc-icon-wrap" style="background:rgba(20,184,166,.1);">
                     <span style="font-size:1.5rem">🌐</span>
                 </div>
                 <div class="pc-title">Kursus Bahasa</div>
                 <div class="pc-desc">Inggris, Jepang, Mandarin, Arab — tingkatkan kemampuan bahasa Anda bersama tutor native & bersertifikat.</div>
-                <div class="pc-link">Lihat Detail <i class="bi bi-chevron-down"></i></div>
-            </div>
+                <div class="pc-link">Daftar Sekarang <i class="bi bi-arrow-right"></i></div>
+            </a>
 
             {{-- Komputer --}}
-            <div class="program-card reveal reveal-delay-2" style="border-color:rgba(246,175,35,.3);">
+            <a href="{{ route('register') }}" class="program-card reveal reveal-delay-2" style="text-decoration:none;color:inherit;border-color:rgba(246,175,35,.3)">
                 <div class="pc-badge" style="background:rgba(246,175,35,.15);color:var(--gold-dark);">POPULER 🔥</div>
                 <div class="pc-icon-wrap" style="background:rgba(246,175,35,.1);">
                     <span style="font-size:1.5rem">💻</span>
                 </div>
                 <div class="pc-title">Kursus Komputer</div>
                 <div class="pc-desc">Microsoft Office, Desain Grafis, Programming — teknologi terkini untuk karir dan masa depan gemilang.</div>
-                <div class="pc-link">Lihat Detail <i class="bi bi-chevron-down"></i></div>
-            </div>
+                <div class="pc-link">Daftar Sekarang <i class="bi bi-arrow-right"></i></div>
+            </a>
 
             {{-- Akuntansi --}}
-            <div class="program-card reveal reveal-delay-3" style="border-color:rgba(16,185,129,.25);">
+            <a href="{{ route('register') }}" class="program-card reveal reveal-delay-3" style="text-decoration:none;color:inherit;border-color:rgba(16,185,129,.25)">
                 <div class="pc-badge" style="background:rgba(16,185,129,.1);color:#059669;">TERBARU ✨</div>
                 <div class="pc-icon-wrap" style="background:rgba(16,185,129,.1);">
                     <span style="font-size:1.5rem">📊</span>
                 </div>
                 <div class="pc-title">Kursus Akuntansi</div>
                 <div class="pc-desc">Akuntansi dasar hingga profesional, perpajakan & keuangan untuk mahasiswa dan karyawan.</div>
-                <div class="pc-link">Lihat Detail <i class="bi bi-chevron-down"></i></div>
-            </div>
+                <div class="pc-link">Daftar Sekarang <i class="bi bi-arrow-right"></i></div>
+            </a>
         </div>
     </div>
 </section>
@@ -917,23 +1002,23 @@
 
         <div class="galeri-grid reveal">
             <div class="galeri-item large">
-                <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=800&q=80" alt="Kegiatan belajar SCI">
+                <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=800&q=80" alt="Kegiatan belajar SCI" loading="lazy">
                 <div class="galeri-overlay"><span>Sesi Belajar Interaktif</span></div>
             </div>
             <div class="galeri-item">
-                <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=800&q=80" alt="Diskusi kelompok">
+                <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=800&q=80" alt="Diskusi kelompok" loading="lazy">
                 <div class="galeri-overlay"><span>Diskusi Kelompok</span></div>
             </div>
             <div class="galeri-item">
-                <img src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=800&q=80" alt="Les privat">
+                <img src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=800&q=80" alt="Les privat" loading="lazy">
                 <div class="galeri-overlay"><span>Les Privat 1 on 1</span></div>
             </div>
             <div class="galeri-item">
-                <img src="https://images.unsplash.com/photo-1509869175650-a1d97972541a?auto=format&fit=crop&w=800&q=80" alt="Kelas komputer">
+                <img src="https://images.unsplash.com/photo-1509869175650-a1d97972541a?auto=format&fit=crop&w=800&q=80" alt="Kelas komputer" loading="lazy">
                 <div class="galeri-overlay"><span>Kursus Komputer</span></div>
             </div>
             <div class="galeri-item">
-                <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80" alt="Persiapan ujian">
+                <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80" alt="Persiapan ujian" loading="lazy">
                 <div class="galeri-overlay"><span>Persiapan Ujian</span></div>
             </div>
         </div>
@@ -1027,11 +1112,15 @@
         @if($branches->count() > 0)
         <div class="cabang-grid">
             @foreach($branches as $i => $branch)
+            @php $branchName = $branch->nama ?? $branch->name ?? 'Cabang SCI'; @endphp
             <div class="cabang-card reveal reveal-delay-{{ ($i % 3) + 1 }}">
                 <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
-                <div class="cabang-name">{{ $branch->nama ?? $branch->name ?? 'Cabang SCI' }}</div>
+                <div class="cabang-name">{{ $branchName }}</div>
                 <div class="cabang-address">{{ $branch->alamat ?? $branch->address ?? 'Indonesia' }}</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
+                <a href="https://wa.me/628001234567?text={{ urlencode('Halo SCI, saya ingin tanya tentang program di cabang '.$branchName) }}" target="_blank" rel="noopener" class="btn-cabang-wa">
+                    <i class="bi bi-whatsapp"></i> Hubungi Cabang
+                </a>
             </div>
             @endforeach
         </div>
@@ -1042,36 +1131,42 @@
                 <div class="cabang-name">SCI Pusat — Jakarta</div>
                 <div class="cabang-address">Jl. Pendidikan No. 1, Jakarta Selatan</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
+                <a href="https://wa.me/628001234567?text={{ urlencode('Halo SCI Jakarta, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
             </div>
             <div class="cabang-card reveal reveal-delay-2">
                 <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
                 <div class="cabang-name">SCI Surabaya</div>
                 <div class="cabang-address">Jl. Raya Darmo No. 45, Surabaya</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
+                <a href="https://wa.me/628001234567?text={{ urlencode('Halo SCI Surabaya, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
             </div>
             <div class="cabang-card reveal reveal-delay-3">
                 <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
                 <div class="cabang-name">SCI Bandung</div>
                 <div class="cabang-address">Jl. Asia Afrika No. 22, Bandung</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
+                <a href="https://wa.me/628001234567?text={{ urlencode('Halo SCI Bandung, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
             </div>
             <div class="cabang-card reveal reveal-delay-1">
                 <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
                 <div class="cabang-name">SCI Yogyakarta</div>
                 <div class="cabang-address">Jl. Malioboro No. 88, Yogyakarta</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
+                <a href="https://wa.me/628001234567?text={{ urlencode('Halo SCI Yogyakarta, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
             </div>
             <div class="cabang-card reveal reveal-delay-2">
                 <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
                 <div class="cabang-name">SCI Medan</div>
                 <div class="cabang-address">Jl. Gatot Subroto No. 12, Medan</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
+                <a href="https://wa.me/628001234567?text={{ urlencode('Halo SCI Medan, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
             </div>
             <div class="cabang-card reveal reveal-delay-3">
                 <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
                 <div class="cabang-name">SCI Makassar</div>
                 <div class="cabang-address">Jl. Penghibur No. 5, Makassar</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
+                <a href="https://wa.me/628001234567?text={{ urlencode('Halo SCI Makassar, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
             </div>
         </div>
         @endif
@@ -1100,6 +1195,17 @@
         </div>
     </div>
 </section>
+
+{{-- ──────────────────────────── FLOATING BUTTONS ──────────────────────────── --}}
+<a href="https://wa.me/628001234567?text={{ urlencode('Halo Smart Center Indonesia! Saya ingin konsultasi tentang program bimbel/kursus. Bisa bantu?') }}"
+   class="wa-float" target="_blank" rel="noopener" aria-label="Hubungi via WhatsApp">
+    <i class="bi bi-whatsapp"></i>
+    <span class="wa-float-label">Konsultasi Gratis 💬</span>
+</a>
+
+<button class="scroll-top" id="scrollTopBtn" aria-label="Kembali ke atas" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <i class="bi bi-arrow-up"></i>
+</button>
 
 {{-- ──────────────────────────── FOOTER ────────────────────────────────────── --}}
 <footer class="footer">
@@ -1188,19 +1294,22 @@ const navObs = new IntersectionObserver((entries) => {
 sections.forEach(s => navObs.observe(s));
 
 /* ── Mobile menu ── */
-const toggle    = document.getElementById('navToggle');
+const toggle     = document.getElementById('navToggle');
 const mobileMenu = document.getElementById('mobileMenu');
 const mobileClose = document.getElementById('mobileClose');
 toggle.addEventListener('click', () => {
     const open = mobileMenu.classList.toggle('open');
     toggle.classList.toggle('open', open);
     document.body.style.overflow = open ? 'hidden' : '';
+    mobileMenu.setAttribute('aria-hidden', open ? 'false' : 'true');
 });
 mobileClose.addEventListener('click', closeMobile);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobile(); });
 function closeMobile() {
     mobileMenu.classList.remove('open');
     toggle.classList.remove('open');
     document.body.style.overflow = '';
+    mobileMenu.setAttribute('aria-hidden', 'true');
 }
 
 /* ── Hero slideshow ── */
@@ -1282,6 +1391,20 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
         if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     });
 });
+
+/* ── Scroll-to-top ── */
+const scrollTopBtn = document.getElementById('scrollTopBtn');
+window.addEventListener('scroll', () => {
+    scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
+}, { passive: true });
+
+/* ── Respect reduced-motion ── */
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll('.carousel-track, .tutor-carousel-track').forEach(el => {
+        el.style.animationDuration = '0s';
+        el.style.animationPlayState = 'paused';
+    });
+}
 </script>
 </body>
 </html>
