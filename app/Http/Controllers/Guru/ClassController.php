@@ -12,7 +12,7 @@ class ClassController extends Controller
     public function index()
     {
         $teacher = Teacher::where('user_id', auth()->id())->first();
-        $classes = SchoolClass::with('mataPelajaran', 'cabang', 'tahunAkademik')
+        $classes = SchoolClass::with('mataPelajaran', 'cabang', 'tahunAkademik', 'siswa')
             ->when($teacher, fn($q) => $q->where('guru_id', $teacher->id))
             ->get();
 
