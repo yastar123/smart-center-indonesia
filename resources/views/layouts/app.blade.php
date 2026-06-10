@@ -1229,6 +1229,11 @@
             .modal-content { border-radius: 16px; }
             #globalToastWrap { right: 10px; left: 10px; max-width: 100%; }
             .g-toast { max-width: 100%; min-width: 0; }
+            /* Quick-action card tighter on small phones */
+            .quick-action-card { padding: 12px 10px !important; gap: 10px !important; }
+            .quick-action-icon { width: 40px !important; height: 40px !important; font-size: 17px !important; border-radius: 11px !important; }
+            .quick-action-label { font-size: 12px !important; }
+            .quick-action-desc  { font-size: 10px !important; }
         }
 
         /* ============================================================

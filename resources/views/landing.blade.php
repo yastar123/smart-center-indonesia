@@ -539,64 +539,19 @@
             font-size: .7rem; color: var(--text-muted); font-weight: 500;
         }
 
-        @keyframes grow-bar {
-            from { transform: scaleY(0); transform-origin: bottom; }
-            to   { transform: scaleY(1); transform-origin: bottom; }
-        }
-        .chart-label {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-        }
-        .chart-label span { font-size: .65rem; color: rgba(255,255,255,.4); }
-
-        /* Floating mini-cards */
-        .float-card {
+        /* Floating particles in hero */
+        .particle {
             position: absolute;
-            background: white;
-            border-radius: 16px;
-            padding: 12px 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,.25), 0 0 0 1px rgba(200,77,223,.1);
-            animation: float-card 4s ease-in-out infinite alternate;
-            z-index: 3;
-            white-space: nowrap;
+            border-radius: 50%;
+            background: rgba(255,255,255,.35);
+            animation: float-particle linear infinite;
+            pointer-events: none;
         }
-        .float-card-1 {
-            bottom: -20px; left: -40px;
-            animation-delay: 0s;
-        }
-        .float-card-2 {
-            top: -15px; right: -30px;
-            animation-delay: 2s;
-        }
-        @keyframes float-card {
-            from { transform: translateY(0) rotate(-1deg); }
-            to   { transform: translateY(-12px) rotate(1deg); }
-        }
-        .float-card-content {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .float-icon {
-            width: 36px; height: 36px;
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px;
-            flex-shrink: 0;
-        }
-        .float-card-text { font-family: var(--font-display); }
-        .float-card-text .fc-val {
-            font-size: 1rem;
-            font-weight: 800;
-            color: var(--deep);
-            line-height: 1;
-            letter-spacing: -.02em;
-        }
-        .float-card-text .fc-lab {
-            font-size: .7rem;
-            color: var(--text-muted);
-            font-weight: 500;
+        @keyframes float-particle {
+            0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+            10%  { opacity: 1; }
+            90%  { opacity: 1; }
+            100% { transform: translateY(-60px) scale(1); opacity: 0; }
         }
 
         @keyframes fade-up {
