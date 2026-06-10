@@ -473,13 +473,14 @@
             .how-visual { order:-1; max-width:480px; margin:0 auto; }
             .how-visual-badge { bottom:.75rem; left:.75rem; }
             .footer-grid { grid-template-columns:1fr 1fr; gap:2rem; }
-            .lp-nav.scrolled { padding:.75rem 1rem; }
-        }
-        @media (max-width:768px) {
+            /* hamburger at tablet — 6 links + 2 CTA don't fit in pill nav */
             .nav-links, .nav-cta { display:none; }
             .nav-toggle { display:flex; }
             .lp-nav.scrolled { padding:.6rem 0; }
             .lp-nav.scrolled .nav-inner { background:rgba(255,255,255,.97); border-radius:0; padding:0 1rem; max-width:none; box-shadow:0 2px 16px rgba(0,0,0,.1); }
+        }
+        @media (max-width:768px) {
+            .lp-nav.scrolled { padding:.6rem 0; }
             .section-pad { padding:3.75rem 0; }
             .stats-strip-inner { grid-template-columns:1fr 1fr; }
             .stat-item { border-right:none; border-bottom:1px solid rgba(200,77,223,.1); }
@@ -651,10 +652,6 @@
         <button class="hero-dot"        data-slide="2" aria-label="Slide 3"></button>
     </div>
 
-    <div class="scroll-indicator">
-        <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
-        <span>Scroll</span>
-    </div>
 </section>
 
 {{-- ──────────────────────────── STATS STRIP ───────────────────────────────── --}}
