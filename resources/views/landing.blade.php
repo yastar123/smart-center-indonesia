@@ -4,6 +4,27 @@
         'teachers' => \App\Models\Teacher::where('status','aktif')->count(),
         'branches' => \App\Models\Branch::count(),
     ];
+    $tutors = \App\Models\Teacher::where('status','aktif')->get();
+    if ($tutors->isEmpty()) {
+        $tutors = collect([
+            (object)['name'=>'Ahmad Fauzi, S.Pd',   'subjects'=>['Matematika'],        'photo'=>null],
+            (object)['name'=>'Sarah Dewi, M.Pd',    'subjects'=>['Bahasa Inggris'],     'photo'=>null],
+            (object)['name'=>'Budi Santoso, S.Si',  'subjects'=>['IPA / Fisika'],       'photo'=>null],
+            (object)['name'=>'Rina Agustina, S.Kom','subjects'=>['Komputer & IT'],      'photo'=>null],
+            (object)['name'=>'Dina Rahayu, S.Pd',   'subjects'=>['Bahasa Indonesia'],   'photo'=>null],
+            (object)['name'=>'Eko Prasetyo, M.Sc',  'subjects'=>['Kimia'],             'photo'=>null],
+        ]);
+    }
+    $tutorGrads = [
+        'linear-gradient(160deg,#260632,#c84ddf)',
+        'linear-gradient(160deg,#1a3a6b,#2563eb)',
+        'linear-gradient(160deg,#064e3b,#10b981)',
+        'linear-gradient(160deg,#7c2d12,#f97316)',
+        'linear-gradient(160deg,#312e81,#8b5cf6)',
+        'linear-gradient(160deg,#881337,#f43f5e)',
+        'linear-gradient(160deg,#134e4a,#14b8a6)',
+        'linear-gradient(160deg,#422006,#f59e0b)',
+    ];
 @endphp
 <!DOCTYPE html>
 <html lang="id">
@@ -240,19 +261,50 @@
         .hvb-text .hvb-val { font-size:1.2rem; font-weight:900; color:var(--deep); font-family:var(--font-display); line-height:1; }
         .hvb-text .hvb-lab { font-size:.7rem; color:var(--text-muted); font-weight:500; margin-top:2px; }
 
-        /* ─── TESTIMONIALS ────────────────────────────────────────── */
+        /* ─── TESTIMONIALS INFINITE CAROUSEL ─────────────────────── */
         .testimonials-bg { background:linear-gradient(135deg,var(--deep) 0%,var(--mid) 50%,#8b1fa8 100%); position:relative; overflow:hidden; }
         .testimonials-bg::before { content:''; position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px); background-size:40px 40px; }
         .testimonials-inner { position:relative; z-index:1; }
-        .testi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; margin-top:3rem; }
-        .testi-card { background:rgba(255,255,255,.07); backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,.1); border-radius:22px; padding:1.75rem; transition:transform .3s, background .3s; }
+
+        .carousel-viewport {
+            overflow:hidden; position:relative; margin-top:3rem;
+        }
+        .carousel-viewport::before,
+        .carousel-viewport::after {
+            content:''; position:absolute; top:0; bottom:0; width:120px; z-index:2; pointer-events:none;
+        }
+        .carousel-viewport::before { left:0;  background:linear-gradient(to right, rgba(38,6,50,1) 0%, transparent 100%); }
+        .carousel-viewport::after  { right:0; background:linear-gradient(to left,  rgba(38,6,50,1) 0%, transparent 100%); }
+
+        .carousel-track {
+            display:flex; gap:1.25rem;
+            width:max-content;
+            animation: marquee-scroll 38s linear infinite;
+        }
+        .carousel-track:hover { animation-play-state: paused; }
+
+        @keyframes marquee-scroll {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .testi-card {
+            background:rgba(255,255,255,.07); backdrop-filter:blur(16px);
+            border:1px solid rgba(255,255,255,.1); border-radius:22px;
+            padding:1.75rem; width:360px; flex-shrink:0;
+            transition:transform .3s, background .3s;
+        }
         .testi-card:hover { transform:translateY(-5px); background:rgba(255,255,255,.11); }
         .testi-stars { display:flex; gap:3px; margin-bottom:1rem; color:var(--gold); font-size:.85rem; }
-        .testi-text { font-size:.88rem; color:rgba(255,255,255,.85); line-height:1.7; margin-bottom:1.25rem; }
+        .testi-text { font-size:.88rem; color:rgba(255,255,255,.85); line-height:1.7; margin-bottom:1.25rem; min-height:80px; }
         .testi-author { display:flex; align-items:center; gap:10px; }
         .testi-avatar { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1rem; font-weight:800; color:white; flex-shrink:0; }
         .testi-name { font-size:.88rem; font-weight:700; color:white; }
         .testi-role { font-size:.72rem; color:rgba(255,255,255,.5); font-weight:500; }
+
+        /* fade edge for tutor carousel (light bg) */
+        .tutor-carousel-viewport::before { background:linear-gradient(to right, var(--off-white) 0%, transparent 100%) !important; }
+        .tutor-carousel-viewport::after  { background:linear-gradient(to left,  var(--off-white) 0%, transparent 100%) !important; }
 
         /* ─── GALERI ──────────────────────────────────────────────── */
         .galeri-grid { display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:auto auto; gap:1rem; margin-top:2.5rem; }
@@ -266,19 +318,30 @@
         .galeri-item:hover .galeri-overlay { opacity:1; }
         .galeri-overlay span { color:white; font-size:.82rem; font-weight:600; font-family:var(--font-display); }
 
-        /* ─── TUTOR ───────────────────────────────────────────────── */
+        /* ─── TUTOR INFINITE CAROUSEL ────────────────────────────── */
         .tutor-bg { background:var(--off-white); }
-        .tutor-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.5rem; margin-top:3rem; }
-        .tutor-card { background:white; border-radius:22px; overflow:hidden; border:1px solid rgba(200,77,223,.1); box-shadow:0 4px 18px rgba(38,6,50,.06); transition:transform .35s var(--ease-out), box-shadow .35s; text-align:center; }
+        .tutor-carousel-track {
+            display:flex; gap:1.25rem;
+            width:max-content;
+            animation: marquee-scroll 32s linear infinite;
+        }
+        .tutor-carousel-track:hover { animation-play-state: paused; }
+        .tutor-card {
+            background:white; border-radius:22px; overflow:hidden;
+            border:1px solid rgba(200,77,223,.1);
+            box-shadow:0 4px 18px rgba(38,6,50,.06);
+            transition:transform .35s var(--ease-out), box-shadow .35s;
+            text-align:center; width:240px; flex-shrink:0;
+        }
         .tutor-card:hover { transform:translateY(-6px); box-shadow:0 18px 50px rgba(38,6,50,.14); }
-        .tutor-avatar-wrap { height:180px; position:relative; overflow:hidden; }
+        .tutor-avatar-wrap { height:200px; position:relative; overflow:hidden; }
         .tutor-avatar-wrap img { width:100%; height:100%; object-fit:cover; object-position:top center; }
         .tutor-avatar-fallback { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:3.5rem; font-weight:900; color:white; font-family:var(--font-display); }
         .tutor-badge-subject { position:absolute; bottom:.75rem; left:50%; transform:translateX(-50%); background:rgba(38,6,50,.85); backdrop-filter:blur(8px); color:white; font-size:.68rem; font-weight:700; padding:3px 12px; border-radius:50px; white-space:nowrap; letter-spacing:.04em; }
-        .tutor-info { padding:1.25rem 1.25rem 1.5rem; }
-        .tutor-name { font-size:1rem; font-weight:800; color:var(--deep); font-family:var(--font-display); margin-bottom:.25rem; }
-        .tutor-meta { font-size:.78rem; color:var(--text-muted); margin-bottom:.75rem; }
-        .tutor-stars { display:flex; gap:2px; justify-content:center; color:var(--gold); font-size:.75rem; }
+        .tutor-info { padding:1rem 1rem 1.25rem; }
+        .tutor-name { font-size:.9rem; font-weight:800; color:var(--deep); font-family:var(--font-display); margin-bottom:.2rem; line-height:1.3; }
+        .tutor-meta { font-size:.73rem; color:var(--text-muted); margin-bottom:.6rem; }
+        .tutor-stars { display:flex; gap:2px; justify-content:center; color:var(--gold); font-size:.72rem; }
 
         /* ─── CABANG ──────────────────────────────────────────────── */
         .cabang-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; margin-top:3rem; }
@@ -780,59 +843,64 @@
 
 {{-- ──────────────────────────── TESTIMONIALS ──────────────────────────────── --}}
 <section class="section-pad testimonials-bg" id="testimonials">
-    <div class="container-lp testimonials-inner">
-        <div class="text-center reveal">
-            <div class="section-eyebrow" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.9)">
-                <i class="bi bi-chat-heart-fill"></i> Kata Mereka
+    <div class="testimonials-inner">
+        <div class="container-lp">
+            <div class="text-center reveal">
+                <div class="section-eyebrow" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.9)">
+                    <i class="bi bi-chat-heart-fill"></i> Kata Mereka
+                </div>
+                <h2 class="section-title" style="color:white">Testimoni Siswa</h2>
+                <p class="section-subtitle mx-auto" style="color:rgba(255,255,255,.7)">Dengarkan cerita sukses ribuan siswa yang telah mempercayai SCI sebagai mitra belajar mereka.</p>
             </div>
-            <h2 class="section-title" style="color:white">Testimoni Siswa</h2>
-            <p class="section-subtitle mx-auto" style="color:rgba(255,255,255,.7)">Dengarkan cerita sukses ribuan siswa yang telah mempercayai SCI sebagai mitra belajar mereka.</p>
         </div>
 
-        <div class="testi-grid">
-            <div class="testi-card reveal reveal-delay-1">
-                <div class="testi-stars">
-                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                </div>
-                <p class="testi-text">"Nilai matematika saya naik dari 60 ke 90 setelah 3 bulan bimbel di SCI! Tutornya sabar dan cara jelasinnya mudah dipahami. Sekarang saya jadi suka matematika."</p>
-                <div class="testi-author">
-                    <div class="testi-avatar" style="background:linear-gradient(135deg,#c84ddf,#68117e)">R</div>
-                    <div>
-                        <div class="testi-name">Rini Kusumawati</div>
-                        <div class="testi-role">Siswa SMA · Surabaya</div>
+        {{-- Infinite carousel — items duplicated for seamless loop --}}
+        <div class="carousel-viewport">
+            <div class="carousel-track">
+                @php
+                $testiItems = [
+                    ['text'=>'"Nilai matematika saya naik dari 60 ke 90 setelah 3 bulan bimbel di SCI! Tutornya sabar dan cara jelasinnya mudah dipahami. Sekarang saya jadi suka matematika."','name'=>'Rini Kusumawati','role'=>'Siswa SMA · Surabaya','init'=>'R','grad'=>'linear-gradient(135deg,#c84ddf,#68117e)'],
+                    ['text'=>'"Anak saya dulu kesulitan di Bahasa Inggris. Sejak les di SCI, dalam 2 bulan sudah bisa percakapan dasar dengan lancar. Tutornya sangat profesional dan sabar."','name'=>'Dimas Prasetyo','role'=>'Orang Tua Siswa SD · Jakarta','init'=>'D','grad'=>'linear-gradient(135deg,#f6af23,#e09000)'],
+                    ['text'=>'"Berkat program intensif SBMPTN di SCI, saya berhasil masuk ITB! Materinya lengkap, soal-soal latihannya mirip ujian asli, dan tutornya selalu siap membantu."','name'=>'Siti Nuraini','role'=>'Mahasiswa ITB · Bandung','init'=>'S','grad'=>'linear-gradient(135deg,#10b981,#059669)'],
+                    ['text'=>'"Kursus komputer di SCI luar biasa! Dalam 3 bulan saya sudah bisa desain grafis dan sekarang sudah dapat klien freelance. Materi up-to-date dan tutornya expert."','name'=>'Andika Putra','role'=>'Alumni Kursus Komputer · Yogyakarta','init'=>'A','grad'=>'linear-gradient(135deg,#6366f1,#4338ca)'],
+                    ['text'=>'"Les privat Bahasa Jepang di SCI sangat membantu persiapan JLPT N3 saya. Tutor datang ke rumah, jadwal fleksibel, dan materi disesuaikan kebutuhan. Alhamdulillah lulus!"','name'=>'Melati Dewi','role'=>'Karyawan · Bekasi','init'=>'M','grad'=>'linear-gradient(135deg,#f43f5e,#be123c)'],
+                    ['text'=>'"SCI benar-benar membantu anakku yang kelas 4 SD. Dulu nilainya selalu di bawah rata-rata, sekarang masuk 10 besar kelas. Guru-gurunya baik dan tidak bikin bosan belajar."','name'=>'Hendra Wijaya','role'=>'Orang Tua Siswa SD · Surabaya','init'=>'H','grad'=>'linear-gradient(135deg,#14b8a6,#0f766e)'],
+                ];
+                @endphp
+                {{-- Set 1 --}}
+                @foreach($testiItems as $t)
+                <div class="testi-card">
+                    <div class="testi-stars">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                    </div>
+                    <p class="testi-text">{{ $t['text'] }}</p>
+                    <div class="testi-author">
+                        <div class="testi-avatar" style="background:{{ $t['grad'] }}">{{ $t['init'] }}</div>
+                        <div>
+                            <div class="testi-name">{{ $t['name'] }}</div>
+                            <div class="testi-role">{{ $t['role'] }}</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="testi-card reveal reveal-delay-2">
-                <div class="testi-stars">
-                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                </div>
-                <p class="testi-text">"Anak saya dulu kesulitan di pelajaran Bahasa Inggris. Sejak les di SCI, dalam 2 bulan sudah bisa percakapan dasar dengan lancar. Tutornya sangat profesional."</p>
-                <div class="testi-author">
-                    <div class="testi-avatar" style="background:linear-gradient(135deg,#f6af23,#e09000)">D</div>
-                    <div>
-                        <div class="testi-name">Dimas Prasetyo</div>
-                        <div class="testi-role">Orang Tua Siswa SD · Jakarta</div>
+                @endforeach
+                {{-- Set 2 (duplicate for seamless loop) --}}
+                @foreach($testiItems as $t)
+                <div class="testi-card">
+                    <div class="testi-stars">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                    </div>
+                    <p class="testi-text">{{ $t['text'] }}</p>
+                    <div class="testi-author">
+                        <div class="testi-avatar" style="background:{{ $t['grad'] }}">{{ $t['init'] }}</div>
+                        <div>
+                            <div class="testi-name">{{ $t['name'] }}</div>
+                            <div class="testi-role">{{ $t['role'] }}</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="testi-card reveal reveal-delay-3">
-                <div class="testi-stars">
-                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                </div>
-                <p class="testi-text">"Berkat program intensif SBMPTN di SCI, saya berhasil masuk ITB! Materinya lengkap, soal-soal latihannya mirip ujian asli, dan tutornya selalu siap membantu."</p>
-                <div class="testi-author">
-                    <div class="testi-avatar" style="background:linear-gradient(135deg,#10b981,#059669)">S</div>
-                    <div>
-                        <div class="testi-name">Siti Nuraini</div>
-                        <div class="testi-role">Mahasiswa ITB · Bandung</div>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </div>
@@ -880,67 +948,65 @@
             <h2 class="section-title">Tutor Terbaik Kami</h2>
             <p class="section-subtitle mx-auto">Dilatih secara profesional dan berpengalaman di bidangnya masing-masing untuk memastikan kualitas belajar terbaik.</p>
         </div>
+    </div>
 
-        <div class="tutor-grid">
-            <div class="tutor-card reveal reveal-delay-1">
-                <div class="tutor-avatar-wrap" style="background:linear-gradient(160deg,var(--deep),var(--primary))">
-                    <div class="tutor-avatar-fallback">A</div>
-                    <div class="tutor-badge-subject">Matematika</div>
+    {{-- Infinite tutor carousel — full width, edge-faded --}}
+    <div class="carousel-viewport tutor-carousel-viewport" style="margin-top:3rem;">
+        <div class="tutor-carousel-track">
+            {{-- Set 1 --}}
+            @foreach($tutors as $i => $tutor)
+            @php
+                $grad  = $tutorGrads[$i % count($tutorGrads)];
+                $subj  = is_array($tutor->subjects) ? implode(', ', array_slice($tutor->subjects, 0, 2)) : ($tutor->subjects ?? 'Tutor');
+                $init  = strtoupper(substr($tutor->name ?? 'T', 0, 1));
+                $hasPhoto = !empty($tutor->photo) && file_exists(public_path('storage/'.$tutor->photo));
+            @endphp
+            <div class="tutor-card">
+                <div class="tutor-avatar-wrap" style="background:{{ $grad }}">
+                    @if($hasPhoto)
+                        <img src="{{ asset('storage/'.$tutor->photo) }}" alt="{{ $tutor->name }}">
+                    @else
+                        <div class="tutor-avatar-fallback">{{ $init }}</div>
+                    @endif
+                    <div class="tutor-badge-subject">{{ $subj }}</div>
                 </div>
                 <div class="tutor-info">
-                    <div class="tutor-name">Ahmad Fauzi, S.Pd</div>
-                    <div class="tutor-meta">5 tahun pengalaman · 200+ siswa</div>
+                    <div class="tutor-name">{{ $tutor->name }}</div>
+                    <div class="tutor-meta">Tutor Profesional SCI</div>
                     <div class="tutor-stars">
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                     </div>
                 </div>
             </div>
-
-            <div class="tutor-card reveal reveal-delay-2">
-                <div class="tutor-avatar-wrap" style="background:linear-gradient(160deg,#1a3a6b,#2563eb)">
-                    <div class="tutor-avatar-fallback">S</div>
-                    <div class="tutor-badge-subject">Bahasa Inggris</div>
+            @endforeach
+            {{-- Set 2 (duplicate for seamless loop) --}}
+            @foreach($tutors as $i => $tutor)
+            @php
+                $grad  = $tutorGrads[$i % count($tutorGrads)];
+                $subj  = is_array($tutor->subjects) ? implode(', ', array_slice($tutor->subjects, 0, 2)) : ($tutor->subjects ?? 'Tutor');
+                $init  = strtoupper(substr($tutor->name ?? 'T', 0, 1));
+                $hasPhoto = !empty($tutor->photo) && file_exists(public_path('storage/'.$tutor->photo));
+            @endphp
+            <div class="tutor-card">
+                <div class="tutor-avatar-wrap" style="background:{{ $grad }}">
+                    @if($hasPhoto)
+                        <img src="{{ asset('storage/'.$tutor->photo) }}" alt="{{ $tutor->name }}">
+                    @else
+                        <div class="tutor-avatar-fallback">{{ $init }}</div>
+                    @endif
+                    <div class="tutor-badge-subject">{{ $subj }}</div>
                 </div>
                 <div class="tutor-info">
-                    <div class="tutor-name">Sarah Dewi, M.Pd</div>
-                    <div class="tutor-meta">7 tahun pengalaman · 350+ siswa</div>
+                    <div class="tutor-name">{{ $tutor->name }}</div>
+                    <div class="tutor-meta">Tutor Profesional SCI</div>
                     <div class="tutor-stars">
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                     </div>
                 </div>
             </div>
-
-            <div class="tutor-card reveal reveal-delay-3">
-                <div class="tutor-avatar-wrap" style="background:linear-gradient(160deg,#064e3b,#10b981)">
-                    <div class="tutor-avatar-fallback">B</div>
-                    <div class="tutor-badge-subject">IPA / Fisika</div>
-                </div>
-                <div class="tutor-info">
-                    <div class="tutor-name">Budi Santoso, S.Si</div>
-                    <div class="tutor-meta">4 tahun pengalaman · 180+ siswa</div>
-                    <div class="tutor-stars">
-                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tutor-card reveal reveal-delay-4">
-                <div class="tutor-avatar-wrap" style="background:linear-gradient(160deg,#7c2d12,#f97316)">
-                    <div class="tutor-avatar-fallback">R</div>
-                    <div class="tutor-badge-subject">Komputer & IT</div>
-                </div>
-                <div class="tutor-info">
-                    <div class="tutor-name">Rina Agustina, S.Kom</div>
-                    <div class="tutor-meta">6 tahun pengalaman · 280+ siswa</div>
-                    <div class="tutor-stars">
-                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 </section>
