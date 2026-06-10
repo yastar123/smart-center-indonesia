@@ -500,6 +500,47 @@
             .wa-float { width:52px; height:52px; font-size:1.4rem; bottom:1.25rem; right:1.25rem; }
             .scroll-top { bottom:1.25rem; left:1.25rem; }
         }
+        /* ── Mobile carousels (≤640px) ── */
+        @media (max-width:640px) {
+            .jenjang-grid,
+            .program-grid,
+            .why-grid {
+                display: flex !important;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                gap: 1rem;
+                padding: 1.5rem 1.25rem 0.75rem;
+                margin: 0 -1.25rem;
+            }
+            .jenjang-grid::-webkit-scrollbar,
+            .program-grid::-webkit-scrollbar,
+            .why-grid::-webkit-scrollbar { display: none; }
+            .jenjang-card { flex: 0 0 72vw; scroll-snap-align: start; }
+            .program-card { flex: 0 0 78vw; scroll-snap-align: start; height: auto; }
+            .why-card     { flex: 0 0 72vw; scroll-snap-align: start; }
+            /* Dot indicators */
+            .mobile-carousel-dots {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 7px;
+                margin-top: 1.25rem;
+            }
+            .mobile-carousel-dots .mcd {
+                width: 8px; height: 8px;
+                border-radius: 50%;
+                background: rgba(200,77,223,.2);
+                border: none; cursor: pointer; padding: 0;
+                transition: background .25s, width .25s, border-radius .25s;
+            }
+            .mobile-carousel-dots .mcd.active {
+                background: var(--primary);
+                width: 22px;
+                border-radius: 4px;
+            }
+        }
         @media (max-width:480px) {
             .section-pad { padding:3rem 0; }
             .hero-inner { padding:6.5rem 1.25rem 5.5rem; }
@@ -507,8 +548,6 @@
             .btn-hero-primary, .btn-hero-secondary { width:100%; justify-content:center; }
             .cta-btns > * { width:100%; justify-content:center; }
             .hero-dots { bottom:4.5rem; }
-            .jenjang-grid { grid-template-columns:1fr 1fr; gap:1rem; }
-            .why-grid { grid-template-columns:1fr 1fr; }
             .galeri-grid { grid-template-columns:1fr; }
             .galeri-item.large { min-height:240px; }
             .testi-card { width:300px; }
@@ -522,7 +561,6 @@
         @media (max-width:360px) {
             .testi-card { width:260px; }
             .tutor-card { width:175px; }
-            .jenjang-grid { grid-template-columns:1fr; }
         }
     </style>
 </head>
@@ -684,7 +722,7 @@
             <p class="section-subtitle mx-auto">Dari TK hingga umum dengan pendekatan personal yang tepat untuk setiap tahap perkembangan.</p>
         </div>
 
-        <div class="jenjang-grid">
+        <div class="jenjang-grid" id="jenjangGrid">
             <a href="{{ route('register') }}" class="jenjang-card reveal reveal-delay-1">
                 <div class="jc-num">1</div>
                 <div class="jc-content">
@@ -733,6 +771,7 @@
                 </div>
             </a>
         </div>
+        <div class="mobile-carousel-dots" id="jenjang-dots"></div>
     </div>
 </section>
 
@@ -745,7 +784,7 @@
             <p class="section-subtitle mx-auto">Pilih program yang sesuai kebutuhanmu bersama para tutor terbaik kami — klik kartu untuk melihat detail lengkap.</p>
         </div>
 
-        <div class="program-grid">
+        <div class="program-grid" id="programGrid">
             {{-- Bimbel --}}
             <a href="{{ route('register') }}" class="program-card reveal reveal-delay-1" style="text-decoration:none;color:inherit">
                 <div class="pc-badge" style="background:rgba(200,77,223,.1);color:var(--primary-dark);">SEMUA JENJANG</div>
@@ -812,6 +851,7 @@
                 <div class="pc-link">Daftar Sekarang <i class="bi bi-arrow-right"></i></div>
             </a>
         </div>
+        <div class="mobile-carousel-dots" id="program-dots"></div>
     </div>
 </section>
 
@@ -883,7 +923,7 @@
             <p class="section-subtitle mx-auto">Lima pilar yang membuat SCI menjadi pilihan terpercaya jutaan keluarga Indonesia selama 14+ tahun.</p>
         </div>
 
-        <div class="why-grid">
+        <div class="why-grid" id="whyGrid">
             <div class="why-card reveal reveal-delay-1">
                 <div class="why-icon-wrap"><i class="bi bi-person-badge-fill"></i></div>
                 <div class="why-num">1</div>
@@ -919,6 +959,7 @@
                 <div class="why-desc">Bantuan belajar & konsultasi 24/7 via WhatsApp. Kami selalu ada untuk mendukung perjalanan belajar Anda.</div>
             </div>
         </div>
+        <div class="mobile-carousel-dots" id="why-dots"></div>
     </div>
 </section>
 
@@ -1391,6 +1432,42 @@ const scrollTopBtn = document.getElementById('scrollTopBtn');
 window.addEventListener('scroll', () => {
     scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
 }, { passive: true });
+
+/* ── Mobile carousel dots ── */
+function initMobileCarousel(gridId, dotsId) {
+    const grid   = document.getElementById(gridId);
+    const dotsEl = document.getElementById(dotsId);
+    if (!grid || !dotsEl) return;
+    const mq = window.matchMedia('(max-width:640px)');
+    function buildDots() {
+        dotsEl.innerHTML = '';
+        if (!mq.matches) return;
+        const cards = Array.from(grid.children);
+        cards.forEach((_, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'mcd' + (i === 0 ? ' active' : '');
+            btn.setAttribute('aria-label', 'Slide ' + (i + 1));
+            btn.addEventListener('click', () => {
+                grid.scrollTo({ left: cards[i].offsetLeft - grid.offsetLeft, behavior: 'smooth' });
+            });
+            dotsEl.appendChild(btn);
+        });
+    }
+    function updateDots() {
+        if (!mq.matches) return;
+        const cards = Array.from(grid.children);
+        const gap   = parseFloat(getComputedStyle(grid).gap) || 16;
+        const cardW = (cards[0]?.offsetWidth || 1) + gap;
+        const idx   = Math.min(Math.round(grid.scrollLeft / cardW), cards.length - 1);
+        dotsEl.querySelectorAll('.mcd').forEach((d, i) => d.classList.toggle('active', i === idx));
+    }
+    grid.addEventListener('scroll', updateDots, { passive: true });
+    mq.addEventListener('change', buildDots);
+    buildDots();
+}
+initMobileCarousel('jenjangGrid', 'jenjang-dots');
+initMobileCarousel('programGrid', 'program-dots');
+initMobileCarousel('whyGrid',     'why-dots');
 
 /* ── Respect reduced-motion ── */
 if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
