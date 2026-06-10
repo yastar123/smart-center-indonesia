@@ -13,7 +13,7 @@ class Teacher extends Model
     protected $fillable = [
         'user_id', 'branch_id', 'nig', 'name', 'gender',
         'birth_date', 'birth_place', 'address', 'phone',
-        'email', 'photo', 'subjects', 'status',
+        'email', 'photo', 'cv_path', 'subjects', 'status',
         'join_date', 'education', 'salary_base',
     ];
 
@@ -26,6 +26,14 @@ class Teacher extends Model
 
     public function user()   { return $this->belongsTo(User::class); }
     public function branch() { return $this->belongsTo(Branch::class); }
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'teacher_courses', 'teacher_id', 'course_id')->withTimestamps();
+    }
+    public function students()
+    {
+        return $this->belongsToMany(Student::class, 'student_teachers', 'teacher_id', 'student_id')->withTimestamps();
+    }
 
     public function getPhotoUrlAttribute()
     {

@@ -86,6 +86,10 @@ Route::middleware(['auth'])
         Route::put('/courses/{course}',   [CourseController::class, 'update'])  ->name('courses.update');
         Route::delete('/courses/{course}',[CourseController::class, 'destroy']) ->name('courses.destroy');
 
+        // COURSE FEES
+        Route::get('/courses/fees', [\App\Http\Controllers\Admin\CourseFeeController::class, 'index'])->name('courses.fees');
+        Route::post('/courses/{course}/fees', [\App\Http\Controllers\Admin\CourseFeeController::class, 'update'])->name('courses.fees.update');
+
         // CATEGORIES
         Route::get('/categories',              [\App\Http\Controllers\Admin\CategoryController::class, 'index']) ->name('categories.index');
         Route::post('/categories',             [\App\Http\Controllers\Admin\CategoryController::class, 'store']) ->name('categories.store');
@@ -203,8 +207,37 @@ Route::middleware(['auth'])
     ->group(function () {
         Route::get('/dashboard', fn() => view('guru.dashboard'))->name('dashboard');
 
-        // Absensi
-        Route::get('/attendance',                        [AttendanceController::class, 'index'])      ->name('attendance');
+        // MESSAGES (Guru)
+        Route::get('/messages', [\App\Http\Controllers\Guru\MessageController::class, 'index'])->name('messages.index');
+        Route::get('/messages/{room}/messages',    [\App\Http\Controllers\Admin\MessageController::class, 'getMessages']) ->name('messages.get');
+        Route::post('/messages/{room}/send',       [\App\Http\Controllers\Admin\MessageController::class, 'sendMessage']) ->name('messages.send');
+        Route::post('/messages/room',              [\App\Http\Controllers\Admin\MessageController::class, 'createRoom'])  ->name('messages.createRoom');
+
+        // CLASSES (Guru)
+        Route::get('/classes', [\App\Http\Controllers\Guru\ClassController::class, 'index'])->name('classes.index');
+        Route::get('/classes/{class}', [\App\Http\Controllers\Guru\ClassController::class, 'show'])->name('classes.show');
+        Route::get('/classes/{class}/attendance', [\App\Http\Controllers\Guru\ClassController::class, 'attendance'])->name('classes.attendance');
+
+        // Pengumuman (Guru) - reuse siswa view but filter by teacher's branch
+        Route::get('/announcements', function () {
+            $teacher = \App\Models\Teacher::where('user_id', auth()->id())->first();
+            $announcements = \App\Models\Announcement::where('status', 'aktif')
+                ->where(function ($q) use ($teacher) {
+                    $q->whereNull('cabang_id');
+                    if ($teacher) {
+                        $q->orWhere('cabang_id', $teacher->branch_id);
+                    }
+                })
+                ->where(function ($q) { $q->whereNull('tanggal_mulai')->orWhere('tanggal_mulai', '<=', now()); })
+                ->where(function ($q) { $q->whereNull('tanggal_selesai')->orWhere('tanggal_selesai', '>=', now()); })
+                ->orderByDesc('is_pinned')
+                ->orderByDesc('created_at')
+                ->paginate(12);
+
+            return view('siswa.announcements', compact('announcements'))->with('student', null);
+        })->name('announcements');
+
+        // Absensi: keep API endpoints used by class attendance, remove standalone index page
         Route::get('/attendance/{schedule}/students',    [AttendanceController::class, 'getStudents'])->name('attendance.students');
         Route::post('/attendance',                       [AttendanceController::class, 'store'])      ->name('attendance.store');
         Route::get('/attendance/report',                 [AttendanceController::class, 'report'])     ->name('attendance.report');
@@ -230,8 +263,13 @@ Route::middleware(['auth'])
     ->group(function () {
         Route::get('/dashboard', fn() => view('siswa.dashboard'))->name('dashboard');
 
-        // Jadwal
-        Route::get('/schedule', [SiswaController::class, 'schedule'])->name('schedule');
+        // MESSAGES (Siswa)
+        Route::get('/messages', [\App\Http\Controllers\Siswa\MessageController::class, 'index'])->name('messages.index');
+        Route::get('/messages/{room}/messages',    [\App\Http\Controllers\Admin\MessageController::class, 'getMessages']) ->name('messages.get');
+        Route::post('/messages/{room}/send',       [\App\Http\Controllers\Admin\MessageController::class, 'sendMessage']) ->name('messages.send');
+        Route::post('/messages/room',              [\App\Http\Controllers\Admin\MessageController::class, 'createRoom'])  ->name('messages.createRoom');
+
+        // Jadwal (dihapus) -- route jadwal siswa dihapus sesuai permintaan
 
         // Sertifikat
         Route::get('/certificates',                           [SiswaController::class, 'certificates'])      ->name('certificates.index');
@@ -255,6 +293,13 @@ Route::middleware(['auth'])
                 ->paginate(12);
             return view('siswa.announcements', compact('announcements', 'student'));
         })->name('announcements');
+
+        // Absensi (Siswa)
+        Route::get('/attendance', [\App\Http\Controllers\Siswa\AttendanceController::class, 'index'])->name('attendance');
+        Route::get('/attendance/{course}', [\App\Http\Controllers\Siswa\AttendanceController::class, 'show'])->name('attendance.show');
+        // Tagihan (Siswa)
+        Route::get('/billing', [\App\Http\Controllers\Siswa\BillingController::class, 'index'])->name('billing.index');
+        Route::post('/billing/{course}/pay', [\App\Http\Controllers\Siswa\BillingController::class, 'pay'])->name('billing.pay');
 
         // Tryout
         Route::get('/tryout', fn() => view('siswa.coming-soon', [

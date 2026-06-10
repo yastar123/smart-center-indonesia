@@ -26,9 +26,7 @@
                 <button onclick="openModal()" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
                     <i class="bi bi-plus-lg me-2"></i>Tambah Mapel
                 </button>
-                <button onclick="openCategoryManager()" class="btn" style="background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);border-radius:10px">
-                    <i class="bi bi-tags me-1"></i>Kategori
-                </button>
+
             </div>
         </div>
     </div>
@@ -103,7 +101,6 @@
                             <th class="px-4">#</th>
                             <th>Kode</th>
                             <th>Nama Mata Pelajaran</th>
-                            <th class="d-none d-md-table-cell">Kategori</th>
                             <th class="d-none d-md-table-cell">Cabang</th>
                             <th>Status</th>
                             <th class="text-end pe-4">Aksi</th>
@@ -115,13 +112,8 @@
                             <td class="px-4 text-muted" style="font-size:.85rem;">{{ $courses->firstItem() + $i }}</td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
-                                    @php $color = $course->warna ?: '#10b981'; @endphp
-                                    <div style="width:36px;height:36px;border-radius:10px;background:{{ $color }}22;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">
-                                        @if($course->icon)
-                                            <img src="{{ asset('storage/'.$course->icon) }}" alt="" style="width:100%;height:100%;object-fit:cover;">
-                                        @else
-                                            <i class="bi bi-book" style="color:{{ $color }};font-size:.95rem;"></i>
-                                        @endif
+                                    <div style="width:36px;height:36px;border-radius:10px;background:var(--soft-primary-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                        <i class="bi bi-book" style="color:var(--soft-primary-text);font-size:.95rem;"></i>
                                     </div>
                                     <span class="fw-semibold" style="font-size:.85rem;font-family:monospace;">{{ $course->kode }}</span>
                                 </div>
@@ -130,13 +122,6 @@
                                 <div class="fw-semibold" style="font-size:.9rem;">{{ $course->nama }}</div>
                                 @if($course->deskripsi)
                                 <div class="text-muted" style="font-size:.78rem;">{{ Str::limit($course->deskripsi, 50) }}</div>
-                                @endif
-                            </td>
-                            <td class="d-none d-md-table-cell">
-                                @if($course->kategori)
-                                <span class="badge rounded-pill" style="background:rgba(16,185,129,.15);color:#059669;font-size:.75rem;font-weight:600;">{{ $course->kategori }}</span>
-                                @else
-                                <span class="text-muted" style="font-size:.82rem;">—</span>
                                 @endif
                             </td>
                             <td class="d-none d-md-table-cell">
@@ -162,7 +147,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="text-center py-5">
+                            <td colspan="6" class="text-center py-5">
                                 <div style="opacity:.5;">
                                     <i class="bi bi-book" style="font-size:2.5rem;display:block;margin-bottom:.5rem;color:#10b981;"></i>
                                     <div class="fw-semibold">Belum ada mata pelajaran</div>
@@ -205,20 +190,6 @@
                             <input type="text" class="form-control" id="nama" placeholder="cth: Matematika Dasar" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold" style="font-size:.85rem;">Kategori</label>
-                            <select class="form-select" id="kategori">
-                                <option value="">-- Pilih Kategori --</option>
-                                <option value="Sains">Sains</option>
-                                <option value="Bahasa">Bahasa</option>
-                                <option value="Matematika">Matematika</option>
-                                <option value="Sosial">Sosial</option>
-                                <option value="Teknologi">Teknologi</option>
-                                <option value="Seni">Seni</option>
-                                <option value="Olahraga">Olahraga</option>
-                                <option value="Lainnya">Lainnya</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
                             <label class="form-label fw-semibold" style="font-size:.85rem;">Cabang</label>
                             <select class="form-select" id="cabang_id">
                                 <option value="">Semua Cabang</option>
@@ -226,24 +197,6 @@
                                 <option value="{{ $b->id }}">{{ $b->name }}</option>
                                 @endforeach
                             </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold" style="font-size:.85rem;">Gambar Mata Pelajaran</label>
-                            <div class="d-flex align-items-center gap-2">
-                                <div style="width:48px;height:48px;border-radius:8px;overflow:hidden;background:var(--soft-muted-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                    <img id="iconPreviewImg" src="" alt="preview" style="width:100%;height:100%;object-fit:cover;display:none;">
-                                    <i id="iconPreviewPlaceholder" class="bi bi-book text-muted" style="font-size:1.1rem"></i>
-                                </div>
-                                <input type="file" class="form-control" id="iconFile" accept="image/*">
-                            </div>
-                            <div class="form-text">Unggah gambar dari komputer (jpg, png, webp). Kosongkan untuk tidak mengganti.</div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold" style="font-size:.85rem;">Warna</label>
-                            <div class="input-group">
-                                <input type="color" class="form-control form-control-color" id="warna" value="#10b981" style="max-width:60px;">
-                                <input type="text" class="form-control" id="warnaHex" placeholder="#10b981" oninput="document.getElementById('warna').value=this.value">
-                            </div>
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-semibold" style="font-size:.85rem;">Deskripsi</label>
@@ -269,29 +222,6 @@
     </div>
 </div>
 
-{{-- CATEGORY MANAGER MODAL --}}
-<div class="modal fade" id="categoryModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius:20px;border:none">
-            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#260632,#461256,#c84ddf);border-radius:20px 20px 0 0">
-                <h5 class="modal-title fw-bold text-white"><i class="bi bi-tags me-2"></i>Kelola Kategori</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3 d-flex gap-2">
-                    <input type="text" id="catName" class="form-control" placeholder="Nama kategori baru...">
-                    <button class="btn btn-primary px-3" id="catAddBtn" onclick="saveCategory()"><i class="bi bi-plus-lg"></i></button>
-                </div>
-                <div id="categoriesList">
-                    <div class="text-center text-muted py-3"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Memuat...</div>
-                </div>
-            </div>
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Tutup</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 @push('scripts')
 <script>
@@ -301,46 +231,19 @@ function openModal() {
     document.getElementById('modalTitle').textContent = 'Tambah Mata Pelajaran';
     document.getElementById('courseId').value = '';
     document.getElementById('courseForm').reset();
-    document.getElementById('warna').value = '#10b981';
-    document.getElementById('warnaHex').value = '#10b981';
-    // reset image preview
-    const img = document.getElementById('iconPreviewImg');
-    const ph = document.getElementById('iconPreviewPlaceholder');
-    img.src = '';
-    img.style.display = 'none';
-    ph.style.display = 'inline-block';
-    document.getElementById('iconFile').value = null;
-    loadCategoriesForSelect().then(() => modal.show());
+    modal.show();
 }
 
 function editCourse(id) {
     document.getElementById('modalTitle').textContent = 'Edit Mata Pelajaran';
     document.getElementById('saveBtn').disabled = true;
-    // Ensure categories are loaded into the select first, then load course
-    loadCategoriesForSelect().then(() => {
-        fetch(`/admin/courses/${id}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+    fetch(`/admin/courses/${id}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
             .then(d => {
                 document.getElementById('courseId').value = d.id;
                 document.getElementById('kode').value = d.kode || '';
                 document.getElementById('nama').value = d.nama || '';
-                document.getElementById('kategori').value = d.kategori || '';
                 document.getElementById('cabang_id').value = d.cabang_id || '';
-                document.getElementById('iconFile').value = null;
-                const img = document.getElementById('iconPreviewImg');
-                const ph = document.getElementById('iconPreviewPlaceholder');
-                if (d.icon_url) {
-                    img.src = d.icon_url;
-                    img.style.display = 'block';
-                    ph.style.display = 'none';
-                } else {
-                    img.src = '';
-                    img.style.display = 'none';
-                    ph.style.display = 'inline-block';
-                }
-                const w = d.warna || '#10b981';
-                document.getElementById('warna').value = w;
-                document.getElementById('warnaHex').value = w;
                 document.getElementById('deskripsi').value = d.deskripsi || '';
                 document.getElementById('status').value = d.status || 'aktif';
                 document.getElementById('saveBtn').disabled = false;
@@ -349,64 +252,8 @@ function editCourse(id) {
                 document.getElementById('saveBtn').disabled = false;
                 showToast('Gagal memuat data mata pelajaran', 'error');
             });
-    });
 }
 
-function loadCategoriesForSelect() {
-    return new Promise((resolve) => {
-        const sel = document.getElementById('kategori');
-        // keep current placeholder
-        sel.innerHTML = '<option value="">-- Pilih Kategori --</option>';
-        fetch('/admin/categories', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-            .then(r => r.json())
-            .then(d => {
-                const items = d.data || [];
-                if (!items.length) {
-                    // fallback to existing static options
-                    const fallback = ['Sains','Bahasa','Matematika','Sosial','Teknologi','Seni','Olahraga','Lainnya'];
-                    fallback.forEach(f => {
-                        const opt = document.createElement('option'); opt.value = f; opt.textContent = f; sel.appendChild(opt);
-                    });
-                    return resolve();
-                }
-                items.forEach(c => {
-                    const opt = document.createElement('option');
-                    opt.value = c.name;
-                    opt.textContent = c.name;
-                    sel.appendChild(opt);
-                });
-                resolve();
-            }).catch(() => {
-                // network error — keep static fallback
-                const fallback = ['Sains','Bahasa','Matematika','Sosial','Teknologi','Seni','Olahraga','Lainnya'];
-                fallback.forEach(f => {
-                    const opt = document.createElement('option'); opt.value = f; opt.textContent = f; sel.appendChild(opt);
-                });
-                resolve();
-            });
-    });
-}
-
-document.getElementById('warna').addEventListener('input', function() {
-    document.getElementById('warnaHex').value = this.value;
-});
-
-// preview selected image
-document.getElementById('iconFile').addEventListener('change', function() {
-    const file = this.files[0];
-    const img = document.getElementById('iconPreviewImg');
-    const ph = document.getElementById('iconPreviewPlaceholder');
-    if (!file) {
-        img.src = '';
-        img.style.display = 'none';
-        ph.style.display = 'inline-block';
-        return;
-    }
-    const url = URL.createObjectURL(file);
-    img.src = url;
-    img.style.display = 'block';
-    ph.style.display = 'none';
-});
 
 function saveCourse() {
     const id = document.getElementById('courseId').value;
@@ -419,14 +266,9 @@ function saveCourse() {
     const formData = new FormData();
     formData.append('kode', document.getElementById('kode').value);
     formData.append('nama', document.getElementById('nama').value);
-    formData.append('kategori', document.getElementById('kategori').value);
     formData.append('cabang_id', document.getElementById('cabang_id').value || '');
-    formData.append('warna', document.getElementById('warna').value);
     formData.append('deskripsi', document.getElementById('deskripsi').value);
     formData.append('status', document.getElementById('status').value);
-    const file = document.getElementById('iconFile').files[0];
-    if (file) formData.append('icon', file);
-    // CSRF
     formData.append('_token', '{{ csrf_token() }}');
     if (isEdit) formData.append('_method', 'PUT');
 
@@ -471,73 +313,6 @@ function deleteCourse(id, nama) {
     }, null, {title:'Hapus Mata Pelajaran', okText:'Ya, Hapus'});
 }
 
-// ---- CATEGORY MANAGER ----
-const catModal = new bootstrap.Modal(document.getElementById('categoryModal'));
-function openCategoryManager() {
-    document.getElementById('catName').value = '';
-    catModal.show();
-    loadCategories();
-}
-
-function loadCategories() {
-    const el = document.getElementById('categoriesList');
-    el.innerHTML = '<div class="text-center text-muted py-3">Memuat...</div>';
-    fetch('/admin/categories', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(r => r.json())
-        .then(d => {
-            const items = d.data || [];
-            if (!items.length) return el.innerHTML = '<div class="text-center text-muted py-3">Belum ada kategori</div>';
-            el.innerHTML = items.map(c => `
-                <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
-                    <div>${c.name}</div>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="editCategory(${c.id}, '${c.name.replace(/'/g,"\\'")}')">Edit</button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="removeCategory(${c.id})">Hapus</button>
-                    </div>
-                </div>
-            `).join('');
-        })
-        .catch(() => el.innerHTML = '<div class="text-danger text-center py-3">Gagal memuat kategori</div>');
-}
-
-let editingCatId = null;
-function saveCategory() {
-    const name = document.getElementById('catName').value.trim();
-    if (!name) return showToast('Nama kategori tidak boleh kosong.', 'warning');
-    const btn = document.getElementById('catAddBtn');
-    btn.disabled = true;
-    const url = editingCatId ? `/admin/categories/${editingCatId}` : '/admin/categories';
-    const method = editingCatId ? 'PUT' : 'POST';
-    fetch(url, {
-        method,
-        headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept':'application/json' },
-        body: JSON.stringify({ name })
-    }).then(r => r.json())
-    .then(res => {
-        btn.disabled = false;
-        if (res.success) {
-            document.getElementById('catName').value = '';
-            editingCatId = null;
-            loadCategories();
-            window.showToast && window.showToast(res.message, 'success');
-        } else {
-            showToast(res.message || 'Terjadi kesalahan', 'error');
-        }
-    }).catch(() => { btn.disabled = false; showToast('Tidak dapat menghubungi server.', 'error'); });
-}
-
-function editCategory(id, name) {
-    editingCatId = id;
-    document.getElementById('catName').value = name;
-}
-
-function removeCategory(id) {
-    confirmAction('Hapus kategori ini? Data tidak dapat dikembalikan.', function() {
-        fetch(`/admin/categories/${id}`, { method:'DELETE', headers:{ 'X-CSRF-TOKEN':'{{ csrf_token() }}', 'Accept':'application/json' } })
-            .then(r => r.json())
-            .then(res => { if (res.success) { loadCategories(); showToast(res.message, 'success'); } });
-    }, null, {title:'Hapus Kategori', okText:'Ya, Hapus'});
-}
 </script>
 @endpush
 @endsection

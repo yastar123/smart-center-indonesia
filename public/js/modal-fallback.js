@@ -3,6 +3,16 @@ document.addEventListener("DOMContentLoaded", function () {
     var pageLoader = document.getElementById("pageLoader");
     var sidebarOverlay = document.getElementById("sidebarOverlay");
 
+    // Bootstrap appends modal backdrops directly to <body>. If a modal is
+    // rendered inside a positioned/z-indexed wrapper, the backdrop can sit
+    // above it and block every click. Keep modals as body children so their
+    // z-index is compared in the same stacking context as the backdrop.
+    document.querySelectorAll(".modal").forEach(function (modalEl) {
+        if (modalEl.parentElement !== document.body) {
+            document.body.appendChild(modalEl);
+        }
+    });
+
     // Safe backdrop remover — only removes backdrops when no Bootstrap modal is active
     function removeStaleBackdrops() {
         if (document.body.classList.contains("modal-open")) return;
@@ -34,7 +44,11 @@ document.addEventListener("DOMContentLoaded", function () {
                                 return;
                             }
                             // Remove backdrop only when no modal is currently active
-                            if (n.matches && n.matches(".modal-backdrop") && !document.body.classList.contains("modal-open")) {
+                            if (
+                                n.matches &&
+                                n.matches(".modal-backdrop") &&
+                                !document.body.classList.contains("modal-open")
+                            ) {
                                 n.remove();
                                 return;
                             }

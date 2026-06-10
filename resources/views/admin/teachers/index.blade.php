@@ -151,16 +151,20 @@
                     <th class="small text-muted fw-semibold py-3" style="width:46px">#</th>
                     <th class="small text-muted fw-semibold py-3">GURU</th>
                     <th class="small text-muted fw-semibold py-3">NIG</th>
-                    <th class="small text-muted fw-semibold py-3 d-none d-md-table-cell">CABANG</th>
-                    <th class="small text-muted fw-semibold py-3 d-none d-lg-table-cell">MATA PELAJARAN</th>
-                    <th class="small text-muted fw-semibold py-3 d-none d-xl-table-cell">KONTAK</th>
+                    <th class="small text-muted fw-semibold py-3">GENDER</th>
+                    <th class="small text-muted fw-semibold py-3">CABANG</th>
+                    <th class="small text-muted fw-semibold py-3">MATA PELAJARAN</th>
+                    <th class="small text-muted fw-semibold py-3">PENDIDIKAN</th>
+                    <th class="small text-muted fw-semibold py-3">TGL LAHIR</th>
+                    <th class="small text-muted fw-semibold py-3">KONTAK</th>
+                    <th class="small text-muted fw-semibold py-3">CV</th>
                     <th class="small text-muted fw-semibold py-3">STATUS</th>
                     <th class="small text-muted fw-semibold py-3 text-center" style="width:100px">AKSI</th>
                 </tr>
             </thead>
             <tbody id="teacherBody">
                 <tr>
-                    <td colspan="8" class="text-center py-5">
+                    <td colspan="12" class="text-center py-5">
                         <div class="spinner-border text-success mb-2" style="width:1.8rem;height:1.8rem"></div>
                         <div class="text-muted small">Memuat data guru...</div>
                     </td>
@@ -276,12 +280,16 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label small fw-semibold">Mata Pelajaran</label>
-                                <input type="text" name="subjects" id="subjects" class="form-control form-control-sm" placeholder="Matematika, Fisika, Kimia...">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-semibold">Email</label>
-                                <input type="email" name="email" id="email" class="form-control form-control-sm" placeholder="email@domain.com">
+                                <label class="form-label small fw-semibold">Mata Pelajaran <span class="text-danger">*</span></label>
+                                <div id="course_ids" class="p-2 rounded-3" style="background:var(--input-bg);border:1.5px solid var(--card-border);max-height:170px;overflow:auto">
+                                    @foreach($courses as $course)
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input course-checkbox" type="checkbox" name="course_ids[]" value="{{ $course->id }}" id="course{{ $course->id }}">
+                                        <label class="form-check-label small" for="course{{ $course->id }}">{{ $course->kode }} — {{ $course->nama }}</label>
+                                    </div>
+                                    @endforeach
+                                </div>
+                                <div class="text-muted mt-1" style="font-size:11px">Centang satu atau lebih mata pelajaran yang bisa diajar guru.</div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-semibold">No. HP</label>
@@ -289,6 +297,30 @@
                                     <span class="input-group-text">+62</span>
                                     <input type="text" name="phone" id="phone" class="form-control" placeholder="8xxxxxxxxxx">
                                 </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold">Upload CV</label>
+                                <input type="file" name="cv" id="cv" class="form-control form-control-sm" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                                <div class="text-muted mt-1" style="font-size:11px">PDF/DOC/DOCX maksimal 5 MB. <span id="cvCurrent"></span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- AKUN LOGIN --}}
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <div style="width:4px;height:20px;background:linear-gradient(#10b981,#68117e);border-radius:4px"></div>
+                            <span class="fw-bold text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em">Akun Login Guru</span>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold">Email Akun <span class="text-danger">*</span></label>
+                                <input type="email" name="email" id="email" class="form-control form-control-sm" placeholder="guru@domain.com" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold">Password <span class="text-danger" id="passwordRequiredMark">*</span></label>
+                                <input type="password" name="password" id="password" class="form-control form-control-sm" placeholder="Min. 8 karakter" minlength="8" required>
+                                <div class="text-muted mt-1" id="passwordHelp" style="font-size:11px">Dipakai guru untuk login ke portal guru.</div>
                             </div>
                         </div>
                     </div>
@@ -321,7 +353,7 @@ function loadTeachers(page) {
     currentPage = page;
 
     document.getElementById('teacherBody').innerHTML = `
-        <tr><td colspan="8" class="text-center py-5">
+        <tr><td colspan="12" class="text-center py-5">
             <div class="spinner-border text-success mb-2" style="width:1.8rem;height:1.8rem"></div>
             <div class="text-muted small">Memuat data...</div>
         </td></tr>`;
@@ -348,7 +380,7 @@ function loadTeachers(page) {
             const teachers = res.data || [];
 
             if (!teachers.length) {
-                html = `<tr><td colspan="8" class="py-5">
+                html = `<tr><td colspan="12" class="py-5">
                     <div class="text-center">
                         <div style="width:72px;height:72px;border-radius:50%;background:var(--input-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
                             <i class="bi bi-person-badge" style="font-size:2rem;opacity:.35"></i>
@@ -366,6 +398,8 @@ function loadTeachers(page) {
                     const badgeLbl = t.status === 'aktif' ? 'Aktif' : 'Nonaktif';
                     const avatar   = `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=${t.gender==='P'?'ec4899':'68117e'}&color=fff&size=80`;
                     const num      = (res.from || ((page - 1) * 10 + 1)) + i;
+                    const courseNames = (t.courses || []).map(c => c.nama).join(', ') || t.subjects || '–';
+                    const birthDate = t.birth_date ? new Date(t.birth_date).toLocaleDateString('id-ID') : '–';
                     html += `<tr>
                         <td class="text-muted small fw-semibold">${num}</td>
                         <td>
@@ -375,25 +409,29 @@ function loadTeachers(page) {
                                      style="object-fit:cover;border:2.5px solid ${t.gender==='P'?'#f9a8d4':'#e9d5ff'}" loading="lazy">
                                 <div>
                                     <div class="fw-semibold" style="font-size:13.5px">${t.name}</div>
-                                    <div class="text-muted" style="font-size:11px">${t.gender==='L'?'👦':'👧'} ${t.education ?? ''}</div>
+                                    <div class="text-muted" style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.address ?? 'Alamat belum diisi'}</div>
                                 </div>
                             </div>
                         </td>
                         <td><code style="background:var(--input-bg);padding:3px 8px;border-radius:6px;font-size:12px;color:var(--bs-primary)">${t.nig}</code></td>
-                        <td class="d-none d-md-table-cell">
-                            <span style="background:var(--input-bg);color:var(--text-muted);border:1px solid var(--card-border);padding:3px 10px;border-radius:6px;font-size:11px">
+                        <td><span class="text-muted" style="font-size:12px">${t.gender === 'L' ? 'Laki-laki' : 'Perempuan'}</span></td>
+                        <td>
+                            <span style="background:var(--input-bg);color:var(--text-muted);border:1px solid var(--card-border);padding:3px 10px;border-radius:6px;font-size:11px;white-space:nowrap">
                                 <i class="bi bi-building me-1"></i>${t.branch?.name ?? 'Pusat'}
                             </span>
                         </td>
-                        <td class="d-none d-lg-table-cell">
-                            <span class="text-muted" style="font-size:12.5px;max-width:160px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
-                                ${t.subjects ?? '–'}
+                        <td>
+                            <span class="text-muted" style="font-size:12.5px;max-width:220px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                                ${courseNames}
                             </span>
                         </td>
-                        <td class="d-none d-xl-table-cell">
-                            <div style="font-size:13px">${t.phone ?? '–'}</div>
-                            <div class="text-muted" style="font-size:11px">${t.email ?? ''}</div>
+                        <td><span class="text-muted" style="font-size:12px">${t.education ?? '–'}</span></td>
+                        <td><span class="text-muted" style="font-size:12px;white-space:nowrap">${birthDate}</span></td>
+                        <td>
+                            <div style="font-size:13px;white-space:nowrap">${t.phone ?? '–'}</div>
+                            <div class="text-muted" style="font-size:11px;white-space:nowrap">${t.email ?? t.user?.email ?? ''}</div>
                         </td>
+                        <td>${t.cv_path ? `<a href="/storage/${t.cv_path}" target="_blank" class="btn btn-sm btn-outline-info" style="border-radius:8px"><i class="bi bi-file-earmark-text"></i></a>` : '<span class="text-muted">–</span>'}</td>
                         <td>
                             <span style="background:${badgeBg};color:${badgeCol};padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600">
                                 <i class="bi bi-circle-fill me-1" style="font-size:7px"></i>${badgeLbl}
@@ -433,7 +471,7 @@ function loadTeachers(page) {
         },
         error() {
             document.getElementById('teacherBody').innerHTML = `
-                <tr><td colspan="8" class="text-center py-5 text-danger">
+                <tr><td colspan="12" class="text-center py-5 text-danger">
                     <i class="bi bi-exclamation-triangle d-block mb-2" style="font-size:2rem"></i>
                     Gagal memuat data. <a href="javascript:loadTeachers()">Coba lagi</a>
                 </td></tr>`;
@@ -447,6 +485,10 @@ function openModal() {
     document.getElementById('teacherId').value = '';
     document.getElementById('modalTitle').innerHTML = '<i class="bi bi-person-plus me-2"></i>Tambah Guru Baru';
     document.getElementById('photoPreview').src = 'https://ui-avatars.com/api/?name=Guru&background=68117e&color=fff&size=120';
+    document.getElementById('cvCurrent').innerHTML = '';
+    document.getElementById('password').required = true;
+    document.getElementById('passwordRequiredMark').classList.remove('d-none');
+    document.getElementById('passwordHelp').textContent = 'Dipakai guru untuk login ke portal guru.';
     new bootstrap.Modal('#teacherModal').show();
 }
 
@@ -461,10 +503,20 @@ function editTeacher(id) {
         document.getElementById('gender').value      = t.gender      ?? '';
         document.getElementById('birth_date').value  = t.birth_date  ?? '';
         document.getElementById('branch_id').value   = t.branch_id   ?? 'pusat';
-        document.getElementById('email').value       = t.email       ?? '';
+        document.getElementById('email').value       = t.email ?? t.user?.email ?? '';
         document.getElementById('phone').value       = t.phone       ?? '';
+        document.getElementById('password').value    = '';
+        document.getElementById('password').required = false;
+        document.getElementById('passwordRequiredMark').classList.add('d-none');
+        document.getElementById('passwordHelp').textContent = 'Kosongkan jika tidak ingin mengubah password akun guru.';
+        document.getElementById('cvCurrent').innerHTML = t.cv_path
+            ? `<a href="/storage/${t.cv_path}" target="_blank" class="text-decoration-none">Lihat CV saat ini</a>`
+            : '';
         document.getElementById('education').value   = t.education   ?? '';
-        document.getElementById('subjects').value    = t.subjects    ?? '';
+        const courseIds = (t.courses || []).map(c => String(c.id));
+        document.querySelectorAll('.course-checkbox').forEach(cb => {
+            cb.checked = courseIds.includes(cb.value);
+        });
         document.getElementById('address').value     = t.address     ?? '';
         const avatar = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(t.name) + '&background=68117e&color=fff&size=120';
         document.getElementById('photoPreview').src = t.photo ? '/storage/' + t.photo : avatar;
@@ -476,9 +528,19 @@ function editTeacher(id) {
 
 // ---- SAVE ----
 function saveTeacher() {
+    const form = document.getElementById('teacherForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    if (!document.querySelector('.course-checkbox:checked')) {
+        showToast('Pilih minimal satu mata pelajaran untuk guru.', 'warning');
+        return;
+    }
+
     const id  = document.getElementById('teacherId').value;
     const url = id ? '/admin/teachers/' + id : '{{ route("admin.teachers.store") }}';
-    const fd  = new FormData(document.getElementById('teacherForm'));
+    const fd  = new FormData(form);
     if (id) fd.append('_method', 'PUT');
 
     const btn = document.getElementById('saveBtn');

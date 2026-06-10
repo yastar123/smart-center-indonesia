@@ -88,6 +88,12 @@
                 <span>Mata Pelajaran</span>
             </a>
         </li>
+        <li class="nav-item {{ request()->routeIs('admin.courses.fees') ? 'active' : '' }}">
+            <a href="{{ route('admin.courses.fees') }}" class="nav-link">
+                <i class="nav-icon bi bi-tag"></i>
+                <span>Biaya Mapel</span>
+            </a>
+        </li>
         <li class="nav-item {{ request()->routeIs('admin.schedules.*') ? 'active' : '' }}">
             <a href="{{ route('admin.schedules.index') }}" class="nav-link">
                 <i class="nav-icon bi bi-calendar3"></i>
@@ -137,16 +143,17 @@
                 <span>Jadwal Mengajar</span>
             </a>
         </li>
-        <li class="nav-item {{ request()->routeIs('guru.attendance') ? 'active' : '' }}">
-            <a href="{{ route('guru.attendance') }}" class="nav-link">
-                <i class="nav-icon bi bi-check2-square"></i>
-                <span>Absensi Siswa</span>
-            </a>
-        </li>
+        
         <li class="nav-item {{ request()->routeIs('guru.grades') ? 'active' : '' }}">
             <a href="{{ route('guru.grades') }}" class="nav-link">
                 <i class="nav-icon bi bi-bar-chart"></i>
                 <span>Input Nilai</span>
+            </a>
+        </li>
+        <li class="nav-item {{ request()->routeIs('guru.announcements') ? 'active' : '' }}">
+            <a href="{{ route('guru.announcements') }}" class="nav-link">
+                <i class="nav-icon bi bi-megaphone"></i>
+                <span>Pengumuman</span>
             </a>
         </li>
         @endrole
@@ -160,10 +167,17 @@
                 <span>Beranda</span>
             </a>
         </li>
-        <li class="nav-item {{ request()->routeIs('siswa.schedule') ? 'active' : '' }}">
-            <a href="{{ route('siswa.schedule') }}" class="nav-link">
-                <i class="nav-icon bi bi-calendar-week"></i>
-                <span>Jadwal Belajar</span>
+        {{-- Jadwal Belajar (siswa) dihapus — link dihilangkan sesuai permintaan pengguna --}}
+        <li class="nav-item {{ request()->routeIs('siswa.attendance*') ? 'active' : '' }}">
+            <a href="{{ route('siswa.attendance') }}" class="nav-link">
+                <i class="nav-icon bi bi-clipboard-check"></i>
+                <span>Absensi</span>
+            </a>
+        </li>
+        <li class="nav-item {{ request()->routeIs('siswa.billing*') ? 'active' : '' }}">
+            <a href="{{ route('siswa.billing.index') }}" class="nav-link">
+                <i class="nav-icon bi bi-wallet2"></i>
+                <span>Tagihan</span>
             </a>
         </li>
         <li class="nav-item {{ request()->routeIs('siswa.tryout') ? 'active' : '' }}">

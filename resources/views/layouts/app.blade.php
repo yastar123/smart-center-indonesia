@@ -489,7 +489,7 @@
            FORM CONTROLS
         ============================================================ */
         .form-control, .form-select {
-            background: var(--input-bg);
+            background-color: var(--input-bg);
             border: 1.5px solid var(--card-border);
             border-radius: 10px;
             color: var(--text-primary);
@@ -497,7 +497,7 @@
             font-size: 13.5px;
         }
         .form-control:focus, .form-select:focus {
-            background: var(--card-bg);
+            background-color: var(--card-bg);
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(200,77,223,.15);
             color: var(--text-primary);
@@ -2484,7 +2484,13 @@
         ============================================================ */
         .form-select {
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23c84ddf' d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 01.753 1.659l-4.796 5.48a1 1 0 01-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right .75rem center;
             background-size: 12px;
+            padding-right: 2.25rem;
+        }
+        [data-theme="dark"] .form-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23e8b4f5' d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 01.753 1.659l-4.796 5.48a1 1 0 01-1.506 0z'/%3E%3C/svg%3E");
         }
 
         /* ============================================================
@@ -3121,18 +3127,24 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('guru.dashboard') }}#jadwal" class="nav-link" data-label="Jadwal Mengajar">
-                <i class="bi bi-calendar2-week"></i><span>Jadwal Mengajar</span>
+            <a href="{{ route('guru.classes.index') }}" class="nav-link {{ request()->routeIs('guru.classes.*') ? 'active' : '' }}" data-label="Kelas">
+                <i class="bi bi-diagram-3"></i><span>Kelas</span>
             </a>
         </div>
-        <div class="nav-item">
-            <a href="{{ route('guru.attendance') }}" class="nav-link {{ request()->routeIs('guru.attendance') ? 'active' : '' }}" data-label="Input Absensi">
-                <i class="bi bi-check2-square"></i><span>Input Absensi</span>
-            </a>
-        </div>
+        
         <div class="nav-item">
             <a href="{{ route('guru.grades') }}" class="nav-link {{ request()->routeIs('guru.grades') ? 'active' : '' }}" data-label="Input Nilai">
                 <i class="bi bi-pencil-square"></i><span>Input Nilai</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('guru.messages.index') }}" class="nav-link {{ request()->routeIs('guru.messages.*') ? 'active' : '' }}" data-label="Pesan">
+                <i class="bi bi-chat-dots"></i><span>Pesan</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('guru.announcements') }}" class="nav-link {{ request()->routeIs('guru.announcements') ? 'active' : '' }}" data-label="Pengumuman">
+                <i class="bi bi-megaphone"></i><span>Pengumuman</span>
             </a>
         </div>
         @endrole
@@ -3145,13 +3157,14 @@
                 <i class="bi bi-speedometer2"></i><span>Dashboard</span>
             </a>
         </div>
+        {{-- Jadwal siswa dihapus: link dihilangkan sesuai permintaan --}}
         <div class="nav-item">
-            <a href="{{ route('siswa.schedule') }}" class="nav-link {{ request()->routeIs('siswa.schedule') ? 'active' : '' }}" data-label="Jadwal Belajar">
-                <i class="bi bi-calendar-event"></i><span>Jadwal Belajar</span>
+            <a href="{{ route('siswa.attendance') }}" class="nav-link {{ request()->routeIs('siswa.attendance*') ? 'active' : '' }}" data-label="Absensi">
+                <i class="bi bi-clipboard-check"></i><span>Absensi</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.dashboard') }}#pembayaran" class="nav-link" data-label="Tagihan">
+            <a href="{{ route('siswa.billing.index') }}" class="nav-link" data-label="Tagihan">
                 <i class="bi bi-credit-card"></i><span>Tagihan & Bayar</span>
             </a>
         </div>
@@ -3169,6 +3182,11 @@
             <a href="{{ route('siswa.tryout') }}" class="nav-link {{ request()->routeIs('siswa.tryout') ? 'active' : '' }}" data-label="Tryout CBT">
                 <i class="bi bi-laptop"></i><span>Tryout CBT</span>
                 <span class="menu-badge" style="background:#68117e">Soon</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('siswa.messages.index') }}" class="nav-link {{ request()->routeIs('siswa.messages.*') ? 'active' : '' }}" data-label="Pesan">
+                <i class="bi bi-chat-dots"></i><span>Pesan</span>
             </a>
         </div>
         @endrole
@@ -3311,19 +3329,20 @@
     </a>
     @endrole
     @role('guru')
-    <a href="{{ route('guru.dashboard') }}#jadwal" class="mob-nav-item">
-        <i class="bi bi-calendar2-week"></i>
-        <span>Jadwal</span>
+    <a href="{{ route('guru.classes.index') }}" class="mob-nav-item {{ request()->routeIs('guru.classes.*') ? 'active' : '' }}">
+        <i class="bi bi-diagram-3"></i>
+        <span>Kelas</span>
     </a>
-    <a href="{{ route('guru.attendance') }}" class="mob-nav-item {{ request()->routeIs('guru.attendance') ? 'active' : '' }}">
-        <i class="bi bi-clipboard-check"></i>
-        <span>Absensi</span>
+    <a href="{{ route('guru.announcements') }}" class="mob-nav-item {{ request()->routeIs('guru.announcements') ? 'active' : '' }}">
+        <i class="bi bi-megaphone"></i>
+        <span>Pengumuman</span>
     </a>
     @endrole
     @role('siswa')
-    <a href="{{ route('siswa.schedule') }}" class="mob-nav-item {{ request()->routeIs('siswa.schedule') ? 'active' : '' }}">
-        <i class="bi bi-calendar-event{{ request()->routeIs('siswa.schedule') ? '-fill' : '' }}"></i>
-        <span>Jadwal</span>
+    {{-- Mobile nav: Jadwal siswa dihapus sesuai permintaan --}}
+    <a href="{{ route('siswa.attendance') }}" class="mob-nav-item {{ request()->routeIs('siswa.attendance*') ? 'active' : '' }}">
+        <i class="bi bi-clipboard-check"></i>
+        <span>Absensi</span>
     </a>
     <a href="{{ route('siswa.announcements') }}" class="mob-nav-item {{ request()->routeIs('siswa.announcements') ? 'active' : '' }}">
         <i class="bi bi-megaphone{{ request()->routeIs('siswa.announcements') ? '-fill' : '' }}"></i>
@@ -3999,12 +4018,13 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         @endrole
         @role('guru')
         { label:'Dashboard Guru', desc:'Portal guru & jadwal', href:'{{ route("guru.dashboard") }}', icon:'bi-speedometer2', color:'#c84ddf', group:'Guru' },
-        { label:'Input Absensi', desc:'Catat kehadiran siswa', href:'{{ route("guru.attendance") }}', icon:'bi-check2-square', color:'#10b981', group:'Guru' },
+        { label:'Kelas', desc:'Kelas yang diajar', href:'{{ route("guru.classes.index") }}', icon:'bi-diagram-3', color:'#68117e', group:'Guru' },
+        { label:'Pengumuman', desc:'Informasi untuk guru', href:'{{ route("guru.announcements") }}', icon:'bi-megaphone', color:'#c84ddf', group:'Guru' },
         { label:'Input Nilai', desc:'Masukkan nilai siswa', href:'{{ route("guru.grades") }}', icon:'bi-pencil-square', color:'#f6af23', group:'Guru' },
         @endrole
         @role('siswa')
         { label:'Dashboard Siswa', desc:'Portal siswa & tagihan', href:'{{ route("siswa.dashboard") }}', icon:'bi-speedometer2', color:'#c84ddf', group:'Siswa' },
-        { label:'Jadwal Belajar', desc:'Lihat jadwal sesi belajar', href:'{{ route("siswa.schedule") }}', icon:'bi-calendar-event', color:'#10b981', group:'Siswa' },
+        // Jadwal Belajar (siswa) dihapus — entri command palette dihilangkan
         { label:'Sertifikat Saya', desc:'Lihat sertifikat yang diterbitkan', href:'{{ route("siswa.certificates.index") }}', icon:'bi-award', color:'#f6af23', group:'Siswa' },
         { label:'Pengumuman', desc:'Informasi & pengumuman terbaru', href:'{{ route("siswa.announcements") }}', icon:'bi-megaphone', color:'#c84ddf', group:'Siswa' },
         @endrole

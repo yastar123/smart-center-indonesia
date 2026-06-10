@@ -7,33 +7,23 @@ use App\Models\SchoolClass;
 use App\Models\Course;
 use App\Models\Teacher;
 use App\Models\Branch;
-use App\Models\AcademicYear;
 use Illuminate\Http\Request;
 
 class SchoolClassController extends Controller
 {
     public function index(Request $request)
     {
-        $query = SchoolClass::with(['cabang', 'mataPelajaran', 'guru', 'tahunAkademik']);
+        $query = SchoolClass::with(['cabang', 'mataPelajaran', 'guru']);
 
-        if ($s = $request->search) {
-            $query->where('nama_kelas', 'like', "%$s%");
-        }
-        if ($request->status) {
-            $query->where('status', $request->status);
-        }
-        if ($request->jenis) {
-            $query->where('jenis', $request->jenis);
-        }
-        if ($request->cabang_id) {
-            $query->where('cabang_id', $request->cabang_id);
-        }
+        if ($s = $request->search) $query->where('nama_kelas', 'like', "%$s%");
+        if ($request->status) $query->where('status', $request->status);
+        if ($request->jenis) $query->where('jenis', $request->jenis);
+        if ($request->cabang_id) $query->where('cabang_id', $request->cabang_id);
 
-        $classes       = $query->latest()->paginate(15)->appends($request->all());
-        $courses       = Course::where('status', 'aktif')->orderBy('nama')->get();
-        $teachers      = Teacher::where('status', 'aktif')->orderBy('name')->get();
-        $branches      = Branch::orderBy('name')->get();
-        $tahunAkademik = AcademicYear::orderByDesc('year_start')->get();
+        $classes  = $query->latest()->paginate(15)->appends($request->all());
+        $courses  = Course::where('status', 'aktif')->orderBy('nama')->get();
+        $teachers = Teacher::where('status', 'aktif')->orderBy('name')->get();
+        $branches = Branch::orderBy('name')->get();
 
         $stats = [
             'total'   => SchoolClass::count(),
@@ -42,14 +32,11 @@ class SchoolClassController extends Controller
             'offline' => SchoolClass::where('jenis', 'offline')->count(),
         ];
 
-        return view('admin.classes.index', compact(
-            'classes', 'courses', 'teachers', 'branches', 'tahunAkademik', 'stats'
-        ));
+        return view('admin.classes.index', compact('classes', 'courses', 'teachers', 'branches', 'stats'));
     }
 
     public function store(Request $request)
     {
-        // normalize 'pusat' selection to null so validation accepts it
         if ($request->input('cabang_id') === 'pusat' || $request->input('cabang_id') === '0') {
             $request->merge(['cabang_id' => null]);
         }
@@ -59,15 +46,13 @@ class SchoolClassController extends Controller
             'cabang_id'         => 'nullable|exists:branches,id',
             'mata_pelajaran_id' => 'nullable|exists:courses,id',
             'guru_id'           => 'nullable|exists:teachers,id',
-            'tahun_akademik_id' => 'nullable|exists:academic_years,id',
             'kapasitas'         => 'nullable|integer|min:1|max:200',
-            'jenis'             => 'required|in:online,offline,hybrid',
-            'ruangan'           => 'nullable|string|max:50',
+            'jumlah_pertemuan'  => 'required|integer|min:1|max:200',
+            'jenis'             => 'required|in:online,offline,private',
             'link_zoom'         => 'nullable|url',
             'status'            => 'required|in:aktif,nonaktif,penuh',
         ]);
 
-        // ensure stored value maps to null for pusat selection
         if ($request->input('cabang_id') === 'pusat' || $request->input('cabang_id') === '0') {
             $data['cabang_id'] = null;
         }
@@ -79,12 +64,11 @@ class SchoolClassController extends Controller
 
     public function show(SchoolClass $class)
     {
-        return response()->json($class->load(['cabang', 'mataPelajaran', 'guru', 'tahunAkademik']));
+        return response()->json($class->load(['cabang', 'mataPelajaran', 'guru']));
     }
 
     public function update(Request $request, SchoolClass $class)
     {
-        // normalize 'pusat' selection to null so validation accepts it
         if ($request->input('cabang_id') === 'pusat' || $request->input('cabang_id') === '0') {
             $request->merge(['cabang_id' => null]);
         }
@@ -94,10 +78,9 @@ class SchoolClassController extends Controller
             'cabang_id'         => 'nullable|exists:branches,id',
             'mata_pelajaran_id' => 'nullable|exists:courses,id',
             'guru_id'           => 'nullable|exists:teachers,id',
-            'tahun_akademik_id' => 'nullable|exists:academic_years,id',
             'kapasitas'         => 'nullable|integer|min:1|max:200',
-            'jenis'             => 'required|in:online,offline,hybrid',
-            'ruangan'           => 'nullable|string|max:50',
+            'jumlah_pertemuan'  => 'required|integer|min:1|max:200',
+            'jenis'             => 'required|in:online,offline,private',
             'link_zoom'         => 'nullable|url',
             'status'            => 'required|in:aktif,nonaktif,penuh',
         ]);
@@ -114,7 +97,6 @@ class SchoolClassController extends Controller
     public function destroy(SchoolClass $class)
     {
         $class->delete();
-
         return response()->json(['success' => true, 'message' => 'Kelas berhasil dihapus.']);
     }
 }

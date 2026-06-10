@@ -16,7 +16,9 @@ class Schedule extends Model
         'kelas_id',
         'guru_id',
         'cabang_id',
+        'pertemuan_ke',
         'tanggal',
+        'tanggal_selesai',
         'jam_mulai',
         'jam_selesai',
         'topik',
@@ -30,6 +32,7 @@ class Schedule extends Model
 
     protected $casts = [
         'tanggal' => 'date',
+        'tanggal_selesai' => 'date',
         'reminder_terkirim' => 'boolean',
     ];
 

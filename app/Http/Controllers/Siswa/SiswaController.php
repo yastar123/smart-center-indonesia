@@ -12,21 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class SiswaController extends Controller
 {
-    public function schedule()
-    {
-        $student = Student::where('user_id', auth()->id())->first();
-
-        $schedules = Schedule::with('guru', 'kelas', 'cabang')
-            ->when($student && $student->branch_id, fn($q) => $q->where('cabang_id', $student->branch_id))
-            ->where('tanggal', '>=', now()->subDays(7))
-            ->where('tanggal', '<=', now()->addDays(30))
-            ->orderBy('tanggal')
-            ->orderBy('jam_mulai')
-            ->get()
-            ->groupBy(fn($s) => $s->tanggal->format('Y-m-d'));
-
-        return view('siswa.schedule', compact('schedules', 'student'));
-    }
+    // Fungsi schedule() dihapus karena halaman jadwal siswa juga dihapus
 
     public function certificates()
     {

@@ -19,9 +19,11 @@
             </div>
         </div>
         <div class="col-md-4 text-md-end">
+            @if($allowCreateRoom ?? auth()->user()->hasRole('admin'))
             <button onclick="openRoomModal()" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px">
                 <i class="bi bi-plus-lg me-2"></i>Room Baru
             </button>
+            @endif
         </div>
     </div>
 </div>
@@ -51,7 +53,13 @@
             <div id="chatEmpty" class="flex-grow-1 d-flex align-items-center justify-content-center flex-column text-center">
                 <i class="bi bi-chat-square-text" style="font-size:3.5rem;color:#cbd5e1;margin-bottom:16px"></i>
                 <div class="fw-semibold" style="font-size:15px;color:var(--text-primary)">Pilih Percakapan</div>
-                <div class="text-muted" style="font-size:13px;margin-top:4px">Pilih room dari kiri atau buat room baru</div>
+                <div class="text-muted" style="font-size:13px;margin-top:4px">
+                    @if($allowCreateRoom ?? auth()->user()->hasRole('admin'))
+                        Pilih room dari kiri atau buat room baru
+                    @else
+                        Pilih room dari kiri
+                    @endif
+                </div>
             </div>
 
             {{-- Active chat --}}
@@ -88,6 +96,7 @@
 
 
 {{-- MODAL ROOM BARU --}}
+@if($allowCreateRoom ?? auth()->user()->hasRole('admin'))
 <div class="modal fade" id="roomModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content" style="border-radius:20px;border:none">
@@ -124,6 +133,7 @@
         </div>
     </div>
 </div>
+@endif
 @endsection
 
 @push('styles')
@@ -139,6 +149,8 @@
 
 @push('scripts')
 <script>
+const baseUrl = '{{ $messageBaseUrl ?? url('admin/messages') }}';
+const createRoomRoute = '{{ $messageCreateRoute ?? route('admin.messages.createRoom') }}';
 let activeRoom = null, pollInterval = null;
 
 function loadRooms() {
@@ -193,7 +205,7 @@ function scrollToBottom() {
 }
 
 function loadMessages(roomId) {
-    fetch(`{{ url('admin/messages') }}/${roomId}/messages`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+    fetch(`${baseUrl}/${roomId}/messages`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
         .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
         .then(res => {
             const myId = {{ auth()->id() }};
@@ -229,7 +241,7 @@ document.getElementById('messageForm').addEventListener('submit', function(e) {
     const input  = document.getElementById('messageInput');
     if (!input.value.trim() || !roomId) return;
     const fd = new FormData(this);
-    fetch(`{{ url('admin/messages') }}/${roomId}/send`, { method: 'POST', body: fd, headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
+    fetch(`${baseUrl}/${roomId}/send`, { method: 'POST', body: fd, headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
         .then(r => r.json()).then(d => { if (d.success) { input.value = ''; loadMessages(roomId); } });
 });
 
@@ -237,7 +249,7 @@ document.getElementById('roomSearch').addEventListener('input', () => {
     const rooms = @json($rooms);
     renderRooms(rooms);
 });
-
+@if($allowCreateRoom ?? auth()->user()->hasRole('admin'))
 function openRoomModal() {
     document.getElementById('roomForm').reset();
     new bootstrap.Modal(document.getElementById('roomModal')).show();
@@ -246,12 +258,13 @@ function openRoomModal() {
 document.getElementById('roomForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const fd = new FormData(this);
-    fetch(`{{ route('admin.messages.createRoom') }}`, { method: 'POST', body: fd, headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
+    fetch(createRoomRoute, { method: 'POST', body: fd, headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
         .then(r => r.json()).then(d => {
             showToast(d.message, d.success ? 'success' : 'error');
             if (d.success) { bootstrap.Modal.getInstance(document.getElementById('roomModal')).hide(); location.reload(); }
         });
 });
+@endif
 
 document.addEventListener('DOMContentLoaded', () => {
     const rooms = @json($rooms);

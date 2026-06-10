@@ -73,11 +73,42 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">Target Audiens</label>
-                            <select name="target" class="form-select"><option value="semua">Semua</option><option value="admin">Admin</option><option value="guru">Guru</option><option value="siswa">Siswa</option></select>
+                            <select name="target" id="targetSelect" class="form-select" onchange="toggleSpecificTargets()">
+                                <option value="semua">Semua Guru & Siswa</option>
+                                <option value="guru">Semua Guru</option>
+                                <option value="siswa">Semua Siswa</option>
+                                <option value="tertentu">Guru/Siswa Tertentu</option>
+                            </select>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">Status</label>
                             <select name="status" class="form-select"><option value="aktif">Aktif</option><option value="draft">Draft</option><option value="arsip">Arsip</option></select>
+                        </div>
+                        <div class="col-12" id="specificTargets" style="display:none">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Pilih Guru</label>
+                                    <div class="p-2 rounded-3" style="background:var(--input-bg);border:1.5px solid var(--card-border);max-height:180px;overflow:auto">
+                                        @foreach($teachers as $teacher)
+                                        <div class="form-check mb-1">
+                                            <input class="form-check-input target-teacher" type="checkbox" name="target_teacher_ids[]" value="{{ $teacher->id }}" id="annTeacher{{ $teacher->id }}">
+                                            <label class="form-check-label small" for="annTeacher{{ $teacher->id }}">{{ $teacher->name }}</label>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Pilih Siswa</label>
+                                    <div class="p-2 rounded-3" style="background:var(--input-bg);border:1.5px solid var(--card-border);max-height:180px;overflow:auto">
+                                        @foreach($students as $student)
+                                        <div class="form-check mb-1">
+                                            <input class="form-check-input target-student" type="checkbox" name="target_student_ids[]" value="{{ $student->id }}" id="annStudent{{ $student->id }}">
+                                            <label class="form-check-label small" for="annStudent{{ $student->id }}">{{ $student->name }}</label>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-6"><label class="form-label fw-semibold">Tanggal Mulai</label><input type="date" name="tanggal_mulai" class="form-control"></div>
                         <div class="col-md-6"><label class="form-label fw-semibold">Tanggal Selesai</label><input type="date" name="tanggal_selesai" class="form-control"></div>
@@ -138,7 +169,7 @@ function renderCards(rows) {
                 <h6 class="fw-bold mb-2">${a.judul}</h6>
                 <p class="text-muted mb-3" style="font-size:12px;line-height:1.5">${a.konten.substring(0,100)}${a.konten.length>100?'...':''}</p>
                 <div class="d-flex justify-content-between align-items-center">
-                    <small class="text-muted"><i class="bi bi-people me-1"></i>${a.target==='semua'?'Semua':a.target}</small>
+                    <small class="text-muted"><i class="bi bi-people me-1"></i>${targetLabel(a)}</small>
                     <div class="d-flex gap-1">
                         <button onclick="editAnn(${a.id})" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></button>
                         <button onclick="deleteAnn(${a.id},'${a.judul}')" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
@@ -163,8 +194,30 @@ function renderPagination(data) {
     el.innerHTML = h;
 }
 
+function targetLabel(a) {
+    if (a.target === 'guru') return 'Semua Guru';
+    if (a.target === 'siswa') return 'Semua Siswa';
+    if (a.target === 'tertentu') {
+        const guru = (a.target_teacher_ids || []).length;
+        const siswa = (a.target_student_ids || []).length;
+        return `Tertentu (${guru} guru, ${siswa} siswa)`;
+    }
+    return 'Semua Guru & Siswa';
+}
+
+function toggleSpecificTargets() {
+    const isSpecific = document.getElementById('targetSelect').value === 'tertentu';
+    document.getElementById('specificTargets').style.display = isSpecific ? 'block' : 'none';
+}
+
 function openModal(reset=true) {
-    if(reset){ document.getElementById('annForm').reset(); document.getElementById('annId').value=''; document.getElementById('modalTitle').textContent='Buat Pengumuman'; }
+    if(reset){
+        document.getElementById('annForm').reset();
+        document.getElementById('annId').value='';
+        document.getElementById('modalTitle').textContent='Buat Pengumuman';
+        document.querySelectorAll('.target-teacher,.target-student').forEach(cb => cb.checked = false);
+    }
+    toggleSpecificTargets();
     new bootstrap.Modal(document.getElementById('annModal')).show();
 }
 
@@ -177,6 +230,9 @@ function editAnn(id) {
             f.querySelector('[name=konten]').value=a.konten||'';
             f.querySelector('[name=jenis]').value=a.jenis||'info';
             f.querySelector('[name=target]').value=a.target||'semua';
+            document.querySelectorAll('.target-teacher').forEach(cb => cb.checked = (a.target_teacher_ids || []).map(String).includes(cb.value));
+            document.querySelectorAll('.target-student').forEach(cb => cb.checked = (a.target_student_ids || []).map(String).includes(cb.value));
+            toggleSpecificTargets();
             f.querySelector('[name=status]').value=a.status||'aktif';
             f.querySelector('[name=tanggal_mulai]').value=a.tanggal_mulai||'';
             f.querySelector('[name=tanggal_selesai]').value=a.tanggal_selesai||'';
@@ -200,6 +256,10 @@ document.getElementById('annForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const id = document.getElementById('annId').value;
     const url = id ? `{{ url('admin/announcements') }}/${id}` : `{{ route('admin.announcements.store') }}`;
+    if (document.getElementById('targetSelect').value === 'tertentu' && !document.querySelector('.target-teacher:checked,.target-student:checked')) {
+        showToast('Pilih minimal satu guru atau siswa untuk target tertentu.', 'warning');
+        return;
+    }
     const fd = new FormData(this);
     if(id) fd.append('_method','PUT');
     document.getElementById('submitBtn').disabled = true;

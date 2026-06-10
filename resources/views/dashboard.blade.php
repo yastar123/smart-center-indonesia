@@ -378,8 +378,8 @@
                     <a href="{{ route('guru.dashboard') }}" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
                         <i class="bi bi-grid-fill me-2"></i>Buka Portal Guru
                     </a>
-                    <a href="{{ route('guru.attendance') }}" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);border-radius:10px">
-                        <i class="bi bi-calendar-check me-2"></i>Input Absensi
+                    <a href="{{ route('guru.classes.index') }}" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);border-radius:10px">
+                        <i class="bi bi-diagram-3 me-2"></i>Kelas Saya
                     </a>
                 </div>
             </div>
@@ -473,8 +473,8 @@
                     <a href="{{ route('siswa.dashboard') }}" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
                         <i class="bi bi-grid-fill me-2"></i>Buka Portal Siswa
                     </a>
-                    <a href="{{ route('siswa.schedule') }}" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);border-radius:10px">
-                        <i class="bi bi-calendar-event me-2"></i>Lihat Jadwal
+                    <a href="{{ route('siswa.dashboard') }}" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);border-radius:10px">
+                        <i class="bi bi-calendar-event me-2"></i>Jadwal (diakses dari Portal)
                     </a>
                 </div>
             </div>
@@ -489,7 +489,7 @@
     @endphp
     <div class="col-6 col-md-3 fade-up" style="animation-delay:.05s">
         <div class="stat-card" style="border-top:3px solid #c84ddf">
-            <a href="{{ route('siswa.schedule') }}" class="text-decoration-none d-block">
+            <a href="{{ route('siswa.dashboard') }}" class="text-decoration-none d-block">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <div class="stat-title">Jadwal Hari Ini</div>
@@ -503,7 +503,7 @@
     </div>
     <div class="col-6 col-md-3 fade-up" style="animation-delay:.10s">
         <div class="stat-card" style="border-top:3px solid #10b981">
-            <a href="{{ route('siswa.schedule') }}" class="text-decoration-none d-block">
+            <a href="{{ route('siswa.dashboard') }}" class="text-decoration-none d-block">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <div class="stat-title">Jadwal Minggu Ini</div>

@@ -19,8 +19,8 @@ class SchoolClass extends Model
         'tahun_akademik_id',
         'nama_kelas',
         'kapasitas',
+        'jumlah_pertemuan',
         'jenis',
-        'ruangan',
         'link_zoom',
         'status',
     ];

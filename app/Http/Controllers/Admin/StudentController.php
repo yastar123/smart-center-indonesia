@@ -5,17 +5,22 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\Branch;
+use App\Models\Teacher;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
 public function index(Request $request)
 {
     $branches = Branch::all();
+    $teachers = Teacher::with('courses')->where('status', 'aktif')->orderBy('name')->get();
 
-        $students = Student::with('branch')
+        $students = Student::with(['branch', 'user', 'teachers.courses'])
         ->when($request->search, fn($q) =>
             $q->where('name', 'like', "%{$request->search}%")
               ->orWhere('nis', 'like', "%{$request->search}%"))
@@ -34,7 +39,7 @@ $stats = [
     'male'   => Student::where('gender', 'L')->count(),
     'female' => Student::where('gender', 'P')->count(),
 ];
-    return view('admin.students.index', compact('branches', 'students', 'stats'));
+    return view('admin.students.index', compact('branches', 'teachers', 'students', 'stats'));
 }
 
 public function store(Request $request)
@@ -58,7 +63,17 @@ public function store(Request $request)
         'school_name'  => 'nullable|string|max:100',
         'grade'        => 'nullable|string|max:50',
         'photo'        => 'nullable|image|max:2048',
+        'teacher_pairs' => 'nullable|array',
+        'teacher_pairs.*' => ['nullable','regex:/^\d+:\d+$/'],
+        'teacher_ids'  => 'nullable|array',
+        'teacher_ids.*'=> 'exists:teachers,id',
+        'email'        => ['required', 'email', 'unique:users,email'],
+        'password'     => 'required|string|min:8',
     ]);
+
+    $password = $data['password'];
+    $email = $data['email'];
+    unset($data['password'], $data['email']);
 
     $data['join_date'] = now()->toDateString();
 
@@ -71,18 +86,49 @@ public function store(Request $request)
         $data['photo'] = $request->file('photo')->store('students', 'public');
     }
 
-    $student = Student::create($data);
+    // prefer explicit pairs if provided, else teacher_ids
+    $teacherIds = [];
+    if ($request->filled('teacher_pairs')) {
+        $pairs = $request->input('teacher_pairs', []);
+        foreach ($pairs as $p) {
+            [$tid, $cid] = explode(':', $p);
+            $teacherIds[] = intval($tid);
+        }
+        $teacherIds = array_values(array_unique($teacherIds));
+    } else {
+        $teacherIds = $request->input('teacher_ids', []);
+    }
+
+    $student = DB::transaction(function () use ($data, $request, $email, $password, $teacherIds) {
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $email,
+            'password' => Hash::make($password),
+            'phone' => $data['phone'] ?? null,
+            'branch_id' => $data['branch_id'] ?? null,
+            'is_active' => true,
+        ]);
+
+        if (method_exists($user, 'assignRole')) {
+            $user->assignRole('siswa');
+        }
+
+        $data['user_id'] = $user->id;
+        $student = Student::create($data);
+        $student->teachers()->sync($teacherIds);
+        return $student;
+    });
 
     return response()->json([
         'success' => true,
         'message' => 'Siswa berhasil ditambahkan',
         'data' => $student
     ]);
-} 
+}
 
     public function show(Student $student)
     {
-        $student->load('branch');
+        $student->load(['branch', 'user', 'teachers.courses']);
         return response()->json(['success' => true, 'data' => $student]);
     }
 
@@ -104,9 +150,25 @@ public function store(Request $request)
             'parent_phone' => 'nullable|string|max:20',
             'branch_id'    => 'nullable|exists:branches,id',
             'photo'        => 'nullable|image|max:2048',
+            'teacher_ids'  => 'nullable|array',
+            'teacher_ids.*'=> 'exists:teachers,id',
+            'email'        => ['nullable', 'email', Rule::unique('users', 'email')->ignore($student->user_id)],
+            'password'     => 'nullable|string|min:8',
         ]);
 
-        $data = $request->except('photo');
+        // prefer explicit pairs if provided, else teacher_ids
+        $teacherIds = [];
+        if ($request->filled('teacher_pairs')) {
+            $pairs = $request->input('teacher_pairs', []);
+            foreach ($pairs as $p) {
+                [$tid, $cid] = explode(':', $p);
+                $teacherIds[] = intval($tid);
+            }
+            $teacherIds = array_values(array_unique($teacherIds));
+        } else {
+            $teacherIds = $request->input('teacher_ids', []);
+        }
+        $data = $request->except(['photo', 'email', 'password', 'teacher_ids']);
 
         if ($request->input('branch_id') === 'pusat' || $request->input('branch_id') === '0') {
             $data['branch_id'] = null;
@@ -117,7 +179,28 @@ public function store(Request $request)
             $data['photo'] = $request->file('photo')->store('students', 'public');
         }
 
-        $student->update($data);
+        DB::transaction(function () use ($request, $student, $data, $teacherIds) {
+            $student->update($data);
+            $student->teachers()->sync($teacherIds);
+
+            $userData = [
+                'name' => $data['name'],
+                'phone' => $data['phone'] ?? null,
+                'branch_id' => $data['branch_id'] ?? null,
+                'is_active' => ($data['status'] ?? $student->status) === 'aktif',
+            ];
+            if ($request->filled('email')) $userData['email'] = $request->email;
+            if ($request->filled('password')) $userData['password'] = Hash::make($request->password);
+
+            if ($student->user) {
+                $student->user->update($userData);
+            } elseif ($request->filled('email') && $request->filled('password')) {
+                $userData['password'] = Hash::make($request->password);
+                $user = User::create($userData);
+                if (method_exists($user, 'assignRole')) $user->assignRole('siswa');
+                $student->update(['user_id' => $user->id]);
+            }
+        });
 
         return response()->json([
             'success' => true,
@@ -128,6 +211,8 @@ public function store(Request $request)
     public function destroy(Student $student)
     {
         if ($student->photo) Storage::disk('public')->delete($student->photo);
+        $student->teachers()->detach();
+        if ($student->user) $student->user->delete();
         $student->delete();
 
         return response()->json([

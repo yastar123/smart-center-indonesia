@@ -433,6 +433,50 @@
                                     <input type="text" name="phone" id="phone" class="form-control" placeholder="8xxxxxxxxxx">
                                 </div>
                             </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold">Guru Pengajar</label>
+                                <div class="p-2 rounded-3" style="background:var(--input-bg);border:1.5px solid var(--card-border);max-height:190px;overflow:auto">
+                                    @foreach($teachers as $teacher)
+                                        @if($teacher->courses && $teacher->courses->isNotEmpty())
+                                            @foreach($teacher->courses as $course)
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input student-teacher-course-checkbox" type="checkbox" name="teacher_pairs[]" value="{{ $teacher->id }}:{{ $course->id }}" id="tp{{ $teacher->id }}_{{ $course->id }}">
+                                                <label class="form-check-label small" for="tp{{ $teacher->id }}_{{ $course->id }}">
+                                                    <strong>{{ $teacher->name }}</strong> - {{ $course->nama }}
+                                                </label>
+                                            </div>
+                                            @endforeach
+                                        @else
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input student-teacher-course-checkbox" type="checkbox" name="teacher_pairs[]" value="{{ $teacher->id }}:0" id="tp{{ $teacher->id }}_0">
+                                                <label class="form-check-label small" for="tp{{ $teacher->id }}_0">
+                                                    <strong>{{ $teacher->name }}</strong> - <span class="text-muted">Belum ada mata pelajaran</span>
+                                                </label>
+                                            </div>
+                                        @endif
+                                    @endforeach
+                                </div>
+                                <div class="text-muted mt-1" style="font-size:11px">Bisa pilih lebih dari satu guru untuk siswa.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- SECTION: AKUN LOGIN --}}
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <div style="width:4px;height:20px;background:linear-gradient(#10b981,#68117e);border-radius:4px"></div>
+                            <span class="fw-bold text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em">Akun Login Siswa</span>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold">Email Akun <span class="text-danger">*</span></label>
+                                <input type="email" name="email" id="email" class="form-control form-control-sm" placeholder="siswa@domain.com" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold">Password <span class="text-danger" id="passwordRequiredMark">*</span></label>
+                                <input type="password" name="password" id="password" class="form-control form-control-sm" placeholder="Min. 8 karakter" minlength="8" required>
+                                <div class="text-muted mt-1" id="passwordHelp" style="font-size:11px">Dipakai siswa untuk login ke portal siswa.</div>
+                            </div>
                         </div>
                     </div>
 
@@ -498,7 +542,11 @@ function openModal() {
     document.getElementById('studentId').value = '';
     document.getElementById('modalTitle').innerHTML = '<i class="bi bi-person-plus me-2"></i>Tambah Siswa Baru';
     document.getElementById('photoPreview').src = 'https://ui-avatars.com/api/?name=Siswa&background=68117e&color=fff&size=120';
-    new bootstrap.Modal('#studentModal').show();
+    document.getElementById('password').required = true;
+    document.getElementById('passwordRequiredMark').classList.remove('d-none');
+    document.getElementById('passwordHelp').textContent = 'Dipakai siswa untuk login ke portal siswa.';
+    document.querySelectorAll('.student-teacher-course-checkbox').forEach(cb => cb.checked = false);
+new bootstrap.Modal('#studentModal').show();
 }
 
 // ---- EDIT ----
@@ -516,6 +564,16 @@ function editStudent(id) {
         document.getElementById('school_name').value = s.school_name ?? '';
         document.getElementById('grade').value       = s.grade       ?? '';
         document.getElementById('phone').value       = s.phone       ?? '';
+        document.getElementById('email').value       = s.user?.email ?? '';
+        document.getElementById('password').value    = '';
+        document.getElementById('password').required = false;
+        document.getElementById('passwordRequiredMark').classList.add('d-none');
+        document.getElementById('passwordHelp').textContent = 'Kosongkan jika tidak ingin mengubah password akun siswa.';
+        const teacherIds = (s.teachers || []).map(t => String(t.id));
+        document.querySelectorAll('.student-teacher-course-checkbox').forEach(cb => {
+            const t = cb.value.split(':')[0];
+            cb.checked = teacherIds.includes(t);
+        });
         document.getElementById('parent_name').value  = s.parent_name  ?? '';
         document.getElementById('parent_phone').value = s.parent_phone ?? '';
         document.getElementById('address').value     = s.address     ?? '';
@@ -558,6 +616,7 @@ function showDetail(id) {
                     ${row('Sekolah', s.school_name ?? '–')}
                     ${row('No. HP', s.phone ?? '–')}
                     ${row('Orang Tua', (s.parent_name??'–') + (s.parent_phone?' · '+s.parent_phone:''))}
+                    ${row('Guru', (s.teachers || []).map(t => t.name + (t.courses?.length ? ' (' + t.courses.map(c => c.nama).join(', ') + ')' : '')).join('<br>') || '–')}
                     ${row('Alamat', s.address ?? '–')}
                     ${row('Bergabung', s.created_at ? s.created_at.substr(0,10) : '–')}
                 </table>
@@ -577,9 +636,22 @@ function row(label, val) {
 
 // ---- SAVE ----
 function saveStudent() {
+    const form = document.getElementById('studentForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
     const id  = document.getElementById('studentId').value;
     const url = id ? '/admin/students/' + id : '{{ route("admin.students.store") }}';
-    const fd  = new FormData(document.getElementById('studentForm'));
+    const fd  = new FormData(form);
+    // Collect teacher_pairs and dedupe into teacher_ids for backend compatibility
+    const checkedPairs = Array.from(document.querySelectorAll('.student-teacher-course-checkbox:checked')).map(cb => cb.value);
+    // append pairs
+    checkedPairs.forEach(p => fd.append('teacher_pairs[]', p));
+    // derive unique teacher ids
+    const teacherIds = [...new Set(checkedPairs.map(p => p.split(':')[0]))];
+    teacherIds.forEach(tid => fd.append('teacher_ids[]', tid));
     if (id) fd.append('_method', 'PUT');
 
     const btn = document.getElementById('saveBtn');

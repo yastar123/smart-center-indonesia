@@ -17,9 +17,6 @@ class Course extends Model
         'kode',
         'nama',
         'deskripsi',
-        'kategori',
-        'icon',
-        'warna',
         'status',
     ];
 
@@ -60,7 +57,7 @@ class Course extends Model
     // Relasi ke modul
     public function modul()
     {
-        return $this->hasMany(Module::class, 'course_id');
+        return $this->hasMany(Module::class, 'mata_pelajaran_id');
     }
 
     // Relasi ke kelas

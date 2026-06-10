@@ -24,6 +24,10 @@ class Student extends Model
 
     public function user()    { return $this->belongsTo(User::class); }
     public function branch()  { return $this->belongsTo(Branch::class); }
+    public function teachers()
+    {
+        return $this->belongsToMany(Teacher::class, 'student_teachers', 'student_id', 'teacher_id')->withTimestamps();
+    }
 
     public function getPhotoUrlAttribute()
     {

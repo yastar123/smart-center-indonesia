@@ -17,7 +17,6 @@ class Module extends Model
         'diupload_oleh',
         'judul',
         'deskripsi',
-        'urutan',
         'jenis',
         'file_path',
         'file_url',

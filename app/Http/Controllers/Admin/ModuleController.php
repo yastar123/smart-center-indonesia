@@ -39,13 +39,24 @@ class ModuleController extends Controller
             'mata_pelajaran_id' => 'required|exists:courses,id',
             'judul'             => 'required|string|max:200',
             'deskripsi'         => 'nullable|string',
-            'jenis'             => 'required|in:pdf,video,materi,link',
-            'urutan'            => 'nullable|integer',
+            'jenis'             => 'required|in:pdf,video,link',
             'is_gratis'         => 'nullable|boolean',
             'file'              => 'nullable|file|max:51200',
             'file_url'          => 'nullable|url',
             'status'            => 'required|in:aktif,draft',
         ]);
+
+        if (!$request->hasFile('file') && !$request->filled('file_url')) {
+            return response()->json(['success' => false, 'message' => 'Upload file atau isi link modul.'], 422);
+        }
+
+        if ($request->hasFile('file') && $request->filled('file_url')) {
+            return response()->json(['success' => false, 'message' => 'Pilih salah satu: upload file atau link, tidak keduanya.'], 422);
+        }
+
+        if ($request->hasFile('file') && $request->jenis === 'link') {
+            return response()->json(['success' => false, 'message' => 'Untuk upload file, pilih jenis PDF atau Video.'], 422);
+        }
 
         $data['diupload_oleh'] = auth()->id();
         $data['is_gratis']     = $request->boolean('is_gratis');
@@ -54,6 +65,11 @@ class ModuleController extends Controller
             $uploaded = $request->file('file')->store('modules', 'public');
             $data['file_path']    = $uploaded;
             $data['ukuran_file']  = $request->file('file')->getSize();
+            $data['file_url']     = null;
+        } else {
+            $data['jenis'] = 'link';
+            $data['file_path'] = null;
+            $data['ukuran_file'] = null;
         }
 
         $module = Module::create($data);
@@ -71,12 +87,28 @@ class ModuleController extends Controller
             'mata_pelajaran_id' => 'required|exists:courses,id',
             'judul'             => 'required|string|max:200',
             'deskripsi'         => 'nullable|string',
-            'jenis'             => 'required|in:pdf,video,materi,link',
-            'urutan'            => 'nullable|integer',
+            'jenis'             => 'required|in:pdf,video,link',
             'is_gratis'         => 'nullable|boolean',
+            'file'              => 'nullable|file|max:51200',
             'file_url'          => 'nullable|url',
             'status'            => 'required|in:aktif,draft',
         ]);
+
+        if ($request->hasFile('file') && $request->filled('file_url')) {
+            return response()->json(['success' => false, 'message' => 'Pilih salah satu: upload file atau link, tidak keduanya.'], 422);
+        }
+
+        if ($request->hasFile('file') && $request->jenis === 'link') {
+            return response()->json(['success' => false, 'message' => 'Untuk upload file, pilih jenis PDF atau Video.'], 422);
+        }
+
+        if (!$request->hasFile('file') && !$request->filled('file_url') && !$module->file_path && !$module->file_url) {
+            return response()->json(['success' => false, 'message' => 'Upload file atau isi link modul.'], 422);
+        }
+
+        if (!$request->hasFile('file') && !$request->filled('file_url') && $request->jenis === 'link' && !$module->file_url) {
+            return response()->json(['success' => false, 'message' => 'Jenis Link wajib memiliki URL link modul.'], 422);
+        }
 
         $data['is_gratis'] = $request->boolean('is_gratis');
 
@@ -84,6 +116,14 @@ class ModuleController extends Controller
             if ($module->file_path) Storage::disk('public')->delete($module->file_path);
             $data['file_path']   = $request->file('file')->store('modules', 'public');
             $data['ukuran_file'] = $request->file('file')->getSize();
+            $data['file_url']    = null;
+        } elseif ($request->filled('file_url')) {
+            if ($module->file_path) Storage::disk('public')->delete($module->file_path);
+            $data['jenis'] = 'link';
+            $data['file_path'] = null;
+            $data['ukuran_file'] = null;
+        } else {
+            unset($data['file_url']);
         }
 
         $module->update($data);

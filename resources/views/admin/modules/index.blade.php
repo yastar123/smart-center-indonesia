@@ -65,7 +65,6 @@
                 <option value="">Semua Jenis</option>
                 <option value="pdf">PDF</option>
                 <option value="video">Video</option>
-                <option value="materi">Materi</option>
                 <option value="link">Link</option>
             </select>
         </div>
@@ -90,10 +89,10 @@
 <div class="dashboard-card">
     <div class="table-responsive">
         <table class="table table-hover table-modern align-middle mb-0">
-            <thead class="thead-modern"><tr><th>Modul</th><th>Mata Pelajaran</th><th>Jenis</th><th>Ukuran</th><th>Akses</th><th>Status</th><th class="text-center">Aksi</th></tr></thead>
+            <thead class="thead-modern"><tr><th>Modul</th><th>Deskripsi</th><th>Mata Pelajaran</th><th>Jenis</th><th>Sumber</th><th>Akses</th><th>Status</th><th class="text-center">Aksi</th></tr></thead>
             <tbody id="tableBody">
                 @for($i=0;$i<5;$i++)
-                <tr class="skeleton-row"><td><div class="d-flex align-items-center gap-2"><div class="skeleton-cell" style="width:36px;height:36px;border-radius:10px;flex-shrink:0"></div><div><div class="skeleton-cell mb-1" style="width:120px"></div><div class="skeleton-cell" style="width:80px;height:10px"></div></div></div></td><td><div class="skeleton-cell" style="width:90px"></div></td><td><div class="skeleton-cell" style="width:55px"></div></td><td><div class="skeleton-cell" style="width:50px"></div></td><td><div class="skeleton-cell" style="width:50px"></div></td><td><div class="skeleton-cell" style="width:55px"></div></td><td><div class="skeleton-cell" style="width:80px;margin:0 auto"></div></td></tr>
+                <tr class="skeleton-row"><td><div class="d-flex align-items-center gap-2"><div class="skeleton-cell" style="width:36px;height:36px;border-radius:10px;flex-shrink:0"></div><div><div class="skeleton-cell mb-1" style="width:120px"></div><div class="skeleton-cell" style="width:80px;height:10px"></div></div></div></td><td><div class="skeleton-cell" style="width:120px"></div></td><td><div class="skeleton-cell" style="width:90px"></div></td><td><div class="skeleton-cell" style="width:55px"></div></td><td><div class="skeleton-cell" style="width:80px"></div></td><td><div class="skeleton-cell" style="width:50px"></div></td><td><div class="skeleton-cell" style="width:55px"></div></td><td><div class="skeleton-cell" style="width:80px;margin:0 auto"></div></td></tr>
                 @endfor
             </tbody>
         </table>
@@ -126,7 +125,6 @@
                             <select name="jenis" class="form-select" required id="jenisSelect">
                                 <option value="pdf">PDF</option>
                                 <option value="video">Video</option>
-                                <option value="materi">Materi</option>
                                 <option value="link">Link External</option>
                             </select>
                         </div>
@@ -139,25 +137,22 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-semibold">Urutan</label>
-                            <input type="number" name="urutan" class="form-control" value="1" min="1">
-                        </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <label class="form-label fw-semibold">Status</label>
                             <select name="status" class="form-select">
                                 <option value="aktif">Aktif</option>
                                 <option value="draft">Draft</option>
                             </select>
                         </div>
-                        <div class="col-12" id="fileSection">
-                            <label class="form-label fw-semibold">Upload File (PDF/Video)</label>
-                            <input type="file" name="file" class="form-control" accept=".pdf,.mp4,.mov,.avi">
-                            <div class="form-text">Maks 50 MB</div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Upload File PDF/Video</label>
+                            <input type="file" name="file" id="fileInput" class="form-control" accept=".pdf,.mp4,.mov,.avi">
+                            <div class="form-text">Maks 50 MB. Isi upload file atau link, pilih salah satu.</div>
                         </div>
-                        <div class="col-12" id="urlSection" style="display:none">
-                            <label class="form-label fw-semibold">URL Link</label>
-                            <input type="url" name="file_url" class="form-control" placeholder="https://...">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Link Modul</label>
+                            <input type="url" name="file_url" id="fileUrlInput" class="form-control" placeholder="https://...">
+                            <div class="form-text">Opsional jika tidak upload file.</div>
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-semibold">Deskripsi</label>
@@ -204,35 +199,39 @@ function loadData(page = 1) {
             renderPagination(data);
         })
         .catch(() => {
-            document.getElementById('tableBody').innerHTML = `<tr><td colspan="7" class="text-center py-5"><i class="bi bi-wifi-off" style="font-size:2rem;color:#ef4444;display:block;margin-bottom:10px"></i><div class="fw-semibold mb-2">Gagal memuat data</div><button onclick="loadData(${page})" class="btn btn-sm btn-outline-primary"><i class="bi bi-arrow-clockwise me-1"></i>Coba lagi</button></td></tr>`;
+            document.getElementById('tableBody').innerHTML = `<tr><td colspan="8" class="text-center py-5"><i class="bi bi-wifi-off" style="font-size:2rem;color:#ef4444;display:block;margin-bottom:10px"></i><div class="fw-semibold mb-2">Gagal memuat data</div><button onclick="loadData(${page})" class="btn btn-sm btn-outline-primary"><i class="bi bi-arrow-clockwise me-1"></i>Coba lagi</button></td></tr>`;
         });
 }
 
 function renderTable(rows) {
-    const jenisMap = { pdf:'<span class="badge" style="background:#ef444422;color:#ef4444">PDF</span>', video:'<span class="badge" style="background:#10b98122;color:#10b981">Video</span>', materi:'<span class="badge" style="background:#68117e22;color:#68117e">Materi</span>', link:'<span class="badge" style="background:#f6af2322;color:#b45309">Link</span>' };
+    const jenisMap = { pdf:'<span class="badge" style="background:#ef444422;color:#ef4444">PDF</span>', video:'<span class="badge" style="background:#10b98122;color:#10b981">Video</span>', link:'<span class="badge" style="background:#f6af2322;color:#b45309">Link</span>' };
     if (!rows.length) {
-        document.getElementById('tableBody').innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted"><i class="bi bi-book" style="font-size:2rem;display:block;margin-bottom:8px"></i>Belum ada modul</td></tr>';
+        document.getElementById('tableBody').innerHTML = '<tr><td colspan="8" class="text-center py-5 text-muted"><i class="bi bi-book" style="font-size:2rem;display:block;margin-bottom:8px"></i>Belum ada modul</td></tr>';
         return;
     }
-    document.getElementById('tableBody').innerHTML = rows.map(m => `
+    document.getElementById('tableBody').innerHTML = rows.map(m => {
+        const sourceUrl = m.file_path ? `/storage/${m.file_path}` : m.file_url;
+        const sourceLabel = m.file_path
+            ? `${m.ukuran_file ? (m.ukuran_file / 1024 / 1024).toFixed(1) + ' MB' : 'File'}`
+            : (m.file_url || '–');
+        return `
         <tr>
-            <td>
-                <div class="fw-semibold">${m.judul}</div>
-                <div class="text-muted" style="font-size:11px">${m.deskripsi ? m.deskripsi.substring(0,60)+'...' : ''}</div>
-            </td>
+            <td><div class="fw-semibold">${m.judul}</div></td>
+            <td><span class="text-muted" style="font-size:12px;max-width:220px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.deskripsi || '–'}</span></td>
             <td><span class="badge bg-primary-subtle text-primary">${m.mata_pelajaran?.nama || '-'}</span></td>
             <td>${jenisMap[m.jenis] || m.jenis}</td>
-            <td>${m.ukuran_file ? (m.ukuran_file/1024/1024).toFixed(1)+' MB' : '-'}</td>
+            <td>${sourceUrl ? `<a href="${sourceUrl}" target="_blank" class="text-decoration-none" style="font-size:12px;max-width:180px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><i class="bi bi-box-arrow-up-right me-1"></i>${sourceLabel}</a>` : '<span class="text-muted">–</span>'}</td>
             <td>${m.is_gratis ? '<span class="badge bg-success-subtle text-success">Gratis</span>' : '<span class="badge bg-secondary-subtle text-secondary">Berbayar</span>'}</td>
             <td>${m.status === 'aktif' ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-warning text-dark">Draft</span>'}</td>
             <td>
                 <div class="d-flex gap-1">
-                    ${m.file_path ? `<a href="/storage/${m.file_path}" target="_blank" class="btn btn-sm btn-outline-info" title="Lihat"><i class="bi bi-eye"></i></a>` : ''}
+                    ${sourceUrl ? `<a href="${sourceUrl}" target="_blank" class="btn btn-sm btn-outline-info" title="Lihat"><i class="bi bi-eye"></i></a>` : ''}
                     <button onclick="editModule(${m.id})" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></button>
-                    <button onclick="deleteModule(${m.id},'${m.judul}')" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                    <button onclick="deleteModule(${m.id},'${String(m.judul).replace(/'/g, "\\'")}')" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
                 </div>
             </td>
-        </tr>`).join('');
+        </tr>`;
+    }).join('');
 }
 
 function renderPagination(data) {
@@ -267,14 +266,14 @@ function editModule(id) {
             f.querySelector('[name=judul]').value = m.judul || '';
             f.querySelector('[name=jenis]').value = m.jenis || 'pdf';
             f.querySelector('[name=mata_pelajaran_id]').value = m.mata_pelajaran_id || '';
-            f.querySelector('[name=urutan]').value = m.urutan || 1;
             f.querySelector('[name=status]').value = m.status || 'aktif';
+            f.querySelector('[name=file_url]').value = m.file_url || '';
+            f.querySelector('[name=file]').value = '';
             f.querySelector('[name=deskripsi]').value = m.deskripsi || '';
             f.querySelector('[name=is_gratis]').checked = !!m.is_gratis;
             document.getElementById('moduleId').value = id;
             document.getElementById('formMethod').value = 'PUT';
             document.getElementById('modalTitle').textContent = 'Edit Modul';
-            toggleUrlSection();
             openModal(false);
         }).catch(()=>showToast('Gagal memuat data modul.', 'error'));
 }
@@ -288,12 +287,7 @@ function deleteModule(id, name) {
     }, null, {title:'Hapus Modul', okText:'Ya, Hapus'});
 }
 
-document.getElementById('jenisSelect').addEventListener('change', toggleUrlSection);
-function toggleUrlSection() {
-    const jenis = document.getElementById('jenisSelect').value;
-    document.getElementById('fileSection').style.display = jenis === 'link' ? 'none' : '';
-    document.getElementById('urlSection').style.display  = jenis === 'link' ? '' : 'none';
-}
+
 
 document.getElementById('moduleForm').addEventListener('submit', function(e) {
     e.preventDefault();

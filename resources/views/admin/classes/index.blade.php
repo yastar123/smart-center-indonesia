@@ -72,7 +72,7 @@
                         <option value="">Semua Jenis</option>
                         <option value="online"  {{ request('jenis')=='online'?'selected':'' }}>Online</option>
                         <option value="offline" {{ request('jenis')=='offline'?'selected':'' }}>Offline</option>
-                        <option value="hybrid"  {{ request('jenis')=='hybrid'?'selected':'' }}>Hybrid</option>
+                        <option value="private"  {{ request('jenis')=='private'?'selected':'' }}>Private</option>
                     </select>
                 </div>
                 <div class="col-6 col-md-2">
@@ -111,7 +111,7 @@
                             <th>Nama Kelas</th>
                             <th class="d-none d-md-table-cell">Mata Pelajaran</th>
                             <th class="d-none d-md-table-cell">Guru</th>
-                            <th class="d-none d-lg-table-cell">Kapasitas</th>
+                            <th class="d-none d-lg-table-cell">Pertemuan</th>
                             <th>Jenis</th>
                             <th>Status</th>
                             <th class="text-end pe-4">Aksi</th>
@@ -123,7 +123,7 @@
                             <td class="px-4 text-muted" style="font-size:.85rem;">{{ $classes->firstItem() + $i }}</td>
                             <td>
                                 <div class="fw-semibold" style="font-size:.9rem;">{{ $class->nama_kelas }}</div>
-                                <div class="text-muted" style="font-size:.78rem;">{{ $class->tahunAkademik?->nama ?? '—' }}</div>
+                                <div class="text-muted" style="font-size:.78rem;">{{ $class->cabang?->name ?? 'Pusat' }}</div>
                             </td>
                             <td class="d-none d-md-table-cell" style="font-size:.85rem;">
                                 {{ $class->mataPelajaran?->nama ?? '—' }}
@@ -132,17 +132,15 @@
                                 {{ $class->guru?->name ?? '—' }}
                             </td>
                             <td class="d-none d-lg-table-cell">
-                                @if($class->kapasitas)
-                                <div class="d-flex align-items-center gap-2">
-                                    <span style="font-size:.85rem;font-weight:600;">{{ $class->kapasitas }}</span>
-                                    <small class="text-muted">siswa</small>
-                                </div>
+                                @if($class->jumlah_pertemuan)
+                                <span style="font-size:.85rem;font-weight:600;">{{ $class->jumlah_pertemuan }}</span>
+                                <small class="text-muted"> sesi</small>
                                 @else
                                 <span class="text-muted">—</span>
                                 @endif
                             </td>
                             <td>
-                                @php $jeниsBadge = ['online'=>['#c84ddf','rgba(200,77,223,.15)'],'offline'=>['#f6af23','rgba(245,158,11,.15)'],'hybrid'=>['#68117e','rgba(104,17,126,.15)']] @endphp
+                                @php $jeниsBadge = ['online'=>['#c84ddf','rgba(200,77,223,.15)'],'offline'=>['#f6af23','rgba(245,158,11,.15)'],'private'=>['#68117e','rgba(104,17,126,.15)']] @endphp
                                 @php $j = $jeниsBadge[$class->jenis] ?? ['#6b7280','rgba(107,114,128,.15)'] @endphp
                                 <span class="badge rounded-pill" style="background:{{ $j[1] }};color:{{ $j[0] }};font-size:.75rem;font-weight:600;padding:.35em .75em;text-transform:capitalize;">{{ $class->jenis }}</span>
                             </td>
@@ -230,25 +228,22 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold" style="font-size:.85rem;">Tahun Akademik</label>
-                            <select class="form-select" id="tahun_akademik_id">
-                                <option value="">-- Pilih Tahun Akademik --</option>
-                                @foreach($tahunAkademik as $ta)
-                                <option value="{{ $ta->id }}">{{ $ta->nama }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+
                         <div class="col-md-4">
                             <label class="form-label fw-semibold" style="font-size:.85rem;">Kapasitas</label>
                             <input type="number" class="form-control" id="kapasitas" placeholder="30" min="1" max="200">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" style="font-size:.85rem;">Jumlah Pertemuan <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="jumlah_pertemuan" placeholder="cth: 12" min="1" max="200" required>
+                            <div class="form-text">Berapa sesi/pertemuan kelas ini berlangsung.</div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-semibold" style="font-size:.85rem;">Jenis <span class="text-danger">*</span></label>
                             <select class="form-select" id="jenis" required onchange="toggleZoom()">
                                 <option value="offline">Offline</option>
                                 <option value="online">Online</option>
-                                <option value="hybrid">Hybrid</option>
+                                <option value="private">Private</option>
                             </select>
                         </div>
                         <div class="col-md-4">
@@ -258,10 +253,6 @@
                                 <option value="nonaktif">Nonaktif</option>
                                 <option value="penuh">Penuh</option>
                             </select>
-                        </div>
-                        <div class="col-md-6" id="ruanganField">
-                            <label class="form-label fw-semibold" style="font-size:.85rem;">Ruangan</label>
-                            <input type="text" class="form-control" id="ruangan" placeholder="cth: R-101, Ruang A">
                         </div>
                         <div class="col-md-6" id="zoomField" style="display:none;">
                             <label class="form-label fw-semibold" style="font-size:.85rem;">Link Zoom</label>
@@ -286,8 +277,7 @@ const classModal = new bootstrap.Modal(document.getElementById('classModal'));
 
 function toggleZoom() {
     const jenis = document.getElementById('jenis').value;
-    document.getElementById('zoomField').style.display = (jenis === 'online' || jenis === 'hybrid') ? 'block' : 'none';
-    document.getElementById('ruanganField').style.display = (jenis === 'offline' || jenis === 'hybrid') ? 'block' : 'none';
+    document.getElementById('zoomField').style.display = jenis === 'online' ? 'block' : 'none';
 }
 
 function openModal() {
@@ -310,11 +300,10 @@ function editClass(id) {
             document.getElementById('cls_cabang_id').value = cabangVal;
             document.getElementById('mata_pelajaran_id').value = d.mata_pelajaran_id || '';
             document.getElementById('guru_id').value = d.guru_id || '';
-            document.getElementById('tahun_akademik_id').value = d.tahun_akademik_id || '';
             document.getElementById('kapasitas').value = d.kapasitas || '';
+            document.getElementById('jumlah_pertemuan').value = d.jumlah_pertemuan || '';
             document.getElementById('jenis').value = d.jenis || 'offline';
             document.getElementById('cls_status').value = d.status || 'aktif';
-            document.getElementById('ruangan').value = d.ruangan || '';
             document.getElementById('link_zoom').value = d.link_zoom || '';
             toggleZoom();
             document.getElementById('classSaveBtn').disabled = false;
@@ -340,11 +329,10 @@ function saveClass() {
             cabang_id:         document.getElementById('cls_cabang_id').value,
             mata_pelajaran_id: document.getElementById('mata_pelajaran_id').value || null,
             guru_id:           document.getElementById('guru_id').value || null,
-            tahun_akademik_id: document.getElementById('tahun_akademik_id').value || null,
             kapasitas:         document.getElementById('kapasitas').value || null,
+            jumlah_pertemuan:  document.getElementById('jumlah_pertemuan').value || null,
             jenis:             document.getElementById('jenis').value,
             status:            document.getElementById('cls_status').value,
-            ruangan:           document.getElementById('ruangan').value,
             link_zoom:         document.getElementById('link_zoom').value || null,
         })
     })
