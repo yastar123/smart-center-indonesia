@@ -151,13 +151,13 @@ class DemoDataSeeder extends Seeder
         // ── COURSES ──────────────────────────────────────────────────────
         if (\App\Models\Course::count() === 0) {
             $courses = [
-                ['kode'=>'MTK','nama'=>'Matematika','deskripsi'=>'Persiapan UN dan SNBT Matematika','kategori'=>'Sains','icon'=>'bi-calculator','warna'=>'#3b82f6','status'=>'aktif'],
-                ['kode'=>'FIS','nama'=>'Fisika','deskripsi'=>'Konsep dan soal Fisika tingkat SMA','kategori'=>'Sains','icon'=>'bi-lightning','warna'=>'#6366f1','status'=>'aktif'],
-                ['kode'=>'KIM','nama'=>'Kimia','deskripsi'=>'Kimia organik, anorganik dan soal CBT','kategori'=>'Sains','icon'=>'bi-moisture','warna'=>'#10b981','status'=>'aktif'],
-                ['kode'=>'BIO','nama'=>'Biologi','deskripsi'=>'Biologi sel, genetika dan ekologi','kategori'=>'Sains','icon'=>'bi-tree','warna'=>'#059669','status'=>'aktif'],
-                ['kode'=>'BI','nama'=>'Bahasa Indonesia','deskripsi'=>'Tata bahasa, sastra dan penulisan','kategori'=>'Bahasa','icon'=>'bi-book','warna'=>'#f59e0b','status'=>'aktif'],
-                ['kode'=>'BIG','nama'=>'Bahasa Inggris','deskripsi'=>'Grammar, reading dan writing skills','kategori'=>'Bahasa','icon'=>'bi-translate','warna'=>'#ef4444','status'=>'aktif'],
-                ['kode'=>'SNBT','nama'=>'Tryout SNBT','deskripsi'=>'Simulasi lengkap seleksi masuk PTN','kategori'=>'CBT','icon'=>'bi-clipboard-check','warna'=>'#8b5cf6','status'=>'aktif'],
+                ['kode'=>'MTK','nama'=>'Matematika','deskripsi'=>'Persiapan UN dan SNBT Matematika','status'=>'aktif'],
+                ['kode'=>'FIS','nama'=>'Fisika','deskripsi'=>'Konsep dan soal Fisika tingkat SMA','status'=>'aktif'],
+                ['kode'=>'KIM','nama'=>'Kimia','deskripsi'=>'Kimia organik, anorganik dan soal CBT','status'=>'aktif'],
+                ['kode'=>'BIO','nama'=>'Biologi','deskripsi'=>'Biologi sel, genetika dan ekologi','status'=>'aktif'],
+                ['kode'=>'BI','nama'=>'Bahasa Indonesia','deskripsi'=>'Tata bahasa, sastra dan penulisan','status'=>'aktif'],
+                ['kode'=>'BIG','nama'=>'Bahasa Inggris','deskripsi'=>'Grammar, reading dan writing skills','status'=>'aktif'],
+                ['kode'=>'SNBT','nama'=>'Tryout SNBT','deskripsi'=>'Simulasi lengkap seleksi masuk PTN','status'=>'aktif'],
             ];
             foreach ($courses as $c) {
                 \App\Models\Course::create($c);
@@ -180,7 +180,6 @@ class DemoDataSeeder extends Seeder
                 'nama_kelas' => 'Matematika XII - Pagi',
                 'kapasitas' => 20,
                 'jenis' => 'offline',
-                'ruangan' => 'Ruang A1',
                 'status' => 'aktif',
             ]);
             \App\Models\SchoolClass::create([
@@ -190,7 +189,6 @@ class DemoDataSeeder extends Seeder
                 'nama_kelas' => 'Bahasa Inggris XII - Sore',
                 'kapasitas' => 15,
                 'jenis' => 'offline',
-                'ruangan' => 'Ruang B2',
                 'status' => 'aktif',
             ]);
             \App\Models\SchoolClass::create([
@@ -228,7 +226,6 @@ class DemoDataSeeder extends Seeder
                     'jam_selesai'=> '10:00',
                     'topik'      => 'Aljabar Linear & Matriks',
                     'jenis'      => 'offline',
-                    'ruangan'    => 'Ruang A1',
                     'status'     => $d < 0 ? 'selesai' : ($isToday ? 'berlangsung' : 'dijadwalkan'),
                 ]);
                 $scheduled++;
@@ -244,7 +241,6 @@ class DemoDataSeeder extends Seeder
                     'jam_selesai'=> '16:00',
                     'topik'      => 'Reading Comprehension & Grammar',
                     'jenis'      => 'offline',
-                    'ruangan'    => 'Ruang B2',
                     'status'     => $d < 0 ? 'selesai' : 'dijadwalkan',
                 ]);
             }
