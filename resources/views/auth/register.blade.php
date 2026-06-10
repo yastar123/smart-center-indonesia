@@ -15,6 +15,7 @@
             min-height: 100vh;
             background: linear-gradient(135deg, #260632 0%, #461256 40%, #461256 75%, #c84ddf 100%);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             font-family: 'Inter', 'Segoe UI', sans-serif;
@@ -107,6 +108,12 @@
     </style>
 </head>
 <body>
+
+<div style="position:relative;z-index:2;margin-bottom:.75rem">
+    <a href="{{ url('/') }}" style="display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,.65);font-size:.78rem;font-weight:600;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='rgba(255,255,255,.95)'" onmouseout="this.style.color='rgba(255,255,255,.65)'">
+        <i class="bi bi-arrow-left" style="font-size:.8rem"></i> Kembali ke Beranda
+    </a>
+</div>
 
 <div class="register-card">
 

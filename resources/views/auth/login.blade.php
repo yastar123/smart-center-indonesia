@@ -376,6 +376,10 @@
     {{-- ===== LEFT PANEL ===== --}}
     <div class="login-left">
 
+        <a href="{{ url('/') }}" style="display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,.6);font-size:.78rem;font-weight:600;text-decoration:none;margin-bottom:1.25rem;transition:color .2s;" onmouseover="this.style.color='rgba(255,255,255,.95)'" onmouseout="this.style.color='rgba(255,255,255,.6)'">
+            <i class="bi bi-arrow-left" style="font-size:.8rem"></i> Kembali ke Beranda
+        </a>
+
         <div class="brand-badge">
             <div class="brand-badge-icon">
                 <i class="bi bi-mortarboard-fill" style="color:#fff"></i>

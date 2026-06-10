@@ -97,7 +97,7 @@
             <a href="javascript:location.reload()" class="back-btn">
                 <i class="bi bi-arrow-clockwise"></i> Muat Ulang
             </a>
-            <a href="{{ url('/dashboard') }}" class="home-btn">
+            <a href="{{ url('/') }}" class="home-btn">
                 <i class="bi bi-house-door"></i> Beranda
             </a>
         </div>

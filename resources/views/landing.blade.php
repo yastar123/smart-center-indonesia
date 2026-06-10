@@ -5,6 +5,13 @@
         'branches' => \App\Models\Branch::count(),
         'schedules'=> \App\Models\Schedule::count(),
     ];
+    $monthRevenue = \App\Models\Payment::where('status','verified')
+        ->whereMonth('tanggal_pembayaran', now()->month)
+        ->whereYear('tanggal_pembayaran',  now()->year)
+        ->sum('jumlah');
+    $revenueLabel = $monthRevenue >= 1000000
+        ? 'Rp'.number_format($monthRevenue/1000000,0,',','.').'JT'
+        : 'Rp'.number_format($monthRevenue,0,',','.');
 @endphp
 <!DOCTYPE html>
 <html lang="id">
@@ -1593,7 +1600,7 @@
             <div class="si-label">Guru Berpengalaman</div>
         </div>
         <div class="stat-item reveal reveal-delay-2">
-            <div class="si-num count-up" data-target="{{ $stats['branches'] }}">0</div>
+            <div class="si-num count-up" data-target="{{ $stats['branches'] }}" data-exact="1">0</div>
             <div class="si-label">Cabang Aktif</div>
         </div>
         <div class="stat-item reveal reveal-delay-3">
@@ -1731,8 +1738,8 @@
                         </div>
                         <div class="db-stat-card">
                             <div class="db-s-label">Pendapatan</div>
-                            <div class="db-s-val" style="color:#f6af23">Rp{{ number_format(rand(15,25)*1000000/1000000,0,',','.')  }}JT</div>
-                            <div class="db-s-trend"><i class="bi bi-arrow-up-short"></i>+8% vs lalu</div>
+                            <div class="db-s-val" style="color:#f6af23">{{ $revenueLabel ?: 'Rp0' }}</div>
+                            <div class="db-s-trend"><i class="bi bi-arrow-up-short"></i>Bulan ini</div>
                         </div>
                     </div>
 
@@ -2035,12 +2042,14 @@ revealEls.forEach(el => revealObs.observe(el));
 function countUp(el) {
     const target = parseInt(el.dataset.target, 10);
     if (!target) return;
+    const exact  = el.dataset.exact === '1';
+    const suffix = (!exact && target > 0) ? '+' : '';
     const duration = 1600;
     const step = target / (duration / 16);
     let current = 0;
     const timer = setInterval(() => {
         current = Math.min(current + step, target);
-        el.textContent = Math.floor(current) + (target > 0 ? '+' : '');
+        el.textContent = Math.floor(current) + suffix;
         if (current >= target) clearInterval(timer);
     }, 16);
 }

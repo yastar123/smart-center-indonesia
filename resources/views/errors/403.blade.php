@@ -110,7 +110,7 @@
             <a href="javascript:history.back()" class="back-btn">
                 <i class="bi bi-arrow-left"></i> Kembali
             </a>
-            <a href="{{ url('/dashboard') }}" class="home-btn">
+            <a href="{{ url('/') }}" class="home-btn">
                 <i class="bi bi-house-door"></i> Beranda
             </a>
         </div>

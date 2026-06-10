@@ -3293,6 +3293,11 @@
 
         <div class="topbar-right">
 
+            {{-- Landing page home link --}}
+            <a href="{{ url('/') }}" class="top-btn d-none d-md-flex" title="Beranda" style="text-decoration:none;align-items:center;">
+                <i class="bi bi-house-door" style="font-size:15px"></i>
+            </a>
+
             {{-- Command palette trigger --}}
             <button class="top-btn d-none d-md-flex align-items-center gap-1" onclick="openCmdPalette()" title="Cari (Ctrl+K)"
                 style="width:auto;padding:0 12px;gap:8px;font-size:12.5px;color:var(--text-muted)">
