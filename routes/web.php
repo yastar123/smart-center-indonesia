@@ -162,6 +162,16 @@ Route::middleware(['auth'])
 
         // REPORTS
         Route::get('/reports', fn() => view('admin.reports.index'))->name('reports.index');
+
+        // LANDING PAGE CONTENT
+        Route::get('/landing',                                          [\App\Http\Controllers\Admin\LandingContentController::class, 'index'])             ->name('landing.index');
+        Route::put('/landing/settings',                                 [\App\Http\Controllers\Admin\LandingContentController::class, 'updateSettings'])    ->name('landing.settings.update');
+        Route::post('/landing/testimonials',                            [\App\Http\Controllers\Admin\LandingContentController::class, 'storeTestimonial'])   ->name('landing.testimonials.store');
+        Route::put('/landing/testimonials/{testimonial}',               [\App\Http\Controllers\Admin\LandingContentController::class, 'updateTestimonial'])  ->name('landing.testimonials.update');
+        Route::delete('/landing/testimonials/{testimonial}',            [\App\Http\Controllers\Admin\LandingContentController::class, 'destroyTestimonial']) ->name('landing.testimonials.destroy');
+        Route::post('/landing/programs',                                [\App\Http\Controllers\Admin\LandingContentController::class, 'storeProgram'])       ->name('landing.programs.store');
+        Route::put('/landing/programs/{program}',                       [\App\Http\Controllers\Admin\LandingContentController::class, 'updateProgram'])      ->name('landing.programs.update');
+        Route::delete('/landing/programs/{program}',                    [\App\Http\Controllers\Admin\LandingContentController::class, 'destroyProgram'])     ->name('landing.programs.destroy');
     });
 
 /*

@@ -15,6 +15,11 @@
             (object)['name'=>'Eko Prasetyo, M.Sc',  'subjects'=>['Kimia'],             'photo'=>null],
         ]);
     }
+    // Landing page DB content
+    $lsAll       = \App\Models\LandingSetting::all()->keyBy('key');
+    $ls          = fn(string $k, string $d='') => $lsAll[$k]->value ?? $d;
+    $dbTestis    = \App\Models\LandingTestimonial::active()->orderBy('sort_order')->get();
+    $dbPrograms  = \App\Models\LandingProgram::active()->orderBy('sort_order')->get();
     $tutorGrads = [
         'linear-gradient(160deg,#260632,#c84ddf)',
         'linear-gradient(160deg,#1a3a6b,#2563eb)',
@@ -461,7 +466,7 @@
         @media (max-width:1200px) {
             .why-grid { grid-template-columns:repeat(3,1fr); }
         }
-        @media (max-width:1024px) {
+        @media (max-width:900px) {
             .float-card-1 { bottom:8rem; left:1.5rem; }
             .float-card-2 { top:7rem; right:1.5rem; }
             .section-pad { padding:4.5rem 0; }
@@ -473,17 +478,42 @@
             .how-visual { order:-1; max-width:480px; margin:0 auto; }
             .how-visual-badge { bottom:.75rem; left:.75rem; }
             .footer-grid { grid-template-columns:1fr 1fr; gap:2rem; }
-            /* hamburger at tablet — 6 links + 2 CTA don't fit in pill nav */
-            .nav-links, .nav-cta { display:none; }
-            .nav-toggle { display:flex; }
-            /* ── Non-sticky navbar on mobile ── */
-            .lp-nav { position:relative !important; top:auto !important; left:auto !important; right:auto !important; background:#260632 !important; padding:.75rem 0 !important; }
-            .lp-nav.scrolled { padding:.75rem 0 !important; }
-            .lp-nav.scrolled .nav-inner { background:transparent !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; border-radius:0 !important; padding:0 1.25rem !important; max-width:none !important; box-shadow:none !important; }
+            /* hamburger — hide links, show toggle */
+            .nav-links, .nav-cta { display:none !important; }
+            .nav-toggle { display:flex !important; }
+            /* ── Transparent fixed navbar on mobile ── */
+            .lp-nav {
+                position: fixed !important;
+                top: 0 !important; left: 0 !important; right: 0 !important;
+                background: transparent !important;
+                padding: .75rem 0 !important;
+            }
+            .lp-nav.scrolled {
+                padding: .75rem 0 !important;
+                background: transparent !important;
+            }
+            .lp-nav.scrolled .nav-inner {
+                background: rgba(38,6,50,.72) !important;
+                backdrop-filter: blur(16px) !important;
+                -webkit-backdrop-filter: blur(16px) !important;
+                border-radius: 14px !important;
+                padding: .45rem 1rem !important;
+                max-width: calc(100% - 2rem) !important;
+                box-shadow: 0 4px 24px rgba(0,0,0,.18) !important;
+            }
+            .lp-nav .nav-inner {
+                background: transparent !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+            }
             .lp-nav.scrolled .nav-brand-text,
-            .lp-nav .nav-brand-text { color:white !important; }
-            /* Hero no longer needs top padding to clear fixed nav */
-            .hero-inner { padding:5rem 1.5rem 5rem; }
+            .lp-nav .nav-brand-text { color: white !important; }
+            .lp-nav.scrolled .nav-toggle span,
+            .lp-nav .nav-toggle span { background: white !important; }
+            /* Hero needs top padding to clear fixed nav */
+            .hero-inner { padding: 6.5rem 1.5rem 5rem; }
         }
         @media (max-width:768px) {
             .lp-nav.scrolled { padding:.6rem 0; }
@@ -619,29 +649,32 @@
 {{-- ─────────────────────────────── HERO ──────────────────────────────────── --}}
 <section class="hero" id="home">
     <div class="hero-slides" id="heroSlides">
-        <div class="hero-slide active" style="background-image:url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1920&q=80')">
+        @php
+            $heroSlides = array_filter([
+                $ls('hero.slide_1_url','https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1920&q=80'),
+                $ls('hero.slide_2_url','https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1920&q=80'),
+                $ls('hero.slide_3_url','https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&w=1920&q=80'),
+            ]);
+        @endphp
+        @foreach($heroSlides as $i => $slideUrl)
+        <div class="hero-slide {{ $i === 0 ? 'active' : '' }}" style="background-image:url('{{ $slideUrl }}')">
             <div class="hero-slide-overlay"></div>
         </div>
-        <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1920&q=80')">
-            <div class="hero-slide-overlay"></div>
-        </div>
-        <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&w=1920&q=80')">
-            <div class="hero-slide-overlay"></div>
-        </div>
+        @endforeach
     </div>
 
     <div class="hero-inner">
         <div class="hero-badge">
             <div class="hero-badge-dot"><i class="bi bi-stars" style="color:white;font-size:11px"></i></div>
-            Bimbel & Kursus Terbaik #1 di Indonesia
+            {{ $ls('hero.badge_text','Bimbel & Kursus Terbaik #1 di Indonesia') }}
         </div>
 
         <h1 class="hero-title">
-            Wujudkan Mimpi,<br><span class="gradient-text">Raih Prestasi!</span>
+            {{ $ls('hero.title_line1','Wujudkan Mimpi,') }}<br><span class="gradient-text">{{ $ls('hero.title_line2','Raih Prestasi!') }}</span>
         </h1>
 
         <p class="hero-desc">
-            Smart Center Indonesia — lembaga bimbingan belajar, kursus, dan les privat berbasis offline & online. Tutor profesional, metode modern, hasil terukur untuk semua jenjang dari TK hingga umum.
+            {{ $ls('hero.description','Smart Center Indonesia — lembaga bimbingan belajar, kursus, dan les privat berbasis offline & online. Tutor profesional, metode modern, hasil terukur untuk semua jenjang dari TK hingga umum.') }}
         </p>
 
         <div class="hero-actions">
@@ -673,8 +706,8 @@
         <div class="float-card-content">
             <div class="float-icon" style="background:rgba(16,185,129,.12);">🏆</div>
             <div class="float-card-text">
-                <div class="fc-val">Nilai Naik!</div>
-                <div class="fc-lab">Rata-rata +30 poin · Bulan ini</div>
+                <div class="fc-val">{{ $ls('hero.float1_title','Nilai Naik!') }}</div>
+                <div class="fc-lab">{{ $ls('hero.float1_subtitle','Rata-rata +30 poin · Bulan ini') }}</div>
             </div>
         </div>
     </div>
@@ -683,8 +716,8 @@
         <div class="float-card-content">
             <div class="float-icon" style="background:rgba(200,77,223,.12);">👤</div>
             <div class="float-card-text">
-                <div class="fc-val">Siswa Baru Daftar</div>
-                <div class="fc-lab">Les Privat · Baru saja</div>
+                <div class="fc-val">{{ $ls('hero.float2_title','Siswa Baru Daftar') }}</div>
+                <div class="fc-lab">{{ $ls('hero.float2_subtitle','Les Privat · Baru saja') }}</div>
             </div>
         </div>
     </div>
@@ -709,11 +742,11 @@
             <div class="si-label">Tutor Profesional</div>
         </div>
         <div class="stat-item reveal reveal-delay-2">
-            <div class="si-num">14+</div>
+            <div class="si-num">{{ $ls('stats.years_exp','14+') }}</div>
             <div class="si-label">Tahun Pengalaman</div>
         </div>
         <div class="stat-item reveal reveal-delay-3">
-            <div class="si-num">98%</div>
+            <div class="si-num">{{ $ls('stats.satisfaction','98%') }}</div>
             <div class="si-label">Kepuasan Pelanggan</div>
         </div>
     </div>
@@ -791,71 +824,20 @@
         </div>
 
         <div class="program-grid" id="programGrid">
-            {{-- Bimbel --}}
-            <a href="{{ route('register') }}" class="program-card reveal reveal-delay-1" style="text-decoration:none;color:inherit">
-                <div class="pc-badge" style="background:rgba(200,77,223,.1);color:var(--primary-dark);">SEMUA JENJANG</div>
-                <div class="pc-icon-wrap" style="background:rgba(200,77,223,.1);">
-                    <span style="font-size:1.5rem">📖</span>
+            @php $delays = ['reveal-delay-1','reveal-delay-2','reveal-delay-3']; @endphp
+            @forelse($dbPrograms as $pi => $prog)
+            <a href="{{ route('register') }}" class="program-card reveal {{ $delays[$pi % 3] }}" style="text-decoration:none;color:inherit{{ $prog->is_popular ? ';border-color:rgba(246,175,35,.3)' : ($prog->is_new ? ';border-color:rgba(16,185,129,.25)' : '') }}">
+                <div class="pc-badge" style="background:{{ $prog->badge_bg }};color:{{ $prog->badge_color }};">{{ $prog->badge_label }}</div>
+                <div class="pc-icon-wrap" style="background:{{ $prog->badge_bg }};">
+                    <span style="font-size:1.5rem">{{ $prog->icon_emoji }}</span>
                 </div>
-                <div class="pc-title">Bimbel Mata Pelajaran</div>
-                <div class="pc-desc">Bimbingan semua mata pelajaran sekolah dengan metode efektif dan menyenangkan untuk meningkatkan nilai secara signifikan.</div>
+                <div class="pc-title">{{ $prog->title }}</div>
+                <div class="pc-desc">{{ $prog->description }}</div>
                 <div class="pc-link">Daftar Sekarang <i class="bi bi-arrow-right"></i></div>
             </a>
-
-            {{-- Ujian --}}
-            <a href="{{ route('register') }}" class="program-card reveal reveal-delay-2" style="text-decoration:none;color:inherit">
-                <div class="pc-badge" style="background:rgba(99,102,241,.1);color:#4f46e5;">SMP · SMA</div>
-                <div class="pc-icon-wrap" style="background:rgba(99,102,241,.1);">
-                    <span style="font-size:1.5rem">📝</span>
-                </div>
-                <div class="pc-title">Persiapan Ujian</div>
-                <div class="pc-desc">Persiapan UTS, UAS & Ujian Sekolah agar nilai meningkat pesat dan lulus dengan hasil terbaik.</div>
-                <div class="pc-link">Daftar Sekarang <i class="bi bi-arrow-right"></i></div>
-            </a>
-
-            {{-- Tes Masuk --}}
-            <a href="{{ route('register') }}" class="program-card reveal reveal-delay-3" style="text-decoration:none;color:inherit">
-                <div class="pc-badge" style="background:rgba(239,68,68,.1);color:#dc2626;">INTENSIF</div>
-                <div class="pc-icon-wrap" style="background:rgba(239,68,68,.1);">
-                    <span style="font-size:1.5rem">🎯</span>
-                </div>
-                <div class="pc-title">Persiapan Tes & SBMPTN</div>
-                <div class="pc-desc">Persiapan masuk sekolah favorit, PTN, CPNS & tes lainnya secara intensif dengan mentor berpengalaman.</div>
-                <div class="pc-link">Daftar Sekarang <i class="bi bi-arrow-right"></i></div>
-            </a>
-
-            {{-- Bahasa --}}
-            <a href="{{ route('register') }}" class="program-card reveal reveal-delay-1" style="text-decoration:none;color:inherit">
-                <div class="pc-badge" style="background:rgba(20,184,166,.1);color:#0f766e;">SEMUA LEVEL</div>
-                <div class="pc-icon-wrap" style="background:rgba(20,184,166,.1);">
-                    <span style="font-size:1.5rem">🌐</span>
-                </div>
-                <div class="pc-title">Kursus Bahasa</div>
-                <div class="pc-desc">Inggris, Jepang, Mandarin, Arab — tingkatkan kemampuan bahasa Anda bersama tutor native & bersertifikat.</div>
-                <div class="pc-link">Daftar Sekarang <i class="bi bi-arrow-right"></i></div>
-            </a>
-
-            {{-- Komputer --}}
-            <a href="{{ route('register') }}" class="program-card reveal reveal-delay-2" style="text-decoration:none;color:inherit;border-color:rgba(246,175,35,.3)">
-                <div class="pc-badge" style="background:rgba(246,175,35,.15);color:var(--gold-dark);">POPULER 🔥</div>
-                <div class="pc-icon-wrap" style="background:rgba(246,175,35,.1);">
-                    <span style="font-size:1.5rem">💻</span>
-                </div>
-                <div class="pc-title">Kursus Komputer</div>
-                <div class="pc-desc">Microsoft Office, Desain Grafis, Programming — teknologi terkini untuk karir dan masa depan gemilang.</div>
-                <div class="pc-link">Daftar Sekarang <i class="bi bi-arrow-right"></i></div>
-            </a>
-
-            {{-- Akuntansi --}}
-            <a href="{{ route('register') }}" class="program-card reveal reveal-delay-3" style="text-decoration:none;color:inherit;border-color:rgba(16,185,129,.25)">
-                <div class="pc-badge" style="background:rgba(16,185,129,.1);color:#059669;">TERBARU ✨</div>
-                <div class="pc-icon-wrap" style="background:rgba(16,185,129,.1);">
-                    <span style="font-size:1.5rem">📊</span>
-                </div>
-                <div class="pc-title">Kursus Akuntansi</div>
-                <div class="pc-desc">Akuntansi dasar hingga profesional, perpajakan & keuangan untuk mahasiswa dan karyawan.</div>
-                <div class="pc-link">Daftar Sekarang <i class="bi bi-arrow-right"></i></div>
-            </a>
+            @empty
+            <div class="col-12 text-center py-5 text-muted">Program segera hadir.</div>
+            @endforelse
         </div>
         <div class="mobile-carousel-dots" id="program-dots"></div>
     </div>
@@ -986,45 +968,42 @@
         <div class="carousel-viewport">
             <div class="carousel-track">
                 @php
-                $testiItems = [
-                    ['text'=>'"Nilai matematika saya naik dari 60 ke 90 setelah 3 bulan bimbel di SCI! Tutornya sabar dan cara jelasinnya mudah dipahami. Sekarang saya jadi suka matematika."','name'=>'Rini Kusumawati','role'=>'Siswa SMA · Surabaya','init'=>'R','grad'=>'linear-gradient(135deg,#c84ddf,#68117e)'],
-                    ['text'=>'"Anak saya dulu kesulitan di Bahasa Inggris. Sejak les di SCI, dalam 2 bulan sudah bisa percakapan dasar dengan lancar. Tutornya sangat profesional dan sabar."','name'=>'Dimas Prasetyo','role'=>'Orang Tua Siswa SD · Jakarta','init'=>'D','grad'=>'linear-gradient(135deg,#f6af23,#e09000)'],
-                    ['text'=>'"Berkat program intensif SBMPTN di SCI, saya berhasil masuk ITB! Materinya lengkap, soal-soal latihannya mirip ujian asli, dan tutornya selalu siap membantu."','name'=>'Siti Nuraini','role'=>'Mahasiswa ITB · Bandung','init'=>'S','grad'=>'linear-gradient(135deg,#10b981,#059669)'],
-                    ['text'=>'"Kursus komputer di SCI luar biasa! Dalam 3 bulan saya sudah bisa desain grafis dan sekarang sudah dapat klien freelance. Materi up-to-date dan tutornya expert."','name'=>'Andika Putra','role'=>'Alumni Kursus Komputer · Yogyakarta','init'=>'A','grad'=>'linear-gradient(135deg,#6366f1,#4338ca)'],
-                    ['text'=>'"Les privat Bahasa Jepang di SCI sangat membantu persiapan JLPT N3 saya. Tutor datang ke rumah, jadwal fleksibel, dan materi disesuaikan kebutuhan. Alhamdulillah lulus!"','name'=>'Melati Dewi','role'=>'Karyawan · Bekasi','init'=>'M','grad'=>'linear-gradient(135deg,#f43f5e,#be123c)'],
-                    ['text'=>'"SCI benar-benar membantu anakku yang kelas 4 SD. Dulu nilainya selalu di bawah rata-rata, sekarang masuk 10 besar kelas. Guru-gurunya baik dan tidak bikin bosan belajar."','name'=>'Hendra Wijaya','role'=>'Orang Tua Siswa SD · Surabaya','init'=>'H','grad'=>'linear-gradient(135deg,#14b8a6,#0f766e)'],
-                ];
+                    $testiSource = $dbTestis->isNotEmpty() ? $dbTestis : collect([
+                        (object)['text'=>'"Nilai matematika saya naik dari 60 ke 90 setelah 3 bulan bimbel di SCI! Tutornya sabar dan cara jelasinnya mudah dipahami."','name'=>'Rini Kusumawati','role'=>'Siswa SMA · Surabaya','initial'=>'R','gradient'=>'linear-gradient(135deg,#c84ddf,#68117e)'],
+                        (object)['text'=>'"Berkat program intensif SBMPTN di SCI, saya berhasil masuk ITB! Materinya lengkap, soal-soal latihannya mirip ujian asli."','name'=>'Siti Nuraini','role'=>'Mahasiswa ITB · Bandung','initial'=>'S','gradient'=>'linear-gradient(135deg,#10b981,#059669)'],
+                        (object)['text'=>'"Kursus komputer di SCI luar biasa! Dalam 3 bulan saya sudah bisa desain grafis dan sekarang sudah dapat klien freelance."','name'=>'Andika Putra','role'=>'Alumni Kursus Komputer · Yogyakarta','initial'=>'A','gradient'=>'linear-gradient(135deg,#6366f1,#4338ca)'],
+                    ]);
                 @endphp
                 {{-- Set 1 --}}
-                @foreach($testiItems as $t)
+                @foreach($testiSource as $t)
                 <div class="testi-card">
                     <div class="testi-stars">
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                     </div>
-                    <p class="testi-text">{{ $t['text'] }}</p>
+                    <p class="testi-text">{{ $t->text }}</p>
                     <div class="testi-author">
-                        <div class="testi-avatar" style="background:{{ $t['grad'] }}">{{ $t['init'] }}</div>
+                        <div class="testi-avatar" style="background:{{ $t->gradient }}">{{ $t->initial }}</div>
                         <div>
-                            <div class="testi-name">{{ $t['name'] }}</div>
-                            <div class="testi-role">{{ $t['role'] }}</div>
+                            <div class="testi-name">{{ $t->name }}</div>
+                            <div class="testi-role">{{ $t->role }}</div>
                         </div>
                     </div>
                 </div>
                 @endforeach
                 {{-- Set 2 (duplicate for seamless loop) --}}
-                @foreach($testiItems as $t)
+                @foreach($testiSource as $t)
                 <div class="testi-card">
                     <div class="testi-stars">
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                     </div>
-                    <p class="testi-text">{{ $t['text'] }}</p>
+                    <p class="testi-text">{{ $t->text }}</p>
                     <div class="testi-author">
-                        <div class="testi-avatar" style="background:{{ $t['grad'] }}">{{ $t['init'] }}</div>
+                        <div class="testi-avatar" style="background:{{ $t->gradient }}">{{ $t->initial }}</div>
                         <div>
-                            <div class="testi-name">{{ $t['name'] }}</div>
-                            <div class="testi-role">{{ $t['role'] }}</div>
+                            <div class="testi-name">{{ $t->name }}</div>
+                            <div class="testi-role">{{ $t->role }}</div>
                         </div>
                     </div>
                 </div>
@@ -1221,9 +1200,9 @@
     <div class="container-lp">
         <div class="cta-box reveal">
             <div class="cta-content">
-                <div class="cta-eyebrow"><i class="bi bi-mortarboard-fill"></i> Mulai Sekarang</div>
-                <h2 class="cta-title">Wujudkan Mimpi<br>Bersama SCI!</h2>
-                <p class="cta-desc">Bergabunglah bersama ribuan siswa yang telah meraih prestasi bersama Smart Center Indonesia. Konsultasi gratis, daftar mudah!</p>
+                <div class="cta-eyebrow"><i class="bi bi-mortarboard-fill"></i> {{ $ls('cta.eyebrow','Mulai Sekarang') }}</div>
+                <h2 class="cta-title">{{ $ls('cta.title','Wujudkan Mimpi Bersama SCI!') }}</h2>
+                <p class="cta-desc">{{ $ls('cta.description','Bergabunglah bersama ribuan siswa yang telah meraih prestasi bersama Smart Center Indonesia. Konsultasi gratis, daftar mudah!') }}</p>
                 <div class="cta-btns">
                     <a href="{{ route('register') }}" class="btn-cta-primary">
                         <i class="bi bi-person-plus-fill"></i>
@@ -1240,7 +1219,7 @@
 </section>
 
 {{-- ──────────────────────────── FLOATING BUTTONS ──────────────────────────── --}}
-<a href="https://wa.me/628001234567?text={{ urlencode('Halo Smart Center Indonesia! Saya ingin konsultasi tentang program bimbel/kursus. Bisa bantu?') }}"
+<a href="https://wa.me/{{ $ls('footer.wa_number','628001234567') }}?text={{ urlencode('Halo Smart Center Indonesia! Saya ingin konsultasi tentang program bimbel/kursus. Bisa bantu?') }}"
    class="wa-float" target="_blank" rel="noopener" aria-label="Hubungi via WhatsApp">
     <i class="bi bi-whatsapp"></i>
     <span class="wa-float-label">Konsultasi Gratis 💬</span>
@@ -1261,12 +1240,12 @@
                         Smart Center<small style="color:rgba(255,255,255,.5)">Indonesia</small>
                     </div>
                 </a>
-                <p class="footer-brand-desc">Lembaga bimbingan belajar, kursus, dan les privat terbaik di Indonesia. Berkomitmen menjadi lembaga pendidikan nomor 1 di Indonesia. "Wujudkan mimpi, raih prestasi!"</p>
+                <p class="footer-brand-desc">{{ $ls('footer.brand_desc','Lembaga bimbingan belajar, kursus, dan les privat terbaik di Indonesia. Berkomitmen menjadi lembaga pendidikan nomor 1 di Indonesia. "Wujudkan mimpi, raih prestasi!"') }}</p>
                 <div class="footer-social">
-                    <a href="#"><i class="bi bi-instagram"></i></a>
-                    <a href="#"><i class="bi bi-facebook"></i></a>
-                    <a href="#"><i class="bi bi-youtube"></i></a>
-                    <a href="#"><i class="bi bi-whatsapp"></i></a>
+                    <a href="{{ $ls('footer.instagram','#') }}"><i class="bi bi-instagram"></i></a>
+                    <a href="{{ $ls('footer.facebook','#') }}"><i class="bi bi-facebook"></i></a>
+                    <a href="{{ $ls('footer.youtube','#') }}"><i class="bi bi-youtube"></i></a>
+                    <a href="https://wa.me/{{ $ls('footer.wa_number','628001234567') }}"><i class="bi bi-whatsapp"></i></a>
                 </div>
             </div>
 

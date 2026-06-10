@@ -3151,6 +3151,14 @@
             </a>
         </div>
 
+        <div class="nav-header">LANDING PAGE</div>
+        <div class="nav-item">
+            <a href="{{ route('admin.landing.index') }}" class="nav-link {{ request()->routeIs('admin.landing.*') ? 'active' : '' }}" data-label="Kelola Landing Page">
+                <i class="bi bi-window-fullscreen"></i>
+                <span>Kelola Landing Page</span>
+            </a>
+        </div>
+
         <div class="nav-header">KOMUNIKASI</div>
 
         <div class="nav-item">
