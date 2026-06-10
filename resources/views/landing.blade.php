@@ -561,7 +561,6 @@
 
 {{-- Mobile Menu --}}
 <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-    <button class="mobile-close" id="mobileClose" aria-label="Tutup menu"><i class="bi bi-x-lg"></i></button>
     <a href="#program"      onclick="closeMobile()">Program</a>
     <a href="#jenjang"      onclick="closeMobile()">Jenjang</a>
     <a href="#mengapa-sci"  onclick="closeMobile()">Mengapa SCI</a>
@@ -1293,14 +1292,12 @@ sections.forEach(s => navObs.observe(s));
 /* ── Mobile menu ── */
 const toggle     = document.getElementById('navToggle');
 const mobileMenu = document.getElementById('mobileMenu');
-const mobileClose = document.getElementById('mobileClose');
 toggle.addEventListener('click', () => {
     const open = mobileMenu.classList.toggle('open');
     toggle.classList.toggle('open', open);
     document.body.style.overflow = open ? 'hidden' : '';
     mobileMenu.setAttribute('aria-hidden', open ? 'false' : 'true');
 });
-mobileClose.addEventListener('click', closeMobile);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobile(); });
 function closeMobile() {
     mobileMenu.classList.remove('open');
