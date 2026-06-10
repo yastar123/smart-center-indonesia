@@ -110,12 +110,13 @@ class TryoutController extends Controller
     public function soalStore(Request $request, Tryout $tryout)
     {
         $data = $request->validate([
-            'teks_pertanyaan' => 'required|string',
-            'jenis'           => 'required|in:pilihan_ganda,benar_salah,isian',
-            'pilihan_jawaban' => 'nullable|array',
-            'penjelasan'      => 'nullable|string',
-            'poin'            => 'nullable|numeric|min:0',
-            'tingkat_kesulitan' => 'nullable|in:mudah,sedang,sulit',
+            'teks_pertanyaan'  => 'required|string',
+            'jenis'            => 'required|in:pilihan_ganda,benar_salah,isian',
+            'pilihan_jawaban'  => 'nullable|array',
+            'kunci_jawaban'    => 'nullable|string|max:20',
+            'penjelasan'       => 'nullable|string',
+            'poin'             => 'nullable|numeric|min:0',
+            'tingkat_kesulitan'=> 'nullable|in:mudah,sedang,sulit',
         ]);
 
         $data['tryout_id'] = $tryout->id;

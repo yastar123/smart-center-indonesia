@@ -136,12 +136,28 @@
                                 </div>
                                 <div id="pilihanSection" class="mb-3">
                                     <label class="form-label fw-semibold">Pilihan Jawaban</label>
-                                    @foreach(['A','B','C','D','E'] as $opt)
+                                    @foreach(['A','B','C','D','E'] as $i => $opt)
                                     <div class="input-group mb-1">
-                                        <span class="input-group-text fw-bold" style="width:36px;justify-content:center">{{ $opt }}</span>
+                                        <div class="input-group-text" style="width:40px;justify-content:center;padding:0">
+                                            <input type="radio" name="kunci_jawaban" value="{{ $i }}" title="Jawaban benar {{ $opt }}" style="width:16px;height:16px;accent-color:#c84ddf;cursor:pointer">
+                                        </div>
+                                        <span class="input-group-text fw-bold" style="width:32px;justify-content:center">{{ $opt }}</span>
                                         <input type="text" name="pilihan_jawaban[]" class="form-control" placeholder="Pilihan {{ $opt }}">
                                     </div>
                                     @endforeach
+                                    <div style="font-size:11px;color:var(--text-muted);margin-top:4px"><i class="bi bi-info-circle me-1"></i>Klik bulatan di kiri untuk menandai jawaban benar</div>
+                                </div>
+                                <div id="benarsalahSection" class="mb-3" style="display:none">
+                                    <label class="form-label fw-semibold">Jawaban Benar</label>
+                                    <select name="kunci_jawaban_bs" class="form-select" id="kunciBenSal">
+                                        <option value="">-- Pilih --</option>
+                                        <option value="0">Benar</option>
+                                        <option value="1">Salah</option>
+                                    </select>
+                                </div>
+                                <div id="isianKunciSection" class="mb-3" style="display:none">
+                                    <label class="form-label fw-semibold">Jawaban Benar <span class="text-danger">*</span></label>
+                                    <input type="text" id="isianKunci" class="form-control" placeholder="Tulis jawaban yang benar...">
                                 </div>
                                 <div class="row g-2 mb-3">
                                     <div class="col-6"><label class="form-label fw-semibold">Tingkat</label><select name="tingkat_kesulitan" class="form-select"><option value="mudah">Mudah</option><option value="sedang" selected>Sedang</option><option value="sulit">Sulit</option></select></div>
@@ -314,19 +330,44 @@ function loadSoal(id) {
 }
 
 document.getElementById('soalJenis').addEventListener('change', function() {
-    document.getElementById('pilihanSection').style.display = this.value === 'isian' ? 'none' : '';
+    const v = this.value;
+    document.getElementById('pilihanSection').style.display    = v === 'pilihan_ganda' ? '' : 'none';
+    document.getElementById('benarsalahSection').style.display = v === 'benar_salah'   ? '' : 'none';
+    document.getElementById('isianKunciSection').style.display = v === 'isian'         ? '' : 'none';
 });
 
 document.getElementById('soalForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    const id = document.getElementById('soalTryoutId').value;
-    const fd = new FormData(this);
+    const id   = document.getElementById('soalTryoutId').value;
+    const jenis = document.getElementById('soalJenis').value;
+    const fd   = new FormData(this);
+
+    // Unify kunci_jawaban into one field
+    fd.delete('kunci_jawaban');
+    fd.delete('kunci_jawaban_bs');
+    if (jenis === 'benar_salah') {
+        const bs = document.getElementById('kunciBenSal').value;
+        if (bs !== '') fd.append('kunci_jawaban', bs);
+    } else if (jenis === 'isian') {
+        const iv = document.getElementById('isianKunci').value.trim();
+        if (iv) fd.append('kunci_jawaban', iv);
+    }
+    // For pilihan_ganda the kunci_jawaban radio is already in fd
+
     document.getElementById('addSoalBtn').disabled = true;
     fetch(`{{ url('admin/tryouts') }}/${id}/soal`, { method: 'POST', body: fd, headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
         .then(r => r.json()).then(d => {
             document.getElementById('addSoalBtn').disabled = false;
             showToast(d.message, d.success ? 'success' : 'error');
-            if (d.success) { this.querySelector('[name=teks_pertanyaan]').value = ''; this.querySelector('[name=penjelasan]').value = ''; this.querySelectorAll('[name="pilihan_jawaban[]"]').forEach(i=>i.value=''); loadSoal(id); }
+            if (d.success) {
+                this.querySelector('[name=teks_pertanyaan]').value = '';
+                this.querySelector('[name=penjelasan]').value = '';
+                this.querySelectorAll('[name="pilihan_jawaban[]"]').forEach(i => i.value = '');
+                this.querySelectorAll('[name=kunci_jawaban]').forEach(r => r.checked = false);
+                document.getElementById('kunciBenSal').value = '';
+                document.getElementById('isianKunci').value = '';
+                loadSoal(id);
+            }
         }).catch(() => { document.getElementById('addSoalBtn').disabled = false; });
 });
 

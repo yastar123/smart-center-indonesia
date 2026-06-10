@@ -358,12 +358,11 @@ Route::middleware(['auth'])
         Route::get('/billing', [\App\Http\Controllers\Siswa\BillingController::class, 'index'])->name('billing.index');
         Route::post('/billing/{course}/pay', [\App\Http\Controllers\Siswa\BillingController::class, 'pay'])->name('billing.pay');
 
-        // Tryout
-        Route::get('/tryout', fn() => view('siswa.coming-soon', [
-            'title' => 'Tryout Online',
-            'icon'  => 'bi-pencil-square',
-            'desc'  => 'Fitur CBT (Computer Based Test) online sedang dalam pengembangan aktif.',
-        ]))->name('tryout');
+        // Tryout (CBT)
+        Route::get('/tryout',                          [\App\Http\Controllers\Siswa\TryoutController::class, 'index']) ->name('tryout');
+        Route::get('/tryout/{tryout}',                 [\App\Http\Controllers\Siswa\TryoutController::class, 'show'])  ->name('tryout.show');
+        Route::post('/tryout/{tryout}/submit',         [\App\Http\Controllers\Siswa\TryoutController::class, 'submit'])->name('tryout.submit');
+        Route::get('/tryout/{tryout}/result/{attempt}',[\App\Http\Controllers\Siswa\TryoutController::class, 'result'])->name('tryout.result');
     });
 
 require __DIR__.'/auth.php';

@@ -17,6 +17,7 @@ class Question extends Model
         'gambar_pertanyaan',
         'jenis',
         'pilihan_jawaban',
+        'kunci_jawaban',
         'penjelasan',
         'poin',
         'urutan',
