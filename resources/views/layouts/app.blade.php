@@ -2919,6 +2919,65 @@
             body { background: white !important; }
         }
 
+        /* ============================================================
+           LIVE SCHEDULE INDICATOR PULSE
+        ============================================================ */
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: .45; }
+        }
+        .live-dot {
+            display: inline-block;
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulseDot 1.5s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+
+        /* ============================================================
+           QUICK ACTION CARD — global hover
+        ============================================================ */
+        .quick-action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(200,77,223,.12) !important;
+            border-color: rgba(200,77,223,.3) !important;
+            text-decoration: none;
+        }
+
+        /* ============================================================
+           FORM INPUT — consistent brand focus ring
+        ============================================================ */
+        .form-control:focus, .form-select:focus, textarea.form-control:focus {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 3px rgba(200,77,223,.12) !important;
+        }
+
+        /* ============================================================
+           TABLE SCROLL WRAP — fade edge auto-detect
+        ============================================================ */
+        .table-scroll-wrap.has-overflow::after { opacity: 1; }
+
+        /* ============================================================
+           MOBILE — schedule time column compact
+        ============================================================ */
+        @media (max-width: 480px) {
+            .schedule-time-col { min-width: 38px !important; font-size: 10.5px !important; }
+        }
+
+        /* ============================================================
+           SECTION TITLE — refined left-bar accent
+        ============================================================ */
+        .section-title i { flex-shrink: 0; }
+
+        /* ============================================================
+           NOTIFICATION PANEL — dark mode
+        ============================================================ */
+        [data-theme="dark"] #notifPanel {
+            background: var(--card-bg);
+            border-color: var(--card-border);
+        }
+
     </style>
 
     @stack('styles')
