@@ -1196,6 +1196,21 @@
         .nav-link:focus-visible { outline-color: rgba(255,255,255,.4); }
 
         /* ============================================================
+           PAGE HEADER CARD — used in admin/landing and similar pages
+        ============================================================ */
+        .page-header-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-card);
+            padding: 20px 24px;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        /* ============================================================
            QUICK DASH ACTION CARDS
         ============================================================ */
         .quick-dash {

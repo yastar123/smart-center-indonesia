@@ -537,6 +537,8 @@
             .scroll-indicator { display:none; }
             .wa-float { width:52px; height:52px; font-size:1.4rem; bottom:1.25rem; right:1.25rem; }
             .scroll-top { bottom:1.25rem; left:1.25rem; }
+            .how-visual-badge { bottom:.5rem; left:.5rem; min-width:160px; padding:.75rem 1rem; }
+            .hvb-text .hvb-val { font-size:1rem; }
         }
         /* ── Mobile carousels (≤640px) ── */
         @media (max-width:640px) {
@@ -652,11 +654,12 @@
 <section class="hero" id="home">
     <div class="hero-slides" id="heroSlides">
         @php
-            $heroSlides = array_filter([
+            // array_values re-indexes so PHP keys are always 0,1,2 — critical for JS slides[idx]
+            $heroSlides = array_values(array_filter([
                 $ls('hero.slide_1_url','https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1920&q=80'),
                 $ls('hero.slide_2_url','https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1920&q=80'),
                 $ls('hero.slide_3_url','https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&w=1920&q=80'),
-            ]);
+            ]));
         @endphp
         @foreach($heroSlides as $i => $slideUrl)
         <div class="hero-slide {{ $i === 0 ? 'active' : '' }}" style="background-image:url('{{ $slideUrl }}')">
@@ -724,10 +727,16 @@
         </div>
     </div>
 
+    {{-- Dynamic dots — synced with actual slide count --}}
     <div class="hero-dots" id="heroDots">
-        <button class="hero-dot active" data-slide="0" aria-label="Slide 1"></button>
-        <button class="hero-dot"        data-slide="1" aria-label="Slide 2"></button>
-        <button class="hero-dot"        data-slide="2" aria-label="Slide 3"></button>
+        @foreach($heroSlides as $i => $slideUrl)
+        <button class="hero-dot {{ $i === 0 ? 'active' : '' }}" data-slide="{{ $i }}" aria-label="Slide {{ $i + 1 }}"></button>
+        @endforeach
+    </div>
+
+    <div class="scroll-indicator" aria-hidden="true">
+        <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
+        <span>SCROLL</span>
     </div>
 
 </section>
@@ -1059,21 +1068,28 @@
         </div>
     </div>
 
+    {{-- Pre-compute tutor data once to avoid duplicate file_exists I/O --}}
+    @php
+        $tutorItems = $tutors->values()->map(function($tutor, $i) use ($tutorGrads) {
+            return [
+                'tutor'    => $tutor,
+                'grad'     => $tutorGrads[$i % count($tutorGrads)],
+                'subj'     => is_array($tutor->subjects) ? implode(', ', array_slice($tutor->subjects, 0, 2)) : ($tutor->subjects ?? 'Tutor'),
+                'init'     => strtoupper(substr($tutor->name ?? 'T', 0, 1)),
+                'hasPhoto' => !empty($tutor->photo) && file_exists(public_path('storage/'.$tutor->photo)),
+            ];
+        });
+    @endphp
     {{-- Infinite tutor carousel — full width, edge-faded --}}
     <div class="carousel-viewport tutor-carousel-viewport" style="margin-top:3rem;">
         <div class="tutor-carousel-track">
             {{-- Set 1 --}}
-            @foreach($tutors as $i => $tutor)
-            @php
-                $grad  = $tutorGrads[$i % count($tutorGrads)];
-                $subj  = is_array($tutor->subjects) ? implode(', ', array_slice($tutor->subjects, 0, 2)) : ($tutor->subjects ?? 'Tutor');
-                $init  = strtoupper(substr($tutor->name ?? 'T', 0, 1));
-                $hasPhoto = !empty($tutor->photo) && file_exists(public_path('storage/'.$tutor->photo));
-            @endphp
+            @foreach($tutorItems as $td)
+            @php extract($td); @endphp
             <div class="tutor-card">
                 <div class="tutor-avatar-wrap" style="background:{{ $grad }}">
                     @if($hasPhoto)
-                        <img src="{{ asset('storage/'.$tutor->photo) }}" alt="{{ $tutor->name }}">
+                        <img src="{{ asset('storage/'.$tutor->photo) }}" alt="{{ $tutor->name }}" loading="lazy">
                     @else
                         <div class="tutor-avatar-fallback">{{ $init }}</div>
                     @endif
@@ -1090,13 +1106,8 @@
             </div>
             @endforeach
             {{-- Set 2 (duplicate for seamless loop) --}}
-            @foreach($tutors as $i => $tutor)
-            @php
-                $grad  = $tutorGrads[$i % count($tutorGrads)];
-                $subj  = is_array($tutor->subjects) ? implode(', ', array_slice($tutor->subjects, 0, 2)) : ($tutor->subjects ?? 'Tutor');
-                $init  = strtoupper(substr($tutor->name ?? 'T', 0, 1));
-                $hasPhoto = !empty($tutor->photo) && file_exists(public_path('storage/'.$tutor->photo));
-            @endphp
+            @foreach($tutorItems as $td)
+            @php extract($td); @endphp
             <div class="tutor-card">
                 <div class="tutor-avatar-wrap" style="background:{{ $grad }}">
                     @if($hasPhoto)
@@ -1306,15 +1317,17 @@ window.addEventListener('scroll', () => {
 /* ── Active nav link tracking ── */
 const sections = document.querySelectorAll('section[id]');
 const navLinks = document.querySelectorAll('.nav-link-item');
+let lastActiveId = '';
 const navObs = new IntersectionObserver((entries) => {
     entries.forEach(e => {
         if (e.isIntersecting) {
+            lastActiveId = e.target.id;
             navLinks.forEach(l => l.classList.remove('nav-active'));
             const active = document.querySelector(`.nav-link-item[href="#${e.target.id}"]`);
             if (active) active.classList.add('nav-active');
         }
     });
-}, { threshold: 0.35, rootMargin: '-60px 0px -40% 0px' });
+}, { threshold: 0.25, rootMargin: '-80px 0px -35% 0px' });
 sections.forEach(s => navObs.observe(s));
 
 /* ── Mobile menu ── */
@@ -1338,22 +1351,31 @@ function closeMobile() {
 (function initSlider() {
     const slides = document.querySelectorAll('.hero-slide');
     const dots   = document.querySelectorAll('.hero-dot');
+    if (slides.length <= 1) return;
     let current  = 0;
     let timer    = null;
     function goTo(idx) {
+        if (!slides[current] || !dots[current]) return;
         slides[current].classList.remove('active');
         dots[current].classList.remove('active');
         current = (idx + slides.length) % slides.length;
-        slides[current].classList.add('active');
-        dots[current].classList.add('active');
+        if (slides[current]) slides[current].classList.add('active');
+        if (dots[current])   dots[current].classList.add('active');
     }
-    function startAuto() { timer = setInterval(() => goTo(current + 1), 6000); }
+    function startAuto() {
+        clearInterval(timer);
+        timer = setInterval(() => goTo(current + 1), 6000);
+    }
     dots.forEach(dot => {
         dot.addEventListener('click', () => {
             clearInterval(timer);
             goTo(parseInt(dot.dataset.slide));
             startAuto();
         });
+    });
+    // Pause on tab hidden, resume on visible
+    document.addEventListener('visibilitychange', () => {
+        document.hidden ? clearInterval(timer) : startAuto();
     });
     startAuto();
 })();
@@ -1435,7 +1457,8 @@ function initMobileCarousel(gridId, dotsId) {
             btn.className = 'mcd' + (i === 0 ? ' active' : '');
             btn.setAttribute('aria-label', 'Slide ' + (i + 1));
             btn.addEventListener('click', () => {
-                grid.scrollTo({ left: cards[i].offsetLeft - grid.offsetLeft, behavior: 'smooth' });
+                const pl = parseFloat(getComputedStyle(grid).paddingLeft) || 0;
+                grid.scrollTo({ left: Math.max(0, cards[i].offsetLeft - pl), behavior: 'smooth' });
             });
             dotsEl.appendChild(btn);
         });
