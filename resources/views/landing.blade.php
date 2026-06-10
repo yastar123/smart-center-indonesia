@@ -20,6 +20,8 @@
     $ls          = fn(string $k, string $d='') => $lsAll[$k]->value ?? $d;
     $dbTestis    = \App\Models\LandingTestimonial::active()->orderBy('sort_order')->get();
     $dbPrograms  = \App\Models\LandingProgram::active()->orderBy('sort_order')->get();
+    $waMain      = \App\Models\LandingWaNumber::primaryNumber($ls('footer.wa_number','628001234567'));
+    $waNumbers   = \App\Models\LandingWaNumber::active()->orderBy('sort_order')->get();
     $tutorGrads = [
         'linear-gradient(160deg,#260632,#c84ddf)',
         'linear-gradient(160deg,#1a3a6b,#2563eb)',
@@ -1140,7 +1142,7 @@
                 <div class="cabang-name">{{ $branchName }}</div>
                 <div class="cabang-address">{{ $branch->alamat ?? $branch->address ?? 'Indonesia' }}</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/628001234567?text={{ urlencode('Halo SCI, saya ingin tanya tentang program di cabang '.$branchName) }}" target="_blank" rel="noopener" class="btn-cabang-wa">
+                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI, saya ingin tanya tentang program di cabang '.$branchName) }}" target="_blank" rel="noopener" class="btn-cabang-wa">
                     <i class="bi bi-whatsapp"></i> Hubungi Cabang
                 </a>
             </div>
@@ -1153,42 +1155,42 @@
                 <div class="cabang-name">SCI Pusat — Jakarta</div>
                 <div class="cabang-address">Jl. Pendidikan No. 1, Jakarta Selatan</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/628001234567?text={{ urlencode('Halo SCI Jakarta, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
+                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI Jakarta, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
             </div>
             <div class="cabang-card reveal reveal-delay-2">
                 <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
                 <div class="cabang-name">SCI Surabaya</div>
                 <div class="cabang-address">Jl. Raya Darmo No. 45, Surabaya</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/628001234567?text={{ urlencode('Halo SCI Surabaya, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
+                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI Surabaya, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
             </div>
             <div class="cabang-card reveal reveal-delay-3">
                 <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
                 <div class="cabang-name">SCI Bandung</div>
                 <div class="cabang-address">Jl. Asia Afrika No. 22, Bandung</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/628001234567?text={{ urlencode('Halo SCI Bandung, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
+                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI Bandung, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
             </div>
             <div class="cabang-card reveal reveal-delay-1">
                 <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
                 <div class="cabang-name">SCI Yogyakarta</div>
                 <div class="cabang-address">Jl. Malioboro No. 88, Yogyakarta</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/628001234567?text={{ urlencode('Halo SCI Yogyakarta, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
+                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI Yogyakarta, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
             </div>
             <div class="cabang-card reveal reveal-delay-2">
                 <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
                 <div class="cabang-name">SCI Medan</div>
                 <div class="cabang-address">Jl. Gatot Subroto No. 12, Medan</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/628001234567?text={{ urlencode('Halo SCI Medan, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
+                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI Medan, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
             </div>
             <div class="cabang-card reveal reveal-delay-3">
                 <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
                 <div class="cabang-name">SCI Makassar</div>
                 <div class="cabang-address">Jl. Penghibur No. 5, Makassar</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/628001234567?text={{ urlencode('Halo SCI Makassar, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
+                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI Makassar, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
             </div>
         </div>
         @endif
@@ -1219,7 +1221,7 @@
 </section>
 
 {{-- ──────────────────────────── FLOATING BUTTONS ──────────────────────────── --}}
-<a href="https://wa.me/{{ $ls('footer.wa_number','628001234567') }}?text={{ urlencode('Halo Smart Center Indonesia! Saya ingin konsultasi tentang program bimbel/kursus. Bisa bantu?') }}"
+<a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo Smart Center Indonesia! Saya ingin konsultasi tentang program bimbel/kursus. Bisa bantu?') }}"
    class="wa-float" target="_blank" rel="noopener" aria-label="Hubungi via WhatsApp">
     <i class="bi bi-whatsapp"></i>
     <span class="wa-float-label">Konsultasi Gratis 💬</span>
@@ -1245,7 +1247,7 @@
                     <a href="{{ $ls('footer.instagram','#') }}"><i class="bi bi-instagram"></i></a>
                     <a href="{{ $ls('footer.facebook','#') }}"><i class="bi bi-facebook"></i></a>
                     <a href="{{ $ls('footer.youtube','#') }}"><i class="bi bi-youtube"></i></a>
-                    <a href="https://wa.me/{{ $ls('footer.wa_number','628001234567') }}"><i class="bi bi-whatsapp"></i></a>
+                    <a href="https://wa.me/{{ $waMain }}"><i class="bi bi-whatsapp"></i></a>
                 </div>
             </div>
 

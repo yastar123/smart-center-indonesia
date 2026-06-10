@@ -172,6 +172,9 @@ Route::middleware(['auth'])
         Route::post('/landing/programs',                                [\App\Http\Controllers\Admin\LandingContentController::class, 'storeProgram'])       ->name('landing.programs.store');
         Route::put('/landing/programs/{program}',                       [\App\Http\Controllers\Admin\LandingContentController::class, 'updateProgram'])      ->name('landing.programs.update');
         Route::delete('/landing/programs/{program}',                    [\App\Http\Controllers\Admin\LandingContentController::class, 'destroyProgram'])     ->name('landing.programs.destroy');
+        Route::post('/landing/wa',                                      [\App\Http\Controllers\Admin\LandingContentController::class, 'storeWa'])              ->name('landing.wa.store');
+        Route::put('/landing/wa/{wa}',                                  [\App\Http\Controllers\Admin\LandingContentController::class, 'updateWa'])             ->name('landing.wa.update');
+        Route::delete('/landing/wa/{wa}',                               [\App\Http\Controllers\Admin\LandingContentController::class, 'destroyWa'])            ->name('landing.wa.destroy');
     });
 
 /*

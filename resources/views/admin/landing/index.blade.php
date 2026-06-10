@@ -36,6 +36,7 @@
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-stats"><i class="bi bi-bar-chart me-1"></i>Statistik</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-programs"><i class="bi bi-award me-1"></i>Program</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-testimonials"><i class="bi bi-chat-heart me-1"></i>Testimoni</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-wa"><i class="bi bi-whatsapp me-1 text-success"></i>WhatsApp <span class="badge bg-success ms-1" style="font-size:.65rem">{{ $waNumbers->count() }}</span></button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-cta"><i class="bi bi-megaphone me-1"></i>CTA</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-footer"><i class="bi bi-layout-sidebar-inset-reverse me-1"></i>Footer</button></li>
     </ul>
@@ -306,6 +307,117 @@
             </div>
         </div>
 
+        {{-- ────── WHATSAPP TAB ────── --}}
+        <div class="tab-pane fade" id="tab-wa">
+
+            {{-- Info box --}}
+            <div class="alert border-0 mb-4 d-flex align-items-start gap-3" style="background:rgba(37,211,102,.08);border-left:4px solid #25d366 !important;border-radius:12px">
+                <i class="bi bi-whatsapp mt-1" style="color:#25d366;font-size:1.4rem;flex-shrink:0"></i>
+                <div>
+                    <div class="fw-bold mb-1" style="color:#1a7a3b">Nomor WhatsApp Landing Page</div>
+                    <div class="small text-muted">Kelola semua nomor WA yang tampil di landing page. Nomor <strong>Utama</strong> digunakan untuk tombol floating WA dan footer. Tambahkan nomor per cabang untuk bagian Cabang.</div>
+                </div>
+            </div>
+
+            {{-- Add WA Form --}}
+            <div class="card lp-card mb-4">
+                <div class="card-header lp-card-header d-flex align-items-center" style="background:linear-gradient(135deg,#075e54,#25d366)">
+                    <i class="bi bi-plus-circle me-2"></i>Tambah Nomor WhatsApp
+                </div>
+                <div class="card-body">
+                    <form action="{{ route('admin.landing.wa.store') }}" method="POST">
+                        @csrf
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Label / Nama <span class="text-danger">*</span></label>
+                                <input type="text" name="label" class="form-control" required placeholder="WhatsApp Pusat" maxlength="100">
+                                <small class="text-muted">Contoh: WA Pusat, WA Cabang Surabaya</small>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Nomor WA <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="background:#25d366;color:white;border-color:#25d366"><i class="bi bi-whatsapp"></i></span>
+                                    <input type="text" name="number" class="form-control" required placeholder="628001234567" maxlength="30" pattern="[0-9]+" title="Hanya angka, tanpa + atau spasi">
+                                </div>
+                                <small class="text-muted">Hanya angka, tanpa + atau spasi. Contoh: 6281234567890</small>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Keterangan</label>
+                                <input type="text" name="description" class="form-control" placeholder="Nomor utama kantor pusat" maxlength="255">
+                            </div>
+                            <div class="col-12 d-flex align-items-center gap-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="is_primary" id="waAddPrimary" value="1">
+                                    <label class="form-check-label fw-semibold" for="waAddPrimary">
+                                        <i class="bi bi-star-fill text-warning me-1"></i>Jadikan Utama
+                                        <small class="text-muted fw-normal">(dipakai tombol float & footer)</small>
+                                    </label>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="is_active" id="waAddActive" value="1" checked>
+                                    <label class="form-check-label" for="waAddActive">Aktif</label>
+                                </div>
+                                <button type="submit" class="btn ms-auto px-4" style="background:#25d366;color:white;font-weight:700">
+                                    <i class="bi bi-plus me-1"></i>Tambah
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {{-- WA Numbers List --}}
+            <div class="card lp-card">
+                <div class="card-header lp-card-header" style="background:linear-gradient(135deg,#075e54,#25d366)">
+                    <i class="bi bi-list-ul me-2"></i>Daftar Nomor WhatsApp ({{ $waNumbers->count() }})
+                </div>
+                <div class="card-body p-0">
+                    @forelse($waNumbers as $wa)
+                    <div class="lp-list-item">
+                        <div class="wa-number-icon {{ $wa->is_primary ? 'primary' : '' }}">
+                            <i class="bi bi-whatsapp"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                                <strong>{{ $wa->label }}</strong>
+                                @if($wa->is_primary)
+                                    <span class="badge" style="background:#fbbf24;color:#1a1a1a"><i class="bi bi-star-fill me-1" style="font-size:.6rem"></i>Utama</span>
+                                @endif
+                                @if(!$wa->is_active)
+                                    <span class="badge bg-secondary">Non-aktif</span>
+                                @endif
+                            </div>
+                            <div class="d-flex align-items-center gap-3">
+                                <code class="wa-number-code">+{{ $wa->number }}</code>
+                                <a href="https://wa.me/{{ $wa->number }}" target="_blank" class="btn btn-xs text-success p-0" style="font-size:.78rem">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i>Buka WA
+                                </a>
+                            </div>
+                            @if($wa->description)
+                                <div class="text-muted small mt-1">{{ $wa->description }}</div>
+                            @endif
+                        </div>
+                        <div class="lp-item-actions">
+                            <button class="btn btn-sm btn-outline-success" onclick="openEditWa({{ $wa->id }})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <form action="{{ route('admin.landing.wa.destroy', $wa) }}" method="POST" class="d-inline"
+                                  onsubmit="return confirm('Hapus nomor {{ addslashes($wa->label) }}?')">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-whatsapp" style="font-size:2.5rem;opacity:.3"></i>
+                        <p class="mt-2">Belum ada nomor WA. Tambahkan di atas.</p>
+                    </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
         {{-- ────── CTA TAB ────── --}}
         <div class="tab-pane fade" id="tab-cta">
             <div class="card lp-card">
@@ -441,9 +553,65 @@
     </div>
 </div>
 
+{{-- ───── Edit WA Modal ───── --}}
+<div class="modal fade" id="editWaModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:16px;border:none;box-shadow:0 12px 48px rgba(7,94,84,.15)">
+            <div class="modal-header text-white border-0" style="background:linear-gradient(135deg,#075e54,#25d366);border-radius:16px 16px 0 0">
+                <h6 class="modal-title fw-bold"><i class="bi bi-whatsapp me-2"></i>Edit Nomor WhatsApp</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="editWaForm" method="POST">
+                    @csrf @method('PUT')
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Label / Nama <span class="text-danger">*</span></label>
+                            <input type="text" name="label" class="form-control" required maxlength="100">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Nomor WA <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background:#25d366;color:white;border-color:#25d366"><i class="bi bi-whatsapp"></i></span>
+                                <input type="text" name="number" class="form-control" required maxlength="30" pattern="[0-9]+" title="Hanya angka">
+                            </div>
+                            <small class="text-muted">Hanya angka, tanpa + atau spasi. Contoh: 6281234567890</small>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Keterangan</label>
+                            <input type="text" name="description" class="form-control" maxlength="255">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">Urutan</label>
+                            <input type="number" name="sort_order" class="form-control" min="0">
+                        </div>
+                        <div class="col-6 d-flex flex-column justify-content-end gap-2">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="is_primary" id="ewPrimary" value="1">
+                                <label class="form-check-label fw-semibold" for="ewPrimary"><i class="bi bi-star-fill text-warning me-1"></i>Utama</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="is_active" id="ewActive" value="1">
+                                <label class="form-check-label" for="ewActive">Aktif</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="button" class="btn btn-outline-secondary flex-fill" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn flex-fill text-white fw-bold" style="background:#25d366">
+                            <i class="bi bi-check-lg me-1"></i>Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @php
 $programsJson      = $programs->keyBy('id')->toJson();
 $testimonialsJson  = $testimonials->keyBy('id')->toJson();
+$waNumbersJson     = $waNumbers->keyBy('id')->toJson();
 @endphp
 
 <style>
@@ -458,12 +626,16 @@ $testimonialsJson  = $testimonials->keyBy('id')->toJson();
 .lp-item-actions { display: flex; gap: .4rem; flex-shrink: 0; }
 .lp-emoji-icon { font-size: 1.8rem; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background: rgba(200,77,223,.07); border-radius: 12px; flex-shrink: 0; }
 .testi-mini-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 800; color: white; flex-shrink: 0; }
+.wa-number-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(37,211,102,.12); color: #25d366; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+.wa-number-icon.primary { background: linear-gradient(135deg,#075e54,#25d366); color: white; }
+.wa-number-code { background: rgba(37,211,102,.08); color: #075e54; padding: .15rem .5rem; border-radius: 6px; font-size: .88rem; border: 1px solid rgba(37,211,102,.2); }
 </style>
 
 @push('scripts')
 <script>
 const programsData     = @json($programs->keyBy('id'));
 const testimonialsData = @json($testimonials->keyBy('id'));
+const waNumbersData    = @json($waNumbers->keyBy('id'));
 
 function openEditProgram(id) {
     const p  = programsData[id];
@@ -480,6 +652,19 @@ function openEditProgram(id) {
     document.getElementById('epNew').checked     = !!p.is_new;
     document.getElementById('epActive').checked  = !!p.is_active;
     new bootstrap.Modal(document.getElementById('editProgramModal')).show();
+}
+
+function openEditWa(id) {
+    const w  = waNumbersData[id];
+    const fm = document.getElementById('editWaForm');
+    fm.action = '/admin/landing/wa/' + id;
+    fm.querySelector('[name=label]').value       = w.label;
+    fm.querySelector('[name=number]').value      = w.number;
+    fm.querySelector('[name=description]').value = w.description || '';
+    fm.querySelector('[name=sort_order]').value  = w.sort_order;
+    document.getElementById('ewPrimary').checked = !!w.is_primary;
+    document.getElementById('ewActive').checked  = !!w.is_active;
+    new bootstrap.Modal(document.getElementById('editWaModal')).show();
 }
 
 function openEditTesti(id) {
