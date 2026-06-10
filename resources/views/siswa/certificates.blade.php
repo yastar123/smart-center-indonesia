@@ -37,11 +37,15 @@
 
 {{-- GRID --}}
 @if($certificates->isEmpty())
-<div class="dashboard-card text-center py-5">
-    <i class="bi bi-award" style="font-size:3rem;color:#cbd5e1;display:block;margin-bottom:16px"></i>
-    <div class="fw-semibold mb-2" style="font-size:16px;color:var(--text-primary)">Belum ada sertifikat</div>
-    <p class="text-muted mb-4">Sertifikat yang diterbitkan admin atau yang Anda upload akan tampil di sini.</p>
-    <button onclick="openUploadModal()" class="btn btn-primary px-4"><i class="bi bi-upload me-2"></i>Upload Sertifikat Pertama</button>
+<div class="dashboard-card fade-up">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="bi bi-award"></i></div>
+        <div class="empty-state-title">Belum Ada Sertifikat</div>
+        <div class="empty-state-desc">Sertifikat yang diterbitkan admin atau yang Anda upload akan tampil di sini.</div>
+        <button onclick="openUploadModal()" class="btn btn-primary px-4 fw-semibold mt-3" style="border-radius:10px">
+            <i class="bi bi-upload me-2"></i>Upload Sertifikat Pertama
+        </button>
+    </div>
 </div>
 @else
 <div class="row g-3">

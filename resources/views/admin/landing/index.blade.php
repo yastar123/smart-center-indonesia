@@ -5,21 +5,28 @@
 @section('content')
 <div class="container-fluid px-0">
 
-    {{-- Page Header --}}
-    <div class="page-header-card mb-4">
-        <div class="d-flex align-items-center gap-3">
-            <div class="stat-icon bg-primary-soft" style="color:white;width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#260632,#c84ddf)!important">
-                <i class="bi bi-window-fullscreen" style="font-size:1.3rem"></i>
+    {{-- HEADER BANNER --}}
+    <div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
+        <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%;pointer-events:none"></div>
+        <div style="position:absolute;right:80px;bottom:-50px;width:120px;height:120px;background:rgba(255,255,255,.03);border-radius:50%;pointer-events:none"></div>
+        <div class="row align-items-center g-3" style="position:relative">
+            <div class="col-md-8">
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">
+                        <i class="bi bi-window-fullscreen"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0" style="color:white">Kelola Konten Landing Page</h5>
+                        <span style="font-size:12px;opacity:.8">Edit teks hero, program, testimoni, dan pengaturan halaman utama</span>
+                    </div>
+                </div>
             </div>
-            <div>
-                <h5 class="mb-0 fw-bold">Kelola Konten Landing Page</h5>
-                <small class="text-muted">Edit teks hero, program, testimoni, dan pengaturan halaman utama</small>
+            <div class="col-md-4 text-md-end">
+                <a href="{{ url('/') }}" target="_blank" class="btn fw-semibold px-4"
+                   style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
+                    <i class="bi bi-eye me-2"></i>Lihat Landing Page
+                </a>
             </div>
-        </div>
-        <div class="ms-auto">
-            <a href="{{ url('/') }}" target="_blank" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-eye me-1"></i> Lihat Landing Page
-            </a>
         </div>
     </div>
 
