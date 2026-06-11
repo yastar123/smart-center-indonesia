@@ -8,15 +8,19 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::table('schedule_proposals', function (Blueprint $table) {
-            $table->unsignedTinyInteger('pertemuan_ke')->nullable()->after('class_id');
-        });
+        if (Schema::hasTable('schedule_proposals') && !Schema::hasColumn('schedule_proposals', 'pertemuan_ke')) {
+            Schema::table('schedule_proposals', function (Blueprint $table) {
+                $table->unsignedTinyInteger('pertemuan_ke')->nullable()->after('class_id');
+            });
+        }
     }
 
     public function down()
     {
-        Schema::table('schedule_proposals', function (Blueprint $table) {
-            $table->dropColumn('pertemuan_ke');
-        });
+        if (Schema::hasTable('schedule_proposals') && Schema::hasColumn('schedule_proposals', 'pertemuan_ke')) {
+            Schema::table('schedule_proposals', function (Blueprint $table) {
+                $table->dropColumn('pertemuan_ke');
+            });
+        }
     }
 };

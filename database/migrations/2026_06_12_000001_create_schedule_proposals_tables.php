@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('schedule_proposals', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('class_id');
+            $table->unsignedTinyInteger('pertemuan_ke')->nullable();
             $table->enum('proposed_by_type', ['guru', 'siswa']);
             $table->unsignedBigInteger('proposed_by_id');
             $table->date('tanggal');
