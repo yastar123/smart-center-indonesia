@@ -766,12 +766,6 @@
         <button class="hero-dot {{ $i === 0 ? 'active' : '' }}" data-slide="{{ $i }}" aria-label="Slide {{ $i + 1 }}"></button>
         @endforeach
     </div>
-
-    <div class="scroll-indicator" aria-hidden="true">
-        <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
-        <span>SCROLL</span>
-    </div>
-
 </section>
 
 {{-- ──────────────────────────── STATS STRIP ───────────────────────────────── --}}

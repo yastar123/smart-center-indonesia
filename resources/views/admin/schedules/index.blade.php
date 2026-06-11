@@ -145,7 +145,6 @@
                     <th class="ps-3">Kelas</th>
                     <th>Pertemuan</th>
                     <th>Tanggal &amp; Waktu</th>
-                    <th class="d-none d-md-table-cell">Topik / Materi</th>
                     <th class="d-none d-md-table-cell">Jenis</th>
                     <th class="d-none d-lg-table-cell">Ruangan / Link</th>
                     <th>Status</th>
@@ -185,9 +184,6 @@
                         <div class="text-muted" style="font-size:11px">s/d {{ $sc->tanggal_selesai->format('d M Y') }}</div>
                         @endif
                         <div class="text-muted" style="font-size:11px"><i class="bi bi-clock me-1"></i>{{ substr($sc->jam_mulai,0,5) ?? '–' }} – {{ substr($sc->jam_selesai,0,5) ?? '–' }}</div>
-                    </td>
-                    <td class="d-none d-md-table-cell">
-                        <div style="font-size:13px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ $sc->topik ?: '–' }}</div>
                     </td>
                     <td class="d-none d-md-table-cell">
                         @if($sc->jenis === 'online')
@@ -318,10 +314,6 @@
                         <label class="form-label fw-semibold" style="font-size:12px">Jam Selesai <span class="text-danger">*</span></label>
                         <input type="time" id="jam_selesai" class="form-control" style="border-radius:10px">
                     </div>
-                    <div class="col-12">
-                        <label class="form-label fw-semibold" style="font-size:12px">Topik / Materi</label>
-                        <input type="text" id="topik" class="form-control" placeholder="cth: Persamaan Kuadrat, Photosynthesis..." style="border-radius:10px">
-                    </div>
                     <div class="col-12" id="ruanganField">
                         <label class="form-label fw-semibold" style="font-size:12px">Ruangan <span class="text-muted">(opsional)</span></label>
                         <input type="text" id="ruangan" class="form-control" placeholder="cth: Ruang A1, Lab Komputer..." style="border-radius:10px">
@@ -329,10 +321,6 @@
                     <div class="col-12" id="linkField" style="display:none">
                         <label class="form-label fw-semibold" style="font-size:12px">Link Meeting</label>
                         <input type="text" id="link_meeting" class="form-control" placeholder="https://meet.google.com/..." style="border-radius:10px">
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label fw-semibold" style="font-size:12px">Catatan</label>
-                        <textarea id="sc_catatan" class="form-control" rows="2" placeholder="Catatan tambahan untuk pertemuan ini..." style="border-radius:10px"></textarea>
                     </div>
                 </div>
             </div>
@@ -447,10 +435,8 @@ function openModal() {
     document.getElementById('tanggal').value    = '';
     document.getElementById('jam_mulai').value  = '';
     document.getElementById('jam_selesai').value= '';
-    document.getElementById('topik').value      = '';
     document.getElementById('ruangan').value    = '';
     document.getElementById('link_meeting').value = '';
-    document.getElementById('sc_catatan').value = '';
     document.getElementById('classInfoBox').style.display = 'none';
     document.getElementById('statusScWrap').style.display = 'none';
     toggleJenis();
@@ -467,10 +453,8 @@ function editSchedule(id) {
         document.getElementById('tanggal').value       = s.tanggal ? s.tanggal.substr(0,10) : '';
         document.getElementById('jam_mulai').value     = s.jam_mulai ? s.jam_mulai.substr(0,5) : '';
         document.getElementById('jam_selesai').value   = s.jam_selesai ? s.jam_selesai.substr(0,5) : '';
-        document.getElementById('topik').value         = s.topik ?? '';
         document.getElementById('ruangan').value       = s.ruangan ?? '';
         document.getElementById('link_meeting').value  = s.link_meeting ?? '';
-        document.getElementById('sc_catatan').value    = s.catatan ?? '';
         document.getElementById('sc_status').value     = s.status ?? 'dijadwalkan';
         document.getElementById('statusScWrap').style.display = 'block';
         toggleJenis();
@@ -496,10 +480,8 @@ function saveSchedule() {
         tanggal:      document.getElementById('tanggal').value,
         jam_mulai:    document.getElementById('jam_mulai').value,
         jam_selesai:  document.getElementById('jam_selesai').value,
-        topik:        document.getElementById('topik').value,
         ruangan:      document.getElementById('ruangan').value || null,
         link_meeting: document.getElementById('link_meeting').value || null,
-        catatan:      document.getElementById('sc_catatan').value,
     };
     if (id) { payload._method = 'PUT'; payload.status = document.getElementById('sc_status').value; }
 
@@ -555,12 +537,10 @@ function showDetail(id) {
                     ${drow('Guru', s.kelas?.guru?.name ?? '–')}
                     ${drow('Mata Pelajaran', s.kelas?.mata_pelajaran?.nama ?? '–')}
                     ${drow('Cabang', s.kelas?.cabang?.name ?? '–')}
-                    ${drow('Topik / Materi', s.topik || '–')}
                     ${drow('Jenis', s.jenis === 'online' ? '🌐 Online' : (s.jenis === 'private' ? '🔒 Private' : '📍 Offline'))}
                     ${s.jenis === 'online'
                         ? drow('Link Meeting', s.link_meeting ? '<a href="'+s.link_meeting+'" target="_blank">Buka Link</a>' : '–')
                         : drow('Ruangan', s.ruangan || '–')}
-                    ${drow('Catatan', s.catatan || '–')}
                 </table>
             </div>
         `;

@@ -3375,6 +3375,11 @@
             </a>
         </div>
         <div class="nav-item">
+            <a href="{{ route('guru.schedule-agreements.index') }}" class="nav-link {{ request()->routeIs('guru.schedule-agreements.*') ? 'active' : '' }}" data-label="Persetujuan Jadwal">
+                <i class="bi bi-calendar-check"></i><span>Persetujuan Jadwal</span>
+            </a>
+        </div>
+        <div class="nav-item">
             <a href="{{ route('guru.payments.index') }}" class="nav-link {{ request()->routeIs('guru.payments.*') ? 'active' : '' }}" data-label="Gaji Saya">
                 <i class="bi bi-cash-coin"></i><span>Gaji Saya</span>
             </a>
@@ -3401,8 +3406,23 @@
         </div>
         {{-- Jadwal siswa dihapus: link dihilangkan sesuai permintaan --}}
         <div class="nav-item">
+            <a href="{{ route('siswa.courses.index') }}" class="nav-link {{ request()->routeIs('siswa.courses*') ? 'active' : '' }}" data-label="List Mata Pelajaran">
+                <i class="bi bi-journal-bookmark"></i><span>List Mata Pelajaran</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('siswa.courses.fees') }}" class="nav-link {{ request()->routeIs('siswa.courses.fees') ? 'active' : '' }}" data-label="Harga Mapel">
+                <i class="bi bi-cash-coin"></i><span>Harga Mapel</span>
+            </a>
+        </div>
+        <div class="nav-item">
             <a href="{{ route('siswa.attendance') }}" class="nav-link {{ request()->routeIs('siswa.attendance*') ? 'active' : '' }}" data-label="Absensi">
                 <i class="bi bi-clipboard-check"></i><span>Absensi</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('siswa.schedule-agreements.index') }}" class="nav-link {{ request()->routeIs('siswa.schedule-agreements.*') ? 'active' : '' }}" data-label="Persetujuan Jadwal">
+                <i class="bi bi-calendar-check"></i><span>Persetujuan Jadwal</span>
             </a>
         </div>
         <div class="nav-item">
@@ -3586,6 +3606,14 @@
     @endrole
     @role('siswa')
     {{-- Mobile nav: Jadwal siswa dihapus sesuai permintaan --}}
+    <a href="{{ route('siswa.courses.index') }}" class="mob-nav-item {{ request()->routeIs('siswa.courses*') ? 'active' : '' }}">
+        <i class="bi bi-journal-bookmark{{ request()->routeIs('siswa.courses*') ? '-fill' : '' }}"></i>
+        <span>Mapel</span>
+    </a>
+    <a href="{{ route('siswa.courses.fees') }}" class="mob-nav-item {{ request()->routeIs('siswa.courses.fees') ? 'active' : '' }}">
+        <i class="bi bi-cash-coin{{ request()->routeIs('siswa.courses.fees') ? '-fill' : '' }}"></i>
+        <span>Harga</span>
+    </a>
     <a href="{{ route('siswa.attendance') }}" class="mob-nav-item {{ request()->routeIs('siswa.attendance*') ? 'active' : '' }}">
         <i class="bi bi-clipboard-check"></i>
         <span>Absensi</span>
@@ -4270,6 +4298,8 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         @endrole
         @role('siswa')
         { label:'Dashboard Siswa', desc:'Portal siswa & tagihan', href:'{{ route("siswa.dashboard") }}', icon:'bi-speedometer2', color:'#c84ddf', group:'Siswa' },
+        { label:'List Mata Pelajaran', desc:'Mata pelajaran yang diambil', href:'{{ route("siswa.courses.index") }}', icon:'bi-journal-bookmark', color:'#10b981', group:'Siswa' },
+        { label:'Harga Mapel', desc:'Daftar harga mata pelajaran', href:'{{ route("siswa.courses.fees") }}', icon:'bi-cash-coin', color:'#f6af23', group:'Siswa' },
         // Jadwal Belajar (siswa) dihapus — entri command palette dihilangkan
         { label:'Sertifikat Saya', desc:'Lihat sertifikat yang diterbitkan', href:'{{ route("siswa.certificates.index") }}', icon:'bi-award', color:'#f6af23', group:'Siswa' },
         { label:'Pengumuman', desc:'Informasi & pengumuman terbaru', href:'{{ route("siswa.announcements") }}', icon:'bi-megaphone', color:'#c84ddf', group:'Siswa' },

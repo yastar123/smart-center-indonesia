@@ -42,7 +42,6 @@ class SchoolClassController extends Controller
         }
 
         $data = $request->validate([
-            'nama_kelas'        => 'required|string|max:100',
             'cabang_id'         => 'nullable|exists:branches,id',
             'mata_pelajaran_id' => 'nullable|exists:courses,id',
             'guru_id'           => 'nullable|exists:teachers,id',
@@ -55,6 +54,21 @@ class SchoolClassController extends Controller
 
         if ($request->input('cabang_id') === 'pusat' || $request->input('cabang_id') === '0') {
             $data['cabang_id'] = null;
+        }
+
+        // Auto-generate nama_kelas if not provided
+        if (!isset($data['nama_kelas'])) {
+            $course = \App\Models\Course::find($request->mata_pelajaran_id);
+            $teacher = \App\Models\Teacher::find($request->guru_id);
+            $branch = \App\Models\Branch::find($request->cabang_id);
+            
+            $parts = [];
+            if ($course) $parts[] = $course->nama;
+            if ($teacher) $parts[] = $teacher->name;
+            if ($branch) $parts[] = $branch->name;
+            if ($request->jenis) $parts[] = ucfirst($request->jenis);
+            
+            $data['nama_kelas'] = implode(' - ', $parts) ?: 'Kelas Baru';
         }
 
         SchoolClass::create($data);
@@ -74,7 +88,6 @@ class SchoolClassController extends Controller
         }
 
         $data = $request->validate([
-            'nama_kelas'        => 'required|string|max:100',
             'cabang_id'         => 'nullable|exists:branches,id',
             'mata_pelajaran_id' => 'nullable|exists:courses,id',
             'guru_id'           => 'nullable|exists:teachers,id',
@@ -89,6 +102,21 @@ class SchoolClassController extends Controller
             $data['cabang_id'] = null;
         }
 
+        // Auto-generate nama_kelas if not provided
+        if (!isset($data['nama_kelas'])) {
+            $course = \App\Models\Course::find($request->mata_pelajaran_id);
+            $teacher = \App\Models\Teacher::find($request->guru_id);
+            $branch = \App\Models\Branch::find($request->cabang_id);
+            
+            $parts = [];
+            if ($course) $parts[] = $course->nama;
+            if ($teacher) $parts[] = $teacher->name;
+            if ($branch) $parts[] = $branch->name;
+            if ($request->jenis) $parts[] = ucfirst($request->jenis);
+            
+            $data['nama_kelas'] = implode(' - ', $parts) ?: 'Kelas Baru';
+        }
+
         $class->update($data);
 
         return response()->json(['success' => true, 'message' => 'Kelas berhasil diperbarui.']);
@@ -98,5 +126,14 @@ class SchoolClassController extends Controller
     {
         $class->delete();
         return response()->json(['success' => true, 'message' => 'Kelas berhasil dihapus.']);
+    }
+
+    public function getTeacherCourses($teacherId)
+    {
+        $teacher = Teacher::with('courses')->find($teacherId);
+        if (!$teacher) {
+            return response()->json(['courses' => []]);
+        }
+        return response()->json(['courses' => $teacher->courses]);
     }
 }

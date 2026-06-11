@@ -35,6 +35,7 @@ class Branch extends Model
         'can_schedules',
         'can_payments',
         'can_tryouts',
+        'allowed_pages',
     ];
 
     protected $casts = [
@@ -43,6 +44,7 @@ class Branch extends Model
         'can_schedules' => 'boolean',
         'can_payments' => 'boolean',
         'can_tryouts' => 'boolean',
+        'allowed_pages' => 'array',
     ];
 
     public function students()

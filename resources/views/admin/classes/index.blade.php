@@ -196,10 +196,6 @@
                     @csrf
                     <input type="hidden" id="classId">
                     <div class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label fw-semibold" style="font-size:.85rem;">Nama Kelas <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="nama_kelas" placeholder="cth: Kelas Matematika Intensif A" required>
-                        </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold" style="font-size:.85rem;">Cabang <span class="text-danger">*</span></label>
                             <select class="form-select" id="cls_cabang_id" required>
@@ -211,22 +207,20 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold" style="font-size:.85rem;">Mata Pelajaran</label>
-                            <select class="form-select" id="mata_pelajaran_id">
-                                <option value="">-- Pilih Mata Pelajaran --</option>
-                                @foreach($courses as $c)
-                                <option value="{{ $c->id }}">{{ $c->kode }} — {{ $c->nama }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-6">
                             <label class="form-label fw-semibold" style="font-size:.85rem;">Guru Pengajar</label>
-                            <select class="form-select" id="guru_id">
+                            <select class="form-select" id="guru_id" onchange="loadTeacherCourses()">
                                 <option value="">-- Pilih Guru --</option>
                                 @foreach($teachers as $t)
                                 <option value="{{ $t->id }}">{{ $t->name }}</option>
                                 @endforeach
                             </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" style="font-size:.85rem;">Mata Pelajaran</label>
+                            <select class="form-select" id="mata_pelajaran_id">
+                                <option value="">-- Pilih Guru Terlebih Dahulu --</option>
+                            </select>
+                            <small class="text-muted" style="font-size:11px">Mata pelajaran akan muncul berdasarkan guru yang dipilih</small>
                         </div>
 
                         <div class="col-md-4">
@@ -280,10 +274,47 @@ function toggleZoom() {
     document.getElementById('zoomField').style.display = jenis === 'online' ? 'block' : 'none';
 }
 
+function loadTeacherCourses() {
+    const guruId = document.getElementById('guru_id').value;
+    const courseSelect = document.getElementById('mata_pelajaran_id');
+    
+    // Reset course dropdown
+    courseSelect.innerHTML = '<option value="">-- Pilih Mata Pelajaran --</option>';
+    
+    if (!guruId) {
+        courseSelect.innerHTML = '<option value="">-- Pilih Guru Terlebih Dahulu --</option>';
+        return Promise.resolve();
+    }
+    
+    // Fetch courses for selected teacher
+    return fetch(`/admin/teachers/${guruId}/courses`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.courses && data.courses.length > 0) {
+                data.courses.forEach(course => {
+                    const option = document.createElement('option');
+                    option.value = course.id;
+                    option.textContent = `${course.kode} — ${course.nama}`;
+                    courseSelect.appendChild(option);
+                });
+            } else {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = '-- Tidak ada mata pelajaran untuk guru ini --';
+                courseSelect.appendChild(option);
+            }
+        })
+        .catch(err => {
+            console.error('Error loading teacher courses:', err);
+            courseSelect.innerHTML = '<option value="">-- Gagal memuat mata pelajaran --</option>';
+        });
+}
+
 function openModal() {
     document.getElementById('classModalTitle').textContent = 'Tambah Kelas';
     document.getElementById('classId').value = '';
     document.getElementById('classForm').reset();
+    document.getElementById('mata_pelajaran_id').innerHTML = '<option value="">-- Pilih Guru Terlebih Dahulu --</option>';
     toggleZoom();
     classModal.show();
 }
@@ -295,10 +326,8 @@ function editClass(id) {
         .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
         .then(d => {
             document.getElementById('classId').value = d.id;
-            document.getElementById('nama_kelas').value = d.nama_kelas || '';
             const cabangVal = (d.cabang_id === null) ? 'pusat' : (d.cabang_id || '');
             document.getElementById('cls_cabang_id').value = cabangVal;
-            document.getElementById('mata_pelajaran_id').value = d.mata_pelajaran_id || '';
             document.getElementById('guru_id').value = d.guru_id || '';
             document.getElementById('kapasitas').value = d.kapasitas || '';
             document.getElementById('jumlah_pertemuan').value = d.jumlah_pertemuan || '';
@@ -306,6 +335,16 @@ function editClass(id) {
             document.getElementById('cls_status').value = d.status || 'aktif';
             document.getElementById('link_zoom').value = d.link_zoom || '';
             toggleZoom();
+            
+            // Load courses for the selected teacher
+            if (d.guru_id) {
+                loadTeacherCourses().then(() => {
+                    document.getElementById('mata_pelajaran_id').value = d.mata_pelajaran_id || '';
+                });
+            } else {
+                document.getElementById('mata_pelajaran_id').innerHTML = '<option value="">-- Pilih Guru Terlebih Dahulu --</option>';
+            }
+            
             document.getElementById('classSaveBtn').disabled = false;
             classModal.show();
         }).catch(() => {
@@ -325,7 +364,6 @@ function saveClass() {
         method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
         body: JSON.stringify({
-            nama_kelas:        document.getElementById('nama_kelas').value,
             cabang_id:         document.getElementById('cls_cabang_id').value,
             mata_pelajaran_id: document.getElementById('mata_pelajaran_id').value || null,
             guru_id:           document.getElementById('guru_id').value || null,

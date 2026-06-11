@@ -75,9 +75,26 @@ $nextSchedule = $todaySchedules->first(fn($s) =>
                             <span style="opacity:.5">·</span>
                             <span><i class="bi bi-building me-1"></i>{{ $teacher->branch->name }}</span>
                         @endif
-                        @if($teacher->subjects && count($teacher->subjects) > 0)
+                        @php
+                            $subjectsArray = [];
+                            if ($teacher->subjects) {
+                                if (is_array($teacher->subjects)) {
+                                    $subjectsArray = $teacher->subjects;
+                                } elseif (is_string($teacher->subjects)) {
+                                    // Try to decode JSON first
+                                    $decoded = json_decode($teacher->subjects, true);
+                                    if (is_array($decoded)) {
+                                        $subjectsArray = $decoded;
+                                    } else {
+                                        // If not JSON, try to explode by comma
+                                        $subjectsArray = explode(',', $teacher->subjects);
+                                    }
+                                }
+                            }
+                        @endphp
+                        @if(!empty($subjectsArray))
                             <span style="opacity:.5">·</span>
-                            <span><i class="bi bi-book me-1"></i>{{ implode(', ', array_slice($teacher->subjects, 0, 2)) }}</span>
+                            <span><i class="bi bi-book me-1"></i>{{ implode(', ', array_slice($subjectsArray, 0, 2)) }}</span>
                         @endif
                     @else
                         <span>Smart Center Indonesia</span>

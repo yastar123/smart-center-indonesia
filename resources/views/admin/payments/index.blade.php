@@ -81,6 +81,64 @@
     </div>
 </div>
 
+{{-- COURSE PAYMENT STATS --}}
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3 fade-up">
+        <div class="stat-card" style="border-top:3px solid #c84ddf">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-title">Pembayaran Mapel</div>
+                    <div class="stat-value text-primary">{{ $stats['course_pending'] + $stats['course_verified'] }}</div>
+                    <div class="stat-growth text-muted"><i class="bi bi-journal-bookmark me-1"></i>Total</div>
+                </div>
+                <div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-journal-bookmark-fill"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3 fade-up" style="animation-delay:.05s">
+        <div class="stat-card" style="border-top:3px solid #f6af23">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-title">Menunggu Verifikasi</div>
+                    <div class="stat-value text-warning">{{ $stats['course_pending'] }}</div>
+                    <div class="stat-growth text-warning"><i class="bi bi-hourglass-split me-1"></i>Pending</div>
+                </div>
+                <div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-hourglass-split"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3 fade-up" style="animation-delay:.10s">
+        <div class="stat-card" style="border-top:3px solid #10b981">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-title">Terverifikasi</div>
+                    <div class="stat-value text-success">{{ $stats['course_verified'] }}</div>
+                    <div class="stat-growth text-success"><i class="bi bi-check-circle me-1"></i>Approved</div>
+                </div>
+                <div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-check-circle-fill"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3 fade-up" style="animation-delay:.15s">
+        <div class="stat-card" style="border-top:3px solid #68117e">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-title">Rate Verifikasi</div>
+                    <div class="stat-value" style="color:#68117e">
+                        @php
+                            $total = $stats['course_pending'] + $stats['course_verified'];
+                            $rate = $total > 0 ? round(($stats['course_verified'] / $total) * 100) : 0;
+                        @endphp
+                        {{ $rate }}%
+                    </div>
+                    <div class="stat-growth" style="color:#68117e"><i class="bi bi-percent me-1"></i>Success</div>
+                </div>
+                <div class="stat-icon" style="background:linear-gradient(135deg,#68117e,#c84ddf);color:white"><i class="bi bi-graph-up-arrow"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- FILTER BAR --}}
 <div class="dashboard-card mb-4 fade-up">
     <form id="filterForm" method="GET" action="{{ route('admin.payments.index') }}">
@@ -231,6 +289,114 @@
     @if($invoices->hasPages())
     <div class="mt-4 d-flex justify-content-center">
         {{ $invoices->links() }}
+    </div>
+    @endif
+</div>
+
+{{-- COURSE PAYMENTS --}}
+<div class="dashboard-card fade-up" style="margin-top:24px">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="fw-bold mb-0"><i class="bi bi-journal-bookmark text-primary me-2"></i>Pembayaran Mata Pelajaran
+            <span class="badge ms-2" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:11px">{{ $coursePayments->total() }} data</span>
+        </h6>
+        <div class="d-flex gap-2">
+            <select name="course_status" class="form-select form-select-sm" style="width:auto;border-radius:8px;border-color:var(--card-border);background:var(--input-bg)"
+                onchange="window.location.href='?course_status='+this.value">
+                <option value="">Semua Status</option>
+                <option value="pending" {{ request('course_status')=='pending'?'selected':'' }}>Menunggu</option>
+                <option value="verified" {{ request('course_status')=='verified'?'selected':'' }}>Terverifikasi</option>
+                <option value="rejected" {{ request('course_status')=='rejected'?'selected':'' }}>Ditolak</option>
+            </select>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-modern align-middle mb-0">
+            <thead class="thead-modern">
+                <tr>
+                    <th class="ps-3">Siswa</th>
+                    <th>Mata Pelajaran</th>
+                    <th class="d-none d-md-table-cell">Cabang</th>
+                    <th>Biaya</th>
+                    <th>Bukti</th>
+                    <th>Status</th>
+                    <th class="text-center">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($coursePayments as $payment)
+                @php
+                    $statusMap = [
+                        'verified' => ['bg'=>'var(--soft-success-bg)','color'=>'var(--soft-success-text)','icon'=>'bi-check-circle-fill','label'=>'Terverifikasi'],
+                        'pending'  => ['bg'=>'var(--soft-warning-bg)','color'=>'var(--soft-warning-text)','icon'=>'bi-hourglass-split','label'=>'Menunggu'],
+                        'rejected' => ['bg'=>'var(--soft-danger-bg)','color'=>'var(--soft-danger-text)','icon'=>'bi-x-circle-fill','label'=>'Ditolak'],
+                    ];
+                    $st = $statusMap[$payment->status] ?? $statusMap['pending'];
+                @endphp
+                <tr style="border-bottom:1px solid var(--card-border);transition:background .15s" onmouseover="this.style.background='rgba(104,17,126,.05)'" onmouseout="this.style.background=''">
+                    <td class="ps-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="width:32px;height:32px;border-radius:50%;background:var(--soft-primary-bg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--soft-primary-text);flex-shrink:0">
+                                {{ strtoupper(substr($payment->student?->name ?? 'S', 0, 1)) }}
+                            </div>
+                            <div>
+                                <div class="fw-semibold" style="font-size:13px">{{ $payment->student?->name ?? '–' }}</div>
+                                <div class="text-muted" style="font-size:11px">{{ $payment->student?->nis ?? '' }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="fw-semibold" style="font-size:13px">{{ $payment->course?->nama ?? '–' }}</td>
+                    <td class="d-none d-md-table-cell text-muted" style="font-size:.85rem">{{ $payment->course?->cabang?->name ?? 'Pusat' }}</td>
+                    <td class="fw-bold text-primary" style="font-size:.9rem">Rp {{ number_format($payment->amount,0,',','.') }}</td>
+                    <td>
+                        @if($payment->proof)
+                        <a href="{{ asset($payment->proof) }}" target="_blank" class="btn btn-sm btn-outline-primary" style="border-radius:8px;font-size:11px">
+                            <i class="bi bi-eye me-1"></i>Lihat
+                        </a>
+                        @else
+                        <span class="text-muted" style="font-size:11px">–</span>
+                        @endif
+                    </td>
+                    <td>
+                        <span style="background:{{ $st['bg'] }};color:{{ $st['color'] }};padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600">
+                            <i class="bi {{ $st['icon'] }} me-1"></i>{{ $st['label'] }}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        @if($payment->status === 'pending')
+                        <div class="d-flex justify-content-center gap-1">
+                            <button onclick="verifyCoursePayment({{ $payment->id }})" class="btn btn-sm btn-success" style="border-radius:8px;font-size:11px" title="Verifikasi">
+                                <i class="bi bi-check-lg"></i>
+                            </button>
+                            <button onclick="rejectCoursePayment({{ $payment->id }})" class="btn btn-sm btn-danger" style="border-radius:8px;font-size:11px" title="Tolak">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                        @elseif($payment->status === 'rejected')
+                        <div class="text-muted small" style="font-size:10px" title="{{ $payment->rejected_reason }}">
+                            {{ \Illuminate\Support\Str::limit($payment->rejected_reason, 20) }}
+                        </div>
+                        @else
+                        <span class="text-muted" style="font-size:11px"><i class="bi bi-check-circle-fill text-success"></i></span>
+                        @endif
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="7" class="text-center py-5">
+                        <div class="text-muted">
+                            <i class="bi bi-journal-x" style="font-size:40px;display:block;margin-bottom:12px;opacity:.4"></i>
+                            <div class="fw-semibold mb-1">Belum ada pembayaran mata pelajaran</div>
+                            <div style="font-size:12px">Pembayaran akan muncul di sini setelah siswa upload bukti</div>
+                        </div>
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+    @if($coursePayments->hasPages())
+    <div class="mt-4 d-flex justify-content-center">
+        {{ $coursePayments->links() }}
     </div>
     @endif
 </div>
@@ -594,6 +760,37 @@ function deleteInvoice(id, nomor) {
             }
         }).fail(() => showToast('Tidak dapat menghapus invoice.', 'error'));
     }, null, {title:'Hapus Invoice', okText:'Ya, Hapus'});
+}
+
+function verifyCoursePayment(id) {
+    confirmAction('Verifikasi pembayaran mata pelajaran ini?', function() {
+        $.post('/admin/payments/course/' + id + '/verify', {
+            _token: document.querySelector('meta[name=csrf-token]').content
+        }, function(res) {
+            if (res.success || res === 'success') {
+                showToast('Pembayaran berhasil diverifikasi', 'success');
+                setTimeout(() => location.reload(), 1200);
+            }
+        }).fail(() => showToast('Gagal memverifikasi pembayaran', 'error'));
+    }, null, {title:'Verifikasi Pembayaran', okText:'Ya, Verifikasi'});
+}
+
+function rejectCoursePayment(id) {
+    const reason = prompt('Masukkan alasan penolakan:');
+    if (!reason || reason.trim() === '') {
+        showToast('Alasan penolakan harus diisi', 'error');
+        return;
+    }
+    
+    $.post('/admin/payments/course/' + id + '/reject', {
+        _token: document.querySelector('meta[name=csrf-token]').content,
+        rejected_reason: reason
+    }, function(res) {
+        if (res.success || res === 'success') {
+            showToast('Pembayaran ditolak', 'success');
+            setTimeout(() => location.reload(), 1200);
+        }
+    }).fail(() => showToast('Gagal menolak pembayaran', 'error'));
 }
 </script>
 @endpush

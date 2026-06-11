@@ -45,7 +45,7 @@ Route::middleware('auth')->group(function () {
 | ADMIN
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth'])
+Route::middleware(['auth', 'check.branch.access'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -71,6 +71,10 @@ Route::middleware(['auth'])
         Route::put('/payments/{payment}',      [PaymentController::class, 'update'])  ->name('payments.update');
         Route::delete('/payments/{payment}',   [PaymentController::class, 'destroy']) ->name('payments.destroy');
         Route::post('/payments/{invoice}/pay', [PaymentController::class, 'markPaid'])->name('payments.pay');
+
+        // Course Payment Verification
+        Route::post('/payments/course/{payment}/verify', [PaymentController::class, 'verifyCoursePayment'])->name('payments.course.verify');
+        Route::post('/payments/course/{payment}/reject', [PaymentController::class, 'rejectCoursePayment'])->name('payments.course.reject');
 
         // SCHEDULES
         Route::get('/schedules',               [ScheduleController::class, 'index'])   ->name('schedules.index');
@@ -104,11 +108,12 @@ Route::middleware(['auth'])
         Route::delete('/categories/{category}',[\App\Http\Controllers\Admin\CategoryController::class, 'destroy'])->name('categories.destroy');
 
         // CLASSES (Kelas)
-        Route::get('/classes',            [SchoolClassController::class, 'index'])   ->name('classes.index');
-        Route::post('/classes',           [SchoolClassController::class, 'store'])   ->name('classes.store');
-        Route::get('/classes/{class}',    [SchoolClassController::class, 'show'])    ->name('classes.show');
-        Route::put('/classes/{class}',    [SchoolClassController::class, 'update'])  ->name('classes.update');
-        Route::delete('/classes/{class}', [SchoolClassController::class, 'destroy']) ->name('classes.destroy');
+        Route::get('/classes',                        [SchoolClassController::class, 'index'])           ->name('classes.index');
+        Route::post('/classes',                       [SchoolClassController::class, 'store'])           ->name('classes.store');
+        Route::get('/classes/{class}',                [SchoolClassController::class, 'show'])            ->name('classes.show');
+        Route::put('/classes/{class}',                [SchoolClassController::class, 'update'])          ->name('classes.update');
+        Route::delete('/classes/{class}',             [SchoolClassController::class, 'destroy'])         ->name('classes.destroy');
+        Route::get('/teachers/{teacher}/courses',     [SchoolClassController::class, 'getTeacherCourses'])->name('teachers.courses');
 
         // CERTIFICATES (Sertifikat)
         Route::get('/certificates',                  [CertificateController::class, 'index'])   ->name('certificates.index');
@@ -302,6 +307,12 @@ Route::middleware(['auth'])
         Route::get('/grades/{grade}',       [GradeController::class, 'show'])       ->name('grades.show');
         Route::put('/grades/{grade}',       [GradeController::class, 'update'])     ->name('grades.update');
         Route::delete('/grades/{grade}',    [GradeController::class, 'destroy'])    ->name('grades.destroy');
+
+        // Schedule Agreements (Proposals)
+        Route::get('/schedule-agreements', [\App\Http\Controllers\Guru\ScheduleProposalController::class, 'index'])->name('schedule-agreements.index');
+        Route::post('/schedule-agreements', [\App\Http\Controllers\Guru\ScheduleProposalController::class, 'store'])->name('schedule-agreements.store');
+        Route::post('/schedule-agreements/{proposal}/approve', [\App\Http\Controllers\Guru\ScheduleProposalController::class, 'approve'])->name('schedule-agreements.approve');
+        Route::post('/schedule-agreements/{proposal}/reject', [\App\Http\Controllers\Guru\ScheduleProposalController::class, 'reject'])->name('schedule-agreements.reject');
     });
 
 /*
@@ -353,16 +364,24 @@ Route::middleware(['auth'])
 
         // List Mata Pelajaran
         Route::get('/courses', [\App\Http\Controllers\Siswa\CourseController::class, 'index'])->name('courses.index');
+        Route::get('/courses/fees', [\App\Http\Controllers\Siswa\CourseController::class, 'fees'])->name('courses.fees');
 
         // Tagihan (Siswa)
         Route::get('/billing', [\App\Http\Controllers\Siswa\BillingController::class, 'index'])->name('billing.index');
         Route::post('/billing/{course}/pay', [\App\Http\Controllers\Siswa\BillingController::class, 'pay'])->name('billing.pay');
+        Route::post('/billing/bulk', [\App\Http\Controllers\Siswa\BillingController::class, 'bulkPay'])->name('billing.bulk');
 
         // Tryout (CBT)
         Route::get('/tryout',                          [\App\Http\Controllers\Siswa\TryoutController::class, 'index']) ->name('tryout');
         Route::get('/tryout/{tryout}',                 [\App\Http\Controllers\Siswa\TryoutController::class, 'show'])  ->name('tryout.show');
         Route::post('/tryout/{tryout}/submit',         [\App\Http\Controllers\Siswa\TryoutController::class, 'submit'])->name('tryout.submit');
         Route::get('/tryout/{tryout}/result/{attempt}',[\App\Http\Controllers\Siswa\TryoutController::class, 'result'])->name('tryout.result');
+
+        // Schedule Agreements (Proposals)
+        Route::get('/schedule-agreements', [\App\Http\Controllers\Siswa\ScheduleProposalController::class, 'index'])->name('schedule-agreements.index');
+        Route::post('/schedule-agreements', [\App\Http\Controllers\Siswa\ScheduleProposalController::class, 'store'])->name('schedule-agreements.store');
+        Route::post('/schedule-agreements/{proposal}/approve', [\App\Http\Controllers\Siswa\ScheduleProposalController::class, 'approve'])->name('schedule-agreements.approve');
+        Route::post('/schedule-agreements/{proposal}/reject', [\App\Http\Controllers\Siswa\ScheduleProposalController::class, 'reject'])->name('schedule-agreements.reject');
     });
 
 require __DIR__.'/auth.php';

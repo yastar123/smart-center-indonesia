@@ -36,7 +36,47 @@ class CoursePaymentController extends Controller
             'rejected_reason' => null,
         ]);
 
-        return back()->with('success', 'Pembayaran berhasil diverifikasi.');
+        // Enroll student in the class for this course
+        $student = $payment->student;
+        $course = $payment->course;
+
+        if ($student && $course) {
+            // Find an active class for this course that matches the student's branch
+            $class = \App\Models\SchoolClass::where('mata_pelajaran_id', $course->id)
+                ->where('status', 'aktif')
+                ->where(function ($query) use ($student) {
+                    $query->whereNull('cabang_id')
+                          ->orWhere('cabang_id', $student->branch_id);
+                })
+                ->first();
+
+            if ($class) {
+                // Check if student is already enrolled in this class
+                $alreadyEnrolled = $class->siswa()->where('student_id', $student->id)->exists();
+                
+                if (!$alreadyEnrolled) {
+                    // Enroll student in the class
+                    $class->siswa()->attach($student->id);
+                    \Log::info("Student {$student->id} enrolled in class {$class->id} for course {$course->id}");
+                } else {
+                    \Log::info("Student {$student->id} already enrolled in class {$class->id}");
+                }
+            } else {
+                \Log::warning("No active class found for course {$course->id} for student {$student->id}");
+                // Create a new class if none exists
+                $newClass = \App\Models\SchoolClass::create([
+                    'mata_pelajaran_id' => $course->id,
+                    'cabang_id' => $student->branch_id,
+                    'nama_kelas' => $course->nama . ' - ' . now()->format('Y'),
+                    'status' => 'aktif',
+                    'kapasitas' => 50,
+                ]);
+                $newClass->siswa()->attach($student->id);
+                \Log::info("Created new class {$newClass->id} and enrolled student {$student->id}");
+            }
+        }
+
+        return back()->with('success', 'Pembayaran mata pelajaran berhasil diverifikasi. Siswa telah ditambahkan ke kelas.');
     }
 
     public function reject(Request $request, StudentCoursePayment $payment)

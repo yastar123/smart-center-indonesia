@@ -9,12 +9,14 @@
     $role = $user->getRoleNames()->first() ?? 'user';
     $isOwnerAdmin = in_array($role, ['owner','admin']);
 
-    $totalStudents  = \App\Models\Student::count();
-    $activeStudents = \App\Models\Student::where('status','aktif')->count();
+    $branchId = ($role === 'admin') ? $user->branch_id : null;
+
+    $totalStudents  = \App\Models\Student::when($branchId, fn($q) => $q->where('branch_id', $branchId))->count();
+    $activeStudents = \App\Models\Student::where('status','aktif')->when($branchId, fn($q) => $q->where('branch_id', $branchId))->count();
     $totalBranches  = \App\Models\Branch::count();
     $activeBranches = \App\Models\Branch::where('status','active')->count();
-    $totalTeachers  = \App\Models\Teacher::count();
-    $activeTeachers = \App\Models\Teacher::where('status','aktif')->count();
+    $totalTeachers  = \App\Models\Teacher::when($branchId, fn($q) => $q->where('branch_id', $branchId))->count();
+    $activeTeachers = \App\Models\Teacher::where('status','aktif')->when($branchId, fn($q) => $q->where('branch_id', $branchId))->count();
 
     // Monthly enrollment (last 6 months)
     $months = collect(range(5,0))->map(function($i) {
@@ -22,25 +24,52 @@
     });
     $monthLabels = $months->map(fn($m) => $m->locale('id')->isoFormat('MMM'))->toArray();
     $monthCounts = $months->map(fn($m) =>
-        \App\Models\Student::whereYear('created_at',$m->year)->whereMonth('created_at',$m->month)->count()
+        \App\Models\Student::whereYear('created_at',$m->year)->whereMonth('created_at',$m->month)
+            ->when($branchId, fn($q) => $q->where('branch_id', $branchId))
+            ->count()
     )->toArray();
 
     // Gender & status for charts
-    $male    = \App\Models\Student::where('gender','L')->count();
-    $female  = \App\Models\Student::where('gender','P')->count();
-    $aktif   = \App\Models\Student::where('status','aktif')->count();
-    $nonaktif= \App\Models\Student::where('status','nonaktif')->count();
-    $lulus   = \App\Models\Student::where('status','lulus')->count();
+    $male    = \App\Models\Student::where('gender','L')->when($branchId, fn($q) => $q->where('branch_id', $branchId))->count();
+    $female  = \App\Models\Student::where('gender','P')->when($branchId, fn($q) => $q->where('branch_id', $branchId))->count();
+    $aktif   = \App\Models\Student::where('status','aktif')->when($branchId, fn($q) => $q->where('branch_id', $branchId))->count();
+    $nonaktif= \App\Models\Student::where('status','nonaktif')->when($branchId, fn($q) => $q->where('branch_id', $branchId))->count();
+    $lulus   = \App\Models\Student::where('status','lulus')->when($branchId, fn($q) => $q->where('branch_id', $branchId))->count();
 
     // Recent students
-    $recentStudents = \App\Models\Student::with('branch')->latest()->limit(5)->get();
+    $recentStudents = \App\Models\Student::with('branch')
+        ->when($branchId, fn($q) => $q->where('branch_id', $branchId))
+        ->latest()->limit(5)->get();
 
-    // Revenue (current month, verified payments)
-    $revenueThisMonth = \App\Models\Payment::where('status', 'verified')
+    // Invoice revenue
+    $revenueThisMonthInvoice = \App\Models\Payment::where('status', 'verified')
         ->whereYear('tanggal_pembayaran', now()->year)
         ->whereMonth('tanggal_pembayaran', now()->month)
+        ->when($branchId, fn($q) => $q->where('cabang_id', $branchId))
         ->sum('jumlah');
-    $revenueTotal = \App\Models\Payment::where('status', 'verified')->sum('jumlah');
+
+    $revenueTotalInvoice = \App\Models\Payment::where('status', 'verified')
+        ->when($branchId, fn($q) => $q->where('cabang_id', $branchId))
+        ->sum('jumlah');
+
+    // Course payment revenue
+    $revenueThisMonthCourse = \App\Models\StudentCoursePayment::where('status', 'verified')
+        ->whereYear('created_at', now()->year)
+        ->whereMonth('created_at', now()->month)
+        ->when($branchId, function($q) use ($branchId) {
+            $q->whereHas('student', fn($sq) => $sq->where('branch_id', $branchId));
+        })
+        ->sum('amount');
+
+    $revenueTotalCourse = \App\Models\StudentCoursePayment::where('status', 'verified')
+        ->when($branchId, function($q) use ($branchId) {
+            $q->whereHas('student', fn($sq) => $sq->where('branch_id', $branchId));
+        })
+        ->sum('amount');
+
+    // Combined revenue
+    $revenueThisMonth = $revenueThisMonthInvoice + $revenueThisMonthCourse;
+    $revenueTotal = $revenueTotalInvoice + $revenueTotalCourse;
 @endphp
 
 {{-- WELCOME BANNER --}}

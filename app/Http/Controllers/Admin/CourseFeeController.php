@@ -5,15 +5,16 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\CourseFee;
+use App\Models\SchoolClass;
 use Illuminate\Http\Request;
 
 class CourseFeeController extends Controller
 {
     public function index()
     {
-        $courses = Course::with(['cabang', 'fee'])->get();
+        $classes = SchoolClass::with(['cabang', 'mataPelajaran.fee', 'guru'])->latest()->get();
 
-        return view('admin.courses.fees', compact('courses'));
+        return view('admin.courses.fees', compact('classes'));
     }
 
     public function store(Request $request)

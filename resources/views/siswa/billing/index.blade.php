@@ -108,6 +108,156 @@
 {{-- BILLING CARDS --}}
 <div class="dashboard-card fade-up">
 
+    @if($draftCourses && $draftCourses->isNotEmpty())
+    {{-- DRAFT COURSES SECTION --}}
+    <div class="p-4 rounded-3 mb-4" style="background:linear-gradient(135deg,rgba(200,77,223,.08),rgba(104,17,126,.08));border:1.5px solid rgba(200,77,223,.2)">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+                <h6 class="fw-bold mb-1" style="color:var(--text-primary)">
+                    <i class="bi bi-cart-plus text-primary me-2"></i>Keranjang Pembayaran
+                </h6>
+                <p class="text-muted mb-0" style="font-size:12px">Mata pelajaran yang ditambahkan untuk dibayar</p>
+            </div>
+            <a href="{{ route('siswa.billing.index', ['clear_draft' => 1]) }}" class="btn btn-outline-danger btn-sm" style="border-radius:10px">
+                <i class="bi bi-trash me-1"></i>Hapus Semua
+            </a>
+        </div>
+
+        <div class="row g-3">
+            @foreach($draftCourses as $course)
+            @php
+                $fee = $fees[$course->id] ?? 0;
+                $payment = $payments[$course->id] ?? null;
+            @endphp
+            <div class="col-md-6">
+                <div class="p-3 rounded-3" style="background:var(--card-bg);border:1px solid var(--card-border)">
+                    <div class="d-flex align-items-start justify-content-between gap-3 mb-2">
+                        <div class="d-flex align-items-center gap-3">
+                            <div style="width:40px;height:40px;border-radius:10px;background:rgba(200,77,223,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                                <i class="bi bi-journal-bookmark-fill text-primary" style="font-size:16px"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold" style="font-size:13px;color:var(--text-primary)">{{ $course->nama }}</div>
+                                <div class="text-muted" style="font-size:11px">{{ $course->cabang->name ?? 'Pusat' }}</div>
+                            </div>
+                        </div>
+                        <a href="{{ route('siswa.billing.index', ['remove_course' => $course->id]) }}" class="text-danger" style="font-size:18px" title="Hapus">
+                            <i class="bi bi-x-circle"></i>
+                        </a>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="fw-bold" style="font-size:15px;color:var(--primary)">
+                            Rp {{ number_format($fee, 0, ',', '.') }}
+                        </div>
+                        @if(!$payment || $payment->status === 'rejected')
+                        <button class="btn btn-primary btn-sm px-3"
+                                data-bs-toggle="modal"
+                                data-bs-target="#payModal{{ $course->id }}"
+                                style="border-radius:10px;font-size:12px">
+                            <i class="bi bi-upload me-1"></i>Bayar
+                        </button>
+                        @elseif($payment->status === 'pending')
+                        <span class="badge bg-warning" style="font-size:11px">
+                            <i class="bi bi-hourglass-split me-1"></i>Menunggu
+                        </span>
+                        @else
+                        <span class="badge bg-success" style="font-size:11px">
+                            <i class="bi bi-check-circle me-1"></i>Lunas
+                        </span>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+
+        @php $totalDraft = $draftCourses->sum(function($c) use ($fees) { return $fees[$c->id] ?? 0; }); @endphp
+        <div class="mt-3 pt-3 d-flex align-items-center justify-content-between" style="border-top:1px solid rgba(200,77,223,.2)">
+            <span class="fw-bold" style="color:var(--primary)">Total: Rp {{ number_format($totalDraft, 0, ',', '.') }}</span>
+            <a href="{{ route('siswa.courses.fees') }}" class="btn btn-outline-primary btn-sm" style="border-radius:10px">
+                <i class="bi bi-plus-lg me-1"></i>Tambah Mata Pelajaran
+            </a>
+        </div>
+
+        {{-- PAYMENT MODALS FOR DRAFT COURSES --}}
+        @foreach($draftCourses as $course)
+        @php $fee = $fees[$course->id] ?? 0; @endphp
+        <div class="modal fade" id="payModal{{ $course->id }}" tabindex="-1" aria-labelledby="payLabel{{ $course->id }}">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="border-radius:20px;border:none;overflow:hidden">
+                    <div class="modal-header border-0 p-4"
+                         style="background:linear-gradient(135deg,#260632,#68117e);color:white">
+                        <div class="d-flex align-items-center gap-3">
+                            <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center">
+                                <i class="bi bi-upload"></i>
+                            </div>
+                            <div>
+                                <h6 class="modal-title fw-bold mb-0" id="payLabel{{ $course->id }}">Upload Bukti Pembayaran</h6>
+                                <div style="font-size:12px;opacity:.75">{{ $course->nama }}</div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="{{ route('siswa.billing.pay', $course->id) }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="modal-body p-4">
+                            <div class="p-3 rounded-3 mb-4"
+                                 style="background:var(--soft-primary-bg);border:1px solid var(--soft-primary-border)">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span style="font-size:13px;color:var(--soft-primary-text);font-weight:600">
+                                        <i class="bi bi-tag me-1"></i>Total Pembayaran
+                                    </span>
+                                    <span style="font-size:16px;font-weight:800;color:var(--primary)">
+                                        @if($fee > 0) Rp {{ number_format($fee, 0, ',', '.') }}
+                                        @else <span class="text-success">Gratis</span>
+                                        @endif
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" style="font-size:13px">
+                                    Catatan Transfer <span class="text-muted">(opsional)</span>
+                                </label>
+                                <input type="text" name="catatan" class="form-control" placeholder="Nama pengirim / bank / no. ref"
+                                       style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" style="font-size:13px">
+                                    Bukti Pembayaran <span class="text-danger">*</span>
+                                </label>
+                                <input type="file" name="proof" class="form-control" required
+                                       accept=".jpg,.jpeg,.png,.pdf"
+                                       style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
+                                <div class="form-text">Format: JPG, PNG, atau PDF. Maks 5MB.</div>
+                            </div>
+
+                            <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
+                                <div style="font-size:12px;color:var(--text-muted);line-height:1.6">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Bukti pembayaran akan diverifikasi oleh admin dalam 1×24 jam.
+                                    Pastikan foto/scan jelas dan terbaca.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 p-4 pt-0 gap-2">
+                            <button type="button" class="btn btn-outline-secondary"
+                                    data-bs-dismiss="modal" style="border-radius:10px">
+                                <i class="bi bi-x me-1"></i>Batal
+                            </button>
+                            <button type="submit" class="btn btn-primary px-4" style="border-radius:10px">
+                                <i class="bi bi-upload me-2"></i>Kirim Bukti
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+    @endif
+
     <div class="d-flex align-items-center justify-content-between mb-4">
         <div>
             <h6 class="fw-bold mb-1" style="color:var(--text-primary)">
@@ -126,12 +276,21 @@
         <p class="text-muted mb-0" style="font-size:13px">Anda belum terdaftar di mata pelajaran apapun.</p>
     </div>
     @else
+    @php
+        $enrolledCourses = $courses->filter(function($c) use ($draftCourses) {
+            return !$draftCourses || !$draftCourses->contains('id', $c->id);
+        });
+    @endphp
+    @if($enrolledCourses->isEmpty())
+    <div class="text-center py-4">
+        <p class="text-muted mb-0" style="font-size:13px">Tidak ada tagihan lain selain yang ada di keranjang.</p>
+    </div>
+    @else
     <div class="row g-3">
-        @foreach($courses as $course)
+        @foreach($enrolledCourses as $course)
         @php
             $payment  = $payments[$course->id] ?? null;
             $fee      = $fees[$course->id] ?? 0;
-            $isSelected = $selectedCourse && $selectedCourse->id === $course->id;
             $statusMap = [
                 'verified' => ['bg'=>'var(--soft-success-bg)','color'=>'var(--soft-success-text)','icon'=>'bi-check-circle-fill','label'=>'Lunas'],
                 'pending'  => ['bg'=>'var(--soft-warning-bg)','color'=>'var(--soft-warning-text)','icon'=>'bi-hourglass-split','label'=>'Menunggu Verifikasi'],
@@ -141,7 +300,7 @@
         @endphp
         <div class="col-md-6">
             <div class="p-4 rounded-3 h-100" id="billing-card-{{ $course->id }}"
-                 style="background:var(--input-bg);border:1.5px solid {{ $isSelected ? '#c84ddf' : 'var(--card-border)' }};{{ $isSelected ? 'box-shadow:0 0 0 3px rgba(200,77,223,.15)' : '' }}">
+                 style="background:var(--input-bg);border:1.5px solid var(--card-border)">
                 <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
                     <div class="d-flex align-items-center gap-3">
                         <div style="width:44px;height:44px;border-radius:12px;background:rgba(200,77,223,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
@@ -290,18 +449,8 @@
         @endforeach
     </div>
     @endif
+    @endif
 
 </div>
-
-@if($selectedCourse)
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const el = document.getElementById('billing-card-{{ $selectedCourse->id }}');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-});
-</script>
-@endpush
-@endif
 
 @endsection

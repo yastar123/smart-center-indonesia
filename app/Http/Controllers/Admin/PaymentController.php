@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Student;
 use App\Models\Branch;
+use App\Models\StudentCoursePayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -27,14 +28,26 @@ class PaymentController extends Controller
             ->latest()
             ->paginate(10)->withQueryString();
 
+        // Course payments
+        $coursePayments = StudentCoursePayment::with(['student', 'course', 'verifier'])
+            ->when($request->course_status, fn ($q) => $q->where('status', $request->course_status))
+            ->when($request->search, function ($q) use ($request) {
+                $q->whereHas('student', fn ($sq) => $sq->where('name', 'like', "%{$request->search}%"));
+            })
+            ->orderByDesc('created_at')
+            ->paginate(15)
+            ->withQueryString();
+
         $stats = [
             'total_tagihan' => Invoice::sum('total'),
             'lunas'         => Invoice::where('status', 'lunas')->count(),
             'belum_bayar'   => Invoice::where('status', 'belum_bayar')->count(),
             'pendapatan'    => Payment::where('status', 'verified')->sum('jumlah'),
+            'course_pending' => StudentCoursePayment::where('status', 'pending')->count(),
+            'course_verified' => StudentCoursePayment::where('status', 'verified')->count(),
         ];
 
-        return view('admin.payments.index', compact('invoices', 'students', 'branches', 'stats'));
+        return view('admin.payments.index', compact('invoices', 'students', 'branches', 'stats', 'coursePayments'));
     }
 
     public function store(Request $request)
@@ -122,5 +135,80 @@ class PaymentController extends Controller
         }
 
         return response()->json(['success' => true, 'message' => 'Pembayaran berhasil dicatat']);
+    }
+
+    // Course payment verification methods
+    public function verifyCoursePayment(StudentCoursePayment $payment)
+    {
+        $payment->update([
+            'status'      => 'verified',
+            'verified_by' => auth()->id(),
+            'rejected_reason' => null,
+        ]);
+
+        // Enroll student in the class for this course
+        $student = $payment->student;
+        $course = $payment->course;
+
+        if ($student && $course) {
+            // Find an active class for this course that matches the student's branch
+            $class = \App\Models\SchoolClass::where('mata_pelajaran_id', $course->id)
+                ->where('status', 'aktif')
+                ->where(function ($query) use ($student) {
+                    $query->whereNull('cabang_id')
+                          ->orWhere('cabang_id', $student->branch_id);
+                })
+                ->first();
+
+            if ($class) {
+                // Check if student is already enrolled in this class
+                $alreadyEnrolled = $class->siswa()->where('student_id', $student->id)->exists();
+                
+                if (!$alreadyEnrolled) {
+                    // Enroll student in the class
+                    $class->siswa()->attach($student->id);
+                    \Log::info("Student {$student->id} enrolled in class {$class->id} for course {$course->id}");
+                } else {
+                    \Log::info("Student {$student->id} already enrolled in class {$class->id}");
+                }
+            } else {
+                \Log::warning("No active class found for course {$course->id} for student {$student->id}");
+                // Create a new class if none exists
+                $newClass = \App\Models\SchoolClass::create([
+                    'mata_pelajaran_id' => $course->id,
+                    'cabang_id' => $student->branch_id,
+                    'nama_kelas' => $course->nama . ' - ' . now()->format('Y'),
+                    'status' => 'aktif',
+                    'kapasitas' => 50,
+                ]);
+                $newClass->siswa()->attach($student->id);
+                \Log::info("Created new class {$newClass->id} and enrolled student {$student->id}");
+            }
+        }
+
+        if (request()->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Pembayaran mata pelajaran berhasil diverifikasi. Siswa telah ditambahkan ke kelas.']);
+        }
+
+        return back()->with('success', 'Pembayaran mata pelajaran berhasil diverifikasi. Siswa telah ditambahkan ke kelas.');
+    }
+
+    public function rejectCoursePayment(Request $request, StudentCoursePayment $payment)
+    {
+        $data = $request->validate([
+            'rejected_reason' => 'required|string|max:500',
+        ]);
+
+        $payment->update([
+            'status'          => 'rejected',
+            'rejected_reason' => $data['rejected_reason'],
+            'verified_by'     => auth()->id(),
+        ]);
+
+        if (request()->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Pembayaran mata pelajaran ditolak. Siswa dapat upload ulang.']);
+        }
+
+        return back()->with('success', 'Pembayaran mata pelajaran ditolak. Siswa dapat upload ulang.');
     }
 }

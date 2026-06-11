@@ -6,10 +6,24 @@ use App\Http\Controllers\Controller;
 use App\Models\Branch;
 use App\Models\Student;
 use App\Models\User;
+use App\Models\Teacher;
+use App\Models\Module;
+use App\Models\Package;
+use App\Models\Course;
+use App\Models\CourseFee;
+use App\Models\SchoolClass;
+use App\Models\Schedule;
+use App\Models\Certificate;
+use App\Models\Payment;
+use App\Models\Salary;
+use App\Models\Announcement;
+use App\Models\ChatMessage;
+use App\Models\Tryout;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Permission;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Support\Facades\Response;
 use PDF;
@@ -20,11 +34,76 @@ class BranchController extends Controller
     {
         $branches = Branch::withCount('students')->latest()->get();
 
+        // Build a simple list of pages (top-level permission keys) to show in the access form
+        try {
+            $pages = Permission::all()->pluck('name')
+                ->map(function ($n) { return explode('.', $n)[0]; })
+                ->unique()
+                ->values()
+                ->sort()
+                ->toArray();
+        } catch (\Throwable $e) {
+            $pages = [];
+        }
+
+        // Build grouped menu structure matching sidebar (label, url, count)
+        try {
+            $counts = [];
+            $counts['students'] = Student::count();
+            $counts['teachers'] = class_exists(Teacher::class) ? Teacher::count() : 0;
+            $counts['modules'] = class_exists(Module::class) ? Module::count() : 0;
+            $counts['packages'] = class_exists(Package::class) ? Package::count() : 0;
+            $counts['courses'] = class_exists(Course::class) ? Course::count() : 0;
+            $counts['course_fees'] = class_exists(CourseFee::class) ? CourseFee::count() : 0;
+            $counts['classes'] = class_exists(SchoolClass::class) ? SchoolClass::count() : 0;
+            $counts['schedules'] = class_exists(Schedule::class) ? Schedule::count() : 0;
+            $counts['certificates'] = class_exists(Certificate::class) ? Certificate::count() : 0;
+            $counts['payments'] = class_exists(Payment::class) ? Payment::count() : 0;
+            $counts['salaries'] = class_exists(Salary::class) ? Salary::count() : 0;
+            $counts['announcements'] = class_exists(Announcement::class) ? Announcement::count() : 0;
+            $counts['messages'] = class_exists(ChatMessage::class) ? ChatMessage::count() : 0;
+            $counts['tryouts'] = class_exists(Tryout::class) ? Tryout::count() : 0;
+        } catch (\Throwable $e) {
+            $counts = [];
+        }
+
+        $menuStructure = [
+            ['section' => 'AKADEMIK', 'items' => [
+                ['key' => 'student', 'label' => 'Siswa', 'url' => url('/admin/students'), 'count' => $counts['students'] ?? 0],
+                ['key' => 'teacher', 'label' => 'Guru', 'url' => url('/admin/teachers'), 'count' => $counts['teachers'] ?? 0],
+                ['key' => 'module', 'label' => 'Modul Belajar', 'url' => url('/admin/modules'), 'count' => $counts['modules'] ?? 0],
+                ['key' => 'package', 'label' => 'Paket Belajar', 'url' => url('/admin/packages'), 'count' => $counts['packages'] ?? 0],
+                ['key' => 'course', 'label' => 'Mata Pelajaran', 'url' => url('/admin/courses'), 'count' => $counts['courses'] ?? 0],
+                ['key' => 'course_fee', 'label' => 'Biaya Mapel', 'url' => url('/admin/courses/fees'), 'count' => $counts['course_fees'] ?? 0],
+                ['key' => 'class', 'label' => 'Kelas', 'url' => url('/admin/classes'), 'count' => $counts['classes'] ?? 0],
+                ['key' => 'schedule', 'label' => 'Jadwal', 'url' => url('/admin/schedules'), 'count' => $counts['schedules'] ?? 0],
+                ['key' => 'certificate', 'label' => 'Sertifikat', 'url' => url('/admin/certificates'), 'count' => $counts['certificates'] ?? 0],
+            ]],
+            ['section' => 'KEUANGAN', 'items' => [
+                ['key' => 'payment', 'label' => 'Pembayaran', 'url' => url('/admin/payments'), 'count' => $counts['payments'] ?? 0],
+                ['key' => 'salary', 'label' => 'Gaji Guru', 'url' => url('/admin/salaries'), 'count' => $counts['salaries'] ?? 0],
+                ['key' => 'report', 'label' => 'Laporan Keuangan', 'url' => url('/admin/reports'), 'count' => 0],
+            ]],
+            ['section' => 'LANDING PAGE', 'items' => [
+                ['key' => 'landing', 'label' => 'Kelola Landing Page', 'url' => url('/admin/landing'), 'count' => 0],
+            ]],
+            ['section' => 'KOMUNIKASI', 'items' => [
+                ['key' => 'announcement', 'label' => 'Pengumuman', 'url' => url('/admin/announcements'), 'count' => $counts['announcements'] ?? 0],
+                ['key' => 'message', 'label' => 'Pesan Aplikasi', 'url' => url('/admin/messages'), 'count' => $counts['messages'] ?? 0],
+                ['key' => 'videocall', 'label' => 'Video Call', 'url' => url('/admin/videocall'), 'count' => 0],
+            ]],
+            ['section' => 'TRYOUT CBT', 'items' => [
+                ['key' => 'tryout', 'label' => 'Tryout UTBK/PTN', 'url' => url('/admin/tryouts'), 'count' => $counts['tryouts'] ?? 0],
+            ]],
+        ];
+
         return view('owner.branches.index', [
             'branches' => $branches,
             'total' => Branch::count(),
             'active' => Branch::where('status', 'active')->count(),
             'students' => Student::count(),
+            'pages' => $pages,
+            'menuStructure' => $menuStructure,
         ]);
     }
 
@@ -51,6 +130,22 @@ class BranchController extends Controller
             'admin_username' => 'nullable|string',
         ]);
 
+        // Determine feature flags from either pages[] (new UI) or legacy can_* inputs
+        $pagesSelected = $request->input('pages');
+        if (is_array($pagesSelected) && count($pagesSelected)) {
+            $can_students = in_array('student', $pagesSelected);
+            $can_teachers = in_array('teacher', $pagesSelected) || in_array('employee', $pagesSelected);
+            $can_schedules = in_array('schedule', $pagesSelected);
+            $can_payments = in_array('payment', $pagesSelected);
+            $can_tryouts = in_array('tryout', $pagesSelected);
+        } else {
+            $can_students = $request->has('can_students');
+            $can_teachers = $request->has('can_teachers');
+            $can_schedules = $request->has('can_schedules');
+            $can_payments = $request->has('can_payments');
+            $can_tryouts = $request->has('can_tryouts');
+        }
+
         // create branch first (without admin_id)
         $branch = Branch::create([
             'name' => $request->name,
@@ -60,11 +155,12 @@ class BranchController extends Controller
             'phone' => $request->phone,
             'email' => $request->email,
             'status' => 'active',
-            'can_students' => $request->has('can_students'),
-            'can_teachers' => $request->has('can_teachers'),
-            'can_schedules' => $request->has('can_schedules'),
-            'can_payments' => $request->has('can_payments'),
-            'can_tryouts' => $request->has('can_tryouts'),
+            'can_students' => $can_students,
+            'can_teachers' => $can_teachers,
+            'can_schedules' => $can_schedules,
+            'can_payments' => $can_payments,
+            'can_tryouts' => $can_tryouts,
+            'allowed_pages' => is_array($pagesSelected) ? array_values($pagesSelected) : [],
             'created_by' => auth()->id(),
         ]);
 
@@ -85,6 +181,10 @@ class BranchController extends Controller
                 $user->assignRole('admin');
             }
 
+            // link user to branch and save relation
+            $user->branch_id = $branch->id;
+            $user->save();
+
             $branch->admin_id = $user->id;
             $branch->save();
         }
@@ -98,16 +198,92 @@ class BranchController extends Controller
             'name' => 'required',
             'city' => 'required',
             'status' => 'required',
+            'email' => 'nullable|email',
+            'password' => 'nullable|min:6',
+            'admin_name' => 'nullable|string',
+            'admin_username' => 'nullable|string',
         ]);
+
+        // Determine feature flags from either pages[] (new UI) or legacy can_* inputs
+        $pagesSelected = $request->input('pages');
+        if (is_array($pagesSelected) && count($pagesSelected)) {
+            $can_students = in_array('student', $pagesSelected);
+            $can_teachers = in_array('teacher', $pagesSelected) || in_array('employee', $pagesSelected);
+            $can_schedules = in_array('schedule', $pagesSelected);
+            $can_payments = in_array('payment', $pagesSelected);
+            $can_tryouts = in_array('tryout', $pagesSelected);
+            $allowed_pages = array_values($pagesSelected);
+        } else {
+            $can_students = $request->has('can_students');
+            $can_teachers = $request->has('can_teachers');
+            $can_schedules = $request->has('can_schedules');
+            $can_payments = $request->has('can_payments');
+            $can_tryouts = $request->has('can_tryouts');
+            $allowed_pages = $branch->allowed_pages ?? [];
+        }
 
         $branch->update([
             'name' => $request->name,
             'city' => $request->city,
-            'status' => $request->status,
+            'regency' => $request->regency ?? $branch->regency,
             'address' => $request->address ?? $branch->address,
             'phone' => $request->phone ?? $branch->phone,
+            'email' => $request->email ?? $branch->email,
+            'status' => $request->status,
+            'can_students' => $can_students,
+            'can_teachers' => $can_teachers,
+            'can_schedules' => $can_schedules,
+            'can_payments' => $can_payments,
+            'can_tryouts' => $can_tryouts,
+            'allowed_pages' => is_array($allowed_pages) ? $allowed_pages : [],
             'updated_by' => auth()->id(),
         ]);
+
+        // Handle admin account creation/update
+        $email = $request->input('email');
+        $password = $request->input('password');
+        $adminName = $request->input('admin_name');
+        $adminUsername = $request->input('admin_username');
+
+        $admin = $branch->admin;
+
+        if ($admin) {
+            $data = [];
+            if (! empty($adminName)) $data['name'] = $adminName;
+            if (! empty($adminUsername)) $data['username'] = $adminUsername;
+            if (! empty($email)) $data['email'] = $email;
+            if (! empty($password)) $data['password'] = Hash::make($password);
+            if (! empty($data)) {
+                $admin->update($data);
+            }
+            if (method_exists($admin, 'assignRole')) {
+                $admin->assignRole('admin');
+            }
+            $admin->branch_id = $branch->id;
+            $admin->save();
+            $branch->admin_id = $admin->id;
+            $branch->save();
+        } else {
+            // create admin if email+password provided
+            if (! empty($email) && ! empty($password)) {
+                $user = User::firstOrCreate(
+                    ['email' => $email],
+                    [
+                        'name' => $adminName ?? $email,
+                        'username' => $adminUsername ?? null,
+                        'password' => Hash::make($password),
+                        'is_active' => true,
+                    ]
+                );
+                if (method_exists($user, 'assignRole')) {
+                    $user->assignRole('admin');
+                }
+                $user->branch_id = $branch->id;
+                $user->save();
+                $branch->admin_id = $user->id;
+                $branch->save();
+            }
+        }
 
         return back()->with('success', 'Cabang berhasil diupdate');
     }

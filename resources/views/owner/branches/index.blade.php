@@ -201,7 +201,7 @@
                 @push('modals')
                 {{-- EDIT MODAL --}}
                 <div class="modal fade" id="editModal{{ $branch->id }}" tabindex="-1">
-                    <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
                         <div class="modal-content border-0 shadow">
                             <div class="modal-header border-0" style="background:linear-gradient(135deg,#f6af23,#e09000);color:white">
                                 <h6 class="modal-title fw-bold"><i class="bi bi-pencil me-2"></i>Edit Cabang — {{ $branch->name }}</h6>
@@ -211,21 +211,128 @@
                                 <form method="POST" action="{{ route('owner.branches.update', $branch) }}">
                                     @csrf
                                     @method('PUT')
-                                    <div class="mb-3">
-                                        <label class="form-label small fw-semibold">Nama Cabang</label>
-                                        <input type="text" class="form-control form-control-sm" name="name" value="{{ $branch->name }}" required>
+
+                                    <h6 class="fw-bold mb-3 text-muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.06em">
+                                        <i class="bi bi-building me-2 text-primary"></i>Info Cabang
+                                    </h6>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold">Nama Cabang <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control form-control-sm" name="name" placeholder="Contoh: Cabang Jakarta" value="{{ old('name', $branch->name) }}" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold">Kota</label>
+                                            <input type="text" class="form-control form-control-sm" name="city" placeholder="Jakarta" value="{{ old('city', $branch->city) }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold">Kabupaten / Kecamatan</label>
+                                            <input type="text" class="form-control form-control-sm" name="regency" placeholder="Kebayoran Baru" value="{{ old('regency', $branch->regency) }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold">Telepon</label>
+                                            <input type="text" class="form-control form-control-sm" name="phone" placeholder="021-xxxxxxxx" value="{{ old('phone', $branch->phone) }}">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-semibold">Alamat</label>
+                                            <input type="text" class="form-control form-control-sm" name="address" placeholder="Alamat lengkap cabang" value="{{ old('address', $branch->address) }}">
+                                        </div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label small fw-semibold">Kota</label>
-                                        <input type="text" class="form-control form-control-sm" name="city" value="{{ $branch->city }}">
+
+                                    <hr class="my-3" style="border-color:var(--card-border)">
+
+                                    <h6 class="fw-bold mb-3 text-muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.06em">
+                                        <i class="bi bi-person-badge me-2 text-success"></i>Akun Login Cabang
+                                    </h6>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold">Nama Admin</label>
+                                            <input type="text" class="form-control form-control-sm" name="admin_name" placeholder="Nama admin cabang" value="{{ old('admin_name', optional($branch->admin)->name ?? '') }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold">Username (opsional)</label>
+                                            <input type="text" class="form-control form-control-sm" name="admin_username" placeholder="admin.jakarta" value="{{ old('admin_username', optional($branch->admin)->username ?? '') }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold">Email</label>
+                                            <input type="email" class="form-control form-control-sm" name="email" placeholder="admin@cabang.com" value="{{ old('email', optional($branch->admin)->email ?? $branch->email ?? '') }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold">Password (kosongkan jika tidak diubah)</label>
+                                            <input type="password" class="form-control form-control-sm" name="password" placeholder="Kosongkan untuk tidak merubah" minlength="6">
+                                        </div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label small fw-semibold">Status</label>
-                                        <select name="status" class="form-select form-select-sm">
-                                            <option value="active" {{ $branch->status==='active'?'selected':'' }}>Aktif</option>
-                                            <option value="inactive" {{ $branch->status==='inactive'?'selected':'' }}>Nonaktif</option>
-                                        </select>
+
+                                    <hr class="my-3" style="border-color:var(--card-border)">
+
+                                    <h6 class="fw-bold mb-3 text-muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.06em">
+                                        <i class="bi bi-toggles me-2 text-warning"></i>Fitur Akses
+                                    </h6>
+                                    <div class="row g-2 mb-4">
+                                        @php
+                                            $branchAllowed = $branch->allowed_pages ?? [];
+                                            if (! is_array($branchAllowed) || empty($branchAllowed)) {
+                                                $branchAllowed = [];
+                                                if ($branch->can_students) $branchAllowed[] = 'student';
+                                                if ($branch->can_teachers) $branchAllowed[] = 'teacher';
+                                                if ($branch->can_schedules) $branchAllowed[] = 'schedule';
+                                                if ($branch->can_payments) $branchAllowed[] = 'payment';
+                                                if ($branch->can_tryouts) $branchAllowed[] = 'tryout';
+                                            }
+                                        @endphp
+
+                                        @if(!empty($menuStructure) && count($menuStructure))
+                                            @foreach($menuStructure as $section)
+                                                <div class="col-12 mb-1"><strong class="small text-muted">{{ $section['section'] }}</strong></div>
+                                                @foreach($section['items'] as $item)
+                                                    @php $checked = in_array($item['key'], (array)$branchAllowed); @endphp
+                                                    <div class="col-md-6">
+                                                        <div class="form-check p-3 rounded-3 d-flex align-items-center justify-content-between" style="background:var(--input-bg);border:1.5px solid var(--card-border);">
+                                                            <div class="d-flex align-items-center">
+                                                                <input class="form-check-input me-2" type="checkbox" name="pages[]" id="page-{{ $item['key'] }}-{{ $branch->id }}" value="{{ $item['key'] }}" {{ $checked ? 'checked' : '' }}>
+                                                                <label class="form-check-label fw-semibold small mb-0" for="page-{{ $item['key'] }}-{{ $branch->id }}">
+                                                                    <a href="{{ $item['url'] }}" target="_blank" class="text-decoration-none">{{ $item['label'] }}</a>
+                                                                </label>
+                                                            </div>
+                                                            <div>
+                                                                <span class="badge bg-secondary">{{ $item['count'] ?? '-' }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            @endforeach
+                                        @elseif(!empty($pages) && count($pages))
+                                            @foreach($pages as $page)
+                                                @php $checked = in_array($page, (array)$branchAllowed); @endphp
+                                                <div class="col-md-6">
+                                                    <div class="form-check p-3 rounded-3" style="background:var(--input-bg);border:1.5px solid var(--card-border);">
+                                                        <input class="form-check-input" type="checkbox" name="pages[]" id="page-{{ $page }}-{{ $branch->id }}" value="{{ $page }}" {{ $checked ? 'checked' : '' }}>
+                                                        <label class="form-check-label fw-semibold small" for="page-{{ $page }}-{{ $branch->id }}">
+                                                            {{ ucwords(str_replace(['-','_'], ' ', $page)) }}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            @foreach([
+                                                ['can_students','Manajemen Siswa','people','primary','student'],
+                                                ['can_teachers','Manajemen Guru','person-workspace','success','teacher'],
+                                                ['can_schedules','Jadwal & Kelas','calendar-week','info','schedule'],
+                                                ['can_payments','Keuangan','wallet2','warning','payment'],
+                                                ['can_tryouts','Tryout CBT','ui-checks-grid','purple','tryout'],
+                                            ] as [$name, $label, $icon, $color, $key])
+                                            @php $checked = in_array($key, (array)$branchAllowed); @endphp
+                                            <div class="col-md-6">
+                                                <div class="form-check form-switch p-3 rounded-3" style="background:var(--input-bg);border:1.5px solid var(--card-border);padding-left:3rem !important">
+                                                    <input class="form-check-input" type="checkbox" name="pages[]" id="{{ $name }}-{{ $branch->id }}" value="{{ $key }}" {{ $checked ? 'checked' : '' }}>
+                                                    <label class="form-check-label fw-semibold small" for="{{ $name }}-{{ $branch->id }}">
+                                                        <i class="bi bi-{{ $icon }} me-1 text-{{ $color==='purple'?'primary':$color }}"></i>{{ $label }}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            @endforeach
+                                        @endif
                                     </div>
+
                                     <button class="btn btn-warning w-100 fw-semibold">
                                         <i class="bi bi-check-lg me-2"></i>Simpan Perubahan
                                     </button>
@@ -346,22 +453,54 @@
                         <i class="bi bi-toggles me-2 text-warning"></i>Fitur Akses
                     </h6>
                     <div class="row g-2 mb-4">
-                        @foreach([
-                            ['can_students','Manajemen Siswa','people','primary'],
-                            ['can_teachers','Manajemen Guru','person-workspace','success'],
-                            ['can_schedules','Jadwal & Kelas','calendar-week','info'],
-                            ['can_payments','Keuangan','wallet2','warning'],
-                            ['can_tryouts','Tryout CBT','ui-checks-grid','purple'],
-                        ] as [$name, $label, $icon, $color])
-                        <div class="col-md-6">
-                            <div class="form-check form-switch p-3 rounded-3" style="background:var(--input-bg);border:1.5px solid var(--card-border);padding-left:3rem !important">
-                                <input class="form-check-input" type="checkbox" name="{{ $name }}" id="{{ $name }}" checked>
-                                <label class="form-check-label fw-semibold small" for="{{ $name }}">
-                                    <i class="bi bi-{{ $icon }} me-1 text-{{ $color==='purple'?'primary':$color }}"></i>{{ $label }}
-                                </label>
+                        @if(!empty($menuStructure) && count($menuStructure))
+                            @foreach($menuStructure as $section)
+                                <div class="col-12 mb-1"><strong class="small text-muted">{{ $section['section'] }}</strong></div>
+                                @foreach($section['items'] as $item)
+                                    <div class="col-md-6">
+                                        <div class="form-check p-3 rounded-3 d-flex align-items-center justify-content-between" style="background:var(--input-bg);border:1.5px solid var(--card-border);">
+                                            <div class="d-flex align-items-center">
+                                                <input class="form-check-input me-2" type="checkbox" name="pages[]" id="page-{{ $item['key'] }}" value="{{ $item['key'] }}" checked>
+                                                <label class="form-check-label fw-semibold small mb-0" for="page-{{ $item['key'] }}">
+                                                    <a href="{{ $item['url'] }}" target="_blank" class="text-decoration-none">{{ $item['label'] }}</a>
+                                                </label>
+                                            </div>
+                                            <div>
+                                                <span class="badge bg-secondary">{{ $item['count'] ?? '-' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endforeach
+                        @elseif(!empty($pages) && count($pages))
+                            @foreach($pages as $page)
+                                <div class="col-md-6">
+                                    <div class="form-check p-3 rounded-3" style="background:var(--input-bg);border:1.5px solid var(--card-border);">
+                                        <input class="form-check-input" type="checkbox" name="pages[]" id="page-{{ $page }}" value="{{ $page }}" checked>
+                                        <label class="form-check-label fw-semibold small" for="page-{{ $page }}">
+                                            {{ ucwords(str_replace(['-','_'], ' ', $page)) }}
+                                        </label>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            @foreach([
+                                ['can_students','Manajemen Siswa','people','primary'],
+                                ['can_teachers','Manajemen Guru','person-workspace','success'],
+                                ['can_schedules','Jadwal & Kelas','calendar-week','info'],
+                                ['can_payments','Keuangan','wallet2','warning'],
+                                ['can_tryouts','Tryout CBT','ui-checks-grid','purple'],
+                            ] as [$name, $label, $icon, $color])
+                            <div class="col-md-6">
+                                <div class="form-check form-switch p-3 rounded-3" style="background:var(--input-bg);border:1.5px solid var(--card-border);padding-left:3rem !important">
+                                    <input class="form-check-input" type="checkbox" name="{{ $name }}" id="{{ $name }}" checked>
+                                    <label class="form-check-label fw-semibold small" for="{{ $name }}">
+                                        <i class="bi bi-{{ $icon }} me-1 text-{{ $color==='purple'?'primary':$color }}"></i>{{ $label }}
+                                    </label>
+                                </div>
                             </div>
-                        </div>
-                        @endforeach
+                            @endforeach
+                        @endif
                     </div>
 
                     <button class="btn btn-primary w-100 py-2 fw-bold">
