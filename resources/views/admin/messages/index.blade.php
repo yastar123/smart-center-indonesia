@@ -138,24 +138,42 @@
 
 @push('styles')
 <style>
+.chat-layout {
+    height: calc(100vh - 260px);
+    min-height: 500px;
+}
 @media (max-width: 991.98px) {
     .chat-layout {
-        height: calc(100vh - 360px) !important;
-        min-height: 360px !important;
+        height: calc(100vh - 320px) !important;
+        min-height: 420px !important;
     }
 }
+@media (max-width: 575.98px) {
+    .chat-layout { height: calc(100vh - 280px) !important; min-height: 380px !important; }
+}
+#chatArea { min-height: 0; }
+#chatActive { min-height: 0; }
+#chatMessages { flex: 1; min-height: 0; }
 </style>
 @endpush
 
 @push('scripts')
 <script>
 const baseUrl = '{{ $messageBaseUrl ?? url('admin/messages') }}';
+const roomsUrl = '{{ $messageRoomsUrl ?? url('admin/messages/rooms') }}';
 const createRoomRoute = '{{ $messageCreateRoute ?? route('admin.messages.createRoom') }}';
-let activeRoom = null, pollInterval = null;
+let activeRoom = null, pollInterval = null, roomPollInterval = null;
+let roomsData = @json($rooms);
 
-function loadRooms() {
-    const rooms = @json($rooms);
-    renderRooms(rooms);
+function fetchRoomsFromServer() {
+    fetch(roomsUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(r => { if (!r.ok) return; return r.json(); })
+        .then(res => {
+            if (res && res.rooms) {
+                roomsData = res.rooms;
+                renderRooms(roomsData);
+            }
+        }).catch(() => {});
 }
 
 function renderRooms(rooms) {
@@ -164,17 +182,17 @@ function renderRooms(rooms) {
     const filtered = rooms.filter(r => r.nama_room.toLowerCase().includes(search));
     if (!filtered.length) { el.innerHTML = '<div class="text-center py-4 text-muted" style="font-size:13px">Tidak ada room ditemukan</div>'; return; }
     el.innerHTML = filtered.map(r => {
-        const lastMsg = r.pesan && r.pesan[0] ? r.pesan[0].pesan : 'Belum ada pesan';
+        const lastMsg = r.pesan && r.pesan[0] ? r.pesan[0].pesan : '';
         const isActive = activeRoom && activeRoom.id == r.id;
         return `<div onclick="openRoom(${r.id},'${r.nama_room.replace(/'/g,"\\'").replace(/"/g,"&quot;")}','${r.jenis_room}')"
-            class="p-3 rounded-3 mb-1 cursor-pointer" style="cursor:pointer;transition:background .15s;${isActive?'background:rgba(200,77,223,.12);border:1px solid rgba(200,77,223,.3);':'border:1px solid transparent'}">
+            class="p-3 rounded-3 mb-1" style="cursor:pointer;transition:background .15s;${isActive?'background:rgba(200,77,223,.12);border:1px solid rgba(200,77,223,.3);':'border:1px solid transparent'}">
             <div class="d-flex align-items-center gap-2">
                 <div style="width:36px;height:36px;border-radius:10px;background:${isActive?'linear-gradient(135deg,#c84ddf,#7c3aed)':'rgba(200,77,223,.1)'};display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;color:${isActive?'white':'#c84ddf'}">
                     <i class="bi ${r.jenis_room==='broadcast'?'bi-megaphone':r.jenis_room==='personal'?'bi-person':'bi-people'}"></i>
                 </div>
-                <div class="flex-grow-1 min-width-0">
+                <div style="flex:1;min-width:0">
                     <div class="fw-semibold" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.nama_room}</div>
-                    <div class="text-muted" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${lastMsg ? lastMsg.substring(0,35) : 'Belum ada pesan'}</div>
+                    <div class="text-muted" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${lastMsg ? lastMsg.substring(0,40) : 'Belum ada pesan'}</div>
                 </div>
             </div>
         </div>`;
@@ -188,14 +206,10 @@ function openRoom(id, name, type) {
     document.getElementById('activeRoomId').value = id;
     document.getElementById('chatEmpty').style.display = 'none';
     document.getElementById('chatActive').style.display = 'flex';
-    document.getElementById('chatActive').style.flexDirection = 'column';
     loadMessages(id);
     if (pollInterval) clearInterval(pollInterval);
-    pollInterval = setInterval(() => loadMessages(id), 5000);
-
-    // Re-render rooms to highlight active
-    const rooms = @json($rooms);
-    renderRooms(rooms);
+    pollInterval = setInterval(() => loadMessages(id), 4000);
+    renderRooms(roomsData);
 }
 
 function scrollToBottom() {
@@ -211,10 +225,10 @@ function loadMessages(roomId) {
             const myId = {{ auth()->id() }};
             const el = document.getElementById('chatMessages');
             if (!res.data || !res.data.length) {
-                el.innerHTML = '<div class="text-center text-muted d-flex flex-column align-items-center justify-content-center h-100"><i class="bi bi-chat-square-dots" style="font-size:2.5rem;opacity:.25;margin-bottom:10px"></i><div>Mulai percakapan pertama!</div></div>';
+                el.innerHTML = '<div class="text-center text-muted d-flex flex-column align-items-center justify-content-center" style="height:100%;padding:32px 0"><i class="bi bi-chat-square-dots" style="font-size:2.5rem;opacity:.25;margin-bottom:10px"></i><div style="font-size:13px">Mulai percakapan pertama!</div></div>';
                 return;
             }
-            const wasAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+            const wasAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
             el.innerHTML = res.data.map(m => {
                 const isMine = m.pengirim_id == myId;
                 const time = (m.created_at||'').toString().substring(11,16);
@@ -226,10 +240,9 @@ function loadMessages(roomId) {
                     </div>
                 </div>`;
             }).join('');
-            if (wasAtBottom || !pollInterval) { el.scrollTop = el.scrollHeight; }
+            if (wasAtBottom) { el.scrollTop = el.scrollHeight; }
             else {
-                const btn = document.getElementById('scrollBottomBtn');
-                btn.style.display = 'flex';
+                document.getElementById('scrollBottomBtn').style.display = 'flex';
             }
         })
         .catch(() => {});
@@ -241,16 +254,15 @@ document.getElementById('messageForm').addEventListener('submit', function(e) {
     const input  = document.getElementById('messageInput');
     if (!input.value.trim() || !roomId) return;
     const fd = new FormData(this);
+    input.value = '';
     fetch(`${baseUrl}/${roomId}/send`, { method: 'POST', body: fd, headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(d => { if (d.success) { input.value = ''; loadMessages(roomId); } else showToast(d.message || 'Gagal mengirim pesan.', 'error'); })
+        .then(d => { if (d.success) { loadMessages(roomId); } else { showToast(d.message || 'Gagal mengirim pesan.', 'error'); } })
         .catch(() => showToast('Gagal mengirim pesan. Coba lagi.', 'error'));
 });
 
-document.getElementById('roomSearch').addEventListener('input', () => {
-    const rooms = @json($rooms);
-    renderRooms(rooms);
-});
+document.getElementById('roomSearch').addEventListener('input', () => renderRooms(roomsData));
+
 @if($allowCreateRoom ?? auth()->user()->hasRole('admin'))
 function openRoomModal() {
     document.getElementById('roomForm').reset();
@@ -264,14 +276,18 @@ document.getElementById('roomForm').addEventListener('submit', function(e) {
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(d => {
             showToast(d.message, d.success ? 'success' : 'error');
-            if (d.success) { bootstrap.Modal.getInstance(document.getElementById('roomModal')).hide(); location.reload(); }
+            if (d.success) {
+                bootstrap.Modal.getInstance(document.getElementById('roomModal')).hide();
+                fetchRoomsFromServer();
+            }
         }).catch(() => showToast('Gagal membuat ruang. Coba lagi.', 'error'));
 });
 @endif
 
 document.addEventListener('DOMContentLoaded', () => {
-    const rooms = @json($rooms);
-    renderRooms(rooms);
+    renderRooms(roomsData);
+    // Auto-refresh room list every 8 seconds to pick up new rooms from other users
+    roomPollInterval = setInterval(fetchRoomsFromServer, 8000);
 });
 </script>
 @endpush

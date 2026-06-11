@@ -35,42 +35,6 @@
         <div class="stat-card" style="border-top:3px solid #10b981">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <div class="stat-title">Total Tagihan</div>
-                    <div class="stat-value text-success">Rp {{ number_format($stats['total_tagihan'],0,',','.') }}</div>
-                    <div class="stat-growth text-muted"><i class="bi bi-receipt me-1"></i>Semua invoice</div>
-                </div>
-                <div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-receipt-cutoff"></i></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-6 col-lg-3 fade-up" style="animation-delay:.05s">
-        <div class="stat-card" style="border-top:3px solid #c84ddf">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="stat-title">Sudah Lunas</div>
-                    <div class="stat-value text-primary">{{ $stats['lunas'] }} Invoice</div>
-                    <div class="stat-growth text-success"><i class="bi bi-check-circle me-1"></i>Terbayar</div>
-                </div>
-                <div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-check-circle-fill"></i></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-6 col-lg-3 fade-up" style="animation-delay:.10s">
-        <div class="stat-card" style="border-top:3px solid #f6af23">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="stat-title">Belum Bayar</div>
-                    <div class="stat-value text-warning">{{ $stats['belum_bayar'] }} Invoice</div>
-                    <div class="stat-growth text-warning"><i class="bi bi-exclamation-circle me-1"></i>Menunggak</div>
-                </div>
-                <div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-clock-fill"></i></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-6 col-lg-3 fade-up" style="animation-delay:.15s">
-        <div class="stat-card" style="border-top:3px solid #10b981">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
                     <div class="stat-title">Total Pendapatan</div>
                     <div class="stat-value text-success">Rp {{ number_format($stats['pendapatan'],0,',','.') }}</div>
                     <div class="stat-growth text-success"><i class="bi bi-graph-up me-1"></i>Terverifikasi</div>
@@ -79,11 +43,7 @@
             </div>
         </div>
     </div>
-</div>
-
-{{-- COURSE PAYMENT STATS --}}
-<div class="row g-3 mb-4">
-    <div class="col-6 col-lg-3 fade-up">
+    <div class="col-6 col-lg-3 fade-up" style="animation-delay:.05s">
         <div class="stat-card" style="border-top:3px solid #c84ddf">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
@@ -95,7 +55,7 @@
             </div>
         </div>
     </div>
-    <div class="col-6 col-lg-3 fade-up" style="animation-delay:.05s">
+    <div class="col-6 col-lg-3 fade-up" style="animation-delay:.10s">
         <div class="stat-card" style="border-top:3px solid #f6af23">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
@@ -107,7 +67,7 @@
             </div>
         </div>
     </div>
-    <div class="col-6 col-lg-3 fade-up" style="animation-delay:.10s">
+    <div class="col-6 col-lg-3 fade-up" style="animation-delay:.15s">
         <div class="stat-card" style="border-top:3px solid #10b981">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
@@ -116,24 +76,6 @@
                     <div class="stat-growth text-success"><i class="bi bi-check-circle me-1"></i>Approved</div>
                 </div>
                 <div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-check-circle-fill"></i></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-6 col-lg-3 fade-up" style="animation-delay:.15s">
-        <div class="stat-card" style="border-top:3px solid #68117e">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="stat-title">Rate Verifikasi</div>
-                    <div class="stat-value" style="color:#68117e">
-                        @php
-                            $total = $stats['course_pending'] + $stats['course_verified'];
-                            $rate = $total > 0 ? round(($stats['course_verified'] / $total) * 100) : 0;
-                        @endphp
-                        {{ $rate }}%
-                    </div>
-                    <div class="stat-growth" style="color:#68117e"><i class="bi bi-percent me-1"></i>Success</div>
-                </div>
-                <div class="stat-icon" style="background:linear-gradient(135deg,#68117e,#c84ddf);color:white"><i class="bi bi-graph-up-arrow"></i></div>
             </div>
         </div>
     </div>

@@ -18,12 +18,23 @@ class SiswaController extends Controller
     {
         $student = Student::where('user_id', auth()->id())->first();
 
-        $certificates = Certificate::with('cabang')
-            ->when($student, fn($q) => $q->where('siswa_id', $student->id))
-            ->latest()
-            ->get();
+        // Enrolled classes/courses for this student
+        $enrolledClasses = $student
+            ? \App\Models\SchoolClass::with(['mataPelajaran', 'guru', 'cabang'])
+                ->whereHas('siswa', fn($q) => $q->where('student_id', $student->id))
+                ->get()
+            : collect();
 
-        return view('siswa.certificates', compact('certificates', 'student'));
+        // Admin-issued certificates for this student (not student-uploaded)
+        $certificates = $student
+            ? Certificate::with('cabang')
+                ->where('siswa_id', $student->id)
+                ->where('nomor_sertifikat', 'not like', 'UPLOAD-%')
+                ->latest()
+                ->get()
+            : collect();
+
+        return view('siswa.certificates', compact('certificates', 'student', 'enrolledClasses'));
     }
 
     public function downloadCertificate(Certificate $certificate)

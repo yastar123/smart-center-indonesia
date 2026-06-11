@@ -28,9 +28,10 @@ class MessageController extends Controller
             }
         }
 
-        $messageBaseUrl = url('siswa/messages');
+        $messageBaseUrl    = url('siswa/messages');
+        $messageRoomsUrl   = url('siswa/messages/rooms');
         $messageCreateRoute = route('siswa.messages.createRoom');
         $allowCreateRoom = true;
-        return view('admin.messages.index', compact('rooms', 'users', 'messageBaseUrl', 'messageCreateRoute', 'allowCreateRoom'));
+        return view('admin.messages.index', compact('rooms', 'users', 'messageBaseUrl', 'messageRoomsUrl', 'messageCreateRoute', 'allowCreateRoom'));
     }
 }

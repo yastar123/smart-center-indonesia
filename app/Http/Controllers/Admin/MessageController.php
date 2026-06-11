@@ -84,13 +84,27 @@ class MessageController extends Controller
             'cabang_id'  => 'nullable|exists:branches,id',
         ]);
 
-        $peserta = $data['peserta_id'];
-        if (!in_array(auth()->id(), $peserta)) {
-            $peserta[] = auth()->id();
+        // Cast to int to ensure consistent JSON storage
+        $peserta = array_map('intval', $data['peserta_id']);
+        if (!in_array((int) auth()->id(), $peserta)) {
+            $peserta[] = (int) auth()->id();
         }
         $data['peserta_id'] = $peserta;
 
         $room = ChatRoom::create($data);
         return response()->json(['success' => true, 'message' => 'Room berhasil dibuat!', 'data' => $room]);
+    }
+
+    public function getRooms()
+    {
+        $rooms = ChatRoom::with(['pesan' => fn($q) => $q->latest()->limit(1)])
+            ->where(function ($q) {
+                $q->whereJsonContains('peserta_id', (int) auth()->id())
+                  ->orWhere('jenis_room', 'broadcast');
+            })
+            ->orderByDesc('waktu_pesan_terakhir')
+            ->get();
+
+        return response()->json(['rooms' => $rooms]);
     }
 }

@@ -17,7 +17,6 @@ use App\Http\Controllers\Admin\TryoutController;
 use App\Http\Controllers\Admin\MessageController;
 use App\Http\Controllers\Owner\BranchController;
 use App\Http\Controllers\Guru\AttendanceController;
-use App\Http\Controllers\Guru\GradeController;
 use App\Http\Controllers\Siswa\SiswaController;
 
 Route::get('/', function () {
@@ -168,6 +167,7 @@ Route::middleware(['auth', 'check.branch.access'])
 
         // MESSAGES (Pesan Aplikasi)
         Route::get('/messages',                    [MessageController::class, 'index'])       ->name('messages.index');
+        Route::get('/messages/rooms',              [MessageController::class, 'getRooms'])    ->name('messages.rooms');
         Route::get('/messages/{room}/messages',    [MessageController::class, 'getMessages']) ->name('messages.get');
         Route::post('/messages/{room}/send',       [MessageController::class, 'sendMessage']) ->name('messages.send');
         Route::post('/messages/room',              [MessageController::class, 'createRoom'])  ->name('messages.createRoom');
@@ -262,6 +262,7 @@ Route::middleware(['auth'])
 
         // MESSAGES (Guru)
         Route::get('/messages', [\App\Http\Controllers\Guru\MessageController::class, 'index'])->name('messages.index');
+        Route::get('/messages/rooms',              [\App\Http\Controllers\Admin\MessageController::class, 'getRooms'])    ->name('messages.rooms');
         Route::get('/messages/{room}/messages',    [\App\Http\Controllers\Admin\MessageController::class, 'getMessages']) ->name('messages.get');
         Route::post('/messages/{room}/send',       [\App\Http\Controllers\Admin\MessageController::class, 'sendMessage']) ->name('messages.send');
         Route::post('/messages/room',              [\App\Http\Controllers\Admin\MessageController::class, 'createRoom'])  ->name('messages.createRoom');
@@ -299,14 +300,6 @@ Route::middleware(['auth'])
         Route::post('/schedules/{schedule}/confirm',     [\App\Http\Controllers\Guru\ScheduleAgreementController::class, 'confirm'])->name('schedules.confirm');
         Route::get('/schedules/{schedule}/info',         [\App\Http\Controllers\Guru\ScheduleAgreementController::class, 'scheduleInfo'])->name('schedules.info');
 
-        // Nilai
-        Route::get('/grades',               [GradeController::class, 'index'])      ->name('grades');
-        Route::post('/grades',              [GradeController::class, 'store'])      ->name('grades.store');
-        Route::post('/grades/batch',        [GradeController::class, 'storeBatch']) ->name('grades.storeBatch');
-        Route::get('/grades/rekap',         [GradeController::class, 'rekap'])      ->name('grades.rekap');
-        Route::get('/grades/{grade}',       [GradeController::class, 'show'])       ->name('grades.show');
-        Route::put('/grades/{grade}',       [GradeController::class, 'update'])     ->name('grades.update');
-        Route::delete('/grades/{grade}',    [GradeController::class, 'destroy'])    ->name('grades.destroy');
 
         // Schedule Agreements (Proposals)
         Route::get('/schedule-agreements', [\App\Http\Controllers\Guru\ScheduleProposalController::class, 'index'])->name('schedule-agreements.index');
@@ -329,6 +322,7 @@ Route::middleware(['auth'])
 
         // MESSAGES (Siswa)
         Route::get('/messages', [\App\Http\Controllers\Siswa\MessageController::class, 'index'])->name('messages.index');
+        Route::get('/messages/rooms',              [\App\Http\Controllers\Admin\MessageController::class, 'getRooms'])    ->name('messages.rooms');
         Route::get('/messages/{room}/messages',    [\App\Http\Controllers\Admin\MessageController::class, 'getMessages']) ->name('messages.get');
         Route::post('/messages/{room}/send',       [\App\Http\Controllers\Admin\MessageController::class, 'sendMessage']) ->name('messages.send');
         Route::post('/messages/room',              [\App\Http\Controllers\Admin\MessageController::class, 'createRoom'])  ->name('messages.createRoom');
