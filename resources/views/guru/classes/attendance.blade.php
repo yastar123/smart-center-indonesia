@@ -36,6 +36,19 @@
     </div>
 </div>
 
+{{-- ALUR INFO --}}
+<div class="dashboard-card mb-4 fade-up" style="border-left:4px solid #c84ddf">
+    <div class="d-flex align-items-center gap-2 flex-wrap" style="font-size:12px;color:var(--text-muted)">
+        <i class="bi bi-info-circle text-primary me-1"></i>
+        <span class="fw-semibold text-primary me-2">Alur Absensi:</span>
+        <span class="badge" style="background:var(--soft-warning-bg);color:var(--soft-warning-text);padding:4px 9px;border-radius:7px">① Jadwal Disetujui Semua Pihak</span>
+        <i class="bi bi-arrow-right" style="font-size:11px"></i>
+        <span class="badge" style="background:var(--soft-success-bg);color:var(--soft-success-text);padding:4px 9px;border-radius:7px">② Guru Isi &amp; Simpan Absensi</span>
+        <i class="bi bi-arrow-right" style="font-size:11px"></i>
+        <span class="badge" style="background:rgba(239,68,68,.1);color:#ef4444;padding:4px 9px;border-radius:7px"><i class="bi bi-lock-fill me-1"></i>③ Absensi Terkunci Permanen</span>
+    </div>
+</div>
+
 {{-- SCHEDULE PICKER --}}
 <div class="dashboard-card mb-4 fade-up">
     <div class="d-flex align-items-center gap-3 mb-3">
@@ -49,11 +62,12 @@
     </div>
     <select id="jadwalSelect" class="form-select" style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
         <option value="">— Pilih pertemuan —</option>
-        @foreach($class->jadwal as $j)
+        @foreach($class->jadwal->sortBy('pertemuan_ke') as $j)
         @php
             $tgl = $j->tanggal instanceof \Carbon\Carbon ? $j->tanggal : \Carbon\Carbon::parse($j->tanggal);
         @endphp
         <option value="{{ $j->id }}">
+            @if($j->pertemuan_ke) Pertemuan ke-{{ $j->pertemuan_ke }} · @endif
             {{ $tgl->locale('id')->isoFormat('dddd, D MMM Y') }} ·
             {{ \Carbon\Carbon::parse($j->jam_mulai)->format('H:i') }} –
             {{ \Carbon\Carbon::parse($j->jam_selesai)->format('H:i') }}
@@ -70,12 +84,15 @@
             <i class="bi bi-calendar-x text-muted" style="font-size:2rem;opacity:.5"></i>
         </div>
         <h6 class="fw-semibold mb-2" style="color:var(--text-primary)">Belum Ada Jadwal</h6>
-        <p class="text-muted mb-0" style="font-size:13px">Jadwal untuk kelas ini belum dibuat oleh admin.</p>
+        <p class="text-muted mb-0" style="font-size:13px">Ajukan proposal jadwal melalui menu <strong>Persetujuan Jadwal</strong>.</p>
+        <a href="{{ route('guru.schedule-agreements.index') }}" class="btn btn-primary mt-3" style="border-radius:10px">
+            <i class="bi bi-calendar-plus me-1"></i>Ajukan Jadwal
+        </a>
     </div>
 </div>
 @else
 <div id="jadwalList" class="d-flex flex-column gap-3">
-    @foreach($class->jadwal as $j)
+    @foreach($class->jadwal->sortBy('pertemuan_ke') as $j)
     @php
         $tgl     = $j->tanggal instanceof \Carbon\Carbon ? $j->tanggal : \Carbon\Carbon::parse($j->tanggal);
         $isPast  = $tgl->isPast();
@@ -89,6 +106,9 @@
                 </div>
                 <div>
                     <div class="fw-semibold" style="font-size:14px;color:var(--text-primary)">
+                        @if($j->pertemuan_ke)
+                        <span style="background:var(--soft-primary-bg);color:var(--soft-primary-text);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;margin-right:6px">Pertemuan ke-{{ $j->pertemuan_ke }}</span>
+                        @endif
                         {{ $tgl->locale('id')->isoFormat('dddd, D MMMM Y') }}
                         @if($isToday)
                         <span class="badge ms-2" style="background:var(--soft-success-bg);color:var(--soft-success-text);font-size:10px;border-radius:6px;padding:2px 8px">Hari Ini</span>
@@ -96,12 +116,16 @@
                     </div>
                     <div class="text-muted" style="font-size:12px">
                         <i class="bi bi-clock me-1"></i>{{ \Carbon\Carbon::parse($j->jam_mulai)->format('H:i') }} – {{ \Carbon\Carbon::parse($j->jam_selesai)->format('H:i') }}
-                        @if($j->keterangan ?? null) · {{ $j->keterangan }} @endif
+                        @if($j->jenis) · <span class="text-capitalize">{{ $j->jenis }}</span> @endif
                     </div>
                 </div>
             </div>
             <div class="d-flex align-items-center gap-2">
-                @if($isToday)
+                @if($j->status === 'selesai')
+                <span class="badge" style="background:rgba(239,68,68,.1);color:#ef4444;font-size:11px;padding:4px 10px;border-radius:7px">
+                    <i class="bi bi-lock-fill me-1"></i>Absensi Terkunci
+                </span>
+                @elseif($isToday)
                 <span class="badge" style="background:var(--soft-success-bg);color:var(--soft-success-text);font-size:11px;padding:4px 10px;border-radius:7px">
                     <i class="bi bi-broadcast me-1"></i>Berlangsung
                 </span>
@@ -156,26 +180,66 @@ function loadAttendance(id, areaEl) {
             const students = res.students;
             const existing = res.existing || {};
             const attendanceLocked = res.attendance_locked;
+            const hasAttendance = res.has_attendance;
             const allAgreed = res.all_agreed;
 
-            if (!allAgreed) {
+            // Not agreed yet
+            if (!allAgreed && !hasAttendance) {
                 area.innerHTML = `<div class="mt-3 p-3 rounded-3" style="background:var(--soft-warning-bg);border:1px solid var(--soft-warning-border)">
-                    <i class="bi bi-exclamation-triangle me-1"></i>
-                    Absensi hanya dapat diisi setelah guru dan siswa sepakat pada jadwal pertemuan ini.
-                    <button type="button" class="btn btn-sm btn-warning ms-2" onclick="guruConfirmSchedule(${id}, area)">
-                        Konfirmasi Jadwal (Guru)
-                    </button>
+                    <i class="bi bi-exclamation-triangle-fill me-2" style="color:#f6af23"></i>
+                    <strong>Persetujuan belum lengkap.</strong>
+                    Absensi hanya dapat diisi setelah semua siswa dan guru menyetujui jadwal ini.
                 </div>`;
                 return;
             }
 
-            if (attendanceLocked) {
-                if (!Object.keys(existing).length) {
-                    area.innerHTML = `<div class="mt-3 p-3 rounded-3 text-muted" style="background:var(--input-bg)">
-                        <i class="bi bi-lock me-1"></i>Pertemuan sudah selesai. Absensi tidak dapat diubah.
+            // Permanently locked — has attendance already saved
+            if (hasAttendance) {
+                const statusMap = { hadir: {label:'Hadir',clr:'#10b981',bg:'var(--soft-success-bg)'}, izin: {label:'Izin',clr:'#0284c7',bg:'var(--soft-info-bg)'}, sakit: {label:'Sakit',clr:'#f6af23',bg:'var(--soft-warning-bg)'}, alpa: {label:'Alpa',clr:'#ef4444',bg:'var(--soft-danger-bg)'} };
+                let rows = students.map((s, i) => {
+                    const cur = existing[s.id] || '';
+                    const sm = statusMap[cur] || {label:'–',clr:'#999',bg:'var(--input-bg)'};
+                    const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(s.name)}&background=68117e&color=fff&size=40`;
+                    return `<tr>
+                        <td style="padding:10px 12px">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="text-muted" style="font-size:12px;min-width:22px">${i+1}</span>
+                                <img src="${s.photo ? '/storage/' + s.photo : avatar}" class="rounded-circle flex-shrink-0" width="32" height="32" style="object-fit:cover">
+                                <span class="fw-semibold" style="font-size:13px">${s.name}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span style="background:${sm.bg};color:${sm.clr};padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600">${sm.label}</span>
+                        </td>
+                    </tr>`;
+                }).join('');
+
+                area.innerHTML = `
+                    <div class="mt-3 p-3 rounded-3" style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2)">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <i class="bi bi-lock-fill" style="color:#ef4444;font-size:15px"></i>
+                            <span class="fw-semibold" style="font-size:13px;color:#ef4444">Absensi Terkunci Permanen</span>
+                            <span class="text-muted" style="font-size:12px">— Tidak dapat diubah</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0" style="font-size:13px">
+                                <thead><tr>
+                                    <th class="text-muted fw-semibold" style="font-size:11px">SISWA</th>
+                                    <th class="text-muted fw-semibold" style="font-size:11px">STATUS</th>
+                                </tr></thead>
+                                <tbody>${rows}</tbody>
+                            </table>
+                        </div>
                     </div>`;
-                    return;
-                }
+                return;
+            }
+
+            // Locked by time (past session end) but no attendance filled
+            if (attendanceLocked) {
+                area.innerHTML = `<div class="mt-3 p-3 rounded-3 text-muted" style="background:var(--input-bg);border:1px solid var(--card-border)">
+                    <i class="bi bi-lock me-1"></i>Pertemuan sudah selesai. Absensi tidak sempat diisi.
+                </div>`;
+                return;
             }
 
             if (!students.length) {
@@ -196,11 +260,10 @@ function loadAttendance(id, areaEl) {
             let rows = students.map((s, i) => {
                 const cur = existing[s.id] || '';
                 const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(s.name)}&background=68117e&color=fff&size=40`;
-                const disabled = attendanceLocked ? 'disabled' : '';
                 const radios = statusOpts.map(opt => `
                     <td class="text-center" style="min-width:64px">
-                        <label style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:${attendanceLocked?'default':'pointer'}">
-                            <input type="radio" name="status_${s.id}" value="${opt.val}" ${cur === opt.val ? 'checked' : ''} ${disabled}
+                        <label style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer">
+                            <input type="radio" name="status_${s.id}" value="${opt.val}" ${cur === opt.val ? 'checked' : ''}
                                    class="abs-radio" data-sid="${s.id}"
                                    style="width:16px;height:16px;accent-color:${opt.clr};cursor:pointer">
                             <span style="font-size:10.5px;color:${opt.clr};font-weight:600">${opt.label}</span>
@@ -220,6 +283,10 @@ function loadAttendance(id, areaEl) {
 
             area.innerHTML = `
                 <div class="mt-3 p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
+                    <div class="d-flex align-items-center gap-2 mb-3 p-2 rounded-2" style="background:rgba(200,77,223,.07)">
+                        <i class="bi bi-exclamation-circle-fill text-primary"></i>
+                        <span style="font-size:12px">Setelah absensi disimpan, <strong>data tidak dapat diubah</strong>. Pastikan data sudah benar.</span>
+                    </div>
                     <form class="absForm">
                         <input type="hidden" name="jadwal_id" value="${id}">
                         <div class="table-responsive">
@@ -238,11 +305,9 @@ function loadAttendance(id, areaEl) {
                         </div>
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <div id="absCount-${id}" class="text-muted" style="font-size:12px"></div>
-                            ${attendanceLocked
-                                ? '<span class="text-muted small"><i class="bi bi-lock me-1"></i>Absensi terkunci (pertemuan selesai)</span>'
-                                : `<button type="submit" class="btn btn-primary" style="border-radius:10px">
-                                    <i class="bi bi-save me-2"></i>Simpan Absensi
-                                   </button>`}
+                            <button type="submit" class="btn btn-primary" style="border-radius:10px">
+                                <i class="bi bi-save me-2"></i>Simpan &amp; Kunci Absensi
+                            </button>
                         </div>
                     </form>
                 </div>`;
@@ -260,15 +325,27 @@ function loadAttendance(id, areaEl) {
 
             area.querySelector('.absForm').addEventListener('submit', function(e) {
                 e.preventDefault();
-                if (attendanceLocked) return;
                 const abs = [];
                 students.forEach(s => {
                     const v = area.querySelector(`input[name="status_${s.id}"]:checked`);
                     if (v) abs.push({ siswa_id: s.id, status: v.value });
                 });
+
+                if (abs.length === 0) {
+                    showToast('Isi status absensi minimal 1 siswa.', 'warning');
+                    return;
+                }
+
+                if (abs.length < students.length) {
+                    const unfilled = students.filter(s => !abs.find(a => a.siswa_id === s.id)).map(s => s.name).join(', ');
+                    showToast(`${students.length - abs.length} siswa belum diisi: ${unfilled}`, 'warning');
+                    return;
+                }
+
                 const submitBtn = area.querySelector('button[type=submit]');
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan & Mengunci...';
+
                 fetch('{{ route("guru.attendance.store") }}', {
                     method: 'POST',
                     headers: {
@@ -279,42 +356,22 @@ function loadAttendance(id, areaEl) {
                     body: JSON.stringify({ jadwal_id: id, absensi: abs })
                 }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
                 .then(d => {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="bi bi-save me-2"></i>Simpan Absensi';
-                    if (d.success) showToast(d.message || 'Absensi berhasil disimpan', 'success');
-                    else showToast(d.message || 'Gagal menyimpan', 'error');
+                    if (d.success) {
+                        showToast(d.message || 'Absensi berhasil disimpan dan dikunci!', 'success');
+                        setTimeout(() => loadAttendance(id, area), 800);
+                    } else {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="bi bi-save me-2"></i>Simpan & Kunci Absensi';
+                        showToast(d.message || 'Gagal menyimpan', 'error');
+                    }
                 }).catch(() => {
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="bi bi-save me-2"></i>Simpan Absensi';
+                    submitBtn.innerHTML = '<i class="bi bi-save me-2"></i>Simpan & Kunci Absensi';
                     showToast('Terjadi kesalahan. Coba lagi.', 'error');
                 });
             });
         })
         .catch(() => { area.innerHTML = '<div class="mt-3 text-muted p-3">Gagal memuat data. Coba lagi.</div>'; });
-}
-
-function guruConfirmSchedule(scheduleId, areaEl) {
-    fetch('/guru/attendance/' + scheduleId + '/students')
-        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(res => {
-            const students = res.students || [];
-            if (!students.length) { showToast('Tidak ada siswa di jadwal ini.', 'warning'); return; }
-            let done = 0;
-            students.forEach(s => {
-                fetch('/guru/schedules/' + scheduleId + '/confirm', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({ student_id: s.id })
-                }).then(() => {
-                    done++;
-                    if (done === students.length) loadAttendance(scheduleId, areaEl);
-                });
-            });
-        });
 }
 
 function updateCount(id, students, existing) {

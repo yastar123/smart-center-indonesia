@@ -311,6 +311,7 @@ Route::middleware(['auth'])
         // Schedule Agreements (Proposals)
         Route::get('/schedule-agreements', [\App\Http\Controllers\Guru\ScheduleProposalController::class, 'index'])->name('schedule-agreements.index');
         Route::post('/schedule-agreements', [\App\Http\Controllers\Guru\ScheduleProposalController::class, 'store'])->name('schedule-agreements.store');
+        Route::get('/schedule-agreements/class/{class}/meetings', [\App\Http\Controllers\Guru\ScheduleProposalController::class, 'classMeetings'])->name('schedule-agreements.class-meetings');
         Route::post('/schedule-agreements/{proposal}/approve', [\App\Http\Controllers\Guru\ScheduleProposalController::class, 'approve'])->name('schedule-agreements.approve');
         Route::post('/schedule-agreements/{proposal}/reject', [\App\Http\Controllers\Guru\ScheduleProposalController::class, 'reject'])->name('schedule-agreements.reject');
     });
@@ -380,6 +381,7 @@ Route::middleware(['auth'])
         // Schedule Agreements (Proposals)
         Route::get('/schedule-agreements', [\App\Http\Controllers\Siswa\ScheduleProposalController::class, 'index'])->name('schedule-agreements.index');
         Route::post('/schedule-agreements', [\App\Http\Controllers\Siswa\ScheduleProposalController::class, 'store'])->name('schedule-agreements.store');
+        Route::get('/schedule-agreements/class/{class}/meetings', [\App\Http\Controllers\Siswa\ScheduleProposalController::class, 'classMeetings'])->name('schedule-agreements.class-meetings');
         Route::post('/schedule-agreements/{proposal}/approve', [\App\Http\Controllers\Siswa\ScheduleProposalController::class, 'approve'])->name('schedule-agreements.approve');
         Route::post('/schedule-agreements/{proposal}/reject', [\App\Http\Controllers\Siswa\ScheduleProposalController::class, 'reject'])->name('schedule-agreements.reject');
     });

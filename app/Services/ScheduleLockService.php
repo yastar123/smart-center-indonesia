@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Schedule;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ScheduleLockService
 {
@@ -31,10 +32,31 @@ class ScheduleLockService
         return now()->gte($this->sessionStart($schedule)->subHour());
     }
 
-    /** Absensi tidak bisa diubah setelah pertemuan selesai */
+    /**
+     * Absensi terkunci PERMANEN setelah disimpan pertama kali,
+     * atau setelah waktu pertemuan selesai.
+     */
     public function isAttendanceLocked(Schedule $schedule): bool
     {
-        return now()->gt($this->sessionEnd($schedule));
+        // Locked by time
+        if (now()->gt($this->sessionEnd($schedule))) {
+            return true;
+        }
+
+        // Permanently locked if any attendance record already exists
+        $hasAttendance = DB::table('absensi_siswas')
+            ->where('jadwal_id', $schedule->id)
+            ->exists();
+
+        return $hasAttendance;
+    }
+
+    /** True if this schedule's meeting slot already has saved attendance */
+    public function hasAttendance(Schedule $schedule): bool
+    {
+        return DB::table('absensi_siswas')
+            ->where('jadwal_id', $schedule->id)
+            ->exists();
     }
 
     public function canEditSchedule(Schedule $schedule): bool

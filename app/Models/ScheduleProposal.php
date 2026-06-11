@@ -8,6 +8,7 @@ class ScheduleProposal extends Model
 {
     protected $fillable = [
         'class_id',
+        'pertemuan_ke',
         'proposed_by_type',
         'proposed_by_id',
         'tanggal',
@@ -39,7 +40,6 @@ class ScheduleProposal extends Model
         return $this->belongsTo(Schedule::class);
     }
 
-    /** Get the proposer model (Teacher or Student) */
     public function proposer()
     {
         if ($this->proposed_by_type === 'guru') {
@@ -54,7 +54,6 @@ class ScheduleProposal extends Model
         return $p ? $p->name : '—';
     }
 
-    /** True if ALL approvals are 'approved' */
     public function allApproved(): bool
     {
         $approvals = $this->approvals;
@@ -62,7 +61,6 @@ class ScheduleProposal extends Model
         return $approvals->every(fn ($a) => $a->status === 'approved');
     }
 
-    /** True if ANY approval is 'rejected' */
     public function anyRejected(): bool
     {
         return $this->approvals->contains(fn ($a) => $a->status === 'rejected');

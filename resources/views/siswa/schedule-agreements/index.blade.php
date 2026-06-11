@@ -17,7 +17,7 @@
             <div>
                 <div style="font-size:11px;opacity:.6;margin-bottom:3px;text-transform:uppercase;letter-spacing:.08em">Portal Siswa</div>
                 <h4 class="fw-bold mb-1" style="color:white;letter-spacing:-.02em">Persetujuan Jadwal</h4>
-                <p class="mb-0" style="opacity:.75;font-size:13px">Kelola proposal jadwal dan persetujuan pertemuan</p>
+                <p class="mb-0" style="opacity:.75;font-size:13px">Ajukan jadwal pertemuan · Jadwal dibuat setelah semua pihak setuju</p>
             </div>
         </div>
         <div>
@@ -26,6 +26,25 @@
                 <i class="bi bi-plus-lg me-2"></i>Ajukan Jadwal Baru
             </button>
         </div>
+    </div>
+</div>
+
+{{-- ALUR INFO --}}
+<div class="dashboard-card mb-4 fade-up" style="border-left:4px solid #c84ddf">
+    <div class="d-flex align-items-center gap-2 mb-2">
+        <i class="bi bi-info-circle text-primary"></i>
+        <span class="fw-semibold" style="font-size:13px">Alur Persetujuan Jadwal</span>
+    </div>
+    <div class="d-flex align-items-center gap-2 flex-wrap" style="font-size:12px;color:var(--text-muted)">
+        <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);padding:5px 10px;border-radius:8px">① Ajukan Jadwal</span>
+        <i class="bi bi-arrow-right" style="font-size:11px"></i>
+        <span class="badge" style="background:var(--soft-warning-bg);color:var(--soft-warning-text);padding:5px 10px;border-radius:8px">② Semua Setuju</span>
+        <i class="bi bi-arrow-right" style="font-size:11px"></i>
+        <span class="badge" style="background:var(--soft-info-bg);color:var(--soft-info-text);padding:5px 10px;border-radius:8px">③ Jadwal Dibuat Otomatis</span>
+        <i class="bi bi-arrow-right" style="font-size:11px"></i>
+        <span class="badge" style="background:var(--soft-success-bg);color:var(--soft-success-text);padding:5px 10px;border-radius:8px">④ Guru Isi Absensi</span>
+        <i class="bi bi-arrow-right" style="font-size:11px"></i>
+        <span class="badge" style="background:rgba(239,68,68,.1);color:#ef4444;padding:5px 10px;border-radius:8px"><i class="bi bi-lock-fill me-1"></i>⑤ Absensi Terkunci</span>
     </div>
 </div>
 
@@ -85,6 +104,7 @@
             <thead class="thead-modern">
                 <tr>
                     <th class="ps-3">Kelas</th>
+                    <th>Pertemuan</th>
                     <th>Pengaju</th>
                     <th>Tanggal & Waktu</th>
                     <th>Status</th>
@@ -96,7 +116,7 @@
                 @foreach($proposals as $proposal)
                 @php
                     $statusMap = [
-                        'pending' => ['bg'=>'var(--soft-warning-bg)','color'=>'var(--soft-warning-text)','label'=>'Menunggu'],
+                        'pending'  => ['bg'=>'var(--soft-warning-bg)','color'=>'var(--soft-warning-text)','label'=>'Menunggu'],
                         'approved' => ['bg'=>'var(--soft-success-bg)','color'=>'var(--soft-success-text)','label'=>'Disetujui'],
                         'rejected' => ['bg'=>'var(--soft-danger-bg)','color'=>'var(--soft-danger-text)','label'=>'Ditolak'],
                     ];
@@ -107,6 +127,15 @@
                     <td class="ps-3">
                         <div class="fw-semibold" style="font-size:13px">{{ $proposal->kelas?->nama_kelas ?? '–' }}</div>
                         <div class="text-muted" style="font-size:11px">{{ $proposal->kelas?->mataPelajaran?->nama ?? '–' }}</div>
+                    </td>
+                    <td>
+                        @if($proposal->pertemuan_ke)
+                        <span style="background:var(--soft-primary-bg);color:var(--soft-primary-text);padding:3px 9px;border-radius:7px;font-size:11px;font-weight:600">
+                            Ke-{{ $proposal->pertemuan_ke }}
+                        </span>
+                        @else
+                        <span class="text-muted" style="font-size:12px">—</span>
+                        @endif
                     </td>
                     <td>
                         <div style="font-size:13px">{{ $proposal->proposerName() }}</div>
@@ -169,7 +198,7 @@
                     <div class="row g-3">
                         <div class="col-12">
                             <label class="form-label fw-semibold" style="font-size:12px">Kelas <span class="text-danger">*</span></label>
-                            <select id="class_id" name="class_id" class="form-select" style="border-radius:10px" required>
+                            <select id="class_id" name="class_id" class="form-select" style="border-radius:10px" required onchange="onClassChange(this.value)">
                                 <option value="">— Pilih Kelas —</option>
                                 @foreach($classes as $c)
                                 <option value="{{ $c->id }}"
@@ -180,6 +209,16 @@
                                 @endforeach
                             </select>
                         </div>
+
+                        {{-- Pertemuan ke- field --}}
+                        <div class="col-12" id="pertemuanField" style="display:none">
+                            <label class="form-label fw-semibold" style="font-size:12px">Pertemuan Ke- <span class="text-muted">(opsional)</span></label>
+                            <select id="pertemuan_ke" name="pertemuan_ke" class="form-select" style="border-radius:10px">
+                                <option value="">— Tidak ditentukan —</option>
+                            </select>
+                            <div id="pertemuanInfo" class="mt-1" style="font-size:11px;color:var(--text-muted)"></div>
+                        </div>
+
                         <div class="col-md-6">
                             <label class="form-label fw-semibold" style="font-size:12px">Tanggal <span class="text-danger">*</span></label>
                             <input type="date" id="tanggal" name="tanggal" class="form-control" style="border-radius:10px" required>
@@ -229,10 +268,64 @@ function toggleJenis() {
     document.getElementById('linkField').style.display = jenis === 'online' ? 'block' : 'none';
 }
 
+function onClassChange(classId) {
+    const pertemuanField = document.getElementById('pertemuanField');
+    const pertemuanSelect = document.getElementById('pertemuan_ke');
+    const pertemuanInfo = document.getElementById('pertemuanInfo');
+
+    if (!classId) {
+        pertemuanField.style.display = 'none';
+        pertemuanSelect.innerHTML = '<option value="">— Tidak ditentukan —</option>';
+        return;
+    }
+
+    pertemuanInfo.textContent = 'Memuat data pertemuan...';
+    pertemuanField.style.display = 'block';
+    pertemuanSelect.innerHTML = '<option value="">Memuat...</option>';
+    pertemuanSelect.disabled = true;
+
+    fetch(`/siswa/schedule-agreements/class/${classId}/meetings`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(res => {
+        pertemuanSelect.disabled = false;
+        if (!res.success || !res.meetings || !res.meetings.length) {
+            pertemuanField.style.display = 'none';
+            pertemuanInfo.textContent = '';
+            return;
+        }
+        const total = res.jumlah_pertemuan || 0;
+        let options = '<option value="">— Tidak ditentukan —</option>';
+        let available = 0, done = 0;
+        res.meetings.forEach(m => {
+            if (m.status === 'done') {
+                options += `<option value="${m.no}" disabled style="color:#ef4444">Pertemuan ke-${m.no} (Sudah selesai — absensi terkunci)</option>`;
+                done++;
+            } else if (m.status === 'scheduled') {
+                options += `<option value="${m.no}">Pertemuan ke-${m.no} (Sudah ada jadwal)</option>`;
+                available++;
+            } else {
+                options += `<option value="${m.no}">Pertemuan ke-${m.no}</option>`;
+                available++;
+            }
+        });
+        pertemuanSelect.innerHTML = options;
+        pertemuanInfo.innerHTML = `<i class="bi bi-info-circle me-1"></i>Total ${total} pertemuan · ${available} tersedia · <span style="color:#ef4444">${done} terkunci</span>`;
+    })
+    .catch(() => {
+        pertemuanSelect.disabled = false;
+        pertemuanSelect.innerHTML = '<option value="">— Tidak ditentukan —</option>';
+        pertemuanInfo.textContent = 'Gagal memuat data pertemuan.';
+    });
+}
+
 function openProposalModal() {
     document.getElementById('proposalForm').reset();
     document.getElementById('class_id').value = '';
     document.getElementById('jenis').value = 'offline';
+    document.getElementById('pertemuanField').style.display = 'none';
+    document.getElementById('pertemuanInfo').textContent = '';
     toggleJenis();
     new bootstrap.Modal('#proposalModal').show();
 }

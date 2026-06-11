@@ -25,24 +25,20 @@ class ScheduleProposalController extends Controller
             return redirect()->route('guru.dashboard')->with('error', 'Profil guru belum lengkap.');
         }
 
-        // Get all classes taught by this teacher
         $classIds = SchoolClass::where('guru_id', $teacher->id)->pluck('id');
 
-        // Get proposals for these classes
         $proposals = ScheduleProposal::whereIn('class_id', $classIds)
             ->with(['kelas', 'approvals'])
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
-        // Stats
         $stats = [
-            'total' => $proposals->total(),
-            'pending' => ScheduleProposal::whereIn('class_id', $classIds)->where('status', 'pending')->count(),
+            'total'    => $proposals->total(),
+            'pending'  => ScheduleProposal::whereIn('class_id', $classIds)->where('status', 'pending')->count(),
             'approved' => ScheduleProposal::whereIn('class_id', $classIds)->where('status', 'approved')->count(),
             'rejected' => ScheduleProposal::whereIn('class_id', $classIds)->where('status', 'rejected')->count(),
         ];
 
-        // Classes for the proposal form
         $classes = SchoolClass::where('guru_id', $teacher->id)
             ->with(['mataPelajaran', 'cabang'])
             ->where('status', 'aktif')
@@ -50,6 +46,19 @@ class ScheduleProposalController extends Controller
             ->get();
 
         return view('guru.schedule-agreements.index', compact('proposals', 'stats', 'classes', 'teacher'));
+    }
+
+    /** Return available meeting slots for a class (AJAX) */
+    public function classMeetings(SchoolClass $class)
+    {
+        $teacher = Teacher::where('user_id', auth()->id())->first();
+        if (! $teacher || $class->guru_id !== $teacher->id) {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak.'], 403);
+        }
+
+        $meetings = $this->service->availableMeetings($class);
+
+        return response()->json(['success' => true, 'meetings' => $meetings, 'jumlah_pertemuan' => $class->jumlah_pertemuan]);
     }
 
     public function store(Request $request)
@@ -60,12 +69,13 @@ class ScheduleProposalController extends Controller
         }
 
         $request->validate([
-            'class_id' => 'required|exists:school_classes,id',
-            'tanggal' => 'required|date|after_or_equal:today',
-            'jam_mulai' => 'required',
-            'jam_selesai' => 'required|after:jam_mulai',
-            'jenis' => 'required|in:online,offline,private',
-            'ruangan' => 'nullable|string|max:255',
+            'class_id'     => 'required|exists:school_classes,id',
+            'pertemuan_ke' => 'nullable|integer|min:1',
+            'tanggal'      => 'required|date|after_or_equal:today',
+            'jam_mulai'    => 'required',
+            'jam_selesai'  => 'required|after:jam_mulai',
+            'jenis'        => 'required|in:online,offline,private',
+            'ruangan'      => 'nullable|string|max:255',
             'link_meeting' => 'nullable|url|max:500',
         ]);
 
@@ -74,14 +84,18 @@ class ScheduleProposalController extends Controller
             return response()->json(['success' => false, 'message' => 'Anda tidak mengajar kelas ini.'], 403);
         }
 
-        $proposal = $this->service->propose($class, 'guru', $teacher->id, $request->only([
-            'tanggal', 'jam_mulai', 'jam_selesai', 'jenis', 'ruangan', 'link_meeting'
+        $result = $this->service->propose($class, 'guru', $teacher->id, $request->only([
+            'pertemuan_ke', 'tanggal', 'jam_mulai', 'jam_selesai', 'jenis', 'ruangan', 'link_meeting',
         ]));
 
+        if (! $result['success']) {
+            return response()->json($result, 422);
+        }
+
         return response()->json([
-            'success' => true,
-            'message' => 'Proposal jadwal berhasil diajukan.',
-            'proposal' => $proposal
+            'success'  => true,
+            'message'  => 'Proposal jadwal berhasil diajukan.',
+            'proposal' => $result['proposal'],
         ]);
     }
 

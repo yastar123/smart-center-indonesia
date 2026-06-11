@@ -7,16 +7,92 @@ use App\Models\ScheduleProposal;
 use App\Models\ScheduleProposalApproval;
 use App\Models\SchoolClass;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ScheduleProposalService
 {
     /**
+     * Return available meeting slots for a class.
+     * Returns array of [ no => int, status => 'available'|'scheduled'|'done' ]
+     */
+    public function availableMeetings(SchoolClass $class): array
+    {
+        $total = (int) ($class->jumlah_pertemuan ?? 0);
+        if ($total <= 0) {
+            return [];
+        }
+
+        // Schedules already created for this class
+        $schedules = Schedule::where('kelas_id', $class->id)
+            ->withTrashed(false)
+            ->get(['id', 'pertemuan_ke']);
+
+        $scheduledMap  = []; // pertemuan_ke => schedule_id
+        foreach ($schedules as $s) {
+            if ($s->pertemuan_ke) {
+                $scheduledMap[$s->pertemuan_ke] = $s->id;
+            }
+        }
+
+        // Which of those schedules already have attendance?
+        $doneIds = [];
+        if (! empty($scheduledMap)) {
+            $doneIds = DB::table('absensi_siswas')
+                ->whereIn('jadwal_id', array_values($scheduledMap))
+                ->pluck('jadwal_id')
+                ->unique()
+                ->toArray();
+        }
+
+        $result = [];
+        for ($i = 1; $i <= $total; $i++) {
+            if (isset($scheduledMap[$i])) {
+                $isDone = in_array($scheduledMap[$i], $doneIds);
+                $result[] = [
+                    'no'     => $i,
+                    'status' => $isDone ? 'done' : 'scheduled',
+                ];
+            } else {
+                $result[] = [
+                    'no'     => $i,
+                    'status' => 'available',
+                ];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Create a new proposal and generate approval records for all class members.
      */
-    public function propose(SchoolClass $class, string $proposerType, int $proposerId, array $data): ScheduleProposal
+    public function propose(SchoolClass $class, string $proposerType, int $proposerId, array $data): array
     {
+        $pertemuanKe = isset($data['pertemuan_ke']) ? (int) $data['pertemuan_ke'] : null;
+
+        // Validate: if pertemuan_ke is given, check it's not already done (has attendance)
+        if ($pertemuanKe) {
+            $existing = Schedule::where('kelas_id', $class->id)
+                ->where('pertemuan_ke', $pertemuanKe)
+                ->first();
+
+            if ($existing) {
+                $hasDone = DB::table('absensi_siswas')
+                    ->where('jadwal_id', $existing->id)
+                    ->exists();
+
+                if ($hasDone) {
+                    return [
+                        'success' => false,
+                        'message' => "Pertemuan ke-{$pertemuanKe} sudah memiliki absensi dan tidak dapat dijadwalkan ulang.",
+                    ];
+                }
+            }
+        }
+
         $proposal = ScheduleProposal::create([
             'class_id'         => $class->id,
+            'pertemuan_ke'     => $pertemuanKe,
             'proposed_by_type' => $proposerType,
             'proposed_by_id'   => $proposerId,
             'tanggal'          => $data['tanggal'],
@@ -54,7 +130,10 @@ class ScheduleProposalService
         // Auto-approve the proposer's own record
         $this->autoApproveProposer($proposal);
 
-        return $proposal->load('approvals');
+        return [
+            'success'  => true,
+            'proposal' => $proposal->load('approvals'),
+        ];
     }
 
     private function autoApproveProposer(ScheduleProposal $proposal): void
@@ -71,7 +150,6 @@ class ScheduleProposalService
      */
     public function respond(ScheduleProposal $proposal, string $approverType, int $approverId, string $status): array
     {
-        // Check lock: cannot change if meeting starts in less than 1 hour
         $sessionStart = Carbon::parse($proposal->tanggal->format('Y-m-d') . ' ' . $proposal->jam_mulai);
         if (now()->gte($sessionStart->subHour())) {
             return ['success' => false, 'message' => 'Jadwal sudah terkunci (H-1 jam sebelum pertemuan).'];
@@ -92,7 +170,6 @@ class ScheduleProposalService
 
         $approval->update(['status' => $status, 'responded_at' => now()]);
 
-        // Reload approvals
         $proposal->load('approvals');
 
         if ($status === 'rejected') {
@@ -116,14 +193,17 @@ class ScheduleProposalService
     {
         $class = $proposal->kelas;
 
-        // Determine next meeting number
-        $existingCount = Schedule::where('kelas_id', $class->id)->count();
+        // Use the chosen pertemuan_ke, or fall back to next available
+        $pertemuanKe = $proposal->pertemuan_ke;
+        if (! $pertemuanKe) {
+            $pertemuanKe = Schedule::where('kelas_id', $class->id)->max('pertemuan_ke') + 1;
+        }
 
         $schedule = Schedule::create([
             'kelas_id'     => $class->id,
             'guru_id'      => $class->guru_id,
             'cabang_id'    => $class->cabang_id,
-            'pertemuan_ke' => $existingCount + 1,
+            'pertemuan_ke' => $pertemuanKe,
             'tanggal'      => $proposal->tanggal,
             'jam_mulai'    => $proposal->jam_mulai,
             'jam_selesai'  => $proposal->jam_selesai,

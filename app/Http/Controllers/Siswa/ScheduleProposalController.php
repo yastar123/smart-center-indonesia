@@ -25,26 +25,22 @@ class ScheduleProposalController extends Controller
             return redirect()->route('siswa.dashboard')->with('error', 'Profil siswa belum lengkap.');
         }
 
-        // Get all classes the student is enrolled in
         $classIds = SchoolClass::whereHas('siswa', function ($q) use ($student) {
             $q->where('student_id', $student->id);
         })->pluck('id');
 
-        // Get proposals for these classes
         $proposals = ScheduleProposal::whereIn('class_id', $classIds)
             ->with(['kelas', 'approvals'])
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
-        // Stats
         $stats = [
-            'total' => $proposals->total(),
-            'pending' => ScheduleProposal::whereIn('class_id', $classIds)->where('status', 'pending')->count(),
+            'total'    => $proposals->total(),
+            'pending'  => ScheduleProposal::whereIn('class_id', $classIds)->where('status', 'pending')->count(),
             'approved' => ScheduleProposal::whereIn('class_id', $classIds)->where('status', 'approved')->count(),
             'rejected' => ScheduleProposal::whereIn('class_id', $classIds)->where('status', 'rejected')->count(),
         ];
 
-        // Classes for the proposal form
         $classes = SchoolClass::whereHas('siswa', function ($q) use ($student) {
             $q->where('student_id', $student->id);
         })
@@ -56,6 +52,24 @@ class ScheduleProposalController extends Controller
         return view('siswa.schedule-agreements.index', compact('proposals', 'stats', 'classes', 'student'));
     }
 
+    /** Return available meeting slots for a class (AJAX) */
+    public function classMeetings(SchoolClass $class)
+    {
+        $student = Student::where('user_id', auth()->id())->first();
+        if (! $student) {
+            return response()->json(['success' => false, 'message' => 'Profil siswa tidak ditemukan.'], 403);
+        }
+
+        $enrolled = $class->siswa()->where('student_id', $student->id)->exists();
+        if (! $enrolled) {
+            return response()->json(['success' => false, 'message' => 'Anda tidak terdaftar di kelas ini.'], 403);
+        }
+
+        $meetings = $this->service->availableMeetings($class);
+
+        return response()->json(['success' => true, 'meetings' => $meetings, 'jumlah_pertemuan' => $class->jumlah_pertemuan]);
+    }
+
     public function store(Request $request)
     {
         $student = Student::where('user_id', auth()->id())->first();
@@ -64,31 +78,35 @@ class ScheduleProposalController extends Controller
         }
 
         $request->validate([
-            'class_id' => 'required|exists:school_classes,id',
-            'tanggal' => 'required|date|after_or_equal:today',
-            'jam_mulai' => 'required',
-            'jam_selesai' => 'required|after:jam_mulai',
-            'jenis' => 'required|in:online,offline,private',
-            'ruangan' => 'nullable|string|max:255',
+            'class_id'     => 'required|exists:school_classes,id',
+            'pertemuan_ke' => 'nullable|integer|min:1',
+            'tanggal'      => 'required|date|after_or_equal:today',
+            'jam_mulai'    => 'required',
+            'jam_selesai'  => 'required|after:jam_mulai',
+            'jenis'        => 'required|in:online,offline,private',
+            'ruangan'      => 'nullable|string|max:255',
             'link_meeting' => 'nullable|url|max:500',
         ]);
 
         $class = SchoolClass::find($request->class_id);
-        
-        // Check if student is enrolled in this class
+
         $isEnrolled = $class->siswa()->where('student_id', $student->id)->exists();
         if (! $isEnrolled) {
             return response()->json(['success' => false, 'message' => 'Anda tidak terdaftar di kelas ini.'], 403);
         }
 
-        $proposal = $this->service->propose($class, 'siswa', $student->id, $request->only([
-            'tanggal', 'jam_mulai', 'jam_selesai', 'jenis', 'ruangan', 'link_meeting'
+        $result = $this->service->propose($class, 'siswa', $student->id, $request->only([
+            'pertemuan_ke', 'tanggal', 'jam_mulai', 'jam_selesai', 'jenis', 'ruangan', 'link_meeting',
         ]));
 
+        if (! $result['success']) {
+            return response()->json($result, 422);
+        }
+
         return response()->json([
-            'success' => true,
-            'message' => 'Proposal jadwal berhasil diajukan.',
-            'proposal' => $proposal
+            'success'  => true,
+            'message'  => 'Proposal jadwal berhasil diajukan.',
+            'proposal' => $result['proposal'],
         ]);
     }
 
