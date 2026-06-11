@@ -97,109 +97,42 @@
         <h6 class="mb-3 fw-semibold">Daftar Siswa (klik untuk lihat mata pelajaran)</h6>
         <div class="row g-2">
             @foreach($students as $st)
+            @php
+                $genderLabel = match($st->gender ?? '') {
+                    'male','laki-laki','L' => 'Laki-laki',
+                    'female','perempuan','P' => 'Perempuan',
+                    default => $st->gender ?? '–',
+                };
+                $genderIcon = in_array($st->gender ?? '', ['male','laki-laki','L']) ? 'bi-gender-male' : 'bi-gender-female';
+                $genderColor = in_array($st->gender ?? '', ['male','laki-laki','L']) ? '#0ea5e9' : '#ec4899';
+            @endphp
             <div class="col-6 col-md-3">
-                <button class="btn btn-outline-secondary w-100 text-start" onclick="openStudentCourses({{ $st->id }}, '{{ addslashes($st->user?->name ?? 'Siswa #'.$st->id) }}')">
-                    <div class="fw-semibold" style="font-size:.95rem">{{ $st->user?->name ?? 'Siswa #'.$st->id }}</div>
-                    <div class="small text-muted">ID: {{ $st->id }}</div>
+                <button class="btn w-100 text-start p-3"
+                    style="border:1px solid var(--card-border);border-radius:12px;background:var(--card-bg);transition:all .2s"
+                    onmouseover="this.style.borderColor='#c84ddf';this.style.background='rgba(200,77,223,.05)'"
+                    onmouseout="this.style.borderColor='var(--card-border)';this.style.background='var(--card-bg)'"
+                    onclick="openStudentCourses({{ $st->id }}, '{{ addslashes($st->user?->name ?? 'Siswa #'.$st->id) }}')">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#c84ddf,#7c3aed);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                            <i class="bi bi-person-fill" style="color:white;font-size:13px"></i>
+                        </div>
+                        <div class="fw-semibold text-truncate" style="font-size:.88rem">{{ $st->user?->name ?? 'Siswa #'.$st->id }}</div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 mt-1" style="font-size:.75rem">
+                        <span style="color:{{ $genderColor }}"><i class="bi {{ $genderIcon }} me-1"></i>{{ $genderLabel }}</span>
+                        <span class="text-muted">·</span>
+                        <span class="text-muted text-truncate">{{ $st->branch?->name ?? '–' }}</span>
+                    </div>
                 </button>
             </div>
             @endforeach
-        </div>
-    </div>
-
-    {{-- TABLE --}}
-    <div class="dashboard-card fade-up">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="thead-modern">
-                        <tr>
-                            <th class="px-4">#</th>
-                            <th>No. Sertifikat</th>
-                            <th>Judul</th>
-                            <th class="d-none d-md-table-cell">Penerima</th>
-                            <th class="d-none d-md-table-cell">Jenis</th>
-                            <th class="d-none d-lg-table-cell">Tgl Terbit</th>
-                            <th class="d-none d-lg-table-cell">Tgl Expired</th>
-                            <th class="text-end pe-4">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($certificates as $i => $cert)
-                        <tr>
-                            <td class="px-4 text-muted" style="font-size:.85rem;">{{ $certificates->firstItem() + $i }}</td>
-                            <td>
-                                <span class="fw-semibold" style="font-size:.82rem;font-family:monospace;background:rgba(245,158,11,.1);color:#b45309;padding:.2em .6em;border-radius:6px;">{{ $cert->nomor_sertifikat }}</span>
-                            </td>
-                            <td>
-                                <div class="fw-semibold" style="font-size:.9rem;">{{ $cert->judul }}</div>
-                                @if($cert->diterbitkan_oleh)
-                                <div class="text-muted" style="font-size:.78rem;">Oleh: {{ $cert->diterbitkan_oleh }}</div>
-                                @endif
-                            </td>
-                            <td class="d-none d-md-table-cell">
-                                @if($cert->siswa?->user)
-                                <div class="d-flex align-items-center gap-2">
-                                    <img src="https://ui-avatars.com/api/?name={{ urlencode($cert->siswa->user->name) }}&size=28&background=f59e0b&color=fff&rounded=true" alt="" style="width:28px;height:28px;border-radius:8px;">
-                                    <span style="font-size:.85rem;">{{ $cert->siswa->user->name }}</span>
-                                </div>
-                                @else
-                                <span class="text-muted">—</span>
-                                @endif
-                            </td>
-                            <td class="d-none d-md-table-cell">
-                                @php
-                                    $jenisColors = [
-                                        'kompetensi'  => ['#c84ddf','rgba(200,77,223,.15)'],
-                                        'kelulusan'   => ['#10b981','rgba(16,185,129,.15)'],
-                                        'prestasi'    => ['#ef4444','rgba(239,68,68,.15)'],
-                                        'partisipasi' => ['#68117e','rgba(104,17,126,.15)'],
-                                    ];
-                                    $jc = $jenisColors[$cert->jenis] ?? ['#6b7280','rgba(107,114,128,.15)'];
-                                @endphp
-                                <span class="badge rounded-pill" style="background:{{ $jc[1] }};color:{{ $jc[0] }};font-size:.75rem;font-weight:600;padding:.35em .75em;text-transform:capitalize;">{{ $cert->jenis }}</span>
-                            </td>
-                            <td class="d-none d-lg-table-cell" style="font-size:.85rem;">
-                                {{ $cert->tanggal_terbit ? $cert->tanggal_terbit->format('d M Y') : '—' }}
-                            </td>
-                            <td class="d-none d-lg-table-cell" style="font-size:.85rem;">
-                                @if($cert->tanggal_expired)
-                                    @if($cert->tanggal_expired->isPast())
-                                        <span style="color:#ef4444;">{{ $cert->tanggal_expired->format('d M Y') }}</span>
-                                    @else
-                                        {{ $cert->tanggal_expired->format('d M Y') }}
-                                    @endif
-                                @else
-                                    <span class="badge rounded-pill" style="background:rgba(16,185,129,.15);color:#059669;font-size:.73rem;">Seumur Hidup</span>
-                                @endif
-                            </td>
-                            <td class="text-end pe-4">
-                                <div class="d-flex gap-1 justify-content-end">
-                                    <button class="btn btn-sm btn-act-edit" onclick="editCert({{ $cert->id }})" title="Edit">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-act-del" onclick="deleteCert({{ $cert->id }}, '{{ addslashes($cert->judul) }}')" title="Hapus">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="8" class="text-center py-5">
-                                <div style="opacity:.5;">
-                                    <i class="bi bi-award" style="font-size:2.5rem;display:block;margin-bottom:.5rem;color:#f6af23;"></i>
-                                    <div class="fw-semibold">Belum ada sertifikat</div>
-                                    <small class="text-muted">Terbitkan sertifikat pertama untuk siswa Anda</small>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+            @if($students->isEmpty())
+            <div class="col-12 text-center text-muted py-3" style="font-size:.875rem">
+                <i class="bi bi-people" style="font-size:1.5rem;display:block;opacity:.35;margin-bottom:.5rem"></i>
+                Belum ada siswa aktif
             </div>
-            @if($certificates->hasPages())
-            <div class="mt-4 pt-3 d-flex justify-content-center" style="border-top:1px solid var(--card-border)">{{ $certificates->links() }}</div>
             @endif
+        </div>
     </div>
 </div>
 

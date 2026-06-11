@@ -31,7 +31,7 @@ class CertificateController extends Controller
         }
 
         $certificates = $query->latest()->paginate(15)->appends($request->all());
-        $students     = Student::with('user')->where('status', 'aktif')->get();
+        $students     = Student::with(['user', 'branch'])->where('status', 'aktif')->get();
         $branches     = Branch::orderBy('name')->get();
 
         $stats = [

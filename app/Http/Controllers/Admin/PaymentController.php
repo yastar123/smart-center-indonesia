@@ -29,10 +29,13 @@ class PaymentController extends Controller
             ->paginate(10)->withQueryString();
 
         // Course payments
-        $coursePayments = StudentCoursePayment::with(['student', 'course', 'verifier'])
+        $coursePayments = StudentCoursePayment::with(['student', 'course.cabang', 'verifier'])
             ->when($request->course_status, fn ($q) => $q->where('status', $request->course_status))
-            ->when($request->search, function ($q) use ($request) {
-                $q->whereHas('student', fn ($sq) => $sq->where('name', 'like', "%{$request->search}%"));
+            ->when($request->course_search, function ($q) use ($request) {
+                $q->whereHas('student', fn ($sq) => $sq->where('name', 'like', "%{$request->course_search}%"));
+            })
+            ->when($request->course_branch, function ($q) use ($request) {
+                $q->whereHas('course', fn ($sq) => $sq->where('cabang_id', $request->course_branch));
             })
             ->orderByDesc('created_at')
             ->paginate(15)

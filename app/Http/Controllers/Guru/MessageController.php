@@ -31,7 +31,7 @@ class MessageController extends Controller
 
         $messageBaseUrl = url('guru/messages');
         $messageCreateRoute = route('guru.messages.createRoom');
-        $allowCreateRoom = false;
+        $allowCreateRoom = true;
         return view('admin.messages.index', compact('rooms', 'users', 'messageBaseUrl', 'messageCreateRoute', 'allowCreateRoom'));
     }
 }

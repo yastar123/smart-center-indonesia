@@ -139,158 +139,49 @@
     </div>
 </div>
 
-{{-- FILTER BAR --}}
+{{-- FILTER PEMBAYARAN MATA PELAJARAN --}}
 <div class="dashboard-card mb-4 fade-up">
-    <form id="filterForm" method="GET" action="{{ route('admin.payments.index') }}">
+    <h6 class="fw-semibold mb-3"><i class="bi bi-funnel text-primary me-2"></i>Filter Pembayaran Mata Pelajaran</h6>
+    <form id="courseFilterForm" method="GET" action="{{ route('admin.payments.index') }}">
         <div class="row g-2 align-items-end">
             <div class="col-12 col-md-4">
-                <label class="form-label fw-semibold" style="font-size:12px">Cari Invoice / Siswa</label>
+                <label class="form-label fw-semibold" style="font-size:12px">Cari Siswa</label>
                 <div class="input-group">
-                    <span class="input-group-text" style="border-radius:10px 0 0 10px;background:var(--input-bg);border-color:var(--card-border)">
-                        <i class="bi bi-search text-muted"></i>
-                    </span>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Nomor invoice atau nama siswa..."
-                        class="form-control" style="border-radius:0 10px 10px 0;border-color:var(--card-border);background:var(--input-bg)"
-                        onchange="document.getElementById('filterForm').submit()">
+                    <span class="input-group-text" style="background:var(--input-bg);border-color:var(--card-border)"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="course_search" value="{{ request('course_search') }}" placeholder="Nama siswa..."
+                        class="form-control" style="border-color:var(--card-border);background:var(--input-bg)">
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <label class="form-label fw-semibold" style="font-size:12px">Status</label>
-                <select name="status" class="form-select" style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)"
-                    onchange="document.getElementById('filterForm').submit()">
+                <select name="course_status" class="form-select" style="border-color:var(--card-border);background:var(--input-bg)">
                     <option value="">Semua Status</option>
-                    <option value="belum_bayar" {{ request('status')=='belum_bayar'?'selected':'' }}>Belum Bayar</option>
-                    <option value="sebagian"    {{ request('status')=='sebagian'?'selected':'' }}>Sebagian</option>
-                    <option value="lunas"       {{ request('status')=='lunas'?'selected':'' }}>Lunas</option>
+                    <option value="pending"  {{ request('course_status')=='pending'?'selected':'' }}>Menunggu Verifikasi</option>
+                    <option value="verified" {{ request('course_status')=='verified'?'selected':'' }}>Terverifikasi</option>
+                    <option value="rejected" {{ request('course_status')=='rejected'?'selected':'' }}>Ditolak</option>
                 </select>
             </div>
             <div class="col-6 col-md-3">
                 <label class="form-label fw-semibold" style="font-size:12px">Cabang</label>
-                <select name="branch_id" class="form-select" style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)"
-                    onchange="document.getElementById('filterForm').submit()">
+                <select name="course_branch" class="form-select" style="border-color:var(--card-border);background:var(--input-bg)">
                     <option value="">Semua Cabang</option>
                     @foreach($branches as $b)
-                    <option value="{{ $b->id }}" {{ request('branch_id')==$b->id?'selected':'' }}>{{ $b->name }}</option>
+                    <option value="{{ $b->id }}" {{ request('course_branch')==$b->id?'selected':'' }}>{{ $b->name }}</option>
                     @endforeach
                 </select>
             </div>
-            <div class="col-12 col-md-2">
-                @if(request()->hasAny(['search','status','branch_id']))
-                <a href="{{ route('admin.payments.index') }}" class="btn btn-outline-secondary w-100" style="border-radius:10px">
-                    <i class="bi bi-x-lg me-1"></i>Reset
-                </a>
-                @else
-                <button type="button" onclick="openModal()" class="btn btn-success w-100 fw-semibold" style="border-radius:10px">
-                    <i class="bi bi-plus-lg me-1"></i>Buat Invoice
+            <div class="col-12 col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-fill fw-semibold" style="border-radius:10px">
+                    <i class="bi bi-search me-1"></i>Filter
                 </button>
+                @if(request()->hasAny(['course_search','course_status','course_branch']))
+                <a href="{{ route('admin.payments.index') }}" class="btn btn-outline-secondary" style="border-radius:10px" title="Reset">
+                    <i class="bi bi-x-lg"></i>
+                </a>
                 @endif
             </div>
         </div>
     </form>
-</div>
-
-{{-- TABLE --}}
-<div class="dashboard-card fade-up">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h6 class="fw-bold mb-0"><i class="bi bi-list-ul text-success me-2"></i>Daftar Invoice
-            <span class="badge ms-2" style="background:var(--soft-success-bg);color:var(--soft-success-text);font-size:11px">{{ $invoices->total() }} data</span>
-        </h6>
-    </div>
-    <div class="table-responsive">
-        <table class="table table-hover table-modern align-middle mb-0">
-            <thead class="thead-modern">
-                <tr>
-                    <th class="ps-3">No. Invoice</th>
-                    <th>Siswa</th>
-                    <th class="d-none d-md-table-cell">Cabang</th>
-                    <th class="d-none d-md-table-cell">Periode</th>
-                    <th>Total</th>
-                    <th class="d-none d-lg-table-cell">Jatuh Tempo</th>
-                    <th>Status</th>
-                    <th class="text-center">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($invoices as $inv)
-                @php
-                    $statusMap = [
-                        'lunas'       => ['bg'=>'var(--soft-success-bg)','color'=>'var(--soft-success-text)','label'=>'Lunas'],
-                        'sebagian'    => ['bg'=>'var(--soft-warning-bg)','color'=>'var(--soft-warning-text)','label'=>'Sebagian'],
-                        'belum_bayar' => ['bg'=>'var(--soft-danger-bg)','color'=>'var(--soft-danger-text)','label'=>'Belum Bayar'],
-                    ];
-                    $st = $statusMap[$inv->status] ?? ['bg'=>'var(--soft-muted-bg)','color'=>'var(--soft-muted-text)','label'=>$inv->status];
-                @endphp
-                <tr style="border-bottom:1px solid var(--card-border);transition:background .15s" onmouseover="this.style.background='rgba(104,17,126,.05)'" onmouseout="this.style.background=''">
-                    <td class="ps-3">
-                        <code style="background:var(--soft-primary-bg);color:var(--soft-primary-text);padding:3px 8px;border-radius:6px;font-size:11px">{{ $inv->nomor_invoice }}</code>
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center gap-2">
-                            <div style="width:32px;height:32px;border-radius:50%;background:var(--soft-primary-bg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--soft-primary-text);flex-shrink:0">
-                                {{ strtoupper(substr($inv->siswa?->name ?? 'S', 0, 1)) }}
-                            </div>
-                            <div>
-                                <div class="fw-semibold" style="font-size:13px">{{ $inv->siswa?->name ?? '–' }}</div>
-                                <div class="text-muted" style="font-size:11px">{{ $inv->siswa?->nis ?? '' }}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="d-none d-md-table-cell text-muted" style="font-size:.85rem">{{ $inv->cabang?->name ?? '–' }}</td>
-                    <td class="d-none d-md-table-cell text-muted" style="font-size:.85rem">{{ $inv->periode ?? '–' }}</td>
-                    <td class="fw-bold text-success" style="font-size:.9rem">Rp {{ number_format($inv->total,0,',','.') }}</td>
-                    <td class="d-none d-lg-table-cell text-muted" style="font-size:.85rem">
-                        @if($inv->jatuh_tempo)
-                            {{ $inv->jatuh_tempo->format('d M Y') }}
-                            @if($inv->jatuh_tempo->isPast() && $inv->status !== 'lunas')
-                                <span class="ms-1 badge rounded-pill" style="background:var(--soft-danger-bg);color:var(--soft-danger-text);font-size:10px">Terlambat</span>
-                            @endif
-                        @else
-                            –
-                        @endif
-                    </td>
-                    <td>
-                        <span style="background:{{ $st['bg'] }};color:{{ $st['color'] }};padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600">
-                            {{ $st['label'] }}
-                        </span>
-                    </td>
-                    <td class="text-center">
-                        <div class="d-flex justify-content-center gap-1">
-                            <button onclick="showDetail({{ $inv->id }})" class="btn btn-sm btn-act-view" title="Detail">
-                                <i class="bi bi-eye-fill"></i>
-                            </button>
-                            @if($inv->status !== 'lunas')
-                            <button onclick="openPayModal({{ $inv->id }}, '{{ addslashes($inv->siswa?->name ?? '') }}', {{ $inv->total }})" class="btn btn-sm btn-act-pay" title="Bayar">
-                                <i class="bi bi-cash-stack"></i>
-                            </button>
-                            @endif
-                            <button onclick="editInvoice({{ $inv->id }})" class="btn btn-sm btn-act-edit" title="Edit">
-                                <i class="bi bi-pencil-fill"></i>
-                            </button>
-                            <button onclick="deleteInvoice({{ $inv->id }}, '{{ addslashes($inv->nomor_invoice) }}')" class="btn btn-sm btn-act-del" title="Hapus">
-                                <i class="bi bi-trash-fill"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="8" class="text-center py-5">
-                        <div class="text-muted">
-                            <i class="bi bi-receipt" style="font-size:40px;display:block;margin-bottom:12px;opacity:.4"></i>
-                            <div class="fw-semibold mb-1">Belum ada invoice</div>
-                            <div style="font-size:12px">Klik "Buat Invoice" untuk membuat invoice pertama</div>
-                        </div>
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-    @if($invoices->hasPages())
-    <div class="mt-4 d-flex justify-content-center">
-        {{ $invoices->links() }}
-    </div>
-    @endif
 </div>
 
 {{-- COURSE PAYMENTS --}}
@@ -299,15 +190,6 @@
         <h6 class="fw-bold mb-0"><i class="bi bi-journal-bookmark text-primary me-2"></i>Pembayaran Mata Pelajaran
             <span class="badge ms-2" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:11px">{{ $coursePayments->total() }} data</span>
         </h6>
-        <div class="d-flex gap-2">
-            <select name="course_status" class="form-select form-select-sm" style="width:auto;border-radius:8px;border-color:var(--card-border);background:var(--input-bg)"
-                onchange="window.location.href='?course_status='+this.value">
-                <option value="">Semua Status</option>
-                <option value="pending" {{ request('course_status')=='pending'?'selected':'' }}>Menunggu</option>
-                <option value="verified" {{ request('course_status')=='verified'?'selected':'' }}>Terverifikasi</option>
-                <option value="rejected" {{ request('course_status')=='rejected'?'selected':'' }}>Ditolak</option>
-            </select>
-        </div>
     </div>
     <div class="table-responsive">
         <table class="table table-hover table-modern align-middle mb-0">
