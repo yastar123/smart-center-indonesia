@@ -1,0 +1,139 @@
+Berikut versi yang lebih rapi dan mudah dipahami:
+
+---
+
+### 1. Halaman Sertifikat Siswa
+
+Pada halaman:
+
+`http://127.0.0.1:8000/siswa/certificates`
+
+Saya ingin menampilkan **card untuk setiap mata pelajaran yang diambil siswa**.
+
+Setiap card menampilkan:
+
+* Nama mata pelajaran
+* Nama guru (jika diperlukan)
+* Status sertifikat
+* Tombol download sertifikat (jika sudah tersedia)
+
+Ketentuan:
+
+* Jika admin belum mengunggah sertifikat, maka card tetap ditampilkan tetapi statusnya **"Sertifikat Belum Tersedia"**.
+* Jangan menampilkan file atau tombol download jika sertifikat belum diunggah.
+
+---
+
+### 2. Halaman Sertifikat Admin
+
+Pada halaman:
+
+`http://127.0.0.1:8000/admin/certificates`
+
+Hapus tabel berikut:
+
+* No. Sertifikat
+* Judul
+* Penerima
+* Jenis
+* Tanggal Terbit
+* Tanggal Expired
+* Aksi
+
+Hapus juga fitur CRUD **Terbitkan Sertifikat** yang saat ini digunakan.
+
+---
+
+### 3. Upload Sertifikat Berdasarkan Mata Pelajaran
+
+Pada halaman:
+
+`http://127.0.0.1:8000/admin/certificates`
+
+Di bagian **Daftar Siswa (Klik untuk Lihat Mata Pelajaran)**, ubah alurnya menjadi:
+
+1. Admin melihat daftar siswa.
+2. Ketika nama siswa diklik, sistem menampilkan seluruh mata pelajaran yang diambil siswa tersebut.
+3. Admin memilih salah satu mata pelajaran.
+4. Admin dapat mengunggah sertifikat untuk mata pelajaran yang dipilih.
+5. Sertifikat yang diunggah akan muncul pada halaman sertifikat siswa sesuai mata pelajarannya.
+
+Contoh:
+
+* Ahmad
+
+  * Biologi → Upload Sertifikat
+  * Matematika → Upload Sertifikat
+  * Fisika → Upload Sertifikat
+
+---
+
+### 4. Hapus Menu Nilai Guru
+
+Pada dashboard guru, hapus halaman dan menu:
+
+`http://127.0.0.1:8000/guru/grades`
+
+Karena fitur tersebut sudah tidak digunakan.
+
+---
+
+### 5. Fitur Pesan Guru
+
+Pada halaman:
+
+`http://127.0.0.1:8000/guru/messages`
+
+Saya ingin halaman ini berfungsi sebagai daftar kontak siswa untuk fitur chat.
+
+Ketentuan:
+
+* Tampilkan hanya siswa yang mengambil mata pelajaran yang diajar oleh guru tersebut.
+* Data harus diambil langsung dari database.
+* Setiap kontak menampilkan minimal:
+
+  * Nama siswa
+  * Mata pelajaran yang diikuti
+
+Contoh:
+
+* Ahmad — Biologi
+* Budi — Biologi
+* Siti — Matematika
+
+Ketika kontak dipilih, guru dapat melakukan percakapan/chat dengan siswa tersebut.
+
+---
+
+### 6. Fitur Pesan Siswa
+
+Pada halaman:
+
+`http://127.0.0.1:8000/siswa/messages`
+
+Saya ingin halaman ini menjadi daftar kontak guru yang mengajar mata pelajaran yang diambil oleh siswa.
+
+Ketentuan:
+
+* Data harus diambil langsung dari database.
+* Siswa hanya dapat melihat guru yang mengajar mata pelajaran yang diikutinya.
+
+Contoh:
+
+Jika siswa mengambil:
+
+* Biologi → Guru Bapak Andi
+* Matematika → Guru Ibu Rina
+
+Maka daftar kontak yang muncul adalah:
+
+* Bapak Andi — Biologi
+* Ibu Rina — Matematika
+
+Ketika kontak dipilih, siswa dapat melakukan percakapan/chat dengan guru tersebut.
+
+---
+
+### Alur Fitur Chat
+
+**Guru mengajar Mata Pelajaran → Siswa mengambil Mata Pelajaran → Sistem menghubungkan Guru dan Siswa → Keduanya muncul di menu Messages → Guru dan Siswa dapat saling berkirim pesan.**
