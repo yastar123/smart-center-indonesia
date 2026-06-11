@@ -49,6 +49,7 @@ class CertificateController extends Controller
         $data = $request->validate([
             'siswa_id'          => 'required|exists:students,id',
             'cabang_id'         => 'required|exists:branches,id',
+            'mata_pelajaran_id' => 'nullable|exists:courses,id',
             'jenis'             => 'required|in:kompetensi,kelulusan,prestasi,partisipasi',
             'judul'             => 'required|string|max:200',
             'deskripsi'         => 'nullable|string',
@@ -67,7 +68,7 @@ class CertificateController extends Controller
 
         Certificate::create($data);
 
-        return response()->json(['success' => true, 'message' => 'Sertifikat berhasil diterbitkan.']);
+        return response()->json(['success' => true, 'message' => 'Sertifikat berhasil diupload.']);
     }
 
     public function show(Certificate $certificate)

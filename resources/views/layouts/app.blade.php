@@ -3365,11 +3365,6 @@
         </div>
         
         <div class="nav-item">
-            <a href="{{ route('guru.grades') }}" class="nav-link {{ request()->routeIs('guru.grades') ? 'active' : '' }}" data-label="Input Nilai">
-                <i class="bi bi-pencil-square"></i><span>Input Nilai</span>
-            </a>
-        </div>
-        <div class="nav-item">
             <a href="{{ route('guru.attendance.history') }}" class="nav-link {{ request()->routeIs('guru.attendance.*') ? 'active' : '' }}" data-label="Riwayat Absensi">
                 <i class="bi bi-clipboard2-check"></i><span>Riwayat Absensi</span>
             </a>
@@ -4294,7 +4289,6 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         { label:'Dashboard Guru', desc:'Portal guru & jadwal', href:'{{ route("guru.dashboard") }}', icon:'bi-speedometer2', color:'#c84ddf', group:'Guru' },
         { label:'Kelas', desc:'Kelas yang diajar', href:'{{ route("guru.classes.index") }}', icon:'bi-diagram-3', color:'#68117e', group:'Guru' },
         { label:'Pengumuman', desc:'Informasi untuk guru', href:'{{ route("guru.announcements") }}', icon:'bi-megaphone', color:'#c84ddf', group:'Guru' },
-        { label:'Input Nilai', desc:'Masukkan nilai siswa', href:'{{ route("guru.grades") }}', icon:'bi-pencil-square', color:'#f6af23', group:'Guru' },
         @endrole
         @role('siswa')
         { label:'Dashboard Siswa', desc:'Portal siswa & tagihan', href:'{{ route("siswa.dashboard") }}', icon:'bi-speedometer2', color:'#c84ddf', group:'Siswa' },

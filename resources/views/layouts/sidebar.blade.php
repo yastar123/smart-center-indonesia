@@ -340,12 +340,6 @@
                 <span>Persetujuan Jadwal</span>
             </a>
         </li>
-        <li class="nav-item {{ request()->routeIs('guru.grades') ? 'active' : '' }}">
-            <a href="{{ route('guru.grades') }}" class="nav-link">
-                <i class="nav-icon bi bi-bar-chart"></i>
-                <span>Input Nilai</span>
-            </a>
-        </li>
         <li class="nav-item {{ request()->routeIs('guru.announcements') ? 'active' : '' }}">
             <a href="{{ route('guru.announcements') }}" class="nav-link">
                 <i class="nav-icon bi bi-megaphone"></i>

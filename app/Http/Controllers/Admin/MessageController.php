@@ -93,4 +93,90 @@ class MessageController extends Controller
         $room = ChatRoom::create($data);
         return response()->json(['success' => true, 'message' => 'Room berhasil dibuat!', 'data' => $room]);
     }
+
+    /**
+     * Get or create a room for contact messaging and get messages
+     */
+    public function getContactMessages(Request $request, $contactUserId)
+    {
+        $currentUserId = auth()->id();
+        
+        // Find or create a personal room between current user and contact
+        $room = ChatRoom::where('jenis_room', 'personal')
+            ->where(function ($q) use ($currentUserId, $contactUserId) {
+                $q->whereJsonContains('peserta_id', $currentUserId)
+                  ->whereJsonContains('peserta_id', $contactUserId);
+            })
+            ->first();
+
+        if (!$room) {
+            // Create new room
+            $room = ChatRoom::create([
+                'nama_room' => 'Chat dengan User #' . $contactUserId,
+                'jenis_room' => 'personal',
+                'peserta_id' => [$currentUserId, (int)$contactUserId],
+                'waktu_pesan_terakhir' => now(),
+            ]);
+        }
+
+        $messages = $room->pesan()
+            ->with('pengirim')
+            ->latest()
+            ->limit(50)
+            ->get()
+            ->reverse()
+            ->values();
+
+        // Mark as read
+        foreach ($messages as $msg) {
+            $read = $msg->dibaca_oleh ?? [];
+            if (!in_array(auth()->id(), $read)) {
+                $read[] = auth()->id();
+                $msg->update(['dibaca_oleh' => $read]);
+            }
+        }
+
+        return response()->json(['success' => true, 'data' => $messages]);
+    }
+
+    /**
+     * Send message to a contact
+     */
+    public function sendContactMessage(Request $request, $contactUserId)
+    {
+        $currentUserId = auth()->id();
+        
+        // Find or create room
+        $room = ChatRoom::where('jenis_room', 'personal')
+            ->where(function ($q) use ($currentUserId, $contactUserId) {
+                $q->whereJsonContains('peserta_id', $currentUserId)
+                  ->whereJsonContains('peserta_id', $contactUserId);
+            })
+            ->first();
+
+        if (!$room) {
+            $room = ChatRoom::create([
+                'nama_room' => 'Chat dengan User #' . $contactUserId,
+                'jenis_room' => 'personal',
+                'peserta_id' => [$currentUserId, (int)$contactUserId],
+                'waktu_pesan_terakhir' => now(),
+            ]);
+        }
+
+        $data = $request->validate([
+            'pesan' => 'nullable|string|max:2000',
+        ]);
+
+        $message = ChatMessage::create([
+            'room_id' => $room->id,
+            'pengirim_id' => auth()->id(),
+            'jenis' => 'teks',
+            'pesan' => $data['pesan'] ?? null,
+            'dibaca_oleh' => [auth()->id()],
+        ]);
+
+        $room->update(['waktu_pesan_terakhir' => now()]);
+
+        return response()->json(['success' => true, 'data' => $message->load('pengirim')]);
+    }
 }

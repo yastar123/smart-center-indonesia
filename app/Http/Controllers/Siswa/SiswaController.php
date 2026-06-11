@@ -7,6 +7,7 @@ use App\Models\Schedule;
 use App\Models\Certificate;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -17,13 +18,47 @@ class SiswaController extends Controller
     public function certificates()
     {
         $student = Student::where('user_id', auth()->id())->first();
+        if (!$student) {
+            return redirect()->route('dashboard')->with('error', 'Profil siswa tidak ditemukan.');
+        }
 
-        $certificates = Certificate::with('cabang')
-            ->when($student, fn($q) => $q->where('siswa_id', $student->id))
-            ->latest()
+        // Ambil semua mata pelajaran yang diambil siswa
+        $studentCourses = DB::table('school_classes as sc')
+            ->join('courses as c', 'c.id', '=', 'sc.mata_pelajaran_id')
+            ->join('class_students as cs', 'cs.class_id', '=', 'sc.id')
+            ->where('cs.student_id', $student->id)
+            ->whereNull('sc.deleted_at')
+            ->select('c.id as course_id', 'c.nama as course_name', 'sc.id as class_id')
+            ->distinct()
             ->get();
 
-        return view('siswa.certificates', compact('certificates', 'student'));
+        // Ambil sertifikat per mata pelajaran
+        $certificatesByCourse = Certificate::where('siswa_id', $student->id)
+            ->get()
+            ->groupBy('mata_pelajaran_id');
+
+        // Siapkan data untuk view
+        $courseData = $studentCourses->map(function ($course) use ($certificatesByCourse, $student) {
+            $certs = $certificatesByCourse->get($course->course_id, collect());
+            $latestCert = $certs->sortByDesc('tanggal_terbit')->first();
+
+            return [
+                'course_id' => $course->course_id,
+                'course_name' => $course->course_name,
+                'class_id' => $course->class_id,
+                'has_certificate' => $certs->isNotEmpty(),
+                'certificate' => $latestCert,
+                'certificate_count' => $certs->count(),
+            ];
+        });
+
+        $stats = [
+            'total_courses' => $studentCourses->count(),
+            'certified' => $courseData->where('has_certificate', true)->count(),
+            'pending' => $courseData->where('has_certificate', false)->count(),
+        ];
+
+        return view('siswa.certificates', compact('courseData', 'stats', 'student'));
     }
 
     public function downloadCertificate(Certificate $certificate)

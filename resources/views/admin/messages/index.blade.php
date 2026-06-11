@@ -13,8 +13,14 @@
             <div class="d-flex align-items-center gap-3">
                 <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0"><i class="bi bi-chat-dots"></i></div>
                 <div>
-                    <h5 class="fw-bold mb-0" style="color:white">Pesan Aplikasi</h5>
-                    <span style="font-size:12px;opacity:.8">Chat internal antar admin, guru, dan siswa</span>
+                    <h5 class="fw-bold mb-0" style="color:white">Pesan</h5>
+                    <span style="font-size:12px;opacity:.8">
+                        @if(isset($contacts))
+                            Chat dengan siswa/guru berdasarkan mata pelajaran
+                        @else
+                            Chat internal antar admin, guru, dan siswa
+                        @endif
+                    </span>
                 </div>
             </div>
         </div>
@@ -152,10 +158,105 @@
 const baseUrl = '{{ $messageBaseUrl ?? url('admin/messages') }}';
 const createRoomRoute = '{{ $messageCreateRoute ?? route('admin.messages.createRoom') }}';
 let activeRoom = null, pollInterval = null;
+const contacts = @json($contacts ?? []);
+const rooms = @json($rooms);
 
 function loadRooms() {
-    const rooms = @json($rooms);
-    renderRooms(rooms);
+    // If contacts exist (guru/siswa), render contacts; otherwise render rooms
+    if (contacts.length > 0) {
+        renderContacts(contacts);
+    } else {
+        renderRooms(rooms);
+    }
+}
+
+function renderContacts(contacts) {
+    const el = document.getElementById('roomList');
+    const search = (document.getElementById('roomSearch').value || '').toLowerCase();
+    
+    // Check if searching by name or course
+    const filtered = contacts.filter(c => {
+        const nameMatch = c.student_name ? c.student_name.toLowerCase().includes(search) : false;
+        const courseMatch = c.courses_str ? c.courses_str.toLowerCase().includes(search) : false;
+        return nameMatch || courseMatch;
+    });
+    
+    if (!filtered.length) { 
+        el.innerHTML = '<div class="text-center py-4 text-muted" style="font-size:13px">Tidak ada kontak ditemukan</div>'; 
+        return; 
+    }
+    
+    el.innerHTML = '<div class="px-2 py-2 mb-2"><small class="text-muted fw-semibold" style="font-size:10px;text-transform:uppercase;letter-spacing:.05em">Kontak</small></div>' +
+        filtered.map(c => {
+            const isActive = activeRoom && activeRoom.contactId == c.user_id;
+            const name = c.student_name || c.teacher_name || 'Unknown';
+            const avatarUrl = c.student_photo || c.teacher_photo 
+                ? '/storage/' + (c.student_photo || c.teacher_photo)
+                : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=0c4a6e&color=fff&size=40';
+            
+            return `<div onclick="openContactChat(${c.user_id}, '${escapeHtml(name)}', '${escapeHtml(c.courses_str || '')}')"
+                class="p-3 rounded-3 mb-1 cursor-pointer" style="cursor:pointer;transition:background .15s;${isActive?'background:rgba(200,77,223,.12);border:1px solid rgba(200,77,223,.3);':'border:1px solid transparent'}">
+                <div class="d-flex align-items-center gap-2">
+                    <img src="${avatarUrl}" style="width:36px;height:36px;border-radius:10px;object-fit:cover;flex-shrink:0" alt="">
+                    <div class="flex-grow-1 min-width-0">
+                        <div class="fw-semibold" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(name)}</div>
+                        <div class="text-muted" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(c.courses_str || '')}</div>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+}
+
+function openContactChat(userId, name, courses) {
+    activeRoom = { contactId: userId, name: name, type: 'contact' };
+    document.getElementById('chatRoomName').textContent = name;
+    document.getElementById('chatRoomType').textContent = courses || 'Pesan';
+    document.getElementById('activeRoomId').value = userId;
+    document.getElementById('chatEmpty').style.display = 'none';
+    document.getElementById('chatActive').style.display = 'flex';
+    document.getElementById('chatActive').style.flexDirection = 'column';
+    
+    // Load existing chat or show empty state
+    loadContactMessages(userId);
+    if (pollInterval) clearInterval(pollInterval);
+    pollInterval = setInterval(() => loadContactMessages(userId), 5000);
+    
+    // Re-render contacts to highlight active
+    renderContacts(contacts);
+}
+
+function loadContactMessages(contactUserId) {
+    // Find existing room with this contact or create new
+    fetch(`${baseUrl}/contact/${contactUserId}/messages`, { 
+        headers: { 'X-Requested-With': 'XMLHttpRequest' } 
+    })
+    .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(res => {
+        const myId = {{ auth()->id() }};
+        const el = document.getElementById('chatMessages');
+        if (!res.data || !res.data.length) {
+            el.innerHTML = '<div class="text-center text-muted d-flex flex-column align-items-center justify-content-center h-100"><i class="bi bi-chat-square-dots" style="font-size:2.5rem;opacity:.25;margin-bottom:10px"></i><div>Mulai percakapan pertama!</div></div>';
+            return;
+        }
+        const wasAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+        el.innerHTML = res.data.map(m => {
+            const isMine = m.pengirim_id == myId;
+            const time = (m.created_at||'').toString().substring(11,16);
+            return `<div class="d-flex ${isMine?'justify-content-end':'justify-content-start'}">
+                <div style="max-width:72%">
+                    ${!isMine ? `<div style="font-size:11px;font-weight:600;color:#0284c7;margin-bottom:3px;padding-left:4px">${m.pengirim?.name||'User'}</div>` : ''}
+                    <div style="background:${isMine?'linear-gradient(135deg,#c84ddf,#7c3aed)':'var(--card-bg)'};color:${isMine?'white':'var(--text-primary)'};border:${isMine?'none':'1px solid var(--card-border)'};padding:9px 14px;border-radius:${isMine?'18px 4px 18px 18px':'4px 18px 18px 18px'};font-size:13.5px;line-height:1.5;word-break:break-word;box-shadow:${isMine?'0 2px 8px rgba(200,77,223,.25)':'0 1px 4px rgba(0,0,0,.07)'}">${m.pesan||''}</div>
+                    <div style="font-size:10px;color:var(--text-muted);margin-top:3px;text-align:${isMine?'right':'left'};padding:0 4px">${time}</div>
+                </div>
+            </div>`;
+        }).join('');
+        if (wasAtBottom || !pollInterval) { el.scrollTop = el.scrollHeight; }
+        else {
+            const btn = document.getElementById('scrollBottomBtn');
+            btn.style.display = 'flex';
+        }
+    })
+    .catch(() => {});
 }
 
 function renderRooms(rooms) {
@@ -163,22 +264,23 @@ function renderRooms(rooms) {
     const search = (document.getElementById('roomSearch').value || '').toLowerCase();
     const filtered = rooms.filter(r => r.nama_room.toLowerCase().includes(search));
     if (!filtered.length) { el.innerHTML = '<div class="text-center py-4 text-muted" style="font-size:13px">Tidak ada room ditemukan</div>'; return; }
-    el.innerHTML = filtered.map(r => {
-        const lastMsg = r.pesan && r.pesan[0] ? r.pesan[0].pesan : 'Belum ada pesan';
-        const isActive = activeRoom && activeRoom.id == r.id;
-        return `<div onclick="openRoom(${r.id},'${r.nama_room.replace(/'/g,"\\'").replace(/"/g,"&quot;")}','${r.jenis_room}')"
-            class="p-3 rounded-3 mb-1 cursor-pointer" style="cursor:pointer;transition:background .15s;${isActive?'background:rgba(200,77,223,.12);border:1px solid rgba(200,77,223,.3);':'border:1px solid transparent'}">
-            <div class="d-flex align-items-center gap-2">
-                <div style="width:36px;height:36px;border-radius:10px;background:${isActive?'linear-gradient(135deg,#c84ddf,#7c3aed)':'rgba(200,77,223,.1)'};display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;color:${isActive?'white':'#c84ddf'}">
-                    <i class="bi ${r.jenis_room==='broadcast'?'bi-megaphone':r.jenis_room==='personal'?'bi-person':'bi-people'}"></i>
+    el.innerHTML = '<div class="px-2 py-2 mb-2"><small class="text-muted fw-semibold" style="font-size:10px;text-transform:uppercase;letter-spacing:.05em">Room Chat</small></div>' +
+        filtered.map(r => {
+            const lastMsg = r.pesan && r.pesan[0] ? r.pesan[0].pesan : 'Belum ada pesan';
+            const isActive = activeRoom && activeRoom.id == r.id;
+            return `<div onclick="openRoom(${r.id},'${r.nama_room.replace(/'/g,"\\'").replace(/"/g,"&quot;")}','${r.jenis_room}')"
+                class="p-3 rounded-3 mb-1 cursor-pointer" style="cursor:pointer;transition:background .15s;${isActive?'background:rgba(200,77,223,.12);border:1px solid rgba(200,77,223,.3);':'border:1px solid transparent'}">
+                <div class="d-flex align-items-center gap-2">
+                    <div style="width:36px;height:36px;border-radius:10px;background:${isActive?'linear-gradient(135deg,#c84ddf,#7c3aed)':'rgba(200,77,223,.1)'};display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;color:${isActive?'white':'#c84ddf'}">
+                        <i class="bi ${r.jenis_room==='broadcast'?'bi-megaphone':r.jenis_room==='personal'?'bi-person':'bi-people'}"></i>
+                    </div>
+                    <div class="flex-grow-1 min-width-0">
+                        <div class="fw-semibold" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.nama_room}</div>
+                        <div class="text-muted" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${lastMsg ? lastMsg.substring(0,35) : 'Belum ada pesan'}</div>
+                    </div>
                 </div>
-                <div class="flex-grow-1 min-width-0">
-                    <div class="fw-semibold" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.nama_room}</div>
-                    <div class="text-muted" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${lastMsg ? lastMsg.substring(0,35) : 'Belum ada pesan'}</div>
-                </div>
-            </div>
-        </div>`;
-    }).join('');
+            </div>`;
+        }).join('');
 }
 
 function openRoom(id, name, type) {
@@ -241,15 +343,23 @@ document.getElementById('messageForm').addEventListener('submit', function(e) {
     const input  = document.getElementById('messageInput');
     if (!input.value.trim() || !roomId) return;
     const fd = new FormData(this);
-    fetch(`${baseUrl}/${roomId}/send`, { method: 'POST', body: fd, headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(d => { if (d.success) { input.value = ''; loadMessages(roomId); } else showToast(d.message || 'Gagal mengirim pesan.', 'error'); })
-        .catch(() => showToast('Gagal mengirim pesan. Coba lagi.', 'error'));
+    
+    // Check if we're in contact mode or room mode
+    if (activeRoom && activeRoom.type === 'contact') {
+        fetch(`${baseUrl}/contact/${roomId}/send`, { method: 'POST', body: fd, headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(d => { if (d.success) { input.value = ''; loadContactMessages(roomId); } else showToast(d.message || 'Gagal mengirim pesan.', 'error'); })
+            .catch(() => showToast('Gagal mengirim pesan. Coba lagi.', 'error'));
+    } else {
+        fetch(`${baseUrl}/${roomId}/send`, { method: 'POST', body: fd, headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(d => { if (d.success) { input.value = ''; loadMessages(roomId); } else showToast(d.message || 'Gagal mengirim pesan.', 'error'); })
+            .catch(() => showToast('Gagal mengirim pesan. Coba lagi.', 'error'));
+    }
 });
 
 document.getElementById('roomSearch').addEventListener('input', () => {
-    const rooms = @json($rooms);
-    renderRooms(rooms);
+    loadRooms();
 });
 @if($allowCreateRoom ?? auth()->user()->hasRole('admin'))
 function openRoomModal() {
