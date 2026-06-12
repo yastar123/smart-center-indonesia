@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
+use App\Models\AbsensiSiswa;
 use App\Models\Schedule;
-use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\SchoolClass;
-use App\Services\ScheduleAgreementService;
-use App\Services\ScheduleLockService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -35,95 +33,89 @@ class AttendanceController extends Controller
 
     public function getStudents(Schedule $schedule)
     {
-        $lockService = app(ScheduleLockService::class);
-        $agreementService = app(ScheduleAgreementService::class);
+        // Load students from the class roster (class_students), not branch-wide
+        $studentIds = DB::table('class_students')
+            ->where('class_id', $schedule->kelas_id)
+            ->pluck('student_id');
 
-        if ($schedule->agreements()->count() === 0) {
-            $agreementService->syncForSchedule($schedule);
-        }
-
-        $students = Student::where('status', 'aktif')
-            ->when($schedule->cabang_id, fn($q) => $q->where('branch_id', $schedule->cabang_id))
+        $students = DB::table('students')
+            ->whereIn('id', $studentIds)
+            ->where('status', 'aktif')
             ->orderBy('name')
-            ->get();
+            ->get(['id', 'name', 'nis', 'photo']);
 
+        // Existing attendance records for this schedule
         $existing = DB::table('absensi_siswas')
             ->where('jadwal_id', $schedule->id)
-            ->pluck('status', 'siswa_id');
-
-        $agreements = $schedule->agreements()->get()->keyBy('student_id');
-
-        $attendanceLocked = $lockService->isAttendanceLocked($schedule);
-        $hasAttendance    = $lockService->hasAttendance($schedule);
+            ->get(['siswa_id', 'guru_hadir', 'siswa_konfirmasi_at', 'status'])
+            ->keyBy('siswa_id');
 
         return response()->json([
-            'success'            => true,
-            'students'           => $students,
-            'existing'           => $existing,
-            'attendance_locked'  => $attendanceLocked,
-            'has_attendance'     => $hasAttendance,
-            'schedule_locked'    => $lockService->isScheduleLocked($schedule),
-            'all_agreed'         => $agreementService->allStudentsAgreed($schedule),
-            'agreements'         => $agreements,
+            'success'  => true,
+            'students' => $students,
+            'existing' => $existing,
         ]);
     }
 
     public function store(Request $request)
     {
         $schedule = Schedule::findOrFail($request->input('jadwal_id'));
-        $lockService = app(ScheduleLockService::class);
-        $agreementService = app(ScheduleAgreementService::class);
-
-        // Permanently locked once attendance already exists
-        if ($lockService->hasAttendance($schedule)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Absensi sudah pernah disimpan dan tidak dapat diubah.',
-            ], 422);
-        }
-
-        if ($lockService->isAttendanceLocked($schedule)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Absensi tidak dapat diubah karena jadwal pertemuan sudah selesai.',
-            ], 422);
-        }
-
-        if (! $agreementService->allStudentsAgreed($schedule)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Absensi hanya dapat diisi setelah guru dan siswa sepakat pada jadwal.',
-            ], 422);
-        }
 
         $data = $request->validate([
-            'jadwal_id'              => 'required|exists:schedules,id',
-            'absensi'                => 'required|array|min:1',
-            'absensi.*.siswa_id'     => 'required|exists:students,id',
-            'absensi.*.status'       => 'required|in:hadir,izin,sakit,alpa',
-            'catatan'                => 'nullable|string',
+            'jadwal_id'       => 'required|exists:schedules,id',
+            'hadir_ids'       => 'nullable|array',
+            'hadir_ids.*'     => 'integer|exists:students,id',
         ]);
 
-        $now = now();
-        $rows = [];
-        foreach ($data['absensi'] as $item) {
-            $rows[] = [
-                'jadwal_id'  => $data['jadwal_id'],
-                'siswa_id'   => $item['siswa_id'],
-                'status'     => $item['status'],
-                'catatan'    => $data['catatan'] ?? null,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ];
+        // All students in this class
+        $allStudentIds = DB::table('class_students')
+            ->where('class_id', $schedule->kelas_id)
+            ->pluck('student_id')
+            ->toArray();
+
+        if (empty($allStudentIds)) {
+            return response()->json(['success' => false, 'message' => 'Belum ada siswa di kelas ini.'], 422);
         }
 
-        // Insert only — never update existing records (permanent lock)
-        DB::table('absensi_siswas')->insertOrIgnore($rows);
+        $hadirIds = array_map('intval', $data['hadir_ids'] ?? []);
+        $now      = now();
 
-        // Mark schedule as selesai
-        $schedule->update(['status' => 'selesai']);
+        foreach ($allStudentIds as $studentId) {
+            $guruHadir = in_array($studentId, $hadirIds);
 
-        return response()->json(['success' => true, 'message' => 'Absensi berhasil disimpan dan dikunci!']);
+            // Get existing record to preserve siswa_konfirmasi_at
+            $existing = DB::table('absensi_siswas')
+                ->where('jadwal_id', $schedule->id)
+                ->where('siswa_id', $studentId)
+                ->first();
+
+            $siswaKonfirmasiAt = $existing?->siswa_konfirmasi_at;
+
+            // If student already confirmed and guru is now un-marking them, preserve the record but mark invalid
+            $status = AbsensiSiswa::computeStatus($guruHadir, $siswaKonfirmasiAt);
+
+            if ($existing) {
+                DB::table('absensi_siswas')
+                    ->where('jadwal_id', $schedule->id)
+                    ->where('siswa_id', $studentId)
+                    ->update([
+                        'guru_hadir'  => $guruHadir,
+                        'status'      => $status,
+                        'updated_at'  => $now,
+                    ]);
+            } else {
+                DB::table('absensi_siswas')->insert([
+                    'jadwal_id'  => $schedule->id,
+                    'siswa_id'   => $studentId,
+                    'guru_hadir' => $guruHadir,
+                    'status'     => $status,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
+            }
+        }
+
+        return response()->json(['success' => true, 'message' => 'Absensi berhasil disimpan. Siswa yang ditandai hadir akan melihat tombol konfirmasi.']);
     }
 
     public function report(Request $request)
@@ -138,9 +130,8 @@ class AttendanceController extends Controller
             ->when($request->tahun, fn($q) => $q->whereYear('sch.tanggal', $request->tahun))
             ->select('s.name', DB::raw("
                 SUM(CASE WHEN ab.status='hadir' THEN 1 ELSE 0 END) as hadir,
-                SUM(CASE WHEN ab.status='izin' THEN 1 ELSE 0 END) as izin,
-                SUM(CASE WHEN ab.status='sakit' THEN 1 ELSE 0 END) as sakit,
-                SUM(CASE WHEN ab.status='alpa' THEN 1 ELSE 0 END) as alpa,
+                SUM(CASE WHEN ab.status='menunggu_konfirmasi' THEN 1 ELSE 0 END) as menunggu,
+                SUM(CASE WHEN ab.status='tidak_hadir' THEN 1 ELSE 0 END) as tidak_hadir,
                 COUNT(*) as total
             "))
             ->groupBy('s.name', 's.id')

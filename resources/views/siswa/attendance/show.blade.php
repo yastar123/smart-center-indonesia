@@ -16,18 +16,28 @@
                 <i class="bi bi-arrow-left me-1"></i>Kembali
             </a>
             <div>
-                <div style="font-size:11px;opacity:.6;margin-bottom:2px;text-transform:uppercase;letter-spacing:.08em">
-                    Riwayat Absensi
-                </div>
+                <div style="font-size:11px;opacity:.6;margin-bottom:2px;text-transform:uppercase;letter-spacing:.08em">Riwayat Absensi</div>
                 <h5 class="fw-bold mb-0" style="color:white">{{ $course->nama }}</h5>
-                <div style="font-size:12px;opacity:.7;margin-top:2px">
-                    Detail kehadiran per pertemuan
-                </div>
+                <div style="font-size:12px;opacity:.7;margin-top:2px">Detail kehadiran per pertemuan</div>
             </div>
         </div>
         <div style="font-size:64px;opacity:.08;line-height:1;flex-shrink:0">
             <i class="bi bi-clipboard2-check"></i>
         </div>
+    </div>
+</div>
+
+{{-- STATUS LEGEND --}}
+<div class="dashboard-card mb-4 fade-up" style="border-left:4px solid #c84ddf">
+    <div class="fw-semibold mb-2" style="font-size:13px;color:var(--text-primary)">
+        <i class="bi bi-info-circle text-primary me-2"></i>Status Absensi
+    </div>
+    <div class="d-flex flex-wrap gap-2" style="font-size:12px">
+        <span style="background:var(--soft-success-bg);color:#10b981;padding:3px 10px;border-radius:6px;font-weight:600">✅ Hadir</span>
+        <span style="font-size:11px;color:var(--text-muted)">= Guru menandai + kamu konfirmasi</span>
+        <span class="d-block d-sm-none w-100"></span>
+        <span style="background:var(--soft-warning-bg);color:#f6af23;padding:3px 10px;border-radius:6px;font-weight:600">⏳ Menunggu Konfirmasimu</span>
+        <span style="font-size:11px;color:var(--text-muted)">= Guru menandai hadir, kamu belum konfirmasi</span>
     </div>
 </div>
 
@@ -58,62 +68,61 @@
                     <th>Pertemuan</th>
                     <th>Tanggal</th>
                     <th>Waktu</th>
-                    <th>Persetujuan Jadwal</th>
-                    <th>Absensi</th>
+                    <th>Status Absensi</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($class->jadwal as $i => $j)
                 @php
-                    $agreement = $agreements[$j->id] ?? null;
-                    $status = $myAttendance[$j->id] ?? null;
-                    $scheduleLocked = $lockService->isScheduleLocked($j);
-                    $attendanceLocked = $lockService->isAttendanceLocked($j);
+                    $rec     = $myAttendance[$j->id] ?? null;
+                    $guruHadir    = $rec ? (bool)$rec->guru_hadir : false;
+                    $siswaKonfirm = $rec ? $rec->siswa_konfirmasi_at : null;
+                    $status       = $rec?->status ?? 'tidak_hadir';
+
                     $statusMap = [
-                        'hadir' => ['bg'=>'var(--soft-success-bg)','color'=>'#10b981','label'=>'Hadir'],
-                        'izin'  => ['bg'=>'var(--soft-info-bg)','color'=>'#0284c7','label'=>'Izin'],
-                        'sakit' => ['bg'=>'var(--soft-warning-bg)','color'=>'#f6af23','label'=>'Sakit'],
-                        'alpa'  => ['bg'=>'var(--soft-danger-bg)','color'=>'#ef4444','label'=>'Alpa'],
+                        'hadir'               => ['bg'=>'var(--soft-success-bg)','color'=>'#10b981','label'=>'Hadir','icon'=>'bi-check-circle-fill'],
+                        'menunggu_konfirmasi' => ['bg'=>'var(--soft-warning-bg)','color'=>'#f6af23','label'=>'Menunggu Konfirmasimu','icon'=>'bi-hourglass-split'],
+                        'tidak_valid'         => ['bg'=>'var(--soft-muted-bg)','color'=>'var(--text-muted)','label'=>'Tidak Valid','icon'=>'bi-x-circle'],
+                        'tidak_hadir'         => ['bg'=>'var(--soft-danger-bg)','color'=>'#ef4444','label'=>'Tidak Hadir','icon'=>'bi-x-circle'],
                     ];
+                    $sm = $statusMap[$status] ?? $statusMap['tidak_hadir'];
+
+                    $canConfirm = $guruHadir && !$siswaKonfirm;
                 @endphp
                 <tr>
                     <td>{{ $i + 1 }}</td>
-                    <td class="fw-semibold">Pertemuan #{{ $j->pertemuan_ke }}</td>
+                    <td class="fw-semibold">
+                        @if($j->pertemuan_ke)
+                        <span style="background:var(--soft-primary-bg);color:var(--soft-primary-text);padding:2px 8px;border-radius:6px;font-size:12px;font-weight:700">Pertemuan #{{ $j->pertemuan_ke }}</span>
+                        @else
+                        —
+                        @endif
+                    </td>
                     <td>{{ $j->tanggal->locale('id')->isoFormat('D MMM Y') }}</td>
                     <td>{{ \Carbon\Carbon::parse($j->jam_mulai)->format('H:i') }} – {{ \Carbon\Carbon::parse($j->jam_selesai)->format('H:i') }}</td>
                     <td>
-                        @if($agreement && $agreement->isAgreed())
-                        <span class="badge bg-success"><i class="bi bi-check2-all me-1"></i>Sepakat</span>
-                        @else
-                        <span class="badge bg-warning text-dark">Menunggu</span>
-                        @if(!$scheduleLocked)
-                        <form action="{{ route('siswa.schedules.confirm', $j->id) }}" method="POST" class="d-inline ms-1 confirm-schedule-form">
-                            @csrf
-                            <button type="submit" class="btn btn-xs btn-outline-primary btn-sm" style="font-size:11px">
-                                Konfirmasi
-                            </button>
-                        </form>
-                        @else
-                        <span class="text-muted small d-block">Terkunci H-1</span>
-                        @endif
-                        @endif
-                    </td>
-                    <td>
-                        @if($status)
-                        @php $b = $statusMap[$status] ?? null; @endphp
-                        <span class="badge" style="background:{{ $b['bg'] ?? '#eee' }};color:{{ $b['color'] ?? '#333' }}">
-                            {{ $b['label'] ?? ucfirst($status) }}
+                        @if($rec)
+                        <span class="badge" style="background:{{ $sm['bg'] }};color:{{ $sm['color'] }};font-size:11.5px;padding:4px 10px;border-radius:7px;font-weight:600">
+                            <i class="bi {{ $sm['icon'] }} me-1"></i>{{ $sm['label'] }}
                         </span>
-                        @elseif($attendanceLocked)
-                        <span class="text-muted small">Belum diisi</span>
                         @else
-                        <span class="text-muted">—</span>
+                        <span class="text-muted" style="font-size:12px">Guru belum mengisi</span>
                         @endif
                     </td>
                     <td>
-                        @if($attendanceLocked && $status)
-                        <span class="text-muted small"><i class="bi bi-lock me-1"></i>Terkunci</span>
+                        @if($canConfirm)
+                        <button class="btn btn-success btn-sm confirm-btn" data-schedule="{{ $j->id }}"
+                                style="border-radius:8px;font-size:12px;font-weight:600">
+                            <i class="bi bi-hand-thumbs-up me-1"></i>Konfirmasi Kehadiran
+                        </button>
+                        @elseif($siswaKonfirm)
+                        <span class="text-muted" style="font-size:12px">
+                            <i class="bi bi-check2-all text-success me-1"></i>
+                            Dikonfirmasi {{ \Carbon\Carbon::parse($siswaKonfirm)->locale('id')->diffForHumans() }}
+                        </span>
+                        @else
+                        <span class="text-muted" style="font-size:12px">—</span>
                         @endif
                     </td>
                 </tr>
@@ -128,19 +137,34 @@
 
 @push('scripts')
 <script>
-document.querySelectorAll('.confirm-schedule-form').forEach(form => {
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        fetch(this.action, {
+document.querySelectorAll('.confirm-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const scheduleId = this.dataset.schedule;
+        const original   = this.innerHTML;
+        this.disabled  = true;
+        this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Mengkonfirmasi...';
+
+        fetch('/siswa/attendance/' + scheduleId + '/confirm', {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
             }
-        }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(d => {
-            if (d.success) { location.reload(); }
-            else showToast(d.message || 'Gagal konfirmasi', 'error');
-        }).catch(() => showToast('Terjadi kesalahan. Coba lagi.', 'error'));
+        }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(d => {
+            if (d.success) {
+                showToast(d.message || 'Kehadiran dikonfirmasi!', 'success');
+                setTimeout(() => location.reload(), 700);
+            } else {
+                this.disabled  = false;
+                this.innerHTML = original;
+                showToast(d.message || 'Gagal konfirmasi', 'error');
+            }
+        }).catch(() => {
+            this.disabled  = false;
+            this.innerHTML = original;
+            showToast('Terjadi kesalahan. Coba lagi.', 'error');
+        });
     });
 });
 </script>

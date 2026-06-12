@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Siswa;
 
 use App\Http\Controllers\Controller;
+use App\Models\AbsensiSiswa;
 use App\Models\Course;
-use App\Models\SchoolClass;
 use App\Models\Schedule;
-use App\Models\ScheduleStudentAgreement;
+use App\Models\SchoolClass;
 use App\Models\Student;
-use App\Services\ScheduleLockService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -48,7 +47,16 @@ class AttendanceController extends Controller
             ->get()
             ->keyBy('mata_pelajaran_id');
 
-        return view('siswa.attendance.index', compact('courses', 'meetingCounts', 'attendanceSummary', 'student'));
+        // Pending confirmations count (guru marked hadir, student hasn't confirmed)
+        $pendingConfirmations = DB::table('absensi_siswas')
+            ->where('siswa_id', $student->id)
+            ->where('guru_hadir', true)
+            ->whereNull('siswa_konfirmasi_at')
+            ->count();
+
+        return view('siswa.attendance.index', compact(
+            'courses', 'meetingCounts', 'attendanceSummary', 'student', 'pendingConfirmations'
+        ));
     }
 
     public function show(Course $course)
@@ -66,25 +74,50 @@ class AttendanceController extends Controller
 
         $scheduleIds = $classes->flatMap(fn ($c) => $c->jadwal->pluck('id'));
 
+        // Load absensi records with dual-confirmation fields
         $myAttendance = DB::table('absensi_siswas')
             ->where('siswa_id', $student->id)
             ->whereIn('jadwal_id', $scheduleIds)
-            ->pluck('status', 'jadwal_id');
-
-        $agreements = ScheduleStudentAgreement::where('student_id', $student->id)
-            ->whereIn('schedule_id', $scheduleIds)
-            ->get()
-            ->keyBy('schedule_id');
-
-        $lockService = app(ScheduleLockService::class);
+            ->get(['jadwal_id', 'guru_hadir', 'siswa_konfirmasi_at', 'status'])
+            ->keyBy('jadwal_id');
 
         return view('siswa.attendance.show', compact(
-            'course', 'classes', 'myAttendance', 'agreements', 'student', 'lockService'
+            'course', 'classes', 'myAttendance', 'student'
         ));
     }
 
-    public function confirmSchedule(Schedule $schedule)
+    public function confirmAttendance(Schedule $schedule)
     {
-        return app(ScheduleAgreementController::class)->confirm(request(), $schedule);
+        $student = Student::where('user_id', auth()->id())->first();
+        if (! $student) {
+            return response()->json(['success' => false, 'message' => 'Profil siswa tidak ditemukan.'], 403);
+        }
+
+        $record = DB::table('absensi_siswas')
+            ->where('jadwal_id', $schedule->id)
+            ->where('siswa_id', $student->id)
+            ->first();
+
+        if (! $record) {
+            return response()->json(['success' => false, 'message' => 'Data absensi belum tersedia. Guru belum mengisi absensi.'], 404);
+        }
+
+        if ($record->siswa_konfirmasi_at) {
+            return response()->json(['success' => false, 'message' => 'Kehadiran sudah dikonfirmasi sebelumnya.'], 422);
+        }
+
+        $now    = now();
+        $status = AbsensiSiswa::computeStatus((bool) $record->guru_hadir, $now);
+
+        DB::table('absensi_siswas')
+            ->where('jadwal_id', $schedule->id)
+            ->where('siswa_id', $student->id)
+            ->update([
+                'siswa_konfirmasi_at' => $now,
+                'status'              => $status,
+                'updated_at'          => $now,
+            ]);
+
+        return response()->json(['success' => true, 'message' => 'Kehadiran berhasil dikonfirmasi!', 'status' => $status]);
     }
 }

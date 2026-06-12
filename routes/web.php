@@ -291,14 +291,17 @@ Route::middleware(['auth'])
             return view('siswa.announcements', compact('announcements'))->with('student', null);
         })->name('announcements');
 
-        // Absensi: keep API endpoints used by class attendance, remove standalone index page
+        // JADWAL GURU — guru dapat melihat & mengedit jadwal miliknya
+        Route::get('/schedules',               [\App\Http\Controllers\Guru\ScheduleController::class, 'index']) ->name('schedules.index');
+        Route::get('/schedules/{schedule}',    [\App\Http\Controllers\Guru\ScheduleController::class, 'show'])  ->name('schedules.show');
+        Route::put('/schedules/{schedule}',    [\App\Http\Controllers\Guru\ScheduleController::class, 'update'])->name('schedules.update');
+
+        // Absensi: API endpoints used by class attendance page
         Route::get('/attendance/history', [\App\Http\Controllers\Guru\AttendanceHistoryController::class, 'index'])->name('attendance.history');
         Route::get('/attendance/history/{course}', [\App\Http\Controllers\Guru\AttendanceHistoryController::class, 'show'])->name('attendance.history.show');
         Route::get('/attendance/{schedule}/students',    [AttendanceController::class, 'getStudents'])->name('attendance.students');
         Route::post('/attendance',                       [AttendanceController::class, 'store'])      ->name('attendance.store');
         Route::get('/attendance/report',                 [AttendanceController::class, 'report'])     ->name('attendance.report');
-        Route::post('/schedules/{schedule}/confirm',     [\App\Http\Controllers\Guru\ScheduleAgreementController::class, 'confirm'])->name('schedules.confirm');
-        Route::get('/schedules/{schedule}/info',         [\App\Http\Controllers\Guru\ScheduleAgreementController::class, 'scheduleInfo'])->name('schedules.info');
 
 
         // Schedule Agreements (Proposals)
@@ -327,7 +330,8 @@ Route::middleware(['auth'])
         Route::post('/messages/{room}/send',       [\App\Http\Controllers\Admin\MessageController::class, 'sendMessage']) ->name('messages.send');
         Route::post('/messages/room',              [\App\Http\Controllers\Admin\MessageController::class, 'createRoom'])  ->name('messages.createRoom');
 
-        // Jadwal (dihapus) -- route jadwal siswa dihapus sesuai permintaan
+        // JADWAL SISWA — read-only view
+        Route::get('/schedules', [\App\Http\Controllers\Siswa\ScheduleController::class, 'index'])->name('schedules.index');
 
         // Sertifikat
         Route::get('/certificates',                           [SiswaController::class, 'certificates'])      ->name('certificates.index');
@@ -352,10 +356,10 @@ Route::middleware(['auth'])
             return view('siswa.announcements', compact('announcements', 'student'));
         })->name('announcements');
 
-        // Absensi (Siswa) — Riwayat Absensi
+        // Absensi (Siswa) — Riwayat & Konfirmasi Kehadiran
         Route::get('/attendance', [\App\Http\Controllers\Siswa\AttendanceController::class, 'index'])->name('attendance');
         Route::get('/attendance/{course}', [\App\Http\Controllers\Siswa\AttendanceController::class, 'show'])->name('attendance.show');
-        Route::post('/schedules/{schedule}/confirm', [\App\Http\Controllers\Siswa\ScheduleAgreementController::class, 'confirm'])->name('schedules.confirm');
+        Route::post('/attendance/{schedule}/confirm', [\App\Http\Controllers\Siswa\AttendanceController::class, 'confirmAttendance'])->name('attendance.confirm');
 
         // List Mata Pelajaran
         Route::get('/courses', [\App\Http\Controllers\Siswa\CourseController::class, 'index'])->name('courses.index');

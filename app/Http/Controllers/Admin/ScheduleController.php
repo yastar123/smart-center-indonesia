@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Schedule;
 use App\Models\SchoolClass;
 use App\Models\Branch;
-use App\Services\ScheduleAgreementService;
 use App\Services\ScheduleLockService;
 use Illuminate\Http\Request;
 
@@ -44,17 +43,17 @@ class ScheduleController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'kelas_id'    => 'required|exists:school_classes,id',
-            'pertemuan_ke'=> 'required|integer|min:1',
-            'tanggal'     => 'required|date',
+            'kelas_id'        => 'required|exists:school_classes,id',
+            'pertemuan_ke'    => 'required|integer|min:1',
+            'tanggal'         => 'required|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal',
-            'jam_mulai'   => 'required',
-            'jam_selesai' => 'required',
-            'topik'       => 'nullable|string|max:200',
-            'jenis'       => 'required|in:offline,online,private',
-            'ruangan'     => 'nullable|string|max:100',
-            'link_meeting'=> 'nullable|string|max:500',
-            'catatan'     => 'nullable|string',
+            'jam_mulai'       => 'required',
+            'jam_selesai'     => 'required',
+            'topik'           => 'nullable|string|max:200',
+            'jenis'           => 'required|in:offline,online,private',
+            'ruangan'         => 'nullable|string|max:100',
+            'link_meeting'    => 'nullable|string|max:500',
+            'catatan'         => 'nullable|string',
         ]);
 
         $kelas = SchoolClass::findOrFail($data['kelas_id']);
@@ -70,9 +69,7 @@ class ScheduleController extends Controller
         $schedule = Schedule::create($data);
         $schedule->load(['kelas.guru', 'kelas.cabang', 'kelas.mataPelajaran']);
 
-        app(ScheduleAgreementService::class)->syncForSchedule($schedule);
-
-        return response()->json(['success' => true, 'message' => 'Jadwal berhasil ditambahkan', 'data' => $schedule]);
+        return response()->json(['success' => true, 'message' => 'Jadwal berhasil ditambahkan. Guru telah mendapat notifikasi.', 'data' => $schedule]);
     }
 
     public function show(Schedule $schedule)
@@ -92,18 +89,18 @@ class ScheduleController extends Controller
         }
 
         $data = $request->validate([
-            'kelas_id'    => 'required|exists:school_classes,id',
-            'pertemuan_ke'=> 'required|integer|min:1',
-            'tanggal'     => 'required|date',
+            'kelas_id'        => 'required|exists:school_classes,id',
+            'pertemuan_ke'    => 'required|integer|min:1',
+            'tanggal'         => 'required|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal',
-            'jam_mulai'   => 'required',
-            'jam_selesai' => 'required',
-            'topik'       => 'nullable|string|max:200',
-            'jenis'       => 'required|in:offline,online,private',
-            'ruangan'     => 'nullable|string|max:100',
-            'link_meeting'=> 'nullable|string|max:500',
-            'status'      => 'required|in:dijadwalkan,berlangsung,selesai,dibatalkan',
-            'catatan'     => 'nullable|string',
+            'jam_mulai'       => 'required',
+            'jam_selesai'     => 'required',
+            'topik'           => 'nullable|string|max:200',
+            'jenis'           => 'required|in:offline,online,private',
+            'ruangan'         => 'nullable|string|max:100',
+            'link_meeting'    => 'nullable|string|max:500',
+            'status'          => 'required|in:dijadwalkan,berlangsung,selesai,dibatalkan',
+            'catatan'         => 'nullable|string',
         ]);
 
         $kelas = SchoolClass::findOrFail($data['kelas_id']);
@@ -115,8 +112,6 @@ class ScheduleController extends Controller
         $data['cabang_id'] = $kelas->cabang_id;
 
         $schedule->update($data);
-
-        app(ScheduleAgreementService::class)->syncForSchedule($schedule->fresh());
 
         return response()->json(['success' => true, 'message' => 'Jadwal berhasil diperbarui']);
     }

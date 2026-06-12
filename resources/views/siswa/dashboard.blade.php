@@ -9,6 +9,7 @@ use App\Models\Student;
 use App\Models\Invoice;
 use App\Models\Schedule;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 $student = Student::where('user_id', auth()->id())->first();
 
@@ -27,14 +28,31 @@ $totalLunas   = $student
     : 0;
 $sisaTunggakan = $totalTagihan - $totalLunas;
 
-// Schedules for this branch (public schedules)
-$weekSchedules = ($student && $student->branch_id)
-    ? Schedule::where('cabang_id', $student->branch_id)
+// Schedules for classes student is enrolled in this week
+$classIds = $student
+    ? DB::table('class_students')->where('student_id', $student->id)->pluck('class_id')
+    : collect();
+$weekSchedules = $classIds->isNotEmpty()
+    ? Schedule::with(['kelas.mataPelajaran', 'kelas.guru'])
+        ->whereIn('kelas_id', $classIds)
         ->whereBetween('tanggal', [now()->startOfWeek(), now()->endOfWeek()])
         ->where('status','!=','dibatalkan')
         ->orderBy('tanggal')->orderBy('jam_mulai')
         ->limit(10)->get()
     : collect();
+
+// Pending attendance confirmations (guru marked hadir, student hasn't confirmed)
+$pendingAttendances = $student ? DB::table('absensi_siswas as ab')
+    ->join('schedules as s', 's.id', '=', 'ab.jadwal_id')
+    ->join('school_classes as sc', 'sc.id', '=', 's.kelas_id')
+    ->leftJoin('courses as c', 'c.id', '=', 'sc.mata_pelajaran_id')
+    ->where('ab.siswa_id', $student->id)
+    ->where('ab.guru_hadir', true)
+    ->whereNull('ab.siswa_konfirmasi_at')
+    ->select('ab.jadwal_id', 's.tanggal', 's.jam_mulai', 's.jam_selesai', 's.pertemuan_ke', 'sc.nama_kelas', 'c.nama as mapel')
+    ->orderByDesc('s.tanggal')
+    ->limit(5)
+    ->get() : collect();
 @endphp
 
 {{-- WELCOME BANNER --}}
@@ -148,6 +166,44 @@ $weekSchedules = ($student && $student->branch_id)
         </div>
     </div>
 </div>
+
+{{-- PENDING CONFIRMATIONS ALERT --}}
+@if($pendingAttendances->isNotEmpty())
+<div class="dashboard-card mb-4 fade-up" style="border-left:4px solid #f6af23;background:var(--soft-warning-bg)">
+    <div class="d-flex align-items-start gap-3">
+        <div style="width:40px;height:40px;border-radius:12px;background:#f6af231a;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <i class="bi bi-hand-thumbs-up-fill" style="color:#f6af23;font-size:18px"></i>
+        </div>
+        <div style="flex:1;min-width:0">
+            <div class="fw-bold mb-1" style="font-size:14px;color:var(--text-primary)">
+                {{ $pendingAttendances->count() }} Kehadiran Menunggu Konfirmasimu
+            </div>
+            <p class="text-muted mb-2" style="font-size:12.5px">
+                Guru telah menandai kamu hadir pada sesi berikut. Konfirmasi kehadiranmu agar status menjadi <strong>Hadir</strong>.
+            </p>
+            <div class="d-flex flex-column gap-1 mb-2">
+                @foreach($pendingAttendances as $pa)
+                <div class="d-flex align-items-center gap-2" style="font-size:12px;color:var(--text-muted)">
+                    <i class="bi bi-calendar3" style="color:#f6af23;flex-shrink:0"></i>
+                    <span class="fw-semibold" style="color:var(--text-primary)">{{ $pa->mapel ?? 'Kelas' }}</span>
+                    <span>·</span>
+                    @if($pa->pertemuan_ke)
+                    <span>Pertemuan ke-{{ $pa->pertemuan_ke }}</span>
+                    <span>·</span>
+                    @endif
+                    <span>{{ \Carbon\Carbon::parse($pa->tanggal)->locale('id')->isoFormat('D MMM Y') }}</span>
+                    <span>·</span>
+                    <span>{{ \Carbon\Carbon::parse($pa->jam_mulai)->format('H:i') }}</span>
+                </div>
+                @endforeach
+            </div>
+            <a href="{{ route('siswa.attendance') }}" class="btn btn-sm" style="border-radius:9px;background:#f6af23;color:white;border:none;font-weight:600;font-size:12.5px">
+                <i class="bi bi-hand-thumbs-up me-1"></i>Konfirmasi Sekarang
+            </a>
+        </div>
+    </div>
+</div>
+@endif
 
 <div class="row g-4" id="pembayaran">
 

@@ -3370,8 +3370,8 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('guru.schedule-agreements.index') }}" class="nav-link {{ request()->routeIs('guru.schedule-agreements.*') ? 'active' : '' }}" data-label="Persetujuan Jadwal">
-                <i class="bi bi-calendar-check"></i><span>Persetujuan Jadwal</span>
+            <a href="{{ route('guru.schedules.index') }}" class="nav-link {{ request()->routeIs('guru.schedules.*') ? 'active' : '' }}" data-label="Jadwal Saya">
+                <i class="bi bi-calendar3"></i><span>Jadwal Saya</span>
             </a>
         </div>
         <div class="nav-item">
@@ -3399,7 +3399,11 @@
                 <i class="bi bi-speedometer2"></i><span>Dashboard</span>
             </a>
         </div>
-        {{-- Jadwal siswa dihapus: link dihilangkan sesuai permintaan --}}
+        <div class="nav-item">
+            <a href="{{ route('siswa.schedules.index') }}" class="nav-link {{ request()->routeIs('siswa.schedules.*') ? 'active' : '' }}" data-label="Jadwal Pertemuan">
+                <i class="bi bi-calendar-check"></i><span>Jadwal Pertemuan</span>
+            </a>
+        </div>
         <div class="nav-item">
             <a href="{{ route('siswa.courses.index') }}" class="nav-link {{ request()->routeIs('siswa.courses.index') ? 'active' : '' }}" data-label="List Mata Pelajaran">
                 <i class="bi bi-journal-bookmark"></i><span>List Mata Pelajaran</span>
@@ -3413,11 +3417,6 @@
         <div class="nav-item">
             <a href="{{ route('siswa.attendance') }}" class="nav-link {{ request()->routeIs('siswa.attendance*') ? 'active' : '' }}" data-label="Absensi">
                 <i class="bi bi-clipboard-check"></i><span>Absensi</span>
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="{{ route('siswa.schedule-agreements.index') }}" class="nav-link {{ request()->routeIs('siswa.schedule-agreements.*') ? 'active' : '' }}" data-label="Persetujuan Jadwal">
-                <i class="bi bi-calendar-check"></i><span>Persetujuan Jadwal</span>
             </a>
         </div>
         <div class="nav-item">

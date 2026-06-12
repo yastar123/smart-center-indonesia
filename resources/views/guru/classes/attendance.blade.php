@@ -18,9 +18,7 @@
                     <i class="bi bi-arrow-left me-1"></i>Kembali
                 </a>
                 <div>
-                    <div style="font-size:11px;opacity:.6;margin-bottom:2px;text-transform:uppercase;letter-spacing:.08em">
-                        Input Absensi
-                    </div>
+                    <div style="font-size:11px;opacity:.6;margin-bottom:2px;text-transform:uppercase;letter-spacing:.08em">Input Absensi</div>
                     <h5 class="fw-bold mb-0" style="color:white">{{ $class->nama_kelas }}</h5>
                     <div style="font-size:12px;opacity:.75">
                         {{ $class->mataPelajaran->nama ?? '–' }} · {{ $class->cabang->name ?? 'Pusat' }}
@@ -41,11 +39,43 @@
     <div class="d-flex align-items-center gap-2 flex-wrap" style="font-size:12px;color:var(--text-muted)">
         <i class="bi bi-info-circle text-primary me-1"></i>
         <span class="fw-semibold text-primary me-2">Alur Absensi:</span>
-        <span class="badge" style="background:var(--soft-warning-bg);color:var(--soft-warning-text);padding:4px 9px;border-radius:7px">① Jadwal Disetujui Semua Pihak</span>
+        <span class="badge" style="background:var(--soft-warning-bg);color:var(--soft-warning-text);padding:4px 9px;border-radius:7px">① Guru menandai siswa hadir</span>
         <i class="bi bi-arrow-right" style="font-size:11px"></i>
-        <span class="badge" style="background:var(--soft-success-bg);color:var(--soft-success-text);padding:4px 9px;border-radius:7px">② Guru Isi &amp; Simpan Absensi</span>
+        <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);padding:4px 9px;border-radius:7px">② Siswa klik tombol "Konfirmasi Kehadiran"</span>
         <i class="bi bi-arrow-right" style="font-size:11px"></i>
-        <span class="badge" style="background:rgba(239,68,68,.1);color:#ef4444;padding:4px 9px;border-radius:7px"><i class="bi bi-lock-fill me-1"></i>③ Absensi Terkunci Permanen</span>
+        <span class="badge" style="background:var(--soft-success-bg);color:var(--soft-success-text);padding:4px 9px;border-radius:7px">③ Status: Hadir ✅</span>
+    </div>
+</div>
+
+{{-- STATUS LEGEND --}}
+<div class="dashboard-card mb-4 fade-up">
+    <div class="fw-semibold mb-2" style="font-size:13px;color:var(--text-primary)">
+        <i class="bi bi-table text-primary me-2"></i>Parameter Status Absensi
+    </div>
+    <div class="row g-2">
+        @php
+        $legends = [
+            ['guru'=>false,'siswa'=>false,'status'=>'Tidak Hadir','bg'=>'var(--soft-danger-bg)','color'=>'#ef4444'],
+            ['guru'=>true, 'siswa'=>false,'status'=>'Menunggu Konfirmasi Siswa','bg'=>'var(--soft-warning-bg)','color'=>'#f6af23'],
+            ['guru'=>false,'siswa'=>true, 'status'=>'Tidak Valid','bg'=>'var(--soft-muted-bg)','color'=>'var(--text-muted)'],
+            ['guru'=>true, 'siswa'=>true, 'status'=>'Hadir','bg'=>'var(--soft-success-bg)','color'=>'#10b981'],
+        ];
+        @endphp
+        @foreach($legends as $l)
+        <div class="col-sm-6 col-lg-3">
+            <div class="d-flex align-items-center gap-2 p-2 rounded-2" style="background:{{ $l['bg'] }};border:1px solid rgba(0,0,0,.05)">
+                <span style="font-size:14px">{{ $l['guru'] ? '✅' : '❌' }}</span>
+                <span style="font-size:14px">{{ $l['siswa'] ? '✅' : '❌' }}</span>
+                <span style="font-size:12px;font-weight:600;color:{{ $l['color'] }}">{{ $l['status'] }}</span>
+            </div>
+        </div>
+        @endforeach
+        <div class="col-12">
+            <div class="text-muted" style="font-size:11px">
+                <span class="me-3">✅/❌ pertama = Guru menandai hadir</span>
+                <span>✅/❌ kedua = Siswa mengkonfirmasi kehadiran</span>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -57,7 +87,7 @@
         </div>
         <div>
             <h6 class="fw-bold mb-0" style="font-size:14px;color:var(--text-primary)">Pilih Pertemuan</h6>
-            <p class="text-muted mb-0" style="font-size:12px">Pilih jadwal untuk melihat dan mengisi absensi</p>
+            <p class="text-muted mb-0" style="font-size:12px">Pilih jadwal untuk mengisi absensi</p>
         </div>
     </div>
     <select id="jadwalSelect" class="form-select" style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
@@ -84,9 +114,9 @@
             <i class="bi bi-calendar-x text-muted" style="font-size:2rem;opacity:.5"></i>
         </div>
         <h6 class="fw-semibold mb-2" style="color:var(--text-primary)">Belum Ada Jadwal</h6>
-        <p class="text-muted mb-0" style="font-size:13px">Ajukan proposal jadwal melalui menu <strong>Persetujuan Jadwal</strong>.</p>
-        <a href="{{ route('guru.schedule-agreements.index') }}" class="btn btn-primary mt-3" style="border-radius:10px">
-            <i class="bi bi-calendar-plus me-1"></i>Ajukan Jadwal
+        <p class="text-muted mb-0" style="font-size:13px">Admin belum membuat jadwal untuk kelas ini.</p>
+        <a href="{{ route('guru.schedules.index') }}" class="btn btn-primary mt-3" style="border-radius:10px">
+            <i class="bi bi-calendar3 me-1"></i>Lihat Jadwal Saya
         </a>
     </div>
 </div>
@@ -121,11 +151,7 @@
                 </div>
             </div>
             <div class="d-flex align-items-center gap-2">
-                @if($j->status === 'selesai')
-                <span class="badge" style="background:rgba(239,68,68,.1);color:#ef4444;font-size:11px;padding:4px 10px;border-radius:7px">
-                    <i class="bi bi-lock-fill me-1"></i>Absensi Terkunci
-                </span>
-                @elseif($isToday)
+                @if($isToday)
                 <span class="badge" style="background:var(--soft-success-bg);color:var(--soft-success-text);font-size:11px;padding:4px 10px;border-radius:7px">
                     <i class="bi bi-broadcast me-1"></i>Berlangsung
                 </span>
@@ -179,68 +205,6 @@ function loadAttendance(id, areaEl) {
             if (!res.success) { area.innerHTML = '<div class="mt-3 text-muted">Gagal memuat data siswa.</div>'; return; }
             const students = res.students;
             const existing = res.existing || {};
-            const attendanceLocked = res.attendance_locked;
-            const hasAttendance = res.has_attendance;
-            const allAgreed = res.all_agreed;
-
-            // Not agreed yet
-            if (!allAgreed && !hasAttendance) {
-                area.innerHTML = `<div class="mt-3 p-3 rounded-3" style="background:var(--soft-warning-bg);border:1px solid var(--soft-warning-border)">
-                    <i class="bi bi-exclamation-triangle-fill me-2" style="color:#f6af23"></i>
-                    <strong>Persetujuan belum lengkap.</strong>
-                    Absensi hanya dapat diisi setelah semua siswa dan guru menyetujui jadwal ini.
-                </div>`;
-                return;
-            }
-
-            // Permanently locked — has attendance already saved
-            if (hasAttendance) {
-                const statusMap = { hadir: {label:'Hadir',clr:'#10b981',bg:'var(--soft-success-bg)'}, izin: {label:'Izin',clr:'#0284c7',bg:'var(--soft-info-bg)'}, sakit: {label:'Sakit',clr:'#f6af23',bg:'var(--soft-warning-bg)'}, alpa: {label:'Alpa',clr:'#ef4444',bg:'var(--soft-danger-bg)'} };
-                let rows = students.map((s, i) => {
-                    const cur = existing[s.id] || '';
-                    const sm = statusMap[cur] || {label:'–',clr:'#999',bg:'var(--input-bg)'};
-                    const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(s.name)}&background=68117e&color=fff&size=40`;
-                    return `<tr>
-                        <td style="padding:10px 12px">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="text-muted" style="font-size:12px;min-width:22px">${i+1}</span>
-                                <img src="${s.photo ? '/storage/' + s.photo : avatar}" class="rounded-circle flex-shrink-0" width="32" height="32" style="object-fit:cover">
-                                <span class="fw-semibold" style="font-size:13px">${s.name}</span>
-                            </div>
-                        </td>
-                        <td>
-                            <span style="background:${sm.bg};color:${sm.clr};padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600">${sm.label}</span>
-                        </td>
-                    </tr>`;
-                }).join('');
-
-                area.innerHTML = `
-                    <div class="mt-3 p-3 rounded-3" style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2)">
-                        <div class="d-flex align-items-center gap-2 mb-3">
-                            <i class="bi bi-lock-fill" style="color:#ef4444;font-size:15px"></i>
-                            <span class="fw-semibold" style="font-size:13px;color:#ef4444">Absensi Terkunci Permanen</span>
-                            <span class="text-muted" style="font-size:12px">— Tidak dapat diubah</span>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-sm align-middle mb-0" style="font-size:13px">
-                                <thead><tr>
-                                    <th class="text-muted fw-semibold" style="font-size:11px">SISWA</th>
-                                    <th class="text-muted fw-semibold" style="font-size:11px">STATUS</th>
-                                </tr></thead>
-                                <tbody>${rows}</tbody>
-                            </table>
-                        </div>
-                    </div>`;
-                return;
-            }
-
-            // Locked by time (past session end) but no attendance filled
-            if (attendanceLocked) {
-                area.innerHTML = `<div class="mt-3 p-3 rounded-3 text-muted" style="background:var(--input-bg);border:1px solid var(--card-border)">
-                    <i class="bi bi-lock me-1"></i>Pertemuan sudah selesai. Absensi tidak sempat diisi.
-                </div>`;
-                return;
-            }
 
             if (!students.length) {
                 area.innerHTML = `<div class="mt-3 p-3 rounded-3 text-center" style="background:var(--input-bg)">
@@ -250,25 +214,19 @@ function loadAttendance(id, areaEl) {
                 return;
             }
 
-            const statusOpts = [
-                { val: 'hadir',  label: 'Hadir',  clr: '#10b981', bg: 'var(--soft-success-bg)' },
-                { val: 'izin',   label: 'Izin',   clr: '#0284c7', bg: 'var(--soft-info-bg)' },
-                { val: 'sakit',  label: 'Sakit',  clr: '#f6af23', bg: 'var(--soft-warning-bg)' },
-                { val: 'alpa',   label: 'Alpa',   clr: '#ef4444', bg: 'var(--soft-danger-bg)' },
-            ];
+            // Status label helper
+            function statusLabel(guruHadir, siswaKonfirmasi) {
+                if (guruHadir && siswaKonfirmasi)  return {label:'Hadir',         clr:'#10b981', bg:'var(--soft-success-bg)'};
+                if (guruHadir && !siswaKonfirmasi) return {label:'Menunggu Konfirmasi', clr:'#f6af23', bg:'var(--soft-warning-bg)'};
+                if (!guruHadir && siswaKonfirmasi) return {label:'Tidak Valid',   clr:'var(--text-muted)', bg:'var(--soft-muted-bg)'};
+                return                                    {label:'Tidak Hadir',    clr:'#ef4444', bg:'var(--soft-danger-bg)'};
+            }
 
             let rows = students.map((s, i) => {
-                const cur = existing[s.id] || '';
+                const rec   = existing[s.id] || {};
+                const checked = rec.guru_hadir ? 'checked' : '';
                 const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(s.name)}&background=68117e&color=fff&size=40`;
-                const radios = statusOpts.map(opt => `
-                    <td class="text-center" style="min-width:64px">
-                        <label style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer">
-                            <input type="radio" name="status_${s.id}" value="${opt.val}" ${cur === opt.val ? 'checked' : ''}
-                                   class="abs-radio" data-sid="${s.id}"
-                                   style="width:16px;height:16px;accent-color:${opt.clr};cursor:pointer">
-                            <span style="font-size:10.5px;color:${opt.clr};font-weight:600">${opt.label}</span>
-                        </label>
-                    </td>`).join('');
+                const sl = statusLabel(rec.guru_hadir, rec.siswa_konfirmasi_at);
                 return `<tr id="row-${s.id}">
                     <td style="white-space:nowrap;padding:10px 12px">
                         <div class="d-flex align-items-center gap-2">
@@ -277,7 +235,22 @@ function loadAttendance(id, areaEl) {
                             <span class="fw-semibold" style="font-size:13px">${s.name}</span>
                         </div>
                     </td>
-                    ${radios}
+                    <td class="text-center" style="min-width:80px">
+                        <label style="display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer">
+                            <input type="checkbox" name="hadir_ids[]" value="${s.id}" ${checked}
+                                   class="abs-check" data-sid="${s.id}"
+                                   style="width:18px;height:18px;accent-color:#10b981;cursor:pointer">
+                            <span style="font-size:11px;color:#10b981;font-weight:600">Hadir</span>
+                        </label>
+                    </td>
+                    <td id="status-${s.id}">
+                        <span style="background:${sl.bg};color:${sl.clr};padding:3px 10px;border-radius:7px;font-size:12px;font-weight:600">${sl.label}</span>
+                    </td>
+                    <td style="font-size:11px;color:var(--text-muted)">
+                        ${rec.siswa_konfirmasi_at
+                            ? '<i class="bi bi-check2-circle text-success me-1"></i>Dikonfirmasi siswa'
+                            : '<span style="opacity:.5">Menunggu siswa</span>'}
+                    </td>
                 </tr>`;
             }).join('');
 
@@ -285,7 +258,7 @@ function loadAttendance(id, areaEl) {
                 <div class="mt-3 p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
                     <div class="d-flex align-items-center gap-2 mb-3 p-2 rounded-2" style="background:rgba(200,77,223,.07)">
                         <i class="bi bi-exclamation-circle-fill text-primary"></i>
-                        <span style="font-size:12px">Setelah absensi disimpan, <strong>data tidak dapat diubah</strong>. Pastikan data sudah benar.</span>
+                        <span style="font-size:12px">Centang siswa yang <strong>hadir</strong>. Setelah disimpan, siswa yang ditandai hadir akan melihat tombol konfirmasi di dashboard mereka.</span>
                     </div>
                     <form class="absForm">
                         <input type="hidden" name="jadwal_id" value="${id}">
@@ -295,9 +268,8 @@ function loadAttendance(id, areaEl) {
                                     <tr>
                                         <th class="small text-muted fw-semibold py-2">SISWA</th>
                                         <th class="text-center small text-muted fw-semibold py-2" style="color:#10b981!important">HADIR</th>
-                                        <th class="text-center small text-muted fw-semibold py-2" style="color:#0284c7!important">IZIN</th>
-                                        <th class="text-center small text-muted fw-semibold py-2" style="color:#f6af23!important">SAKIT</th>
-                                        <th class="text-center small text-muted fw-semibold py-2" style="color:#ef4444!important">ALPA</th>
+                                        <th class="small text-muted fw-semibold py-2">STATUS ABSENSI</th>
+                                        <th class="small text-muted fw-semibold py-2">KONFIRMASI SISWA</th>
                                     </tr>
                                 </thead>
                                 <tbody>${rows}</tbody>
@@ -306,7 +278,7 @@ function loadAttendance(id, areaEl) {
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <div id="absCount-${id}" class="text-muted" style="font-size:12px"></div>
                             <button type="submit" class="btn btn-primary" style="border-radius:10px">
-                                <i class="bi bi-save me-2"></i>Simpan &amp; Kunci Absensi
+                                <i class="bi bi-save me-2"></i>Simpan Absensi
                             </button>
                         </div>
                     </form>
@@ -314,37 +286,23 @@ function loadAttendance(id, areaEl) {
 
             updateCount(id, students, existing);
 
-            area.querySelectorAll('.abs-radio').forEach(r => r.addEventListener('change', () => {
+            area.querySelectorAll('.abs-check').forEach(r => r.addEventListener('change', () => {
                 const cur = {};
                 students.forEach(s => {
-                    const checked = area.querySelector(`input[name="status_${s.id}"]:checked`);
-                    if (checked) cur[s.id] = checked.value;
+                    const ch = area.querySelector(`input[value="${s.id}"].abs-check`);
+                    if (ch) cur[s.id] = { guru_hadir: ch.checked };
                 });
                 updateCount(id, students, cur);
             }));
 
             area.querySelector('.absForm').addEventListener('submit', function(e) {
                 e.preventDefault();
-                const abs = [];
-                students.forEach(s => {
-                    const v = area.querySelector(`input[name="status_${s.id}"]:checked`);
-                    if (v) abs.push({ siswa_id: s.id, status: v.value });
-                });
-
-                if (abs.length === 0) {
-                    showToast('Isi status absensi minimal 1 siswa.', 'warning');
-                    return;
-                }
-
-                if (abs.length < students.length) {
-                    const unfilled = students.filter(s => !abs.find(a => a.siswa_id === s.id)).map(s => s.name).join(', ');
-                    showToast(`${students.length - abs.length} siswa belum diisi: ${unfilled}`, 'warning');
-                    return;
-                }
+                const hadirIds = [];
+                area.querySelectorAll('.abs-check:checked').forEach(ch => hadirIds.push(parseInt(ch.value)));
 
                 const submitBtn = area.querySelector('button[type=submit]');
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan & Mengunci...';
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';
 
                 fetch('{{ route("guru.attendance.store") }}', {
                     method: 'POST',
@@ -353,20 +311,20 @@ function loadAttendance(id, areaEl) {
                         'Content-Type': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                    body: JSON.stringify({ jadwal_id: id, absensi: abs })
+                    body: JSON.stringify({ jadwal_id: id, hadir_ids: hadirIds })
                 }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
                 .then(d => {
                     if (d.success) {
-                        showToast(d.message || 'Absensi berhasil disimpan dan dikunci!', 'success');
-                        setTimeout(() => loadAttendance(id, area), 800);
+                        showToast(d.message || 'Absensi berhasil disimpan!', 'success');
+                        setTimeout(() => loadAttendance(id, area), 600);
                     } else {
                         submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="bi bi-save me-2"></i>Simpan & Kunci Absensi';
+                        submitBtn.innerHTML = '<i class="bi bi-save me-2"></i>Simpan Absensi';
                         showToast(d.message || 'Gagal menyimpan', 'error');
                     }
                 }).catch(() => {
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="bi bi-save me-2"></i>Simpan & Kunci Absensi';
+                    submitBtn.innerHTML = '<i class="bi bi-save me-2"></i>Simpan Absensi';
                     showToast('Terjadi kesalahan. Coba lagi.', 'error');
                 });
             });
@@ -377,8 +335,8 @@ function loadAttendance(id, areaEl) {
 function updateCount(id, students, existing) {
     const el = document.getElementById('absCount-' + id);
     if (!el) return;
-    const filled = students.filter(s => existing[s.id]).length;
-    el.textContent = `${filled} dari ${students.length} siswa sudah diisi`;
+    const filled = students.filter(s => existing[s.id]?.guru_hadir).length;
+    el.textContent = `${filled} dari ${students.length} siswa ditandai hadir`;
 }
 
 document.getElementById('jadwalSelect').addEventListener('change', function() {
