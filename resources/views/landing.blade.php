@@ -4,34 +4,63 @@
         'teachers' => \App\Models\Teacher::where('status','aktif')->count(),
         'branches' => \App\Models\Branch::count(),
     ];
-    $tutors = \App\Models\Teacher::where('status','aktif')->get();
-    if ($tutors->isEmpty()) {
-        $tutors = collect([
-            (object)['name'=>'Ahmad Fauzi, S.Pd',   'subjects'=>['Matematika'],        'photo'=>null],
-            (object)['name'=>'Sarah Dewi, M.Pd',    'subjects'=>['Bahasa Inggris'],     'photo'=>null],
-            (object)['name'=>'Budi Santoso, S.Si',  'subjects'=>['IPA / Fisika'],       'photo'=>null],
-            (object)['name'=>'Rina Agustina, S.Kom','subjects'=>['Komputer & IT'],      'photo'=>null],
-            (object)['name'=>'Dina Rahayu, S.Pd',   'subjects'=>['Bahasa Indonesia'],   'photo'=>null],
-            (object)['name'=>'Eko Prasetyo, M.Sc',  'subjects'=>['Kimia'],             'photo'=>null],
-        ]);
-    }
-    // Landing page DB content
-    $lsAll       = \App\Models\LandingSetting::all()->keyBy('key');
-    $ls          = fn(string $k, string $d='') => $lsAll[$k]->value ?? $d;
-    $dbTestis    = \App\Models\LandingTestimonial::active()->orderBy('sort_order')->get();
-    $dbPrograms  = \App\Models\LandingProgram::active()->orderBy('sort_order')->get();
-    $waMain      = \App\Models\LandingWaNumber::primaryNumber($ls('footer.wa_number','628001234567'));
-    $waNumbers   = \App\Models\LandingWaNumber::active()->orderBy('sort_order')->get();
-    $tutorGrads = [
-        'linear-gradient(160deg,#260632,#c84ddf)',
-        'linear-gradient(160deg,#1a3a6b,#2563eb)',
-        'linear-gradient(160deg,#064e3b,#10b981)',
-        'linear-gradient(160deg,#7c2d12,#f97316)',
-        'linear-gradient(160deg,#312e81,#8b5cf6)',
-        'linear-gradient(160deg,#881337,#f43f5e)',
-        'linear-gradient(160deg,#134e4a,#14b8a6)',
-        'linear-gradient(160deg,#422006,#f59e0b)',
+    $tutors     = \App\Models\Teacher::where('status','aktif')->get();
+    $branches   = \App\Models\Branch::all();
+    $lsAll      = \App\Models\LandingSetting::all()->keyBy('key');
+    $ls         = fn(string $k, string $d='') => $lsAll[$k]->value ?? $d;
+    $dbTestis   = \App\Models\LandingTestimonial::active()->orderBy('sort_order')->get();
+    $dbPrograms = \App\Models\LandingProgram::active()->orderBy('sort_order')->get();
+    $waMain     = \App\Models\LandingWaNumber::primaryNumber($ls('footer.wa_number','628001234567'));
+    $waNumbers  = \App\Models\LandingWaNumber::active()->orderBy('sort_order')->get();
+
+    $heroSlides = [
+        ['img'=>'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80','alt'=>'Siswa belajar bersama'],
+        ['img'=>'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1600&q=80','alt'=>'Les privat'],
+        ['img'=>'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=1600&q=80','alt'=>'Kelas bimbel'],
     ];
+
+    $jenjangItems = [
+        ['label'=>'TK','desc'=>'Taman Kanak-Kanak','img'=>'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=300&q=80'],
+        ['label'=>'SD','desc'=>'Sekolah Dasar','img'=>'https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=300&q=80'],
+        ['label'=>'SMP','desc'=>'Sekolah Menengah Pertama','img'=>'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=300&q=80'],
+        ['label'=>'SMA / Umum','desc'=>'SMA & Karyawan','img'=>'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=300&q=80'],
+    ];
+
+    $keunggulanItems = [
+        ['icon'=>'🎓','title'=>'Tutor Bersertifikat','desc'=>'Pengajar ahli bersertifikat resmi dengan pengalaman bertahun-tahun dan rekam jejak membuktikan hasil nyata.'],
+        ['icon'=>'🏠','title'=>'Bisa Home Visit','desc'=>'Tutor kami siap datang ke rumah Anda kapan saja. Jadwal fleksibel, nyaman, dan tanpa perlu repot.'],
+        ['icon'=>'💻','title'=>'Kelas Online & Offline','desc'=>'Sistem belajar interaktif yang disesuaikan dengan gaya belajar masing-masing siswa. Belajar itu menyenangkan!'],
+        ['icon'=>'📊','title'=>'Evaluasi Rutin Bulanan','desc'=>'Evaluasi rutin, progress terpantau, laporan bulanan. Nilai meningkat signifikan — dijamin atau kami ulang!'],
+        ['icon'=>'💬','title'=>'Konsultasi 24/7','desc'=>'Bantuan belajar & konsultasi 24/7 via WhatsApp. Kami selalu ada untuk mendukung perjalanan belajar Anda.'],
+    ];
+
+    $programFallback = collect([
+        (object)['nama'=>'Bimbel Mata Pelajaran','deskripsi'=>'Bimbingan semua mata pelajaran sekolah dengan metode efektif dan menyenangkan.','badge'=>'SEMUA JENJANG','icon'=>'📚','image'=>'https://images.unsplash.com/photo-1509869175650-a1d97972541a?auto=format&fit=crop&w=600&q=80'],
+        (object)['nama'=>'Persiapan Ujian','deskripsi'=>'Persiapan UTS, UAS & Ujian Sekolah agar nilai meningkat pesat dan lulus terbaik.','badge'=>'SMP - SMA','icon'=>'📝','image'=>'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=600&q=80'],
+        (object)['nama'=>'Persiapan Tes & SBMPTN','deskripsi'=>'Persiapan masuk sekolah favorit, PTN, CPNS & tes lainnya secara intensif.','badge'=>'INTENSIF','icon'=>'🏆','image'=>'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=600&q=80'],
+        (object)['nama'=>'Kursus Bahasa','deskripsi'=>'Inggris, Jepang, Mandarin, Arab — tingkatkan kemampuan bahasa Anda bersama kami.','badge'=>'SEMUA LEVEL','icon'=>'🌐','image'=>'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=600&q=80'],
+        (object)['nama'=>'Kursus Komputer','deskripsi'=>'Microsoft Office, Desain Grafis, Programming — teknologi terkini untuk karir masa depan.','badge'=>'POPULER 🔥','icon'=>'💻','image'=>'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80'],
+        (object)['nama'=>'Kursus Akuntansi','deskripsi'=>'Akuntansi dasar hingga profesional, perpajakan & keuangan untuk mahasiswa dan karyawan.','badge'=>'TERBARU ✨','icon'=>'📊','image'=>'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=600&q=80'],
+    ]);
+    $programs = $dbPrograms->isNotEmpty() ? $dbPrograms : $programFallback;
+
+    $testisFallback = collect([
+        (object)['text'=>'Belajar di SCI sangat menyenangkan! Tutor menjelaskan dengan cara yang mudah dipahami dan nilai saya meningkat pesat. Sangat merekomendasikan untuk semua!','name'=>'Aisyah Rahma','role'=>'Siswa SMA · Matematika','photo'=>null,'initial'=>'A'],
+        (object)['text'=>'Program persiapan ujian di SCI sangat membantu. Akhirnya lolos ke kampus impian! Materinya lengkap banget dan tutornya super sabar dan profesional!','name'=>'Ricky Pratama','role'=>'Mahasiswa · Persiapan SBMPTN','photo'=>null,'initial'=>'R'],
+        (object)['text'=>'Kursus akuntansi di SCI sangat bermanfaat untuk tugas kuliah dan persiapan kerja. Tutornya sabar, materi lengkap, dan nilai kuliah naik drastis!','name'=>'Dinda Lestari','role'=>'Mahasiswi · Akuntansi','photo'=>null,'initial'=>'D'],
+        (object)['text'=>'Anakku belajar lebih semangat sejak ikut SCI. Metodenya menyenangkan dan hasilnya terlihat nyata dalam waktu singkat. Terima kasih SCI!','name'=>'Budi Santoso','role'=>'Orang Tua Siswa · Jakarta','photo'=>null,'initial'=>'B'],
+    ]);
+    $testis = $dbTestis->isNotEmpty() ? $dbTestis : $testisFallback;
+
+    $galeriPhotos = [
+        'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1509869175650-a1d97972541a?auto=format&fit=crop&w=600&q=80',
+    ];
+    $tutorGrads = ['#c84ddf','#7c3aed','#2563eb','#10b981','#f97316','#f43f5e','#14b8a6','#f59e0b'];
 @endphp
 <!DOCTYPE html>
 <html lang="id">
@@ -40,1517 +69,957 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Smart Center Indonesia — Lembaga bimbingan belajar, kursus, dan les privat terbaik di Indonesia. Melayani TK hingga umum dengan tutor profesional, metode modern, dan hasil terukur.">
     <title>Smart Center Indonesia | Bimbel & Kursus Terbaik #1 di Indonesia</title>
-
     <meta property="og:title" content="Smart Center Indonesia | Bimbel & Kursus Terbaik #1">
-    <meta property="og:description" content="Lembaga bimbingan belajar, kursus, dan les privat terbaik di Indonesia. Tutor profesional, metode modern, hasil terukur.">
-    <meta property="og:type" content="website">
-    <meta name="theme-color" content="#260632">
+    <meta property="og:description" content="Lembaga bimbingan belajar, kursus, dan les privat terbaik di Indonesia.">
+    <meta name="theme-color" content="#7c3aed">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
-        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{
+        --pri:#7c3aed;
+        --pri-dark:#5b21b6;
+        --pri-light:#a855f7;
+        --gold:#f6af23;
+        --gold-dark:#d97706;
+        --lavender:#f5f0ff;
+        --lavender2:#ede9fe;
+        --dark:#1e1245;
+        --dark2:#2e1065;
+        --white:#ffffff;
+        --text:#1e1245;
+        --text-muted:#6b7280;
+        --border:rgba(124,58,237,.12);
+        --font:'Inter',system-ui,sans-serif;
+        --serif:'Playfair Display',Georgia,serif;
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font);color:var(--text);background:#fff;overflow-x:hidden}
+    .italic-accent{font-family:var(--serif);font-style:italic;color:var(--pri-light)}
 
-        :root {
-            --primary:      #c84ddf;
-            --primary-dark: #68117e;
-            --deep:         #260632;
-            --mid:          #461256;
-            --gold:         #f6af23;
-            --gold-dark:    #e09000;
-            --success:      #10b981;
-            --white:        #ffffff;
-            --off-white:    #fdf8ff;
-            --text:         #1e0828;
-            --text-muted:   #6b5878;
-            --border:       rgba(200,77,223,.12);
-            --font-sans:    'Inter', system-ui, sans-serif;
-            --font-display: 'Plus Jakarta Sans', 'Inter', sans-serif;
-            --ease-out:     cubic-bezier(.22,1,.36,1);
-            --ease-in-out:  cubic-bezier(.4,0,.2,1);
-        }
+    /* ── NAVBAR ── */
+    .sci-nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid rgba(0,0,0,.07);box-shadow:0 2px 12px rgba(0,0,0,.06)}
+    .sci-nav-inner{max-width:1200px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:68px}
+    .sci-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .sci-logo-sq{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--pri-dark),var(--pri-light));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:14px;letter-spacing:-.5px;flex-shrink:0}
+    .sci-logo-text{line-height:1.1}
+    .sci-logo-text strong{display:block;font-size:.95rem;font-weight:800;color:var(--dark);letter-spacing:-.02em}
+    .sci-logo-text small{display:block;font-size:.72rem;font-weight:500;color:var(--pri-light)}
+    .sci-nav-links{display:flex;align-items:center;gap:.25rem;list-style:none;margin:0;padding:0}
+    .sci-nav-links a{color:#374151;text-decoration:none;font-size:.88rem;font-weight:600;padding:.5rem .9rem;border-radius:8px;transition:color .2s,background .2s}
+    .sci-nav-links a:hover,.sci-nav-links a.active{color:var(--pri);background:rgba(124,58,237,.07)}
+    .sci-nav-toggle{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;border:none;background:none}
+    .sci-nav-toggle span{display:block;width:24px;height:2px;background:var(--dark);border-radius:2px;transition:.3s}
+    .sci-nav-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+    .sci-nav-toggle.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+    .sci-nav-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+    .sci-mobile-menu{display:none;position:fixed;inset:0;background:rgba(30,18,69,.97);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem}
+    .sci-mobile-menu.open{display:flex}
+    .sci-mobile-menu a{color:rgba(255,255,255,.88);text-decoration:none;font-size:1.3rem;font-weight:700}
+    .sci-mobile-menu a:hover{color:#fff}
+    .sci-mobile-close{position:absolute;top:1.5rem;right:1.5rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
-        html { scroll-behavior: smooth; }
-        body { font-family: var(--font-sans); color: var(--text); background: var(--white); overflow-x: hidden; }
-        h1,h2,h3,h4,h5,h6 { font-family: var(--font-display); letter-spacing: -.025em; }
+    /* ── HERO ── */
+    .sci-hero{position:relative;height:100vh;min-height:560px;overflow:hidden;display:flex;align-items:center;justify-content:center;margin-top:68px}
+    .sci-hero-slides{position:absolute;inset:0;z-index:0}
+    .sci-hero-slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.4s ease-in-out}
+    .sci-hero-slide.active{opacity:1}
+    .sci-hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(30,10,60,.75) 0%,rgba(80,20,120,.55) 50%,rgba(30,10,60,.75) 100%)}
+    .sci-hero-content{position:relative;z-index:2;text-align:center;color:#fff;padding:2rem 1.5rem;max-width:800px}
+    .sci-hero-title{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:900;line-height:1.1;margin-bottom:1rem;text-shadow:0 2px 20px rgba(0,0,0,.3)}
+    .sci-hero-sub{font-size:clamp(.9rem,1.5vw,1.1rem);color:rgba(255,255,255,.82);max-width:560px;margin:0 auto 2rem;line-height:1.7}
+    .sci-hero-btns{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center}
+    .btn-hero-gold{display:inline-flex;align-items:center;gap:8px;padding:.85rem 2rem;border-radius:50px;font-size:.92rem;font-weight:700;color:#1a0a00;background:linear-gradient(135deg,var(--gold),#f8d07a);text-decoration:none;box-shadow:0 6px 24px rgba(246,175,35,.4);transition:.25s}
+    .btn-hero-gold:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(246,175,35,.55);color:#1a0a00}
+    .btn-hero-outline{display:inline-flex;align-items:center;gap:8px;padding:.85rem 1.8rem;border-radius:50px;font-size:.92rem;font-weight:600;color:#fff;border:2px solid rgba(255,255,255,.4);background:rgba(255,255,255,.1);backdrop-filter:blur(8px);text-decoration:none;transition:.25s}
+    .btn-hero-outline:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.7);color:#fff}
+    .sci-hero-scroll{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:6px;color:rgba(255,255,255,.55);font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+    .scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,rgba(255,255,255,.5),transparent);animation:scrollln 1.5s ease-in-out infinite}
+    @keyframes scrollln{0%,100%{opacity:.4;transform:scaleY(1)}50%{opacity:1;transform:scaleY(1.2)}}
+    .sci-hero-dots{position:absolute;bottom:5rem;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:3}
+    .sci-hero-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.35);border:none;cursor:pointer;padding:0;transition:.3s}
+    .sci-hero-dot.active{background:#fff;width:26px;border-radius:4px}
+    .sci-hero-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.25);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:.2s}
+    .sci-hero-arrow:hover{background:rgba(255,255,255,.28)}
+    .sci-hero-arrow.prev{left:2rem}
+    .sci-hero-arrow.next{right:2rem}
+    @media(max-width:576px){.sci-hero-arrow{display:none}}
 
-        /* ─── NAVBAR ─────────────────────────────────────────────── */
-        .lp-nav { position:fixed; top:0; left:0; right:0; z-index:1000; padding:1rem 0; transition:padding .45s var(--ease-in-out); }
-        .lp-nav.scrolled { padding:.85rem 2rem; }
-        .nav-inner {
-            display:flex; align-items:center; justify-content:space-between;
-            max-width:1200px; margin:0 auto; padding:0 1.5rem;
-            border-radius:0; background:transparent;
-            transition:background .45s var(--ease-in-out), border-radius .45s var(--ease-in-out),
-                        box-shadow .45s var(--ease-in-out), padding .45s var(--ease-in-out), max-width .45s var(--ease-in-out);
-        }
-        .lp-nav.scrolled .nav-inner {
-            background:rgba(255,255,255,.96); backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px);
-            border-radius:100px; padding:.4rem .5rem .4rem 1.5rem;
-            box-shadow:0 10px 44px rgba(0,0,0,.13),0 2px 10px rgba(0,0,0,.07); max-width:960px;
-        }
-        .lp-nav.scrolled .nav-brand-text    { color:var(--deep); }
-        .lp-nav.scrolled .nav-link-item     { color:#4b5563; }
-        .lp-nav.scrolled .nav-link-item:hover { color:var(--primary-dark); background:rgba(200,77,223,.08); }
-        .lp-nav.scrolled .nav-link-item.nav-active { background:var(--gold); color:#1a1a1a !important; font-weight:700; border-radius:50px; }
-        .lp-nav.scrolled .nav-toggle span   { background:var(--deep); }
+    /* ── TICKER ── */
+    .sci-ticker{background:var(--gold);padding:.65rem 0;overflow:hidden;white-space:nowrap}
+    .sci-ticker-inner{display:inline-flex;animation:ticker-scroll 28s linear infinite}
+    .sci-ticker-inner:hover{animation-play-state:paused}
+    .sci-ticker-item{display:inline-flex;align-items:center;gap:.5rem;font-size:.83rem;font-weight:700;color:#1a0a00;padding:0 2rem}
+    .sci-ticker-item::after{content:'|';opacity:.3;margin-left:2rem}
+    @keyframes ticker-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
-        .nav-brand { display:flex; align-items:center; gap:10px; text-decoration:none; }
-        .nav-brand-icon {
-            width:38px; height:38px; border-radius:12px;
-            background:linear-gradient(135deg,var(--primary-dark),var(--primary));
-            display:flex; align-items:center; justify-content:center; font-size:19px; color:white;
-            flex-shrink:0; box-shadow:0 4px 12px rgba(200,77,223,.4);
-        }
-        .nav-brand-text { font-family:var(--font-display); font-weight:800; font-size:1.05rem; color:white; letter-spacing:-.02em; line-height:1.1; }
-        .nav-brand-text small { display:block; font-size:.65rem; font-weight:500; opacity:.7; letter-spacing:.02em; }
+    /* ── SECTION COMMONS ── */
+    .lp-section{padding:5rem 0}
+    .lp-section-lavender{background:var(--lavender)}
+    .lp-section-dark{background:linear-gradient(135deg,#2e1065 0%,#4c1d95 50%,#7c3aed 100%)}
+    .container-lp{max-width:1160px;margin:0 auto;padding:0 1.5rem}
+    .section-eyebrow-line{display:flex;align-items:center;gap:.5rem;color:var(--pri);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;justify-content:center}
+    .section-eyebrow-line::before{content:'';display:block;width:28px;height:2px;background:var(--pri);border-radius:2px}
+    .section-title-lg{font-size:clamp(1.9rem,3.5vw,2.8rem);font-weight:900;color:var(--dark);line-height:1.2;margin-bottom:1rem}
+    .section-subtitle-lp{font-size:.98rem;color:var(--text-muted);line-height:1.7;max-width:580px;margin:0 auto}
 
-        .nav-links { display:flex; align-items:center; gap:.25rem; list-style:none; }
-        .nav-link-item { color:rgba(255,255,255,.85); text-decoration:none; font-size:.88rem; font-weight:500; padding:.45rem .85rem; border-radius:8px; transition:color .2s, background .2s; }
-        .nav-link-item:hover { color:white; background:rgba(255,255,255,.12); }
+    /* ── BADGE PILLS ── */
+    .pill-badge{display:inline-flex;align-items:center;gap:5px;background:var(--lavender2);border:1px solid rgba(124,58,237,.2);border-radius:50px;padding:5px 14px;font-size:.75rem;font-weight:600;color:var(--pri);margin-bottom:1rem}
 
-        .nav-cta { display:flex; align-items:center; gap:.6rem; }
-        .btn-nav-login { padding:.45rem 1.1rem; border-radius:10px; font-size:.88rem; font-weight:600; color:rgba(255,255,255,.9); border:1.5px solid rgba(255,255,255,.25); background:transparent; text-decoration:none; transition:.2s; }
-        .btn-nav-login:hover { color:white; border-color:rgba(255,255,255,.5); background:rgba(255,255,255,.1); }
-        .lp-nav.scrolled .btn-nav-login { color:var(--primary-dark); border-color:rgba(200,77,223,.28); }
-        .lp-nav.scrolled .btn-nav-login:hover { background:rgba(200,77,223,.07); border-color:var(--primary); }
+    /* ── TENTANG SECTION ── */
+    .feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.75rem}
+    .feature-item{display:flex;align-items:center;gap:.85rem;background:#fff;border:1.5px solid rgba(124,58,237,.1);border-radius:14px;padding:1rem 1.25rem;transition:.2s}
+    .feature-item:hover{border-color:rgba(124,58,237,.3);box-shadow:0 4px 18px rgba(124,58,237,.08)}
+    .feature-icon{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--pri-dark),var(--pri-light));display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;color:#fff}
+    .feature-label{font-size:.88rem;font-weight:700;color:var(--dark)}
 
-        .btn-nav-register { padding:.45rem 1.2rem; border-radius:10px; font-size:.88rem; font-weight:700; color:white; background:linear-gradient(135deg,var(--primary-dark),var(--primary)); text-decoration:none; border:none; transition:transform .2s, box-shadow .2s, border-radius .45s var(--ease-in-out); box-shadow:0 4px 14px rgba(200,77,223,.35); }
-        .btn-nav-register:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(200,77,223,.5); color:white; }
-        .lp-nav.scrolled .btn-nav-register { border-radius:50px; padding:.5rem 1.4rem; }
+    /* ── JENJANG ── */
+    .jenjang-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-top:3rem}
+    .jenjang-card{background:#fff;border-radius:20px;padding:2rem 1.5rem;text-align:center;border:1.5px solid rgba(124,58,237,.1);box-shadow:0 4px 20px rgba(0,0,0,.05);transition:.3s;text-decoration:none;color:inherit;display:block}
+    .jenjang-card:hover{transform:translateY(-6px);box-shadow:0 16px 44px rgba(124,58,237,.15);border-color:rgba(124,58,237,.25);color:inherit}
+    .jenjang-photo{width:90px;height:90px;border-radius:50%;object-fit:cover;margin:0 auto 1rem;border:3px solid rgba(124,58,237,.15);display:block}
+    .jenjang-label{font-size:1.5rem;font-weight:900;color:var(--dark);margin-bottom:.25rem}
+    .jenjang-desc{font-size:.82rem;color:var(--text-muted);margin-bottom:1rem}
+    .jenjang-link{font-size:.8rem;font-weight:700;color:var(--pri);display:inline-flex;align-items:center;gap:4px}
 
-        .nav-toggle { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:6px; background:none; border:none; }
-        .nav-toggle span { display:block; width:24px; height:2px; background:white; border-radius:2px; transition:.3s var(--ease-in-out); }
-        .nav-toggle.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
-        .nav-toggle.open span:nth-child(2) { opacity:0; transform:scaleX(0); }
-        .nav-toggle.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+    /* ── CARI GURU ── */
+    .cari-guru-section{background:linear-gradient(135deg,#2e1065 0%,#4c1d95 50%,#7c3aed 100%);padding:5rem 0}
+    .cari-guru-eyebrow{color:rgba(255,255,255,.6);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;justify-content:center}
+    .cari-guru-eyebrow::before{content:'';display:block;width:28px;height:2px;background:var(--gold);border-radius:2px}
+    .cari-guru-title{font-size:clamp(1.9rem,3.5vw,2.8rem);font-weight:900;color:#fff;line-height:1.2;margin-bottom:.75rem}
+    .cari-guru-sub{font-size:.97rem;color:rgba(255,255,255,.7);max-width:520px;margin:0 auto 2.5rem;line-height:1.7}
+    .search-box{background:rgba(255,255,255,.1);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:1.75rem;display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:1rem;align-items:end;margin-bottom:1.5rem}
+    .search-field label{display:block;font-size:.72rem;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem}
+    .search-field label i{margin-right:.3rem;color:var(--gold)}
+    .search-field select{width:100%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:.65rem 1rem;font-size:.88rem;font-weight:500;color:#fff;appearance:none;cursor:pointer;outline:none;transition:.2s}
+    .search-field select:focus{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.18)}
+    .search-field select option{color:#1e1245;background:#fff}
+    .btn-cari{display:inline-flex;align-items:center;gap:.5rem;background:var(--gold);border:none;border-radius:12px;padding:.7rem 1.5rem;font-size:.9rem;font-weight:800;color:#1a0a00;cursor:pointer;transition:.25s;white-space:nowrap;width:100%}
+    .btn-cari:hover{background:var(--gold-dark);transform:translateY(-1px);box-shadow:0 6px 20px rgba(246,175,35,.4)}
+    .trust-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:1.5rem}
+    .trust-badge{display:flex;align-items:center;gap:.4rem;color:rgba(255,255,255,.75);font-size:.8rem;font-weight:600}
+    .trust-badge i{color:var(--gold)}
 
-        .mobile-menu {
-            display:flex; position:fixed; top:0; left:0; right:0; bottom:0;
-            background:rgba(38,6,50,.97); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-            z-index:999; flex-direction:column; align-items:center; justify-content:center; gap:1.5rem;
-            opacity:0; transform:scale(.96); visibility:hidden; pointer-events:none;
-            transition:opacity .35s var(--ease-out), transform .35s var(--ease-out), visibility .35s;
-        }
-        .mobile-menu.open { opacity:1; transform:scale(1); visibility:visible; pointer-events:auto; }
-        .mobile-menu a { color:rgba(255,255,255,.85); text-decoration:none; font-size:1.35rem; font-family:var(--font-display); font-weight:700; letter-spacing:-.02em; transition:color .2s, transform .2s; }
-        .mobile-menu a:hover { color:white; transform:translateX(4px); }
-        .mobile-menu .mobile-divider { width:40px; height:2px; background:rgba(255,255,255,.1); border-radius:2px; margin:.25rem 0; }
-        .mobile-close { position:absolute; top:1.5rem; right:1.5rem; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.12); color:white; width:42px; height:42px; border-radius:50%; font-size:1.1rem; cursor:pointer; transition:background .2s; display:flex; align-items:center; justify-content:center; }
-        .mobile-close:hover { background:rgba(255,255,255,.2); }
+    /* ── PROGRAM ── */
+    .program-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem}
+    .program-card{background:#fff;border-radius:18px;overflow:hidden;border:1.5px solid rgba(0,0,0,.06);box-shadow:0 4px 18px rgba(0,0,0,.06);transition:.3s;text-decoration:none;color:inherit;display:block}
+    .program-card:hover{transform:translateY(-6px);box-shadow:0 16px 44px rgba(0,0,0,.12);color:inherit}
+    .program-img{width:100%;height:200px;object-fit:cover}
+    .program-body{padding:1.5rem}
+    .program-badge{display:inline-flex;align-items:center;gap:4px;background:var(--lavender2);border-radius:50px;padding:4px 12px;font-size:.7rem;font-weight:700;color:var(--pri);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.04em}
+    .program-title{font-size:1.05rem;font-weight:800;color:var(--dark);margin-bottom:.45rem}
+    .program-desc{font-size:.84rem;color:var(--text-muted);line-height:1.65;margin-bottom:1rem}
+    .program-link{font-size:.82rem;font-weight:700;color:var(--pri);display:inline-flex;align-items:center;gap:5px}
+    .program-link i{font-size:.65rem}
 
-        /* ─── HERO ─────────────────────────────────────────────────── */
-        .hero { position:relative; min-height:100vh; overflow:hidden; display:flex; align-items:center; justify-content:center; }
-        .hero-slides { position:absolute; inset:0; z-index:0; }
-        .hero-slide { position:absolute; inset:0; background-size:cover; background-position:center center; background-repeat:no-repeat; opacity:0; transition:opacity 1.4s ease-in-out; transform:scale(1.04); }
-        .hero-slide.active { opacity:1; animation:hero-zoom 8s ease-in-out forwards; }
-        @keyframes hero-zoom { from { transform:scale(1.06); } to { transform:scale(1.0); } }
-        .hero-slide-overlay { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(20,5,32,.72) 0%, rgba(20,5,32,.42) 40%, rgba(20,5,32,.52) 65%, rgba(20,5,32,.78) 100%); }
-        .hero-inner { position:relative; z-index:2; text-align:center; max-width:860px; padding:9rem 2rem 8rem; margin:0 auto; width:100%; }
-        .hero-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.12); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.18); border-radius:50px; padding:6px 18px 6px 6px; font-size:.8rem; font-weight:600; color:rgba(255,255,255,.9); margin-bottom:1.75rem; animation:fade-up .6s var(--ease-out) both; }
-        .hero-badge-dot { width:24px; height:24px; border-radius:50%; background:linear-gradient(135deg,var(--gold),var(--primary)); display:flex; align-items:center; justify-content:center; font-size:12px; animation:pulse-dot 2s ease-in-out infinite; }
-        @keyframes pulse-dot { 0%,100% { box-shadow:0 0 0 0 rgba(246,175,35,.4); } 50% { box-shadow:0 0 0 6px rgba(246,175,35,0); } }
-        .hero-title { font-size:clamp(2.4rem,5.5vw,4.2rem); font-weight:900; color:white; line-height:1.08; margin-bottom:1.25rem; text-shadow:0 2px 24px rgba(0,0,0,.3); animation:fade-up .7s var(--ease-out) .1s both; }
-        .hero-title .gradient-text { background:linear-gradient(90deg,var(--gold),#f8d07a); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-        .hero-desc { font-size:clamp(.92rem,1.5vw,1.1rem); color:rgba(255,255,255,.82); line-height:1.8; margin-bottom:2.5rem; max-width:640px; margin-left:auto; margin-right:auto; animation:fade-up .7s var(--ease-out) .2s both; }
-        .hero-actions { display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; animation:fade-up .7s var(--ease-out) .3s both; }
-        .btn-hero-primary { display:inline-flex; align-items:center; gap:8px; padding:.95rem 2.2rem; border-radius:50px; font-size:.95rem; font-weight:700; color:#1a0a00; background:linear-gradient(135deg,var(--gold),#f8d07a); text-decoration:none; border:none; transition:transform .25s, box-shadow .25s; box-shadow:0 8px 28px rgba(246,175,35,.45); letter-spacing:-.01em; }
-        .btn-hero-primary:hover { transform:translateY(-3px); box-shadow:0 14px 40px rgba(246,175,35,.6); color:#1a0a00; }
-        .btn-hero-secondary { display:inline-flex; align-items:center; gap:8px; padding:.95rem 2rem; border-radius:50px; font-size:.95rem; font-weight:600; color:white; border:2px solid rgba(255,255,255,.35); background:rgba(255,255,255,.1); backdrop-filter:blur(10px); text-decoration:none; transition:.25s; }
-        .btn-hero-secondary:hover { background:rgba(255,255,255,.2); border-color:rgba(255,255,255,.6); transform:translateY(-2px); color:white; }
-        .hero-trust { display:flex; align-items:center; gap:1rem; margin-top:2.75rem; justify-content:center; animation:fade-up .7s var(--ease-out) .4s both; }
-        .hero-avatars { display:flex; }
-        .hero-avatar { width:34px; height:34px; border-radius:50%; border:2.5px solid rgba(255,255,255,.35); background:linear-gradient(135deg,var(--primary-dark),var(--primary)); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:white; margin-left:-10px; }
-        .hero-avatars .hero-avatar:first-child { margin-left:0; }
-        .hero-trust-text { font-size:.8rem; color:rgba(255,255,255,.75); line-height:1.4; }
-        .hero-trust-text strong { color:white; display:block; }
-        .hero-dots { position:absolute; bottom:5.5rem; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:9px; z-index:3; }
-        .hero-dot { width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,.38); border:none; cursor:pointer; transition:background .35s, width .35s, border-radius .35s; padding:0; }
-        .hero-dot.active { background:white; width:30px; border-radius:5px; }
-        .hero-dot:hover:not(.active) { background:rgba(255,255,255,.7); }
+    /* ── KEUNGGULAN ── */
+    .keunggulan-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1.25rem;margin-top:3rem}
+    .keunggulan-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:1.75rem 1.25rem;transition:.25s}
+    .keunggulan-card:hover{background:rgba(255,255,255,.14);transform:translateY(-4px)}
+    .keunggulan-emoji{font-size:2rem;margin-bottom:1rem;display:block}
+    .keunggulan-title{font-size:.95rem;font-weight:800;color:#fff;margin-bottom:.6rem}
+    .keunggulan-desc{font-size:.82rem;color:rgba(255,255,255,.68);line-height:1.65}
 
-        .float-card { position:absolute; background:white; border-radius:16px; padding:12px 16px; box-shadow:0 20px 60px rgba(0,0,0,.25),0 0 0 1px rgba(200,77,223,.08); animation:float-card 4s ease-in-out infinite alternate; z-index:3; white-space:nowrap; }
-        .float-card-1 { bottom:9rem; left:3rem; animation-delay:0s; }
-        .float-card-2 { top:8rem; right:3rem; animation-delay:2s; }
-        @keyframes float-card { from { transform:translateY(0) rotate(-1deg); } to { transform:translateY(-12px) rotate(1deg); } }
-        .float-card-content { display:flex; align-items:center; gap:10px; }
-        .float-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
-        .float-card-text { font-family:var(--font-display); }
-        .float-card-text .fc-val { font-size:1rem; font-weight:800; color:var(--deep); line-height:1; letter-spacing:-.02em; }
-        .float-card-text .fc-lab { font-size:.7rem; color:var(--text-muted); font-weight:500; }
-        .particle { position:absolute; border-radius:50%; background:rgba(255,255,255,.35); animation:float-particle linear infinite; pointer-events:none; }
-        @keyframes float-particle { 0% { transform:translateY(100vh) scale(0); opacity:0; } 10% { opacity:1; } 90% { opacity:1; } 100% { transform:translateY(-60px) scale(1); opacity:0; } }
-        @keyframes fade-up { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
-        .scroll-indicator { position:absolute; bottom:2.5rem; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:8px; color:rgba(255,255,255,.5); font-size:.72rem; font-weight:500; letter-spacing:.06em; text-transform:uppercase; animation:fade-up 1s var(--ease-out) .8s both; z-index:2; }
-        .scroll-mouse { width:22px; height:36px; border:2px solid rgba(255,255,255,.3); border-radius:11px; display:flex; justify-content:center; padding-top:6px; }
-        .scroll-wheel { width:4px; height:8px; background:rgba(255,255,255,.6); border-radius:2px; animation:scroll-down 1.5s ease-in-out infinite; }
-        @keyframes scroll-down { 0% { transform:translateY(0); opacity:1; } 100% { transform:translateY(8px); opacity:0; } }
+    /* ── TESTIMONI ── */
+    .testi-slider-wrap{position:relative;overflow:hidden;margin-top:3rem}
+    .testi-track{display:flex;gap:1.25rem;transition:transform .5s cubic-bezier(.22,1,.36,1);padding:.5rem 0}
+    .testi-card{flex:0 0 320px;background:#fff;border-radius:18px;padding:1.75rem;border:1.5px solid rgba(124,58,237,.1);box-shadow:0 4px 20px rgba(0,0,0,.06)}
+    .testi-stars{color:var(--gold);font-size:.85rem;margin-bottom:.75rem;display:flex;gap:2px}
+    .testi-quote{font-size:3rem;color:rgba(124,58,237,.08);line-height:1;font-family:var(--serif);margin-bottom:.25rem}
+    .testi-text{font-size:.87rem;color:#374151;line-height:1.7;margin-bottom:1.25rem}
+    .testi-author{display:flex;align-items:center;gap:.75rem}
+    .testi-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0}
+    .testi-avatar-fallback{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:1.1rem;flex-shrink:0}
+    .testi-name{font-size:.88rem;font-weight:700;color:var(--dark)}
+    .testi-role{font-size:.75rem;color:var(--pri);font-weight:600}
+    .testi-verified{font-size:.72rem;color:#10b981;font-weight:600;display:flex;align-items:center;gap:3px}
+    .slider-controls{display:flex;justify-content:center;gap:.75rem;margin-top:2rem}
+    .slider-btn{width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(124,58,237,.25);background:#fff;color:var(--pri);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:.2s}
+    .slider-btn:hover{background:var(--pri);color:#fff;border-color:var(--pri)}
 
-        /* ─── SCROLL PROGRESS BAR ─────────────────────────────── */
-        #scroll-progress {
-            position:fixed; top:0; left:0; width:0%; height:3px;
-            background:linear-gradient(90deg,#68117e,#c84ddf,#f6af23);
-            z-index:2000; transition:width .1s linear;
-            border-radius:0 3px 3px 0;
-            box-shadow:0 0 8px rgba(200,77,223,.5);
-        }
+    /* ── GALERI ── */
+    .galeri-slider-wrap{position:relative;overflow:hidden;margin-top:3rem}
+    .galeri-track{display:flex;gap:1.25rem;transition:transform .5s cubic-bezier(.22,1,.36,1)}
+    .galeri-item{flex:0 0 280px;height:200px;border-radius:18px;overflow:hidden;position:relative;cursor:pointer}
+    .galeri-item img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+    .galeri-item:hover img{transform:scale(1.06)}
+    .galeri-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(30,18,69,.65),transparent);opacity:0;transition:.3s;display:flex;align-items:flex-end;padding:1rem}
+    .galeri-item:hover .galeri-overlay{opacity:1}
+    .galeri-overlay span{color:#fff;font-size:.8rem;font-weight:600}
 
-        /* ─── FLOAT CARDS — hide on mobile ───────────────────── */
-        @media (max-width:900px) { .float-card { display:none !important; } }
+    /* ── TUTOR ── */
+    .tutor-slider-wrap{position:relative;overflow:hidden;margin-top:3rem}
+    .tutor-track{display:flex;gap:1.25rem;transition:transform .5s cubic-bezier(.22,1,.36,1)}
+    .tutor-card{flex:0 0 180px;background:#fff;border-radius:18px;padding:1.5rem 1.25rem;text-align:center;border:1.5px solid rgba(124,58,237,.1);box-shadow:0 4px 16px rgba(0,0,0,.06);transition:.25s}
+    .tutor-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(124,58,237,.12)}
+    .tutor-photo-wrap{position:relative;width:80px;height:80px;margin:0 auto 1rem}
+    .tutor-photo{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid rgba(124,58,237,.15)}
+    .tutor-photo-fb{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.6rem;font-weight:800}
+    .tutor-star-badge{position:absolute;bottom:-2px;right:-2px;width:24px;height:24px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;color:#1a0a00}
+    .tutor-name{font-size:.87rem;font-weight:800;color:var(--dark);margin-bottom:.35rem}
+    .tutor-subj{display:inline-block;background:var(--lavender2);border-radius:50px;padding:3px 10px;font-size:.72rem;font-weight:700;color:var(--pri);margin-bottom:.5rem}
+    .tutor-rating{font-size:.78rem;color:var(--text-muted);display:flex;align-items:center;gap:3px;justify-content:center}
+    .tutor-rating i{color:var(--gold);font-size:.65rem}
+    .tutor-exp{font-size:.72rem;color:var(--text-muted)}
 
-        /* ─── MOBILE MENU — stagger entrance ─────────────────── */
-        .mobile-menu a, .mobile-menu .mobile-divider {
-            opacity:0; transform:translateY(20px);
-            transition:opacity .45s var(--ease-out), transform .45s var(--ease-out);
-        }
-        .mobile-menu.open a:nth-child(1)  { opacity:1; transform:none; transition-delay:.06s; }
-        .mobile-menu.open a:nth-child(2)  { opacity:1; transform:none; transition-delay:.11s; }
-        .mobile-menu.open a:nth-child(3)  { opacity:1; transform:none; transition-delay:.16s; }
-        .mobile-menu.open a:nth-child(4)  { opacity:1; transform:none; transition-delay:.21s; }
-        .mobile-menu.open a:nth-child(5)  { opacity:1; transform:none; transition-delay:.26s; }
-        .mobile-menu.open a:nth-child(6)  { opacity:1; transform:none; transition-delay:.31s; }
-        .mobile-menu.open .mobile-divider { opacity:1; transform:none; transition-delay:.34s; }
-        .mobile-menu.open a:nth-child(8)  { opacity:1; transform:none; transition-delay:.38s; }
-        .mobile-menu.open a:nth-child(9)  { opacity:1; transform:none; transition-delay:.43s; }
-        /* close button always visible */
-        .mobile-menu .mobile-close { opacity:1 !important; transform:none !important; }
+    /* ── FAQ + CONTACT ── */
+    .faq-item{border:1.5px solid rgba(0,0,0,.08);border-radius:14px;margin-bottom:.75rem;overflow:hidden;transition:.2s}
+    .faq-item:hover{border-color:rgba(124,58,237,.2)}
+    .faq-q{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;cursor:pointer;font-size:.9rem;font-weight:700;color:var(--dark)}
+    .faq-q .faq-icon{width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(124,58,237,.25);display:flex;align-items:center;justify-content:center;color:var(--pri);font-size:1rem;flex-shrink:0;transition:.3s}
+    .faq-item.open .faq-icon{background:var(--pri);color:#fff;border-color:var(--pri);transform:rotate(45deg)}
+    .faq-a{display:none;padding:.75rem 1.25rem 1.25rem;font-size:.87rem;color:var(--text-muted);line-height:1.7}
+    .faq-item.open .faq-a{display:block}
+    .contact-box{background:linear-gradient(135deg,#2e1065,#7c3aed);border-radius:22px;padding:2.25rem;color:#fff;height:100%}
+    .contact-box h4{font-size:1.3rem;font-weight:800;margin-bottom:.4rem}
+    .contact-box p{font-size:.85rem;opacity:.75;margin-bottom:1.5rem}
+    .contact-field{margin-bottom:1rem}
+    .contact-field label{display:block;font-size:.75rem;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem}
+    .contact-field input,.contact-field textarea{width:100%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:.65rem 1rem;font-size:.88rem;color:#fff;outline:none;transition:.2s;font-family:var(--font)}
+    .contact-field input::placeholder,.contact-field textarea::placeholder{color:rgba(255,255,255,.4)}
+    .contact-field input:focus,.contact-field textarea:focus{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.18)}
+    .contact-field textarea{resize:none;height:80px}
+    .btn-contact-send{width:100%;background:var(--gold);border:none;border-radius:12px;padding:.8rem;font-size:.9rem;font-weight:800;color:#1a0a00;cursor:pointer;transition:.25s;margin-top:.25rem;display:flex;align-items:center;justify-content:center;gap:.5rem}
+    .btn-contact-send:hover{background:var(--gold-dark);transform:translateY(-1px);box-shadow:0 6px 20px rgba(246,175,35,.35)}
 
-        /* ─── STATS STRIP ─────────────────────────────────────────── */
-        .stats-strip { background:var(--off-white); border-top:1px solid rgba(200,77,223,.08); border-bottom:1px solid rgba(200,77,223,.08); padding:2.5rem 0; }
-        .stats-strip-inner { max-width:1100px; margin:0 auto; padding:0 1.5rem; display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
-        .stat-item { text-align:center; padding:1rem; border-right:1px solid rgba(200,77,223,.1); transition:transform .3s; }
-        .stat-item:last-child { border-right:none; }
-        .stat-item:hover { transform:translateY(-3px); }
-        .stat-item .si-num { font-size:clamp(1.8rem,3vw,2.4rem); font-weight:900; font-family:var(--font-display); background:linear-gradient(135deg,var(--deep),var(--primary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; letter-spacing:-.03em; line-height:1; }
-        .stat-item .si-label { font-size:.82rem; color:var(--text-muted); font-weight:500; margin-top:.4rem; }
+    /* ── CABANG ── */
+    .cabang-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-top:3rem}
+    .cabang-card{border-radius:18px;overflow:hidden;position:relative;height:200px;cursor:pointer;text-decoration:none;display:block}
+    .cabang-card img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+    .cabang-card:hover img{transform:scale(1.05)}
+    .cabang-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(30,18,69,.75) 0%,rgba(0,0,0,.1) 50%);display:flex;flex-direction:column;justify-content:flex-end;padding:1.5rem}
+    .cabang-city{font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:.2rem}
+    .cabang-tagline{font-size:.8rem;color:rgba(255,255,255,.75);margin-bottom:.75rem}
+    .cabang-btn{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:.4rem .85rem;font-size:.75rem;font-weight:700;color:#fff;text-decoration:none;transition:.2s}
+    .cabang-btn:hover{background:rgba(255,255,255,.3);color:#fff}
+    .cabang-fallback{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;background:linear-gradient(135deg,var(--pri-dark),var(--pri-light));padding:1.5rem}
 
-        /* ─── SECTION COMMONS ─────────────────────────────────────── */
-        .section-eyebrow { display:inline-flex; align-items:center; gap:6px; background:rgba(200,77,223,.08); border:1px solid rgba(200,77,223,.15); border-radius:50px; padding:5px 16px; font-size:.75rem; font-weight:700; color:var(--primary-dark); text-transform:uppercase; letter-spacing:.06em; margin-bottom:1rem; }
-        .section-title { font-size:clamp(1.8rem,3vw,2.6rem); font-weight:900; color:var(--deep); line-height:1.2; margin-bottom:1rem; }
-        .section-subtitle { font-size:1rem; color:var(--text-muted); line-height:1.7; max-width:560px; }
-        .section-pad { padding:6rem 0; }
-        .container-lp { max-width:1160px; margin:0 auto; padding:0 1.5rem; }
+    /* ── FOOTER ── */
+    .sci-footer{background:linear-gradient(180deg,#1e1245 0%,#0f0825 100%);padding:4rem 0 2rem;color:rgba(255,255,255,.75)}
+    .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem}
+    .footer-brand-desc{font-size:.85rem;line-height:1.7;margin:1.25rem 0 1.5rem;max-width:280px}
+    .footer-social{display:flex;gap:.6rem}
+    .footer-social a{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;font-size:.9rem;text-decoration:none;transition:.2s}
+    .footer-social a:hover{background:var(--pri);color:#fff;border-color:var(--pri)}
+    .footer-col-title{font-size:.85rem;font-weight:800;color:#fff;margin-bottom:1rem;text-transform:uppercase;letter-spacing:.06em}
+    .footer-links{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.5rem}
+    .footer-links a{color:rgba(255,255,255,.6);text-decoration:none;font-size:.84rem;transition:.2s}
+    .footer-links a:hover{color:#fff}
+    .footer-contact{display:flex;flex-direction:column;gap:.65rem}
+    .footer-contact-item{display:flex;align-items:center;gap:.6rem;font-size:.83rem;color:rgba(255,255,255,.65)}
+    .footer-contact-item i{color:var(--pri-light);flex-shrink:0}
+    .footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:1.75rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;font-size:.8rem;color:rgba(255,255,255,.4)}
+    .footer-bottom a{color:rgba(255,255,255,.4);text-decoration:none}
+    .footer-bottom a:hover{color:rgba(255,255,255,.7)}
 
-        /* ─── JENJANG PENDIDIKAN ──────────────────────────────────── */
-        .jenjang-bg { background:var(--off-white); }
-        .jenjang-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.5rem; margin-top:3rem; }
-        .jenjang-card {
-            background:white; border-radius:24px; padding:2.25rem 1.75rem;
-            border:1px solid rgba(200,77,223,.1);
-            box-shadow:0 4px 20px rgba(38,6,50,.06);
-            text-align:center; position:relative; overflow:hidden;
-            transition:transform .35s var(--ease-out), box-shadow .35s;
-            cursor:pointer; text-decoration:none; display:block; color:inherit;
-        }
-        .jenjang-card::before { content:''; position:absolute; inset:0; background:linear-gradient(160deg,var(--deep),var(--primary)); opacity:0; transition:opacity .35s; }
-        .jenjang-card:hover { transform:translateY(-8px); box-shadow:0 20px 60px rgba(38,6,50,.18); }
-        .jenjang-card:hover::before { opacity:1; }
-        .jenjang-card:hover .jc-num,
-        .jenjang-card:hover .jc-icon,
-        .jenjang-card:hover .jc-name,
-        .jenjang-card:hover .jc-label,
-        .jenjang-card:hover .jc-link { color:rgba(255,255,255,.9); }
-        .jenjang-card:hover .jc-icon-wrap { background:rgba(255,255,255,.15); }
-        .jenjang-card:hover .jc-link { color:white; }
-        .jc-num { font-size:3.5rem; font-weight:900; font-family:var(--font-display); color:rgba(200,77,223,.12); position:absolute; top:.75rem; right:1.25rem; line-height:1; letter-spacing:-.04em; transition:color .35s; z-index:1; }
-        .jc-content { position:relative; z-index:2; }
-        .jc-icon-wrap { width:64px; height:64px; border-radius:18px; background:rgba(200,77,223,.08); display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem; transition:background .35s; }
-        .jc-icon { font-size:1.8rem; transition:color .35s; }
-        .jc-name { font-size:1.5rem; font-weight:900; font-family:var(--font-display); color:var(--deep); line-height:1; margin-bottom:.35rem; transition:color .35s; }
-        .jc-label { font-size:.85rem; font-weight:500; color:var(--text-muted); margin-bottom:1.5rem; transition:color .35s; }
-        .jc-link { font-size:.8rem; font-weight:700; color:var(--primary); display:inline-flex; align-items:center; gap:5px; transition:color .35s; }
+    /* ── WA FLOAT ── */
+    .wa-float{position:fixed;bottom:2rem;right:2rem;z-index:500;width:56px;height:56px;border-radius:50%;background:#25d366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;text-decoration:none;box-shadow:0 6px 24px rgba(37,211,102,.45);transition:.25s}
+    .wa-float:hover{transform:scale(1.1);color:#fff;box-shadow:0 10px 32px rgba(37,211,102,.55)}
+    .scroll-top{position:fixed;bottom:5.5rem;right:2rem;z-index:500;width:44px;height:44px;border-radius:50%;background:#fff;border:1.5px solid rgba(0,0,0,.1);color:var(--pri);display:none;align-items:center;justify-content:center;font-size:.95rem;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.1);transition:.2s}
+    .scroll-top:hover{background:var(--pri);color:#fff}
+    .scroll-top.visible{display:flex}
 
-        /* ─── PROGRAM UNGGULAN ────────────────────────────────────── */
-        .program-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; margin-top:3rem; }
-        .program-card {
-            background:white; border-radius:22px; padding:2rem 1.75rem;
-            border:1.5px solid rgba(200,77,223,.1);
-            box-shadow:0 4px 18px rgba(38,6,50,.05);
-            cursor:pointer; transition:transform .3s var(--ease-out), box-shadow .3s, border-color .3s;
-            position:relative; overflow:hidden;
-        }
-        .program-card:hover { transform:translateY(-6px); box-shadow:0 18px 50px rgba(38,6,50,.14); border-color:rgba(200,77,223,.3); }
-        .pc-badge { display:inline-flex; align-items:center; gap:5px; font-size:.68rem; font-weight:700; padding:3px 10px; border-radius:50px; margin-bottom:1rem; text-transform:uppercase; letter-spacing:.04em; }
-        .pc-icon-wrap { width:52px; height:52px; border-radius:16px; display:flex; align-items:center; justify-content:center; margin-bottom:1rem; font-size:1.5rem; }
-        .pc-title { font-size:1.1rem; font-weight:800; color:var(--deep); margin-bottom:.5rem; font-family:var(--font-display); }
-        .pc-desc { font-size:.87rem; color:var(--text-muted); line-height:1.65; margin-bottom:1.25rem; }
-        .pc-link { font-size:.82rem; font-weight:700; color:var(--primary); display:inline-flex; align-items:center; gap:5px; transition:gap .2s; }
-        .program-card:hover .pc-link { gap:9px; }
+    /* ── REVEAL ANIMATIONS ── */
+    .reveal{opacity:0;transform:translateY(28px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
+    .reveal.visible{opacity:1;transform:none}
+    .reveal-d1{transition-delay:.08s}
+    .reveal-d2{transition-delay:.16s}
+    .reveal-d3{transition-delay:.24s}
+    .reveal-d4{transition-delay:.32s}
 
-        /* ─── MENGAPA SCI ─────────────────────────────────────────── */
-        .why-bg { background:var(--off-white); }
-        .why-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:1.25rem; margin-top:3rem; }
-        .why-card {
-            background:white; border-radius:22px; padding:2rem 1.5rem;
-            border:1px solid rgba(200,77,223,.1); text-align:center;
-            box-shadow:0 4px 18px rgba(38,6,50,.05);
-            transition:transform .35s var(--ease-out), box-shadow .35s;
-        }
-        .why-card:hover { transform:translateY(-8px); box-shadow:0 20px 55px rgba(38,6,50,.14); }
-        .why-num { font-size:2.5rem; font-weight:900; font-family:var(--font-display); background:linear-gradient(135deg,var(--deep),var(--primary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1; margin-bottom:.5rem; }
-        .why-icon-wrap { width:58px; height:58px; border-radius:16px; background:linear-gradient(135deg,var(--deep),var(--primary)); display:flex; align-items:center; justify-content:center; margin:0 auto .875rem; font-size:1.4rem; color:white; box-shadow:0 8px 20px rgba(104,17,126,.35); }
-        .why-title { font-size:.95rem; font-weight:800; color:var(--deep); margin-bottom:.5rem; font-family:var(--font-display); }
-        .why-desc { font-size:.8rem; color:var(--text-muted); line-height:1.6; }
-
-        /* ─── HOW IT WORKS ────────────────────────────────────────── */
-        .how-inner { display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:center; }
-        .steps-list { list-style:none; display:flex; flex-direction:column; gap:1.5rem; margin-top:2.5rem; }
-        .step-item { display:flex; gap:1.25rem; align-items:flex-start; }
-        .step-num { flex-shrink:0; width:44px; height:44px; border-radius:14px; background:linear-gradient(135deg,var(--deep),var(--primary)); display:flex; align-items:center; justify-content:center; font-size:.78rem; font-weight:900; color:white; letter-spacing:.02em; font-family:var(--font-display); box-shadow:0 6px 18px rgba(104,17,126,.3); }
-        .step-body {}
-        .step-title { font-size:1rem; font-weight:700; color:var(--deep); margin-bottom:.3rem; font-family:var(--font-display); }
-        .step-desc { font-size:.88rem; color:var(--text-muted); line-height:1.6; }
-        .how-visual { position:relative; }
-        .how-visual-img { width:100%; border-radius:28px; overflow:hidden; box-shadow:0 30px 80px rgba(38,6,50,.22); position:relative; }
-        .how-visual-img img { width:100%; height:420px; object-fit:cover; display:block; }
-        .how-visual-badge { position:absolute; bottom:-1.5rem; left:-1.5rem; background:white; border-radius:18px; padding:1rem 1.4rem; box-shadow:0 16px 48px rgba(0,0,0,.18); display:flex; align-items:center; gap:12px; min-width:200px; }
-        .hvb-icon { width:44px; height:44px; border-radius:12px; background:linear-gradient(135deg,var(--gold),#f8d07a); display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0; }
-        .hvb-text .hvb-val { font-size:1.2rem; font-weight:900; color:var(--deep); font-family:var(--font-display); line-height:1; }
-        .hvb-text .hvb-lab { font-size:.7rem; color:var(--text-muted); font-weight:500; margin-top:2px; }
-
-        /* ─── TESTIMONIALS INFINITE CAROUSEL ─────────────────────── */
-        .testimonials-bg { background:linear-gradient(135deg,var(--deep) 0%,var(--mid) 50%,#8b1fa8 100%); position:relative; overflow:hidden; }
-        .testimonials-bg::before { content:''; position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px); background-size:40px 40px; }
-        .testimonials-inner { position:relative; z-index:1; }
-
-        .carousel-viewport {
-            overflow:hidden; position:relative; margin-top:3rem;
-        }
-        .carousel-viewport::before,
-        .carousel-viewport::after {
-            content:''; position:absolute; top:0; bottom:0; width:120px; z-index:2; pointer-events:none;
-        }
-        .carousel-viewport::before { left:0;  background:linear-gradient(to right, rgba(38,6,50,1) 0%, transparent 100%); }
-        .carousel-viewport::after  { right:0; background:linear-gradient(to left,  rgba(38,6,50,1) 0%, transparent 100%); }
-
-        .carousel-track {
-            display:flex; gap:1.25rem;
-            width:max-content;
-            animation: marquee-scroll 38s linear infinite;
-        }
-        .carousel-track:hover { animation-play-state: paused; }
-
-        @keyframes marquee-scroll {
-            0%   { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        .testi-card {
-            background:rgba(255,255,255,.07); backdrop-filter:blur(16px);
-            border:1px solid rgba(255,255,255,.1); border-radius:22px;
-            padding:1.75rem; width:360px; flex-shrink:0;
-            transition:transform .3s, background .3s;
-        }
-        .testi-card:hover { transform:translateY(-5px); background:rgba(255,255,255,.11); }
-        .testi-stars { display:flex; gap:3px; margin-bottom:1rem; color:var(--gold); font-size:.85rem; }
-        .testi-text { font-size:.88rem; color:rgba(255,255,255,.85); line-height:1.7; margin-bottom:1.25rem; min-height:80px; }
-        .testi-author { display:flex; align-items:center; gap:10px; }
-        .testi-avatar { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1rem; font-weight:800; color:white; flex-shrink:0; }
-        .testi-name { font-size:.88rem; font-weight:700; color:white; }
-        .testi-role { font-size:.72rem; color:rgba(255,255,255,.5); font-weight:500; }
-
-        /* fade edge for tutor carousel (light bg) */
-        .tutor-carousel-viewport::before { background:linear-gradient(to right, var(--off-white) 0%, transparent 100%) !important; }
-        .tutor-carousel-viewport::after  { background:linear-gradient(to left,  var(--off-white) 0%, transparent 100%) !important; }
-
-        /* ─── GALERI ──────────────────────────────────────────────── */
-        .galeri-grid { display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:auto auto; gap:1rem; margin-top:2.5rem; }
-        .galeri-item { border-radius:20px; overflow:hidden; position:relative; cursor:pointer; }
-        .galeri-item img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .5s var(--ease-out); }
-        .galeri-item:hover img { transform:scale(1.06); }
-        .galeri-item.large { grid-row:span 2; }
-        .galeri-item { height:220px; }
-        .galeri-item.large { height:auto; min-height:455px; }
-        .galeri-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(38,6,50,.75) 0%,transparent 50%); opacity:0; transition:opacity .3s; display:flex; align-items:flex-end; padding:1.25rem; }
-        .galeri-item:hover .galeri-overlay { opacity:1; }
-        .galeri-overlay span { color:white; font-size:.82rem; font-weight:600; font-family:var(--font-display); }
-
-        /* ─── TUTOR INFINITE CAROUSEL ────────────────────────────── */
-        .tutor-bg { background:var(--off-white); }
-        .tutor-carousel-track {
-            display:flex; gap:1.25rem;
-            width:max-content;
-            animation: marquee-scroll 32s linear infinite;
-        }
-        .tutor-carousel-track:hover { animation-play-state: paused; }
-        .tutor-card {
-            background:white; border-radius:22px; overflow:hidden;
-            border:1px solid rgba(200,77,223,.1);
-            box-shadow:0 4px 18px rgba(38,6,50,.06);
-            transition:transform .35s var(--ease-out), box-shadow .35s;
-            text-align:center; width:240px; flex-shrink:0;
-        }
-        .tutor-card:hover { transform:translateY(-6px); box-shadow:0 18px 50px rgba(38,6,50,.14); }
-        .tutor-avatar-wrap { height:200px; position:relative; overflow:hidden; }
-        .tutor-avatar-wrap img { width:100%; height:100%; object-fit:cover; object-position:top center; }
-        .tutor-avatar-fallback { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:3.5rem; font-weight:900; color:white; font-family:var(--font-display); }
-        .tutor-badge-subject { position:absolute; bottom:.75rem; left:50%; transform:translateX(-50%); background:rgba(38,6,50,.85); backdrop-filter:blur(8px); color:white; font-size:.68rem; font-weight:700; padding:3px 12px; border-radius:50px; white-space:nowrap; letter-spacing:.04em; }
-        .tutor-info { padding:1rem 1rem 1.25rem; }
-        .tutor-name { font-size:.9rem; font-weight:800; color:var(--deep); font-family:var(--font-display); margin-bottom:.2rem; line-height:1.3; }
-        .tutor-meta { font-size:.73rem; color:var(--text-muted); margin-bottom:.6rem; }
-        .tutor-stars { display:flex; gap:2px; justify-content:center; color:var(--gold); font-size:.72rem; }
-
-        /* ─── CABANG ──────────────────────────────────────────────── */
-        .cabang-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; margin-top:3rem; }
-        .cabang-card { background:white; border-radius:22px; padding:1.75rem; border:1px solid rgba(200,77,223,.1); box-shadow:0 4px 18px rgba(38,6,50,.05); transition:transform .3s var(--ease-out), box-shadow .3s; }
-        .cabang-card:hover { transform:translateY(-5px); box-shadow:0 16px 45px rgba(38,6,50,.13); }
-        .cabang-icon { width:46px; height:46px; border-radius:14px; background:linear-gradient(135deg,var(--deep),var(--primary)); display:flex; align-items:center; justify-content:center; color:white; font-size:1.1rem; margin-bottom:1rem; box-shadow:0 6px 18px rgba(104,17,126,.3); }
-        .cabang-name { font-size:1rem; font-weight:800; color:var(--deep); font-family:var(--font-display); margin-bottom:.3rem; }
-        .cabang-address { font-size:.82rem; color:var(--text-muted); line-height:1.5; }
-        .cabang-tag { display:inline-flex; align-items:center; gap:4px; margin-top:.75rem; font-size:.7rem; font-weight:700; color:var(--success); background:rgba(16,185,129,.08); padding:3px 10px; border-radius:50px; }
-
-        /* ─── CTA ─────────────────────────────────────────────────── */
-        .cta-section { padding:6rem 0; }
-        .cta-box { background:linear-gradient(160deg,var(--deep) 0%,var(--mid) 60%,#8b1fa8 100%); border-radius:32px; padding:4.5rem 3rem; text-align:center; position:relative; overflow:hidden; }
-        .cta-box::before { content:''; position:absolute; width:400px; height:400px; background:radial-gradient(circle,rgba(200,77,223,.25),transparent 70%); top:-100px; right:-100px; pointer-events:none; }
-        .cta-box::after { content:''; position:absolute; width:300px; height:300px; background:radial-gradient(circle,rgba(246,175,35,.15),transparent 70%); bottom:-80px; left:-80px; pointer-events:none; }
-        .cta-content { position:relative; z-index:1; }
-        .cta-eyebrow { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.15); border-radius:50px; padding:5px 16px; font-size:.75rem; font-weight:700; color:rgba(255,255,255,.9); text-transform:uppercase; letter-spacing:.06em; margin-bottom:1.25rem; }
-        .cta-title { font-size:clamp(1.8rem,3vw,2.8rem); font-weight:900; color:white; line-height:1.2; margin-bottom:1rem; }
-        .cta-desc { font-size:1rem; color:rgba(255,255,255,.7); margin-bottom:2.5rem; max-width:520px; margin-left:auto; margin-right:auto; }
-        .cta-btns { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
-        .btn-cta-primary { display:inline-flex; align-items:center; gap:8px; padding:1rem 2.25rem; border-radius:14px; font-size:1rem; font-weight:700; color:var(--deep); background:white; text-decoration:none; transition:transform .25s, box-shadow .25s; box-shadow:0 8px 24px rgba(0,0,0,.2); }
-        .btn-cta-primary:hover { transform:translateY(-3px); box-shadow:0 14px 40px rgba(0,0,0,.3); color:var(--primary-dark); }
-        .btn-cta-secondary { display:inline-flex; align-items:center; gap:8px; padding:1rem 2rem; border-radius:14px; font-size:1rem; font-weight:600; color:white; border:1.5px solid rgba(255,255,255,.3); background:rgba(255,255,255,.08); text-decoration:none; transition:.25s; }
-        .btn-cta-secondary:hover { background:rgba(255,255,255,.15); border-color:rgba(255,255,255,.5); transform:translateY(-2px); color:white; }
-
-        /* ─── FOOTER ─────────────────────────────────────────────── */
-        .footer { background:var(--deep); color:rgba(255,255,255,.65); padding:4rem 0 2rem; }
-        .footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:3rem; padding-bottom:3rem; border-bottom:1px solid rgba(255,255,255,.07); }
-        .footer-brand-desc { font-size:.85rem; line-height:1.7; color:rgba(255,255,255,.5); margin-top:1rem; max-width:280px; }
-        .footer-social { display:flex; gap:8px; margin-top:1.25rem; }
-        .footer-social a { width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.6); font-size:.95rem; text-decoration:none; transition:.2s; }
-        .footer-social a:hover { background:var(--primary); border-color:var(--primary); color:white; }
-        .footer-col-title { font-family:var(--font-display); font-size:.85rem; font-weight:700; color:white; margin-bottom:1rem; letter-spacing:-.01em; }
-        .footer-links { list-style:none; display:flex; flex-direction:column; gap:8px; }
-        .footer-links a { font-size:.82rem; color:rgba(255,255,255,.5); text-decoration:none; transition:color .2s; }
-        .footer-links a:hover { color:var(--primary); }
-        .footer-bottom { padding-top:2rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
-        .footer-bottom p { font-size:.78rem; }
-        .footer-bottom-links { display:flex; gap:1.5rem; }
-        .footer-bottom-links a { font-size:.78rem; color:rgba(255,255,255,.4); text-decoration:none; transition:color .2s; }
-        .footer-bottom-links a:hover { color:var(--primary); }
-
-        /* ─── CABANG CARD EXTRAS ──────────────────────────────────── */
-        .cabang-phone { font-size:.8rem; color:var(--text-muted); margin-top:.4rem; display:flex; align-items:center; gap:5px; }
-        .btn-cabang-wa { display:inline-flex; align-items:center; gap:6px; margin-top:1rem; padding:.45rem 1rem; border-radius:10px; font-size:.78rem; font-weight:700; color:#128C7E; background:rgba(37,211,102,.1); border:1px solid rgba(37,211,102,.2); text-decoration:none; transition:background .2s, color .2s, transform .2s; }
-        .btn-cabang-wa:hover { background:rgba(37,211,102,.18); color:#128C7E; transform:translateY(-1px); }
-
-        /* ─── FLOATING WA BUTTON ──────────────────────────────────── */
-        .wa-float {
-            position:fixed; bottom:1.75rem; right:1.75rem; z-index:9000;
-            width:58px; height:58px; border-radius:50%;
-            background:linear-gradient(135deg,#25D366,#128C7E);
-            display:flex; align-items:center; justify-content:center;
-            font-size:1.6rem; color:white; text-decoration:none;
-            box-shadow:0 8px 28px rgba(37,211,102,.5), 0 0 0 0 rgba(37,211,102,.3);
-            animation:wa-pulse 2.5s ease-in-out infinite;
-            transition:transform .25s var(--ease-out), box-shadow .25s;
-        }
-        .wa-float:hover { transform:scale(1.12) translateY(-2px); box-shadow:0 16px 44px rgba(37,211,102,.6), 0 0 0 8px rgba(37,211,102,.1); color:white; }
-        .wa-float-label {
-            position:absolute; right:68px; top:50%; transform:translateY(-50%);
-            background:rgba(38,6,50,.88); backdrop-filter:blur(10px);
-            color:white; font-size:.78rem; font-weight:700; white-space:nowrap;
-            padding:.38rem .85rem; border-radius:50px;
-            opacity:0; pointer-events:none;
-            transition:opacity .25s, transform .25s;
-            transform:translateY(-50%) translateX(6px);
-        }
-        .wa-float:hover .wa-float-label { opacity:1; transform:translateY(-50%) translateX(0); }
-        @keyframes wa-pulse {
-            0%,100% { box-shadow:0 8px 28px rgba(37,211,102,.5), 0 0 0 0 rgba(37,211,102,.25); }
-            50%      { box-shadow:0 8px 28px rgba(37,211,102,.5), 0 0 0 14px rgba(37,211,102,0); }
-        }
-
-        /* ─── SCROLL-TO-TOP ───────────────────────────────────────── */
-        .scroll-top {
-            position:fixed; bottom:1.75rem; left:1.75rem; z-index:9000;
-            width:46px; height:46px; border-radius:14px;
-            background:rgba(38,6,50,.82); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
-            border:1px solid rgba(200,77,223,.22);
-            display:flex; align-items:center; justify-content:center;
-            color:white; font-size:1rem; cursor:pointer;
-            opacity:0; visibility:hidden;
-            transition:opacity .3s, visibility .3s, transform .3s var(--ease-out), background .2s;
-            transform:translateY(10px);
-        }
-        .scroll-top.visible { opacity:1; visibility:visible; transform:translateY(0); }
-        .scroll-top:hover { background:var(--primary); transform:translateY(-2px); }
-
-        /* ─── SCROLL-REVEAL ──────────────────────────────────────── */
-        .reveal { opacity:0; transform:translateY(32px); transition:opacity .7s var(--ease-out), transform .7s var(--ease-out); }
-        .reveal.visible { opacity:1; transform:none; }
-        .reveal-delay-1 { transition-delay:.1s; }
-        .reveal-delay-2 { transition-delay:.2s; }
-        .reveal-delay-3 { transition-delay:.3s; }
-        .reveal-delay-4 { transition-delay:.4s; }
-        .reveal-delay-5 { transition-delay:.5s; }
-        /* Fallback: show content if JS is disabled */
-        @media (scripting: none) { .reveal { opacity:1; transform:none; } }
-
-        /* ─── RESPONSIVE ─────────────────────────────────────────── */
-        @media (max-width:1200px) {
-            .why-grid { grid-template-columns:repeat(3,1fr); }
-        }
-        @media (max-width:900px) {
-            .float-card-1 { bottom:8rem; left:1.5rem; }
-            .float-card-2 { top:7rem; right:1.5rem; }
-            .section-pad { padding:4.5rem 0; }
-            .jenjang-grid { grid-template-columns:1fr 1fr; }
-            .program-grid { grid-template-columns:1fr 1fr; }
-            .why-grid { grid-template-columns:1fr 1fr; }
-            .cabang-grid { grid-template-columns:1fr 1fr; }
-            .how-inner { grid-template-columns:1fr; }
-            .how-visual { order:-1; max-width:480px; margin:0 auto; }
-            .how-visual-badge { bottom:.75rem; left:.75rem; }
-            .footer-grid { grid-template-columns:1fr 1fr; gap:2rem; }
-            /* hamburger — hide links, show toggle */
-            .nav-links, .nav-cta { display:none !important; }
-            .nav-toggle { display:flex !important; }
-            /* ── Transparent fixed navbar on mobile ── */
-            .lp-nav {
-                position: fixed !important;
-                top: 0 !important; left: 0 !important; right: 0 !important;
-                background: transparent !important;
-                padding: .75rem 0 !important;
-            }
-            .lp-nav.scrolled {
-                padding: .75rem 0 !important;
-                background: transparent !important;
-            }
-            .lp-nav.scrolled .nav-inner {
-                background: rgba(38,6,50,.72) !important;
-                backdrop-filter: blur(16px) !important;
-                -webkit-backdrop-filter: blur(16px) !important;
-                border-radius: 14px !important;
-                padding: .45rem 1rem !important;
-                max-width: calc(100% - 2rem) !important;
-                box-shadow: 0 4px 24px rgba(0,0,0,.18) !important;
-            }
-            .lp-nav .nav-inner {
-                background: transparent !important;
-                backdrop-filter: none !important;
-                -webkit-backdrop-filter: none !important;
-                border-radius: 0 !important;
-                box-shadow: none !important;
-            }
-            .lp-nav.scrolled .nav-brand-text,
-            .lp-nav .nav-brand-text { color: white !important; }
-            .lp-nav.scrolled .nav-toggle span,
-            .lp-nav .nav-toggle span { background: white !important; }
-            /* Hero needs top padding to clear fixed nav */
-            .hero-inner { padding: 6.5rem 1.5rem 5rem; }
-        }
-        @media (max-width:768px) {
-            .lp-nav.scrolled { padding:.6rem 0; }
-            .section-pad { padding:3.75rem 0; }
-            .stats-strip-inner { grid-template-columns:1fr 1fr; }
-            .stat-item { border-right:none; border-bottom:1px solid rgba(200,77,223,.1); }
-            .stat-item:nth-child(odd) { border-right:1px solid rgba(200,77,223,.1); }
-            .stat-item:nth-child(3), .stat-item:nth-child(4) { border-bottom:none; }
-            .jenjang-grid { grid-template-columns:1fr 1fr; }
-            .program-grid { grid-template-columns:1fr; }
-            .why-grid { grid-template-columns:1fr 1fr; }
-            .galeri-grid { grid-template-columns:1fr 1fr; }
-            .galeri-item.large { grid-row:auto; min-height:220px; }
-            .cabang-grid { grid-template-columns:1fr; }
-            .footer-grid { grid-template-columns:1fr; gap:2rem; }
-            .footer-bottom { flex-direction:column; text-align:center; }
-            .cta-box { padding:3rem 1.5rem; border-radius:24px; }
-            .float-card { display:none; }
-            .scroll-indicator { display:none; }
-            .wa-float { width:52px; height:52px; font-size:1.4rem; bottom:1.25rem; right:1.25rem; }
-            .scroll-top { bottom:1.25rem; left:1.25rem; }
-            .how-visual-badge { bottom:.5rem; left:.5rem; min-width:160px; padding:.75rem 1rem; }
-            .hvb-text .hvb-val { font-size:1rem; }
-        }
-        /* ── Mobile carousels (≤640px) ── */
-        @media (max-width:640px) {
-            .jenjang-grid,
-            .program-grid,
-            .why-grid {
-                display: flex !important;
-                overflow-x: auto;
-                scroll-snap-type: x mandatory;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;
-                gap: 1rem;
-                padding: 1.5rem 1.25rem 0.75rem;
-                margin: 0 -1.25rem;
-            }
-            .jenjang-grid::-webkit-scrollbar,
-            .program-grid::-webkit-scrollbar,
-            .why-grid::-webkit-scrollbar { display: none; }
-            .jenjang-card { flex: 0 0 72vw; scroll-snap-align: start; }
-            .program-card { flex: 0 0 78vw; scroll-snap-align: start; height: auto; }
-            .why-card     { flex: 0 0 72vw; scroll-snap-align: start; }
-            /* Dot indicators */
-            .mobile-carousel-dots {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                gap: 7px;
-                margin-top: 1.25rem;
-            }
-            .mobile-carousel-dots .mcd {
-                width: 8px; height: 8px;
-                border-radius: 50%;
-                background: rgba(200,77,223,.2);
-                border: none; cursor: pointer; padding: 0;
-                transition: background .25s, width .25s, border-radius .25s;
-            }
-            .mobile-carousel-dots .mcd.active {
-                background: var(--primary);
-                width: 22px;
-                border-radius: 4px;
-            }
-        }
-        @media (max-width:480px) {
-            .section-pad { padding:3rem 0; }
-            .hero-inner { padding:6.5rem 1.25rem 5.5rem; }
-            .hero-title { font-size:clamp(1.9rem,8vw,2.4rem); }
-            .btn-hero-primary, .btn-hero-secondary { width:100%; justify-content:center; }
-            .cta-btns > * { width:100%; justify-content:center; }
-            .hero-dots { bottom:4.5rem; }
-            .galeri-grid { grid-template-columns:1fr; }
-            .galeri-item.large { min-height:240px; }
-            .testi-card { width:300px; }
-            .tutor-card { width:200px; }
-            .tutor-avatar-wrap { height:170px; }
-            .section-title { font-size:clamp(1.55rem,6vw,2rem); }
-            .how-inner { gap:2.5rem; }
-            .footer-grid { gap:1.5rem; }
-            .cta-box { padding:2.5rem 1.25rem; }
-        }
-        @media (max-width:360px) {
-            .testi-card { width:260px; }
-            .tutor-card { width:175px; }
-        }
+    /* ── RESPONSIVE ── */
+    @media(max-width:900px){
+        .sci-nav-links{display:none}
+        .sci-nav-toggle{display:flex}
+        .search-box{grid-template-columns:1fr;gap:.75rem}
+        .keunggulan-grid{grid-template-columns:repeat(2,1fr)}
+        .jenjang-grid{grid-template-columns:repeat(2,1fr)}
+        .program-grid{grid-template-columns:repeat(2,1fr)}
+        .footer-grid{grid-template-columns:1fr 1fr;gap:2rem}
+    }
+    @media(max-width:640px){
+        .sci-hero{height:80vh}
+        .jenjang-grid{grid-template-columns:repeat(2,1fr)}
+        .program-grid{grid-template-columns:1fr}
+        .keunggulan-grid{grid-template-columns:1fr}
+        .cabang-grid{grid-template-columns:1fr}
+        .footer-grid{grid-template-columns:1fr}
+        .feature-grid{grid-template-columns:1fr}
+        .lp-section{padding:3.5rem 0}
+    }
+    @media(max-width:480px){
+        .jenjang-grid{grid-template-columns:repeat(2,1fr)}
+    }
     </style>
 </head>
 <body>
-<div id="scroll-progress" role="progressbar" aria-hidden="true"></div>
 
-{{-- ─────────────────────────────── NAVBAR ────────────────────────────────── --}}
-<nav class="lp-nav" id="navbar">
-    <div class="nav-inner">
-        <a href="{{ url('/') }}" class="nav-brand">
-            <div class="nav-brand-icon"><i class="bi bi-mortarboard-fill"></i></div>
-            <div class="nav-brand-text">
-                Smart Center
+{{-- ── NAVBAR ── --}}
+<nav class="sci-nav" id="sciNav">
+    <div class="sci-nav-inner">
+        <a href="{{ url('/') }}" class="sci-logo">
+            <div class="sci-logo-sq">SCI</div>
+            <div class="sci-logo-text">
+                <strong>Smart Center</strong>
                 <small>Indonesia</small>
             </div>
         </a>
-
-        <ul class="nav-links">
-            <li><a href="#program"      class="nav-link-item">Program</a></li>
-            <li><a href="#jenjang"      class="nav-link-item">Jenjang</a></li>
-            <li><a href="#mengapa-sci"  class="nav-link-item">Mengapa SCI</a></li>
-            <li><a href="#tutor"        class="nav-link-item">Tutor</a></li>
-            <li><a href="#testimonials" class="nav-link-item">Testimoni</a></li>
-            <li><a href="#cabang"       class="nav-link-item">Cabang</a></li>
+        <ul class="sci-nav-links">
+            <li><a href="#tentang">Tentang</a></li>
+            <li><a href="#program">Program</a></li>
+            <li><a href="#keunggulan">Keunggulan</a></li>
+            <li><a href="#testimoni">Testimoni</a></li>
+            <li><a href="#tutor">Tutor</a></li>
+            <li><a href="#cabang">Cabang</a></li>
         </ul>
-
-        <div class="nav-cta">
-            <a href="{{ route('login') }}"    class="btn-nav-login">Masuk</a>
-            <a href="{{ route('register') }}" class="btn-nav-register">Daftar Sekarang</a>
-        </div>
-
-        <button class="nav-toggle" id="navToggle" aria-label="Menu">
+        <button class="sci-nav-toggle" id="navToggle" aria-label="Menu">
             <span></span><span></span><span></span>
         </button>
     </div>
 </nav>
 
 {{-- Mobile Menu --}}
-<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-    <button class="mobile-close" onclick="closeMobile()" aria-label="Tutup menu">
-        <i class="bi bi-x-lg"></i>
-    </button>
-    <a href="#program"      onclick="closeMobile()">Program</a>
-    <a href="#jenjang"      onclick="closeMobile()">Jenjang</a>
-    <a href="#mengapa-sci"  onclick="closeMobile()">Mengapa SCI</a>
-    <a href="#tutor"        onclick="closeMobile()">Tutor</a>
-    <a href="#testimonials" onclick="closeMobile()">Testimoni</a>
-    <a href="#cabang"       onclick="closeMobile()">Cabang</a>
-    <div class="mobile-divider"></div>
-    <a href="{{ route('login') }}"    onclick="closeMobile()" style="color:rgba(255,255,255,.65);font-size:1.05rem;font-weight:600"><i class="bi bi-box-arrow-in-right" style="font-size:.9rem"></i> Masuk</a>
-    <a href="{{ route('register') }}" onclick="closeMobile()" style="background:linear-gradient(135deg,var(--primary-dark),var(--primary));padding:.8rem 2.5rem;border-radius:14px;font-size:1rem;color:white">Daftar Sekarang</a>
+<div class="sci-mobile-menu" id="mobileMenu">
+    <button class="sci-mobile-close" id="mobileClose"><i class="bi bi-x"></i></button>
+    <a href="#tentang" onclick="closeMobile()">Tentang</a>
+    <a href="#program" onclick="closeMobile()">Program</a>
+    <a href="#keunggulan" onclick="closeMobile()">Keunggulan</a>
+    <a href="#testimoni" onclick="closeMobile()">Testimoni</a>
+    <a href="#tutor" onclick="closeMobile()">Tutor</a>
+    <a href="#cabang" onclick="closeMobile()">Cabang</a>
+    <a href="{{ route('login') }}" onclick="closeMobile()" style="color:var(--gold)">Masuk Portal</a>
 </div>
 
-{{-- ─────────────────────────────── HERO ──────────────────────────────────── --}}
-<section class="hero" id="home">
-    <div class="hero-slides" id="heroSlides">
-        @php
-            // array_values re-indexes so PHP keys are always 0,1,2 — critical for JS slides[idx]
-            $heroSlides = array_values(array_filter([
-                $ls('hero.slide_1_url','https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1920&q=80'),
-                $ls('hero.slide_2_url','https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1920&q=80'),
-                $ls('hero.slide_3_url','https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&w=1920&q=80'),
-            ]));
-        @endphp
-        @foreach($heroSlides as $i => $slideUrl)
-        <div class="hero-slide {{ $i === 0 ? 'active' : '' }}" style="background-image:url('{{ $slideUrl }}')">
-            <div class="hero-slide-overlay"></div>
+{{-- ── HERO ── --}}
+<section class="sci-hero" id="beranda">
+    <div class="sci-hero-slides">
+        @foreach($heroSlides as $i => $slide)
+        <div class="sci-hero-slide {{ $i===0?'active':'' }}" style="background-image:url('{{ $slide['img'] }}')"></div>
+        @endforeach
+        <div class="sci-hero-overlay"></div>
+    </div>
+
+    <button class="sci-hero-arrow prev" id="heroPrev"><i class="bi bi-chevron-left"></i></button>
+    <button class="sci-hero-arrow next" id="heroNext"><i class="bi bi-chevron-right"></i></button>
+
+    <div class="sci-hero-content">
+        <h1 class="sci-hero-title">{{ $ls('hero.title','Wujudkan Mimpi,') }}<br><span class="italic-accent">{{ $ls('hero.subtitle','Raih Prestasi!') }}</span></h1>
+        <p class="sci-hero-sub">{{ $ls('hero.description','Smart Center Indonesia — lembaga bimbingan belajar, kursus, dan les privat berbasis offline & online. Tutor profesional, metode modern, hasil terukur untuk semua jenjang dari TK hingga umum.') }}</p>
+        <div class="sci-hero-btns">
+            <a href="{{ route('register') }}" class="btn-hero-gold"><i class="bi bi-rocket-takeoff-fill"></i> Daftar Sekarang</a>
+            <a href="#program" class="btn-hero-outline"><i class="bi bi-grid-3x3-gap-fill"></i> Lihat Program</a>
         </div>
+    </div>
+
+    <div class="sci-hero-dots" id="heroDots">
+        @foreach($heroSlides as $i => $slide)
+        <button class="sci-hero-dot {{ $i===0?'active':'' }}" data-slide="{{ $i }}"></button>
         @endforeach
     </div>
 
-    <div class="hero-inner">
-        <div class="hero-badge">
-            <div class="hero-badge-dot"><i class="bi bi-stars" style="color:white;font-size:11px"></i></div>
-            {{ $ls('hero.badge_text','Bimbel & Kursus Terbaik #1 di Indonesia') }}
-        </div>
-
-        <h1 class="hero-title">
-            {{ $ls('hero.title_line1','Wujudkan Mimpi,') }}<br><span class="gradient-text">{{ $ls('hero.title_line2','Raih Prestasi!') }}</span>
-        </h1>
-
-        <p class="hero-desc">
-            {{ $ls('hero.description','Smart Center Indonesia — lembaga bimbingan belajar, kursus, dan les privat berbasis offline & online. Tutor profesional, metode modern, hasil terukur untuk semua jenjang dari TK hingga umum.') }}
-        </p>
-
-        <div class="hero-actions">
-            <a href="{{ route('register') }}" class="btn-hero-primary">
-                <i class="bi bi-rocket-takeoff-fill"></i>
-                Daftar Sekarang
-            </a>
-            <a href="#program" class="btn-hero-secondary">
-                <i class="bi bi-grid-3x3-gap-fill"></i>
-                Lihat Program
-            </a>
-        </div>
-
-        <div class="hero-trust">
-            <div class="hero-avatars">
-                <div class="hero-avatar">A</div>
-                <div class="hero-avatar">B</div>
-                <div class="hero-avatar">C</div>
-                <div class="hero-avatar">D</div>
-            </div>
-            <div class="hero-trust-text">
-                <strong>Dipercaya ribuan siswa & orang tua</strong>
-                di seluruh Indonesia ⭐⭐⭐⭐⭐
-            </div>
-        </div>
-    </div>
-
-    <div class="float-card float-card-1">
-        <div class="float-card-content">
-            <div class="float-icon" style="background:rgba(16,185,129,.12);">🏆</div>
-            <div class="float-card-text">
-                <div class="fc-val">{{ $ls('hero.float1_title','Nilai Naik!') }}</div>
-                <div class="fc-lab">{{ $ls('hero.float1_subtitle','Rata-rata +30 poin · Bulan ini') }}</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="float-card float-card-2">
-        <div class="float-card-content">
-            <div class="float-icon" style="background:rgba(200,77,223,.12);">👤</div>
-            <div class="float-card-text">
-                <div class="fc-val">{{ $ls('hero.float2_title','Siswa Baru Daftar') }}</div>
-                <div class="fc-lab">{{ $ls('hero.float2_subtitle','Les Privat · Baru saja') }}</div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Dynamic dots — synced with actual slide count --}}
-    <div class="hero-dots" id="heroDots">
-        @foreach($heroSlides as $i => $slideUrl)
-        <button class="hero-dot {{ $i === 0 ? 'active' : '' }}" data-slide="{{ $i }}" aria-label="Slide {{ $i + 1 }}"></button>
-        @endforeach
+    <div class="sci-hero-scroll">
+        <div class="scroll-line"></div>
+        SCROLL
     </div>
 </section>
 
-{{-- ──────────────────────────── STATS STRIP ───────────────────────────────── --}}
-<section class="stats-strip">
-    <div class="stats-strip-inner">
-        <div class="stat-item reveal">
-            <div class="si-num count-up" data-target="{{ max($stats['students'], 500) }}">0</div>
-            <div class="si-label">Siswa Aktif</div>
-        </div>
-        <div class="stat-item reveal reveal-delay-1">
-            <div class="si-num count-up" data-target="{{ max($stats['teachers'], 50) }}">0</div>
-            <div class="si-label">Tutor Profesional</div>
-        </div>
-        <div class="stat-item reveal reveal-delay-2">
-            <div class="si-num">{{ $ls('stats.years_exp','14+') }}</div>
-            <div class="si-label">Tahun Pengalaman</div>
-        </div>
-        <div class="stat-item reveal reveal-delay-3">
-            <div class="si-num">{{ $ls('stats.satisfaction','98%') }}</div>
-            <div class="si-label">Kepuasan Pelanggan</div>
-        </div>
-    </div>
-</section>
-
-{{-- ──────────────────────────── JENJANG PENDIDIKAN ───────────────────────── --}}
-<section class="section-pad jenjang-bg" id="jenjang">
-    <div class="container-lp">
-        <div class="text-center reveal">
-            <div class="section-eyebrow"><i class="bi bi-layers-fill"></i> Jenjang Pendidikan</div>
-            <h2 class="section-title">Kami Melayani Semua Jenjang</h2>
-            <p class="section-subtitle mx-auto">Dari TK hingga umum dengan pendekatan personal yang tepat untuk setiap tahap perkembangan.</p>
-        </div>
-
-        <div class="jenjang-grid" id="jenjangGrid">
-            <a href="{{ route('register') }}" class="jenjang-card reveal reveal-delay-1">
-                <div class="jc-num">1</div>
-                <div class="jc-content">
-                    <div class="jc-icon-wrap">
-                        <span class="jc-icon">🌱</span>
-                    </div>
-                    <div class="jc-name">TK</div>
-                    <div class="jc-label">Taman Kanak-Kanak</div>
-                    <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
-                </div>
-            </a>
-
-            <a href="{{ route('register') }}" class="jenjang-card reveal reveal-delay-2">
-                <div class="jc-num">2</div>
-                <div class="jc-content">
-                    <div class="jc-icon-wrap">
-                        <span class="jc-icon">📚</span>
-                    </div>
-                    <div class="jc-name">SD</div>
-                    <div class="jc-label">Sekolah Dasar</div>
-                    <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
-                </div>
-            </a>
-
-            <a href="{{ route('register') }}" class="jenjang-card reveal reveal-delay-3">
-                <div class="jc-num">3</div>
-                <div class="jc-content">
-                    <div class="jc-icon-wrap">
-                        <span class="jc-icon">🔬</span>
-                    </div>
-                    <div class="jc-name">SMP</div>
-                    <div class="jc-label">Sekolah Menengah Pertama</div>
-                    <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
-                </div>
-            </a>
-
-            <a href="{{ route('register') }}" class="jenjang-card reveal reveal-delay-4">
-                <div class="jc-num">4</div>
-                <div class="jc-content">
-                    <div class="jc-icon-wrap">
-                        <span class="jc-icon">🎓</span>
-                    </div>
-                    <div class="jc-name">SMA</div>
-                    <div class="jc-label">SMA & Karyawan / Umum</div>
-                    <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
-                </div>
-            </a>
-        </div>
-        <div class="mobile-carousel-dots" id="jenjang-dots"></div>
-    </div>
-</section>
-
-{{-- ──────────────────────────── PROGRAM UNGGULAN ─────────────────────────── --}}
-<section class="section-pad" id="program">
-    <div class="container-lp">
-        <div class="text-center reveal">
-            <div class="section-eyebrow"><i class="bi bi-award-fill"></i> Program Unggulan</div>
-            <h2 class="section-title">Pilih Program Terbaik<br>Sesuai Kebutuhan Anda</h2>
-            <p class="section-subtitle mx-auto">Pilih program yang sesuai kebutuhanmu bersama para tutor terbaik kami — klik kartu untuk melihat detail lengkap.</p>
-        </div>
-
-        <div class="program-grid" id="programGrid">
-            @php $delays = ['reveal-delay-1','reveal-delay-2','reveal-delay-3']; @endphp
-            @forelse($dbPrograms as $pi => $prog)
-            <a href="{{ route('register') }}" class="program-card reveal {{ $delays[$pi % 3] }}" style="text-decoration:none;color:inherit{{ $prog->is_popular ? ';border-color:rgba(246,175,35,.3)' : ($prog->is_new ? ';border-color:rgba(16,185,129,.25)' : '') }}">
-                <div class="pc-badge" style="background:{{ $prog->badge_bg }};color:{{ $prog->badge_color }};">{{ $prog->badge_label }}</div>
-                <div class="pc-icon-wrap" style="background:{{ $prog->badge_bg }};">
-                    <span style="font-size:1.5rem">{{ $prog->icon_emoji }}</span>
-                </div>
-                <div class="pc-title">{{ $prog->title }}</div>
-                <div class="pc-desc">{{ $prog->description }}</div>
-                <div class="pc-link">Daftar Sekarang <i class="bi bi-arrow-right"></i></div>
-            </a>
-            @empty
-            <div class="col-12 text-center py-5 text-muted">Program segera hadir.</div>
-            @endforelse
-        </div>
-        <div class="mobile-carousel-dots" id="program-dots"></div>
-    </div>
-</section>
-
-{{-- ──────────────────────────── CARA BERGABUNG ───────────────────────────── --}}
-<section class="section-pad" id="cara-bergabung" style="background:var(--off-white)">
-    <div class="container-lp">
-        <div class="how-inner">
-            <div>
-                <div class="reveal">
-                    <div class="section-eyebrow"><i class="bi bi-map"></i> Cara Bergabung</div>
-                    <h2 class="section-title">Mulai Belajar di SCI<br>Sangat Mudah</h2>
-                    <p class="section-subtitle">Daftar, pilih program, dan mulai belajar — semua bisa dilakukan dalam hitungan menit.</p>
-                </div>
-
-                <ul class="steps-list">
-                    <li class="step-item reveal reveal-delay-1">
-                        <div class="step-num">01</div>
-                        <div class="step-body">
-                            <div class="step-title">Konsultasi Gratis</div>
-                            <div class="step-desc">Hubungi kami via WhatsApp atau kunjungi cabang terdekat. Tim kami siap membantu memilih program terbaik.</div>
-                        </div>
-                    </li>
-                    <li class="step-item reveal reveal-delay-2">
-                        <div class="step-num">02</div>
-                        <div class="step-body">
-                            <div class="step-title">Pilih Program & Jadwal</div>
-                            <div class="step-desc">Tentukan program, jenjang, dan jadwal belajar yang sesuai. Tersedia offline, online, maupun home visit.</div>
-                        </div>
-                    </li>
-                    <li class="step-item reveal reveal-delay-3">
-                        <div class="step-num">03</div>
-                        <div class="step-body">
-                            <div class="step-title">Mulai Belajar</div>
-                            <div class="step-desc">Siswa langsung belajar bersama tutor profesional pilihan. Materi disesuaikan dengan kebutuhan dan gaya belajar.</div>
-                        </div>
-                    </li>
-                    <li class="step-item reveal reveal-delay-4">
-                        <div class="step-num">04</div>
-                        <div class="step-body">
-                            <div class="step-title">Pantau Perkembangan</div>
-                            <div class="step-desc">Laporan bulanan dikirimkan ke orang tua. Progress nilai terpantau, evaluasi rutin, dijamin hasilnya!</div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="how-visual reveal reveal-delay-2">
-                <div class="how-visual-img">
-                    <img src="https://images.unsplash.com/photo-1491841573634-28140fc7ced7?auto=format&fit=crop&w=800&q=80" alt="Belajar bersama tutor SCI">
-                </div>
-                <div class="how-visual-badge">
-                    <div class="hvb-icon">🎓</div>
-                    <div class="hvb-text">
-                        <div class="hvb-val">14+ Tahun</div>
-                        <div class="hvb-lab">Melayani Indonesia</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-{{-- ──────────────────────────── MENGAPA SCI ───────────────────────────────── --}}
-<section class="section-pad" id="mengapa-sci">
-    <div class="container-lp">
-        <div class="text-center reveal">
-            <div class="section-eyebrow"><i class="bi bi-shield-fill-check"></i> Mengapa SCI?</div>
-            <h2 class="section-title">Keunggulan SCI</h2>
-            <p class="section-subtitle mx-auto">Lima pilar yang membuat SCI menjadi pilihan terpercaya jutaan keluarga Indonesia selama 14+ tahun.</p>
-        </div>
-
-        <div class="why-grid" id="whyGrid">
-            <div class="why-card reveal reveal-delay-1">
-                <div class="why-icon-wrap"><i class="bi bi-person-badge-fill"></i></div>
-                <div class="why-num">1</div>
-                <div class="why-title">Tutor Profesional</div>
-                <div class="why-desc">Pengajar ahli bersertifikat resmi dengan pengalaman bertahun-tahun dan rekam jejak hasil nyata.</div>
-            </div>
-
-            <div class="why-card reveal reveal-delay-2">
-                <div class="why-icon-wrap"><i class="bi bi-house-heart-fill"></i></div>
-                <div class="why-num">2</div>
-                <div class="why-title">Bisa Home Visit</div>
-                <div class="why-desc">Tutor kami siap datang ke rumah Anda kapan saja. Jadwal fleksibel, nyaman, tanpa perlu repot.</div>
-            </div>
-
-            <div class="why-card reveal reveal-delay-3">
-                <div class="why-icon-wrap"><i class="bi bi-lightbulb-fill"></i></div>
-                <div class="why-num">3</div>
-                <div class="why-title">Metode Modern</div>
-                <div class="why-desc">Sistem belajar interaktif yang disesuaikan gaya belajar masing-masing siswa. Belajar itu menyenangkan!</div>
-            </div>
-
-            <div class="why-card reveal reveal-delay-4">
-                <div class="why-icon-wrap"><i class="bi bi-graph-up-arrow"></i></div>
-                <div class="why-num">4</div>
-                <div class="why-title">Hasil Terukur</div>
-                <div class="why-desc">Evaluasi rutin, progress terpantau, laporan bulanan. Nilai meningkat signifikan — dijamin atau kami ulang!</div>
-            </div>
-
-            <div class="why-card reveal reveal-delay-5">
-                <div class="why-icon-wrap"><i class="bi bi-headset"></i></div>
-                <div class="why-num">5</div>
-                <div class="why-title">Support Penuh</div>
-                <div class="why-desc">Bantuan belajar & konsultasi 24/7 via WhatsApp. Kami selalu ada untuk mendukung perjalanan belajar Anda.</div>
-            </div>
-        </div>
-        <div class="mobile-carousel-dots" id="why-dots"></div>
-    </div>
-</section>
-
-{{-- ──────────────────────────── TESTIMONIALS ──────────────────────────────── --}}
-<section class="section-pad testimonials-bg" id="testimonials">
-    <div class="testimonials-inner">
-        <div class="container-lp">
-            <div class="text-center reveal">
-                <div class="section-eyebrow" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.9)">
-                    <i class="bi bi-chat-heart-fill"></i> Kata Mereka
-                </div>
-                <h2 class="section-title" style="color:white">Testimoni Siswa</h2>
-                <p class="section-subtitle mx-auto" style="color:rgba(255,255,255,.7)">Dengarkan cerita sukses ribuan siswa yang telah mempercayai SCI sebagai mitra belajar mereka.</p>
-            </div>
-        </div>
-
-        {{-- Infinite carousel — items duplicated for seamless loop --}}
-        <div class="carousel-viewport">
-            <div class="carousel-track">
-                @php
-                    $testiSource = $dbTestis->isNotEmpty() ? $dbTestis : collect([
-                        (object)['text'=>'"Nilai matematika saya naik dari 60 ke 90 setelah 3 bulan bimbel di SCI! Tutornya sabar dan cara jelasinnya mudah dipahami."','name'=>'Rini Kusumawati','role'=>'Siswa SMA · Surabaya','initial'=>'R','gradient'=>'linear-gradient(135deg,#c84ddf,#68117e)'],
-                        (object)['text'=>'"Berkat program intensif SBMPTN di SCI, saya berhasil masuk ITB! Materinya lengkap, soal-soal latihannya mirip ujian asli."','name'=>'Siti Nuraini','role'=>'Mahasiswa ITB · Bandung','initial'=>'S','gradient'=>'linear-gradient(135deg,#10b981,#059669)'],
-                        (object)['text'=>'"Kursus komputer di SCI luar biasa! Dalam 3 bulan saya sudah bisa desain grafis dan sekarang sudah dapat klien freelance."','name'=>'Andika Putra','role'=>'Alumni Kursus Komputer · Yogyakarta','initial'=>'A','gradient'=>'linear-gradient(135deg,#6366f1,#4338ca)'],
-                    ]);
-                @endphp
-                {{-- Set 1 --}}
-                @foreach($testiSource as $t)
-                <div class="testi-card">
-                    <div class="testi-stars">
-                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                    </div>
-                    <p class="testi-text">{{ $t->text }}</p>
-                    <div class="testi-author">
-                        <div class="testi-avatar" style="background:{{ $t->gradient }}">{{ $t->initial }}</div>
-                        <div>
-                            <div class="testi-name">{{ $t->name }}</div>
-                            <div class="testi-role">{{ $t->role }}</div>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-                {{-- Set 2 (duplicate for seamless loop) --}}
-                @foreach($testiSource as $t)
-                <div class="testi-card">
-                    <div class="testi-stars">
-                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                    </div>
-                    <p class="testi-text">{{ $t->text }}</p>
-                    <div class="testi-author">
-                        <div class="testi-avatar" style="background:{{ $t->gradient }}">{{ $t->initial }}</div>
-                        <div>
-                            <div class="testi-name">{{ $t->name }}</div>
-                            <div class="testi-role">{{ $t->role }}</div>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
-</section>
-
-{{-- ──────────────────────────── GALERI KEGIATAN ──────────────────────────── --}}
-<section class="section-pad" id="galeri">
-    <div class="container-lp">
-        <div class="text-center reveal">
-            <div class="section-eyebrow"><i class="bi bi-images"></i> Galeri Kegiatan</div>
-            <h2 class="section-title">Momen Belajar Bersama SCI</h2>
-            <p class="section-subtitle mx-auto">Momen belajar menyenangkan bersama siswa dan tutor terbaik SCI di seluruh Indonesia.</p>
-        </div>
-
-        <div class="galeri-grid reveal">
-            <div class="galeri-item large">
-                <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=800&q=80" alt="Kegiatan belajar SCI" loading="lazy">
-                <div class="galeri-overlay"><span>Sesi Belajar Interaktif</span></div>
-            </div>
-            <div class="galeri-item">
-                <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=800&q=80" alt="Diskusi kelompok" loading="lazy">
-                <div class="galeri-overlay"><span>Diskusi Kelompok</span></div>
-            </div>
-            <div class="galeri-item">
-                <img src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=800&q=80" alt="Les privat" loading="lazy">
-                <div class="galeri-overlay"><span>Les Privat 1 on 1</span></div>
-            </div>
-            <div class="galeri-item">
-                <img src="https://images.unsplash.com/photo-1509869175650-a1d97972541a?auto=format&fit=crop&w=800&q=80" alt="Kelas komputer" loading="lazy">
-                <div class="galeri-overlay"><span>Kursus Komputer</span></div>
-            </div>
-            <div class="galeri-item">
-                <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80" alt="Persiapan ujian" loading="lazy">
-                <div class="galeri-overlay"><span>Persiapan Ujian</span></div>
-            </div>
-        </div>
-    </div>
-</section>
-
-{{-- ──────────────────────────── TUTOR TERBAIK ─────────────────────────────── --}}
-<section class="section-pad tutor-bg" id="tutor">
-    <div class="container-lp">
-        <div class="text-center reveal">
-            <div class="section-eyebrow"><i class="bi bi-person-hearts"></i> Tim Tutor</div>
-            <h2 class="section-title">Tutor Terbaik Kami</h2>
-            <p class="section-subtitle mx-auto">Dilatih secara profesional dan berpengalaman di bidangnya masing-masing untuk memastikan kualitas belajar terbaik.</p>
-        </div>
-    </div>
-
-    {{-- Pre-compute tutor data once to avoid duplicate file_exists I/O --}}
+{{-- ── TICKER ── --}}
+<div class="sci-ticker">
     @php
-        $tutorItems = $tutors->values()->map(function($tutor, $i) use ($tutorGrads) {
-            return [
-                'tutor'    => $tutor,
-                'grad'     => $tutorGrads[$i % count($tutorGrads)],
-                'subj'     => is_array($tutor->subjects) ? implode(', ', array_slice($tutor->subjects, 0, 2)) : ($tutor->subjects ?? 'Tutor'),
-                'init'     => strtoupper(substr($tutor->name ?? 'T', 0, 1)),
-                'hasPhoto' => !empty($tutor->photo) && file_exists(public_path('storage/'.$tutor->photo)),
-            ];
-        });
+        $tickerItems = [
+            '📚 Daftar sekarang & dapatkan sesi konsultasi GRATIS!',
+            '⚡ Promo Paket Hemat: Beli 10 sesi gratis 2 sesi ekstra',
+            '⭐ Rating bintang 5 dari 10.000+ siswa di seluruh Indonesia',
+            '🎓 500+ Tutor Bersertifikat siap mengajar di kotamu',
+            '🏆 Lembaga Bimbel #1 Terpercaya di Indonesia sejak 2010',
+            '📈 95% siswa mengalami peningkatan nilai dalam 3 bulan',
+        ];
     @endphp
-    {{-- Infinite tutor carousel — full width, edge-faded --}}
-    <div class="carousel-viewport tutor-carousel-viewport" style="margin-top:3rem;">
-        <div class="tutor-carousel-track">
-            {{-- Set 1 --}}
-            @foreach($tutorItems as $td)
-            @php extract($td); @endphp
-            <div class="tutor-card">
-                <div class="tutor-avatar-wrap" style="background:{{ $grad }}">
-                    @if($hasPhoto)
-                        <img src="{{ asset('storage/'.$tutor->photo) }}" alt="{{ $tutor->name }}" loading="lazy">
-                    @else
-                        <div class="tutor-avatar-fallback">{{ $init }}</div>
-                    @endif
-                    <div class="tutor-badge-subject">{{ $subj }}</div>
+    <div class="sci-ticker-inner">
+        @foreach($tickerItems as $item)
+        <span class="sci-ticker-item">{{ $item }}</span>
+        @endforeach
+        @foreach($tickerItems as $item)
+        <span class="sci-ticker-item">{{ $item }}</span>
+        @endforeach
+    </div>
+</div>
+
+{{-- ── TENTANG KAMI ── --}}
+<section class="lp-section" id="tentang">
+    <div class="container-lp">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-5 reveal">
+                <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem">
+                    <span class="pill-badge">🏫 Tentang Kami</span>
+                    <span class="pill-badge">📅 Sejak 2010</span>
+                    <span class="pill-badge">✅ ISO Certified</span>
                 </div>
-                <div class="tutor-info">
-                    <div class="tutor-name">{{ $tutor->name }}</div>
-                    <div class="tutor-meta">Tutor Profesional SCI</div>
-                    <div class="tutor-stars">
-                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                <h2 class="section-title-lg" style="text-align:left">Tentang <span class="italic-accent">Smart Center Indonesia</span></h2>
+                <p style="font-size:.95rem;color:#374151;line-height:1.8;margin-bottom:.75rem">
+                    {{ $ls('about.description','Smart Center Indonesia (SCI) adalah lembaga pendidikan yang bergerak di bidang bimbingan belajar, kursus, dan les privat (1 guru 1 siswa) berbasis offline dan online yang berkomitmen menjadi lembaga terbaik nomor 1 di Indonesia.') }}
+                </p>
+                <p style="font-size:.95rem;color:#374151;line-height:1.8;margin-bottom:1.5rem">
+                    Dengan metode pembelajaran efektif, pengajar berpengalaman, serta pendekatan personal, SCI hadir sebagai solusi pendidikan terpercaya. <em style="color:var(--pri);font-family:var(--serif)">"Wujudkan mimpi, raih prestasi!"</em>
+                </p>
+                <div class="row g-2 text-center" style="margin-top:1.5rem">
+                    <div class="col-4">
+                        <div style="font-size:1.8rem;font-weight:900;color:var(--pri)">{{ number_format($stats['students']) }}+</div>
+                        <div style="font-size:.75rem;color:var(--text-muted);font-weight:600">Siswa Aktif</div>
+                    </div>
+                    <div class="col-4">
+                        <div style="font-size:1.8rem;font-weight:900;color:var(--pri)">{{ number_format($stats['teachers']) }}+</div>
+                        <div style="font-size:.75rem;color:var(--text-muted);font-weight:600">Tutor Aktif</div>
+                    </div>
+                    <div class="col-4">
+                        <div style="font-size:1.8rem;font-weight:900;color:var(--pri)">{{ $branches->count() ?: '150' }}+</div>
+                        <div style="font-size:.75rem;color:var(--text-muted);font-weight:600">Cabang</div>
                     </div>
                 </div>
             </div>
-            @endforeach
-            {{-- Set 2 (duplicate for seamless loop) --}}
-            @foreach($tutorItems as $td)
-            @php extract($td); @endphp
-            <div class="tutor-card">
-                <div class="tutor-avatar-wrap" style="background:{{ $grad }}">
-                    @if($hasPhoto)
-                        <img src="{{ asset('storage/'.$tutor->photo) }}" alt="{{ $tutor->name }}">
-                    @else
-                        <div class="tutor-avatar-fallback">{{ $init }}</div>
-                    @endif
-                    <div class="tutor-badge-subject">{{ $subj }}</div>
-                </div>
-                <div class="tutor-info">
-                    <div class="tutor-name">{{ $tutor->name }}</div>
-                    <div class="tutor-meta">Tutor Profesional SCI</div>
-                    <div class="tutor-stars">
-                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+            <div class="col-lg-7 reveal reveal-d1">
+                <div class="feature-grid">
+                    @php
+                    $features = [
+                        ['icon'=>'bi bi-award-fill','label'=>'Tutor Bersertifikat'],
+                        ['icon'=>'bi bi-house-heart-fill','label'=>'Bisa Home Visit'],
+                        ['icon'=>'bi bi-display-fill','label'=>'Kelas Online & Offline'],
+                        ['icon'=>'bi bi-clipboard2-data-fill','label'=>'Evaluasi Rutin Bulanan'],
+                        ['icon'=>'bi bi-headset','label'=>'Konsultasi 24/7'],
+                        ['icon'=>'bi bi-graph-up-arrow','label'=>'Target & Hasil Terukur'],
+                    ];
+                    @endphp
+                    @foreach($features as $f)
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="{{ $f['icon'] }}"></i></div>
+                        <div class="feature-label">{{ $f['label'] }}</div>
                     </div>
+                    @endforeach
                 </div>
             </div>
+        </div>
+    </div>
+</section>
+
+{{-- ── JENJANG PENDIDIKAN ── --}}
+<section class="lp-section lp-section-lavender" id="jenjang">
+    <div class="container-lp text-center">
+        <div class="reveal">
+            <div class="section-eyebrow-line">LAYANAN KAMI</div>
+            <h2 class="section-title-lg">Jenjang <span class="italic-accent">Pendidikan</span></h2>
+            <p class="section-subtitle-lp">Kami melayani semua jenjang dari TK hingga umum dengan pendekatan personal yang tepat untuk setiap tahap perkembangan.</p>
+        </div>
+        <div class="jenjang-grid">
+            @foreach($jenjangItems as $i => $j)
+            <a href="#program" class="jenjang-card reveal reveal-d{{ $i+1 }}">
+                <img src="{{ $j['img'] }}" alt="{{ $j['label'] }}" class="jenjang-photo" loading="lazy">
+                <div class="jenjang-label">{{ $j['label'] }}</div>
+                <div class="jenjang-desc">{{ $j['desc'] }}</div>
+                <span class="jenjang-link">Lihat Detail <i class="bi bi-arrow-right"></i></span>
+            </a>
             @endforeach
         </div>
     </div>
 </section>
 
-{{-- ──────────────────────────── CABANG SCI ─────────────────────────────────── --}}
-<section class="section-pad" id="cabang">
+{{-- ── CARI GURU ── --}}
+<section class="cari-guru-section" id="cari-guru">
+    <div class="container-lp text-center">
+        <div class="reveal">
+            <div class="cari-guru-eyebrow">TEMUKAN PENGAJAR TERBAIK</div>
+            <h2 class="cari-guru-title">Cari Guru <span style="font-family:var(--serif);font-style:italic;color:var(--gold)">Terbaik</span>, Secepat Klik</h2>
+            <p class="cari-guru-sub">Temukan tutor privat terbaik di kotamu — pilih berdasarkan mata pelajaran, lokasi, dan metode belajar yang kamu inginkan.</p>
+        </div>
+        <div class="search-box reveal reveal-d1">
+            <div class="search-field">
+                <label><i class="bi bi-geo-alt-fill"></i> KOTA / LOKASI</label>
+                <select>
+                    <option>Semua Kota</option>
+                    @foreach($branches as $b)
+                    <option>{{ $b->nama ?? $b->name ?? 'Cabang' }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="search-field">
+                <label><i class="bi bi-journal-bookmark-fill"></i> MATA PELAJARAN</label>
+                <select>
+                    <option>Semua Mata Pelajaran</option>
+                    <option>Matematika</option><option>Bahasa Inggris</option>
+                    <option>IPA / Fisika</option><option>Kimia</option>
+                    <option>Biologi</option><option>Bahasa Indonesia</option>
+                    <option>Komputer</option><option>Akuntansi</option>
+                </select>
+            </div>
+            <div class="search-field">
+                <label><i class="bi bi-laptop-fill"></i> METODE BELAJAR</label>
+                <select>
+                    <option>Semua Metode</option>
+                    <option>Online</option><option>Offline</option><option>Home Visit</option>
+                </select>
+            </div>
+            <div>
+                <a href="{{ route('register') }}" class="btn-cari">🔍 Cari Guru</a>
+            </div>
+        </div>
+        <div class="trust-badges reveal reveal-d2">
+            <span class="trust-badge"><i class="bi bi-patch-check-fill"></i> 500+ Tutor Bersertifikat</span>
+            <span class="trust-badge"><i class="bi bi-lightning-fill"></i> Respon dalam 1 Jam</span>
+            <span class="trust-badge"><i class="bi bi-shield-lock-fill"></i> Aman & Terpercaya</span>
+            <span class="trust-badge"><i class="bi bi-trophy-fill"></i> Garansi Hasil Belajar</span>
+        </div>
+    </div>
+</section>
+
+{{-- ── PROGRAM UNGGULAN ── --}}
+<section class="lp-section" id="program">
     <div class="container-lp">
         <div class="text-center reveal">
-            <div class="section-eyebrow"><i class="bi bi-geo-alt-fill"></i> Cabang Kami</div>
-            <h2 class="section-title">Cabang SCI Indonesia</h2>
-            <p class="section-subtitle mx-auto">Temukan cabang SCI terdekat di kota Anda dan mulai perjalanan belajar bersama kami.</p>
+            <div class="section-eyebrow-line">PROGRAM SCI</div>
+            <h2 class="section-title-lg">Program <span class="italic-accent">Unggulan</span></h2>
+            <p class="section-subtitle-lp">Pilih program yang sesuai kebutuhan Anda bersama para tutor terbaik kami — klik kartu untuk melihat detail lengkap.</p>
         </div>
-
-        @php
-            $branches = \App\Models\Branch::take(6)->get();
-        @endphp
-
-        @if($branches->count() > 0)
-        <div class="cabang-grid">
-            @foreach($branches as $i => $branch)
-            @php $branchName = $branch->nama ?? $branch->name ?? 'Cabang SCI'; @endphp
-            <div class="cabang-card reveal reveal-delay-{{ ($i % 3) + 1 }}">
-                <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
-                <div class="cabang-name">{{ $branchName }}</div>
-                <div class="cabang-address">{{ $branch->alamat ?? $branch->address ?? 'Indonesia' }}</div>
-                <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI, saya ingin tanya tentang program di cabang '.$branchName) }}" target="_blank" rel="noopener" class="btn-cabang-wa">
-                    <i class="bi bi-whatsapp"></i> Hubungi Cabang
-                </a>
-            </div>
+        <div class="program-grid">
+            @php
+                $badgeList = ['SEMUA JENJANG','SMP - SMA','INTENSIF','SEMUA LEVEL','POPULER 🔥','TERBARU ✨'];
+                $progImgs  = [
+                    'https://images.unsplash.com/photo-1509869175650-a1d97972541a?auto=format&fit=crop&w=600&q=80',
+                    'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=600&q=80',
+                    'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=600&q=80',
+                    'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=600&q=80',
+                    'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80',
+                    'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=600&q=80',
+                ];
+            @endphp
+            @foreach($programs as $i => $prog)
+            @php
+                $hasImg = !empty($prog->image) && (str_starts_with($prog->image,'http') || file_exists(public_path('storage/'.$prog->image)));
+                $imgSrc = $hasImg ? (str_starts_with($prog->image,'http') ? $prog->image : asset('storage/'.$prog->image)) : $progImgs[$i % count($progImgs)];
+                $badge  = $prog->badge ?? $badgeList[$i % count($badgeList)];
+                $nama   = $prog->nama ?? $prog->name ?? 'Program SCI';
+                $desc   = $prog->deskripsi ?? $prog->description ?? '';
+            @endphp
+            <a href="{{ route('register') }}" class="program-card reveal reveal-d{{ ($i%3)+1 }}">
+                <img src="{{ $imgSrc }}" alt="{{ $nama }}" class="program-img" loading="lazy">
+                <div class="program-body">
+                    <span class="program-badge">{{ $badge }}</span>
+                    <div class="program-title">{{ $nama }}</div>
+                    @if($desc)<p class="program-desc">{{ Str::limit($desc,90) }}</p>@endif
+                    <span class="program-link">Lihat Detail <i class="bi bi-arrow-down-circle-fill"></i></span>
+                </div>
+            </a>
             @endforeach
         </div>
-        @else
-        <div class="cabang-grid">
-            <div class="cabang-card reveal reveal-delay-1">
-                <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
-                <div class="cabang-name">SCI Pusat — Jakarta</div>
-                <div class="cabang-address">Jl. Pendidikan No. 1, Jakarta Selatan</div>
-                <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI Jakarta, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
-            </div>
-            <div class="cabang-card reveal reveal-delay-2">
-                <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
-                <div class="cabang-name">SCI Surabaya</div>
-                <div class="cabang-address">Jl. Raya Darmo No. 45, Surabaya</div>
-                <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI Surabaya, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
-            </div>
-            <div class="cabang-card reveal reveal-delay-3">
-                <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
-                <div class="cabang-name">SCI Bandung</div>
-                <div class="cabang-address">Jl. Asia Afrika No. 22, Bandung</div>
-                <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI Bandung, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
-            </div>
-            <div class="cabang-card reveal reveal-delay-1">
-                <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
-                <div class="cabang-name">SCI Yogyakarta</div>
-                <div class="cabang-address">Jl. Malioboro No. 88, Yogyakarta</div>
-                <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI Yogyakarta, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
-            </div>
-            <div class="cabang-card reveal reveal-delay-2">
-                <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
-                <div class="cabang-name">SCI Medan</div>
-                <div class="cabang-address">Jl. Gatot Subroto No. 12, Medan</div>
-                <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI Medan, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
-            </div>
-            <div class="cabang-card reveal reveal-delay-3">
-                <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
-                <div class="cabang-name">SCI Makassar</div>
-                <div class="cabang-address">Jl. Penghibur No. 5, Makassar</div>
-                <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI Makassar, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
-            </div>
-        </div>
-        @endif
     </div>
 </section>
 
-{{-- ──────────────────────────── CTA ───────────────────────────────────────── --}}
-<section class="cta-section">
+{{-- ── KEUNGGULAN SCI ── --}}
+<section class="lp-section lp-section-dark" id="keunggulan">
+    <div class="container-lp text-center">
+        <div class="reveal">
+            <div class="section-eyebrow-line" style="color:rgba(255,255,255,.6);justify-content:center">
+                <span style="background:var(--gold);height:2px;width:28px;border-radius:2px;display:inline-block"></span>
+                MENGAPA SCI?
+            </div>
+            <h2 class="section-title-lg" style="color:#fff">Keunggulan <span style="font-family:var(--serif);font-style:italic;color:var(--pri-light)">SCI</span></h2>
+            <p class="section-subtitle-lp" style="color:rgba(255,255,255,.65)">Lima pilar yang membuat SCI menjadi pilihan terpercaya jutaan keluarga Indonesia selama 14+ tahun.</p>
+        </div>
+        <div class="keunggulan-grid">
+            @foreach($keunggulanItems as $i => $k)
+            <div class="keunggulan-card reveal reveal-d{{ ($i%4)+1 }}">
+                <span class="keunggulan-emoji">{{ $k['icon'] }}</span>
+                <div class="keunggulan-title">{{ $k['title'] }}</div>
+                <div class="keunggulan-desc">{{ $k['desc'] }}</div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+
+{{-- ── TESTIMONI SISWA ── --}}
+<section class="lp-section lp-section-lavender" id="testimoni">
     <div class="container-lp">
-        <div class="cta-box reveal">
-            <div class="cta-content">
-                <div class="cta-eyebrow"><i class="bi bi-mortarboard-fill"></i> {{ $ls('cta.eyebrow','Mulai Sekarang') }}</div>
-                <h2 class="cta-title">{{ $ls('cta.title','Wujudkan Mimpi Bersama SCI!') }}</h2>
-                <p class="cta-desc">{{ $ls('cta.description','Bergabunglah bersama ribuan siswa yang telah meraih prestasi bersama Smart Center Indonesia. Konsultasi gratis, daftar mudah!') }}</p>
-                <div class="cta-btns">
-                    <a href="{{ route('register') }}" class="btn-cta-primary">
-                        <i class="bi bi-person-plus-fill"></i>
-                        Daftar Sekarang
-                    </a>
-                    <a href="{{ route('login') }}" class="btn-cta-secondary">
-                        <i class="bi bi-box-arrow-in-right"></i>
-                        Masuk ke Portal
-                    </a>
+        <div class="text-center reveal">
+            <div class="section-eyebrow-line">KATA MEREKA</div>
+            <h2 class="section-title-lg">Testimoni <span class="italic-accent">Siswa</span></h2>
+            <p class="section-subtitle-lp">Dengarkan cerita sukses ribuan siswa yang telah mempercayai SCI sebagai mitra belajar mereka.</p>
+        </div>
+        <div class="testi-slider-wrap reveal reveal-d1">
+            <div class="testi-track" id="testiTrack">
+                @php
+                    $testiColors = ['linear-gradient(135deg,#7c3aed,#a855f7)','linear-gradient(135deg,#10b981,#059669)','linear-gradient(135deg,#f97316,#dc2626)','linear-gradient(135deg,#2563eb,#1d4ed8)','linear-gradient(135deg,#ec4899,#db2777)','linear-gradient(135deg,#f59e0b,#d97706)'];
+                @endphp
+                @foreach($testis as $i => $t)
+                <div class="testi-card">
+                    <div class="testi-stars">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                    </div>
+                    <div class="testi-quote">"</div>
+                    <p class="testi-text">{{ $t->text ?? $t->comment ?? '' }}</p>
+                    <div class="testi-author">
+                        @if(!empty($t->photo) && file_exists(public_path('storage/'.$t->photo)))
+                            <img src="{{ asset('storage/'.$t->photo) }}" alt="{{ $t->name }}" class="testi-avatar">
+                        @else
+                            <div class="testi-avatar-fallback" style="background:{{ $testiColors[$i % count($testiColors)] }}">{{ strtoupper(substr($t->name??'S',0,1)) }}</div>
+                        @endif
+                        <div>
+                            <div class="testi-name">{{ $t->name }}</div>
+                            <div class="testi-role">{{ $t->role ?? 'Siswa SCI' }}</div>
+                            <div class="testi-verified"><i class="bi bi-patch-check-fill"></i> Siswa Terverifikasi</div>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        <div class="slider-controls">
+            <button class="slider-btn" id="testiPrev"><i class="bi bi-chevron-left"></i></button>
+            <button class="slider-btn" id="testiNext"><i class="bi bi-chevron-right"></i></button>
+        </div>
+    </div>
+</section>
+
+{{-- ── GALERI KEGIATAN ── --}}
+<section class="lp-section" id="galeri">
+    <div class="container-lp">
+        <div class="text-center reveal">
+            <div class="section-eyebrow-line">DOKUMENTASI</div>
+            <h2 class="section-title-lg">Galeri <span class="italic-accent">Kegiatan</span></h2>
+            <p class="section-subtitle-lp">Momen belajar menyenangkan bersama siswa dan tutor terbaik SCI di seluruh Indonesia.</p>
+        </div>
+        <div class="galeri-slider-wrap reveal reveal-d1">
+            <div class="galeri-track" id="galeriTrack">
+                @foreach($galeriPhotos as $photo)
+                <div class="galeri-item">
+                    <img src="{{ $photo }}" alt="Galeri SCI" loading="lazy">
+                    <div class="galeri-overlay"><span>Kegiatan SCI</span></div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        <div class="slider-controls">
+            <button class="slider-btn" id="galeriPrev"><i class="bi bi-chevron-left"></i></button>
+            <button class="slider-btn" id="galeriNext"><i class="bi bi-chevron-right"></i></button>
+        </div>
+    </div>
+</section>
+
+{{-- ── TUTOR TERBAIK ── --}}
+<section class="lp-section lp-section-lavender" id="tutor">
+    <div class="container-lp">
+        <div class="text-center reveal">
+            <div class="section-eyebrow-line">TIM PENGAJAR</div>
+            <h2 class="section-title-lg">Tutor <span class="italic-accent">Terbaik</span> Kami</h2>
+            <p class="section-subtitle-lp">Dilatih secara profesional dan berpengalaman di bidangnya masing-masing untuk memberikan hasil terbaik bagi setiap siswa.</p>
+        </div>
+        <div class="tutor-slider-wrap reveal reveal-d1">
+            <div class="tutor-track" id="tutorTrack">
+                @php
+                    $tutorFallback = collect([
+                        (object)['name'=>'Ms. Anisa Putri','subjects'=>['Matematika'],'photo'=>null,'experience'=>7],
+                        (object)['name'=>'Mr. Budi Santoso','subjects'=>['Fisika'],'photo'=>null,'experience'=>9],
+                        (object)['name'=>'Ms. Cindy Lestari','subjects'=>['Bahasa Inggris'],'photo'=>null,'experience'=>6],
+                        (object)['name'=>'Mr. Dimas Arif','subjects'=>['Akuntansi'],'photo'=>null,'experience'=>8],
+                        (object)['name'=>'Ms. Rina Wulandari','subjects'=>['Kimia'],'photo'=>null,'experience'=>6],
+                        (object)['name'=>'Mr. Hendra Wijaya','subjects'=>['Biologi'],'photo'=>null,'experience'=>5],
+                    ]);
+                    $tutorSource = $tutors->isNotEmpty() ? $tutors : $tutorFallback;
+                @endphp
+                @foreach($tutorSource as $i => $tutor)
+                @php
+                    $subj  = is_array($tutor->subjects) ? ($tutor->subjects[0] ?? 'Tutor') : ($tutor->subjects ?? 'Tutor');
+                    $init  = strtoupper(substr($tutor->name??'T',0,1));
+                    $hasP  = !empty($tutor->photo) && file_exists(public_path('storage/'.$tutor->photo));
+                    $exp   = $tutor->experience ?? rand(5,12);
+                    $rating = number_format(4.7 + ($i%3)*0.1, 1);
+                @endphp
+                <div class="tutor-card">
+                    <div class="tutor-photo-wrap">
+                        @if($hasP)
+                            <img src="{{ asset('storage/'.$tutor->photo) }}" alt="{{ $tutor->name }}" class="tutor-photo" loading="lazy">
+                        @else
+                            <div class="tutor-photo-fb" style="background:{{ $tutorGrads[$i % count($tutorGrads)] }}">{{ $init }}</div>
+                        @endif
+                        <div class="tutor-star-badge">⭐</div>
+                    </div>
+                    <div class="tutor-name">{{ $tutor->name }}</div>
+                    <span class="tutor-subj">{{ $subj }}</span>
+                    <div class="tutor-rating">
+                        <i class="bi bi-star-fill"></i> {{ $rating }}
+                    </div>
+                    <div class="tutor-exp">{{ $exp }} Tahun Pengalaman</div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        <div class="slider-controls">
+            <button class="slider-btn" id="tutorPrev"><i class="bi bi-chevron-left"></i></button>
+            <button class="slider-btn" id="tutorNext"><i class="bi bi-chevron-right"></i></button>
+        </div>
+    </div>
+</section>
+
+{{-- ── FAQ + KONTAK ── --}}
+<section class="lp-section" id="kontak">
+    <div class="container-lp">
+        <div class="text-center reveal">
+            <div class="section-eyebrow-line">BANTUAN & KONTAK</div>
+            <h2 class="section-title-lg">Pertanyaan <span style="font-family:var(--serif);font-style:normal;color:var(--dark)">&</span> <span class="italic-accent">Hubungi Kami</span></h2>
+            <p class="section-subtitle-lp">Punya pertanyaan atau ingin bergabung? Kami siap membantu Anda kapan saja.</p>
+        </div>
+        <div class="row g-4 mt-2">
+            <div class="col-lg-6 reveal">
+                @php
+                $faqs = [
+                    ['q'=>'Bagaimana cara mendaftar di SCI?','a'=>'Pendaftaran bisa dilakukan secara online melalui website ini, atau langsung datang ke cabang SCI terdekat. Proses mudah dan cepat, tidak ada biaya pendaftaran.'],
+                    ['q'=>'Apakah bisa datang ke rumah?','a'=>'Ya! SCI menyediakan layanan Home Visit di mana tutor kami akan datang langsung ke rumah Anda. Jadwal sangat fleksibel sesuai kebutuhan Anda.'],
+                    ['q'=>'Berapa biaya les privat di SCI?','a'=>'Biaya bervariasi tergantung jenjang, mata pelajaran, dan metode belajar. Hubungi kami untuk mendapatkan penawaran terbaik sesuai kebutuhan Anda.'],
+                    ['q'=>'Bagaimana sistem pembayaran di SCI?','a'=>'Pembayaran bisa per sesi, per paket, atau per bulan. Kami menerima berbagai metode pembayaran termasuk transfer bank dan e-wallet.'],
+                    ['q'=>'Apakah ada garansi hasil belajar?','a'=>'Ya! SCI memberikan garansi peningkatan nilai. Jika tidak ada kemajuan dalam waktu yang disepakati, kami siap mengulang sesi tanpa biaya tambahan.'],
+                ];
+                @endphp
+                @foreach($faqs as $i => $faq)
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-q">
+                        {{ $faq['q'] }}
+                        <span class="faq-icon"><i class="bi bi-plus"></i></span>
+                    </div>
+                    <div class="faq-a">{{ $faq['a'] }}</div>
+                </div>
+                @endforeach
+            </div>
+            <div class="col-lg-6 reveal reveal-d1">
+                <div class="contact-box">
+                    <h4>Kirim Pesan 📩</h4>
+                    <p>Isi form di bawah ini, kami akan segera menghubungi Anda.</p>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="contact-field">
+                                <label>NAMA LENGKAP</label>
+                                <input type="text" placeholder="Nama Anda">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="contact-field">
+                                <label>NO. WHATSAPP</label>
+                                <input type="tel" placeholder="08xx-xxxx-xxxx">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="contact-field">
+                                <label>PESAN</label>
+                                <textarea placeholder="Tulis pesan atau pertanyaan Anda..."></textarea>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI! Saya ingin konsultasi tentang program bimbel/kursus.') }}"
+                               target="_blank" rel="noopener" class="btn-contact-send">
+                                <i class="bi bi-whatsapp"></i> Kirim Pesan ✨
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-{{-- ──────────────────────────── FLOATING BUTTONS ──────────────────────────── --}}
-<a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo Smart Center Indonesia! Saya ingin konsultasi tentang program bimbel/kursus. Bisa bantu?') }}"
-   class="wa-float" target="_blank" rel="noopener" aria-label="Hubungi via WhatsApp">
-    <i class="bi bi-whatsapp"></i>
-    <span class="wa-float-label">Konsultasi Gratis 💬</span>
-</a>
+{{-- ── CABANG SCI ── --}}
+<section class="lp-section lp-section-lavender" id="cabang">
+    <div class="container-lp">
+        <div class="text-center reveal">
+            <div class="section-eyebrow-line">HADIR DI SELURUH INDONESIA</div>
+            <h2 class="section-title-lg">Cabang SCI <span class="italic-accent">Indonesia</span></h2>
+            <p class="section-subtitle-lp">Dengan {{ $branches->count() ?: '150' }}+ cabang di berbagai kota, SCI selalu dekat dengan Anda dan keluarga.</p>
+        </div>
+        @php
+            $cityImages = [
+                'https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?auto=format&fit=crop&w=600&q=80',
+                'https://images.unsplash.com/photo-1569367178534-dfcd8ef28f7b?auto=format&fit=crop&w=600&q=80',
+                'https://images.unsplash.com/photo-1555899434-94d1368aa7af?auto=format&fit=crop&w=600&q=80',
+                'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=600&q=80',
+                'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=600&q=80',
+                'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
+            ];
+            $displayBranches = $branches->take(6);
+            $fallbackBranches = collect([
+                (object)['nama'=>'Riau','alamat'=>'Jasa Les Privat Riau'],
+                (object)['nama'=>'Sumatera Barat','alamat'=>'Jasa Les Privat Sumatera Barat'],
+                (object)['nama'=>'Sumatera Utara','alamat'=>'Jasa Les Privat Sumatera Utara'],
+                (object)['nama'=>'DKI Jakarta','alamat'=>'Jasa Les Privat Jakarta'],
+                (object)['nama'=>'Jawa Barat','alamat'=>'Jasa Les Privat Jawa Barat'],
+                (object)['nama'=>'Jawa Timur','alamat'=>'Jasa Les Privat Jawa Timur'],
+            ]);
+            $branchShow = $displayBranches->isNotEmpty() ? $displayBranches : $fallbackBranches;
+        @endphp
+        <div class="cabang-grid reveal reveal-d1">
+            @foreach($branchShow as $i => $branch)
+            @php
+                $branchName = $branch->nama ?? $branch->name ?? 'Cabang SCI';
+                $branchDesc = $branch->alamat ?? $branch->address ?? 'Jasa Les Privat '.$branchName;
+            @endphp
+            <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI, saya ingin tahu tentang cabang '.$branchName) }}"
+               target="_blank" rel="noopener" class="cabang-card">
+                <img src="{{ $cityImages[$i % count($cityImages)] }}" alt="{{ $branchName }}" loading="lazy">
+                <div class="cabang-card-overlay">
+                    <div class="cabang-city">{{ $branchName }}</div>
+                    <div class="cabang-tagline">{{ $branchDesc }}</div>
+                    <span class="cabang-btn">Lihat Detail</span>
+                </div>
+            </a>
+            @endforeach
+        </div>
+    </div>
+</section>
 
-<button class="scroll-top" id="scrollTopBtn" aria-label="Kembali ke atas" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+{{-- ── WA FLOAT ── --}}
+<a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo Smart Center Indonesia! Saya ingin konsultasi tentang program bimbel/kursus.') }}"
+   class="wa-float" target="_blank" rel="noopener" aria-label="Chat WhatsApp">
+    <i class="bi bi-whatsapp"></i>
+</a>
+<button class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
     <i class="bi bi-arrow-up"></i>
 </button>
 
-{{-- ──────────────────────────── FOOTER ────────────────────────────────────── --}}
-<footer class="footer">
+{{-- ── FOOTER ── --}}
+<footer class="sci-footer">
     <div class="container-lp">
         <div class="footer-grid">
             <div>
-                <a href="{{ url('/') }}" class="nav-brand" style="text-decoration:none">
-                    <div class="nav-brand-icon"><i class="bi bi-mortarboard-fill"></i></div>
-                    <div class="nav-brand-text" style="color:white">
-                        Smart Center<small style="color:rgba(255,255,255,.5)">Indonesia</small>
+                <a href="{{ url('/') }}" class="sci-logo" style="text-decoration:none">
+                    <div class="sci-logo-sq">SCI</div>
+                    <div class="sci-logo-text">
+                        <strong style="color:#fff">Smart Center Indonesia</strong>
+                        <small style="color:rgba(255,255,255,.5)">Wujudkan Mimpi, Raih Prestasi</small>
                     </div>
                 </a>
-                <p class="footer-brand-desc">{{ $ls('footer.brand_desc','Lembaga bimbingan belajar, kursus, dan les privat terbaik di Indonesia. Berkomitmen menjadi lembaga pendidikan nomor 1 di Indonesia. "Wujudkan mimpi, raih prestasi!"') }}</p>
+                <p class="footer-brand-desc">Platform pendidikan modern untuk semua jenjang. Dari TK hingga profesional — kami selalu ada untuk mendukung perjalanan belajar Anda.</p>
                 <div class="footer-social">
-                    <a href="{{ $ls('footer.instagram','#') }}"><i class="bi bi-instagram"></i></a>
-                    <a href="{{ $ls('footer.facebook','#') }}"><i class="bi bi-facebook"></i></a>
-                    <a href="{{ $ls('footer.youtube','#') }}"><i class="bi bi-youtube"></i></a>
-                    <a href="https://wa.me/{{ $waMain }}"><i class="bi bi-whatsapp"></i></a>
+                    <a href="{{ $ls('footer.facebook','#') }}" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                    <a href="{{ $ls('footer.instagram','#') }}" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                    <a href="{{ $ls('footer.youtube','#') }}" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+                    <a href="https://wa.me/{{ $waMain }}" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>
                 </div>
             </div>
-
             <div>
-                <div class="footer-col-title">Program</div>
+                <div class="footer-col-title">Navigasi</div>
                 <ul class="footer-links">
-                    <li><a href="#program">Bimbel Mata Pelajaran</a></li>
-                    <li><a href="#program">Persiapan Ujian</a></li>
-                    <li><a href="#program">Kursus Bahasa</a></li>
-                    <li><a href="#program">Kursus Komputer</a></li>
-                    <li><a href="#program">Kursus Akuntansi</a></li>
+                    <li><a href="#beranda">Beranda</a></li>
+                    <li><a href="#tentang">Tentang Kami</a></li>
+                    <li><a href="#program">Program</a></li>
+                    <li><a href="#keunggulan">Keunggulan</a></li>
+                    <li><a href="#testimoni">Testimoni</a></li>
                 </ul>
             </div>
-
             <div>
-                <div class="footer-col-title">Jenjang</div>
+                <div class="footer-col-title">Layanan</div>
                 <ul class="footer-links">
-                    <li><a href="#jenjang">TK</a></li>
-                    <li><a href="#jenjang">SD</a></li>
-                    <li><a href="#jenjang">SMP</a></li>
-                    <li><a href="#jenjang">SMA / Umum</a></li>
+                    <li><a href="#galeri">Galeri</a></li>
+                    <li><a href="#tutor">Tutor</a></li>
+                    <li><a href="#kontak">FAQ</a></li>
+                    <li><a href="#cabang">Cabang</a></li>
+                    <li><a href="#kontak">Kontak</a></li>
                 </ul>
             </div>
-
             <div>
-                <div class="footer-col-title">Perusahaan</div>
-                <ul class="footer-links">
-                    <li><a href="#">Tentang SCI</a></li>
-                    <li><a href="#cabang">Lokasi Cabang</a></li>
-                    <li><a href="#tutor">Tim Tutor</a></li>
-                    <li><a href="#">Kontak Kami</a></li>
-                    <li><a href="{{ route('login') }}">Portal Siswa</a></li>
-                </ul>
+                <div class="footer-col-title">Kontak</div>
+                <div class="footer-contact">
+                    <div class="footer-contact-item"><i class="bi bi-telephone-fill"></i> {{ $ls('footer.phone','+62 853-3339-9210') }}</div>
+                    <div class="footer-contact-item"><i class="bi bi-envelope-fill"></i> {{ $ls('footer.email','smartcenterindonesia@gmail.com') }}</div>
+                    <div class="footer-contact-item"><i class="bi bi-clock-fill"></i> Senin–Sabtu (08.00–20.00)</div>
+                    <div class="footer-contact-item"><i class="bi bi-geo-alt-fill"></i> {{ $branches->count() ?: '150' }}+ Cabang di Indonesia</div>
+                </div>
             </div>
         </div>
-
         <div class="footer-bottom">
-            <p>&copy; {{ date('Y') }} Smart Center Indonesia. All rights reserved.</p>
-            <div class="footer-bottom-links">
-                <a href="#">Kebijakan Privasi</a>
-                <a href="#">Syarat & Ketentuan</a>
-                <a href="#">Bantuan</a>
-            </div>
+            <p>© {{ date('Y') }} Smart Center Indonesia (SCI). All Rights Reserved.</p>
+            <p>Made with ❤️ for Indonesian Education</p>
         </div>
     </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-/* ── Navbar scroll + pill ── */
-const navbar = document.getElementById('navbar');
-window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 60);
-}, { passive: true });
-
-/* ── Active nav link tracking ── */
+/* ── NAV ACTIVE ── */
+const navLinks = document.querySelectorAll('.sci-nav-links a');
 const sections = document.querySelectorAll('section[id]');
-const navLinks = document.querySelectorAll('.nav-link-item');
-let lastActiveId = '';
-const navObs = new IntersectionObserver((entries) => {
+const navObs = new IntersectionObserver(entries => {
     entries.forEach(e => {
         if (e.isIntersecting) {
-            lastActiveId = e.target.id;
-            navLinks.forEach(l => l.classList.remove('nav-active'));
-            const active = document.querySelector(`.nav-link-item[href="#${e.target.id}"]`);
-            if (active) active.classList.add('nav-active');
+            navLinks.forEach(l => l.classList.remove('active'));
+            const a = document.querySelector(`.sci-nav-links a[href="#${e.target.id}"]`);
+            if (a) a.classList.add('active');
         }
     });
-}, { threshold: 0.25, rootMargin: '-80px 0px -35% 0px' });
+}, { threshold: 0.3, rootMargin: '-80px 0px -35% 0px' });
 sections.forEach(s => navObs.observe(s));
 
-/* ── Mobile menu ── */
-const toggle     = document.getElementById('navToggle');
-const mobileMenu = document.getElementById('mobileMenu');
-toggle.addEventListener('click', () => {
-    const open = mobileMenu.classList.toggle('open');
-    toggle.classList.toggle('open', open);
-    document.body.style.overflow = open ? 'hidden' : '';
-    mobileMenu.setAttribute('aria-hidden', open ? 'false' : 'true');
-});
+/* ── MOBILE MENU ── */
+const toggle  = document.getElementById('navToggle');
+const mMenu   = document.getElementById('mobileMenu');
+const mClose  = document.getElementById('mobileClose');
+toggle.addEventListener('click', () => { mMenu.classList.toggle('open'); toggle.classList.toggle('open'); document.body.style.overflow = mMenu.classList.contains('open') ? 'hidden' : ''; });
+mClose.addEventListener('click', closeMobile);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobile(); });
-function closeMobile() {
-    mobileMenu.classList.remove('open');
-    toggle.classList.remove('open');
-    document.body.style.overflow = '';
-    mobileMenu.setAttribute('aria-hidden', 'true');
-}
+function closeMobile() { mMenu.classList.remove('open'); toggle.classList.remove('open'); document.body.style.overflow = ''; }
 
-/* ── Hero slideshow ── */
-(function initSlider() {
-    const slides = document.querySelectorAll('.hero-slide');
-    const dots   = document.querySelectorAll('.hero-dot');
-    if (slides.length <= 1) return;
-    let current  = 0;
-    let timer    = null;
-    function goTo(idx) {
-        if (!slides[current] || !dots[current]) return;
-        slides[current].classList.remove('active');
-        dots[current].classList.remove('active');
-        current = (idx + slides.length) % slides.length;
-        if (slides[current]) slides[current].classList.add('active');
-        if (dots[current])   dots[current].classList.add('active');
-    }
-    function startAuto() {
-        clearInterval(timer);
-        timer = setInterval(() => goTo(current + 1), 6000);
-    }
-    dots.forEach(dot => {
-        dot.addEventListener('click', () => {
-            clearInterval(timer);
-            goTo(parseInt(dot.dataset.slide));
-            startAuto();
-        });
-    });
-    // Pause on tab hidden, resume on visible
-    document.addEventListener('visibilitychange', () => {
-        document.hidden ? clearInterval(timer) : startAuto();
-    });
-    startAuto();
-})();
-
-/* ── Particles ── */
-(function createParticles() {
-    const container = document.querySelector('.hero');
-    if (!container) return;
-    const wrap = document.createElement('div');
-    wrap.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1;';
-    for (let i = 0; i < 18; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        const size = Math.random() * 3 + 2;
-        p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;animation-duration:${Math.random()*15+10}s;animation-delay:${Math.random()*10}s;opacity:${Math.random()*.4+.15};`;
-        wrap.appendChild(p);
-    }
-    container.appendChild(wrap);
-})();
-
-/* ── Scroll-reveal ── */
-const revealEls = document.querySelectorAll('.reveal');
-const revealObs = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-        if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); }
-    });
-}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-revealEls.forEach(el => revealObs.observe(el));
-
-/* ── Count-up ── */
-function countUp(el) {
-    const target = parseInt(el.dataset.target, 10);
-    if (!target) return;
-    const exact  = el.dataset.exact === '1';
-    const suffix = (!exact && target > 0) ? '+' : '';
-    const duration = 1600;
-    const step = target / (duration / 16);
-    let current = 0;
-    const timer = setInterval(() => {
-        current = Math.min(current + step, target);
-        el.textContent = Math.floor(current) + suffix;
-        if (current >= target) clearInterval(timer);
-    }, 16);
-}
-const countObs = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-        if (e.isIntersecting) { countUp(e.target); countObs.unobserve(e.target); }
-    });
-}, { threshold: 0.5 });
-document.querySelectorAll('.count-up[data-target]').forEach(el => countObs.observe(el));
-
-/* ── Smooth anchor scroll ── */
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-        const id = a.getAttribute('href').slice(1);
-        const target = document.getElementById(id);
-        if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-    });
-});
-
-/* ── Scroll-to-top ── */
-const scrollTopBtn = document.getElementById('scrollTopBtn');
-window.addEventListener('scroll', () => {
-    scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
-}, { passive: true });
-
-/* ── Mobile carousel dots ── */
-function initMobileCarousel(gridId, dotsId) {
-    const grid   = document.getElementById(gridId);
-    const dotsEl = document.getElementById(dotsId);
-    if (!grid || !dotsEl) return;
-    const mq = window.matchMedia('(max-width:640px)');
-    function buildDots() {
-        dotsEl.innerHTML = '';
-        if (!mq.matches) return;
-        const cards = Array.from(grid.children);
-        cards.forEach((_, i) => {
-            const btn = document.createElement('button');
-            btn.className = 'mcd' + (i === 0 ? ' active' : '');
-            btn.setAttribute('aria-label', 'Slide ' + (i + 1));
-            btn.addEventListener('click', () => {
-                const pl = parseFloat(getComputedStyle(grid).paddingLeft) || 0;
-                grid.scrollTo({ left: Math.max(0, cards[i].offsetLeft - pl), behavior: 'smooth' });
-            });
-            dotsEl.appendChild(btn);
-        });
-    }
-    function updateDots() {
-        if (!mq.matches) return;
-        const cards = Array.from(grid.children);
-        const gap   = parseFloat(getComputedStyle(grid).gap) || 16;
-        const cardW = (cards[0]?.offsetWidth || 1) + gap;
-        const idx   = Math.min(Math.round(grid.scrollLeft / cardW), cards.length - 1);
-        dotsEl.querySelectorAll('.mcd').forEach((d, i) => d.classList.toggle('active', i === idx));
-    }
-    grid.addEventListener('scroll', updateDots, { passive: true });
-    mq.addEventListener('change', buildDots);
-    buildDots();
-}
-initMobileCarousel('jenjangGrid', 'jenjang-dots');
-initMobileCarousel('programGrid', 'program-dots');
-initMobileCarousel('whyGrid',     'why-dots');
-
-/* ── Respect reduced-motion ── */
-if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    document.querySelectorAll('.carousel-track, .tutor-carousel-track').forEach(el => {
-        el.style.animationDuration = '0s';
-        el.style.animationPlayState = 'paused';
-    });
-}
-
-/* ── Scroll progress bar ── */
+/* ── HERO SLIDER ── */
 (function() {
-    const bar = document.getElementById('scroll-progress');
-    if (!bar) return;
-    function updateBar() {
-        const scrolled = window.scrollY;
-        const total    = document.documentElement.scrollHeight - window.innerHeight;
-        bar.style.width = total > 0 ? Math.min((scrolled / total) * 100, 100) + '%' : '0%';
+    const slides = document.querySelectorAll('.sci-hero-slide');
+    const dots   = document.querySelectorAll('.sci-hero-dot');
+    if (!slides.length) return;
+    let cur = 0, timer;
+    function goTo(n) {
+        slides[cur].classList.remove('active'); dots[cur].classList.remove('active');
+        cur = (n + slides.length) % slides.length;
+        slides[cur].classList.add('active'); dots[cur].classList.add('active');
     }
-    window.addEventListener('scroll', updateBar, { passive: true });
-    updateBar();
+    function start() { clearInterval(timer); timer = setInterval(() => goTo(cur+1), 6000); }
+    dots.forEach(d => d.addEventListener('click', () => { clearInterval(timer); goTo(+d.dataset.slide); start(); }));
+    document.getElementById('heroPrev').addEventListener('click', () => { clearInterval(timer); goTo(cur-1); start(); });
+    document.getElementById('heroNext').addEventListener('click', () => { clearInterval(timer); goTo(cur+1); start(); });
+    document.addEventListener('visibilitychange', () => document.hidden ? clearInterval(timer) : start());
+    start();
 })();
 
-/* ── Float card mouse parallax ── */
-(function() {
-    const fc1  = document.querySelector('.float-card-1');
-    const fc2  = document.querySelector('.float-card-2');
-    const hero = document.querySelector('.hero');
-    if (!fc1 || !fc2 || !hero) return;
-    if (window.matchMedia('(max-width:900px)').matches) return;
-    let rafId = null;
-    hero.addEventListener('mousemove', e => {
-        if (rafId) cancelAnimationFrame(rafId);
-        rafId = requestAnimationFrame(() => {
-            const rect = hero.getBoundingClientRect();
-            const cx   = (e.clientX - rect.left) / rect.width  - 0.5;
-            const cy   = (e.clientY - rect.top)  / rect.height - 0.5;
-            fc1.style.transform = `translate(${cx * -16}px, ${cy * -11}px) rotate(-1deg)`;
-            fc2.style.transform = `translate(${cx *  14}px, ${cy *  9}px)  rotate(1deg)`;
-        });
-    });
-    hero.addEventListener('mouseleave', () => {
-        if (rafId) cancelAnimationFrame(rafId);
-        fc1.style.transform = '';
-        fc2.style.transform = '';
-    });
-})();
+/* ── GENERIC SLIDER FACTORY ── */
+function makeSlider(trackId, prevId, nextId, cardWidth) {
+    const track = document.getElementById(trackId);
+    if (!track) return;
+    let pos = 0;
+    const step = cardWidth + 20;
+    function clamp() {
+        const max = track.scrollWidth - track.parentElement.offsetWidth;
+        pos = Math.max(0, Math.min(pos, max));
+    }
+    document.getElementById(prevId).addEventListener('click', () => { pos -= step * 2; clamp(); track.style.transform = `translateX(-${pos}px)`; });
+    document.getElementById(nextId).addEventListener('click', () => { pos += step * 2; clamp(); track.style.transform = `translateX(-${pos}px)`; });
+}
+makeSlider('testiTrack', 'testiPrev', 'testiNext', 320);
+makeSlider('galeriTrack', 'galeriPrev', 'galeriNext', 280);
+makeSlider('tutorTrack', 'tutorPrev', 'tutorNext', 180);
+
+/* ── FAQ TOGGLE ── */
+function toggleFaq(el) {
+    const isOpen = el.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(f => f.classList.remove('open'));
+    if (!isOpen) el.classList.add('open');
+}
+
+/* ── SCROLL REVEAL ── */
+const revObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revObs.unobserve(e.target); } });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
+
+/* ── SCROLL TOP ── */
+const scrollBtn = document.getElementById('scrollTopBtn');
+window.addEventListener('scroll', () => { scrollBtn.classList.toggle('visible', window.scrollY > 400); }, { passive: true });
 </script>
 </body>
 </html>
