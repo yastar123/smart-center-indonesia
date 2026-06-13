@@ -1,0 +1,239 @@
+ada error di page http://127.0.0.1:8000/guru/attendance/history perbaiki
+Stack
+Context
+Debug
+Flare
+Share 
+Share with Flare
+Docs
+Stack
+Context
+Debuga
+Create Share
+Docs
+ 
+Ignition Settings
+Docs
+EditorClipboard
+Sublime
+TextMate
+Emacs
+MacVim
+PhpStorm
+PHPStorm Remote
+Idea
+VS Code
+VS Code Insiders
+VS Code Remote
+VS Code Insiders Remote
+VS Codium
+Cursor
+Atom
+Nova
+NetBeans
+Xdebug
+ 
+Theme 
+auto
+Save settings
+Settings will be saved locally in ~/.ignition.json.
+array_sum(): Argument #1 ($array) must be of type array, Illuminate\Support\Collection given
+TypeErrorPHP 8.3.89.52.21
+array_sum(): Argument #1 ($array) must be of type array, Illuminate\Support\Collection given
+ 
+Expand vendor frames
+C:\Users\Edu Juanda Pratama\Downloads\smart-center-indonesia\smart-center-indonesia\resources\views\guru\attendance-history\index.blade.php : 47
+array_sum
+
+C:\Users\Edu Juanda Pratama\Downloads\smart-center-indonesia\smart-center-indonesia\resources\views\guru\attendance-history\index.blade.php : 47
+require
+52 vendor frames
+C:\Users\Edu Juanda Pratama\Downloads\smart-center-indonesia\smart-center-indonesia\public\index.php : 51
+require_once
+1 vendor frame
+C:\Users\Edu Juanda Pratama\Downloads\smart-center-indonesia\smart-center-indonesia\resources\views\guru\attendance-history\index.blade.php : 47
+
+<div class="d-flex justify-content-between align-items-start">
+<div>
+<div class="stat-title">Mata Pelajaran</div>
+<div class="stat-value text-primary">{{ $courses->count() }}</div>
+<div class="stat-label text-muted" style="font-size:11px">yang diajar</div>
+</div>
+<div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-journal-bookmark-fill"></i></div>
+</div>
+</div>
+</div>
+<div class="col-6 col-md-4 fade-up" style="animation-delay:.05s">
+<div class="stat-card" style="border-top:3px solid #10b981">
+<div class="d-flex justify-content-between align-items-start">
+<div>
+<div class="stat-title">Total Pertemuan</div>
+<div class="stat-value text-success">{{ array_sum($meetingCounts ?? []) }}</div>
+<div class="stat-label text-muted" style="font-size:11px">semua mapel</div>
+</div>
+<div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-calendar-check-fill"></i></div>
+</div>
+</div>
+</div>
+<div class="col-12 col-md-4 fade-up" style="animation-delay:.10s">
+<div class="stat-card" style="border-top:3px solid #f6af23">
+<div class="d-flex justify-content-between align-items-start">
+<div>
+<div class="stat-title">Status Absensi</div>
+<div class="stat-value" style="color:#f6af23;font-size:16px">Aktif</div>
+<div class="stat-label" style="font-size:11px;color:#f6af23"><i class="bi bi-circle-fill me-1" style="font-size:7px"></i>Tahun Ajaran Berjalan</div>
+</div>
+AppRouting
+Views
+RequestBrowser
+Headers
+Body
+ContextUser
+Versions
+App
+Routing
+ControllerApp\Http\Controllers\Guru\AttendanceHistoryController@index
+ 
+Route nameguru.attendance.history
+ 
+Middlewareweb
+ 
+auth
+ 
+Views
+ViewC:\Users\Edu Juanda Pratama\Downloads\smart-center-indonesia\smart-center-indonesia\resources\views\guru\attendance-history\index.blade.php
+Data
+Request
+http://127.0.0.1:8000/guru/attendance/historyGET
+curl "http://127.0.0.1:8000/guru/attendance/history" \
+-X GET \
+-H 'host: 127.0.0.1:8000' \
+-H 'connection: keep-alive' \
+-H 'sec-ch-ua: "Google Chrome";v="149", "Chromium";v="149", "Not)A;Brand";v="24"' \
+-H 'sec-ch-ua-mobile: ?0' \
+-H 'sec-ch-ua-platform: "Windows"' \
+-H 'upgrade-insecure-requests: 1' \
+-H 'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36' \
+-H 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' \
+-H 'sec-fetch-site: same-origin' \
+-H 'sec-fetch-mode: navigate' \
+-H 'sec-fetch-user: ?1' \
+-H 'sec-fetch-dest: document' \
+-H 'referer: http://127.0.0.1:8000/guru/classes/1/attendance' \
+-H 'accept-encoding: gzip, deflate, br, zstd' \
+-H 'accept-language: en-US,en;q=0.9,id;q=0.8' \
+-H 'cookie: XSRF-TOKEN=eyJpdiI6IjdtcUNLMGc5U3lUYnlDVUZIZlMyZnc9PSIsInZhbHVlIjoiY25reVFud1lvMko5eGpPK2N1bnNWK2IxZE5kZU9ZbVVVL2ZQMXpabHJ3OXgyK2tSTFlRa2Vja3NUVEk3QXJjVVFpaXdZOWE0My9JNlUxeUZ3Rk1JUGRPVVNUQnlXOUVLMzJWcGEzaElVSS9pa1pFVFVHMW9Fb29ERzh2ci9JdjAiLCJtYWMiOiIzMTU3NmYzNTAwMGVjMjU1N2QyNjUyNWI3YTQ2NmNiNTEzODA3MGU1NDdkMGUzYzI1ZTQ2MDY5YjAwNDAxNjc0IiwidGFnIjoiIn0%3D; akademi_bimbel_session=eyJpdiI6IkFZTVp5REpUV1VWWWZNUklrZ05CRFE9PSIsInZhbHVlIjoiZUNXRVJ2NlBmSittdklpQUxXV09KT01KLzZ2KytSSjZMRHBoUyt4RmdTSmxXSjQ2VzJObS9RR3hyWWZMR1luV3Zpa09CRllJQkZSTVk5V1BrTHRiUnVEWnNneHZnYjdreHhyZlcwaHV5WnZjdWxtR1E1TklIcWpwV0N2YkpEcTMiLCJtYWMiOiI5MTJjMDJhNDc5YTlhYjVlNWQwYmQ2OGFmZmM5ODIxNzgyNzUwMDQ2ZmQwZDAwNzllYmJlMWIzZmQzNDg5MTAwIiwidGFnIjoiIn0%3D';
+ 
+
+Browser
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36
+ 
+Headers
+host127.0.0.1:8000
+ 
+connectionkeep-alive
+ 
+sec-ch-ua"Google Chrome";v="149", "Chromium";v="149", "Not)A;Brand";v="24"
+ 
+sec-ch-ua-mobile?0
+ 
+sec-ch-ua-platform"Windows"
+ 
+upgrade-insecure-requests1
+ 
+user-agentMozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36
+ 
+accepttext/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+ 
+sec-fetch-sitesame-origin
+ 
+sec-fetch-modenavigate
+ 
+sec-fetch-user?1
+ 
+sec-fetch-destdocument
+ 
+refererhttp://127.0.0.1:8000/guru/classes/1/attendance
+ 
+accept-encodinggzip, deflate, br, zstd
+ 
+accept-languageen-US,en;q=0.9,id;q=0.8
+ 
+cookieXSRF-TOKEN=eyJpdiI6IjdtcUNLMGc5U3lUYnlDVUZIZlMyZnc9PSIsInZhbHVlIjoiY25reVFud1lvMko5eGpPK2N1bnNWK2IxZE5kZU9ZbVVVL2ZQMXpabHJ3OXgyK2tSTFlRa2Vja3NUVEk3QXJjVVFpaXdZOWE0My9JNlUxeUZ3Rk1JUGRPVVNUQnlXOUVLMzJWcGEzaElVSS9pa1pFVFVHMW9Fb29ERzh2ci9JdjAiLCJtYWMiOiIzMTU3NmYzNTAwMGVjMjU1N2QyNjUyNWI3YTQ2NmNiNTEzODA3MGU1NDdkMGUzYzI1ZTQ2MDY5YjAwNDAxNjc0IiwidGFnIjoiIn0%3D; akademi_bimbel_session=eyJpdiI6IkFZTVp5REpUV1VWWWZNUklrZ05CRFE9PSIsInZhbHVlIjoiZUNXRVJ2NlBmSittdklpQUxXV09KT01KLzZ2KytSSjZMRHBoUyt4RmdTSmxXSjQ2VzJObS9RR3hyWWZMR1luV3Zpa09CRllJQkZSTVk5V1BrTHRiUnVEWnNneHZnYjdreHhyZlcwaHV5WnZjdWxtR1E1TklIcWpwV0N2YkpEcTMiLCJtYWMiOiI5MTJjMDJhNDc5YTlhYjVlNWQwYmQ2OGFmZmM5ODIxNzgyNzUwMDQ2ZmQwZDAwNzllYmJlMWIzZmQzNDg5MTAwIiwidGFnIjoiIn0%3D
+ 
+Body
+[]
+ 
+Context
+User
+
+yastar iskandar
+
+guru@gmail.com
+{
+"id": 4,
+"name": "yastar iskandar",
+"username": null,
+"email": "guru@gmail.com",
+"phone": "1",
+"avatar": null,
+"branch_id": 1,
+"is_active": true,
+"last_login_at": null,
+"email_verified_at": null,
+"created_at": "2026-06-13T10:46:06.000000Z",
+"updated_at": "2026-06-13T10:46:06.000000Z",
+"deleted_at": null
+}
+ 
+
+Versions
+Php Version8.3.8
+ 
+Laravel Version9.52.21
+ 
+Laravel Localeen
+ 
+Laravel Config Cachedfalse
+App Debugtrue
+App Envlocal
+ 
+4Queries
+7:33:58 PM
+4.87ms
+mysql
+select * from `users` where `id` = 4 and `users`.`deleted_at` is null limit 1
+ 
+
+1 query parameter
+7:33:58 PM
+0.94ms
+mysql
+select * from `teachers` where `user_id` = 4 and `teachers`.`deleted_at` is null limit 1
+ 
+
+1 query parameter
+7:33:58 PM
+0.94ms
+mysql
+select * from `courses` where `id` in (select `mata_pelajaran_id` from `school_classes` where `guru_id` = 1 and `deleted_at` is null) and `courses`.`deleted_at` is null
+ 
+
+1 query parameter
+7:33:58 PM
+0.77ms
+mysql
+select `sc`.`mata_pelajaran_id`, COUNT(*) as total from `schedules` as `s` inner join `school_classes` as `sc` on `sc`.`id` = `s`.`kelas_id` where `s`.`guru_id` = 1 group by `sc`.`mata_pelajaran_id`
+ 
+
+1 query parameter
+
+·
+Source
+·
+Docs
+·
+Laravel
+Ignition is built byFlare, the Laravel error reporting service.
+
+

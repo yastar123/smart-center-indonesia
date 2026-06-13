@@ -44,7 +44,7 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Total Pertemuan</div>
-                    <div class="stat-value text-success">{{ array_sum($meetingCounts ?? []) }}</div>
+                    <div class="stat-value text-success">{{ ($meetingCounts ?? collect())->sum() }}</div>
                     <div class="stat-label text-muted" style="font-size:11px">semua mapel</div>
                 </div>
                 <div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-calendar-check-fill"></i></div>
