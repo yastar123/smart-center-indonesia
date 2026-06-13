@@ -48,7 +48,7 @@ class CertificateController extends Controller
     {
         $data = $request->validate([
             'siswa_id'          => 'required|exists:students,id',
-            'cabang_id'         => 'required|exists:branches,id',
+            'cabang_id'         => 'nullable|exists:branches,id',
             'jenis'             => 'required|in:kompetensi,kelulusan,prestasi,partisipasi',
             'judul'             => 'required|string|max:200',
             'deskripsi'         => 'nullable|string',
@@ -57,6 +57,12 @@ class CertificateController extends Controller
             'diterbitkan_oleh'  => 'nullable|string|max:100',
             'file_sertifikat'   => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
+
+        // Auto-derive cabang_id from student if not provided
+        if (empty($data['cabang_id'])) {
+            $student = Student::find($data['siswa_id']);
+            $data['cabang_id'] = $student?->branch_id ?? null;
+        }
 
         $data['nomor_sertifikat'] = 'SCI-' . strtoupper(Str::random(3)) . '-' . date('Ymd') . '-' . rand(100, 999);
 
