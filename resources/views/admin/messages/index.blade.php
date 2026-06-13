@@ -29,7 +29,7 @@
 </div>
 
 {{-- CHAT LAYOUT --}}
-<div class="row g-3 chat-layout" style="height:calc(100vh - 280px);min-height:500px">
+<div class="row g-3 chat-layout">
 
     {{-- ROOM LIST --}}
     <div class="col-md-4 col-lg-3">
@@ -139,20 +139,27 @@
 @push('styles')
 <style>
 .chat-layout {
-    height: calc(100vh - 260px);
     min-height: 500px;
 }
-@media (max-width: 991.98px) {
+@media (min-width: 768px) {
     .chat-layout {
-        height: calc(100vh - 320px) !important;
-        min-height: 420px !important;
+        height: calc(100vh - 260px);
+        min-height: 520px;
+    }
+    .chat-layout > [class*="col-"] {
+        height: 100%;
     }
 }
-@media (max-width: 575.98px) {
-    .chat-layout { height: calc(100vh - 280px) !important; min-height: 380px !important; }
+@media (max-width: 767.98px) {
+    .chat-layout > .col-md-4,
+    .chat-layout > .col-md-8 {
+        height: 48vh;
+        min-height: 280px;
+    }
 }
 #chatArea { min-height: 0; }
-#chatActive { min-height: 0; }
+#chatActive { min-height: 0; display: none; flex-direction: column; }
+#chatActive.active { display: flex !important; }
 #chatMessages { flex: 1; min-height: 0; }
 </style>
 @endpush

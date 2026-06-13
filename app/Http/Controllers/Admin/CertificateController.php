@@ -49,6 +49,7 @@ class CertificateController extends Controller
         $data = $request->validate([
             'siswa_id'          => 'required|exists:students,id',
             'cabang_id'         => 'nullable|exists:branches,id',
+            'course_id'         => 'nullable|exists:courses,id',
             'jenis'             => 'required|in:kompetensi,kelulusan,prestasi,partisipasi',
             'judul'             => 'required|string|max:200',
             'deskripsi'         => 'nullable|string',
@@ -86,6 +87,7 @@ class CertificateController extends Controller
         $data = $request->validate([
             'siswa_id'          => 'required|exists:students,id',
             'cabang_id'         => 'nullable|exists:branches,id',
+            'course_id'         => 'nullable|exists:courses,id',
             'jenis'             => 'required|in:kompetensi,kelulusan,prestasi,partisipasi',
             'judul'             => 'required|string|max:200',
             'deskripsi'         => 'nullable|string',

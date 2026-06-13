@@ -44,7 +44,10 @@
     @php
         $courseName = $class->mataPelajaran?->nama ?? $class->nama_kelas;
         $courseCode = $class->mataPelajaran?->kode ?? '—';
-        $certForClass = $certificates->first(function($cert) use ($courseName) {
+        $certForClass = $certificates->first(function($cert) use ($class, $courseName) {
+            if (!is_null($cert->course_id) && !is_null($class->mataPelajaran?->id)) {
+                return (int)$cert->course_id === (int)$class->mataPelajaran->id;
+            }
             return str_contains(strtolower($cert->judul ?? ''), strtolower($courseName));
         });
         $hasCert = !is_null($certForClass);
@@ -107,6 +110,9 @@
 {{-- ADDITIONAL CERTIFICATES (admin-issued, not matched to enrolled class) --}}
 @php
     $matchedCertIds = $enrolledClasses->map(fn($class) => $certificates->first(function($cert) use ($class) {
+        if (!is_null($cert->course_id) && !is_null($class->mataPelajaran?->id)) {
+            return (int)$cert->course_id === (int)$class->mataPelajaran->id;
+        }
         $courseName = $class->mataPelajaran?->nama ?? $class->nama_kelas;
         return str_contains(strtolower($cert->judul ?? ''), strtolower($courseName));
     }))->filter()->pluck('id');

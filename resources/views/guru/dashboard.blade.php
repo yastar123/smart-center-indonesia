@@ -214,18 +214,6 @@ $nextSchedule = $todaySchedules->first(fn($s) =>
             </a>
         </div>
         <div class="col-6 col-lg-3">
-            <a href="{{ route('guru.grades') }}" class="quick-action-card text-decoration-none d-flex align-items-center gap-3"
-               style="border-radius:16px;padding:16px 18px;background:var(--card-bg);border:1.5px solid var(--card-border);transition:all .2s;display:flex">
-                <div class="quick-action-icon" style="background:var(--soft-warning-bg);color:#e09000;width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">
-                    <i class="bi bi-pencil-square"></i>
-                </div>
-                <div>
-                    <div class="fw-bold" style="font-size:13px;color:var(--text-primary)">Input Nilai</div>
-                    <div style="font-size:11px;color:var(--text-muted)">Nilai tugas & ujian</div>
-                </div>
-            </a>
-        </div>
-        <div class="col-6 col-lg-3">
             <a href="{{ route('guru.messages.index') }}" class="quick-action-card text-decoration-none d-flex align-items-center gap-3"
                style="border-radius:16px;padding:16px 18px;background:var(--card-bg);border:1.5px solid var(--card-border);transition:all .2s;display:flex">
                 <div class="quick-action-icon" style="background:var(--soft-info-bg);color:#0284c7;width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">

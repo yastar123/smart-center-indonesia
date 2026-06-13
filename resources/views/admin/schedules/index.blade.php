@@ -183,7 +183,7 @@
                         @if($sc->tanggal_selesai && $sc->tanggal_selesai != $sc->tanggal)
                         <div class="text-muted" style="font-size:11px">s/d {{ $sc->tanggal_selesai->format('d M Y') }}</div>
                         @endif
-                        <div class="text-muted" style="font-size:11px"><i class="bi bi-clock me-1"></i>{{ substr($sc->jam_mulai,0,5) ?? '–' }} – {{ substr($sc->jam_selesai,0,5) ?? '–' }}</div>
+                        <div class="text-muted" style="font-size:11px"><i class="bi bi-clock me-1"></i>{{ str_replace(':', '.', substr($sc->jam_mulai ?? '', 0, 5)) ?: '–' }} – {{ str_replace(':', '.', substr($sc->jam_selesai ?? '', 0, 5)) ?: '–' }} WIB</div>
                     </td>
                     <td class="d-none d-md-table-cell">
                         @if($sc->jenis === 'online')
@@ -351,6 +351,11 @@
 
 @push('scripts')
 <script>
+function fmtWib(t) {
+    if (!t || t === '–') return '–';
+    return t.substr(0,5).replace(':', '.') + ' WIB';
+}
+
 // Cache kelas data dari server
 const kelasData = {};
 @foreach($classes as $c)
@@ -528,7 +533,7 @@ function showDetail(id) {
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
                         <div class="fw-bold" style="font-size:15px">${s.kelas?.nama_kelas ?? 'Kelas'} — Pertemuan ke-${s.pertemuan_ke ?? '?'}</div>
-                        <div style="font-size:12px;color:var(--text-muted)">${tgl}${tglSelesai} · ${(s.jam_mulai||'–').substr(0,5)} – ${(s.jam_selesai||'–').substr(0,5)}</div>
+                        <div style="font-size:12px;color:var(--text-muted)">${tgl}${tglSelesai} · ${fmtWib(s.jam_mulai)} – ${fmtWib(s.jam_selesai)}</div>
                     </div>
                     <span style="background:${sbg};color:${scol};padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600">${slbl}</span>
                 </div>

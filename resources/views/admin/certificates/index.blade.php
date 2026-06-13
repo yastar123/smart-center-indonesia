@@ -23,9 +23,9 @@
                 </div>
             </div>
             <div class="col-md-4 text-md-end">
-                <button onclick="openCertModal()" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
-                    <i class="bi bi-plus-lg me-2"></i>Terbitkan Sertifikat
-                </button>
+                <div style="font-size:12px;opacity:.75;color:white;text-align:right;line-height:1.4">
+                    <i class="bi bi-info-circle me-1"></i>Klik nama siswa di bawah<br>untuk menerbitkan sertifikat
+                </div>
             </div>
         </div>
     </div>
@@ -92,6 +92,77 @@
         </form>
     </div>
     
+    {{-- CERT LIST TABLE --}}
+    <div class="dashboard-card mb-4 fade-up">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold mb-0">
+                <i class="bi bi-award text-warning me-2"></i>Daftar Sertifikat
+                <span class="badge ms-1" style="background:var(--soft-warning-bg);color:var(--soft-warning-text);font-size:11px">{{ $certificates->total() }}</span>
+            </h6>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="thead-modern">
+                    <tr>
+                        <th class="ps-3">Siswa</th>
+                        <th>Judul Sertifikat</th>
+                        <th class="d-none d-md-table-cell">Jenis</th>
+                        <th class="d-none d-md-table-cell">Tanggal Terbit</th>
+                        <th class="d-none d-lg-table-cell">Cabang</th>
+                        <th class="text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($certificates as $cert)
+                    @php
+                        $jenisMap = ['kompetensi'=>['var(--soft-primary-bg)','var(--soft-primary-text)'],'kelulusan'=>['var(--soft-success-bg)','var(--soft-success-text)'],'prestasi'=>['var(--soft-warning-bg)','var(--soft-warning-text)'],'partisipasi'=>['var(--soft-info-bg)','var(--soft-info-text)']];
+                        $jc = $jenisMap[$cert->jenis] ?? ['var(--soft-muted-bg)','var(--text-muted)'];
+                    @endphp
+                    <tr style="border-bottom:1px solid var(--card-border);transition:background .15s" onmouseover="this.style.background='rgba(104,17,126,.05)'" onmouseout="this.style.background=''">
+                        <td class="ps-3">
+                            <div class="fw-semibold" style="font-size:13px">{{ $cert->siswa?->user?->name ?? '–' }}</div>
+                            <code style="font-size:10px;color:var(--text-muted)">{{ $cert->nomor_sertifikat }}</code>
+                        </td>
+                        <td style="font-size:13px;max-width:200px">{{ \Illuminate\Support\Str::limit($cert->judul, 50) }}</td>
+                        <td class="d-none d-md-table-cell">
+                            <span style="background:{{ $jc[0] }};color:{{ $jc[1] }};padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;text-transform:capitalize">{{ $cert->jenis }}</span>
+                        </td>
+                        <td class="d-none d-md-table-cell text-muted" style="font-size:.82rem">
+                            {{ $cert->tanggal_terbit ? $cert->tanggal_terbit->format('d M Y') : '–' }}
+                        </td>
+                        <td class="d-none d-lg-table-cell text-muted" style="font-size:.82rem">{{ $cert->cabang?->name ?? 'Pusat' }}</td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-1">
+                                @if($cert->file_sertifikat)
+                                <a href="{{ asset('storage/'.$cert->file_sertifikat) }}" target="_blank" class="btn btn-sm btn-outline-success" title="Lihat" style="border-radius:7px;font-size:11px">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                @endif
+                                <button onclick="editCert({{ $cert->id }})" class="btn btn-sm btn-outline-primary" title="Edit" style="border-radius:7px;font-size:11px">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button onclick="deleteCert({{ $cert->id }}, '{{ addslashes($cert->judul) }}')" class="btn btn-sm btn-outline-danger" title="Hapus" style="border-radius:7px;font-size:11px">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-award" style="font-size:2rem;display:block;opacity:.25;margin-bottom:.5rem"></i>
+                            Belum ada sertifikat. Klik nama siswa di bawah untuk menerbitkan.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        @if($certificates->hasPages())
+        <div class="mt-3 px-2">{{ $certificates->links() }}</div>
+        @endif
+    </div>
+
     {{-- STUDENTS QUICK LIST (Admin: klik untuk lihat mata pelajaran dan upload) --}}
     <div class="dashboard-card mb-4 fade-up">
         <h6 class="mb-3 fw-semibold">Daftar Siswa (klik untuk lihat mata pelajaran)</h6>
@@ -245,31 +316,26 @@ const certModal = new bootstrap.Modal(document.getElementById('certModal'));
 
 // ---- Date validation helpers ----
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('tanggal_terbit').addEventListener('change', function() {
-        const exp = document.getElementById('tanggal_expired');
-        if (this.value) {
-            const d = new Date(this.value); d.setDate(d.getDate() + 1);
-            exp.min = d.toISOString().split('T')[0];
-            if (exp.value && exp.value <= this.value) { exp.value = ''; }
-        }
-        exp.classList.remove('is-invalid');
-    });
-    document.getElementById('seumurHidup').addEventListener('change', function() {
-        const exp = document.getElementById('tanggal_expired');
-        exp.disabled = this.checked;
-        if (this.checked) { exp.value = ''; exp.classList.remove('is-invalid'); }
-    });
+    const terbitEl = document.getElementById('tanggal_terbit');
+    const expEl    = document.getElementById('tanggal_expired');
+    const slEl     = document.getElementById('seumurHidup');
+    if (terbitEl) {
+        terbitEl.addEventListener('change', function() {
+            if (this.value) {
+                const d = new Date(this.value); d.setDate(d.getDate() + 1);
+                expEl.min = d.toISOString().split('T')[0];
+                if (expEl.value && expEl.value <= this.value) expEl.value = '';
+            }
+            expEl.classList.remove('is-invalid');
+        });
+    }
+    if (slEl) {
+        slEl.addEventListener('change', function() {
+            expEl.disabled = this.checked;
+            if (this.checked) { expEl.value = ''; expEl.classList.remove('is-invalid'); }
+        });
+    }
 });
-
-function openCertModal() {
-    document.getElementById('certModalTitle').innerHTML = '<i class="bi bi-award me-2"></i>Terbitkan Sertifikat';
-    document.getElementById('certId').value = '';
-    document.getElementById('certForm').reset();
-    document.getElementById('seumurHidup').checked = false;
-    document.getElementById('tanggal_expired').disabled = false;
-    document.getElementById('tanggal_terbit').value = new Date().toISOString().split('T')[0];
-    certModal.show();
-}
 
 function editCert(id) {
     document.getElementById('certModalTitle').innerHTML = '<i class="bi bi-pencil-square me-2"></i>Edit Sertifikat';
@@ -296,10 +362,8 @@ function editCert(id) {
 
 function saveCert() {
     const id = document.getElementById('certId').value;
-    const isEdit = id !== '';
     const btn = document.getElementById('certSaveBtn');
 
-    // Validate expiry date
     const terbit  = document.getElementById('tanggal_terbit').value;
     const expired = document.getElementById('tanggal_expired').value;
     const expEl   = document.getElementById('tanggal_expired');
@@ -313,16 +377,16 @@ function saveCert() {
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan…';
 
-    fetch(isEdit ? `/admin/certificates/${id}` : '/admin/certificates', {
-        method: isEdit ? 'PUT' : 'POST',
+    fetch(`/admin/certificates/${id}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
         body: JSON.stringify({
             siswa_id:         document.getElementById('siswa_id').value,
             cabang_id:        document.getElementById('cert_cabang_id').value,
             judul:            document.getElementById('cert_judul').value,
             jenis:            document.getElementById('cert_jenis').value,
-            tanggal_terbit:   document.getElementById('tanggal_terbit').value,
-            tanggal_expired:  document.getElementById('tanggal_expired').value || null,
+            tanggal_terbit:   terbit,
+            tanggal_expired:  expired || null,
             diterbitkan_oleh: document.getElementById('diterbitkan_oleh').value,
             deskripsi:        document.getElementById('cert_deskripsi').value,
         })
@@ -330,7 +394,7 @@ function saveCert() {
     .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
     .then(res => {
         btn.disabled = false;
-        btn.innerHTML = isEdit ? '<i class="bi bi-check-circle me-2"></i>Simpan' : '<i class="bi bi-award me-2"></i>Terbitkan';
+        btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Simpan';
         if (res.success) {
             certModal.hide();
             window.showToast && window.showToast(res.message, 'success');
@@ -342,7 +406,7 @@ function saveCert() {
     })
     .catch(() => {
         btn.disabled = false;
-        btn.innerHTML = isEdit ? '<i class="bi bi-check-circle me-2"></i>Simpan' : '<i class="bi bi-award me-2"></i>Terbitkan';
+        btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Simpan';
         window.showToast && window.showToast('Gagal menghubungi server.', 'error');
     });
 }
@@ -380,10 +444,12 @@ function openStudentCourses(studentId, studentName) {
                 html += `<div class="list-group-item d-flex justify-content-between align-items-center">
                     <div>
                         <div class="fw-semibold">${c.nama}</div>
-                        <div class="small text-muted">Cabang: ${c.cabang_id ? c.cabang_id : 'Pusat'}</div>
+                        <div class="small text-muted">Cabang: ${c.cabang_name ?? (c.cabang_id ? c.cabang_id : 'Pusat')}</div>
                     </div>
                     <div>
-                        <button class="btn btn-sm btn-outline-primary me-2" onclick="openUploadForStudent(${studentId}, ${c.id}, '${escapeHtml(c.nama)}')">Upload Bukti</button>
+                        <button class="btn btn-sm btn-outline-primary" onclick="openUploadForStudent(${studentId}, ${c.id}, '${escapeHtml(c.nama)}')">
+                            <i class="bi bi-upload me-1"></i>Terbitkan
+                        </button>
                     </div>
                 </div>`;
             });
@@ -398,19 +464,26 @@ function openUploadForStudent(studentId, courseId, courseName) {
         <form id="adminUploadForm" enctype="multipart/form-data">
             <input type="hidden" name="siswa_id" value="${studentId}">
             <input type="hidden" name="course_id" value="${courseId}">
-            <div class="mb-2"><label class="form-label">Mata Pelajaran</label><div class="fw-semibold">${courseName}</div></div>
-            <div class="mb-2"><label class="form-label">Judul Sertifikat</label><input name="judul" class="form-control" required></div>
-            <div class="mb-2"><label class="form-label">Jenis</label>
-                <select name="jenis" class="form-select">
-                    <option value="kompetensi">Kompetensi</option>
-                    <option value="kelulusan">Kelulusan</option>
-                    <option value="prestasi">Prestasi</option>
-                    <option value="partisipasi">Partisipasi</option>
-                </select>
+            <div class="mb-3 p-3 rounded-3" style="background:var(--soft-primary-bg);font-size:13px">
+                <div class="text-muted" style="font-size:11px;text-transform:uppercase;font-weight:600;margin-bottom:2px">Mata Pelajaran</div>
+                <div class="fw-bold">${courseName}</div>
             </div>
-            <div class="mb-2"><label class="form-label">Tanggal Terbit</label><input type="date" name="tanggal_terbit" class="form-control" value="${new Date().toISOString().split('T')[0]}" required></div>
-            <div class="mb-2"><label class="form-label">File Sertifikat</label><input type="file" name="file_sertifikat" class="form-control" accept=".pdf,.jpg,.jpeg,.png" required></div>
-            <div class="text-end mt-2"><button type="submit" class="btn btn-primary">Upload</button></div>
+            <div class="mb-2"><label class="form-label fw-semibold" style="font-size:13px">Judul Sertifikat <span class="text-danger">*</span></label><input name="judul" class="form-control" placeholder="cth: Sertifikat Kompetensi Matematika" required></div>
+            <div class="row g-2 mb-2">
+                <div class="col-7"><label class="form-label fw-semibold" style="font-size:13px">Jenis</label>
+                    <select name="jenis" class="form-select">
+                        <option value="kompetensi">Kompetensi</option>
+                        <option value="kelulusan">Kelulusan</option>
+                        <option value="prestasi">Prestasi</option>
+                        <option value="partisipasi">Partisipasi</option>
+                    </select>
+                </div>
+                <div class="col-5"><label class="form-label fw-semibold" style="font-size:13px">Tanggal Terbit <span class="text-danger">*</span></label>
+                    <input type="date" name="tanggal_terbit" class="form-control" value="${new Date().toISOString().split('T')[0]}" required>
+                </div>
+            </div>
+            <div class="mb-2"><label class="form-label fw-semibold" style="font-size:13px">File Sertifikat <span class="text-muted fw-normal">(PDF/JPG/PNG)</span></label><input type="file" name="file_sertifikat" class="form-control" accept=".pdf,.jpg,.jpeg,.png"></div>
+            <div class="text-end mt-3"><button type="button" class="btn btn-light me-2" onclick="openStudentCourses(${studentId},'')">← Kembali</button><button type="submit" class="btn btn-primary px-4"><i class="bi bi-award me-1"></i>Terbitkan</button></div>
         </form>`;
 
     const body = document.getElementById('studentCoursesBody');

@@ -1,0 +1,101 @@
+### Perbaikan dan Penyesuaian Sistem
+
+#### 1. Halaman Pesan Admin
+
+**URL:** `http://127.0.0.1:8000/admin/messages`
+
+* Perbaiki tampilan halaman yang saat ini mengalami tabrakan (overlap) seperti pada gambar yang saya lampirkan.
+* Pastikan seluruh komponen tampil dengan rapi dan responsif pada desktop, tablet, maupun mobile.
+* Tidak boleh ada elemen yang saling menimpa atau keluar dari area tampilan.
+
+---
+
+#### 2. Hak Akses Admin Cabang
+
+**URL:** `http://127.0.0.1:8000/owner/branches`
+
+* Saat Admin Pusat memberikan hak akses kepada Admin Cabang, masih ada beberapa menu yang tidak berfungsi meskipun akses sudah diberikan.
+* Contoh: akses ke menu **Mata Pelajaran** sudah diberikan, tetapi saat login menggunakan akun Admin Cabang, halaman tersebut tidak dapat diakses.
+* Periksa dan perbaiki seluruh sistem permission/hak akses.
+* Pastikan semua fitur yang diberikan oleh Admin Pusat benar-benar dapat diakses oleh Admin Cabang sesuai izin yang diberikan.
+
+---
+
+#### 3. Biaya Mata Pelajaran
+
+**URL:** `http://127.0.0.1:8000/admin/courses/fees`
+
+* Tambahkan fitur **Update** dan **Delete** untuk data Biaya Mata Pelajaran.
+* Pada kolom biaya, gunakan format rupiah otomatis saat mengetik.
+* Contoh:
+
+  * Input: `100000`
+  * Tampil menjadi: `100.000`
+
+---
+
+#### 4. Deskripsi Pembayaran
+
+**URL Admin:** `http://127.0.0.1:8000/admin/payments`
+**URL Siswa:** `http://127.0.0.1:8000/siswa/billing`
+
+* Tambahkan kolom **Deskripsi** pada tabel pembayaran di halaman admin.
+* Data deskripsi berasal dari input opsional yang diisi siswa saat melakukan pembayaran pada halaman billing.
+
+---
+
+#### 5. Jadwal Pertemuan
+
+**URL:** `http://127.0.0.1:8000/admin/schedules`
+
+* Saat melakukan CRUD jadwal, field **Waktu Mulai** dan **Waktu Selesai** harus menggunakan format waktu Indonesia.
+* Tampilan input dan data yang tersimpan juga harus mengikuti format waktu Indonesia.
+
+---
+
+#### 6. Route Guru Grades
+
+* Hapus seluruh kode, file, menu, dan referensi yang berkaitan dengan error:
+
+```text
+Route [guru.grades] not defined.
+```
+
+* Pastikan tidak ada lagi pemanggilan route tersebut di dalam sistem.
+
+---
+
+#### 7. Upload Sertifikat
+
+**URL Admin:** `http://127.0.0.1:8000/admin/certificates`
+**URL Siswa:** `http://127.0.0.1:8000/siswa/certificates`
+
+##### Perubahan Alur Upload Sertifikat
+
+* Hapus fitur CRUD **Terbitkan Sertifikat** yang ada saat ini.
+* Pada halaman sertifikat admin, tampilkan daftar siswa dalam bentuk card.
+* Ketika card siswa diklik:
+
+  * Tampilkan daftar mata pelajaran yang diambil oleh siswa tersebut.
+  * Admin dapat mengunggah sertifikat pada masing-masing mata pelajaran.
+* Sertifikat yang diunggah harus dapat diunduh oleh siswa melalui halaman:
+
+  * `http://127.0.0.1:8000/siswa/certificates`
+
+##### Perbaikan Bug Sertifikat
+
+Saat ini terjadi masalah:
+
+* Admin mengunggah sertifikat pada mata pelajaran tertentu.
+* Namun sertifikat tersebut malah muncul pada bagian **Sertifikat Lainnya**, bukan pada mata pelajaran yang sesuai.
+
+Contoh kasus:
+
+* Sertifikat diunggah untuk mata pelajaran **Matematika**.
+* Namun setelah diunggah, sertifikat muncul pada bagian **Sertifikat Lainnya**.
+
+Periksa relasi database dan logika penyimpanan sertifikat agar:
+
+* Sertifikat selalu terhubung dengan mata pelajaran yang benar.
+* Sertifikat hanya muncul pada mata pelajaran tempat sertifikat tersebut diunggah.
+* Tidak muncul pada kategori atau mata pelajaran lain yang tidak sesuai.

@@ -217,9 +217,9 @@
 
                             <div class="mb-3">
                                 <label class="form-label fw-semibold" style="font-size:13px">
-                                    Catatan Transfer <span class="text-muted">(opsional)</span>
+                                    Deskripsi Pembayaran <span class="text-muted">(opsional)</span>
                                 </label>
-                                <input type="text" name="catatan" class="form-control" placeholder="Nama pengirim / bank / no. ref"
+                                <input type="text" name="catatan" class="form-control" placeholder="cth: Transfer BCA atas nama Budi / no. ref: 12345"
                                        style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
                             </div>
 
@@ -409,9 +409,9 @@
 
                             <div class="mb-3">
                                 <label class="form-label fw-semibold" style="font-size:13px">
-                                    Catatan Transfer <span class="text-muted">(opsional)</span>
+                                    Deskripsi Pembayaran <span class="text-muted">(opsional)</span>
                                 </label>
-                                <input type="text" name="catatan" class="form-control" placeholder="Nama pengirim / bank / no. ref"
+                                <input type="text" name="catatan" class="form-control" placeholder="cth: Transfer BCA atas nama Budi / no. ref: 12345"
                                        style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
                             </div>
 

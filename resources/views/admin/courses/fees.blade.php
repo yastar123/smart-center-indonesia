@@ -54,10 +54,12 @@
                     <td>{{ $class->cabang->name ?? 'Pusat' }}</td>
                     <td>
                         @if($class->mataPelajaran)
-                        <form action="{{ route('admin.courses.fees.update', $class->mataPelajaran->id) }}" method="POST" class="d-flex gap-2 align-items-center">
+                        <form action="{{ route('admin.courses.fees.update', $class->mataPelajaran->id) }}" method="POST" class="d-flex gap-2 align-items-center fee-form">
                             @csrf
-                            <input type="number" name="amount" value="{{ $class->mataPelajaran->fee->amount ?? 0 }}" min="0" step="1000"
-                                   class="form-control form-control-sm" style="width:160px" placeholder="0">
+                            <input type="text" class="form-control form-control-sm fee-display" style="width:160px" placeholder="Rp 0"
+                                   data-raw="{{ $class->mataPelajaran->fee->amount ?? 0 }}"
+                                   value="Rp {{ number_format($class->mataPelajaran->fee->amount ?? 0, 0, ',', '.') }}">
+                            <input type="hidden" name="amount" class="fee-raw" value="{{ $class->mataPelajaran->fee->amount ?? 0 }}">
                             <button class="btn btn-sm btn-primary">Simpan</button>
                         </form>
                         @else
@@ -95,3 +97,30 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+document.querySelectorAll('.fee-display').forEach(function(input) {
+    input.addEventListener('focus', function() {
+        var raw = parseInt(this.dataset.raw) || 0;
+        this.value = raw || '';
+        this.select();
+    });
+    input.addEventListener('input', function() {
+        var raw = parseInt(this.value.replace(/[^0-9]/g, '')) || 0;
+        this.dataset.raw = raw;
+        this.closest('.fee-form').querySelector('.fee-raw').value = raw;
+    });
+    input.addEventListener('blur', function() {
+        var raw = parseInt(this.dataset.raw) || 0;
+        this.value = 'Rp ' + raw.toLocaleString('id-ID');
+    });
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            this.closest('.fee-form').querySelector('button[type="submit"], button:not([type])').click();
+        }
+    });
+});
+</script>
+@endpush

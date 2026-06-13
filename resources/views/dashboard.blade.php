@@ -445,16 +445,14 @@
     </div>
     <div class="col-6 col-md-3 fade-up" style="animation-delay:.15s">
         <div class="stat-card" style="border-top:3px solid #f6af23">
-            <a href="{{ route('guru.grades') }}" class="text-decoration-none d-block">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <div class="stat-title">Input Nilai</div>
-                        <div class="stat-value text-warning" style="font-size:16px">Input Sekarang</div>
-                        <div class="stat-growth text-muted"><i class="bi bi-bar-chart me-1"></i>Nilai siswa</div>
-                    </div>
-                    <div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-bar-chart-fill"></i></div>
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-title">Jadwal Hari Ini</div>
+                    <div class="stat-value text-warning" style="font-size:16px">Lihat Jadwal</div>
+                    <div class="stat-growth text-muted"><i class="bi bi-calendar-check me-1"></i>Pertemuan</div>
                 </div>
-            </a>
+                <div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-calendar-week-fill"></i></div>
+            </div>
         </div>
     </div>
     <div class="col-6 col-md-3 fade-up" style="animation-delay:.20s">

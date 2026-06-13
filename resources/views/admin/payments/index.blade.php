@@ -141,6 +141,7 @@
                     <th>Mata Pelajaran</th>
                     <th class="d-none d-md-table-cell">Cabang</th>
                     <th>Biaya</th>
+                    <th class="d-none d-lg-table-cell">Deskripsi</th>
                     <th>Bukti</th>
                     <th>Status</th>
                     <th class="text-center">Aksi</th>
@@ -171,6 +172,9 @@
                     <td class="fw-semibold" style="font-size:13px">{{ $payment->course?->nama ?? '–' }}</td>
                     <td class="d-none d-md-table-cell text-muted" style="font-size:.85rem">{{ $payment->course?->cabang?->name ?? 'Pusat' }}</td>
                     <td class="fw-bold text-primary" style="font-size:.9rem">Rp {{ number_format($payment->amount,0,',','.') }}</td>
+                    <td class="d-none d-lg-table-cell text-muted" style="font-size:.82rem;max-width:160px">
+                        {{ $payment->catatan ? \Illuminate\Support\Str::limit($payment->catatan, 40) : '–' }}
+                    </td>
                     <td>
                         @if($payment->proof)
                         <a href="{{ asset($payment->proof) }}" target="_blank" class="btn btn-sm btn-outline-primary" style="border-radius:8px;font-size:11px">
@@ -206,7 +210,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="text-center py-5">
+                    <td colspan="8" class="text-center py-5">
                         <div class="text-muted">
                             <i class="bi bi-journal-x" style="font-size:40px;display:block;margin-bottom:12px;opacity:.4"></i>
                             <div class="fw-semibold mb-1">Belum ada pembayaran mata pelajaran</div>

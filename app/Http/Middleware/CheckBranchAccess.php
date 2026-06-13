@@ -113,6 +113,19 @@ class CheckBranchAccess
     {
         $word = Str::lower($word);
 
+        // Explicit mappings for words that end in -es but retain the trailing 'e'
+        $explicit = [
+            'courses'       => 'course',
+            'schedules'     => 'schedule',
+            'certificates'  => 'certificate',
+            'modules'       => 'module',
+            'packages'      => 'package',
+            'messages'      => 'message',
+            'videocalls'    => 'videocall',
+            'course-fees'   => 'course_fee',
+        ];
+        if (isset($explicit[$word])) return $explicit[$word];
+
         if (str_ends_with($word, 'ies')) {
             return substr($word, 0, -3).'y';
         }
