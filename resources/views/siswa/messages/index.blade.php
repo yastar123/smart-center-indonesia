@@ -1,12 +1,6 @@
-@extends('layouts.app')
-@section('title','Pesan - Siswa')
-@section('page-title','Pesan')
-
-@section('content')
-@php
-    $messageBaseUrl = url('siswa/messages');
-    $messageCreateRoute = route('siswa.messages.createRoom');
-    $allowCreateRoom = false;
-@endphp
-@include('admin.messages.index')
-@endsection
+{{--
+  This file is intentionally a redirect stub.
+  The Siswa\MessageController renders admin.messages.index directly with proper variables.
+  This file is only reached if something incorrectly references the view name.
+--}}
+@php redirect(route('siswa.messages.index'))->send(); @endphp

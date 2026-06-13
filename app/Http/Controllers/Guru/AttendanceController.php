@@ -77,28 +77,9 @@ class AttendanceController extends Controller
                 }
             }
 
-            // Fallback 2: find users with 'siswa' role in same branch (for setups without Student profile)
-            if ($students->isEmpty()) {
-                $teacher = Teacher::where('user_id', auth()->id())->first();
-                $branchId = $teacher?->branch_id
-                    ?? optional(SchoolClass::find($schedule->kelas_id))->cabang_id;
-
-                $siswaUsers = User::role('siswa')
-                    ->when($branchId, fn($q) => $q->where('branch_id', $branchId))
-                    ->where('id', '!=', auth()->id())
-                    ->orderBy('name')
-                    ->get(['id', 'name', 'email']);
-
-                // Map to a common shape (no Student record — use user_id as pseudo student_id)
-                $students = $siswaUsers->map(fn($u) => (object)[
-                    'id'    => $u->id,     // use user_id as proxy when no Student record
-                    'name'  => $u->name,
-                    'nis'   => null,
-                    'photo' => null,
-                    'email' => $u->email,
-                    '_is_user_proxy' => true,
-                ]);
-            }
+            // Fallback 2: show empty — no student profiles exist for this branch.
+            // We deliberately do NOT use User.id as a proxy for siswa_id because
+            // absensi_siswas.siswa_id must reference students.id, not users.id.
 
             // Existing attendance records for this schedule
             $existing = DB::table('absensi_siswas')
@@ -197,10 +178,7 @@ class AttendanceController extends Controller
 
     private function computeStatus(bool $guruHadir, $siswaKonfirmasiAt): string
     {
-        if ($guruHadir && $siswaKonfirmasiAt)  return 'hadir';
-        if ($guruHadir && !$siswaKonfirmasiAt) return 'menunggu_konfirmasi';
-        if (!$guruHadir && $siswaKonfirmasiAt) return 'tidak_valid';
-        return 'tidak_hadir';
+        return \App\Models\AbsensiSiswa::computeStatus($guruHadir, $siswaKonfirmasiAt);
     }
 
     public function report(Request $request)

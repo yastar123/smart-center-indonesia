@@ -65,4 +65,9 @@ class Schedule extends Model
         return $this->hasMany(ScheduleStudentAgreement::class);
     }
 
+    public function absensi()
+    {
+        return $this->hasMany(AbsensiSiswa::class, 'jadwal_id');
+    }
+
 }

@@ -85,7 +85,7 @@ class CertificateController extends Controller
     {
         $data = $request->validate([
             'siswa_id'          => 'required|exists:students,id',
-            'cabang_id'         => 'required|exists:branches,id',
+            'cabang_id'         => 'nullable|exists:branches,id',
             'jenis'             => 'required|in:kompetensi,kelulusan,prestasi,partisipasi',
             'judul'             => 'required|string|max:200',
             'deskripsi'         => 'nullable|string',
@@ -94,8 +94,14 @@ class CertificateController extends Controller
             'diterbitkan_oleh'  => 'nullable|string|max:100',
             'file_sertifikat'   => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
+
+        // Auto-derive cabang_id from student if not provided
+        if (empty($data['cabang_id'])) {
+            $student = \App\Models\Student::find($data['siswa_id'] ?? $certificate->siswa_id);
+            $data['cabang_id'] = $student?->branch_id ?? $certificate->cabang_id ?? null;
+        }
+
         if ($request->hasFile('file_sertifikat')) {
-            // remove old file if exists
             if ($certificate->file_sertifikat && Storage::disk('public')->exists($certificate->file_sertifikat)) {
                 Storage::disk('public')->delete($certificate->file_sertifikat);
             }
