@@ -1,0 +1,42 @@
+Admin UI/UX overhaul: animations, mobile table expand, modal headers, filter resets
+
+ENTRANCE ANIMATION SYSTEM (app.blade.php)
+- Full keyframe library: fadeUp, scaleIn, fadeInLeft, fadeInRight
+- Utility classes: .anim-fade-up, .anim-scale-in, .anim-fade-left, .anim-fade-right
+- 8-step delay helpers: .anim-d1 … .anim-d8
+- Auto-staggered stat-card entrance via nth-child CSS (delays 0–400ms, no JS needed)
+- Page section stagger: .fade-up.in-view > .mb-4:nth-child(n) animates in sequence
+- Page wrapper entrance improved: transition-based .fade-up.in-view (IntersectionObserver)
+
+MOBILE TABLE ROW-EXPAND (app.blade.php global)
+- initMobileRowExpand() JS: adds chevron expand button to every row with hidden columns
+- MutationObserver auto-reinits after AJAX tbody updates (covers all AJAX table pages)
+- Expand detail row shows hidden column data in responsive 2-col grid with column labels
+- CSS: compact table padding on mobile, expand button + detail row styling
+- Works on all 15 admin table pages without per-page changes
+
+GRADIENT MODAL HEADERS
+- classes: purple gradient (68117e→c84ddf)
+- courses: green gradient (059669→10b981)
+- certificates: gold gradient (f6af23→b45309), title icon updates on open/edit
+
+CERTIFICATES DATE VALIDATION
+- Seumur Hidup checkbox disables tanggal_expired
+- tanggal_terbit change → sets min on expired field
+- saveCert() validates expired > terbit, shows .is-invalid feedback
+
+THEAD CONSISTENCY
+- teachers, students: inline background style → .thead-modern class
+
+VIDEOCALL - responsive iframe: calc(100vh-200px) mobile / 620px desktop + loading=lazy
+
+MESSAGES - scroll-to-bottom button, wasAtBottom logic, online dot, better bubbles
+
+FILTER RESET BUTTONS (all AJAX pages)
+- resetFilter() + ×-icon button: tryouts, salaries, packages, announcements, modules
+- Filter bar cols updated to col-12/col-6 mobile breakpoints
+
+GLOBAL CSS
+- Fluid typography: clamp() on headings, topbar h4, stat titles/values
+- Mobile sidebar overlay: blur(8px) saturate(120%) + animated fadeOverlay
+- aria-label on dark toggle, notification button, expand buttons

@@ -19,9 +19,7 @@ use App\Http\Controllers\Owner\BranchController;
 use App\Http\Controllers\Guru\AttendanceController;
 use App\Http\Controllers\Siswa\SiswaController;
 
-Route::get('/', function () {
-    return view('landing');
-})->name('landing');
+Route::redirect('/', '/login');
 
 Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
