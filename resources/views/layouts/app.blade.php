@@ -518,12 +518,31 @@
         .badge { font-weight: 600; border-radius: 8px; }
 
         /* ============================================================
-           MODAL
+           MODAL — globally scrollable body, fixed header/footer
         ============================================================ */
         .modal-content {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 20px;
+            /* Constrain modal height to viewport so body can scroll */
+            max-height: calc(100vh - 48px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .modal-dialog {
+            max-height: calc(100vh - 48px);
+        }
+        /* Make the body scroll while header/footer stay visible */
+        .modal-body {
+            overflow-y: auto;
+            flex: 1 1 auto;
+            overscroll-behavior: contain;
+        }
+        /* Header and footer never shrink */
+        .modal-header,
+        .modal-footer {
+            flex-shrink: 0;
         }
 
         /* Ensure Bootstrap modals/backdrops are above any global overlays */
