@@ -211,7 +211,7 @@ function openRoom(id, name, type) {
     document.getElementById('chatRoomName').textContent = name;
     document.getElementById('chatRoomType').textContent = { grup: 'Grup', personal: 'Personal', broadcast: 'Broadcast' }[type] || type;
     document.getElementById('activeRoomId').value = id;
-    document.getElementById('chatEmpty').style.display = 'none';
+    document.getElementById('chatEmpty').classList.add('d-none');
     document.getElementById('chatActive').style.display = 'flex';
     loadMessages(id);
     if (pollInterval) clearInterval(pollInterval);

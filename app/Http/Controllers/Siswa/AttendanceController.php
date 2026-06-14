@@ -106,7 +106,18 @@ class AttendanceController extends Controller
             return response()->json(['success' => false, 'message' => 'Kehadiran sudah dikonfirmasi sebelumnya.'], 422);
         }
 
-        $now    = now();
+        // Confirmation only allowed during class hours
+        $now = now();
+        $classDate = \Carbon\Carbon::parse($schedule->tanggal)->format('Y-m-d');
+        $startTime = \Carbon\Carbon::parse($classDate . ' ' . $schedule->jam_mulai);
+        $endTime   = \Carbon\Carbon::parse($classDate . ' ' . $schedule->jam_selesai);
+
+        if ($now->lt($startTime)) {
+            return response()->json(['success' => false, 'message' => 'Konfirmasi kehadiran hanya bisa dilakukan saat kelas sudah dimulai (' . $startTime->format('H:i') . ' WIB).'], 422);
+        }
+        if ($now->gt($endTime)) {
+            return response()->json(['success' => false, 'message' => 'Konfirmasi kehadiran sudah ditutup. Kelas telah selesai pada ' . $endTime->format('H:i') . ' WIB.'], 422);
+        }
         $status = AbsensiSiswa::computeStatus((bool) $record->guru_hadir, $now);
 
         DB::table('absensi_siswas')

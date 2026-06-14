@@ -106,6 +106,19 @@ class AttendanceController extends Controller
     {
         $schedule = Schedule::findOrFail($request->input('jadwal_id'));
 
+        // Attendance only allowed during class hours
+        $now = now();
+        $classDate = \Carbon\Carbon::parse($schedule->tanggal)->format('Y-m-d');
+        $startTime = \Carbon\Carbon::parse($classDate . ' ' . $schedule->jam_mulai);
+        $endTime   = \Carbon\Carbon::parse($classDate . ' ' . $schedule->jam_selesai);
+
+        if ($now->lt($startTime)) {
+            return response()->json(['success' => false, 'message' => 'Absensi hanya bisa dilakukan saat kelas sudah dimulai (' . $startTime->format('H:i') . ' WIB).'], 422);
+        }
+        if ($now->gt($endTime)) {
+            return response()->json(['success' => false, 'message' => 'Absensi sudah ditutup. Kelas telah selesai pada ' . $endTime->format('H:i') . ' WIB.'], 422);
+        }
+
         $data = $request->validate([
             'jadwal_id'       => 'required|exists:schedules,id',
             'hadir_ids'       => 'nullable|array',

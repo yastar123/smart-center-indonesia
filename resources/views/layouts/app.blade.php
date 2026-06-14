@@ -3278,6 +3278,12 @@
             </a>
         </div>
         <div class="nav-item">
+            <a href="{{ route('admin.attendance-history.index') }}" class="nav-link {{ request()->routeIs('admin.attendance-history.*') ? 'active' : '' }}" data-label="Riwayat Absensi">
+                <i class="bi bi-clipboard2-pulse"></i>
+                <span>Riwayat Absensi</span>
+            </a>
+        </div>
+        <div class="nav-item">
             <a href="{{ route('admin.certificates.index') }}" class="nav-link {{ request()->routeIs('admin.certificates.*') ? 'active' : '' }}" data-label="Sertifikat">
                 <i class="bi bi-award"></i>
                 <span>Sertifikat</span>

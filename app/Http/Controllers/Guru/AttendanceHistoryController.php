@@ -43,19 +43,25 @@ class AttendanceHistoryController extends Controller
 
         $scheduleIds = $classes->flatMap(fn ($c) => $c->jadwal->pluck('id'));
 
-        $attendanceStats = DB::table('absensi_siswas')
+        // Per-student per-schedule attendance records (for grid view)
+        $attendanceRecords = DB::table('absensi_siswas')
             ->whereIn('jadwal_id', $scheduleIds)
-            ->select('jadwal_id', DB::raw("
-                SUM(CASE WHEN status='hadir' THEN 1 ELSE 0 END) as hadir,
-                SUM(CASE WHEN status='izin' THEN 1 ELSE 0 END) as izin,
-                SUM(CASE WHEN status='sakit' THEN 1 ELSE 0 END) as sakit,
-                SUM(CASE WHEN status='alpa' THEN 1 ELSE 0 END) as alpa,
-                COUNT(*) as total
-            "))
+            ->get(['jadwal_id', 'siswa_id', 'guru_hadir', 'siswa_konfirmasi_at', 'status'])
             ->groupBy('jadwal_id')
-            ->get()
-            ->keyBy('jadwal_id');
+            ->map(fn ($rows) => $rows->keyBy('siswa_id'));
 
-        return view('guru.attendance-history.show', compact('course', 'classes', 'attendanceStats', 'teacher'));
+        // Students per class (from class_students pivot)
+        $classStudents = [];
+        foreach ($classes as $class) {
+            $studentIds = DB::table('class_students')->where('class_id', $class->id)->pluck('student_id');
+            $students = DB::table('students')
+                ->whereIn('id', $studentIds)
+                ->where('status', 'aktif')
+                ->orderBy('name')
+                ->get(['id', 'name', 'nis']);
+            $classStudents[$class->id] = $students;
+        }
+
+        return view('guru.attendance-history.show', compact('course', 'classes', 'attendanceRecords', 'classStudents', 'teacher'));
     }
 }

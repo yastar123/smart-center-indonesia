@@ -308,11 +308,11 @@
                     {{-- Tanggal Selesai dihapus sesuai permintaan --}}
                     <div class="col-md-6">
                         <label class="form-label fw-semibold" style="font-size:12px">Jam Mulai <span class="text-danger">*</span></label>
-                        <input type="time" id="jam_mulai" class="form-control" style="border-radius:10px">
+                        <input type="text" id="jam_mulai" class="form-control flatpickr-time-input" placeholder="13:30" autocomplete="off" style="border-radius:10px">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-semibold" style="font-size:12px">Jam Selesai <span class="text-danger">*</span></label>
-                        <input type="time" id="jam_selesai" class="form-control" style="border-radius:10px">
+                        <input type="text" id="jam_selesai" class="form-control flatpickr-time-input" placeholder="15:00" autocomplete="off" style="border-radius:10px">
                     </div>
                     <div class="col-12" id="ruanganField">
                         <label class="form-label fw-semibold" style="font-size:12px">Ruangan <span class="text-muted">(opsional)</span></label>
@@ -350,7 +350,22 @@
 @endsection
 
 @push('scripts')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
+// Initialize 24-hour time pickers
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.flatpickr-time-input').forEach(function(el) {
+        flatpickr(el, {
+            enableTime: true,
+            noCalendar: true,
+            time_24hr: true,
+            dateFormat: 'H:i',
+            minuteIncrement: 5,
+        });
+    });
+});
+
 function fmtWib(t) {
     if (!t || t === '–') return '–';
     return t.substr(0,5).replace(':', '.') + ' WIB';

@@ -1,0 +1,46 @@
+Berikut paragraf yang sudah disederhanakan dan mudah dipahami:
+
+---
+
+**Daftar Bug dan Fitur yang Perlu Diperbaiki/Ditambahkan**
+
+**1. Bug di Halaman Manajemen Cabang (`/owner/branches`)**
+Di halaman ini terdapat dua bug. Pertama, ketika admin pusat mencoba mengubah hak akses admin cabang (misalnya mengizinkan admin cabang mengakses halaman siswa), muncul pesan error: *"The status field is required."* Kedua, pesan error yang sama juga muncul saat admin pusat memperbarui data admin cabang seperti nama atau nomor HP.
+
+Selain itu, website ini belum menerapkan sistem **Role-Based Access Control (RBAC)**, sehingga ada celah keamanan di mana akun dengan role siswa bisa mengakses halaman yang seharusnya hanya untuk admin. Ini harus segera diperbaiki.
+
+---
+
+**2. Fitur Tabel Riwayat Absensi di Akun Guru**
+Di halaman Detail Riwayat Absensi (akun guru), tampilkan data absensi dalam bentuk **tabel grid** seperti ini:
+
+| Nama | Pertemuan 1 | Pertemuan 2 | Pertemuan 3 | Total Hadir |
+|---|---|---|---|---|
+| Ahmad | ✅ | ✅ | ❌ | 2 |
+| Anton | ✅ | ❌ | ✅ | 2 |
+
+Status kehadiran mengikuti aturan berikut:
+
+| Guru Tandai | Siswa Konfirmasi | Status |
+|---|---|---|
+| ❌ | ❌ | Tidak Hadir |
+| ✅ | ❌ | Menunggu Konfirmasi Siswa |
+| ❌ | ✅ | Tidak Valid |
+| ✅ | ✅ | **Hadir** ✅ |
+
+---
+
+**3. Perbaikan Format Waktu & Batasan Absensi di Halaman Jadwal (`/admin/schedules`)**
+Saat admin membuat atau mengedit jadwal pertemuan, format jam **jangan menggunakan AM/PM**, melainkan gunakan format **24 jam** (contoh: `10:10`, `13:30`). Gunakan library jika diperlukan.
+
+Selain itu, guru dan siswa hanya bisa melakukan absensi **selama jam kelas berlangsung**. Setelah jam kelas selesai, absensi tidak bisa diubah lagi.
+
+---
+
+**4. Halaman Baru "Riwayat Absensi" di Akun Admin**
+Tambahkan menu baru di sidebar akun admin bernama **"Riwayat Absensi"**. Di halaman ini, admin dapat melihat seluruh data absensi dari semua guru dan semua mata pelajaran. Referensi tampilannya mengikuti halaman: `/guru/attendance/history`.
+
+---
+
+**5. Bug Tampilan di Halaman Pesan (`/messages`)**
+Terdapat bug UI/UX di mana komponen **"Pilih Percakapan"** (yang muncul saat belum ada chat yang dipilih) menutupi area chat yang sedang aktif. Komponen ini seharusnya hanya tampil ketika belum ada percakapan yang dipilih, bukan menimpa tampilan chat.

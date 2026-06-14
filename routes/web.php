@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\SalaryController;
 use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\TryoutController;
 use App\Http\Controllers\Admin\MessageController;
+use App\Http\Controllers\Admin\AttendanceHistoryController;
 use App\Http\Controllers\Owner\BranchController;
 use App\Http\Controllers\Guru\AttendanceController;
 use App\Http\Controllers\Siswa\SiswaController;
@@ -42,7 +43,7 @@ Route::middleware('auth')->group(function () {
 | ADMIN
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'check.branch.access'])
+Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -72,6 +73,9 @@ Route::middleware(['auth', 'check.branch.access'])
         // Course Payment Verification
         Route::post('/payments/course/{payment}/verify', [PaymentController::class, 'verifyCoursePayment'])->name('payments.course.verify');
         Route::post('/payments/course/{payment}/reject', [PaymentController::class, 'rejectCoursePayment'])->name('payments.course.reject');
+
+        // ATTENDANCE HISTORY (Admin)
+        Route::get('/attendance-history', [AttendanceHistoryController::class, 'index'])->name('attendance-history.index');
 
         // SCHEDULES
         Route::get('/schedules',               [ScheduleController::class, 'index'])   ->name('schedules.index');
@@ -195,7 +199,7 @@ Route::middleware(['auth', 'check.branch.access'])
 | OWNER
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth'])
+Route::middleware(['auth', 'role:owner'])
     ->prefix('owner')
     ->name('owner.')
     ->group(function () {
@@ -249,7 +253,7 @@ Route::middleware(['auth'])
 | GURU PORTAL
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth'])
+Route::middleware(['auth', 'role:guru'])
     ->prefix('guru')
     ->name('guru.')
     ->group(function () {
@@ -315,7 +319,7 @@ Route::middleware(['auth'])
 | SISWA PORTAL
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth'])
+Route::middleware(['auth', 'role:siswa'])
     ->prefix('siswa')
     ->name('siswa.')
     ->group(function () {

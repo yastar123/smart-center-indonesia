@@ -197,7 +197,7 @@ class BranchController extends Controller
         $request->validate([
             'name' => 'required',
             'city' => 'required',
-            'status' => 'required',
+            'status' => 'nullable',
             'email' => 'nullable|email',
             'password' => 'nullable|min:6',
             'admin_name' => 'nullable|string',
@@ -229,7 +229,7 @@ class BranchController extends Controller
             'address' => $request->address ?? $branch->address,
             'phone' => $request->phone ?? $branch->phone,
             'email' => $request->email ?? $branch->email,
-            'status' => $request->status,
+            'status' => $request->status ?? $branch->status,
             'can_students' => $can_students,
             'can_teachers' => $can_teachers,
             'can_schedules' => $can_schedules,
