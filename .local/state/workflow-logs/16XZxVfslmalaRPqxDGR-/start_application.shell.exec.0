@@ -1,0 +1,22 @@
+Generated .env file
+
+  [37;44m INFO [39;49m Configuration cache cleared successfully.  
+
+
+  [37;44m INFO [39;49m Application cache cleared successfully.  
+
+Running migrations...
+
+  [37;44m INFO [39;49m Nothing to migrate.  
+
+Database already seeded (roles: 5), skipping.
+
+  [37;41m ERROR [39;49m The [1m[public/storage][22m link already exists.  
+
+Starting Laravel server on 0.0.0.0:5000...
+
+  [37;44m INFO [39;49m Server running on [1m[http://0.0.0.0:5000][22m.  
+
+[33m  [39m[33;1mPress Ctrl+C to stop the server[39;22m
+
+  [90m2026-06-12[39m 05:50:38 [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [90m~ 0s[39m
