@@ -13,6 +13,7 @@ class Module extends Model
     protected $table = 'modules';
 
     protected $fillable = [
+        'kode_modul',
         'mata_pelajaran_id',
         'diupload_oleh',
         'judul',

@@ -3291,6 +3291,12 @@
             </a>
         </div>
         <div class="nav-item">
+            <a href="{{ route('admin.module.index') }}" class="nav-link {{ request()->routeIs('admin.module.*') ? 'active' : '' }}" data-label="Modul Akademik">
+                <i class="bi bi-journal-text"></i>
+                <span>Modul Akademik</span>
+            </a>
+        </div>
+        <div class="nav-item">
             <a href="{{ route('admin.classes.index') }}" class="nav-link {{ request()->routeIs('admin.classes.*') ? 'active' : '' }}" data-label="Kelas">
                 <i class="bi bi-diagram-3"></i>
                 <span>Kelas</span>
@@ -3327,6 +3333,16 @@
 
         <div class="nav-header">KEUANGAN</div>
 
+        <div class="nav-item">
+            <a href="{{ route('admin.billing.index') }}" class="nav-link {{ request()->routeIs('admin.billing.*') ? 'active' : '' }}" data-label="Billing">
+                <i class="bi bi-receipt-cutoff"></i>
+                <span>Billing</span>
+                @php $overdueBilling = \App\Models\Invoice::where('status','belum_bayar')->whereNotNull('jatuh_tempo')->where('jatuh_tempo','<',now()->toDateString())->count(); @endphp
+                @if($overdueBilling > 0)
+                    <span class="menu-badge">{{ $overdueBilling > 99 ? '99+' : $overdueBilling }}</span>
+                @endif
+            </a>
+        </div>
         <div class="nav-item">
             <a href="{{ route('admin.payments.index') }}" class="nav-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}" data-label="Pembayaran">
                 <i class="bi bi-wallet2"></i>

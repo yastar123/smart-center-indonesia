@@ -18,6 +18,8 @@ use App\Http\Controllers\Admin\CoursePackageController;
 use App\Http\Controllers\Admin\ScheduleDashboardController;
 use App\Http\Controllers\Admin\RescheduleController;
 use App\Http\Controllers\Admin\RegistrationController;
+use App\Http\Controllers\Admin\AcademicModuleController;
+use App\Http\Controllers\Admin\BillingController;
 use App\Http\Controllers\Admin\TryoutController;
 use App\Http\Controllers\Admin\MessageController;
 use App\Http\Controllers\Admin\AttendanceHistoryController;
@@ -215,6 +217,26 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::get('/registration-list',         [RegistrationController::class, 'index'])  ->name('registration.index');
         Route::get('/registration-create',       [RegistrationController::class, 'create']) ->name('registration.create');
         Route::post('/registration-create',      [RegistrationController::class, 'store'])  ->name('registration.store');
+
+        // ACADEMIC MODULE (Modul Akademik)
+        Route::get('/module',                    [AcademicModuleController::class, 'index'])   ->name('module.index');
+        Route::get('/module/create',             [AcademicModuleController::class, 'create'])  ->name('module.create');
+        Route::post('/module',                   [AcademicModuleController::class, 'store'])   ->name('module.store');
+        Route::get('/module/{module}',           [AcademicModuleController::class, 'show'])    ->name('module.show');
+        Route::get('/module/{module}/edit',      [AcademicModuleController::class, 'edit'])    ->name('module.edit');
+        Route::put('/module/{module}',           [AcademicModuleController::class, 'update'])  ->name('module.update');
+        Route::delete('/module/{module}',        [AcademicModuleController::class, 'destroy']) ->name('module.destroy');
+
+        // BILLING (Manajemen E-Billing)
+        Route::get('/billing',                   [BillingController::class, 'index'])   ->name('billing.index');
+        Route::post('/billing',                  [BillingController::class, 'store'])   ->name('billing.store');
+        Route::get('/billing/{billing}',         [BillingController::class, 'show'])    ->name('billing.show');
+        Route::put('/billing/{billing}',         [BillingController::class, 'update'])  ->name('billing.update');
+        Route::delete('/billing/{billing}',      [BillingController::class, 'destroy']) ->name('billing.destroy');
+
+        // SCHEDULE LIST & CREATE (aliases to existing schedules)
+        Route::get('/schedule-list',  fn() => redirect()->route('admin.schedules.index'))  ->name('schedule-list.index');
+        Route::get('/schedule-create',fn() => redirect()->route('admin.schedules.index'))  ->name('schedule-create.index');
 
         // LANDING PAGE CONTENT
         Route::get('/landing',                                          [\App\Http\Controllers\Admin\LandingContentController::class, 'index'])             ->name('landing.index');
