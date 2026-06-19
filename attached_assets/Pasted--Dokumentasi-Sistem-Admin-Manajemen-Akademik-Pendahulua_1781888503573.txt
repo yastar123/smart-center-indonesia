@@ -1,0 +1,445 @@
+# Dokumentasi Sistem Admin - Manajemen Akademik
+
+## Pendahuluan
+
+Dokumentasi ini menjelaskan secara lengkap semua halaman admin yang tersedia dalam sistem manajemen akademik. Sistem ini dirancang untuk membantu administrator mengelola berbagai aspek operasional, mulai dari mata pelajaran, paket kursus, jadwal, hingga proses registrasi siswa dan penanganan perubahan jadwal.
+
+Semua halaman terintegrasi dalam satu ekosistem yang memungkinkan alur kerja yang efisien dan terstruktur. Data yang disajikan merupakan ilustrasi berdasarkan skenario umum, namun seluruh logika dan struktur telah dirancang untuk implementasi penuh dengan basis data nyata.
+
+---
+
+## Daftar Halaman Admin
+
+1. [Mata Pelajaran (Subject)](#1-halaman-mata-pelajaran-subject)
+2. [Paket Belajar (Course Package)](#2-halaman-paket-belajar-course-package)
+3. [Jadwal Kelas (Schedule)](#3-halaman-jadwal-kelas-schedule)
+4. [Reschedule & Availability](#4-halaman-reschedule-availability)
+5. [Registrasi Baru (Registration Create)](#5-halaman-registrasi-baru-registration-create)
+
+---
+
+## 1. Halaman Mata Pelajaran (Subject)
+
+### 1.1 Tujuan Halaman
+
+Halaman ini digunakan untuk mengelola master data mata pelajaran yang tersedia di sistem. Administrator dapat melihat daftar pelajaran, mengkategorikannya, dan mengelola status aktif/nonaktif.
+
+### 1.2 Alur Navigasi
+
+- Akses: `/admin/subject`
+- Tombol **Tambah Mapel** → `/admin/subject-create`
+- Setiap baris memiliki aksi:
+  - **Detail** → `/admin/subject-detail`
+  - **Edit** → `/admin/subject-edit`
+
+### 1.3 Struktur Tampilan
+
+#### A. Header Halaman
+- Judul: **Mata Pelajaran**
+- Deskripsi: *Daftar master mata pelajaran yang ditawarkan kepada siswa*
+- Tombol aksi: **Tambah Mapel** (kanan atas)
+
+#### B. Tabel Daftar Mata Pelajaran
+
+| Kolom | Deskripsi |
+|-------|-----------|
+| Nama Pelajaran | Nama mata pelajaran yang tersedia |
+| Kategori Keterampilan | Jenis kategori (Academic / Skill) |
+| Status | Aktif atau Tidak Aktif |
+| Aksi | Tombol Detail dan Edit |
+
+### 1.4 Data Ilustratif
+
+| Nama Pelajaran | Kategori | Status | Aksi |
+|----------------|----------|--------|------|
+| Matematika Wajib | Academic | Aktif | Detail, Edit |
+| Fisika | Academic | Aktif | Detail, Edit |
+| Bahasa Inggris Percakapan | Skill / Soft-Skill | Aktif | Edit |
+
+### 1.5 Interaksi yang Tersedia
+
+- **Tambah Mapel**: Membuka halaman form pembuatan mata pelajaran baru
+- **Detail**: Melihat informasi lengkap mata pelajaran
+- **Edit**: Mengubah data mata pelajaran
+
+### 1.6 Logika Visual
+
+- Ikon buku di header
+- Badge warna untuk membedakan kategori
+- Tombol aksi dengan warna kontras
+- Desain tabel bersih dan responsif
+
+---
+
+## 2. Halaman Paket Belajar (Course Package)
+
+### 2.1 Tujuan Halaman
+
+Halaman ini menampilkan daftar paket belajar yang tersedia beserta informasi lengkap seperti nama paket, kategori, jumlah sesi, harga, dan status.
+
+### 2.2 Alur Navigasi
+
+- Akses: `/admin/course-package`
+- Tombol **Tambah Paket** → `/admin/course-package-create`
+- Aksi per baris:
+  - **Detail** → `/admin/course-package-detail`
+  - **Edit** → `/admin/course-package-edit`
+
+### 2.3 Struktur Tampilan
+
+#### A. Header Halaman
+- Judul: **Paket Belajar & Harga**
+- Deskripsi: *Daftar paket kursus yang tersedia, jenjang, dan harga*
+- Tombol: **Tambah Paket**
+
+#### B. Tabel Daftar Paket
+
+| Kolom | Deskripsi |
+|-------|-----------|
+| Nama Paket | Nama paket yang ditawarkan |
+| Kategori & Jenjang | Reguler/Privat dengan kapasitas |
+| Jumlah Sesi | Total pertemuan dalam paket |
+| Harga Dasar | Nilai harga paket (format Rupiah) |
+| Status | Aktif/Draft (dengan badge warna) |
+| Aksi | Detail dan Edit |
+
+### 2.4 Data Ilustratif
+
+| Nama Paket | Kategori & Jenjang | Sesi | Harga | Status | Aksi |
+|------------|-------------------|------|-------|--------|------|
+| Intensif UTBK 12 SMA | Reguler (Maks 15 Siswa) | 24 Sesi | Rp 2.500.000 | Aktif | Detail, Edit |
+| Privat Fisika 11 SMA | Privat (1 Siswa) | 8 Sesi | Rp 1.200.000 | Aktif | Detail, Edit |
+| Reguler Calistung TK | Reguler Dasar | 12 Sesi | Rp 800.000 | Draft | Edit |
+
+### 2.5 Logika Status
+
+- **Aktif**: Badge hijau - paket dapat diakses dan didaftarkan
+- **Draft**: Badge kuning/oranye - paket masih dalam tahap persiapan
+
+### 2.6 Interaksi
+
+- **Tambah Paket**: Membuka form pembuatan paket baru
+- **Detail**: Melihat rincian lengkap paket (tidak tersedia untuk status Draft)
+- **Edit**: Mengubah data paket (satu-satunya aksi untuk paket Draft)
+
+---
+
+## 3. Halaman Jadwal Kelas (Schedule)
+
+### 3.1 Tujuan Halaman
+
+Dashboard visual untuk melihat daftar sesi kelas yang sedang berlangsung, dijadwalkan, atau sudah selesai pada hari tertentu. Fokus pada monitoring dan manajemen jadwal harian.
+
+### 3.2 Alur Navigasi
+
+- Akses: `/admin/schedule`
+- Tombol **Kelola Daftar Kelas** → `/admin/schedule-list`
+- Tombol **Buat Jadwal Baru** → `/admin/schedule-create`
+
+### 3.3 Struktur Tampilan
+
+#### A. Header Action
+- Judul: **Jadwal Kelas**
+- Subtitle: *Kelola dan pantau seluruh sesi kelas cabang hari ini*
+- Tombol aksi cepat
+
+#### B. Date Selector Strip
+Menampilkan hari dalam seminggu yang dapat dipilih:
+- Senin, Selasa, Rabu, Kamis, Jumat (dengan tanggal)
+- Komponen datepicker untuk memilih bulan dan tahun
+
+#### C. Quick Stats
+Ringkasan data sesi berdasarkan status:
+- **Total Sesi**: Jumlah seluruh sesi
+- **Berlangsung**: Sesi aktif saat ini
+- **Menunggu**: Sesi yang akan datang
+- **Selesai**: Sesi yang sudah berakhir
+
+#### D. Schedule Cards Grid
+Kartu-kartu sesi kelas dengan informasi:
+- Nama kelas
+- Nama guru
+- Nama ruangan
+- Waktu kelas
+- Status kelas
+- Jumlah siswa (dengan avatar)
+
+### 3.4 Data dan Struktur
+
+Setiap item schedule memiliki:
+```
+- id
+- class_name
+- teacher_name
+- room_name
+- time
+- date
+- status (ongoing/scheduled/completed)
+- students_count (format: "12/15")
+```
+
+### 3.5 Status Sesi dan Aksi
+
+| Status | Warna Top Bar | Badge | Warna Jam | Tombol Aksi |
+|--------|---------------|-------|-----------|-------------|
+| **Ongoing** | Hijau | Sedang Berlangsung | Hijau | Pantau Kelas |
+| **Scheduled** | Oranye | Dijadwalkan | Normal | Edit, Detail Kelas |
+| **Completed** | Abu-abu | Selesai | Dicoret | Lihat Laporan Sesi |
+
+### 3.6 Perhitungan Statistik
+
+- Total: `count($schedules)`
+- Berlangsung: `collect($schedules)->where('status', 'ongoing')->count()`
+- Menunggu: `collect($schedules)->where('status', 'scheduled')->count()`
+- Selesai: `collect($schedules)->where('status', 'completed')->count()`
+
+### 3.7 Logika Visual
+
+- Avatar siswa dengan perhitungan jumlah tambahan (contoh: `12/15` → tampil `+10`)
+- Warna dan badge berbeda tergantung status
+- Komponen datepicker terintegrasi
+
+---
+
+## 4. Halaman Reschedule & Availability
+
+### 4.1 Tujuan Halaman
+
+Mengelola request reschedule kelas privat dengan mengecek ketersediaan guru. Fokus pada approval process dan monitoring jadwal guru.
+
+### 4.2 Alur Navigasi
+
+- Akses: `/admin/reschedule`
+- Navigasi bawah menggunakan komponen include (terintegrasi dengan modul lain)
+
+### 4.3 Struktur Tampilan
+
+#### A. Header / Hero Section
+- Label: **Reschedule & Availability**
+- Judul: **Manajemen Reschedule**
+- Deskripsi: Pengelolaan approval reschedule dan cek ketersediaan guru
+
+#### B. Guard Rule Banner
+Aturan bisnis penting:
+- ✅ Hanya kelas **PRIVATE** yang bisa di-reschedule
+- ❌ Kelas reguler tidak boleh diproses
+- 📌 Semua request yang masuk sudah dipastikan valid untuk paket privat
+
+#### C. Ketersediaan Guru (Availability Grid)
+Menampilkan jadwal guru per hari dengan status:
+- `OFF`: Guru libur
+- `FULL`: Guru sudah penuh
+- `08:00-16:00`: Rentang jam tersedia
+
+Setiap card guru menampilkan:
+- Avatar inisial
+- Nama guru
+- Mata pelajaran
+- Grid hari Sen–Sab dengan warna berbeda
+
+#### D. Tabel Request Reschedule
+
+| Kolom | Deskripsi |
+|-------|-----------|
+| Guru / Kelas | Nama guru dan kelas terkait |
+| Tipe | PRIVAT (badge) |
+| Jadwal Lama | Tanggal dan waktu awal |
+| Usulan Baru | Tanggal dan waktu yang diminta |
+| Alasan | Alasan perubahan jadwal |
+| Status | pending/approved/ditolak |
+| Aksi | Tombol Setujui/Tolak |
+
+### 4.4 Data Structure
+
+#### Teacher Availability
+```
+{
+  teacher: string,
+  subject: string,
+  mon: string, // "OFF", "FULL", atau "08:00-16:00"
+  tue: string,
+  // ... sampai sat
+}
+```
+
+#### Reschedule Requests
+```
+{
+  id: number,
+  class: string,
+  class_type: string,
+  teacher: string,
+  original_date: string,
+  requested_date: string,
+  reason: string,
+  status: 'pending' | 'approved' | 'rejected',
+  conflict: boolean
+}
+```
+
+### 4.5 Status dan Logika Visual
+
+| Status | Badge | Tombol Aksi | Warna |
+|--------|-------|-------------|-------|
+| **Pending** | Menunggu | Setujui / Tolak | Kuning/Amber |
+| **Pending + Conflict** | Menunggu + Bentrok | Setujui / Tolak | Merah |
+| **Approved** | Disetujui | Ikon centang hijau | Hijau |
+| **Rejected** | Ditolak | Ikon silang merah | Merah |
+
+### 4.6 Interaksi yang Tersedia
+
+- **Setujui**: Menyetujui request reschedule (memperbarui status dan jadwal)
+- **Tolak**: Menolak request reschedule (memperbarui status)
+- **Pengecekan Konflik**: Sistem mendeteksi bentrok jadwal secara otomatis berdasarkan data ketersediaan guru
+
+### 4.7 Flow Penggunaan
+
+1. Admin membuka halaman
+2. Melihat banner aturan (hanya privat)
+3. Memeriksa availability guru untuk slot yang tersedia
+4. Melihat daftar request reschedule
+5. Memutuskan menyetujui atau menolak request pending
+6. Request yang sudah selesai hanya menampilkan status final
+
+---
+
+## 5. Halaman Registrasi Baru (Registration Create)
+
+### 5.1 Tujuan Halaman
+
+Proses registrasi siswa baru atau siswa lama dengan konfigurasi lengkap: data siswa, paket, guru, dan skema tagihan dengan estimasi biaya real-time.
+
+### 5.2 Alur Navigasi
+
+- Akses: `/admin/registration-create`
+- Berasal dari: `/admin/registration-list`
+- Breadcrumb: `Daftar Registrasi > Registrasi Baru`
+- Tombol **Batal & Kembali**
+
+### 5.3 Struktur Form (4 Cards)
+
+#### Card 1 — Informasi Pendaftar & Wali
+- **Pilih Cabang Target**: Dropdown cabang (misal: SCI Pusat, SCI Tebet)
+- **Toggle Siswa Baru / Siswa Lama**:
+  - *Siswa Baru*: Form biodata lengkap
+  - *Siswa Lama*: Dropdown pemilihan siswa
+- **Input Biodata**:
+  - Nama Lengkap Siswa
+  - No. WA Siswa
+  - Nama Wali
+  - No. WA Wali
+
+#### Card 2 — Konfigurasi Kelas & Paket
+- **Opsi Paket**:
+  - **Paket Standar**: Pilih dari dropdown (contoh: Paket Matematika Intensif, Paket B. Inggris Pro)
+  - **Custom Package**: Buat paket manual
+- **Input Custom**:
+  - Nama Paket Custom
+  - Kategori Tipe
+  - Hubungkan Modul (opsional)
+  - Total Pertemuan (Sesi)
+  - Masa Aktif Paket (bulan)
+  - Harga Kesepakatan Paket
+  - Biaya Registrasi Pendaftaran
+  - Deskripsi & Catatan Kontrak
+
+#### Card 3 — Setup Jadwal & Guru
+- **Assign Guru Pengajar**: Dropdown guru dengan tipe
+  - `freelance`
+  - `contract`
+- **Custom Fee per Sesi**: Muncul jika guru freelance
+- **Tanggal Mulai Kelas**: Date picker
+
+#### Card 4 — Skema Tagihan & Aktivasi
+- **Opsi Pembayaran**:
+  - **Prabayar (Prepaid)**: Pembayaran di depan
+    - Jumlah Cicilan
+    - Mulai Ditagihkan Pada
+    - Tanggal Jatuh Tempo Berikutnya
+  - **Pascabayar (Per Sesi)**: Tagihan per sesi
+- **Tombol Selesaikan Registrasi**
+
+### 5.4 Panel Kanan — Live Quotation
+
+Menampilkan estimasi biaya real-time:
+- Nama siswa
+- Cabang
+- Nama paket
+- Skema tagihan
+- Metode absensi
+- Estimasi biaya
+
+#### Rumus Estimasi
+```
+Total Awal Tagihan = 
+  - Prepaid: packagePrice + adminFee (Rp 150.000 untuk siswa baru)
+  - Postpaid: 0 (kecuali ada biaya tambahan)
+```
+
+### 5.5 Data State (`formData`)
+
+```javascript
+{
+  branch: string,
+  isNewStudent: boolean,
+  studentName: string,
+  studentPhone: string,
+  isCustomPackage: boolean,
+  packageName: string,
+  packagePrice: number,
+  customSessions: number,
+  classType: string,
+  attendanceMethod: string,
+  teacherId: string,
+  teacherType: 'freelance' | 'contract',
+  customTeacherFee: number,
+  startDate: string,
+  billingMode: 'prepaid' | 'postpaid'
+}
+```
+
+### 5.6 Fungsi JavaScript
+
+- `updateTeacherType(select)`: Membaca dan menyimpan tipe guru
+- `submitForm()`: Mengirim data registrasi (proses backend)
+- `formatRupiah(num)`: Mengubah angka ke format Rupiah
+
+### 5.7 Alur Proses
+
+1. Pengguna mengisi semua field yang diperlukan
+2. Panel kanan otomatis menampilkan estimasi biaya
+3. Klik **Selesaikan Registrasi**
+4. Sistem memproses data dan menyimpan ke database
+5. Notifikasi sukses ditampilkan dan pengguna diarahkan ke halaman daftar registrasi
+
+---
+
+## Ringkasan Fitur dan Integrasi Antar Halaman
+
+### Matriks Fitur
+
+| Fitur | Subject | Course Package | Schedule | Reschedule | Registration |
+|-------|---------|----------------|----------|------------|--------------|
+| CRUD Data | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Status Management | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Real-time Preview | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Availability Check | ❌ | ❌ | ❌ | ✅ | ❌ |
+| Navigation Actions | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Integrasi dengan Database | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+### Alur Bisnis Utama
+
+```
+Mata Pelajaran → Paket Belajar → Jadwal Kelas → Registrasi Siswa → Reschedule (jika diperlukan)
+```
+
+### Catatan Arsitektur
+
+- Semua halaman terhubung dengan basis data melalui service layer
+- Setiap modul memiliki controller dan view terpisah
+- Navigasi antar halaman konsisten menggunakan routing yang telah ditentukan
+- Desain responsif dan mengikuti pedoman UI/UX perusahaan
+
+---
+
+*Dokumentasi ini merupakan panduan lengkap untuk pengembangan dan pengoperasian sistem manajemen akademik admin. Seluruh fitur dan logika telah dirancang untuk implementasi produksi.*

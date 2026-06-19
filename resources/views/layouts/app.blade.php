@@ -3249,6 +3249,12 @@
         <div class="nav-header">AKADEMIK</div>
 
         <div class="nav-item">
+            <a href="{{ route('admin.registration.index') }}" class="nav-link {{ request()->routeIs('admin.registration.*') ? 'active' : '' }}" data-label="Registrasi">
+                <i class="bi bi-person-plus-fill"></i>
+                <span>Registrasi</span>
+            </a>
+        </div>
+        <div class="nav-item">
             <a href="{{ route('admin.students.index') }}" class="nav-link {{ request()->routeIs('admin.students.*') ? 'active' : '' }}" data-label="Siswa">
                 <i class="bi bi-mortarboard"></i>
                 <span>Siswa</span>
@@ -3261,21 +3267,15 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.modules.index') }}" class="nav-link {{ request()->routeIs('admin.modules.*') ? 'active' : '' }}" data-label="Modul Belajar">
-                <i class="bi bi-book-half"></i>
-                <span>Modul Belajar</span>
+            <a href="{{ route('admin.subject.index') }}" class="nav-link {{ request()->routeIs('admin.subject.*') ? 'active' : '' }}" data-label="Mata Pelajaran">
+                <i class="bi bi-journal-bookmark-fill"></i>
+                <span>Mata Pelajaran</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.packages.index') }}" class="nav-link {{ request()->routeIs('admin.packages.*') ? 'active' : '' }}" data-label="Paket Belajar">
+            <a href="{{ route('admin.course-package.index') }}" class="nav-link {{ request()->routeIs('admin.course-package.*') ? 'active' : '' }}" data-label="Paket Belajar">
                 <i class="bi bi-box-seam"></i>
                 <span>Paket Belajar</span>
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="{{ route('admin.courses.index') }}" class="nav-link {{ (request()->routeIs('admin.courses.*') && !request()->routeIs('admin.courses.fees*')) ? 'active' : '' }}" data-label="Mata Pelajaran">
-                <i class="bi bi-journal-bookmark"></i>
-                <span>Mata Pelajaran</span>
             </a>
         </div>
         <div class="nav-item">
@@ -3285,15 +3285,31 @@
             </a>
         </div>
         <div class="nav-item">
+            <a href="{{ route('admin.modules.index') }}" class="nav-link {{ request()->routeIs('admin.modules.*') ? 'active' : '' }}" data-label="Modul Belajar">
+                <i class="bi bi-book-half"></i>
+                <span>Modul Belajar</span>
+            </a>
+        </div>
+        <div class="nav-item">
             <a href="{{ route('admin.classes.index') }}" class="nav-link {{ request()->routeIs('admin.classes.*') ? 'active' : '' }}" data-label="Kelas">
                 <i class="bi bi-diagram-3"></i>
                 <span>Kelas</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.schedules.index') }}" class="nav-link {{ request()->routeIs('admin.schedules.*') ? 'active' : '' }}" data-label="Jadwal">
+            <a href="{{ route('admin.schedule-dashboard.index') }}" class="nav-link {{ request()->routeIs('admin.schedule-dashboard.*') ? 'active' : '' }}" data-label="Jadwal Kelas">
                 <i class="bi bi-calendar-week"></i>
-                <span>Jadwal</span>
+                <span>Jadwal Kelas</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('admin.reschedule.index') }}" class="nav-link {{ request()->routeIs('admin.reschedule.*') ? 'active' : '' }}" data-label="Reschedule">
+                <i class="bi bi-arrow-left-right"></i>
+                <span>Reschedule</span>
+                @php $pendingReschedule = \App\Models\ScheduleProposal::where('status','pending')->count(); @endphp
+                @if($pendingReschedule > 0)
+                    <span class="menu-badge">{{ $pendingReschedule > 99 ? '99+' : $pendingReschedule }}</span>
+                @endif
             </a>
         </div>
         <div class="nav-item">

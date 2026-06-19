@@ -13,6 +13,11 @@ use App\Http\Controllers\Admin\ModuleController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Admin\SalaryController;
 use App\Http\Controllers\Admin\AnnouncementController;
+use App\Http\Controllers\Admin\SubjectController;
+use App\Http\Controllers\Admin\CoursePackageController;
+use App\Http\Controllers\Admin\ScheduleDashboardController;
+use App\Http\Controllers\Admin\RescheduleController;
+use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\TryoutController;
 use App\Http\Controllers\Admin\MessageController;
 use App\Http\Controllers\Admin\AttendanceHistoryController;
@@ -179,6 +184,37 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
 
         // REPORTS
         Route::get('/reports', fn() => view('admin.reports.index'))->middleware('role:admin|owner')->name('reports.index');
+
+        // SUBJECT (Mata Pelajaran — new UI)
+        Route::get('/subject',               [SubjectController::class, 'index'])   ->name('subject.index');
+        Route::get('/subject/create',        [SubjectController::class, 'create'])  ->name('subject.create');
+        Route::post('/subject',              [SubjectController::class, 'store'])   ->name('subject.store');
+        Route::get('/subject/{subject}',     [SubjectController::class, 'show'])    ->name('subject.show');
+        Route::get('/subject/{subject}/edit',[SubjectController::class, 'edit'])    ->name('subject.edit');
+        Route::put('/subject/{subject}',     [SubjectController::class, 'update'])  ->name('subject.update');
+        Route::delete('/subject/{subject}',  [SubjectController::class, 'destroy']) ->name('subject.destroy');
+
+        // COURSE PACKAGE (Paket Belajar — new UI)
+        Route::get('/course-package',                        [CoursePackageController::class, 'index'])   ->name('course-package.index');
+        Route::get('/course-package/create',                 [CoursePackageController::class, 'create'])  ->name('course-package.create');
+        Route::post('/course-package',                       [CoursePackageController::class, 'store'])   ->name('course-package.store');
+        Route::get('/course-package/{coursePackage}',        [CoursePackageController::class, 'show'])    ->name('course-package.show');
+        Route::get('/course-package/{coursePackage}/edit',   [CoursePackageController::class, 'edit'])    ->name('course-package.edit');
+        Route::put('/course-package/{coursePackage}',        [CoursePackageController::class, 'update'])  ->name('course-package.update');
+        Route::delete('/course-package/{coursePackage}',     [CoursePackageController::class, 'destroy']) ->name('course-package.destroy');
+
+        // SCHEDULE DASHBOARD (Visual calendar view)
+        Route::get('/schedule',              [ScheduleDashboardController::class, 'index']) ->name('schedule-dashboard.index');
+
+        // RESCHEDULE & AVAILABILITY
+        Route::get('/reschedule',                       [RescheduleController::class, 'index'])   ->name('reschedule.index');
+        Route::post('/reschedule/{proposal}/approve',   [RescheduleController::class, 'approve']) ->name('reschedule.approve');
+        Route::post('/reschedule/{proposal}/reject',    [RescheduleController::class, 'reject'])  ->name('reschedule.reject');
+
+        // REGISTRATION (Registrasi Siswa)
+        Route::get('/registration-list',         [RegistrationController::class, 'index'])  ->name('registration.index');
+        Route::get('/registration-create',       [RegistrationController::class, 'create']) ->name('registration.create');
+        Route::post('/registration-create',      [RegistrationController::class, 'store'])  ->name('registration.store');
 
         // LANDING PAGE CONTENT
         Route::get('/landing',                                          [\App\Http\Controllers\Admin\LandingContentController::class, 'index'])             ->name('landing.index');
