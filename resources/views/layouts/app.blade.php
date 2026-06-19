@@ -3279,18 +3279,6 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.courses.fees') }}" class="nav-link {{ request()->routeIs('admin.courses.fees*') ? 'active' : '' }}" data-label="Biaya Mapel">
-                <i class="bi bi-tag"></i>
-                <span>Biaya Mapel</span>
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="{{ route('admin.modules.index') }}" class="nav-link {{ request()->routeIs('admin.modules.*') ? 'active' : '' }}" data-label="Modul Belajar">
-                <i class="bi bi-book-half"></i>
-                <span>Modul Belajar</span>
-            </a>
-        </div>
-        <div class="nav-item">
             <a href="{{ route('admin.module.index') }}" class="nav-link {{ request()->routeIs('admin.module.*') ? 'active' : '' }}" data-label="Modul Akademik">
                 <i class="bi bi-journal-text"></i>
                 <span>Modul Akademik</span>
@@ -4327,7 +4315,6 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         @role('admin|owner')
         { label:'Data Siswa', desc:'Kelola siswa', href:'{{ route("admin.students.index") }}', icon:'bi-mortarboard', color:'#c84ddf', group:'Akademik' },
         { label:'Data Guru', desc:'Kelola guru & pengajar', href:'{{ route("admin.teachers.index") }}', icon:'bi-person-workspace', color:'#10b981', group:'Akademik' },
-        { label:'Modul Belajar', desc:'Upload & kelola materi', href:'{{ route("admin.modules.index") }}', icon:'bi-book-half', color:'#68117e', group:'Akademik' },
         { label:'Paket Belajar', desc:'Atur paket & harga', href:'{{ route("admin.packages.index") }}', icon:'bi-box-seam', color:'#059669', group:'Akademik' },
         { label:'Mata Pelajaran', desc:'Kelola mapel', href:'{{ route("admin.courses.index") }}', icon:'bi-journal-bookmark', color:'#10b981', group:'Akademik' },
         { label:'Kelas', desc:'Manajemen kelas belajar', href:'{{ route("admin.classes.index") }}', icon:'bi-diagram-3', color:'#68117e', group:'Akademik' },

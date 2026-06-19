@@ -91,17 +91,12 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::put('/schedules/{schedule}',    [ScheduleController::class, 'update'])  ->name('schedules.update');
         Route::delete('/schedules/{schedule}', [ScheduleController::class, 'destroy']) ->name('schedules.destroy');
 
-        // COURSES (Mata Pelajaran) — fees routes MUST be before {course} wildcard
-        Route::get('/courses/fees', [\App\Http\Controllers\Admin\CourseFeeController::class, 'index'])->name('courses.fees')->middleware('role:admin|owner');
-        Route::post('/courses/fees', [\App\Http\Controllers\Admin\CourseFeeController::class, 'store'])->name('courses.fees.store')->middleware('role:admin|owner');
-        Route::delete('/courses/fees/{fee}', [\App\Http\Controllers\Admin\CourseFeeController::class, 'destroy'])->name('courses.fees.destroy')->middleware('role:admin|owner');
-
+        // COURSES (Mata Pelajaran)
         Route::get('/courses',            [CourseController::class, 'index'])   ->name('courses.index');
         Route::post('/courses',           [CourseController::class, 'store'])   ->name('courses.store');
         Route::get('/courses/{course}',   [CourseController::class, 'show'])    ->name('courses.show');
         Route::put('/courses/{course}',   [CourseController::class, 'update'])  ->name('courses.update');
         Route::delete('/courses/{course}',[CourseController::class, 'destroy']) ->name('courses.destroy');
-        Route::post('/courses/{course}/fees', [\App\Http\Controllers\Admin\CourseFeeController::class, 'update'])->name('courses.fees.update')->middleware('role:admin|owner');
 
         // VERIFIKASI PEMBAYARAN MAPEL SISWA
         Route::get('/course-payments', [\App\Http\Controllers\Admin\CoursePaymentController::class, 'index'])->name('course-payments.index');
@@ -132,12 +127,6 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         // API untuk ambil mata pelajaran yang diambil siswa (dipakai di UI admin)
         Route::get('/students/{student}/courses',    [CertificateController::class, 'studentCourses']) ->name('students.courses');
 
-        // MODULES (Modul Belajar)
-        Route::get('/modules',             [ModuleController::class, 'index'])   ->name('modules.index');
-        Route::post('/modules',            [ModuleController::class, 'store'])   ->name('modules.store');
-        Route::get('/modules/{module}',    [ModuleController::class, 'show'])    ->name('modules.show');
-        Route::put('/modules/{module}',    [ModuleController::class, 'update'])  ->name('modules.update');
-        Route::delete('/modules/{module}', [ModuleController::class, 'destroy']) ->name('modules.destroy');
 
         // PACKAGES (Paket Belajar)
         Route::get('/packages',              [PackageController::class, 'index'])   ->name('packages.index');

@@ -110,13 +110,6 @@
             </div>
 
             <div class="row g-3">
-                <div class="col-12">
-                    <label class="form-label fw-semibold">Nama Kelas <span class="text-danger">*</span></label>
-                    <input type="text" name="nama_kelas" class="form-control @error('nama_kelas') is-invalid @enderror"
-                           placeholder="cth. Privat Matematika - Budi" value="{{ old('nama_kelas') }}" required>
-                    @error('nama_kelas')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
-
                 {{-- TOGGLE PAKET STANDAR / CUSTOM --}}
                 <div class="col-12">
                     <div class="d-flex gap-2 mb-3">
@@ -133,7 +126,7 @@
 
                     {{-- PAKET STANDAR --}}
                     <div id="standardPackage">
-                        <select name="package_id" class="form-select" onchange="onPackageChange(this)">
+                        <select name="package_id" class="form-select mb-3" onchange="onPackageChange(this)">
                             <option value="">— Pilih paket standar —</option>
                             @foreach($packages as $pk)
                                 <option value="{{ $pk->id }}"
@@ -147,39 +140,66 @@
                         </select>
                         <input type="hidden" name="package_price" id="packagePrice" value="{{ old('package_price', 0) }}">
                         <input type="hidden" name="package_name_std" id="packageNameStd" value="">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Metode Absensi <span class="text-danger">*</span></label>
+                                <select name="metode_absensi" class="form-select @error('metode_absensi') is-invalid @enderror" required>
+                                    <option value="manual"    {{ old('metode_absensi','manual')=='manual'   ?'selected':'' }}>Manual</option>
+                                    <option value="otomatis"  {{ old('metode_absensi')=='otomatis'?'selected':'' }}>Otomatis</option>
+                                </select>
+                                @error('metode_absensi')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                        </div>
                     </div>
 
                     {{-- CUSTOM PACKAGE --}}
                     <div id="customPackage" style="display:none">
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Nama Paket Custom</label>
-                                <input type="text" name="custom_package_name" class="form-control" placeholder="Nama paket..." value="{{ old('custom_package_name') }}" oninput="updateQuote()">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Harga Kesepakatan (Rp)</label>
-                                <input type="number" name="custom_package_price" class="form-control" placeholder="0" value="{{ old('custom_package_price', 0) }}" min="0" oninput="syncCustomPrice()">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Total Sesi</label>
-                                <input type="number" name="jumlah_pertemuan" class="form-control" value="{{ old('jumlah_pertemuan', 8) }}" min="1">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Masa Aktif (bulan)</label>
-                                <input type="number" name="durasi_bulan" class="form-control" value="{{ old('durasi_bulan', 3) }}" min="1">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Biaya Registrasi</label>
-                                <input type="number" name="biaya_registrasi" class="form-control" value="{{ old('biaya_registrasi', 150000) }}" min="0" oninput="updateQuote()">
-                            </div>
                             <div class="col-12">
-                                <label class="form-label fw-semibold">Mata Pelajaran</label>
+                                <label class="form-label fw-semibold">Nama Paket Custom <span class="text-danger">*</span></label>
+                                <input type="text" name="custom_package_name" class="form-control" placeholder="Misal: Paket Khusus UTBK Arif Rahman" value="{{ old('custom_package_name') }}" oninput="updateQuote()">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Kategori Tipe</label>
+                                <select name="custom_kategori" class="form-select">
+                                    <option value="academic" {{ old('custom_kategori','academic')=='academic'?'selected':'' }}>Academic (Kurikulum Sekolah)</option>
+                                    <option value="skill"    {{ old('custom_kategori')=='skill'   ?'selected':'' }}>Skill / Soft-Skill</option>
+                                    <option value="kedinasan" {{ old('custom_kategori')=='kedinasan'?'selected':'' }}>Kedinasan</option>
+                                    <option value="bahasa"  {{ old('custom_kategori')=='bahasa'  ?'selected':'' }}>Bahasa Asing</option>
+                                    <option value="komputer" {{ old('custom_kategori')=='komputer'?'selected':'' }}>Kursus Komputer</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Hubungkan Modul <span class="text-muted fw-normal">(Opsional)</span></label>
                                 <select name="course_id" class="form-select">
-                                    <option value="">— Pilih mapel (opsional) —</option>
+                                    <option value="">— Pilih Modul Master —</option>
                                     @foreach($courses as $c)
                                         <option value="{{ $c->id }}" {{ old('course_id')==$c->id?'selected':'' }}>{{ $c->nama }}</option>
                                     @endforeach
                                 </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Total Pertemuan (Sesi) <span class="text-danger">*</span></label>
+                                <input type="number" name="jumlah_pertemuan" class="form-control" value="{{ old('jumlah_pertemuan', 1) }}" min="1">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Masa Aktif Paket (Bulan) <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" name="durasi_bulan" class="form-control" value="{{ old('durasi_bulan', 3) }}" min="1">
+                                    <span class="input-group-text">bulan</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Harga Kesepakatan Paket (Deal Price) <span class="text-danger">*</span></label>
+                                <input type="number" name="custom_package_price" class="form-control" placeholder="0" value="{{ old('custom_package_price', 0) }}" min="0" oninput="syncCustomPrice()">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Biaya Registrasi Pendaftaran (Deal)</label>
+                                <input type="number" name="biaya_registrasi" class="form-control" value="{{ old('biaya_registrasi', 0) }}" min="0" oninput="updateQuote()">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Deskripsi & Catatan Kontrak</label>
+                                <textarea name="custom_deskripsi" class="form-control" rows="3" placeholder="Catatan atau deskripsi khusus paket ini…">{{ old('custom_deskripsi') }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -284,9 +304,16 @@
             </div>
 
             <div id="postpaidFields" style="display:none">
-                <div class="alert alert-info" style="font-size:13px">
-                    <i class="bi bi-info-circle me-2"></i>
-                    Tagihan akan dibuat otomatis setelah setiap sesi selesai dilaksanakan.
+                <div class="p-3 rounded-3" style="background:var(--soft-info);border:1.5px solid rgba(2,132,199,.2)">
+                    <div class="fw-semibold mb-1" style="font-size:13px;color:#0284c7">
+                        <i class="bi bi-receipt me-2"></i>Pascabayar (Per Sesi)
+                        <span class="text-muted fw-normal ms-1" style="font-size:12px">Invoice muncul harian/bulanan setelah kelas berjalan.</span>
+                    </div>
+                    <div class="mt-2 p-2 rounded-2" style="background:rgba(255,255,255,.6);font-size:12.5px;color:#374151">
+                        <strong>Informasi Pascabayar</strong><br>
+                        Tagihan awal hari ini adalah <strong>Rp 0</strong> <span class="text-muted">(Hanya Biaya Admin jika ada)</span>.
+                        Akun siswa akan otomatis aktif. Invoice sesi akan di-generate setiap guru mensubmit Jurnal Mengajar.
+                    </div>
                 </div>
             </div>
 

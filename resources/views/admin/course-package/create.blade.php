@@ -53,21 +53,14 @@
                 @error('jenis')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <label class="form-label fw-semibold">Jumlah Sesi <span class="text-danger">*</span></label>
                 <input type="number" name="jumlah_pertemuan" class="form-control @error('jumlah_pertemuan') is-invalid @enderror"
                        value="{{ old('jumlah_pertemuan', 8) }}" min="1" required>
                 @error('jumlah_pertemuan')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
 
-            <div class="col-md-4">
-                <label class="form-label fw-semibold">Durasi (bulan) <span class="text-danger">*</span></label>
-                <input type="number" name="durasi_bulan" class="form-control @error('durasi_bulan') is-invalid @enderror"
-                       value="{{ old('durasi_bulan', 3) }}" min="1" required>
-                @error('durasi_bulan')<div class="invalid-feedback">{{ $message }}</div>@enderror
-            </div>
-
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <label class="form-label fw-semibold">Harga Dasar (Rp) <span class="text-danger">*</span></label>
                 <input type="number" name="harga" class="form-control @error('harga') is-invalid @enderror"
                        value="{{ old('harga', 0) }}" min="0" required>
@@ -93,33 +86,8 @@
             </div>
 
             <div class="col-12">
-                <label class="form-label fw-semibold">Mata Pelajaran (Opsional)</label>
-                <div class="row g-2">
-                    @foreach($courses as $c)
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="course_ids[]"
-                                   value="{{ $c->id }}" id="course_{{ $c->id }}"
-                                   {{ in_array($c->id, old('course_ids', [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="course_{{ $c->id }}" style="font-size:13px">
-                                {{ $c->nama }}
-                            </label>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-
-            <div class="col-12">
                 <label class="form-label fw-semibold">Deskripsi</label>
                 <textarea name="deskripsi" class="form-control" rows="3" placeholder="Deskripsi paket belajar…">{{ old('deskripsi') }}</textarea>
-            </div>
-
-            <div class="col-md-6">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" name="is_unggulan" id="isUnggulan" value="1" {{ old('is_unggulan') ? 'checked' : '' }}>
-                    <label class="form-check-label fw-semibold" for="isUnggulan">Tandai sebagai Paket Unggulan</label>
-                </div>
             </div>
         </div>
 

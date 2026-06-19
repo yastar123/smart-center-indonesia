@@ -1,0 +1,144 @@
+di page /register itu siswa akan isi form ini saja
+
+FORMULIR PENDAFTARAN SISWA – AYO KURSUS
+DATA SISWA
+Nama Lengkap : ..........................................................
+Tempat, Tanggal Lahir : ..........................................................
+Alamat Tinggal : ..........................................................
+Nomor WA/HP : ..........................................................
+Jenjang Pendidikan (Sekolah & Kelas) / Umum : ..........................................................
+DATA ORANG TUA / WALI
+Nama Orang Tua/Wali : ..........................................................
+Nomor WA/HP Orang Tua/Wali : ..........................................................
+PROGRAM BELAJAR
+Program Belajar
+[ ] Kelas
+[ ] Privat
+Sistem Belajar
+[ ] Online (Daring)
+[ ] Offline (Tatap Muka)
+Tempat Belajar
+[ ] Belajar di Kantor
+[ ] Guru ke Rumah
+Sistem Pengambilan
+[ ] Paket
+[ ] Pertemuan / Sesi
+Jumlah Paket / Pertemuan : ..........................................................
+PROGRAM YANG DIMINATI
+KURSUS KOMPUTER
+[ ] Microsoft Office Perkantoran
+[ ] Word
+[ ] Excel
+[ ] PowerPoint
+[ ] Desain Grafis
+[ ] CorelDraw
+[ ] Photoshop
+[ ] AutoCAD
+[ ] Programmer / Coding
+KURSUS BAHASA ASING
+[ ] Bahasa Inggris
+[ ] Bahasa Arab
+[ ] Bahasa Mandarin
+[ ] Bahasa Jepang
+[ ] Bahasa Korea
+MATA PELAJARAN
+[ ] Matematika
+[ ] Kimia
+[ ] Biologi
+[ ] Bahasa Indonesia
+[ ] Fisika
+[ ] Akuntansi / Ekonomi
+[ ] Geografi
+[ ] Bahasa Inggris
+[ ] IPA
+[ ] IPS
+PROGRAM KEDINASAN
+[ ] SKD (TIU, TWK, TKP)
+[ ] TPA
+[ ] Psikotes
+[ ] TBI
+AKPOL / AKMIL / BINTARA
+[ ] Pengetahuan Umum
+[ ] Wawasan Kebangsaan
+[ ] Bahasa Indonesia
+[ ] Bahasa Inggris
+[ ] TKD
+[ ] Tes Akademik
+CPNS
+[ ] SKD (TIU, TWK, TKP)
+BUMN
+[ ] TKD
+[ ] Tes AKHLAK
+[ ] TWK
+JADWAL BELAJAR
+Hari Belajar
+[ ] Senin
+[ ] Selasa
+[ ] Rabu
+[ ] Kamis
+[ ] Jumat
+[ ] Sabtu
+[ ] Minggu
+Jam Belajar
+Fleksibel / Sesuai Kesepakatan : ..........................................................
+TANGGAL MULAI
+Tanggal Mulai Belajar : ..........................................................
+
+kemudian akan di arahkan ke whastapp dari website ini ( di tampilkan wa seluruh cababg dan pusat )
+
+di admin dashboard datanya akan terbuat di /admin/students ( email dan paswoordnya juga terbuat disitu buat sama semua email dan pw nya) yang disimpan itu hanya data ini
+Nama Lengkap : ..........................................................
+Tempat, Tanggal Lahir : ..........................................................
+Alamat Tinggal : ..........................................................
+Nomor WA/HP : ..........................................................
+Jenjang Pendidikan (Sekolah & Kelas) / Umum : ..........................................................
+DATA ORANG TUA / WALI
+Nama Orang Tua/Wali : ..........................................................
+Nomor WA/HP Orang Tua/Wali : ..........................................................
+
+hapus page dan menu /admin/courses/fees dan /admin/modules
+
+di page /admin/registration-create hapus input Nama Kelas *
+di  input nomor 2 Konfigurasi Kelas  dan tambahkan input metode absensi ( manual dan otomatis ) di menu paket standar
+
+
+di page /admin/registration-create-mockup pada input nomor 2
+Konfigurasi Kelas & Paket pada menu costom paket buat inputnya seperti ini
+
+Nama Paket Custom *
+Misal: Paket Khusus UTBK Arif Rahman
+Kategori Tipe
+
+Academic (Kurikulum Sekolah)
+Hubungkan Modul (Optional)
+
+-- Pilih Modul Master --
+Total Pertemuan (Sesi) *
+1
+Masa Aktif Paket (Bulan) *
+3
+bulan
+Harga Kesepakatan Paket (Deal Price) *
+0
+Biaya Registrasi Pendaftaran (Deal)
+0
+Deskripsi & Catatan Kontrak
+
+
+di page /admin/registration-create untuk input 
+Skema Tagihan & Aktivasi di Pascabayar menu (Per Sesi) buat seperti di bawah
+
+Pascabayar (Per Sesi)Invoice muncul harian/bulanan setelah kelas berjalan.
+Informasi Pascabayar
+Tagihan awal hari ini adalah Rp 0 (Hanya Biaya Admin jika ada). Akun siswa akan otomatis aktif. Invoice sesi akan di-generate setiap guru mensubmit Jurnal Mengajar.
+
+
+
+di page /admin/teachers saat akan crud  tambah input baru yaitu jenis guru ( kontrak dan freelance )
+
+di page /admin/subject/create hapus input kategori keterampilan
+
+hapus page dan menu /admin/courses/fees
+
+di page admin/course-package/create
+hapus input Durasi (bulan) , Mata Pelajaran (Opsional) dan Tandai sebagai Paket Unggulan

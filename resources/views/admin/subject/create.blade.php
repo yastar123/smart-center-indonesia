@@ -49,16 +49,6 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label fw-semibold">Kategori Keterampilan <span class="text-danger">*</span></label>
-                <select name="kategori" class="form-select @error('kategori') is-invalid @enderror" required>
-                    <option value="">Pilih kategori…</option>
-                    <option value="academic" {{ old('kategori')=='academic'?'selected':'' }}>Academic</option>
-                    <option value="skill"    {{ old('kategori')=='skill'   ?'selected':'' }}>Skill / Soft-Skill</option>
-                </select>
-                @error('kategori')<div class="invalid-feedback">{{ $message }}</div>@enderror
-            </div>
-
-            <div class="col-md-6">
                 <label class="form-label fw-semibold">Cabang</label>
                 <select name="cabang_id" class="form-select @error('cabang_id') is-invalid @enderror">
                     <option value="">Semua Cabang</option>

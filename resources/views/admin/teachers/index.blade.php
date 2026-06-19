@@ -306,6 +306,24 @@
                         </div>
                     </div>
 
+                    {{-- JENIS GURU --}}
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <div style="width:4px;height:20px;background:linear-gradient(#f6af23,#e09000);border-radius:4px"></div>
+                            <span class="fw-bold text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em">Jenis Guru</span>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold">Jenis Guru <span class="text-danger">*</span></label>
+                                <select name="jenis_guru" id="jenis_guru" class="form-select form-select-sm" required>
+                                    <option value="">Pilih...</option>
+                                    <option value="kontrak">Kontrak</option>
+                                    <option value="freelance">Freelance</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
                     {{-- AKUN LOGIN --}}
                     <div class="mb-4">
                         <div class="d-flex align-items-center gap-2 mb-3">
@@ -518,6 +536,7 @@ function editTeacher(id) {
             cb.checked = courseIds.includes(cb.value);
         });
         document.getElementById('address').value     = t.address     ?? '';
+        document.getElementById('jenis_guru').value  = t.jenis_guru  ?? '';
         const avatar = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(t.name) + '&background=68117e&color=fff&size=120';
         document.getElementById('photoPreview').src = t.photo ? '/storage/' + t.photo : avatar;
         new bootstrap.Modal('#teacherModal').show();

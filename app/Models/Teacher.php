@@ -14,7 +14,7 @@ class Teacher extends Model
         'user_id', 'branch_id', 'nig', 'name', 'gender',
         'birth_date', 'birth_place', 'address', 'phone',
         'email', 'photo', 'cv_path', 'subjects', 'status',
-        'join_date', 'education', 'salary_base',
+        'join_date', 'education', 'salary_base', 'jenis_guru',
     ];
 
     protected $casts = [

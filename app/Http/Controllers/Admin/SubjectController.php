@@ -54,7 +54,7 @@ class SubjectController extends Controller
         $data = $request->validate([
             'kode'      => 'required|string|max:20',
             'nama'      => 'required|string|max:100',
-            'kategori'  => 'required|in:academic,skill',
+            'kategori'  => 'nullable|in:academic,skill',
             'deskripsi' => 'nullable|string',
             'cabang_id' => 'nullable|exists:branches,id',
             'status'    => 'required|in:aktif,nonaktif',
@@ -83,7 +83,7 @@ class SubjectController extends Controller
         $data = $request->validate([
             'kode'      => 'required|string|max:20',
             'nama'      => 'required|string|max:100',
-            'kategori'  => 'required|in:academic,skill',
+            'kategori'  => 'nullable|in:academic,skill',
             'deskripsi' => 'nullable|string',
             'cabang_id' => 'nullable|exists:branches,id',
             'status'    => 'required|in:aktif,nonaktif',

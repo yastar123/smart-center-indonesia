@@ -151,14 +151,6 @@
         </li>
         @endif
 
-        @if($isOwner || in_array('module', (array)$allowedPages))
-        <li class="nav-item {{ request()->routeIs('admin.modules.*') ? 'active' : '' }}">
-            <a href="{{ route('admin.modules.index') }}" class="nav-link">
-                <i class="nav-icon bi bi-bookmark"></i>
-                <span>Modul Belajar</span>
-            </a>
-        </li>
-        @endif
 
         @if($isOwner || in_array('package', (array)$allowedPages))
         <li class="nav-item {{ request()->routeIs('admin.packages.*') ? 'active' : '' }}">
@@ -170,7 +162,7 @@
         @endif
 
         @if($isOwner || in_array('course', (array)$allowedPages))
-        <li class="nav-item {{ (request()->routeIs('admin.courses.*') && !request()->routeIs('admin.courses.fees*')) ? 'active' : '' }}">
+        <li class="nav-item {{ request()->routeIs('admin.courses.*') ? 'active' : '' }}">
             <a href="{{ route('admin.courses.index') }}" class="nav-link">
                 <i class="nav-icon bi bi-book"></i>
                 <span>Mata Pelajaran</span>
@@ -178,14 +170,6 @@
         </li>
         @endif
 
-        @if($isOwner || in_array('course_fee', (array)$allowedPages) || in_array('course', (array)$allowedPages))
-        <li class="nav-item {{ request()->routeIs('admin.courses.fees*') ? 'active' : '' }}">
-            <a href="{{ route('admin.courses.fees') }}" class="nav-link">
-                <i class="nav-icon bi bi-tag"></i>
-                <span>Biaya Mapel</span>
-            </a>
-        </li>
-        @endif
 
         @if($isOwner || in_array('class', (array)$allowedPages))
         <li class="nav-item {{ request()->routeIs('admin.classes.*') ? 'active' : '' }}">
