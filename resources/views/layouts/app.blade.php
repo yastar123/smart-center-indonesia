@@ -4340,6 +4340,13 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         { label:'Pesan Aplikasi', desc:'Chat internal', href:'{{ route("admin.messages.index") }}', icon:'bi-chat-dots', color:'#0284c7', group:'Komunikasi' },
         { label:'Video Call', desc:'Kelas virtual online', href:'{{ route("admin.videocall.index") }}', icon:'bi-camera-video', color:'#0d9488', group:'Komunikasi' },
         { label:'Tryout UTBK/PTN', desc:'Kelola soal & ujian CBT', href:'{{ route("admin.tryouts.index") }}', icon:'bi-journal-check', color:'#c84ddf', group:'Tryout CBT' },
+        { label:'Modul Akademik', desc:'Kelola modul materi pelajaran', href:'{{ route("admin.module.index") }}', icon:'bi-layers', color:'#68117e', group:'Akademik' },
+        { label:'Paket Kursus', desc:'Paket belajar & harga kursus', href:'{{ route("admin.course-package.index") }}', icon:'bi-collection', color:'#059669', group:'Akademik' },
+        { label:'Mata Pelajaran (Subject)', desc:'Kelola bidang studi', href:'{{ route("admin.subject.index") }}', icon:'bi-journal-text', color:'#10b981', group:'Akademik' },
+        { label:'Dashboard Jadwal', desc:'Pantau jadwal kelas harian', href:'{{ route("admin.schedule-dashboard.index") }}', icon:'bi-calendar3', color:'#461256', group:'Akademik' },
+        { label:'Reschedule Kelas', desc:'Kelola permohonan reschedule', href:'{{ route("admin.reschedule.index") }}', icon:'bi-arrow-repeat', color:'#68117e', group:'Akademik' },
+        { label:'Registrasi Siswa Baru', desc:'Daftarkan siswa & buat paket', href:'{{ route("admin.registration.create") }}', icon:'bi-person-plus', color:'#c84ddf', group:'Akademik' },
+        { label:'E-Billing & Invoice', desc:'Manajemen invoice & tagihan siswa', href:'{{ route("admin.billing.index") }}', icon:'bi-receipt', color:'#059669', group:'Keuangan' },
         @endrole
         @role('guru')
         { label:'Dashboard Guru', desc:'Portal guru & jadwal', href:'{{ route("guru.dashboard") }}', icon:'bi-speedometer2', color:'#c84ddf', group:'Guru' },

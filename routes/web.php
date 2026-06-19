@@ -230,6 +230,7 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         // BILLING (Manajemen E-Billing)
         Route::get('/billing',                   [BillingController::class, 'index'])   ->name('billing.index');
         Route::post('/billing',                  [BillingController::class, 'store'])   ->name('billing.store');
+        Route::get('/billing/export',            [BillingController::class, 'export'])  ->name('billing.export');
         Route::get('/billing/{billing}',         [BillingController::class, 'show'])    ->name('billing.show');
         Route::put('/billing/{billing}',         [BillingController::class, 'update'])  ->name('billing.update');
         Route::delete('/billing/{billing}',      [BillingController::class, 'destroy']) ->name('billing.destroy');

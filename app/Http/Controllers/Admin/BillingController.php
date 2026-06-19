@@ -129,4 +129,56 @@ class BillingController extends Controller
         return redirect()->route('admin.billing.index')
             ->with('success', 'Invoice berhasil dihapus.');
     }
+
+    public function export(Request $request)
+    {
+        $query = Invoice::with(['siswa', 'cabang']);
+
+        if (auth()->user()->hasRole('admin')) {
+            $query->where('cabang_id', auth()->user()->admin?->branch_id);
+        }
+        if ($s = $request->search) {
+            $query->where(function ($q) use ($s) {
+                $q->where('nomor_invoice', 'like', "%$s%")
+                  ->orWhereHas('siswa', fn($sq) => $sq->where('name', 'like', "%$s%"));
+            });
+        }
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+        if ($request->periode) {
+            $query->where('periode', $request->periode);
+        }
+
+        $invoices = $query->latest()->get();
+
+        $filename = 'billing-export-' . now()->format('Ymd-His') . '.csv';
+
+        $headers = [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($invoices) {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['No. Invoice', 'Siswa', 'Cabang', 'Deskripsi', 'Total', 'Jatuh Tempo', 'Status', 'Periode', 'Dibuat']);
+            foreach ($invoices as $inv) {
+                $statusMap = ['belum_bayar' => 'Belum Bayar', 'sebagian' => 'Sebagian', 'lunas' => 'Lunas'];
+                fputcsv($out, [
+                    $inv->nomor_invoice,
+                    $inv->siswa?->name ?? '-',
+                    $inv->cabang?->name ?? '-',
+                    $inv->deskripsi ?? '-',
+                    $inv->total,
+                    $inv->jatuh_tempo ?? '-',
+                    $statusMap[$inv->status] ?? $inv->status,
+                    $inv->periode ?? '-',
+                    $inv->created_at?->format('d/m/Y H:i') ?? '-',
+                ]);
+            }
+            fclose($out);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

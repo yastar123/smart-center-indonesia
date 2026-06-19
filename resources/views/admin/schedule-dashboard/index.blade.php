@@ -26,7 +26,7 @@
             <a href="{{ route('admin.schedules.index') }}" class="btn fw-semibold px-3" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.25);border-radius:10px;font-size:13px">
                 <i class="bi bi-list-ul me-1"></i>Kelola Daftar Kelas
             </a>
-            <a href="#createModal" data-bs-toggle="modal" class="btn fw-semibold px-3" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;font-size:13px">
+            <a href="{{ route('admin.schedule-create.index') }}" class="btn fw-semibold px-3" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;font-size:13px">
                 <i class="bi bi-plus-lg me-1"></i>Buat Jadwal Baru
             </a>
         </div>
@@ -97,7 +97,7 @@
     <i class="bi bi-calendar-x" style="font-size:48px;color:var(--text-muted)"></i>
     <h6 class="mt-3 fw-bold">Tidak ada sesi kelas pada tanggal ini</h6>
     <p class="text-muted" style="font-size:13px">{{ $date->isoFormat('dddd, D MMMM Y') }}</p>
-    <a href="#createModal" data-bs-toggle="modal" class="btn btn-primary mt-2">
+    <a href="{{ route('admin.schedule-create.index') }}" class="btn btn-primary mt-2">
         <i class="bi bi-plus-lg me-2"></i>Buat Jadwal Baru
     </a>
 </div>

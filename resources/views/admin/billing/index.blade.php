@@ -324,8 +324,8 @@ function openEditModal(id, deskripsi, total, jatuhTempo, catatan) {
 
 function exportLaporan() {
     const params = new URLSearchParams(window.location.search);
-    params.set('export', '1');
-    showToast('Fitur export sedang disiapkan.', 'info');
+    const base   = '{{ route("admin.billing.export") }}';
+    window.location.href = base + (params.toString() ? '?' + params.toString() : '');
 }
 
 document.addEventListener('keydown', function(e) {
