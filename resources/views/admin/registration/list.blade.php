@@ -149,7 +149,7 @@
                         @endif
                     </td>
                     <td class="text-center">
-                        <a href="{{ route('admin.classes.show', $r) }}" class="btn btn-sm btn-outline-primary">
+                        <a href="{{ route('admin.students.show', $r->siswa_id ?? $r->id) }}" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-eye"></i> Detail
                         </a>
                     </td>

@@ -14,6 +14,7 @@ class Schedule extends Model
 
     protected $fillable = [
         'kelas_id',
+        'paket_id',
         'guru_id',
         'cabang_id',
         'pertemuan_ke',
@@ -36,25 +37,21 @@ class Schedule extends Model
         'reminder_terkirim' => 'boolean',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | RELASI
-    |--------------------------------------------------------------------------
-    */
-
-    // Relasi ke kelas
     public function kelas()
     {
         return $this->belongsTo(SchoolClass::class, 'kelas_id');
     }
 
-    // Relasi ke guru
+    public function paket()
+    {
+        return $this->belongsTo(Package::class, 'paket_id');
+    }
+
     public function guru()
     {
         return $this->belongsTo(Teacher::class, 'guru_id');
     }
 
-    // Relasi ke cabang
     public function cabang()
     {
         return $this->belongsTo(Branch::class, 'cabang_id');
@@ -69,5 +66,4 @@ class Schedule extends Model
     {
         return $this->hasMany(AbsensiSiswa::class, 'jadwal_id');
     }
-
 }

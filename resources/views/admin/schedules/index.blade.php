@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'Jadwal Kelas')
-@section('page-title', 'Jadwal Kelas')
+@section('title', 'Jadwal Mata Pelajaran')
+@section('page-title', 'Jadwal Mata Pelajaran')
 
 @section('content')
 
@@ -15,8 +15,8 @@
                     <i class="bi bi-calendar-week-fill"></i>
                 </div>
                 <div>
-                    <h5 class="fw-bold mb-0" style="color:white">Jadwal Pertemuan Kelas</h5>
-                    <span style="font-size:12px;opacity:.8">Atur jadwal setiap pertemuan berdasarkan kelas yang sudah dibuat</span>
+                    <h5 class="fw-bold mb-0" style="color:white">Jadwal Sesi Mata Pelajaran</h5>
+                    <span style="font-size:12px;opacity:.8">Atur jadwal setiap sesi berdasarkan paket belajar yang tersedia</span>
                 </div>
             </div>
         </div>
@@ -70,7 +70,7 @@
     <form id="filterForm" method="GET" action="{{ route('admin.schedules.index') }}">
         <div class="row g-2 align-items-end">
             <div class="col-12 col-md-3">
-                <label class="form-label fw-semibold" style="font-size:12px">Cari Kelas / Topik / Ruangan</label>
+                <label class="form-label fw-semibold" style="font-size:12px">Cari Paket / Topik / Ruangan</label>
                 <div class="input-group">
                     <span class="input-group-text" style="border-radius:10px 0 0 10px;background:var(--input-bg);border-color:var(--card-border)">
                         <i class="bi bi-search text-muted"></i>
@@ -80,13 +80,13 @@
                         onchange="document.getElementById('filterForm').submit()">
                 </div>
             </div>
-            <div class="col-6 col-md-2">
-                <label class="form-label fw-semibold" style="font-size:12px">Kelas</label>
-                <select name="kelas_id" class="form-select" style="border-radius:10px"
+            <div class="col-6 col-md-3">
+                <label class="form-label fw-semibold" style="font-size:12px">Paket</label>
+                <select name="paket_id" class="form-select" style="border-radius:10px"
                     onchange="document.getElementById('filterForm').submit()">
-                    <option value="">Semua Kelas</option>
-                    @foreach($classes as $c)
-                    <option value="{{ $c->id }}" {{ request('kelas_id')==$c->id?'selected':'' }}>{{ $c->nama_kelas }}</option>
+                    <option value="">Semua Paket</option>
+                    @foreach($pakets as $p)
+                    <option value="{{ $p->id }}" {{ request('paket_id')==$p->id?'selected':'' }}>{{ $p->nama }}</option>
                     @endforeach
                 </select>
             </div>
@@ -107,19 +107,9 @@
                     style="border-radius:10px" onchange="document.getElementById('filterForm').submit()">
             </div>
             <div class="col-6 col-md-2">
-                <label class="form-label fw-semibold" style="font-size:12px">Jenis</label>
-                <select name="jenis" class="form-select" style="border-radius:10px"
-                    onchange="document.getElementById('filterForm').submit()">
-                    <option value="">Semua</option>
-                    <option value="offline" {{ request('jenis')=='offline'?'selected':'' }}>Offline</option>
-                    <option value="online"  {{ request('jenis')=='online'?'selected':'' }}>Online</option>
-                    <option value="private" {{ request('jenis')=='private'?'selected':'' }}>Private</option>
-                </select>
-            </div>
-            <div class="col-12 col-md-1">
-                @if(request()->hasAny(['search','status','kelas_id','jenis','tanggal']))
+                @if(request()->hasAny(['search','status','paket_id','tanggal']))
                 <a href="{{ route('admin.schedules.index') }}" class="btn btn-outline-secondary w-100" style="border-radius:10px" title="Reset">
-                    <i class="bi bi-x-lg"></i>
+                    <i class="bi bi-x-lg me-1"></i>Reset
                 </a>
                 @else
                 <button type="button" onclick="openModal()" class="btn btn-primary w-100 fw-semibold" style="border-radius:10px">
@@ -134,7 +124,7 @@
 {{-- TABLE --}}
 <div class="dashboard-card fade-up">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h6 class="fw-bold mb-0"><i class="bi bi-list-ul text-primary me-2"></i>Daftar Jadwal Pertemuan
+        <h6 class="fw-bold mb-0"><i class="bi bi-list-ul text-primary me-2"></i>Daftar Jadwal Sesi
             <span class="badge ms-2" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:11px">{{ $schedules->total() }} data</span>
         </h6>
     </div>
@@ -142,10 +132,10 @@
         <table class="table table-hover table-modern align-middle mb-0">
             <thead class="thead-modern">
                 <tr>
-                    <th class="ps-3">Kelas</th>
-                    <th>Pertemuan</th>
+                    <th class="ps-3">Paket</th>
+                    <th>Sesi</th>
                     <th>Tanggal &amp; Waktu</th>
-                    <th class="d-none d-md-table-cell">Jenis</th>
+                    <th class="d-none d-md-table-cell">Guru</th>
                     <th class="d-none d-lg-table-cell">Ruangan / Link</th>
                     <th>Status</th>
                     <th class="text-center">Aksi</th>
@@ -162,12 +152,13 @@
                     ];
                     $st = $statusMap[$sc->status] ?? ['bg'=>'var(--soft-muted-bg)','color'=>'var(--soft-muted-text)','label'=>$sc->status];
                     $isToday = $sc->tanggal && $sc->tanggal->isToday();
+                    $mapelNames = $sc->paket?->mataPelajaran->pluck('nama')->join(', ') ?? '–';
                 @endphp
                 <tr style="border-bottom:1px solid var(--card-border);transition:background .15s{{ $isToday ? ';background:rgba(104,17,126,.03)' : '' }}">
                     <td class="ps-3">
-                        <div class="fw-semibold" style="font-size:13px">{{ $sc->kelas?->nama_kelas ?? '–' }}</div>
+                        <div class="fw-semibold" style="font-size:13px">{{ $sc->paket?->nama ?? '–' }}</div>
                         <div class="text-muted" style="font-size:11px">
-                            <i class="bi bi-person me-1"></i>{{ $sc->kelas?->guru?->name ?? '–' }}
+                            <i class="bi bi-journal-bookmark me-1"></i>{{ $mapelNames }}
                         </div>
                     </td>
                     <td>
@@ -180,19 +171,10 @@
                             {{ $sc->tanggal ? $sc->tanggal->format('d M Y') : '–' }}
                             @if($isToday)<span class="badge ms-1" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:10px">Hari ini</span>@endif
                         </div>
-                        @if($sc->tanggal_selesai && $sc->tanggal_selesai != $sc->tanggal)
-                        <div class="text-muted" style="font-size:11px">s/d {{ $sc->tanggal_selesai->format('d M Y') }}</div>
-                        @endif
                         <div class="text-muted" style="font-size:11px"><i class="bi bi-clock me-1"></i>{{ str_replace(':', '.', substr($sc->jam_mulai ?? '', 0, 5)) ?: '–' }} – {{ str_replace(':', '.', substr($sc->jam_selesai ?? '', 0, 5)) ?: '–' }} WIB</div>
                     </td>
                     <td class="d-none d-md-table-cell">
-                        @if($sc->jenis === 'online')
-                        <span class="badge rounded-pill" style="background:var(--soft-success-bg);color:var(--soft-success-text);font-size:11px;font-weight:600"><i class="bi bi-wifi me-1"></i>Online</span>
-                        @elseif($sc->jenis === 'private')
-                        <span class="badge rounded-pill" style="background:var(--soft-warning-bg);color:var(--soft-warning-text);font-size:11px;font-weight:600"><i class="bi bi-person-lock me-1"></i>Private</span>
-                        @else
-                        <span class="badge rounded-pill" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:11px;font-weight:600"><i class="bi bi-building me-1"></i>Offline</span>
-                        @endif
+                        <div style="font-size:12.5px">{{ $sc->paket?->guru?->name ?? $sc->guru?->name ?? '–' }}</div>
                     </td>
                     <td class="d-none d-lg-table-cell text-muted" style="font-size:.82rem">
                         @if($sc->ruangan)
@@ -210,17 +192,17 @@
                         <div class="d-flex justify-content-center gap-1">
                             <button onclick="showDetail({{ $sc->id }})" class="btn btn-sm btn-act-view" title="Detail"><i class="bi bi-eye-fill"></i></button>
                             <button onclick="editSchedule({{ $sc->id }})" class="btn btn-sm btn-act-edit" title="Edit"><i class="bi bi-pencil-fill"></i></button>
-                            <button onclick="deleteSchedule({{ $sc->id }}, '{{ addslashes($sc->kelas?->nama_kelas ?? 'Jadwal ini') }}', {{ $sc->pertemuan_ke ?? 0 }})" class="btn btn-sm btn-act-del" title="Hapus"><i class="bi bi-trash-fill"></i></button>
+                            <button onclick="deleteSchedule({{ $sc->id }}, '{{ addslashes($sc->paket?->nama ?? 'Jadwal ini') }}', {{ $sc->pertemuan_ke ?? 0 }})" class="btn btn-sm btn-act-del" title="Hapus"><i class="bi bi-trash-fill"></i></button>
                         </div>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="text-center py-5">
+                    <td colspan="7" class="text-center py-5">
                         <div class="text-muted">
                             <i class="bi bi-calendar-x" style="font-size:40px;display:block;margin-bottom:12px;opacity:.4"></i>
-                            <div class="fw-semibold mb-1">Belum ada jadwal pertemuan</div>
-                            <div style="font-size:12px">Klik "Tambah Jadwal" untuk menjadwalkan pertemuan kelas</div>
+                            <div class="fw-semibold mb-1">Belum ada jadwal sesi</div>
+                            <div style="font-size:12px">Klik "Tambah Jadwal" untuk menjadwalkan sesi belajar</div>
                         </div>
                     </td>
                 </tr>
@@ -238,61 +220,51 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg" style="border-radius:18px;overflow:hidden">
             <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#461256,#68117e);color:#fff">
-                <h6 class="modal-title fw-bold" id="modalTitle"><i class="bi bi-calendar-plus me-2"></i>Tambah Jadwal Pertemuan</h6>
+                <h6 class="modal-title fw-bold" id="modalTitle"><i class="bi bi-calendar-plus me-2"></i>Tambah Jadwal Sesi</h6>
                 <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-4" style="background:var(--input-bg)">
                 <input type="hidden" id="scheduleId">
 
-                {{-- INFO KELAS --}}
-                <div class="mb-3 p-3 rounded-3" id="classInfoBox" style="background:var(--soft-primary-bg);border:1.5px solid var(--soft-primary-border);display:none">
+                {{-- INFO PAKET --}}
+                <div class="mb-3 p-3 rounded-3" id="paketInfoBox" style="background:var(--soft-primary-bg);border:1.5px solid var(--soft-primary-border);display:none">
                     <div class="d-flex gap-3 align-items-center">
-                        <div style="width:40px;height:40px;border-radius:10px;background:var(--primary);display:flex;align-items:center;justify-content:center;color:white;flex-shrink:0"><i class="bi bi-building-fill"></i></div>
+                        <div style="width:40px;height:40px;border-radius:10px;background:var(--primary);display:flex;align-items:center;justify-content:center;color:white;flex-shrink:0"><i class="bi bi-box-seam"></i></div>
                         <div style="flex:1">
-                            <div class="fw-bold" id="classInfoName" style="font-size:14px;color:var(--soft-primary-text)"></div>
-                            <div style="font-size:12px;color:var(--text-muted)" id="classInfoMeta"></div>
+                            <div class="fw-bold" id="paketInfoName" style="font-size:14px;color:var(--soft-primary-text)"></div>
+                            <div style="font-size:12px;color:var(--text-muted)" id="paketInfoMeta"></div>
                         </div>
-                        <div id="classInfoProgress" style="text-align:right">
-                            <div style="font-size:12px;color:var(--text-muted)">Pertemuan terjadwal</div>
-                            <div class="fw-bold" id="classInfoCount" style="font-size:15px;color:var(--soft-primary-text)">– / –</div>
+                        <div id="paketInfoProgress" style="text-align:right">
+                            <div style="font-size:12px;color:var(--text-muted)">Sesi terjadwal</div>
+                            <div class="fw-bold" id="paketInfoCount" style="font-size:15px;color:var(--soft-primary-text)">– / –</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="row g-3">
                     <div class="col-12">
-                        <label class="form-label fw-semibold" style="font-size:12px">Kelas <span class="text-danger">*</span></label>
-                        <select id="kelas_id" class="form-select" onchange="onKelasChange(this.value)">
-                            <option value="">— Pilih Kelas —</option>
-                            @foreach($classes as $c)
-                            <option value="{{ $c->id }}"
-                                data-nama="{{ $c->nama_kelas }}"
-                                data-guru="{{ $c->guru?->name ?? '–' }}"
-                                data-cabang="{{ $c->cabang?->name ?? '–' }}"
-                                data-mapel="{{ $c->mataPelajaran?->nama ?? '–' }}"
-                                data-jenis="{{ $c->jenis }}"
-                                data-jumlah="{{ $c->jumlah_pertemuan }}"
-                                data-link="{{ $c->link_zoom ?? '' }}">
-                                {{ $c->nama_kelas }} — {{ $c->mataPelajaran?->nama ?? '' }} ({{ $c->guru?->name ?? 'belum ada guru' }})
+                        <label class="form-label fw-semibold" style="font-size:12px">Paket Belajar <span class="text-danger">*</span></label>
+                        <select id="paket_id" class="form-select" onchange="onPaketChange(this.value)">
+                            <option value="">— Pilih Paket —</option>
+                            @foreach($pakets as $p)
+                            <option value="{{ $p->id }}"
+                                data-nama="{{ $p->nama }}"
+                                data-guru="{{ $p->guru?->name ?? '–' }}"
+                                data-mapel="{{ $p->mataPelajaran->pluck('nama')->join(', ') ?: '–' }}"
+                                data-jenis="{{ $p->jenis }}"
+                                data-jumlah="{{ $p->jumlah_pertemuan }}">
+                                {{ $p->nama }} — {{ $p->mataPelajaran->pluck('nama')->join(', ') ?: '–' }} — {{ $p->guru?->name ?? 'belum ada guru' }} — {{ ucfirst($p->jenis) }}
                             </option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold" style="font-size:12px">Pertemuan Ke <span class="text-danger">*</span></label>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:12px">Sesi Ke <span class="text-danger">*</span></label>
                         <select id="pertemuan_ke" class="form-select">
-                            <option value="">— Pilih dulu kelas —</option>
+                            <option value="">— Pilih dulu paket —</option>
                         </select>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold" style="font-size:12px">Jenis <span class="text-danger">*</span></label>
-                        <select id="jenis" class="form-select" onchange="toggleJenis()">
-                            <option value="offline">📍 Offline</option>
-                            <option value="online">🌐 Online</option>
-                            <option value="private">🔒 Private</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4" id="statusScWrap" style="display:none">
+                    <div class="col-md-6" id="statusScWrap" style="display:none">
                         <label class="form-label fw-semibold" style="font-size:12px">Status</label>
                         <select id="sc_status" class="form-select">
                             <option value="dijadwalkan">Dijadwalkan</option>
@@ -305,7 +277,6 @@
                         <label class="form-label fw-semibold" style="font-size:12px">Tanggal Mulai <span class="text-danger">*</span></label>
                         <input type="date" id="tanggal" class="form-control" style="border-radius:10px">
                     </div>
-                    {{-- Tanggal Selesai dihapus sesuai permintaan --}}
                     <div class="col-md-6">
                         <label class="form-label fw-semibold" style="font-size:12px">Jam Mulai <span class="text-danger">*</span></label>
                         <input type="text" id="jam_mulai" class="form-control flatpickr-time-input" placeholder="13:30" autocomplete="off" style="border-radius:10px">
@@ -314,12 +285,12 @@
                         <label class="form-label fw-semibold" style="font-size:12px">Jam Selesai <span class="text-danger">*</span></label>
                         <input type="text" id="jam_selesai" class="form-control flatpickr-time-input" placeholder="15:00" autocomplete="off" style="border-radius:10px">
                     </div>
-                    <div class="col-12" id="ruanganField">
+                    <div class="col-md-6">
                         <label class="form-label fw-semibold" style="font-size:12px">Ruangan <span class="text-muted">(opsional)</span></label>
                         <input type="text" id="ruangan" class="form-control" placeholder="cth: Ruang A1, Lab Komputer..." style="border-radius:10px">
                     </div>
-                    <div class="col-12" id="linkField" style="display:none">
-                        <label class="form-label fw-semibold" style="font-size:12px">Link Meeting</label>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold" style="font-size:12px">Link Meeting <span class="text-muted">(opsional, untuk sesi online)</span></label>
                         <input type="text" id="link_meeting" class="form-control" placeholder="https://meet.google.com/..." style="border-radius:10px">
                     </div>
                 </div>
@@ -337,7 +308,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="border-radius:18px;overflow:hidden">
             <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#461256,#68117e);color:#fff">
-                <h6 class="modal-title fw-bold"><i class="bi bi-calendar-event me-2"></i>Detail Jadwal Pertemuan</h6>
+                <h6 class="modal-title fw-bold"><i class="bi bi-calendar-event me-2"></i>Detail Jadwal Sesi</h6>
                 <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-0" id="detailBody">
@@ -353,7 +324,6 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-// Initialize 24-hour time pickers
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.flatpickr-time-input').forEach(function(el) {
         flatpickr(el, {
@@ -371,105 +341,84 @@ function fmtWib(t) {
     return t.substr(0,5).replace(':', '.') + ' WIB';
 }
 
-// Cache kelas data dari server
-const kelasData = {};
-@foreach($classes as $c)
-kelasData[{{ $c->id }}] = {
-    nama: @json($c->nama_kelas),
-    guru: @json($c->guru?->name ?? '–'),
-    cabang: @json($c->cabang?->name ?? '–'),
-    mapel: @json($c->mataPelajaran?->nama ?? '–'),
-    jenis: @json($c->jenis),
-    jumlah: {{ $c->jumlah_pertemuan }},
-    link: @json($c->link_zoom ?? '')
+const paketData = {};
+@foreach($pakets as $p)
+paketData[{{ $p->id }}] = {
+    nama:   @json($p->nama),
+    guru:   @json($p->guru?->name ?? '–'),
+    mapel:  @json($p->mataPelajaran->pluck('nama')->join(', ') ?: '–'),
+    jenis:  @json($p->jenis),
+    jumlah: {{ $p->jumlah_pertemuan }},
 };
 @endforeach
 
-function toggleJenis() {
-    const jenis = document.getElementById('jenis').value;
-    document.getElementById('ruanganField').style.display = (jenis === 'offline' || jenis === 'private') ? 'block' : 'none';
-    document.getElementById('linkField').style.display    = jenis === 'online' ? 'block' : 'none';
-}
-
-function onKelasChange(kelasId, currentPertemuan) {
-    const box = document.getElementById('classInfoBox');
+function onPaketChange(paketId, currentSesi) {
+    const box = document.getElementById('paketInfoBox');
     const sel = document.getElementById('pertemuan_ke');
 
-    if (!kelasId) {
+    if (!paketId) {
         box.style.display = 'none';
-        sel.innerHTML = '<option value="">— Pilih dulu kelas —</option>';
+        sel.innerHTML = '<option value="">— Pilih dulu paket —</option>';
         return;
     }
 
-    const k = kelasData[kelasId];
-    if (!k) return;
+    const p = paketData[paketId];
+    if (!p) return;
 
-    // Info box
-    document.getElementById('classInfoName').textContent = k.nama + ' — ' + k.mapel;
-    document.getElementById('classInfoMeta').textContent = 'Guru: ' + k.guru + ' | Cabang: ' + k.cabang + ' | Jenis: ' + k.jenis;
+    document.getElementById('paketInfoName').textContent = p.nama + ' — ' + p.mapel;
+    document.getElementById('paketInfoMeta').textContent = 'Guru: ' + p.guru + ' | Jenis: ' + p.jenis;
     box.style.display = 'block';
 
-    // Jenis sesuai kelas
-    document.getElementById('jenis').value = k.jenis;
-    toggleJenis();
-
-    // Link from kelas (for online)
-    if (k.link) document.getElementById('link_meeting').value = k.link;
-
-    // Load already scheduled pertemuan for this class
-    fetch(`/admin/schedules?kelas_id=${kelasId}&all=1`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+    fetch(`/admin/schedules?paket_id=${paketId}&all=1`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
             const used = (data.data || []).map(s => s.pertemuan_ke);
-            document.getElementById('classInfoCount').textContent = used.length + ' / ' + k.jumlah;
+            document.getElementById('paketInfoCount').textContent = used.length + ' / ' + p.jumlah;
 
             sel.innerHTML = '';
-            for (let i = 1; i <= k.jumlah; i++) {
+            for (let i = 1; i <= p.jumlah; i++) {
                 const opt = document.createElement('option');
                 opt.value = i;
-                const alreadyScheduled = used.includes(i) && i !== Number(currentPertemuan);
-                opt.textContent = 'Pertemuan ke-' + i + (alreadyScheduled ? ' (sudah dijadwalkan)' : '');
+                const alreadyScheduled = used.includes(i) && i !== Number(currentSesi);
+                opt.textContent = 'Sesi ke-' + i + (alreadyScheduled ? ' (sudah dijadwalkan)' : '');
                 if (alreadyScheduled) opt.style.color = 'var(--text-muted)';
-                if (i === Number(currentPertemuan)) opt.selected = true;
+                if (i === Number(currentSesi)) opt.selected = true;
                 sel.appendChild(opt);
             }
         })
         .catch(() => {
             sel.innerHTML = '';
-            for (let i = 1; i <= k.jumlah; i++) {
+            for (let i = 1; i <= p.jumlah; i++) {
                 const opt = document.createElement('option');
                 opt.value = i;
-                opt.textContent = 'Pertemuan ke-' + i;
-                if (i === Number(currentPertemuan)) opt.selected = true;
+                opt.textContent = 'Sesi ke-' + i;
+                if (i === Number(currentSesi)) opt.selected = true;
                 sel.appendChild(opt);
             }
         });
 }
 
 function openModal() {
-    document.getElementById('scheduleId').value = '';
-    document.getElementById('modalTitle').innerHTML = '<i class="bi bi-calendar-plus me-2"></i>Tambah Jadwal Pertemuan';
-    document.getElementById('kelas_id').value   = '';
-    document.getElementById('pertemuan_ke').innerHTML = '<option value="">— Pilih dulu kelas —</option>';
-    document.getElementById('jenis').value      = 'offline';
-    document.getElementById('tanggal').value    = '';
-    document.getElementById('jam_mulai').value  = '';
-    document.getElementById('jam_selesai').value= '';
-    document.getElementById('ruangan').value    = '';
-    document.getElementById('link_meeting').value = '';
-    document.getElementById('classInfoBox').style.display = 'none';
-    document.getElementById('statusScWrap').style.display = 'none';
-    toggleJenis();
+    document.getElementById('scheduleId').value    = '';
+    document.getElementById('modalTitle').innerHTML= '<i class="bi bi-calendar-plus me-2"></i>Tambah Jadwal Sesi';
+    document.getElementById('paket_id').value      = '';
+    document.getElementById('pertemuan_ke').innerHTML = '<option value="">— Pilih dulu paket —</option>';
+    document.getElementById('tanggal').value       = '';
+    document.getElementById('jam_mulai').value     = '';
+    document.getElementById('jam_selesai').value   = '';
+    document.getElementById('ruangan').value       = '';
+    document.getElementById('link_meeting').value  = '';
+    document.getElementById('paketInfoBox').style.display  = 'none';
+    document.getElementById('statusScWrap').style.display  = 'none';
     new bootstrap.Modal('#scheduleModal').show();
 }
 
 function editSchedule(id) {
     $.get('/admin/schedules/' + id, function(res) {
         const s = res.data;
-        document.getElementById('modalTitle').innerHTML = '<i class="bi bi-pencil me-2"></i>Edit Jadwal Pertemuan';
+        document.getElementById('modalTitle').innerHTML = '<i class="bi bi-pencil me-2"></i>Edit Jadwal Sesi';
         document.getElementById('scheduleId').value    = s.id;
-        document.getElementById('kelas_id').value      = s.kelas_id ?? '';
-        document.getElementById('jenis').value         = s.jenis ?? 'offline';
+        document.getElementById('paket_id').value      = s.paket_id ?? '';
         document.getElementById('tanggal').value       = s.tanggal ? s.tanggal.substr(0,10) : '';
         document.getElementById('jam_mulai').value     = s.jam_mulai ? s.jam_mulai.substr(0,5) : '';
         document.getElementById('jam_selesai').value   = s.jam_selesai ? s.jam_selesai.substr(0,5) : '';
@@ -477,29 +426,32 @@ function editSchedule(id) {
         document.getElementById('link_meeting').value  = s.link_meeting ?? '';
         document.getElementById('sc_status').value     = s.status ?? 'dijadwalkan';
         document.getElementById('statusScWrap').style.display = 'block';
-        toggleJenis();
-        onKelasChange(s.kelas_id, s.pertemuan_ke);
+        onPaketChange(s.paket_id, s.pertemuan_ke);
         new bootstrap.Modal('#scheduleModal').show();
     }).fail(() => showToast('Tidak dapat memuat data jadwal.', 'error'));
 }
 
 function saveSchedule() {
-    const id  = document.getElementById('scheduleId').value;
-    const url = id ? '/admin/schedules/' + id : '{{ route("admin.schedules.store") }}';
+    const id     = document.getElementById('scheduleId').value;
+    const url    = id ? '/admin/schedules/' + id : '{{ route("admin.schedules.store") }}';
+    const paketId = document.getElementById('paket_id').value;
+    const sesiKe  = document.getElementById('pertemuan_ke').value;
+    const tgl     = document.getElementById('tanggal').value;
+    const jMulai  = document.getElementById('jam_mulai').value;
+    const jSelesai= document.getElementById('jam_selesai').value;
 
-    if (!document.getElementById('kelas_id').value) { showToast('Pilih kelas terlebih dahulu.', 'warning'); return; }
-    if (!document.getElementById('pertemuan_ke').value) { showToast('Pilih pertemuan ke berapa.', 'warning'); return; }
-    if (!document.getElementById('tanggal').value) { showToast('Tanggal wajib diisi.', 'warning'); return; }
-    if (!document.getElementById('jam_mulai').value || !document.getElementById('jam_selesai').value) { showToast('Jam mulai dan selesai wajib diisi.', 'warning'); return; }
+    if (!paketId)  { showToast('Pilih paket belajar terlebih dahulu.', 'warning'); return; }
+    if (!sesiKe)   { showToast('Pilih sesi ke berapa.', 'warning'); return; }
+    if (!tgl)      { showToast('Tanggal wajib diisi.', 'warning'); return; }
+    if (!jMulai || !jSelesai) { showToast('Jam mulai dan selesai wajib diisi.', 'warning'); return; }
 
     const payload = {
         _token:       document.querySelector('meta[name=csrf-token]').content,
-        kelas_id:     document.getElementById('kelas_id').value,
-        pertemuan_ke: document.getElementById('pertemuan_ke').value,
-        jenis:        document.getElementById('jenis').value,
-        tanggal:      document.getElementById('tanggal').value,
-        jam_mulai:    document.getElementById('jam_mulai').value,
-        jam_selesai:  document.getElementById('jam_selesai').value,
+        paket_id:     paketId,
+        pertemuan_ke: sesiKe,
+        tanggal:      tgl,
+        jam_mulai:    jMulai,
+        jam_selesai:  jSelesai,
         ruangan:      document.getElementById('ruangan').value || null,
         link_meeting: document.getElementById('link_meeting').value || null,
     };
@@ -542,25 +494,23 @@ function showDetail(id) {
         };
         const [sbg,scol,slbl] = (statusMap[s.status]||'rgba(148,163,184,.15):#64748b:'+s.status).split(':');
         const tgl = s.tanggal ? s.tanggal.substr(0,10) : '–';
-        const tglSelesai = s.tanggal_selesai && s.tanggal_selesai !== s.tanggal ? ' s/d ' + s.tanggal_selesai.substr(0,10) : '';
+        const mapelNames = s.paket?.mata_pelajaran?.map(m => m.nama).join(', ') ?? '–';
         document.getElementById('detailBody').innerHTML = `
             <div style="padding:20px">
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
-                        <div class="fw-bold" style="font-size:15px">${s.kelas?.nama_kelas ?? 'Kelas'} — Pertemuan ke-${s.pertemuan_ke ?? '?'}</div>
-                        <div style="font-size:12px;color:var(--text-muted)">${tgl}${tglSelesai} · ${fmtWib(s.jam_mulai)} – ${fmtWib(s.jam_selesai)}</div>
+                        <div class="fw-bold" style="font-size:15px">${s.paket?.nama ?? 'Paket'} — Sesi ke-${s.pertemuan_ke ?? '?'}</div>
+                        <div style="font-size:12px;color:var(--text-muted)">${tgl} · ${fmtWib(s.jam_mulai)} – ${fmtWib(s.jam_selesai)}</div>
                     </div>
                     <span style="background:${sbg};color:${scol};padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600">${slbl}</span>
                 </div>
                 <table style="width:100%;border-collapse:collapse;font-size:13px">
-                    ${drow('Kelas', s.kelas?.nama_kelas ?? '–')}
-                    ${drow('Guru', s.kelas?.guru?.name ?? '–')}
-                    ${drow('Mata Pelajaran', s.kelas?.mata_pelajaran?.nama ?? '–')}
-                    ${drow('Cabang', s.kelas?.cabang?.name ?? '–')}
-                    ${drow('Jenis', s.jenis === 'online' ? '🌐 Online' : (s.jenis === 'private' ? '🔒 Private' : '📍 Offline'))}
-                    ${s.jenis === 'online'
-                        ? drow('Link Meeting', s.link_meeting ? '<a href="'+s.link_meeting+'" target="_blank">Buka Link</a>' : '–')
-                        : drow('Ruangan', s.ruangan || '–')}
+                    ${drow('Paket', s.paket?.nama ?? '–')}
+                    ${drow('Mata Pelajaran', mapelNames)}
+                    ${drow('Guru', s.paket?.guru?.name ?? s.guru?.name ?? '–')}
+                    ${drow('Cabang', s.paket?.cabang?.name ?? s.cabang?.name ?? '–')}
+                    ${drow('Jenis', s.paket?.jenis ? (s.paket.jenis.charAt(0).toUpperCase() + s.paket.jenis.slice(1)) : '–')}
+                    ${s.link_meeting ? drow('Link Meeting', '<a href="'+s.link_meeting+'" target="_blank">Buka Link</a>') : drow('Ruangan', s.ruangan || '–')}
                 </table>
             </div>
         `;
@@ -574,8 +524,8 @@ function drow(label, val) {
     </tr>`;
 }
 
-function deleteSchedule(id, kelas, pertemuan) {
-    confirmAction(`Hapus jadwal pertemuan ke-${pertemuan} kelas "${kelas}"?`, function() {
+function deleteSchedule(id, paket, sesi) {
+    confirmAction(`Hapus jadwal sesi ke-${sesi} dari paket "${paket}"?`, function() {
         $.post('/admin/schedules/' + id, {
             _method: 'DELETE',
             _token:  document.querySelector('meta[name=csrf-token]').content

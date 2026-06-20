@@ -14,6 +14,7 @@ class Package extends Model
 
     protected $fillable = [
         'cabang_id',
+        'guru_id',
         'nama',
         'deskripsi',
         'harga',
@@ -31,19 +32,16 @@ class Package extends Model
         'harga' => 'decimal:2',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | RELASI
-    |--------------------------------------------------------------------------
-    */
-
-    // Relasi ke cabang
     public function cabang()
     {
         return $this->belongsTo(Branch::class, 'cabang_id');
     }
 
-    // Relasi ke mata pelajaran
+    public function guru()
+    {
+        return $this->belongsTo(Teacher::class, 'guru_id');
+    }
+
     public function mataPelajaran()
     {
         return $this->belongsToMany(
@@ -54,7 +52,6 @@ class Package extends Model
         );
     }
 
-    // Relasi ke siswa
     public function siswa()
     {
         return $this->hasMany(Student::class, 'package_id');

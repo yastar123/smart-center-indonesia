@@ -3285,9 +3285,9 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.classes.index') }}" class="nav-link {{ request()->routeIs('admin.classes.*') ? 'active' : '' }}" data-label="Kelas">
-                <i class="bi bi-diagram-3"></i>
-                <span>Kelas</span>
+            <a href="{{ route('admin.attendance.index') }}" class="nav-link {{ request()->routeIs('admin.attendance.*') ? 'active' : '' }}" data-label="Absensi">
+                <i class="bi bi-clipboard2-check"></i>
+                <span>Absensi</span>
             </a>
         </div>
         <div class="nav-item">
@@ -4317,7 +4317,7 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         { label:'Data Guru', desc:'Kelola guru & pengajar', href:'{{ route("admin.teachers.index") }}', icon:'bi-person-workspace', color:'#10b981', group:'Akademik' },
         { label:'Paket Belajar', desc:'Atur paket & harga', href:'{{ route("admin.packages.index") }}', icon:'bi-box-seam', color:'#059669', group:'Akademik' },
         { label:'Mata Pelajaran', desc:'Kelola mapel', href:'{{ route("admin.courses.index") }}', icon:'bi-journal-bookmark', color:'#10b981', group:'Akademik' },
-        { label:'Kelas', desc:'Manajemen kelas belajar', href:'{{ route("admin.classes.index") }}', icon:'bi-diagram-3', color:'#68117e', group:'Akademik' },
+        { label:'Absensi', desc:'Kelola absensi siswa per sesi', href:'{{ route("admin.attendance.index") }}', icon:'bi-clipboard2-check', color:'#461256', group:'Akademik' },
         { label:'Jadwal', desc:'Jadwal mengajar & sesi', href:'{{ route("admin.schedules.index") }}', icon:'bi-calendar-week', color:'#461256', group:'Akademik' },
         { label:'Sertifikat', desc:'Terbitkan sertifikat siswa', href:'{{ route("admin.certificates.index") }}', icon:'bi-award', color:'#f6af23', group:'Akademik' },
         { label:'Pembayaran', desc:'Invoice & tagihan siswa', href:'{{ route("admin.payments.index") }}', icon:'bi-wallet2', color:'#059669', group:'Keuangan' },

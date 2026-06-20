@@ -280,18 +280,6 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label small fw-semibold">Mata Pelajaran <span class="text-danger">*</span></label>
-                                <div id="course_ids" class="p-2 rounded-3" style="background:var(--input-bg);border:1.5px solid var(--card-border);max-height:170px;overflow:auto">
-                                    @foreach($courses as $course)
-                                    <div class="form-check mb-1">
-                                        <input class="form-check-input course-checkbox" type="checkbox" name="course_ids[]" value="{{ $course->id }}" id="course{{ $course->id }}">
-                                        <label class="form-check-label small" for="course{{ $course->id }}">{{ $course->kode }} — {{ $course->nama }}</label>
-                                    </div>
-                                    @endforeach
-                                </div>
-                                <div class="text-muted mt-1" style="font-size:11px">Centang satu atau lebih mata pelajaran yang bisa diajar guru.</div>
-                            </div>
-                            <div class="col-md-6">
                                 <label class="form-label small fw-semibold">No. HP</label>
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text">+62</span>
@@ -531,10 +519,6 @@ function editTeacher(id) {
             ? `<a href="/storage/${t.cv_path}" target="_blank" class="text-decoration-none">Lihat CV saat ini</a>`
             : '';
         document.getElementById('education').value   = t.education   ?? '';
-        const courseIds = (t.courses || []).map(c => String(c.id));
-        document.querySelectorAll('.course-checkbox').forEach(cb => {
-            cb.checked = courseIds.includes(cb.value);
-        });
         document.getElementById('address').value     = t.address     ?? '';
         document.getElementById('jenis_guru').value  = t.jenis_guru  ?? '';
         const avatar = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(t.name) + '&background=68117e&color=fff&size=120';
@@ -552,11 +536,6 @@ function saveTeacher() {
         form.reportValidity();
         return;
     }
-    if (!document.querySelector('.course-checkbox:checked')) {
-        showToast('Pilih minimal satu mata pelajaran untuk guru.', 'warning');
-        return;
-    }
-
     const id  = document.getElementById('teacherId').value;
     const url = id ? '/admin/teachers/' + id : '{{ route("admin.teachers.store") }}';
     const fd  = new FormData(form);

@@ -7,7 +7,6 @@ use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Admin\CourseController;
-use App\Http\Controllers\Admin\SchoolClassController;
 use App\Http\Controllers\Admin\CertificateController;
 use App\Http\Controllers\Admin\ModuleController;
 use App\Http\Controllers\Admin\PackageController;
@@ -110,13 +109,11 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::put('/categories/{category}',   [\App\Http\Controllers\Admin\CategoryController::class, 'update'])->name('categories.update');
         Route::delete('/categories/{category}',[\App\Http\Controllers\Admin\CategoryController::class, 'destroy'])->name('categories.destroy');
 
-        // CLASSES (Kelas)
-        Route::get('/classes',                        [SchoolClassController::class, 'index'])           ->name('classes.index');
-        Route::post('/classes',                       [SchoolClassController::class, 'store'])           ->name('classes.store');
-        Route::get('/classes/{class}',                [SchoolClassController::class, 'show'])            ->name('classes.show');
-        Route::put('/classes/{class}',                [SchoolClassController::class, 'update'])          ->name('classes.update');
-        Route::delete('/classes/{class}',             [SchoolClassController::class, 'destroy'])         ->name('classes.destroy');
-        Route::get('/teachers/{teacher}/courses',     [SchoolClassController::class, 'getTeacherCourses'])->name('teachers.courses');
+        // ATTENDANCE ADMIN (Manajemen Absensi)
+        Route::get('/attendance',                         [\App\Http\Controllers\Admin\AdminAttendanceController::class, 'index'])      ->name('attendance.index');
+        Route::get('/attendance/{schedule}',              [\App\Http\Controllers\Admin\AdminAttendanceController::class, 'show'])       ->name('attendance.show');
+        Route::put('/attendance/{absensi}',               [\App\Http\Controllers\Admin\AdminAttendanceController::class, 'update'])     ->name('attendance.update');
+        Route::post('/attendance/{schedule}/bulk',        [\App\Http\Controllers\Admin\AdminAttendanceController::class, 'bulkUpdate']) ->name('attendance.bulk');
 
         // CERTIFICATES (Sertifikat)
         Route::get('/certificates',                  [CertificateController::class, 'index'])   ->name('certificates.index');

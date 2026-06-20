@@ -172,10 +172,10 @@
 
 
         @if($isOwner || in_array('class', (array)$allowedPages))
-        <li class="nav-item {{ request()->routeIs('admin.classes.*') ? 'active' : '' }}">
-            <a href="{{ route('admin.classes.index') }}" class="nav-link">
-                <i class="nav-icon bi bi-grid-3x3-gap"></i>
-                <span>Kelas</span>
+        <li class="nav-item {{ request()->routeIs('admin.attendance.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.attendance.index') }}" class="nav-link">
+                <i class="nav-icon bi bi-clipboard2-check"></i>
+                <span>Absensi</span>
             </a>
         </li>
         @endif

@@ -13,14 +13,14 @@
     </ol>
 </nav>
 
-<div class="dashboard-card" style="max-width:750px;margin:0 auto">
+<div class="dashboard-card" style="max-width:780px;margin:0 auto">
     <div class="d-flex align-items-center gap-3 mb-4">
         <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#461256,#c84ddf);display:flex;align-items:center;justify-content:center;color:white;font-size:22px;flex-shrink:0">
             <i class="bi bi-plus-circle"></i>
         </div>
         <div>
             <h5 class="fw-bold mb-0">Tambah Paket Belajar Baru</h5>
-            <p class="text-muted mb-0" style="font-size:13px">Konfigurasi paket kursus, harga, dan mata pelajaran</p>
+            <p class="text-muted mb-0" style="font-size:13px">Konfigurasi paket kursus, harga, mata pelajaran, dan guru pengampu</p>
         </div>
     </div>
 
@@ -43,7 +43,7 @@
 
             <div class="col-md-6">
                 <label class="form-label fw-semibold">Jenis Paket <span class="text-danger">*</span></label>
-                <select name="jenis" class="form-select @error('jenis') is-invalid @enderror" required id="jenisSelect" onchange="toggleKapasitas()">
+                <select name="jenis" class="form-select @error('jenis') is-invalid @enderror" required id="jenisSelect">
                     <option value="">Pilih jenis…</option>
                     <option value="reguler"  {{ old('jenis')=='reguler' ?'selected':'' }}>Reguler</option>
                     <option value="intensif" {{ old('jenis')=='intensif'?'selected':'' }}>Intensif</option>
@@ -68,6 +68,17 @@
             </div>
 
             <div class="col-md-6">
+                <label class="form-label fw-semibold">Guru Pengampu</label>
+                <select name="guru_id" class="form-select @error('guru_id') is-invalid @enderror">
+                    <option value="">— Pilih Guru —</option>
+                    @foreach($teachers as $t)
+                        <option value="{{ $t->id }}" {{ old('guru_id')==$t->id?'selected':'' }}>{{ $t->name }}</option>
+                    @endforeach
+                </select>
+                @error('guru_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </div>
+
+            <div class="col-md-6">
                 <label class="form-label fw-semibold">Cabang</label>
                 <select name="cabang_id" class="form-select">
                     <option value="">Semua Cabang</option>
@@ -83,6 +94,30 @@
                     <option value="aktif"    {{ old('status','aktif')=='aktif'   ?'selected':'' }}>Aktif</option>
                     <option value="nonaktif" {{ old('status')=='nonaktif'?'selected':'' }}>Draft</option>
                 </select>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label fw-semibold">Mata Pelajaran</label>
+                <div class="p-3 rounded-3" style="background:var(--input-bg);border:1.5px solid var(--card-border)">
+                    <div class="row g-2">
+                        @foreach($courses as $c)
+                        <div class="col-6 col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="course_ids[]"
+                                       value="{{ $c->id }}" id="cp_course_{{ $c->id }}"
+                                       {{ in_array($c->id, old('course_ids', [])) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="cp_course_{{ $c->id }}" style="font-size:13px">
+                                    {{ $c->nama }}
+                                </label>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    @if($courses->isEmpty())
+                        <div class="text-muted" style="font-size:13px">Belum ada mata pelajaran aktif.</div>
+                    @endif
+                </div>
+                <div class="text-muted mt-1" style="font-size:11px">Centang satu atau lebih mata pelajaran yang termasuk dalam paket ini.</div>
             </div>
 
             <div class="col-12">
@@ -103,14 +138,4 @@
 </div>
 
 </div>
-@push('scripts')
-<script>
-function toggleKapasitas() {
-    const jenis = document.getElementById('jenisSelect').value;
-    const wrap = document.getElementById('kapasitasWrap');
-    wrap.style.display = jenis === 'privat' ? 'none' : '';
-}
-toggleKapasitas();
-</script>
-@endpush
 @endsection

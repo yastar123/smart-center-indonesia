@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Package;
 use App\Models\Branch;
 use App\Models\Course;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
 
 class CoursePackageController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Package::with(['cabang', 'mataPelajaran']);
+        $query = Package::with(['cabang', 'mataPelajaran', 'guru']);
 
         if ($s = $request->search) {
             $query->where('nama', 'like', "%$s%");
@@ -44,7 +45,8 @@ class CoursePackageController extends Controller
     {
         $branches = Branch::orderBy('name')->get();
         $courses  = Course::where('status', 'aktif')->orderBy('nama')->get();
-        return view('admin.course-package.create', compact('branches', 'courses'));
+        $teachers = Teacher::where('status', 'aktif')->orderBy('name')->get();
+        return view('admin.course-package.create', compact('branches', 'courses', 'teachers'));
     }
 
     public function store(Request $request)
@@ -53,10 +55,11 @@ class CoursePackageController extends Controller
             'nama'             => 'required|string|max:150',
             'deskripsi'        => 'nullable|string',
             'harga'            => 'required|numeric|min:0',
-            'durasi_bulan'     => 'required|integer|min:1',
+            'durasi_bulan'     => 'nullable|integer|min:1',
             'jumlah_pertemuan' => 'required|integer|min:1',
             'jenis'            => 'required|in:reguler,intensif,privat,online',
             'cabang_id'        => 'nullable|exists:branches,id',
+            'guru_id'          => 'nullable|exists:teachers,id',
             'is_unggulan'      => 'nullable|boolean',
             'status'           => 'required|in:aktif,nonaktif',
         ]);
@@ -75,7 +78,7 @@ class CoursePackageController extends Controller
 
     public function show(Package $coursePackage)
     {
-        $coursePackage->load(['cabang', 'mataPelajaran']);
+        $coursePackage->load(['cabang', 'mataPelajaran', 'guru']);
         return view('admin.course-package.detail', compact('coursePackage'));
     }
 
@@ -83,7 +86,8 @@ class CoursePackageController extends Controller
     {
         $branches = Branch::orderBy('name')->get();
         $courses  = Course::where('status', 'aktif')->orderBy('nama')->get();
-        return view('admin.course-package.edit', compact('coursePackage', 'branches', 'courses'));
+        $teachers = Teacher::where('status', 'aktif')->orderBy('name')->get();
+        return view('admin.course-package.edit', compact('coursePackage', 'branches', 'courses', 'teachers'));
     }
 
     public function update(Request $request, Package $coursePackage)
@@ -92,10 +96,11 @@ class CoursePackageController extends Controller
             'nama'             => 'required|string|max:150',
             'deskripsi'        => 'nullable|string',
             'harga'            => 'required|numeric|min:0',
-            'durasi_bulan'     => 'required|integer|min:1',
+            'durasi_bulan'     => 'nullable|integer|min:1',
             'jumlah_pertemuan' => 'required|integer|min:1',
             'jenis'            => 'required|in:reguler,intensif,privat,online',
             'cabang_id'        => 'nullable|exists:branches,id',
+            'guru_id'          => 'nullable|exists:teachers,id',
             'is_unggulan'      => 'nullable|boolean',
             'status'           => 'required|in:aktif,nonaktif',
         ]);
