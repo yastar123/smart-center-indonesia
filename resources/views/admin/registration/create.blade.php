@@ -92,6 +92,15 @@
                     <select name="student_id" class="form-select" onchange="updateQuote(); updateSelectedStudentDetails()">
                         <option value="">— Cari siswa —</option>
                         @foreach($students as $s)
+                            @php
+                                $studentPackage = $s->package;
+                                $studentLabelParts = collect([
+                                    $s->name,
+                                    optional($s->branch)->name,
+                                    $s->kategori_peserta_didik,
+                                ])->filter(fn($value) => filled($value));
+                                $studentLabel = $studentLabelParts->implode(' - ');
+                            @endphp
                             <option value="{{ $s->id }}"
                                 data-name="{{ $s->name }}"
                                 data-gender="{{ $s->gender == 'L' ? 'Laki-laki' : ($s->gender == 'P' ? 'Perempuan' : '-') }}"
@@ -102,8 +111,12 @@
                                 data-address="{{ $s->address ?? '' }}"
                                 data-parent-name="{{ $s->parent_name ?? '' }}"
                                 data-parent-phone="{{ $s->parent_phone ?? '' }}"
+                                data-package-name="{{ optional($studentPackage)->nama ?? '' }}"
+                                data-package-description="{{ optional($studentPackage)->deskripsi ?? '' }}"
+                                data-package-cabang="{{ optional(optional($studentPackage)->cabang)->name ?? '' }}"
+                                data-package-guru="{{ optional(optional($studentPackage)->guru)->name ?? '' }}"
                                 {{ old('student_id')==$s->id?'selected':'' }}>
-                                {{ $s->name }} {{ $s->phone ? '('.$s->phone.')' : '' }}
+                                {{ $studentLabel }}
                             </option>
                         @endforeach
                     </select>
@@ -122,6 +135,13 @@
                             <div class="col-md-6"><strong>Nama Orang Tua / Wali:</strong> <span id="detailStudentParentName">—</span></div>
                             <div class="col-md-6"><strong>HP Orang Tua:</strong> <span id="detailStudentParentPhone">—</span></div>
                         </div>
+                    </div>
+                </div>
+
+                <div id="studentPackageHistoryCard" class="col-12" style="display:none">
+                    <div class="p-3 rounded-3 border" style="background:var(--input-bg);border-color:var(--card-border)">
+                        <div class="fw-semibold mb-2">Paket yang Diambil</div>
+                        <div id="studentPackageHistoryContent" class="small text-muted"></div>
                     </div>
                 </div>
             </div>
@@ -166,7 +186,7 @@
                                     data-courses="{{ e($pk->mataPelajaran->pluck('nama')->implode(', ')) }}"
                                     data-description="{{ e($pk->deskripsi ?? '-') }}"
                                     {{ old('package_id')==$pk->id?'selected':'' }}>
-                                    {{ $pk->nama }} — Rp {{ number_format($pk->harga, 0, ',', '.') }}
+                                    {{ $pk->nama }} - Harga Dasar (Rp {{ number_format($pk->harga, 0, ',', '.') }}) - {{ $pk->jumlah_pertemuan }} Sesi
                                 </option>
                             @endforeach
                         </select>
@@ -260,6 +280,13 @@
                     <select name="guru_id" class="form-select @error('guru_id') is-invalid @enderror" required onchange="updateTeacherType(this); updateSelectedTeacherDetails()">
                         <option value="">— Pilih guru —</option>
                         @foreach($teachers as $t)
+                            @php
+                                $teacherSubjects = collect((array)($t->subjects ?? []))
+                                    ->map(fn($subject) => trim((string) $subject))
+                                    ->filter()
+                                    ->implode(', ');
+                                $teacherBranch = optional($t->branch)->name ?: '-';
+                            @endphp
                             <option value="{{ $t->id }}"
                                 data-name="{{ $t->name }}"
                                 data-type="{{ $t->tipe_gaji ?? 'contract' }}"
@@ -267,12 +294,12 @@
                                 data-gender="{{ $t->gender == 'L' ? 'Laki-laki' : ($t->gender == 'P' ? 'Perempuan' : '-') }}"
                                 data-birth-date="{{ optional($t->birth_date)->format('Y-m-d') ?? '-' }}"
                                 data-education="{{ $t->education ?? '-' }}"
-                                data-branch="{{ optional($t->branch)->name ?? '-' }}"
+                                data-branch="{{ $teacherBranch }}"
                                 data-phone="{{ $t->phone ?? '-' }}"
                                 data-jenis-guru="{{ $t->jenis_guru ?? '-' }}"
                                 data-address="{{ $t->address ?? '-' }}"
                                 {{ old('guru_id')==$t->id?'selected':'' }}>
-                                {{ $t->name }} — {{ implode(', ', (array)($t->subjects ?? [])) }}
+                                {{ $t->name }} - {{ $teacherSubjects ?: '-' }} - {{ $teacherBranch }} - {{ $t->jenis_guru ?? '-' }}
                             </option>
                         @endforeach
                     </select>
@@ -340,7 +367,7 @@
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Jumlah Cicilan</label>
-                        <select name="cicilan" class="form-select">
+                        <select name="cicilan" id="cicilanSelect" class="form-select">
                             <option value="1">Lunas (1x)</option>
                             <option value="2">2x Cicilan</option>
                             <option value="3">3x Cicilan</option>
@@ -353,6 +380,21 @@
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Jatuh Tempo</label>
                         <input type="date" name="jatuh_tempo" class="form-control" value="{{ date('Y-m-d', strtotime('+7 days')) }}">
+                    </div>
+                </div>
+
+                <div id="installmentBreakdown" class="row g-3 mt-2" style="display:none;">
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Harga Paket</label>
+                        <input type="text" id="installmentPackagePrice" class="form-control" readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Cicilan Pertama</label>
+                        <input type="text" id="installmentFirst" class="form-control" readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Sisa Cicilan</label>
+                        <input type="text" id="installmentRemaining" class="form-control" readonly>
                     </div>
                 </div>
             </div>
@@ -492,14 +534,26 @@ function formatDisplay(value) {
     return value && value.trim() ? value : '—';
 }
 
+function escapeHtml(value) {
+    return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+}
+
 function updateSelectedStudentDetails() {
     const sel = document.querySelector('[name=student_id]');
     const card = document.getElementById('studentDetailCard');
-    if (!sel || !card) return;
+    const packageCard = document.getElementById('studentPackageHistoryCard');
+    const packageContent = document.getElementById('studentPackageHistoryContent');
+    if (!sel || !card || !packageCard || !packageContent) return;
 
     const opt = sel.options[sel.selectedIndex];
     if (!opt || !opt.value) {
         card.style.display = 'none';
+        packageCard.style.display = 'none';
         document.getElementById('detailStudentGender').textContent = '—';
         document.getElementById('detailStudentBirthPlace').textContent = '—';
         document.getElementById('detailStudentBirthDate').textContent = '—';
@@ -508,6 +562,7 @@ function updateSelectedStudentDetails() {
         document.getElementById('detailStudentAddress').textContent = '—';
         document.getElementById('detailStudentParentName').textContent = '—';
         document.getElementById('detailStudentParentPhone').textContent = '—';
+        packageContent.innerHTML = '';
         return;
     }
 
@@ -520,6 +575,27 @@ function updateSelectedStudentDetails() {
     document.getElementById('detailStudentAddress').textContent = formatDisplay(opt.dataset.address || '');
     document.getElementById('detailStudentParentName').textContent = formatDisplay(opt.dataset.parentName || '');
     document.getElementById('detailStudentParentPhone').textContent = formatDisplay(opt.dataset.parentPhone || '');
+
+    const packageName = opt.dataset.packageName || '';
+    const packageDescription = opt.dataset.packageDescription || '';
+    const packageCabang = opt.dataset.packageCabang || '';
+    const packageGuru = opt.dataset.packageGuru || '';
+
+    if (packageName || packageDescription || packageCabang || packageGuru) {
+        packageCard.style.display = '';
+        packageContent.innerHTML = `
+            <div class="small text-muted mb-1"><strong>${escapeHtml(packageName || '-')}</strong></div>
+            ${packageDescription ? `<div class="small text-muted mb-1">${escapeHtml(packageDescription)}</div>` : ''}
+            <div class="small text-muted">
+                ${packageCabang ? `${escapeHtml(packageCabang)}` : ''}
+                ${packageCabang && packageGuru ? ' · ' : ''}
+                ${packageGuru ? `${escapeHtml(packageGuru)}` : ''}
+            </div>
+        `;
+    } else {
+        packageCard.style.display = '';
+        packageContent.innerHTML = '<div class="small text-muted mb-0">Belum sama sekali siswa ini memiliki paket</div>';
+    }
 }
 
 function onPackageChange(sel) {
@@ -632,6 +708,32 @@ function formatRupiah(num) {
     return 'Rp ' + Math.round(num).toLocaleString('id-ID');
 }
 
+function updateInstallmentBreakdown() {
+    const installmentSelect = document.getElementById('cicilanSelect');
+    const breakdown = document.getElementById('installmentBreakdown');
+    const pkgPriceInput = document.getElementById('installmentPackagePrice');
+    const firstInput = document.getElementById('installmentFirst');
+    const remainingInput = document.getElementById('installmentRemaining');
+
+    if (!installmentSelect || !breakdown || !pkgPriceInput || !firstInput || !remainingInput) return;
+
+    const installmentCount = parseInt(installmentSelect.value || '1', 10);
+    const currentPackagePrice = Math.max(0, packagePrice || 0);
+
+    if (installmentCount <= 1) {
+        breakdown.style.display = 'none';
+        return;
+    }
+
+    const firstInstallment = Math.round(currentPackagePrice / installmentCount);
+    const remaining = currentPackagePrice - firstInstallment;
+
+    pkgPriceInput.value = formatRupiah(currentPackagePrice);
+    firstInput.value = formatRupiah(firstInstallment);
+    remainingInput.value = formatRupiah(remaining);
+    breakdown.style.display = 'flex';
+}
+
 function updateQuote() {
     const branchSel = document.getElementById('branchSelect');
     const branchName = branchSel.options[branchSel.selectedIndex]?.text || '—';
@@ -661,12 +763,15 @@ function updateQuote() {
     document.getElementById('qPkgPrice').textContent = formatRupiah(packagePrice);
     document.getElementById('qTotal').textContent    = formatRupiah(total);
     document.getElementById('adminFeeRow').style.display = isNewStudent ? '' : 'none';
+    updateInstallmentBreakdown();
 }
 
 const packageSelectOnLoad = document.querySelector('[name=package_id]');
 if (packageSelectOnLoad) {
     onPackageChange(packageSelectOnLoad);
 }
+
+document.getElementById('cicilanSelect')?.addEventListener('change', updateInstallmentBreakdown);
 updateSelectedStudentDetails();
 updateSelectedTeacherDetails();
 updateQuote();

@@ -261,17 +261,6 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-6">
-                    <a href="{{ route('admin.payments.index') }}"
-                       class="d-flex align-items-center gap-2 p-3 rounded-3 text-decoration-none quick-dash"
-                       style="background:var(--soft-primary-bg);border:1px solid var(--soft-primary-border)">
-                        <i class="bi bi-wallet2" style="font-size:1.4rem;color:#c84ddf"></i>
-                        <div>
-                            <div class="fw-semibold" style="font-size:12.5px;color:var(--text-primary)">Cek Pembayaran</div>
-                            <div style="font-size:11px;color:var(--text-muted)">Tagihan & invoice</div>
-                        </div>
-                    </a>
-                </div>
                 @if($role === 'owner')
                 <div class="col-6">
                     <a href="{{ route('owner.branches.index') }}"

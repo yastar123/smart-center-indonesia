@@ -127,7 +127,6 @@
                     ['route'=>'owner.branches.index','icon'=>'bi-building-fill','color'=>'#c84ddf','bg'=>'var(--soft-primary-bg)','border'=>'var(--soft-primary-border)','label'=>'Monitoring Cabang','sub'=>'Pantau semua cabang'],
                     ['route'=>'admin.students.index','icon'=>'bi-people-fill','color'=>'#059669','bg'=>'var(--soft-success-bg)','border'=>'var(--soft-success-border)','label'=>'Data Siswa','sub'=>'Kelola seluruh siswa'],
                     ['route'=>'admin.teachers.index','icon'=>'bi-person-badge-fill','color'=>'#e09000','bg'=>'var(--soft-warning-bg)','border'=>'var(--soft-warning-border)','label'=>'Data Guru','sub'=>'Manajemen pengajar'],
-                    ['route'=>'admin.payments.index','icon'=>'bi-cash-stack','color'=>'#db2777','bg'=>'var(--soft-danger-bg)','border'=>'var(--soft-danger-border)','label'=>'Keuangan','sub'=>'Laporan & invoice'],
                     ['route'=>'admin.tryouts.index','icon'=>'bi-journal-check','color'=>'#c84ddf','bg'=>'var(--soft-primary-bg)','border'=>'var(--soft-primary-border)','label'=>'Tryout CBT','sub'=>'Monitoring ujian'],
                 ];
                 @endphp

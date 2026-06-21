@@ -77,18 +77,6 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::put('/teachers/{teacher}',    [TeacherController::class, 'update'])  ->name('teachers.update');
         Route::delete('/teachers/{teacher}', [TeacherController::class, 'destroy']) ->name('teachers.destroy');
 
-        // PAYMENTS (Invoices)
-        Route::get('/payments',                [PaymentController::class, 'index'])   ->name('payments.index');
-        Route::post('/payments',               [PaymentController::class, 'store'])   ->name('payments.store');
-        Route::get('/payments/{payment}',      [PaymentController::class, 'show'])    ->name('payments.show');
-        Route::put('/payments/{payment}',      [PaymentController::class, 'update'])  ->name('payments.update');
-        Route::delete('/payments/{payment}',   [PaymentController::class, 'destroy']) ->name('payments.destroy');
-        Route::post('/payments/{invoice}/pay', [PaymentController::class, 'markPaid'])->name('payments.pay');
-
-        // Course Payment Verification
-        Route::post('/payments/course/{payment}/verify', [PaymentController::class, 'verifyCoursePayment'])->name('payments.course.verify');
-        Route::post('/payments/course/{payment}/reject', [PaymentController::class, 'rejectCoursePayment'])->name('payments.course.reject');
-
         // ATTENDANCE HISTORY (Admin)
         Route::get('/attendance-history', [AttendanceHistoryController::class, 'index'])->name('attendance-history.index');
 
@@ -144,6 +132,8 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         // SALARIES (Gaji Guru)
         Route::middleware('role:admin|owner')->group(function () {
             Route::get('/salaries',             [SalaryController::class, 'index'])    ->name('salaries.index');
+            Route::get('/salaries/create',      [SalaryController::class, 'create'])   ->name('salaries.create');
+            Route::get('/salaries/teachers/{teacher}/packages', [SalaryController::class, 'teacherPackages']) ->name('salaries.teacher-packages');
             Route::post('/salaries',            [SalaryController::class, 'store'])    ->name('salaries.store');
             Route::get('/salaries/{salary}',    [SalaryController::class, 'show'])     ->name('salaries.show');
             Route::put('/salaries/{salary}',    [SalaryController::class, 'update'])   ->name('salaries.update');
@@ -264,6 +254,8 @@ Route::middleware(['auth', 'role:owner'])
     ->group(function () {
 
         Route::get('/branches', [BranchController::class, 'index'])->name('branches.index');
+        Route::get('/branches/create', [BranchController::class, 'create'])->name('branches.create');
+        Route::get('/branches/{branch}/edit', [BranchController::class, 'edit'])->name('branches.edit');
         Route::get('/branches/{branch}/dashboard', [BranchController::class, 'dashboard'])->name('branches.dashboard');
         Route::post('/branches/{branch}/impersonate', [BranchController::class, 'impersonate'])->name('branches.impersonate');
 

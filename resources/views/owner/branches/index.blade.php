@@ -21,10 +21,10 @@
             </div>
         </div>
         <div class="col-md-4 text-md-end">
-            <button class="btn fw-semibold px-4" data-bs-toggle="modal" data-bs-target="#addModal"
+            <a href="{{ route('owner.branches.create') }}" class="btn fw-semibold px-4"
                 style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
                 <i class="bi bi-plus-lg me-2"></i>Tambah Cabang
-            </button>
+            </a>
         </div>
     </div>
 </div>
@@ -85,9 +85,9 @@
             <button onclick="window.print()" class="btn btn-secondary btn-sm">
                 <i class="bi bi-printer me-1"></i>Print
             </button>
-            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addModal">
+            <a href="{{ route('owner.branches.create') }}" class="btn btn-primary btn-sm">
                 <i class="bi bi-plus-lg me-1"></i>Tambah Cabang
-            </button>
+            </a>
         </div>
     </div>
 
@@ -176,11 +176,9 @@
                                     <i class="bi bi-box-arrow-in-right"></i>
                                 </button>
                             </form>
-                            <button class="btn btn-outline-warning"
-                                data-bs-toggle="modal" data-bs-target="#editModal{{ $branch->id }}"
-                                title="Edit">
+                            <a href="{{ route('owner.branches.edit', $branch) }}" class="btn btn-outline-warning" title="Edit">
                                 <i class="bi bi-pencil"></i>
-                            </button>
+                            </a>
                             <button class="btn btn-outline-info"
                                 data-bs-toggle="modal" data-bs-target="#resetModal{{ $branch->id }}"
                                 title="Reset Password">

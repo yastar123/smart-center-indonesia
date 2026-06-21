@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Salary;
 use App\Models\Teacher;
 use App\Models\Branch;
+use App\Models\Package;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
@@ -38,6 +39,32 @@ class SalaryController extends Controller
         $teachers = Teacher::where('status', 'aktif')->orderBy('name')->get();
         $branches = Branch::orderBy('name')->get();
         return view('admin.salaries.index', compact('teachers', 'branches'));
+    }
+
+    public function create()
+    {
+        $teachers = Teacher::where('status', 'aktif')->orderBy('name')->get();
+        $branches = Branch::orderBy('name')->get();
+        return view('admin.salaries.create', compact('teachers', 'branches'));
+    }
+
+    public function teacherPackages(Teacher $teacher)
+    {
+        $packages = Package::where('guru_id', $teacher->id)
+            ->where('status', 'aktif')
+            ->orderBy('nama')
+            ->get([
+                'id',
+                'nama',
+                'jenis',
+                'jumlah_pertemuan',
+                'durasi_bulan',
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $packages,
+        ]);
     }
 
     public function store(Request $request)
@@ -78,7 +105,13 @@ class SalaryController extends Controller
         }
 
         Salary::create($data);
-        return response()->json(['success' => true, 'message' => 'Data gaji berhasil disimpan!']);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Data gaji berhasil disimpan!']);
+        }
+
+        return redirect()->route('admin.salaries.index')
+            ->with('success', 'Data gaji berhasil disimpan!');
     }
 
     public function show(Salary $salary)

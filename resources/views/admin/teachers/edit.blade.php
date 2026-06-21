@@ -111,6 +111,11 @@
                                 <option value="freelance" {{ old('jenis_guru', $teacher->jenis_guru) == 'freelance' ? 'selected' : '' }}>Freelance</option>
                             </select>
                         </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold">Mata Pelajaran</label>
+                            <textarea name="subjects" class="form-control form-control-sm" rows="3" placeholder="Contoh: Matematika, Bahasa Indonesia, Fisika">{{ old('subjects', is_array($teacher->subjects) ? implode(', ', $teacher->subjects) : $teacher->subjects) }}</textarea>
+                            <div class="form-text">Pisahkan dengan koma atau enter. Field ini tidak bergantung pada data mata pelajaran dari halaman lain.</div>
+                        </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-semibold">Upload CV</label>
                             <input type="file" name="cv" class="form-control form-control-sm" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">

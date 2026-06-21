@@ -6,6 +6,8 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\Teacher;
 use App\Models\Salary;
+use App\Models\Package;
+use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -25,7 +27,17 @@ class AdminSalaryTest extends TestCase
     {
         Storage::fake('public');
 
-        $admin = User::factory()->create(['email' => 'admin@example.com']);
+        $branch = Branch::create([
+            'name' => 'Cabang Test',
+            'city' => 'Test City',
+            'status' => 'active',
+            'allowed_pages' => ['salary'],
+        ]);
+
+        $admin = User::factory()->create([
+            'email' => 'admin@example.com',
+            'branch_id' => $branch->id,
+        ]);
         if (method_exists($admin, 'assignRole')) {
             $admin->assignRole('admin');
         }
@@ -49,7 +61,8 @@ class AdminSalaryTest extends TestCase
             'bukti_pembayaran' => $file,
         ]);
 
-        $response->assertJson(['success' => true]);
+        $response->assertRedirect(route('admin.salaries.index'))
+            ->assertSessionHas('success');
 
         $this->assertDatabaseHas('salaries', [
             'guru_id' => $teacher->id,
@@ -62,6 +75,49 @@ class AdminSalaryTest extends TestCase
         Storage::disk('public')->assertExists($salary->bukti_pembayaran);
     }
 
+    public function test_admin_can_fetch_teacher_packages_for_salary_form()
+    {
+        $branch = Branch::create([
+            'name' => 'Cabang Test',
+            'city' => 'Test City',
+            'status' => 'active',
+            'allowed_pages' => ['salary'],
+        ]);
+
+        $admin = User::factory()->create([
+            'branch_id' => $branch->id,
+        ]);
+        if (method_exists($admin, 'assignRole')) $admin->assignRole('admin');
+
+        $teacher = Teacher::create([
+            'nig' => 'NIG-TEST-002',
+            'name' => 'Guru Paket',
+            'status' => 'aktif'
+        ]);
+
+        Package::create([
+            'guru_id' => $teacher->id,
+            'nama' => 'Paket Intensif',
+            'jenis' => 'Reguler',
+            'jumlah_pertemuan' => 16,
+            'harga' => 1500000,
+            'status' => 'aktif'
+        ]);
+
+        $this->actingAs($admin);
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->get(route('admin.salaries.teacher-packages', ['teacher' => $teacher->id]));
+
+        $response->assertStatus(200)
+            ->assertJsonFragment([
+                'nama' => 'Paket Intensif',
+                'jenis' => 'Reguler',
+                'jumlah_pertemuan' => 16,
+            ]);
+    }
+
     public function test_teacher_can_view_payments()
     {
         $user = User::factory()->create();
@@ -69,7 +125,7 @@ class AdminSalaryTest extends TestCase
 
         $teacher = Teacher::create([
             'user_id' => $user->id,
-            'nig' => 'NIG-TEST-002',
+            'nig' => 'NIG-TEST-003',
             'name' => 'Guru Viewer',
             'status' => 'aktif'
         ]);
@@ -91,7 +147,16 @@ class AdminSalaryTest extends TestCase
 
     public function test_admin_can_view_reports()
     {
-        $admin = User::factory()->create();
+        $branch = Branch::create([
+            'name' => 'Cabang Test Reports',
+            'city' => 'Test City',
+            'status' => 'active',
+            'allowed_pages' => ['report'],
+        ]);
+
+        $admin = User::factory()->create([
+            'branch_id' => $branch->id,
+        ]);
         if (method_exists($admin, 'assignRole')) $admin->assignRole('admin');
 
         $this->actingAs($admin);

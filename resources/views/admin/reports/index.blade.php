@@ -239,9 +239,6 @@ $outstandingSalaries = Salary::with(['guru'])->where('status','pending')->orderB
                 <h6 class="fw-bold mb-0" style="font-size:14px">
                     <i class="bi bi-check-circle-fill text-success me-2"></i>Pembayaran Terverifikasi
                 </h6>
-                <a href="{{ route('admin.payments.index') }}" class="btn btn-sm btn-outline-primary" style="border-radius:8px;font-size:11px;padding:4px 12px">
-                    Semua <i class="bi bi-arrow-right ms-1"></i>
-                </a>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover table-modern align-middle mb-0">

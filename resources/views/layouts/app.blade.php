@@ -3337,16 +3337,6 @@
                 @endif
             </a>
         </div>
-        <div class="nav-item">
-            <a href="{{ route('admin.payments.index') }}" class="nav-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}" data-label="Pembayaran">
-                <i class="bi bi-wallet2"></i>
-                <span>Pembayaran</span>
-                @php $unpaidInvoices = \App\Models\Invoice::where('status','belum_bayar')->count() @endphp
-                @if($unpaidInvoices > 0)
-                    <span class="menu-badge">{{ $unpaidInvoices > 99 ? '99+' : $unpaidInvoices }}</span>
-                @endif
-            </a>
-        </div>
         @if(auth()->check() && auth()->user()->hasAnyRole(['admin','owner']))
         <div class="nav-item">
             <a href="{{ route('admin.salaries.index') }}" class="nav-link {{ request()->routeIs('admin.salaries.*') ? 'active' : '' }}" data-label="Gaji Guru">
@@ -3461,8 +3451,8 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.courses.fees') }}" class="nav-link {{ request()->routeIs('siswa.courses.fees') ? 'active' : '' }}" data-label="Harga Mapel">
-                <i class="bi bi-cash-coin"></i><span>Harga Mapel</span>
+            <a href="{{ route('siswa.courses.fees') }}" class="nav-link {{ request()->routeIs('siswa.courses.fees') ? 'active' : '' }}" data-label="Harga Paket">
+                <i class="bi bi-cash-coin"></i><span>Harga Paket</span>
             </a>
         </div>
         <div class="nav-item">
@@ -3633,10 +3623,6 @@
     <a href="{{ route('admin.students.index') }}" class="mob-nav-item {{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
         <i class="bi bi-people{{ request()->routeIs('admin.students.*') ? '-fill' : '' }}"></i>
         <span>Siswa</span>
-    </a>
-    <a href="{{ route('admin.payments.index') }}" class="mob-nav-item {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
-        <i class="bi bi-cash{{ request()->routeIs('admin.payments.*') ? '-stack' : '' }}"></i>
-        <span>Bayar</span>
     </a>
     @endrole
     @role('guru')
@@ -4326,7 +4312,6 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         { label:'Absensi', desc:'Kelola absensi siswa per sesi', href:'{{ route("admin.attendance.index") }}', icon:'bi-clipboard2-check', color:'#461256', group:'Akademik' },
         { label:'Jadwal', desc:'Jadwal mengajar & sesi', href:'{{ route("admin.schedules.index") }}', icon:'bi-calendar-week', color:'#461256', group:'Akademik' },
         { label:'Sertifikat', desc:'Terbitkan sertifikat siswa', href:'{{ route("admin.certificates.index") }}', icon:'bi-award', color:'#f6af23', group:'Akademik' },
-        { label:'Pembayaran', desc:'Invoice & tagihan siswa', href:'{{ route("admin.payments.index") }}', icon:'bi-wallet2', color:'#059669', group:'Keuangan' },
         { label:'Gaji Guru', desc:'Kelola gaji & slip', href:'{{ route("admin.salaries.index") }}', icon:'bi-cash-stack', color:'#68117e', group:'Keuangan' },
         { label:'Laporan Keuangan', desc:'Rekap & analitik keuangan', href:'{{ route("admin.reports.index") }}', icon:'bi-bar-chart-line', color:'#260632', group:'Keuangan' },
         { label:'Pengumuman', desc:'Buat & kelola pengumuman', href:'{{ route("admin.announcements.index") }}', icon:'bi-megaphone', color:'#68117e', group:'Komunikasi' },
@@ -4349,7 +4334,7 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         @role('siswa')
         { label:'Dashboard Siswa', desc:'Portal siswa & tagihan', href:'{{ route("siswa.dashboard") }}', icon:'bi-speedometer2', color:'#c84ddf', group:'Siswa' },
         { label:'List Mata Pelajaran', desc:'Mata pelajaran yang diambil', href:'{{ route("siswa.courses.index") }}', icon:'bi-journal-bookmark', color:'#10b981', group:'Siswa' },
-        { label:'Harga Mapel', desc:'Daftar harga mata pelajaran', href:'{{ route("siswa.courses.fees") }}', icon:'bi-cash-coin', color:'#f6af23', group:'Siswa' },
+        { label:'Harga Paket', desc:'Daftar harga paket', href:'{{ route("siswa.courses.fees") }}', icon:'bi-cash-coin', color:'#f6af23', group:'Siswa' },
         // Jadwal Belajar (siswa) dihapus — entri command palette dihilangkan
         { label:'Sertifikat Saya', desc:'Lihat sertifikat yang diterbitkan', href:'{{ route("siswa.certificates.index") }}', icon:'bi-award', color:'#f6af23', group:'Siswa' },
         { label:'Pengumuman', desc:'Informasi & pengumuman terbaru', href:'{{ route("siswa.announcements") }}', icon:'bi-megaphone', color:'#c84ddf', group:'Siswa' },

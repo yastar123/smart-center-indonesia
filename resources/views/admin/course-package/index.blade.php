@@ -114,6 +114,7 @@
                 <tr>
                     <th>Nama Paket</th>
                     <th>Kategori & Jenjang</th>
+                    <th>Mata Pelajaran</th>
                     <th class="text-center">Jumlah Sesi</th>
                     <th>Harga Dasar</th>
                     <th>Status</th>
@@ -154,6 +155,17 @@
                             {{ $jenisLabel }}
                         </span>
                     </td>
+                    <td>
+                        @if($p->mataPelajaran->isNotEmpty())
+                            <div class="d-flex flex-wrap gap-1">
+                                @foreach($p->mataPelajaran as $course)
+                                    <span class="badge" style="background:rgba(16,185,129,.12);color:#059669;font-size:11px">{{ $course->nama }}</span>
+                                @endforeach
+                            </div>
+                        @else
+                            <span class="text-muted" style="font-size:12px">—</span>
+                        @endif
+                    </td>
                     <td class="text-center">
                         <span class="fw-semibold">{{ $p->jumlah_pertemuan }}</span>
                         <span class="text-muted" style="font-size:11px"> Sesi</span>
@@ -189,7 +201,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="6" class="text-center py-4 text-muted">
+                <tr><td colspan="7" class="text-center py-4 text-muted">
                     <i class="bi bi-box-seam fs-3 d-block mb-2"></i>Belum ada paket belajar.
                 </td></tr>
                 @endforelse

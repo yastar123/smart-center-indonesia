@@ -21,7 +21,13 @@ public function index(Request $request)
     $branches = Branch::all();
     $teachers = Teacher::with('courses')->where('status', 'aktif')->orderBy('name')->get();
 
-        $students = Student::with(['branch', 'user', 'teachers.courses'])
+        $students = Student::with([
+                'branch',
+                'user',
+                'teachers.courses',
+                'package.cabang',
+                'package.guru'
+            ])
         ->when($request->search, fn($q) =>
             $q->where('name', 'like', "%{$request->search}%")
               ->orWhere('nis', 'like', "%{$request->search}%"))
@@ -52,7 +58,7 @@ public function create()
 
 public function edit(Student $student)
 {
-    $student->load(['branch', 'user']);
+    $student->load(['branch', 'user', 'package.cabang', 'package.guru']);
     $branches = Branch::all();
     return view('admin.students.edit', compact('student', 'branches'));
 }
@@ -145,7 +151,7 @@ public function store(Request $request)
 
     public function show(Student $student)
     {
-        $student->load(['branch', 'user', 'teachers.courses']);
+        $student->load(['branch', 'user', 'teachers.courses', 'package.cabang', 'package.guru']);
         return response()->json(['success' => true, 'data' => $student]);
     }
 

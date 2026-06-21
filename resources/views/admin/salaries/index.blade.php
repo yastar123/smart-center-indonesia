@@ -37,9 +37,9 @@
             </div>
         </div>
         <div class="col-md-4 text-md-end">
-            <button onclick="openModal()" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px">
+            <a href="{{ route('admin.salaries.create') }}" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px">
                 <i class="bi bi-plus-lg me-2"></i>Input Gaji
-            </button>
+            </a>
         </div>
     </div>
 </div>
@@ -300,15 +300,8 @@ function openTeacher(id){
             // wire upload button
             const btn = document.getElementById('openUploadBtn');
             btn.onclick = function(){
-                // prefill salary form and open salary modal
-                const f = document.getElementById('salaryForm');
-                if(f.querySelector('[name=guru_id]')) f.querySelector('[name=guru_id]').value = t.id;
-                if(f.querySelector('[name=gaji_pokok]')) f.querySelector('[name=gaji_pokok]').value = (t.salary_base || 0);
-                if(f.querySelector('[name=periode]')) f.querySelector('[name=periode]').value = new Date().toISOString().slice(0,7);
-                if(f.querySelector('[name=status]')) f.querySelector('[name=status]').value = 'dibayar';
-                if(f.querySelector('[name=tipe_gaji]')) f.querySelector('[name=tipe_gaji]').value = 'bulanan';
                 bootstrap.Modal.getInstance(document.getElementById('teacherModal')).hide();
-                openModal(false);
+                window.location.href = `{{ route('admin.salaries.create') }}?guru_id=${t.id}`;
             };
         }).catch(()=>showToast('Gagal memuat data guru.', 'error'));
 }

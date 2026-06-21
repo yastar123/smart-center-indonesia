@@ -80,7 +80,6 @@ class BranchController extends Controller
                 ['key' => 'certificate', 'label' => 'Sertifikat', 'url' => url('/admin/certificates'), 'count' => $counts['certificates'] ?? 0],
             ]],
             ['section' => 'KEUANGAN', 'items' => [
-                ['key' => 'payment', 'label' => 'Pembayaran', 'url' => url('/admin/payments'), 'count' => $counts['payments'] ?? 0],
                 ['key' => 'salary', 'label' => 'Gaji Guru', 'url' => url('/admin/salaries'), 'count' => $counts['salaries'] ?? 0],
                 ['key' => 'report', 'label' => 'Laporan Keuangan', 'url' => url('/admin/reports'), 'count' => 0],
             ]],
@@ -117,6 +116,148 @@ class BranchController extends Controller
 
             return $next($request);
         });
+    }
+
+    public function create()
+    {
+        $pages = [];
+        try {
+            $pages = Permission::all()->pluck('name')
+                ->map(function ($n) { return explode('.', $n)[0]; })
+                ->unique()
+                ->values()
+                ->sort()
+                ->toArray();
+        } catch (\Throwable $e) {
+            $pages = [];
+        }
+
+        $counts = [];
+        try {
+            $counts['students'] = Student::count();
+            $counts['teachers'] = class_exists(Teacher::class) ? Teacher::count() : 0;
+            $counts['modules'] = class_exists(Module::class) ? Module::count() : 0;
+            $counts['packages'] = class_exists(Package::class) ? Package::count() : 0;
+            $counts['courses'] = class_exists(Course::class) ? Course::count() : 0;
+            $counts['course_fees'] = class_exists(CourseFee::class) ? CourseFee::count() : 0;
+            $counts['classes'] = class_exists(SchoolClass::class) ? SchoolClass::count() : 0;
+            $counts['schedules'] = class_exists(Schedule::class) ? Schedule::count() : 0;
+            $counts['certificates'] = class_exists(Certificate::class) ? Certificate::count() : 0;
+            $counts['payments'] = class_exists(Payment::class) ? Payment::count() : 0;
+            $counts['salaries'] = class_exists(Salary::class) ? Salary::count() : 0;
+            $counts['announcements'] = class_exists(Announcement::class) ? Announcement::count() : 0;
+            $counts['messages'] = class_exists(ChatMessage::class) ? ChatMessage::count() : 0;
+            $counts['tryouts'] = class_exists(Tryout::class) ? Tryout::count() : 0;
+        } catch (\Throwable $e) {
+            $counts = [];
+        }
+
+        $menuStructure = [
+            ['section' => 'AKADEMIK', 'items' => [
+                ['key' => 'student', 'label' => 'Siswa', 'url' => url('/admin/students'), 'count' => $counts['students'] ?? 0],
+                ['key' => 'teacher', 'label' => 'Guru', 'url' => url('/admin/teachers'), 'count' => $counts['teachers'] ?? 0],
+                ['key' => 'module', 'label' => 'Modul Belajar', 'url' => url('/admin/modules'), 'count' => $counts['modules'] ?? 0],
+                ['key' => 'package', 'label' => 'Paket Belajar', 'url' => url('/admin/packages'), 'count' => $counts['packages'] ?? 0],
+                ['key' => 'course', 'label' => 'Mata Pelajaran', 'url' => url('/admin/courses'), 'count' => $counts['courses'] ?? 0],
+                ['key' => 'course_fee', 'label' => 'Biaya Mapel', 'url' => url('/admin/courses/fees'), 'count' => $counts['course_fees'] ?? 0],
+                ['key' => 'class', 'label' => 'Kelas', 'url' => url('/admin/classes'), 'count' => $counts['classes'] ?? 0],
+                ['key' => 'schedule', 'label' => 'Jadwal', 'url' => url('/admin/schedules'), 'count' => $counts['schedules'] ?? 0],
+                ['key' => 'certificate', 'label' => 'Sertifikat', 'url' => url('/admin/certificates'), 'count' => $counts['certificates'] ?? 0],
+            ]],
+            ['section' => 'KEUANGAN', 'items' => [
+                ['key' => 'salary', 'label' => 'Gaji Guru', 'url' => url('/admin/salaries'), 'count' => $counts['salaries'] ?? 0],
+                ['key' => 'report', 'label' => 'Laporan Keuangan', 'url' => url('/admin/reports'), 'count' => 0],
+            ]],
+            ['section' => 'LANDING PAGE', 'items' => [
+                ['key' => 'landing', 'label' => 'Kelola Landing Page', 'url' => url('/admin/landing'), 'count' => 0],
+            ]],
+            ['section' => 'KOMUNIKASI', 'items' => [
+                ['key' => 'announcement', 'label' => 'Pengumuman', 'url' => url('/admin/announcements'), 'count' => $counts['announcements'] ?? 0],
+                ['key' => 'message', 'label' => 'Pesan Aplikasi', 'url' => url('/admin/messages'), 'count' => $counts['messages'] ?? 0],
+                ['key' => 'videocall', 'label' => 'Video Call', 'url' => url('/admin/videocall'), 'count' => 0],
+            ]],
+            ['section' => 'TRYOUT CBT', 'items' => [
+                ['key' => 'tryout', 'label' => 'Tryout UTBK/PTN', 'url' => url('/admin/tryouts'), 'count' => $counts['tryouts'] ?? 0],
+            ]],
+        ];
+
+        return view('owner.branches.form', [
+            'branch' => null,
+            'title' => 'Tambah Cabang',
+            'pages' => $pages,
+            'menuStructure' => $menuStructure,
+        ]);
+    }
+
+    public function edit(Branch $branch)
+    {
+        $pages = [];
+        try {
+            $pages = Permission::all()->pluck('name')
+                ->map(function ($n) { return explode('.', $n)[0]; })
+                ->unique()
+                ->values()
+                ->sort()
+                ->toArray();
+        } catch (\Throwable $e) {
+            $pages = [];
+        }
+
+        $counts = [];
+        try {
+            $counts['students'] = Student::count();
+            $counts['teachers'] = class_exists(Teacher::class) ? Teacher::count() : 0;
+            $counts['modules'] = class_exists(Module::class) ? Module::count() : 0;
+            $counts['packages'] = class_exists(Package::class) ? Package::count() : 0;
+            $counts['courses'] = class_exists(Course::class) ? Course::count() : 0;
+            $counts['course_fees'] = class_exists(CourseFee::class) ? CourseFee::count() : 0;
+            $counts['classes'] = class_exists(SchoolClass::class) ? SchoolClass::count() : 0;
+            $counts['schedules'] = class_exists(Schedule::class) ? Schedule::count() : 0;
+            $counts['certificates'] = class_exists(Certificate::class) ? Certificate::count() : 0;
+            $counts['payments'] = class_exists(Payment::class) ? Payment::count() : 0;
+            $counts['salaries'] = class_exists(Salary::class) ? Salary::count() : 0;
+            $counts['announcements'] = class_exists(Announcement::class) ? Announcement::count() : 0;
+            $counts['messages'] = class_exists(ChatMessage::class) ? ChatMessage::count() : 0;
+            $counts['tryouts'] = class_exists(Tryout::class) ? Tryout::count() : 0;
+        } catch (\Throwable $e) {
+            $counts = [];
+        }
+
+        $menuStructure = [
+            ['section' => 'AKADEMIK', 'items' => [
+                ['key' => 'student', 'label' => 'Siswa', 'url' => url('/admin/students'), 'count' => $counts['students'] ?? 0],
+                ['key' => 'teacher', 'label' => 'Guru', 'url' => url('/admin/teachers'), 'count' => $counts['teachers'] ?? 0],
+                ['key' => 'module', 'label' => 'Modul Belajar', 'url' => url('/admin/modules'), 'count' => $counts['modules'] ?? 0],
+                ['key' => 'package', 'label' => 'Paket Belajar', 'url' => url('/admin/packages'), 'count' => $counts['packages'] ?? 0],
+                ['key' => 'course', 'label' => 'Mata Pelajaran', 'url' => url('/admin/courses'), 'count' => $counts['courses'] ?? 0],
+                ['key' => 'course_fee', 'label' => 'Biaya Mapel', 'url' => url('/admin/courses/fees'), 'count' => $counts['course_fees'] ?? 0],
+                ['key' => 'class', 'label' => 'Kelas', 'url' => url('/admin/classes'), 'count' => $counts['classes'] ?? 0],
+                ['key' => 'schedule', 'label' => 'Jadwal', 'url' => url('/admin/schedules'), 'count' => $counts['schedules'] ?? 0],
+                ['key' => 'certificate', 'label' => 'Sertifikat', 'url' => url('/admin/certificates'), 'count' => $counts['certificates'] ?? 0],
+            ]],
+            ['section' => 'KEUANGAN', 'items' => [
+                ['key' => 'salary', 'label' => 'Gaji Guru', 'url' => url('/admin/salaries'), 'count' => $counts['salaries'] ?? 0],
+                ['key' => 'report', 'label' => 'Laporan Keuangan', 'url' => url('/admin/reports'), 'count' => 0],
+            ]],
+            ['section' => 'LANDING PAGE', 'items' => [
+                ['key' => 'landing', 'label' => 'Kelola Landing Page', 'url' => url('/admin/landing'), 'count' => 0],
+            ]],
+            ['section' => 'KOMUNIKASI', 'items' => [
+                ['key' => 'announcement', 'label' => 'Pengumuman', 'url' => url('/admin/announcements'), 'count' => $counts['announcements'] ?? 0],
+                ['key' => 'message', 'label' => 'Pesan Aplikasi', 'url' => url('/admin/messages'), 'count' => $counts['messages'] ?? 0],
+                ['key' => 'videocall', 'label' => 'Video Call', 'url' => url('/admin/videocall'), 'count' => 0],
+            ]],
+            ['section' => 'TRYOUT CBT', 'items' => [
+                ['key' => 'tryout', 'label' => 'Tryout UTBK/PTN', 'url' => url('/admin/tryouts'), 'count' => $counts['tryouts'] ?? 0],
+            ]],
+        ];
+
+        return view('owner.branches.form', [
+            'branch' => $branch,
+            'title' => 'Edit Cabang',
+            'pages' => $pages,
+            'menuStructure' => $menuStructure,
+        ]);
     }
 
     public function store(Request $request)

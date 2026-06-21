@@ -80,18 +80,25 @@ class TeacherController extends Controller
             'password'   => 'required|string|min:8',
             'branch_id'  => 'nullable|exists:branches,id',
             'education'  => 'nullable|string|max:50',
+            'subjects'   => 'nullable|string',
             'photo'      => 'nullable|image|max:2048',
             'cv'         => 'nullable|file|mimes:pdf,doc,docx|max:5120',
         ]);
 
         $teacher = DB::transaction(function () use ($request) {
-            $courseIds = $request->input('course_ids', []);
-            $data = $request->except(['photo', 'cv', 'password', 'course_ids']);
+            $rawSubjects = is_array($request->input('subjects'))
+                ? $request->input('subjects')
+                : preg_split('/[\n,]+/', (string) $request->input('subjects', ''));
+            $subjects = collect($rawSubjects)
+                ->map(fn ($value) => trim((string) $value))
+                ->filter()
+                ->values()
+                ->all();
+
+            $data = $request->except(['photo', 'cv', 'password', 'subjects']);
             $data['join_date'] = now()->toDateString();
             $data['status'] = 'aktif';
-            $data['subjects'] = !empty($courseIds)
-                ? Course::whereIn('id', $courseIds)->orderBy('nama')->pluck('nama')->implode(', ')
-                : null;
+            $data['subjects'] = $subjects;
 
             if ($request->hasFile('photo')) {
                 $data['photo'] = $request->file('photo')->store('teachers', 'public');
@@ -117,9 +124,6 @@ class TeacherController extends Controller
             $data['user_id'] = $user->id;
 
             $teacher = Teacher::create($data);
-            if (!empty($courseIds)) {
-                $teacher->courses()->sync($courseIds);
-            }
 
             return $teacher;
         });
@@ -161,16 +165,23 @@ class TeacherController extends Controller
                 Rule::unique('users', 'email')->ignore($teacher->user_id),
             ],
             'password'   => 'nullable|string|min:8',
+            'subjects'   => 'nullable|string',
             'photo'      => 'nullable|image|max:2048',
             'cv'         => 'nullable|file|mimes:pdf,doc,docx|max:5120',
         ]);
 
         DB::transaction(function () use ($request, $teacher) {
-            $courseIds = $request->input('course_ids', []);
-            $data = $request->except(['photo', 'cv', 'password', 'course_ids']);
-            $data['subjects'] = !empty($courseIds)
-                ? Course::whereIn('id', $courseIds)->orderBy('nama')->pluck('nama')->implode(', ')
-                : null;
+            $rawSubjects = is_array($request->input('subjects'))
+                ? $request->input('subjects')
+                : preg_split('/[\n,]+/', (string) $request->input('subjects', ''));
+            $subjects = collect($rawSubjects)
+                ->map(fn ($value) => trim((string) $value))
+                ->filter()
+                ->values()
+                ->all();
+
+            $data = $request->except(['photo', 'cv', 'password', 'subjects']);
+            $data['subjects'] = $subjects;
 
             if ($request->hasFile('photo')) {
                 if ($teacher->photo) Storage::disk('public')->delete($teacher->photo);
@@ -183,9 +194,6 @@ class TeacherController extends Controller
             }
 
             $teacher->update($data);
-            if (!empty($courseIds)) {
-                $teacher->courses()->sync($courseIds);
-            }
 
             $userData = [
                 'name'      => $request->name,

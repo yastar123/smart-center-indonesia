@@ -203,15 +203,6 @@
         <li class="nav-header">KEUANGAN</li>
 
         @if($isOwner || in_array('payment', (array)$allowedPages))
-        <li class="nav-item {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
-            <a href="{{ route('admin.payments.index') }}" class="nav-link">
-                <i class="nav-icon bi bi-cash-coin"></i>
-                <span>Pembayaran Invoice</span>
-            </a>
-        </li>
-        @endif
-
-        @if($isOwner || in_array('payment', (array)$allowedPages))
         <li class="nav-item {{ request()->routeIs('admin.course-payments.*') ? 'active' : '' }}">
             <a href="{{ route('admin.course-payments.index') }}" class="nav-link">
                 <i class="nav-icon bi bi-credit-card"></i>
@@ -357,7 +348,7 @@
         <li class="nav-item {{ request()->routeIs('siswa.courses.fees') ? 'active' : '' }}">
             <a href="{{ route('siswa.courses.fees') }}" class="nav-link">
                 <i class="nav-icon bi bi-cash-coin"></i>
-                <span>Harga Mapel</span>
+                <span>Harga Paket</span>
             </a>
         </li>
         <li class="nav-item {{ request()->routeIs('siswa.attendance*') ? 'active' : '' }}">
