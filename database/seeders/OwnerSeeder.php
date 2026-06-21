@@ -10,14 +10,22 @@ class OwnerSeeder extends Seeder
 {
     public function run(): void
     {
-        $owner = User::updateOrCreate(
-            ['email' => 'adminpusatsci@akademi.com'],
-            [
-                'name'     => 'Admin Pusat SCI',
-                'password' => Hash::make('password'),
-            ]
-        );
+        $owner = User::where('email', 'adminpusatsci@akademi.com')->first();
 
-        $owner->assignRole('owner');
+        if (! $owner) {
+            $owner = new User();
+            $owner->email = 'adminpusatsci@akademi.com';
+        }
+
+        $owner->forceFill([
+            'name' => 'Admin Pusat SCI',
+            'password' => Hash::make('password'),
+            'is_active' => true,
+        ]);
+        $owner->save();
+
+        if (method_exists($owner, 'syncRoles')) {
+            $owner->syncRoles(['owner']);
+        }
     }
 }

@@ -46,6 +46,23 @@ class TeacherController extends Controller
         return view('admin.teachers.index', compact('branches', 'courses'));
     }
 
+    public function create()
+    {
+        $branches = Branch::all();
+        $courses = Course::where('status', 'aktif')->orderBy('nama')->get();
+
+        return view('admin.teachers.create', compact('branches', 'courses'));
+    }
+
+    public function edit(Teacher $teacher)
+    {
+        $teacher->load(['branch', 'user', 'courses']);
+        $branches = Branch::all();
+        $courses = Course::where('status', 'aktif')->orderBy('nama')->get();
+
+        return view('admin.teachers.edit', compact('teacher', 'branches', 'courses'));
+    }
+
     public function store(Request $request)
     {
         // normalize 'pusat' selection
@@ -63,8 +80,6 @@ class TeacherController extends Controller
             'password'   => 'required|string|min:8',
             'branch_id'  => 'nullable|exists:branches,id',
             'education'  => 'nullable|string|max:50',
-            'course_ids' => 'required|array|min:1',
-            'course_ids.*' => 'exists:courses,id',
             'photo'      => 'nullable|image|max:2048',
             'cv'         => 'nullable|file|mimes:pdf,doc,docx|max:5120',
         ]);
@@ -74,7 +89,9 @@ class TeacherController extends Controller
             $data = $request->except(['photo', 'cv', 'password', 'course_ids']);
             $data['join_date'] = now()->toDateString();
             $data['status'] = 'aktif';
-            $data['subjects'] = Course::whereIn('id', $courseIds)->orderBy('nama')->pluck('nama')->implode(', ');
+            $data['subjects'] = !empty($courseIds)
+                ? Course::whereIn('id', $courseIds)->orderBy('nama')->pluck('nama')->implode(', ')
+                : null;
 
             if ($request->hasFile('photo')) {
                 $data['photo'] = $request->file('photo')->store('teachers', 'public');
@@ -100,12 +117,23 @@ class TeacherController extends Controller
             $data['user_id'] = $user->id;
 
             $teacher = Teacher::create($data);
-            $teacher->courses()->sync($courseIds);
+            if (!empty($courseIds)) {
+                $teacher->courses()->sync($courseIds);
+            }
 
             return $teacher;
         });
 
-        return response()->json(['success' => true, 'message' => 'Guru dan akun login berhasil ditambahkan!', 'data' => $teacher]);
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Guru dan akun login berhasil ditambahkan!',
+                'data' => $teacher,
+            ]);
+        }
+
+        return redirect()->route('admin.teachers.index')
+            ->with('success', 'Guru dan akun login berhasil ditambahkan!');
     }
 
     public function show(Teacher $teacher)
@@ -126,8 +154,6 @@ class TeacherController extends Controller
             'gender'     => 'required|in:L,P',
             'birth_date' => 'nullable|date',
             'branch_id'  => 'nullable|exists:branches,id',
-            'course_ids' => 'required|array|min:1',
-            'course_ids.*' => 'exists:courses,id',
             'email'      => [
                 'nullable',
                 'email',
@@ -142,7 +168,9 @@ class TeacherController extends Controller
         DB::transaction(function () use ($request, $teacher) {
             $courseIds = $request->input('course_ids', []);
             $data = $request->except(['photo', 'cv', 'password', 'course_ids']);
-            $data['subjects'] = Course::whereIn('id', $courseIds)->orderBy('nama')->pluck('nama')->implode(', ');
+            $data['subjects'] = !empty($courseIds)
+                ? Course::whereIn('id', $courseIds)->orderBy('nama')->pluck('nama')->implode(', ')
+                : null;
 
             if ($request->hasFile('photo')) {
                 if ($teacher->photo) Storage::disk('public')->delete($teacher->photo);
@@ -155,7 +183,9 @@ class TeacherController extends Controller
             }
 
             $teacher->update($data);
-            $teacher->courses()->sync($courseIds);
+            if (!empty($courseIds)) {
+                $teacher->courses()->sync($courseIds);
+            }
 
             $userData = [
                 'name'      => $request->name,

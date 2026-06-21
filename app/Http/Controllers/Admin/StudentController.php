@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
@@ -24,7 +25,8 @@ public function index(Request $request)
         ->when($request->search, fn($q) =>
             $q->where('name', 'like', "%{$request->search}%")
               ->orWhere('nis', 'like', "%{$request->search}%"))
-        ->when($request->status,    fn($q) => $q->where('status',    $request->status))
+        ->when($request->kategori_peserta_didik, fn($q) =>
+            $q->where('kategori_peserta_didik', $request->kategori_peserta_didik))
         ->when($request->gender,    fn($q) => $q->where('gender',    $request->gender))
             ->when($request->branch_id, function($q) use ($request) {
                 if ($request->branch_id === 'pusat') return $q->whereNull('branch_id');
@@ -42,6 +44,19 @@ $stats = [
     return view('admin.students.index', compact('branches', 'teachers', 'students', 'stats'));
 }
 
+public function create()
+{
+    $branches = Branch::all();
+    return view('admin.students.create', compact('branches'));
+}
+
+public function edit(Student $student)
+{
+    $student->load(['branch', 'user']);
+    $branches = Branch::all();
+    return view('admin.students.edit', compact('student', 'branches'));
+}
+
 public function store(Request $request)
 {
         // normalize 'pusat' selection to null so validation accepts it
@@ -50,30 +65,34 @@ public function store(Request $request)
         }
 
         $data = $request->validate([
-        'name'         => 'required|string|max:100',
-        'nis'          => 'required|string|unique:students,nis',
-        'gender'       => 'required|in:L,P',
-        'birth_date'   => 'nullable|date',
-        'birth_place'  => 'nullable|string|max:100',
-            'branch_id'    => 'nullable|exists:branches,id',
-        'phone'        => 'nullable|string|max:20',
-        'address'      => 'nullable|string',
-        'parent_name'  => 'nullable|string|max:100',
-        'parent_phone' => 'nullable|string|max:20',
-        'school_name'  => 'nullable|string|max:100',
-        'grade'        => 'nullable|string|max:50',
-        'photo'        => 'nullable|image|max:2048',
-        'teacher_pairs' => 'nullable|array',
-        'teacher_pairs.*' => ['nullable','regex:/^\d+:\d+$/'],
-        'teacher_ids'  => 'nullable|array',
-        'teacher_ids.*'=> 'exists:teachers,id',
-        'email'        => ['required', 'email', 'unique:users,email'],
-        'password'     => 'required|string|min:8',
+        'name'                    => 'required|string|max:100',
+        'gender'                  => 'required|in:L,P',
+        'birth_date'              => 'nullable|date',
+        'birth_place'             => 'nullable|string|max:100',
+        'branch_id'               => 'nullable|exists:branches,id',
+        'phone'                   => 'nullable|string|max:20',
+        'address'                 => 'nullable|string',
+        'parent_name'             => 'nullable|string|max:100',
+        'parent_phone'            => 'nullable|string|max:20',
+        'kategori_peserta_didik'  => 'nullable|in:Pra Sekolah (PAUD/TK),Sekolah Dasar (SD),Sekolah Menengah Pertama (SMP),Sekolah Menengah Atas/Kejuruan (SMA/SMK),Mahasiswa,Umum',
+        'photo'                   => 'nullable|image|max:2048',
+        'teacher_pairs'           => 'nullable|array',
+        'teacher_pairs.*'         => ['nullable','regex:/^\d+:\d+$/'],
+        'teacher_ids'             => 'nullable|array',
+        'teacher_ids.*'           => 'exists:teachers,id',
+        'email'                   => ['required', 'email', 'unique:users,email'],
+        'password'                => 'required|string|min:8',
     ]);
 
     $password = $data['password'];
     $email = $data['email'];
     unset($data['password'], $data['email']);
+
+    if (empty($data['nis'] ?? null)) {
+        do {
+            $data['nis'] = 'S' . now()->format('YmdHis') . Str::upper(Str::random(3));
+        } while (Student::where('nis', $data['nis'])->exists());
+    }
 
     $data['join_date'] = now()->toDateString();
 
@@ -119,11 +138,9 @@ public function store(Request $request)
         return $student;
     });
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Siswa berhasil ditambahkan',
-        'data' => $student
-    ]);
+    return redirect()
+        ->route('admin.students.index')
+        ->with('success', 'Siswa berhasil ditambahkan.');
 }
 
     public function show(Student $student)
@@ -140,20 +157,20 @@ public function store(Request $request)
         }
 
         $request->validate([
-            'name'         => 'required|string|max:100',
-            'nis'          => 'required|string|unique:students,nis,' . $student->id,
-            'gender'       => 'required|in:L,P',
-            'birth_date'   => 'nullable|date',
-            'phone'        => 'nullable|string|max:20',
-            'address'      => 'nullable|string',
-            'parent_name'  => 'nullable|string|max:100',
-            'parent_phone' => 'nullable|string|max:20',
-            'branch_id'    => 'nullable|exists:branches,id',
-            'photo'        => 'nullable|image|max:2048',
-            'teacher_ids'  => 'nullable|array',
-            'teacher_ids.*'=> 'exists:teachers,id',
-            'email'        => ['nullable', 'email', Rule::unique('users', 'email')->ignore($student->user_id)],
-            'password'     => 'nullable|string|min:8',
+            'name'                   => 'required|string|max:100',
+            'gender'                 => 'required|in:L,P',
+            'birth_date'             => 'nullable|date',
+            'phone'                  => 'nullable|string|max:20',
+            'address'                => 'nullable|string',
+            'parent_name'            => 'nullable|string|max:100',
+            'parent_phone'           => 'nullable|string|max:20',
+            'branch_id'              => 'nullable|exists:branches,id',
+            'kategori_peserta_didik' => 'nullable|in:Pra Sekolah (PAUD/TK),Sekolah Dasar (SD),Sekolah Menengah Pertama (SMP),Sekolah Menengah Atas/Kejuruan (SMA/SMK),Mahasiswa,Umum',
+            'photo'                  => 'nullable|image|max:2048',
+            'teacher_ids'            => 'nullable|array',
+            'teacher_ids.*'          => 'exists:teachers,id',
+            'email'                  => ['nullable', 'email', Rule::unique('users', 'email')->ignore($student->user_id)],
+            'password'               => 'nullable|string|min:8',
         ]);
 
         // prefer explicit pairs if provided, else teacher_ids
@@ -202,10 +219,9 @@ public function store(Request $request)
             }
         });
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Data siswa berhasil diupdate!',
-        ]);
+        return redirect()
+            ->route('admin.students.index')
+            ->with('success', 'Data siswa berhasil diperbarui.');
     }
 
     public function destroy(Student $student)

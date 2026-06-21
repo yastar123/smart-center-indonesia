@@ -135,7 +135,7 @@ class RegistrationController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('admin.registration.index')
+            return redirect()->route('admin.registration.create')
                 ->with('success', 'Registrasi berhasil disimpan.');
         } catch (\Throwable $e) {
             DB::rollBack();

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Module;
 use App\Models\Course;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AcademicModuleController extends Controller
 {
@@ -51,11 +52,36 @@ class AcademicModuleController extends Controller
             'judul'             => 'required|string|max:200',
             'deskripsi'         => 'nullable|string',
             'mata_pelajaran_id' => 'required|exists:courses,id',
-            'jenis'             => 'nullable|in:pdf,video,link,materi',
-            'status'            => 'required|in:aktif,review',
+            'jenis'             => 'nullable|in:materi,video',
+            'status'            => 'required|in:aktif,nonaktif',
+            'module_file'       => 'nullable|file|mimes:pdf,doc,docx|max:51200',
+            'video_url'         => 'nullable|url',
         ]);
 
-        $data['jenis'] = $data['jenis'] ?? 'materi';
+        if (!$request->hasFile('module_file') && !$request->filled('video_url')) {
+            return redirect()->back()
+                ->withErrors([
+                    'module_file' => 'Upload file modul (PDF/DOC/DOCX) atau isi link video wajib diisi.',
+                ])
+                ->withInput();
+        }
+
+        $data['jenis'] = $data['jenis'] ?? ($request->filled('video_url') ? 'video' : 'materi');
+        $data['diupload_oleh'] = auth()->id();
+
+        if ($request->hasFile('module_file')) {
+            $uploaded = $request->file('module_file')->store('modules', 'public');
+            $data['file_path'] = $uploaded;
+            $data['file_url'] = null;
+            $data['ukuran_file'] = $request->file('module_file')->getSize();
+            if ($request->file('module_file')->getClientOriginalExtension() === 'pdf') {
+                $data['jenis'] = 'pdf';
+            }
+        } elseif ($request->filled('video_url')) {
+            $data['file_url'] = $request->video_url;
+            $data['file_path'] = null;
+            $data['ukuran_file'] = null;
+        }
 
         Module::create($data);
 
@@ -82,9 +108,37 @@ class AcademicModuleController extends Controller
             'judul'             => 'required|string|max:200',
             'deskripsi'         => 'nullable|string',
             'mata_pelajaran_id' => 'required|exists:courses,id',
-            'jenis'             => 'nullable|in:pdf,video,link,materi',
-            'status'            => 'required|in:aktif,review',
+            'jenis'             => 'nullable|in:materi,video',
+            'status'            => 'required|in:aktif,nonaktif',
+            'module_file'       => 'nullable|file|mimes:pdf,doc,docx|max:51200',
+            'video_url'         => 'nullable|url',
         ]);
+
+        if (!$request->hasFile('module_file') && !$request->filled('video_url') && !$module->file_path && !$module->file_url) {
+            return redirect()->back()
+                ->withErrors([
+                    'module_file' => 'Upload file modul (PDF/DOC/DOCX) atau isi link video wajib diisi.',
+                ])
+                ->withInput();
+        }
+
+        if ($request->hasFile('module_file')) {
+            if ($module->file_path) {
+                Storage::disk('public')->delete($module->file_path);
+            }
+            $uploaded = $request->file('module_file')->store('modules', 'public');
+            $data['file_path'] = $uploaded;
+            $data['file_url'] = null;
+            $data['ukuran_file'] = $request->file('module_file')->getSize();
+            if ($request->file('module_file')->getClientOriginalExtension() === 'pdf') {
+                $data['jenis'] = 'pdf';
+            }
+        } elseif ($request->filled('video_url')) {
+            $data['file_url'] = $request->video_url;
+            $data['file_path'] = null;
+            $data['ukuran_file'] = null;
+            $data['jenis'] = $data['jenis'] ?? 'video';
+        }
 
         $module->update($data);
 

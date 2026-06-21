@@ -14,7 +14,7 @@ class Student extends Model
         'user_id', 'branch_id', 'nis', 'name', 'gender',
         'birth_date', 'birth_place', 'address', 'phone',
         'parent_name', 'parent_phone', 'photo', 'status',
-        'join_date', 'school_name', 'grade',
+        'join_date', 'school_name', 'grade', 'kategori_peserta_didik',
     ];
 
     protected $casts = [
@@ -24,6 +24,10 @@ class Student extends Model
 
     public function user()    { return $this->belongsTo(User::class); }
     public function branch()  { return $this->belongsTo(Branch::class); }
+    public function package()
+    {
+        return $this->belongsTo(Package::class, 'package_id');
+    }
     public function teachers()
     {
         return $this->belongsToMany(Teacher::class, 'student_teachers', 'student_id', 'teacher_id')->withTimestamps();

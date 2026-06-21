@@ -20,7 +20,7 @@
 
 <div class="row g-4">
     <div class="col-lg-8">
-        <form method="POST" action="{{ route('admin.module.update', $module) }}">
+        <form method="POST" action="{{ route('admin.module.update', $module) }}" enctype="multipart/form-data">
         @csrf @method('PUT')
         <div class="dashboard-card">
             <h6 class="fw-bold mb-4 pb-2 border-bottom">Edit Modul: {{ $module->judul }}</h6>
@@ -68,6 +68,24 @@
                         <option value="review" {{ old('status', $module->status)=='review' ?'selected':'' }}>Review</option>
                     </select>
                     @error('status')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Upload File Modul (PDF / DOC / DOCX)</label>
+                    <input type="file" name="module_file"
+                           class="form-control @error('module_file') is-invalid @enderror"
+                           accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                    <div class="form-text">Kosongkan jika tidak ingin mengganti file. Wajib salah satu: file atau link video.</div>
+                    @error('module_file')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Link Video Modul</label>
+                    <input type="url" name="video_url" value="{{ old('video_url', $module->file_url) }}"
+                           class="form-control @error('video_url') is-invalid @enderror"
+                           placeholder="https://www.youtube.com/watch?v=...">
+                    <div class="form-text">Isi jika modul menggunakan video pembelajaran.</div>
+                    @error('video_url')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="col-12">

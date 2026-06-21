@@ -50,7 +50,7 @@
     <div class="col-4 fade-up" style="animation-delay:.10s">
         <div class="stat-card" style="border-top:3px solid #f6af23">
             <div class="d-flex justify-content-between align-items-start">
-                <div><div class="stat-title">Review</div><div class="stat-value text-warning">{{ $stats['review'] }}</div></div>
+                <div><div class="stat-title">Nonaktif</div><div class="stat-value text-warning">{{ $stats['review'] }}</div></div>
                 <div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-hourglass-split"></i></div>
             </div>
         </div>
@@ -82,8 +82,8 @@
                 <label class="form-label fw-semibold" style="font-size:12px">Status</label>
                 <select name="status" class="form-select" style="border-color:var(--card-border);background:var(--input-bg)">
                     <option value="">Semua</option>
-                    <option value="aktif"  {{ request('status')=='aktif'  ?'selected':'' }}>Aktif</option>
-                    <option value="review" {{ request('status')=='review' ?'selected':'' }}>Review</option>
+                    <option value="aktif"    {{ request('status')=='aktif'    ?'selected':'' }}>Aktif</option>
+                    <option value="nonaktif" {{ request('status')=='nonaktif' ?'selected':'' }}>Nonaktif</option>
                 </select>
             </div>
             <div class="col-md-2 d-flex gap-2">
@@ -108,6 +108,9 @@
                     <th class="fw-semibold" style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px">Kode Modul</th>
                     <th class="fw-semibold" style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px">Judul Modul</th>
                     <th class="fw-semibold" style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px">Mata Pelajaran</th>
+                    <th class="fw-semibold" style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px">Deskripsi</th>
+                    <th class="fw-semibold" style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px">Jenis</th>
+                    <th class="fw-semibold" style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px">File Modul atau Link Modul</th>
                     <th class="fw-semibold text-center" style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px">Status</th>
                     <th class="fw-semibold text-center" style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px">Aksi</th>
                 </tr>
@@ -125,15 +128,37 @@
                     </td>
                     <td>
                         <div class="fw-semibold">{{ $m->judul }}</div>
-                        @if($m->deskripsi)
-                            <div class="text-muted" style="font-size:12px">{{ Str::limit($m->deskripsi, 60) }}</div>
-                        @endif
                     </td>
                     <td>
                         @if($m->mataPelajaran)
                             <span style="background:var(--soft-info);color:#0369a1;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500">
                                 {{ $m->mataPelajaran->nama }}
                             </span>
+                        @else
+                            <span class="text-muted">—</span>
+                        @endif
+                    </td>
+                    <td>
+                        <span class="text-muted" style="font-size:12px">{{ $m->deskripsi ? Str::limit($m->deskripsi, 80) : '—' }}</span>
+                    </td>
+                    <td>
+                        <span class="text-capitalize">{{ $m->jenis ?: '—' }}</span>
+                    </td>
+                    <td>
+                        @php
+                            $moduleFileUrl = null;
+                            if (!empty($m->file_path)) {
+                                if (Storage::disk('public')->exists($m->file_path)) {
+                                    $moduleFileUrl = Storage::disk('public')->url($m->file_path);
+                                } elseif (file_exists(public_path($m->file_path))) {
+                                    $moduleFileUrl = asset($m->file_path);
+                                }
+                            }
+                        @endphp
+                        @if($moduleFileUrl)
+                            <a href="{{ $moduleFileUrl }}" target="_blank" class="btn btn-sm btn-outline-primary">Lihat File</a>
+                        @elseif($m->file_url)
+                            <a href="{{ $m->file_url }}" target="_blank" class="btn btn-sm btn-outline-info">Lihat Link</a>
                         @else
                             <span class="text-muted">—</span>
                         @endif
@@ -145,7 +170,7 @@
                             </span>
                         @else
                             <span style="background:var(--soft-warning);color:#d97706;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600">
-                                <i class="bi bi-hourglass-split me-1"></i>Review
+                                <i class="bi bi-x-circle-fill me-1"></i>Nonaktif
                             </span>
                         @endif
                     </td>
@@ -165,7 +190,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="text-center py-5">
+                    <td colspan="8" class="text-center py-5">
                         <div style="font-size:40px;opacity:.3;margin-bottom:8px"><i class="bi bi-journal-x"></i></div>
                         <div class="text-muted">Belum ada modul akademik</div>
                         <a href="{{ route('admin.module.create') }}" class="btn btn-sm btn-primary mt-2">Tambah Modul</a>

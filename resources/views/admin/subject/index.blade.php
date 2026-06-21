@@ -37,8 +37,6 @@
             ['label'=>'Total Mapel',  'value'=>$stats['total'],    'icon'=>'bi-book-fill',        'topColor'=>'#10b981', 'textColor'=>'text-success', 'iconBg'=>'bg-success-soft'],
             ['label'=>'Mapel Aktif',  'value'=>$stats['aktif'],    'icon'=>'bi-check-circle-fill','topColor'=>'#c84ddf', 'textColor'=>'text-primary', 'iconBg'=>'bg-primary-soft'],
             ['label'=>'Tidak Aktif',  'value'=>$stats['nonaktif'], 'icon'=>'bi-x-circle-fill',   'topColor'=>'#ef4444', 'textColor'=>'text-danger',  'iconBg'=>'bg-danger-soft'],
-            ['label'=>'Academic',     'value'=>$stats['academic'], 'icon'=>'bi-mortarboard-fill', 'topColor'=>'#3b82f6', 'textColor'=>'text-info',    'iconBg'=>'bg-info-soft'],
-            ['label'=>'Skill/Soft',   'value'=>$stats['skill'],    'icon'=>'bi-lightning-fill',   'topColor'=>'#f6af23', 'textColor'=>'text-warning', 'iconBg'=>'bg-warning-soft'],
         ];
     @endphp
     @foreach($statCards as $i => $sc)
@@ -62,38 +60,22 @@
 <div class="dashboard-card mb-4 fade-up">
     <form method="GET" class="row g-2 align-items-end">
         <div class="col-12 col-md-4">
-            <div class="input-group">
-                <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-search text-muted"></i></span>
-                <input type="text" name="search" class="form-control border-start-0" placeholder="Cari nama atau kode mapel…" value="{{ request('search') }}">
-            </div>
+            <input type="text" name="search" class="form-control" placeholder="Cari nama atau kode mapel…" value="{{ request('search') }}">
         </div>
-        <div class="col-6 col-md-2">
-            <select name="kategori" class="form-select">
-                <option value="">Semua Kategori</option>
-                <option value="academic" {{ request('kategori')=='academic'?'selected':'' }}>Academic</option>
-                <option value="skill"    {{ request('kategori')=='skill'   ?'selected':'' }}>Skill / Soft-Skill</option>
-            </select>
-        </div>
-        <div class="col-6 col-md-2">
+        <div class="col-6 col-md-3">
             <select name="status" class="form-select">
                 <option value="">Semua Status</option>
                 <option value="aktif"    {{ request('status')=='aktif'   ?'selected':'' }}>Aktif</option>
                 <option value="nonaktif" {{ request('status')=='nonaktif'?'selected':'' }}>Tidak Aktif</option>
             </select>
         </div>
-        <div class="col-6 col-md-2">
+        <div class="col-6 col-md-3">
             <select name="cabang_id" class="form-select">
                 <option value="">Semua Cabang</option>
                 @foreach($branches as $b)
                     <option value="{{ $b->id }}" {{ request('cabang_id')==$b->id?'selected':'' }}>{{ $b->name }}</option>
                 @endforeach
             </select>
-        </div>
-        <div class="col-3 col-md-1">
-            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel"></i></button>
-        </div>
-        <div class="col-3 col-md-1">
-            <a href="{{ route('admin.subject.index') }}" class="btn btn-outline-secondary w-100"><i class="bi bi-x-lg"></i></a>
         </div>
     </form>
 </div>
@@ -113,7 +95,7 @@
                 <tr>
                     <th>Kode</th>
                     <th>Nama Pelajaran</th>
-                    <th>Kategori Keterampilan</th>
+                    <th>Deskripsi</th>
                     <th>Cabang</th>
                     <th>Status</th>
                     <th class="text-center">Aksi</th>
@@ -124,28 +106,10 @@
                 <tr>
                     <td><span class="badge bg-secondary">{{ $s->kode }}</span></td>
                     <td>
-                        <div class="d-flex align-items-center gap-2">
-                            <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#461256,#c84ddf);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
-                                <i class="bi bi-book"></i>
-                            </div>
-                            <div>
-                                <div class="fw-semibold">{{ $s->nama }}</div>
-                                <div class="text-muted" style="font-size:11px">{{ Str::limit($s->deskripsi, 50) }}</div>
-                            </div>
-                        </div>
+                        <div class="fw-semibold">{{ $s->nama }}</div>
                     </td>
-                    <td>
-                        @if($s->kategori === 'academic')
-                            <span class="badge" style="background:rgba(59,130,246,.15);color:#3b82f6;font-size:11px">
-                                <i class="bi bi-mortarboard me-1"></i>Academic
-                            </span>
-                        @else
-                            <span class="badge" style="background:rgba(246,175,35,.15);color:#e09000;font-size:11px">
-                                <i class="bi bi-lightning me-1"></i>Skill / Soft-Skill
-                            </span>
-                        @endif
-                    </td>
-                    <td>{{ $s->cabang->name ?? '—' }}</td>
+                    <td>{{ Str::limit($s->deskripsi, 60) }}</td>
+                    <td>{{ $s->cabang_id ? ($s->cabang->name ?? '—') : 'Semua Cabang' }}</td>
                     <td>
                         @if($s->status === 'aktif')
                             <span class="badge" style="background:rgba(16,185,129,.15);color:#059669">Aktif</span>
@@ -155,15 +119,10 @@
                     </td>
                     <td class="text-center">
                         <div class="d-flex gap-1 justify-content-center">
-                            <a href="{{ route('admin.subject.show', $s) }}" class="btn btn-sm btn-outline-primary" title="Detail">
-                                <i class="bi bi-eye"></i> Detail
-                            </a>
-                            <a href="{{ route('admin.subject.edit', $s) }}" class="btn btn-sm btn-outline-secondary" title="Edit">
-                                <i class="bi bi-pencil"></i> Edit
-                            </a>
+                            <a href="{{ route('admin.subject.edit', $s) }}" class="btn btn-sm btn-outline-secondary" title="Edit">Edit</a>
                             <form method="POST" action="{{ route('admin.subject.destroy', $s) }}" class="d-inline" onsubmit="return confirm('Hapus mata pelajaran ini?')">
                                 @csrf @method('DELETE')
-                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                <button class="btn btn-sm btn-outline-danger">Hapus</button>
                             </form>
                         </div>
                     </td>

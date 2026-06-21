@@ -17,9 +17,11 @@ use App\Http\Controllers\Admin\CoursePackageController;
 use App\Http\Controllers\Admin\ScheduleDashboardController;
 use App\Http\Controllers\Admin\RescheduleController;
 use App\Http\Controllers\Admin\RegistrationController;
+use App\Http\Controllers\Admin\StudentRegistrationController;
 use App\Http\Controllers\Admin\AcademicModuleController;
 use App\Http\Controllers\Admin\BillingController;
 use App\Http\Controllers\Admin\TryoutController;
+use App\Http\Controllers\Public\StudentRegistrationPublicController;
 use App\Http\Controllers\Admin\MessageController;
 use App\Http\Controllers\Admin\AttendanceHistoryController;
 use App\Http\Controllers\Owner\BranchController;
@@ -27,6 +29,9 @@ use App\Http\Controllers\Guru\AttendanceController;
 use App\Http\Controllers\Siswa\SiswaController;
 
 Route::redirect('/', '/login');
+
+Route::post('/public/student-registrations', [StudentRegistrationPublicController::class, 'store'])
+    ->name('public.student-registrations.store');
 
 Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -56,14 +61,18 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
 
         // STUDENTS
         Route::get('/students',              [StudentController::class, 'index'])   ->name('students.index');
+        Route::get('/students/create',        [StudentController::class, 'create'])  ->name('students.create');
         Route::post('/students',             [StudentController::class, 'store'])   ->name('students.store');
+        Route::get('/students/{student}/edit',[StudentController::class, 'edit'])    ->name('students.edit');
         Route::get('/students/{student}',    [StudentController::class, 'show'])    ->name('students.show');
         Route::put('/students/{student}',    [StudentController::class, 'update'])  ->name('students.update');
         Route::delete('/students/{student}', [StudentController::class, 'destroy']) ->name('students.destroy');
 
         // TEACHERS
         Route::get('/teachers',              [TeacherController::class, 'index'])   ->name('teachers.index');
+        Route::get('/teachers/create',       [TeacherController::class, 'create'])  ->name('teachers.create');
         Route::post('/teachers',             [TeacherController::class, 'store'])   ->name('teachers.store');
+        Route::get('/teachers/{teacher}/edit', [TeacherController::class, 'edit'])   ->name('teachers.edit');
         Route::get('/teachers/{teacher}',    [TeacherController::class, 'show'])    ->name('teachers.show');
         Route::put('/teachers/{teacher}',    [TeacherController::class, 'update'])  ->name('teachers.update');
         Route::delete('/teachers/{teacher}', [TeacherController::class, 'destroy']) ->name('teachers.destroy');
@@ -200,9 +209,14 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::post('/reschedule/{proposal}/reject',    [RescheduleController::class, 'reject'])  ->name('reschedule.reject');
 
         // REGISTRATION (Registrasi Siswa)
-        Route::get('/registration-list',         [RegistrationController::class, 'index'])  ->name('registration.index');
         Route::get('/registration-create',       [RegistrationController::class, 'create']) ->name('registration.create');
         Route::post('/registration-create',      [RegistrationController::class, 'store'])  ->name('registration.store');
+
+        // STUDENT REGISTRATIONS (pending applicants)
+        Route::get('/student-registrations',               [StudentRegistrationController::class, 'index'])->name('student-registrations.index');
+        Route::get('/student-registrations/{studentRegistration}', [StudentRegistrationController::class, 'show'])->name('student-registrations.show');
+        Route::get('/student-registrations/{studentRegistration}/verify', [StudentRegistrationController::class, 'verify'])->name('student-registrations.verify');
+        Route::delete('/student-registrations/{studentRegistration}', [StudentRegistrationController::class, 'destroy'])->name('student-registrations.destroy');
 
         // ACADEMIC MODULE (Modul Akademik)
         Route::get('/module',                    [AcademicModuleController::class, 'index'])   ->name('module.index');

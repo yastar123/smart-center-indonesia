@@ -13,14 +13,14 @@
     </ol>
 </nav>
 
-<div class="dashboard-card" style="max-width:780px;margin:0 auto">
-    <div class="d-flex align-items-center gap-3 mb-4">
+<div class="w-100">
+    <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
         <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#461256,#c84ddf);display:flex;align-items:center;justify-content:center;color:white;font-size:22px;flex-shrink:0">
             <i class="bi bi-plus-circle"></i>
         </div>
         <div>
             <h5 class="fw-bold mb-0">Tambah Paket Belajar Baru</h5>
-            <p class="text-muted mb-0" style="font-size:13px">Konfigurasi paket kursus, harga, mata pelajaran, dan guru pengampu</p>
+            <p class="text-muted mb-0" style="font-size:13px">Konfigurasi paket kursus, harga, dan mata pelajaran</p>
         </div>
     </div>
 
@@ -61,21 +61,29 @@
             </div>
 
             <div class="col-md-6">
+                <label class="form-label fw-semibold">Metode Absensi <span class="text-danger">*</span></label>
+                <select name="metode_absensi" class="form-select @error('metode_absensi') is-invalid @enderror" required>
+                    <option value="manual" {{ old('metode_absensi', 'manual') == 'manual' ? 'selected' : '' }}>Manual</option>
+                    <option value="otomatis" {{ old('metode_absensi') == 'otomatis' ? 'selected' : '' }}>Otomatis</option>
+                </select>
+                @error('metode_absensi')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Tipe Kelas <span class="text-danger">*</span></label>
+                <select name="tipe_kelas" class="form-select @error('tipe_kelas') is-invalid @enderror" required>
+                    <option value="offline" {{ old('tipe_kelas', 'offline') == 'offline' ? 'selected' : '' }}>Offline</option>
+                    <option value="online" {{ old('tipe_kelas') == 'online' ? 'selected' : '' }}>Online</option>
+                    <option value="private" {{ old('tipe_kelas') == 'private' ? 'selected' : '' }}>Private</option>
+                </select>
+                @error('tipe_kelas')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </div>
+
+            <div class="col-md-6">
                 <label class="form-label fw-semibold">Harga Dasar (Rp) <span class="text-danger">*</span></label>
                 <input type="number" name="harga" class="form-control @error('harga') is-invalid @enderror"
                        value="{{ old('harga', 0) }}" min="0" required>
                 @error('harga')<div class="invalid-feedback">{{ $message }}</div>@enderror
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-semibold">Guru Pengampu</label>
-                <select name="guru_id" class="form-select @error('guru_id') is-invalid @enderror">
-                    <option value="">— Pilih Guru —</option>
-                    @foreach($teachers as $t)
-                        <option value="{{ $t->id }}" {{ old('guru_id')==$t->id?'selected':'' }}>{{ $t->name }}</option>
-                    @endforeach
-                </select>
-                @error('guru_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
 
             <div class="col-md-6">
@@ -91,8 +99,8 @@
             <div class="col-md-6">
                 <label class="form-label fw-semibold">Status <span class="text-danger">*</span></label>
                 <select name="status" class="form-select" required>
-                    <option value="aktif"    {{ old('status','aktif')=='aktif'   ?'selected':'' }}>Aktif</option>
-                    <option value="nonaktif" {{ old('status')=='nonaktif'?'selected':'' }}>Draft</option>
+                    <option value="aktif" {{ old('status', 'aktif') == 'aktif' ? 'selected' : '' }}>Aktif</option>
+                    <option value="nonaktif" {{ old('status') == 'nonaktif' ? 'selected' : '' }}>Non Aktif</option>
                 </select>
             </div>
 

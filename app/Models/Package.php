@@ -21,6 +21,8 @@ class Package extends Model
         'durasi_bulan',
         'jumlah_pertemuan',
         'jenis',
+        'metode_absensi',
+        'tipe_kelas',
         'fitur',
         'is_unggulan',
         'status',

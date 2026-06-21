@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Formulir Pendaftaran – Ayo Kursus</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
@@ -273,29 +274,54 @@ function handleSubmit(e){
   e.preventDefault();
   const minat=[...document.querySelectorAll('input[name=minat]:checked')].map(x=>x.value);
   const hari=[...document.querySelectorAll('input[name=hari]:checked')].map(x=>x.value);
-  const noReg='AK-'+Date.now().toString().slice(-6);
-  const data={
-    id:Date.now(),noReg,status:'Pending',tglDaftar:new Date().toISOString(),
-    nama:document.getElementById('nama_lengkap').value,hp:document.getElementById('hp_siswa').value,
-    jk:document.getElementById('jenis_kelamin').value,tempat_lahir:document.getElementById('tempat_lahir').value,
-    tanggal_lahir:document.getElementById('tanggal_lahir').value,alamat:document.getElementById('alamat').value,
-    jenisPeserta:jenisPeserta.value,jenjang:jenjang.style.display!=='none'?jenjang.value:'',
-    kelas:kelas.style.display!=='none'?kelas.value:'',sekolah:namaSekolah.style.display!=='none'?namaSekolah.value:'',
-    nama_ortu:document.getElementById('nama_ortu').value,hp_ortu:document.getElementById('hp_ortu').value,
-    pekerjaan:document.getElementById('pekerjaan').value,
-    program:document.querySelector('input[name=program]:checked')?.value||'',
-    sistem:document.querySelector('input[name=sistem]:checked')?.value||'',
-    tempat:document.querySelector('input[name=tempat]:checked')?.value||'',
-    pengambilan:document.querySelector('input[name=pengambilan]:checked')?.value||'',
-    cabang:document.getElementById('cabang').value,minat:minat.join(', '),hariPref:hari.join(', '),
-    jamPref:document.getElementById('jam_belajar').value,tanggalMulai:document.getElementById('tanggal_mulai').value,
-    catatan:document.getElementById('catatan').value,jadwal:[]
+
+  const payload={
+    nama_lengkap: document.getElementById('nama_lengkap').value,
+    tempat_lahir: document.getElementById('tempat_lahir').value,
+    tanggal_lahir: document.getElementById('tanggal_lahir').value,
+    alamat: document.getElementById('alamat').value,
+    hp_siswa: document.getElementById('hp_siswa').value,
+    jenis_kelamin: document.getElementById('jenis_kelamin').value,
+    jenisPeserta: jenisPeserta.value,
+    jenjang: jenjang.style.display !== 'none' ? jenjang.value : '',
+    kelas: kelas.style.display !== 'none' ? kelas.value : '',
+    namaSekolah: namaSekolah.style.display !== 'none' ? namaSekolah.value : '',
+    nama_ortu: document.getElementById('nama_ortu').value,
+    hp_ortu: document.getElementById('hp_ortu').value,
+    pekerjaan: document.getElementById('pekerjaan').value,
+    program: document.querySelector('input[name=program]:checked')?.value || '',
+    sistem: document.querySelector('input[name=sistem]:checked')?.value || '',
+    tempat: document.querySelector('input[name=tempat]:checked')?.value || '',
+    pengambilan: document.querySelector('input[name=pengambilan]:checked')?.value || '',
+    cabang: document.getElementById('cabang').value,
+    minat: minat,
+    hari: hari,
+    jam_belajar: document.getElementById('jam_belajar').value,
+    tanggal_mulai: document.getElementById('tanggal_mulai').value,
+    catatan: document.getElementById('catatan').value,
   };
-  const existing=JSON.parse(localStorage.getItem('ayokursus_pendaftar')||'[]');
-  existing.push(data);
-  localStorage.setItem('ayokursus_pendaftar',JSON.stringify(existing));
-  document.getElementById('noReg').textContent=noReg;
-  document.getElementById('successOverlay').classList.add('show');
+
+  fetch('{{ route("public.student-registrations.store") }}', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(async res => {
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || 'Gagal menyimpan pendaftaran');
+    }
+    document.getElementById('noReg').textContent = data.data?.no_reg || '–';
+    document.getElementById('successOverlay').classList.add('show');
+  })
+  .catch(err => {
+    alert(err.message || 'Terjadi kesalahan.');
+  });
 }
 function closeSuccess(){
   document.getElementById('successOverlay').classList.remove('show');

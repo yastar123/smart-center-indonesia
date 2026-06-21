@@ -76,26 +76,32 @@ class RolePermissionSeeder extends Seeder
         $karyawan->syncPermissions(['schedule.view', 'salary.view']);
 
         // Create Super Admin (Admin Pusat)
-        $ownerUser = User::firstOrCreate(
-            ['email' => 'adminpusatsci@akademi.com'],
-            [
-                'name'      => 'Admin Pusat SCI',
-                'password'  => bcrypt('password'),
-                'is_active' => true,
-            ]
-        );
-        $ownerUser->assignRole('owner');
+        $ownerUser = User::where('email', 'adminpusatsci@akademi.com')->first();
+        if (! $ownerUser) {
+            $ownerUser = new User();
+            $ownerUser->email = 'adminpusatsci@akademi.com';
+        }
+        $ownerUser->forceFill([
+            'name'      => 'Admin Pusat SCI',
+            'password'  => bcrypt('password'),
+            'is_active' => true,
+        ]);
+        $ownerUser->save();
+        $ownerUser->syncRoles(['owner']);
 
         // Create Admin Cabang
-        $adminUser = User::firstOrCreate(
-            ['email' => 'admincabangsci@akademi.com'],
-            [
-                'name'      => 'Admin Cabang SCI',
-                'password'  => bcrypt('password'),
-                'is_active' => true,
-            ]
-        );
-        $adminUser->assignRole('admin');
+        $adminUser = User::where('email', 'admincabangsci@akademi.com')->first();
+        if (! $adminUser) {
+            $adminUser = new User();
+            $adminUser->email = 'admincabangsci@akademi.com';
+        }
+        $adminUser->forceFill([
+            'name'      => 'Admin Cabang SCI',
+            'password'  => bcrypt('password'),
+            'is_active' => true,
+        ]);
+        $adminUser->save();
+        $adminUser->syncRoles(['admin']);
 
         $this->command->info('✅ Roles, Permissions & Users seeded!');
     }

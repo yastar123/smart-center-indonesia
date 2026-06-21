@@ -14,8 +14,8 @@
     </ol>
 </nav>
 
-<div class="dashboard-card" style="max-width:780px;margin:0 auto">
-    <div class="d-flex align-items-center gap-3 mb-4">
+<div class="w-100">
+    <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
         <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#461256,#c84ddf);display:flex;align-items:center;justify-content:center;color:white;font-size:22px;flex-shrink:0">
             <i class="bi bi-pencil-square"></i>
         </div>
@@ -58,19 +58,26 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label fw-semibold">Harga Dasar (Rp) <span class="text-danger">*</span></label>
-                <input type="number" name="harga" class="form-control"
-                       value="{{ old('harga', $coursePackage->harga) }}" min="0" required>
+                <label class="form-label fw-semibold">Metode Absensi <span class="text-danger">*</span></label>
+                <select name="metode_absensi" class="form-select" required>
+                    <option value="manual" {{ old('metode_absensi', $coursePackage->metode_absensi ?? 'manual') == 'manual' ? 'selected' : '' }}>Manual</option>
+                    <option value="otomatis" {{ old('metode_absensi', $coursePackage->metode_absensi ?? '') == 'otomatis' ? 'selected' : '' }}>Otomatis</option>
+                </select>
             </div>
 
             <div class="col-md-6">
-                <label class="form-label fw-semibold">Guru Pengampu</label>
-                <select name="guru_id" class="form-select">
-                    <option value="">— Pilih Guru —</option>
-                    @foreach($teachers as $t)
-                        <option value="{{ $t->id }}" {{ old('guru_id', $coursePackage->guru_id)==$t->id?'selected':'' }}>{{ $t->name }}</option>
-                    @endforeach
+                <label class="form-label fw-semibold">Tipe Kelas <span class="text-danger">*</span></label>
+                <select name="tipe_kelas" class="form-select" required>
+                    <option value="offline" {{ old('tipe_kelas', $coursePackage->tipe_kelas ?? 'offline') == 'offline' ? 'selected' : '' }}>Offline</option>
+                    <option value="online" {{ old('tipe_kelas', $coursePackage->tipe_kelas ?? '') == 'online' ? 'selected' : '' }}>Online</option>
+                    <option value="private" {{ old('tipe_kelas', $coursePackage->tipe_kelas ?? '') == 'private' ? 'selected' : '' }}>Private</option>
                 </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Harga Dasar (Rp) <span class="text-danger">*</span></label>
+                <input type="number" name="harga" class="form-control"
+                       value="{{ old('harga', $coursePackage->harga) }}" min="0" required>
             </div>
 
             <div class="col-md-6">
@@ -86,8 +93,8 @@
             <div class="col-md-6">
                 <label class="form-label fw-semibold">Status <span class="text-danger">*</span></label>
                 <select name="status" class="form-select" required>
-                    <option value="aktif"    {{ old('status',$coursePackage->status)=='aktif'   ?'selected':'' }}>Aktif</option>
-                    <option value="nonaktif" {{ old('status',$coursePackage->status)=='nonaktif'?'selected':'' }}>Draft</option>
+                    <option value="aktif" {{ old('status', $coursePackage->status) == 'aktif' ? 'selected' : '' }}>Aktif</option>
+                    <option value="nonaktif" {{ old('status', $coursePackage->status) == 'nonaktif' ? 'selected' : '' }}>Non Aktif</option>
                 </select>
             </div>
 

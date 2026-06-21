@@ -23,12 +23,13 @@
 
         body {
             min-height: 100vh;
+            width: 100%;
             background: linear-gradient(135deg, #260632 0%, #461256 40%, #68117e 75%, #c84ddf 100%);
             display: flex;
-            align-items: center;
-            justify-content: center;
+            align-items: stretch;
+            justify-content: stretch;
             font-family: 'Inter', 'Segoe UI', sans-serif;
-            padding: 1rem;
+            padding: 0;
             position: relative;
             overflow: hidden;
         }
@@ -60,11 +61,11 @@
 
         .login-wrapper {
             display: flex;
-            width: min(960px, 100%);
-            min-height: 560px;
-            border-radius: 28px;
+            width: 100%;
+            min-height: 100vh;
+            border-radius: 0;
             overflow: hidden;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.08);
+            box-shadow: none;
             position: relative;
             z-index: 1;
             animation: slideUp 0.6s cubic-bezier(0.22,1,0.36,1) both;
@@ -76,7 +77,8 @@
 
         /* ===== LEFT PANEL ===== */
         .login-left {
-            flex: 1.1;
+            flex: 0 0 50%;
+            width: 50%;
             background: linear-gradient(160deg, #260632 0%, #461256 50%, #68117e 100%);
             padding: 3rem 2.5rem;
             display: flex;
@@ -184,7 +186,8 @@
 
         /* ===== RIGHT PANEL ===== */
         .login-right {
-            flex: 1;
+            flex: 0 0 50%;
+            width: 50%;
             background: #fff;
             padding: clamp(2rem, 5vw, 3.5rem);
             display: flex;
@@ -345,21 +348,26 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .login-wrapper { flex-direction: column; border-radius: 20px; }
-            .login-left { padding: 2rem; min-height: auto; }
+            .login-wrapper {
+                flex-direction: column;
+                min-height: 100vh;
+            }
+            .login-left,
+            .login-right {
+                flex: 1 1 auto;
+                width: 100%;
+            }
+            .login-left {
+                min-height: 45vh;
+            }
+            .login-right {
+                padding: 2rem 1.5rem;
+            }
             .feature-grid { grid-template-columns: 1fr 1fr; }
             .left-footer { display: none; }
         }
         @media (max-width: 480px) {
             .login-wrapper { border-radius: 16px; }
-            .login-left { padding: 1.5rem; }
-            .login-left h1 { font-size: 1.5rem; }
-            .login-left .lead { font-size: .85rem; margin-bottom: 1rem; }
-            .feature-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-            .feature-item { padding: 10px 10px 8px; }
-            .feature-num { font-size: 1.15rem; }
-            .feature-item span { font-size: 10px; }
-            .feature-item i { font-size: 16px; }
             .login-right { padding: 1.5rem; }
         }
         @media (max-width: 360px) {

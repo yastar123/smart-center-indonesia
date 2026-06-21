@@ -19,9 +19,6 @@ class SubjectController extends Controller
                   ->orWhere('kode', 'like', "%$s%");
             });
         }
-        if ($request->kategori) {
-            $query->where('kategori', $request->kategori);
-        }
         if ($request->status) {
             $query->where('status', $request->status);
         }
@@ -36,8 +33,6 @@ class SubjectController extends Controller
             'total'    => Course::count(),
             'aktif'    => Course::where('status', 'aktif')->count(),
             'nonaktif' => Course::where('status', 'nonaktif')->count(),
-            'academic' => Course::where('kategori', 'academic')->count(),
-            'skill'    => Course::where('kategori', 'skill')->count(),
         ];
 
         return view('admin.subject.index', compact('subjects', 'branches', 'stats'));

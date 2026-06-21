@@ -3249,9 +3249,15 @@
         <div class="nav-header">AKADEMIK</div>
 
         <div class="nav-item">
-            <a href="{{ route('admin.registration.index') }}" class="nav-link {{ request()->routeIs('admin.registration.*') ? 'active' : '' }}" data-label="Registrasi">
+            <a href="{{ route('admin.registration.create') }}" class="nav-link {{ request()->routeIs('admin.registration.*') ? 'active' : '' }}" data-label="Registrasi">
                 <i class="bi bi-person-plus-fill"></i>
                 <span>Registrasi</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('admin.student-registrations.index') }}" class="nav-link {{ request()->routeIs('admin.student-registrations.*') ? 'active' : '' }}" data-label="Siswa Sementara">
+                <i class="bi bi-person-plus"></i>
+                <span>Siswa Sementara</span>
             </a>
         </div>
         <div class="nav-item">

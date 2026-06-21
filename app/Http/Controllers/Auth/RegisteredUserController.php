@@ -19,7 +19,15 @@ class RegisteredUserController extends Controller
         return view('auth.register');
     }
 
-    public function store(Request $request): \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+    public function success(): View
+    {
+        $studentName = session('student_name', 'Siswa');
+        $waNumbers   = LandingWaNumber::active()->orderBy('sort_order')->get();
+
+        return view('auth.register-success', compact('waNumbers', 'studentName'));
+    }
+
+    public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
         $request->validate([
             'name'  => ['required', 'string', 'max:255'],
@@ -55,10 +63,9 @@ class RegisteredUserController extends Controller
             'join_date'    => now()->toDateString(),
         ]);
 
-        // Redirect to WA page — do NOT log in
-        $waNumbers   = LandingWaNumber::active()->orderBy('sort_order')->get();
-        $studentName = $request->name;
+        // Save student name for the success page and redirect there.
+        $request->session()->put('student_name', $request->name);
 
-        return response()->view('auth.register-success', compact('waNumbers', 'studentName'));
+        return redirect()->route('register.success');
     }
 }

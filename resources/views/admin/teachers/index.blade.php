@@ -21,7 +21,7 @@
             </div>
         </div>
         <div class="col-md-4 text-md-end">
-            <button onclick="openModal()" class="btn fw-semibold px-4"
+            <button onclick="window.location.href='{{ route('admin.teachers.create') }}'" class="btn fw-semibold px-4"
                 style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
                 <i class="bi bi-plus-lg me-2"></i>Tambah Guru
             </button>
@@ -107,7 +107,7 @@
             <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">
                 <i class="bi bi-printer me-1"></i><span class="d-none d-md-inline">Print</span>
             </button>
-            <button class="btn btn-success btn-sm" onclick="openModal()">
+            <button class="btn btn-success btn-sm" onclick="window.location.href='{{ route('admin.teachers.create') }}'">
                 <i class="bi bi-plus-lg me-1"></i>Tambah Guru
             </button>
         </div>
@@ -392,7 +392,7 @@ function loadTeachers(page) {
                             <i class="bi bi-person-badge" style="font-size:2rem;opacity:.35"></i>
                         </div>
                         <p class="text-muted mb-3">Belum ada data guru${document.getElementById('searchInput').value ? ' yang cocok' : ''}</p>
-                        <button class="btn btn-sm btn-success" onclick="openModal()">
+                        <button class="btn btn-sm btn-success" onclick="window.location.href='{{ route('admin.teachers.create') }}'">
                             <i class="bi bi-plus-lg me-1"></i>Tambah Guru
                         </button>
                     </div>
@@ -445,7 +445,7 @@ function loadTeachers(page) {
                         </td>
                         <td class="text-center">
                             <div class="d-flex gap-1 justify-content-center">
-                                <button class="btn btn-sm btn-outline-warning" onclick="editTeacher(${t.id})"
+                                <button class="btn btn-sm btn-outline-warning" onclick="window.location.href='/admin/teachers/${t.id}/edit'"
                                         title="Edit" style="border-radius:8px;padding:5px 8px"><i class="bi bi-pencil"></i></button>
                                 <button class="btn btn-sm btn-outline-danger" onclick="deleteTeacher(${t.id}, '${t.name.replace(/'/g, "\\\'")}')"
                                         title="Hapus" style="border-radius:8px;padding:5px 8px"><i class="bi bi-trash"></i></button>
@@ -485,17 +485,9 @@ function loadTeachers(page) {
     });
 }
 
-// ---- OPEN MODAL (ADD) ----
+// ---- OPEN CREATE PAGE (ADD) ----
 function openModal() {
-    document.getElementById('teacherForm').reset();
-    document.getElementById('teacherId').value = '';
-    document.getElementById('modalTitle').innerHTML = '<i class="bi bi-person-plus me-2"></i>Tambah Guru Baru';
-    document.getElementById('photoPreview').src = 'https://ui-avatars.com/api/?name=Guru&background=68117e&color=fff&size=120';
-    document.getElementById('cvCurrent').innerHTML = '';
-    document.getElementById('password').required = true;
-    document.getElementById('passwordRequiredMark').classList.remove('d-none');
-    document.getElementById('passwordHelp').textContent = 'Dipakai guru untuk login ke portal guru.';
-    new bootstrap.Modal('#teacherModal').show();
+    window.location.href = '{{ route("admin.teachers.create") }}';
 }
 
 // ---- EDIT ----

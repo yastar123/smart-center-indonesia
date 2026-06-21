@@ -20,7 +20,7 @@
 
 <div class="row g-4">
     <div class="col-lg-8">
-        <form method="POST" action="{{ route('admin.module.store') }}">
+        <form method="POST" action="{{ route('admin.module.store') }}" enctype="multipart/form-data">
         @csrf
         <div class="dashboard-card">
             <h6 class="fw-bold mb-4 pb-2 border-bottom">Informasi Modul Akademik</h6>
@@ -56,19 +56,35 @@
                     <label class="form-label fw-semibold">Jenis</label>
                     <select name="jenis" class="form-select">
                         <option value="materi" {{ old('jenis','materi')=='materi'?'selected':'' }}>Materi</option>
-                        <option value="pdf"    {{ old('jenis')=='pdf'   ?'selected':'' }}>PDF</option>
                         <option value="video"  {{ old('jenis')=='video' ?'selected':'' }}>Video</option>
-                        <option value="link"   {{ old('jenis')=='link'  ?'selected':'' }}>Link</option>
                     </select>
                 </div>
 
                 <div class="col-md-3">
                     <label class="form-label fw-semibold">Status <span class="text-danger">*</span></label>
                     <select name="status" class="form-select @error('status') is-invalid @enderror" required>
-                        <option value="aktif"  {{ old('status','aktif')=='aktif'  ?'selected':'' }}>Aktif</option>
-                        <option value="review" {{ old('status')=='review'?'selected':'' }}>Review</option>
+                        <option value="aktif"   {{ old('status','aktif')=='aktif'   ?'selected':'' }}>Aktif</option>
+                        <option value="nonaktif" {{ old('status')=='nonaktif'?'selected':'' }}>Nonaktif</option>
                     </select>
                     @error('status')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Upload File Modul (PDF / DOC / DOCX)</label>
+                    <input type="file" name="module_file"
+                           class="form-control @error('module_file') is-invalid @enderror"
+                           accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                    <div class="form-text">Wajib isi salah satu: upload file PDF/DOC/DOCX atau link video di bawah.</div>
+                    @error('module_file')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Link Video Modul</label>
+                    <input type="url" name="video_url" value="{{ old('video_url') }}"
+                           class="form-control @error('video_url') is-invalid @enderror"
+                           placeholder="https://www.youtube.com/watch?v=...">
+                    <div class="form-text">Isi jika modul menggunakan video pembelajaran.</div>
+                    @error('video_url')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="col-12">
