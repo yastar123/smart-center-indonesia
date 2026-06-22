@@ -284,19 +284,20 @@ function onPaketChange(paketId) {
     const sesiSelect    = document.getElementById('pertemuan_ke');
     const guruSelect    = document.getElementById('guru_id');
     const guruInfoBox   = document.getElementById('guruInfoBox');
+    const siswaBox      = document.getElementById('daftarSiswaBox');
 
     if (!paketId) {
         detailBox.style.display = 'none';
         sesiSelect.innerHTML = '<option value="">— Pilih paket dulu —</option>';
-        guruSelect.innerHTML = '<option value="">— Pilih paket dulu —</option>';
+        guruSelect.value = '';
         guruInfoBox.innerHTML = '<div class="text-muted" style="font-size:12px">Pilih paket untuk melihat info guru pengajar</div>';
+        siswaBox.style.display = 'none';
         return;
     }
 
     const pkg = pakets.find(p => p.id == paketId);
     if (!pkg) return;
 
-    // Package detail box
     detailBox.style.display = 'block';
     detailContent.innerHTML = `
         <div class="col-md-3 col-6"><strong>Jenis:</strong> ${pkg.jenis || '—'}</div>
@@ -308,7 +309,13 @@ function onPaketChange(paketId) {
         ${pkg.deskripsi ? `<div class="col-12"><strong>Deskripsi:</strong> ${pkg.deskripsi}</div>` : ''}
     `;
 
-    // Guru select & info
+    let sesiOptions = '<option value="">— Pilih Sesi —</option>';
+    const totalSesi = Number(pkg.jumlah_pertemuan || 0);
+    for (let i = 1; i <= totalSesi; i++) {
+        sesiOptions += `<option value="${i}">${i}</option>`;
+    }
+    sesiSelect.innerHTML = sesiOptions;
+
     if (pkg.guru_id) {
         guruSelect.value = pkg.guru_id;
         guruInfoBox.innerHTML = `
@@ -317,18 +324,12 @@ function onPaketChange(paketId) {
             ${pkg.guru_nig ? `<div class="text-muted" style="font-size:12px">NIG: ${pkg.guru_nig}</div>` : ''}
             ${pkg.guru_email ? `<div class="text-muted" style="font-size:12px">${pkg.guru_email}</div>` : ''}
         `;
-        loadStudentsByGuru(pkg.guru_id);
+        loadStudentsByGuru(pkg.guru_id, paketId);
     } else {
+        guruSelect.value = '';
         guruInfoBox.innerHTML = '<div class="text-muted" style="font-size:12px">Paket ini belum memiliki guru pengajar</div>';
+        siswaBox.style.display = 'none';
     }
-
-    // Session dropdown
-    const total = parseInt(pkg.jumlah_pertemuan) || 0;
-    let opts = '<option value="">— Pilih Sesi —</option>';
-    for (let i = 1; i <= total; i++) {
-        opts += `<option value="${i}">Sesi ke-${i}</option>`;
-    }
-    sesiSelect.innerHTML = opts;
 }
 
 function onModuleChange(moduleId) {
@@ -361,17 +362,22 @@ function onGuruChange(guruId) {
     const sel = document.getElementById('guru_id');
     const name = sel.options[sel.selectedIndex]?.text || '—';
     guruInfoBox.innerHTML = `<div class="fw-semibold">${name}</div>`;
-    loadStudentsByGuru(guruId);
+    loadStudentsByGuru(guruId, document.getElementById('paket_id').value);
 }
 
-function loadStudentsByGuru(guruId) {
+function loadStudentsByGuru(guruId, paketId = null) {
     if (!guruId) return;
     const box = document.getElementById('daftarSiswaBox');
     const content = document.getElementById('daftarSiswaContent');
     content.innerHTML = '<span class="text-muted" style="font-size:12px">Memuat siswa...</span>';
     box.style.display = 'block';
 
-    fetch(`${teacherStudentsUrl}/${guruId}/students`, {
+    const url = new URL(`${teacherStudentsUrl}/${guruId}/students`, window.location.origin);
+    if (paketId) {
+        url.searchParams.set('package_id', paketId);
+    }
+
+    fetch(url, {
         headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
     })
     .then(r => r.json())

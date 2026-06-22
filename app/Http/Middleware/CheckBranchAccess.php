@@ -99,6 +99,12 @@ class CheckBranchAccess
             if ($branch->can_tryouts) $allowed[] = 'tryout';
         }
 
+        // If the branch has not configured any page permissions yet, keep access open
+        // so admins can still use the page instead of being redirected to dashboard.
+        if (empty($allowed)) {
+            return $next($request);
+        }
+
         if (! in_array($pageKey, $allowed)) {
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['message' => 'Akses ditolak untuk cabang ini'], 403);

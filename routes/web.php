@@ -259,16 +259,43 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::post('/verifikasi-pembayaran/{payment}/reject', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'reject'])->name('verifikasi-pembayaran.reject');
 
         // AJAX: students by teacher (for schedule create form)
-        Route::get('/schedules/teacher/{teacher}/students', function(\App\Models\Teacher $teacher) {
-            $students = \App\Models\Student::whereHas('schoolClasses', fn($q) => $q->where('guru_id', $teacher->id))
-                ->with('schoolClasses.mataPelajaran')
-                ->get()
-                ->map(fn($s) => [
-                    'id'      => $s->id,
-                    'name'    => $s->name,
-                    'classes' => $s->schoolClasses->where('guru_id', $teacher->id)->map(fn($k) => $k->mataPelajaran?->nama ?? $k->nama_kelas)->values(),
-                ]);
-            return response()->json($students);
+        Route::get('/schedules/teacher/{teacher}/students', function(\App\Models\Teacher $teacher, \Illuminate\Http\Request $request) {
+            $packageId = $request->query('package_id');
+
+            $courseIds = [];
+            if ($packageId) {
+                $package = \App\Models\Package::with('mataPelajaran')->find($packageId);
+                if ($package) {
+                    $courseIds = $package->mataPelajaran->pluck('id')->all();
+                }
+            }
+
+            $classes = \App\Models\SchoolClass::where('guru_id', $teacher->id)
+                ->when(! empty($courseIds), function ($q) use ($courseIds) {
+                    $q->whereIn('mata_pelajaran_id', $courseIds);
+                })
+                ->with(['mataPelajaran', 'siswa'])
+                ->get();
+
+            $students = [];
+            foreach ($classes as $class) {
+                foreach ($class->siswa as $student) {
+                    if (! isset($students[$student->id])) {
+                        $students[$student->id] = [
+                            'id'      => $student->id,
+                            'name'    => $student->name,
+                            'classes' => [],
+                        ];
+                    }
+
+                    $label = $class->mataPelajaran?->nama ?? $class->nama_kelas;
+                    if (! in_array($label, $students[$student->id]['classes'], true)) {
+                        $students[$student->id]['classes'][] = $label;
+                    }
+                }
+            }
+
+            return response()->json(array_values($students));
         })->name('schedules.teacher-students');
     });
 
