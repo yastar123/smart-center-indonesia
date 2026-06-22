@@ -12,7 +12,8 @@ use Carbon\Carbon;
 
 $activeTab = request('tab', 'pendapatan');
 
-$totalRevenue   = Payment::where('status','verified')->sum('jumlah');
+$courseRevTotal = \App\Models\StudentCoursePayment::where('status','verified')->sum('amount');
+$totalRevenue   = Payment::where('status','verified')->sum('jumlah') + $courseRevTotal;
 $monthRevenue   = Payment::where('status','verified')
                     ->whereMonth('tanggal_pembayaran', now()->month)
                     ->whereYear('tanggal_pembayaran',  now()->year)

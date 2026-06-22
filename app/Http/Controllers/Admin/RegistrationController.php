@@ -203,19 +203,30 @@ class RegistrationController extends Controller
                 $count = Invoice::whereYear('created_at', $year)->whereMonth('created_at', date('m'))->count() + 1;
                 $nomor = 'INV-' . $year . '-' . $month . str_pad($count, 3, '0', STR_PAD_LEFT);
 
-                // If cicilan = 1 (lunas), set status directly to 'lunas'
-                $cicilanCount   = (int)($request->cicilan ?? 1);
-                $invoiceStatus  = ($cicilanCount <= 1) ? 'lunas' : 'belum_bayar';
+                $cicilanCount  = (int)($request->cicilan ?? 1);
+                $invoiceStatus = ($cicilanCount <= 1) ? 'lunas' : 'belum_bayar';
+
+                $firstAmount = $totalTagihan;
+                if ($cicilanCount > 1 && $request->filled('cicilan_pertama')) {
+                    $parsedFirst = (float) str_replace(['.', ','], ['', '.'], $request->cicilan_pertama);
+                    if ($parsedFirst > 0) {
+                        $firstAmount = $parsedFirst;
+                    }
+                }
+
+                $desc = $cicilanCount > 1
+                    ? 'Registrasi (Cicilan 1/' . $cicilanCount . '): ' . $namaKelas
+                    : 'Registrasi: ' . $namaKelas;
 
                 Invoice::create([
                     'siswa_id'      => $student->id,
                     'cabang_id'     => $request->cabang_id,
                     'nomor_invoice' => $nomor,
-                    'deskripsi'     => 'Registrasi: ' . $namaKelas,
-                    'subtotal'      => $totalTagihan,
+                    'deskripsi'     => $desc,
+                    'subtotal'      => $firstAmount,
                     'diskon'        => 0,
                     'pajak'         => 0,
-                    'total'         => $totalTagihan,
+                    'total'         => $firstAmount,
                     'status'        => $invoiceStatus,
                     'jatuh_tempo'   => Carbon::now()->addDays(7),
                     'periode'       => date('Y-m'),

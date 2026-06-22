@@ -71,7 +71,11 @@ class ScheduleController extends Controller
         $paket = Package::with('cabang')->findOrFail($data['paket_id']);
 
         if ($data['pertemuan_ke'] > $paket->jumlah_pertemuan) {
-            return response()->json(['success' => false, 'message' => "Sesi ke-{$data['pertemuan_ke']} melebihi jumlah sesi paket ({$paket->jumlah_pertemuan})."], 422);
+            $msg = "Sesi ke-{$data['pertemuan_ke']} melebihi jumlah sesi paket ({$paket->jumlah_pertemuan}).";
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+            return back()->withErrors(['pertemuan_ke' => $msg])->withInput();
         }
 
         $data['guru_id']   = $paket->guru_id;

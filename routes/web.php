@@ -242,7 +242,10 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
 
         // TAGIHAN SISWA (cicilan & pascabayar)
         Route::get('/tagihan-siswa', [\App\Http\Controllers\Admin\TagihanSiswaController::class, 'index'])->name('tagihan-siswa.index');
+        Route::get('/tagihan-siswa/{kelas}', [\App\Http\Controllers\Admin\TagihanSiswaController::class, 'show'])->name('tagihan-siswa.show');
         Route::post('/tagihan-siswa/{kelas}/generate-invoice', [\App\Http\Controllers\Admin\TagihanSiswaController::class, 'generateInvoice'])->name('tagihan-siswa.generate-invoice');
+        Route::get('/riwayat-guru-mengajar', [\App\Http\Controllers\Admin\TeacherHistoryController::class, 'index'])->name('riwayat-guru.index');
+        Route::get('/riwayat-guru-mengajar/{teacher}', [\App\Http\Controllers\Admin\TeacherHistoryController::class, 'show'])->name('riwayat-guru.show');
     });
 
 // CERTIFICATES — accessible by admin, owner, and guru

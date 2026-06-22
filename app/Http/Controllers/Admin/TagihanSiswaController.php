@@ -35,7 +35,7 @@ class TagihanSiswaController extends Controller
             $query->where('cabang_id', $request->cabang_id);
         }
 
-        $classes = $query->latest()->paginate(20)->appends($request->all());
+        $classes = $query->with(['siswa.package'])->latest()->paginate(20)->appends($request->all());
 
         $branches = Branch::orderBy('name')->get();
 
@@ -50,6 +50,25 @@ class TagihanSiswaController extends Controller
         ];
 
         return view('admin.tagihan-siswa.index', compact('classes', 'branches', 'stats'));
+    }
+
+    public function show(Request $request, SchoolClass $kelas)
+    {
+        $kelas->load(['cabang', 'guru', 'mataPelajaran', 'siswa.user', 'siswa.package']);
+
+        if (auth()->user()->hasRole('admin')) {
+            $branchId = auth()->user()->admin?->branch_id;
+            if ($branchId && $kelas->cabang_id !== $branchId) {
+                abort(403);
+            }
+        }
+
+        $student = $kelas->siswa->first();
+        $invoices = $student
+            ? Invoice::where('siswa_id', $student->id)->orderByDesc('created_at')->get()
+            : collect();
+
+        return view('admin.tagihan-siswa.show', compact('kelas', 'student', 'invoices'));
     }
 
     public function generateInvoice(Request $request, SchoolClass $kelas)

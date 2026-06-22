@@ -130,11 +130,11 @@
         <table class="table table-hover align-middle mb-0">
             <thead>
                 <tr style="background:var(--input-bg)">
-                    <th style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Siswa / Kelas</th>
-                    <th style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Cabang</th>
-                    <th style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Guru</th>
+                    <th style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Nama Siswa / Kelas</th>
+                    <th style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Paket</th>
+                    <th style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Harga Paket</th>
                     <th class="text-center" style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Tipe Tagihan</th>
-                    <th class="text-center" style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Status Invoice</th>
+                    <th style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Cabang</th>
                     <th class="text-center" style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Aksi</th>
                 </tr>
             </thead>
@@ -143,13 +143,7 @@
                 @php
                     $siswa = $kelas->siswa->first();
                     $siswaNama = $siswa?->user?->name ?? $siswa?->name ?? '—';
-                    $invoices = $siswa ? \App\Models\Invoice::where('siswa_id', $siswa->id)->orderByDesc('created_at')->get() : collect();
-                    $latestInv = $invoices->first();
-                    $statusMap = [
-                        'belum_bayar' => ['bg'=>'var(--soft-danger-bg)','fg'=>'#dc2626','label'=>'Belum Bayar'],
-                        'sebagian'    => ['bg'=>'rgba(59,130,246,.12)','fg'=>'#2563eb','label'=>'Dibayar Sebagian'],
-                        'lunas'       => ['bg'=>'var(--soft-success-bg)','fg'=>'#059669','label'=>'Lunas'],
-                    ];
+                    $paket = $siswa?->package;
                     $billingLabel = $kelas->billing_mode === 'postpaid' ? 'Pascabayar' : 'Cicilan';
                     $billingColor = $kelas->billing_mode === 'postpaid' ? '#0ea5e9' : '#f6af23';
                     $billingBg    = $kelas->billing_mode === 'postpaid' ? 'rgba(14,165,233,.12)' : 'rgba(246,175,35,.15)';
@@ -159,31 +153,38 @@
                         <div class="fw-semibold" style="font-size:13px">{{ $siswaNama }}</div>
                         <div class="text-muted" style="font-size:12px"><i class="bi bi-diagram-3 me-1"></i>{{ $kelas->nama_kelas }}</div>
                     </td>
-                    <td style="font-size:13px">{{ $kelas->cabang?->name ?? '—' }}</td>
-                    <td style="font-size:13px">{{ $kelas->guru?->name ?? '—' }}</td>
+                    <td style="font-size:13px">
+                        @if($paket)
+                            <div class="fw-semibold" style="font-size:13px">{{ $paket->nama }}</div>
+                            <div class="text-muted" style="font-size:11px">{{ ucfirst($paket->jenis ?? '—') }} · {{ $paket->jumlah_pertemuan ?? '?' }} sesi</div>
+                        @else
+                            <span class="text-muted">—</span>
+                        @endif
+                    </td>
+                    <td style="font-size:13px">
+                        @if($paket?->harga)
+                            <span class="fw-semibold">Rp {{ number_format($paket->harga, 0, ',', '.') }}</span>
+                        @else
+                            <span class="text-muted">—</span>
+                        @endif
+                    </td>
                     <td class="text-center">
                         <span style="background:{{ $billingBg }};color:{{ $billingColor }};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600">
                             {{ $billingLabel }}
                         </span>
                     </td>
+                    <td style="font-size:13px">{{ $kelas->cabang?->name ?? '—' }}</td>
                     <td class="text-center">
-                        @if($latestInv)
-                            @php $s = $statusMap[$latestInv->status] ?? ['bg'=>'var(--soft-muted-bg)','fg'=>'#6b7280','label'=>ucfirst($latestInv->status)]; @endphp
-                            <span style="background:{{ $s['bg'] }};color:{{ $s['fg'] }};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600">
-                                {{ $s['label'] }}
-                            </span>
-                            <div class="text-muted mt-1" style="font-size:10px">Rp {{ number_format($latestInv->total,0,',','.') }}</div>
-                        @else
-                            <span style="background:var(--soft-muted-bg);color:var(--text-muted);padding:3px 10px;border-radius:20px;font-size:11px">
-                                Belum ada invoice
-                            </span>
-                        @endif
-                    </td>
-                    <td class="text-center">
-                        <button onclick="openInvoiceModal({{ $kelas->id }}, '{{ addslashes($kelas->nama_kelas) }}')"
-                                class="btn btn-sm btn-primary" style="border-radius:8px;font-size:11px">
-                            <i class="bi bi-plus-lg me-1"></i>Buat Invoice
-                        </button>
+                        <div class="d-flex gap-1 justify-content-center">
+                            <a href="{{ route('admin.tagihan-siswa.show', $kelas->id) }}"
+                               class="btn btn-sm btn-outline-primary" style="border-radius:8px;font-size:11px">
+                                <i class="bi bi-eye me-1"></i>Lihat
+                            </a>
+                            <button onclick="openInvoiceModal({{ $kelas->id }}, '{{ addslashes($kelas->nama_kelas) }}')"
+                                    class="btn btn-sm btn-primary" style="border-radius:8px;font-size:11px">
+                                <i class="bi bi-plus-lg me-1"></i>Invoice
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 @empty

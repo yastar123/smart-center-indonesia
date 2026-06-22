@@ -25,9 +25,10 @@ class ScheduleProposalController extends Controller
             return redirect()->route('siswa.dashboard')->with('error', 'Profil siswa belum lengkap.');
         }
 
-        $classIds = SchoolClass::whereHas('siswa', function ($q) use ($student) {
-            $q->where('student_id', $student->id);
-        })->pluck('id');
+        $classIds = SchoolClass::where('jenis', 'private')
+            ->whereHas('siswa', function ($q) use ($student) {
+                $q->where('student_id', $student->id);
+            })->pluck('id');
 
         $proposals = ScheduleProposal::whereIn('class_id', $classIds)
             ->with(['kelas', 'approvals'])
@@ -41,9 +42,10 @@ class ScheduleProposalController extends Controller
             'rejected' => ScheduleProposal::whereIn('class_id', $classIds)->where('status', 'rejected')->count(),
         ];
 
-        $classes = SchoolClass::whereHas('siswa', function ($q) use ($student) {
-            $q->where('student_id', $student->id);
-        })
+        $classes = SchoolClass::where('jenis', 'private')
+            ->whereHas('siswa', function ($q) use ($student) {
+                $q->where('student_id', $student->id);
+            })
             ->with(['mataPelajaran', 'guru', 'cabang'])
             ->where('status', 'aktif')
             ->orderBy('nama_kelas')
@@ -89,6 +91,10 @@ class ScheduleProposalController extends Controller
         ]);
 
         $class = SchoolClass::find($request->class_id);
+
+        if (! $class || $class->jenis !== 'private') {
+            return response()->json(['success' => false, 'message' => 'Pengajuan jadwal hanya tersedia untuk paket privat.'], 403);
+        }
 
         $isEnrolled = $class->siswa()->where('student_id', $student->id)->exists();
         if (! $isEnrolled) {

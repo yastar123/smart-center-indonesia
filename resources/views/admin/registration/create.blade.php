@@ -186,7 +186,7 @@
                                     data-courses="{{ e($pk->mataPelajaran->pluck('nama')->implode(', ')) }}"
                                     data-description="{{ e($pk->deskripsi ?? '-') }}"
                                     {{ old('package_id')==$pk->id?'selected':'' }}>
-                                    {{ $pk->nama }} - Harga Dasar (Rp {{ number_format($pk->harga, 0, ',', '.') }}) - {{ $pk->jumlah_pertemuan }} Sesi
+                                    {{ $pk->nama }}{{ optional($pk->cabang)->name ? ' ('.optional($pk->cabang)->name.')' : '' }} — Rp {{ number_format($pk->harga, 0, ',', '.') }} — {{ $pk->jumlah_pertemuan }} Sesi
                                 </option>
                             @endforeach
                         </select>
@@ -407,7 +407,9 @@
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Cicilan Pertama</label>
-                        <input type="text" id="installmentFirst" class="form-control" readonly>
+                        <input type="text" name="cicilan_pertama" id="installmentFirst" class="form-control"
+                               placeholder="Bisa diubah manual" oninput="onCicilanPertamaInput()">
+                        <div class="form-text">Kosongkan untuk otomatis (harga÷cicilan)</div>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Sisa Cicilan</label>
