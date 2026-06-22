@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Schedule;
 use App\Models\Package;
 use App\Models\Branch;
+use App\Models\Module;
 use App\Services\ScheduleLockService;
 use Illuminate\Http\Request;
 
@@ -18,7 +19,11 @@ class ScheduleController extends Controller
             ->orderBy('nama')
             ->get();
         $branches = Branch::all();
-        return view('admin.schedules.create', compact('pakets', 'branches'));
+        $modules  = Module::with('mataPelajaran')
+            ->where('status', 'aktif')
+            ->orderBy('judul')
+            ->get();
+        return view('admin.schedules.create', compact('pakets', 'branches', 'modules'));
     }
 
     public function index(Request $request)
@@ -57,6 +62,8 @@ class ScheduleController extends Controller
     {
         $data = $request->validate([
             'paket_id'        => 'required|exists:packages,id',
+            'module_id'       => 'nullable|exists:modules,id',
+            'guru_id'         => 'nullable|exists:teachers,id',
             'pertemuan_ke'    => 'required|integer|min:1',
             'tanggal'         => 'required|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal',
@@ -64,7 +71,7 @@ class ScheduleController extends Controller
             'jam_selesai'     => 'required',
             'topik'           => 'nullable|string|max:200',
             'ruangan'         => 'nullable|string|max:100',
-            'link_meeting'    => 'nullable|string|max:500',
+            'link_meeting'    => 'nullable|url|max:500',
             'catatan'         => 'nullable|string',
         ]);
 
@@ -78,7 +85,8 @@ class ScheduleController extends Controller
             return back()->withErrors(['pertemuan_ke' => $msg])->withInput();
         }
 
-        $data['guru_id']   = $paket->guru_id;
+        // Use form guru_id if provided, otherwise fall back to package's guru
+        $data['guru_id']   = $data['guru_id'] ?? $paket->guru_id;
         $data['cabang_id'] = $paket->cabang_id;
         $data['jenis']     = $paket->jenis;
         $data['status']    = 'dijadwalkan';

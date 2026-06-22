@@ -12,186 +12,306 @@
     </ol>
 </nav>
 
-<div class="row g-4">
-    <div class="col-lg-8">
-        <div class="dashboard-card">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h5 class="fw-bold mb-1"><i class="bi bi-calendar-plus me-2 text-primary"></i>Tambah Jadwal Sesi</h5>
-                    <div class="text-muted small">Buat jadwal sesi baru untuk paket belajar</div>
-                </div>
-                <a href="{{ route('admin.schedules.index') }}" class="btn btn-outline-secondary" style="border-radius:10px">
-                    <i class="bi bi-arrow-left me-1"></i>Kembali
-                </a>
+{{-- HEADER --}}
+<div class="dashboard-card mb-4" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
+    <div style="position:absolute;right:-20px;top:-20px;width:160px;height:160px;background:rgba(255,255,255,.05);border-radius:50%;pointer-events:none"></div>
+    <div class="d-flex align-items-center justify-content-between" style="position:relative">
+        <div class="d-flex align-items-center gap-3">
+            <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">
+                <i class="bi bi-calendar-plus"></i>
             </div>
+            <div>
+                <h5 class="fw-bold mb-0" style="color:white">Tambah Jadwal Sesi</h5>
+                <div style="font-size:12px;opacity:.8">Buat jadwal sesi baru untuk paket belajar</div>
+            </div>
+        </div>
+        <a href="{{ route('admin.schedules.index') }}" class="btn btn-sm"
+           style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.3)">
+            <i class="bi bi-arrow-left me-1"></i>Kembali
+        </a>
+    </div>
+</div>
 
-            <form action="{{ route('admin.schedules.store') }}" method="POST" id="scheduleForm">
-                @csrf
-                @if($errors->any())
-                <div class="alert alert-danger mb-3">
-                    <ul class="mb-0 ps-3">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
-                </div>
-                @endif
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show mb-4"><i class="bi bi-check-circle me-2"></i>{{ session('success') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+@endif
 
-                <div class="row g-3">
-                    {{-- PAKET BELAJAR --}}
-                    <div class="col-12">
-                        <label class="form-label fw-semibold">Paket Belajar <span class="text-danger">*</span></label>
-                        <select name="paket_id" id="paket_id" class="form-select" required onchange="onPaketChange(this.value)">
-                            <option value="">— Pilih Paket —</option>
-                            @foreach($pakets as $p)
-                            <option value="{{ $p->id }}" {{ old('paket_id') == $p->id ? 'selected' : '' }}>
-                                {{ $p->nama }}
-                                @if($p->guru) — {{ $p->guru->name }}@endif
-                                @if($p->cabang) ({{ $p->cabang->name }})@endif
-                            </option>
-                            @endforeach
-                        </select>
-                    </div>
+<form action="{{ route('admin.schedules.store') }}" method="POST" id="scheduleForm">
+@csrf
+@if($errors->any())
+<div class="alert alert-danger mb-4">
+    <ul class="mb-0 ps-3">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+</div>
+@endif
 
-                    {{-- DETAIL PAKET --}}
-                    <div class="col-12" id="paketDetailBox" style="display:none">
-                        <div class="p-3 rounded-3" style="background:var(--soft-primary-bg);border:1.5px solid var(--soft-primary-border)">
-                            <div class="fw-semibold mb-2" style="color:var(--soft-primary-text)"><i class="bi bi-box-seam me-2"></i>Detail Paket</div>
-                            <div class="row g-2 small" id="paketDetailContent"></div>
-                        </div>
-                    </div>
-
-                    {{-- SESI KE --}}
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Sesi Ke- <span class="text-danger">*</span></label>
-                        <select name="pertemuan_ke" id="pertemuan_ke" class="form-select" required>
-                            <option value="">— Pilih dulu paket —</option>
-                        </select>
-                    </div>
-
-                    {{-- TANGGAL --}}
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Tanggal <span class="text-danger">*</span></label>
-                        <input type="date" name="tanggal" id="tanggal" class="form-control" value="{{ old('tanggal') }}" required>
-                    </div>
-
-                    {{-- JAM --}}
-                    <div class="col-md-2">
-                        <label class="form-label fw-semibold">Jam Mulai <span class="text-danger">*</span></label>
-                        <input type="time" name="jam_mulai" id="jam_mulai" class="form-control" value="{{ old('jam_mulai') }}" required>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label fw-semibold">Jam Selesai <span class="text-danger">*</span></label>
-                        <input type="time" name="jam_selesai" id="jam_selesai" class="form-control" value="{{ old('jam_selesai') }}" required>
-                    </div>
-
-                    {{-- TOPIK --}}
-                    <div class="col-12">
-                        <label class="form-label fw-semibold">Topik / Materi</label>
-                        <input type="text" name="topik" class="form-control" value="{{ old('topik') }}" placeholder="Contoh: Persamaan Kuadrat, Past Tense, dll">
-                    </div>
-
-                    {{-- RUANGAN --}}
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Ruangan</label>
-                        <input type="text" name="ruangan" class="form-control" value="{{ old('ruangan') }}" placeholder="Opsional — misal: Ruang A1">
-                    </div>
-
-                    {{-- LINK MEETING --}}
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Link Meeting</label>
-                        <input type="url" name="link_meeting" class="form-control" value="{{ old('link_meeting') }}" placeholder="https://zoom.us/...">
-                    </div>
-
-                    {{-- CATATAN --}}
-                    <div class="col-12">
-                        <label class="form-label fw-semibold">Catatan</label>
-                        <textarea name="catatan" class="form-control" rows="2" placeholder="Catatan tambahan (opsional)">{{ old('catatan') }}</textarea>
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
-                    <a href="{{ route('admin.schedules.index') }}" class="btn btn-outline-secondary">Batal</a>
-                    <button type="submit" class="btn btn-primary px-4 fw-semibold">
-                        <i class="bi bi-calendar-check me-1"></i>Simpan Jadwal
-                    </button>
-                </div>
-            </form>
+{{-- SECTION 1: PAKET --}}
+<div class="dashboard-card mb-4">
+    <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
+        <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#c84ddf,#461256);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
+            <i class="bi bi-box-seam"></i>
+        </div>
+        <div>
+            <div class="fw-bold" style="font-size:15px">Paket Belajar</div>
+            <div class="text-muted" style="font-size:12px">Pilih paket untuk sesi ini</div>
         </div>
     </div>
 
-    <div class="col-lg-4">
-        <div class="dashboard-card" id="paketInfoSidebar" style="display:none">
-            <h6 class="fw-bold mb-3"><i class="bi bi-info-circle me-2 text-primary"></i>Info Paket Terpilih</h6>
-            <div id="paketInfoSidebarContent"></div>
+    <div class="row g-3">
+        {{-- PAKET BELAJAR --}}
+        <div class="col-lg-8">
+            <label class="form-label fw-semibold">Paket Belajar <span class="text-danger">*</span></label>
+            <select name="paket_id" id="paket_id" class="form-select" required onchange="onPaketChange(this.value)">
+                <option value="">— Pilih Paket —</option>
+                @foreach($pakets as $p)
+                <option value="{{ $p->id }}" {{ old('paket_id') == $p->id ? 'selected' : '' }}>
+                    {{ $p->nama }}@if($p->guru) – {{ $p->guru->name }}@endif@if($p->cabang) ({{ $p->cabang->name }})@endif
+                </option>
+                @endforeach
+            </select>
+        </div>
+
+        {{-- SESI KE --}}
+        <div class="col-lg-4">
+            <label class="form-label fw-semibold">Sesi Ke- <span class="text-danger">*</span></label>
+            <select name="pertemuan_ke" id="pertemuan_ke" class="form-select" required>
+                <option value="">— Pilih paket dulu —</option>
+            </select>
+        </div>
+
+        {{-- DETAIL PAKET BOX --}}
+        <div class="col-12" id="paketDetailBox" style="display:none">
+            <div class="p-3 rounded-3" style="background:var(--soft-primary-bg);border:1.5px solid var(--soft-primary-border)">
+                <div class="fw-semibold mb-2" style="color:var(--soft-primary-text);font-size:13px"><i class="bi bi-info-circle me-2"></i>Detail Paket Terpilih</div>
+                <div class="row g-2" id="paketDetailContent" style="font-size:12px"></div>
+            </div>
         </div>
     </div>
 </div>
 
+{{-- SECTION 2: GURU PENGAJAR --}}
+<div class="dashboard-card mb-4">
+    <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
+        <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#10b981,#047857);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
+            <i class="bi bi-person-badge"></i>
+        </div>
+        <div>
+            <div class="fw-bold" style="font-size:15px">Guru Pengajar</div>
+            <div class="text-muted" style="font-size:12px">Guru yang mengajar sesi ini (otomatis dari paket)</div>
+        </div>
+    </div>
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <label class="form-label fw-semibold">Guru Pengajar <span class="text-danger">*</span></label>
+            <select name="guru_id" id="guru_id" class="form-select">
+                <option value="">— Pilih paket dulu —</option>
+            </select>
+            <div class="form-text">Guru diambil dari paket yang dipilih. Bisa diubah jika perlu.</div>
+        </div>
+        <div class="col-lg-6">
+            <div class="p-3 rounded-3 h-100" style="background:var(--input-bg);border:1px solid var(--card-border)" id="guruInfoBox">
+                <div class="text-muted" style="font-size:12px">Pilih paket untuk melihat info guru pengajar</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- SECTION 3: WAKTU & JADWAL --}}
+<div class="dashboard-card mb-4">
+    <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
+        <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#0ea5e9,#0369a1);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
+            <i class="bi bi-clock"></i>
+        </div>
+        <div>
+            <div class="fw-bold" style="font-size:15px">Waktu & Jadwal</div>
+            <div class="text-muted" style="font-size:12px">Tanggal dan jam pelaksanaan sesi</div>
+        </div>
+    </div>
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Tanggal <span class="text-danger">*</span></label>
+            <input type="date" name="tanggal" id="tanggal" class="form-control" value="{{ old('tanggal') }}" required>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Jam Mulai <span class="text-danger">*</span></label>
+            <input type="time" name="jam_mulai" id="jam_mulai" class="form-control" value="{{ old('jam_mulai') }}" required>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Jam Selesai <span class="text-danger">*</span></label>
+            <input type="time" name="jam_selesai" id="jam_selesai" class="form-control" value="{{ old('jam_selesai') }}" required>
+        </div>
+        <div class="col-12">
+            <label class="form-label fw-semibold">Topik / Materi <span class="text-muted fw-normal">(opsional)</span></label>
+            <input type="text" name="topik" class="form-control" value="{{ old('topik') }}" placeholder="Contoh: Persamaan Kuadrat, Past Tense, dll">
+        </div>
+    </div>
+</div>
+
+{{-- SECTION 4: MODUL --}}
+<div class="dashboard-card mb-4">
+    <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
+        <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#f6af23,#d97706);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
+            <i class="bi bi-journals"></i>
+        </div>
+        <div>
+            <div class="fw-bold" style="font-size:15px">Modul Belajar <span class="badge text-muted fw-normal ms-1" style="font-size:11px;background:var(--input-bg)">Opsional</span></div>
+            <div class="text-muted" style="font-size:12px">Pilih modul materi untuk sesi ini</div>
+        </div>
+    </div>
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <label class="form-label fw-semibold">Modul <span class="text-muted fw-normal">(opsional)</span></label>
+            <select name="module_id" id="module_id" class="form-select" onchange="onModuleChange(this.value)">
+                <option value="">— Tidak ada modul (opsional) —</option>
+                @foreach($modules as $m)
+                <option value="{{ $m->id }}" {{ old('module_id') == $m->id ? 'selected' : '' }}>
+                    {{ $m->judul }}@if($m->mataPelajaran) – {{ $m->mataPelajaran->nama }}@endif
+                    @if($m->kode_modul) [{{ $m->kode_modul }}]@endif
+                </option>
+                @endforeach
+            </select>
+            <div class="form-text">Modul dari halaman <a href="{{ route('admin.module.index') }}" target="_blank">Admin &gt; Modul</a></div>
+        </div>
+        <div class="col-lg-4">
+            <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border);min-height:60px" id="moduleInfoBox">
+                <div class="text-muted" style="font-size:12px">Tidak ada modul dipilih</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- SECTION 5: LOKASI & LINK --}}
+<div class="dashboard-card mb-4">
+    <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
+        <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
+            <i class="bi bi-geo-alt"></i>
+        </div>
+        <div>
+            <div class="fw-bold" style="font-size:15px">Lokasi & Link Meeting <span class="badge text-muted fw-normal ms-1" style="font-size:11px;background:var(--input-bg)">Opsional</span></div>
+            <div class="text-muted" style="font-size:12px">Lokasi fisik atau tautan kelas online</div>
+        </div>
+    </div>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">Ruangan <span class="text-muted fw-normal">(opsional)</span></label>
+            <div class="input-group">
+                <span class="input-group-text" style="background:var(--input-bg);border-color:var(--card-border)"><i class="bi bi-door-open text-muted"></i></span>
+                <input type="text" name="ruangan" class="form-control" value="{{ old('ruangan') }}" placeholder="misal: Ruang A1, Lab Komputer">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">Link Meeting <span class="text-muted fw-normal">(opsional)</span></label>
+            <div class="input-group">
+                <span class="input-group-text" style="background:var(--input-bg);border-color:var(--card-border)"><i class="bi bi-camera-video text-muted"></i></span>
+                <input type="url" name="link_meeting" class="form-control" value="{{ old('link_meeting') }}" placeholder="https://zoom.us/...">
+            </div>
+        </div>
+        <div class="col-12">
+            <label class="form-label fw-semibold">Catatan <span class="text-muted fw-normal">(opsional)</span></label>
+            <textarea name="catatan" class="form-control" rows="2" placeholder="Catatan tambahan untuk sesi ini">{{ old('catatan') }}</textarea>
+        </div>
+    </div>
+</div>
+
+{{-- SUBMIT --}}
+<div class="dashboard-card">
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="text-muted" style="font-size:13px"><i class="bi bi-info-circle me-1"></i>Field bertanda <span class="text-danger">*</span> wajib diisi</div>
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.schedules.index') }}" class="btn btn-outline-secondary px-4">Batal</a>
+            <button type="submit" class="btn btn-primary px-5 fw-semibold">
+                <i class="bi bi-calendar-check me-2"></i>Simpan Jadwal
+            </button>
+        </div>
+    </div>
+</div>
+
+</form>
 </div>
 @endsection
 
 @php
 $paketsJson = $pakets->map(function ($p) {
     return [
-        'id' => $p->id,
-        'nama' => $p->nama,
-        'jenis' => $p->jenis,
+        'id'               => $p->id,
+        'nama'             => $p->nama,
+        'jenis'            => $p->jenis,
         'jumlah_pertemuan' => $p->jumlah_pertemuan,
-        'metode_absensi' => $p->metode_absensi,
-        'tipe_kelas' => $p->tipe_kelas,
-        'harga' => $p->harga,
-        'deskripsi' => $p->deskripsi,
-        'status' => $p->status,
-        'cabang' => $p->cabang?->name,
-        'guru' => $p->guru?->name,
-        'mata_pelajaran' => $p->mataPelajaran->pluck('nama'),
+        'metode_absensi'   => $p->metode_absensi,
+        'tipe_kelas'       => $p->tipe_kelas,
+        'harga'            => $p->harga,
+        'deskripsi'        => $p->deskripsi,
+        'status'           => $p->status,
+        'cabang'           => $p->cabang?->name,
+        'cabang_id'        => $p->cabang_id,
+        'guru_id'          => $p->guru_id,
+        'guru_name'        => $p->guru?->name,
+        'guru_email'       => $p->guru?->email,
+        'guru_nig'         => $p->guru?->nig,
+        'mata_pelajaran'   => $p->mataPelajaran->pluck('nama'),
+    ];
+});
+$modulesJson = $modules->map(function ($m) {
+    return [
+        'id'           => $m->id,
+        'judul'        => $m->judul,
+        'jenis'        => $m->jenis,
+        'kode_modul'   => $m->kode_modul,
+        'deskripsi'    => $m->deskripsi,
+        'mata_pelajaran' => $m->mataPelajaran?->nama,
     ];
 });
 @endphp
 
 @push('scripts')
 <script>
-const pakets = @json($paketsJson);
+const pakets  = @json($paketsJson);
+const modules = @json($modulesJson);
 
 function onPaketChange(paketId) {
-    const detailBox = document.getElementById('paketDetailBox');
+    const detailBox     = document.getElementById('paketDetailBox');
     const detailContent = document.getElementById('paketDetailContent');
-    const sesiSelect = document.getElementById('pertemuan_ke');
-    const sidebar = document.getElementById('paketInfoSidebar');
-    const sidebarContent = document.getElementById('paketInfoSidebarContent');
+    const sesiSelect    = document.getElementById('pertemuan_ke');
+    const guruSelect    = document.getElementById('guru_id');
+    const guruInfoBox   = document.getElementById('guruInfoBox');
 
     if (!paketId) {
         detailBox.style.display = 'none';
-        sidebar.style.display = 'none';
-        sesiSelect.innerHTML = '<option value="">— Pilih dulu paket —</option>';
+        sesiSelect.innerHTML = '<option value="">— Pilih paket dulu —</option>';
+        guruSelect.innerHTML = '<option value="">— Pilih paket dulu —</option>';
+        guruInfoBox.innerHTML = '<div class="text-muted" style="font-size:12px">Pilih paket untuk melihat info guru pengajar</div>';
         return;
     }
 
     const pkg = pakets.find(p => p.id == paketId);
     if (!pkg) return;
 
-    // Render package detail
+    // Package detail box
     detailBox.style.display = 'block';
-    sidebar.style.display = 'block';
     detailContent.innerHTML = `
-        <div class="col-6"><strong>Nama:</strong> ${pkg.nama || '—'}</div>
-        <div class="col-6"><strong>Jenis:</strong> ${pkg.jenis || '—'}</div>
-        <div class="col-6"><strong>Jumlah Sesi:</strong> ${pkg.jumlah_pertemuan || '—'}</div>
-        <div class="col-6"><strong>Metode Absensi:</strong> ${pkg.metode_absensi || '—'}</div>
-        <div class="col-6"><strong>Tipe Kelas:</strong> ${pkg.tipe_kelas || '—'}</div>
-        <div class="col-6"><strong>Harga:</strong> Rp ${pkg.harga ? parseInt(pkg.harga).toLocaleString('id-ID') : '—'}</div>
-        <div class="col-6"><strong>Cabang:</strong> ${pkg.cabang || 'Pusat'}</div>
-        <div class="col-6"><strong>Guru:</strong> ${pkg.guru || '—'}</div>
-        <div class="col-12"><strong>Mata Pelajaran:</strong> ${pkg.mata_pelajaran?.join(', ') || '—'}</div>
+        <div class="col-md-3 col-6"><strong>Jenis:</strong> ${pkg.jenis || '—'}</div>
+        <div class="col-md-3 col-6"><strong>Total Sesi:</strong> ${pkg.jumlah_pertemuan || '—'}</div>
+        <div class="col-md-3 col-6"><strong>Tipe Kelas:</strong> ${pkg.tipe_kelas || '—'}</div>
+        <div class="col-md-3 col-6"><strong>Harga:</strong> Rp ${pkg.harga ? parseInt(pkg.harga).toLocaleString('id-ID') : '—'}</div>
+        <div class="col-md-6 col-12"><strong>Mata Pelajaran:</strong> ${pkg.mata_pelajaran?.join(', ') || '—'}</div>
+        <div class="col-md-6 col-12"><strong>Cabang:</strong> ${pkg.cabang || 'Pusat'}</div>
         ${pkg.deskripsi ? `<div class="col-12"><strong>Deskripsi:</strong> ${pkg.deskripsi}</div>` : ''}
     `;
 
-    sidebarContent.innerHTML = `
-        <div class="mb-2 p-2 rounded" style="background:var(--input-bg)"><span class="text-muted small">Guru Pengajar</span><div class="fw-semibold">${pkg.guru || '—'}</div></div>
-        <div class="mb-2 p-2 rounded" style="background:var(--input-bg)"><span class="text-muted small">Cabang</span><div class="fw-semibold">${pkg.cabang || 'Pusat'}</div></div>
-        <div class="mb-2 p-2 rounded" style="background:var(--input-bg)"><span class="text-muted small">Jenis Paket</span><div class="fw-semibold">${pkg.jenis || '—'}</div></div>
-        <div class="mb-2 p-2 rounded" style="background:var(--input-bg)"><span class="text-muted small">Total Sesi</span><div class="fw-bold text-primary" style="font-size:1.3rem">${pkg.jumlah_pertemuan || '—'}</div></div>
-        <div class="mb-2 p-2 rounded" style="background:var(--input-bg)"><span class="text-muted small">Mata Pelajaran</span><div class="fw-semibold">${pkg.mata_pelajaran?.join(', ') || '—'}</div></div>
-    `;
+    // Guru select & info
+    if (pkg.guru_id) {
+        guruSelect.innerHTML = `<option value="${pkg.guru_id}" selected>${pkg.guru_name || '—'}</option>`;
+        guruInfoBox.innerHTML = `
+            <div class="text-muted mb-1" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px">Guru dari Paket</div>
+            <div class="fw-semibold">${pkg.guru_name || '—'}</div>
+            ${pkg.guru_nig ? `<div class="text-muted" style="font-size:12px">NIG: ${pkg.guru_nig}</div>` : ''}
+            ${pkg.guru_email ? `<div class="text-muted" style="font-size:12px">${pkg.guru_email}</div>` : ''}
+        `;
+    } else {
+        guruSelect.innerHTML = '<option value="">— Tidak ada guru pada paket —</option>';
+        guruInfoBox.innerHTML = '<div class="text-muted" style="font-size:12px">Paket ini belum memiliki guru pengajar</div>';
+    }
 
-    // Build session dropdown
+    // Session dropdown
     const total = parseInt(pkg.jumlah_pertemuan) || 0;
     let opts = '<option value="">— Pilih Sesi —</option>';
     for (let i = 1; i <= total; i++) {
@@ -200,8 +320,29 @@ function onPaketChange(paketId) {
     sesiSelect.innerHTML = opts;
 }
 
-// Init if value already selected (on validation error)
+function onModuleChange(moduleId) {
+    const box = document.getElementById('moduleInfoBox');
+    if (!moduleId) {
+        box.innerHTML = '<div class="text-muted" style="font-size:12px">Tidak ada modul dipilih</div>';
+        return;
+    }
+    const m = modules.find(x => x.id == moduleId);
+    if (!m) return;
+    box.innerHTML = `
+        <div class="text-muted mb-1" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px">Modul Dipilih</div>
+        <div class="fw-semibold" style="font-size:13px">${m.judul}</div>
+        ${m.kode_modul ? `<div class="text-muted" style="font-size:11px">Kode: ${m.kode_modul}</div>` : ''}
+        ${m.mata_pelajaran ? `<div class="text-muted" style="font-size:11px">Mapel: ${m.mata_pelajaran}</div>` : ''}
+        ${m.jenis ? `<div class="text-muted" style="font-size:11px">Jenis: ${m.jenis}</div>` : ''}
+        ${m.deskripsi ? `<div class="text-muted mt-1" style="font-size:11px">${m.deskripsi}</div>` : ''}
+    `;
+}
+
+// Init on validation error
 const initPaket = document.getElementById('paket_id').value;
 if (initPaket) onPaketChange(initPaket);
+
+const initModule = document.getElementById('module_id').value;
+if (initModule) onModuleChange(initModule);
 </script>
 @endpush

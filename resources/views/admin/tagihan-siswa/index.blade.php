@@ -134,6 +134,8 @@
                     <th style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Paket</th>
                     <th style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Harga Paket</th>
                     <th class="text-center" style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Tipe Tagihan</th>
+                    <th style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Cicilan Dibayar</th>
+                    <th style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Sisa Cicilan</th>
                     <th style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Cabang</th>
                     <th class="text-center" style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Aksi</th>
                 </tr>
@@ -147,6 +149,12 @@
                     $billingLabel = $kelas->billing_mode === 'postpaid' ? 'Pascabayar' : 'Cicilan';
                     $billingColor = $kelas->billing_mode === 'postpaid' ? '#0ea5e9' : '#f6af23';
                     $billingBg    = $kelas->billing_mode === 'postpaid' ? 'rgba(14,165,233,.12)' : 'rgba(246,175,35,.15)';
+
+                    // Cicilan summary for this kelas
+                    $kelasInvoices   = $invoicesByKelas[$kelas->id] ?? collect();
+                    $totalTagihan    = $kelasInvoices->sum('total');
+                    $totalDibayar    = $kelasInvoices->flatMap->pembayaran->where('status', 'verified')->sum('jumlah');
+                    $sisaCicilan     = max(0, $totalTagihan - $totalDibayar);
                 @endphp
                 <tr>
                     <td>
@@ -173,23 +181,33 @@
                             {{ $billingLabel }}
                         </span>
                     </td>
+                    <td style="font-size:13px">
+                        @if($totalDibayar > 0)
+                            <span class="fw-semibold text-success">Rp {{ number_format($totalDibayar, 0, ',', '.') }}</span>
+                        @else
+                            <span class="text-muted">—</span>
+                        @endif
+                    </td>
+                    <td style="font-size:13px">
+                        @if($sisaCicilan > 0)
+                            <span class="fw-semibold text-danger">Rp {{ number_format($sisaCicilan, 0, ',', '.') }}</span>
+                        @elseif($totalTagihan > 0)
+                            <span class="text-success fw-semibold"><i class="bi bi-check-circle me-1"></i>Lunas</span>
+                        @else
+                            <span class="text-muted">—</span>
+                        @endif
+                    </td>
                     <td style="font-size:13px">{{ $kelas->cabang?->name ?? '—' }}</td>
                     <td class="text-center">
-                        <div class="d-flex gap-1 justify-content-center">
-                            <a href="{{ route('admin.tagihan-siswa.show', $kelas->id) }}"
-                               class="btn btn-sm btn-outline-primary" style="border-radius:8px;font-size:11px">
-                                <i class="bi bi-eye me-1"></i>Lihat
-                            </a>
-                            <button onclick="openInvoiceModal({{ $kelas->id }}, '{{ addslashes($kelas->nama_kelas) }}')"
-                                    class="btn btn-sm btn-primary" style="border-radius:8px;font-size:11px">
-                                <i class="bi bi-plus-lg me-1"></i>Invoice
-                            </button>
-                        </div>
+                        <a href="{{ route('admin.tagihan-siswa.show', $kelas->id) }}"
+                           class="btn btn-sm btn-outline-primary" style="border-radius:8px;font-size:11px">
+                            <i class="bi bi-eye me-1"></i>Lihat Detail
+                        </a>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="text-center py-5">
+                    <td colspan="8" class="text-center py-5">
                         <div style="font-size:40px;opacity:.3;margin-bottom:8px"><i class="bi bi-wallet2"></i></div>
                         <div class="text-muted">Belum ada data tagihan siswa cicilan atau pascabayar</div>
                     </td>
@@ -209,54 +227,4 @@
 </div>
 
 </div>
-
-{{-- MODAL: BUAT INVOICE --}}
-<div id="modalBuatInvoice" style="display:none;position:fixed;inset:0;z-index:1050;background:rgba(0,0,0,.5);align-items:center;justify-content:center">
-    <div class="dashboard-card" style="width:100%;max-width:460px;margin:20px;max-height:90vh;overflow-y:auto">
-        <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
-            <h6 class="fw-bold mb-0"><i class="bi bi-receipt text-primary me-2"></i>Buat Invoice</h6>
-            <button onclick="document.getElementById('modalBuatInvoice').style.display='none'" class="btn-close"></button>
-        </div>
-        <p class="text-muted mb-3" style="font-size:13px" id="invoiceModalDesc"></p>
-        <form method="POST" id="invoiceForm" action="">
-            @csrf
-            <div class="row g-3">
-                <div class="col-12">
-                    <label class="form-label fw-semibold">Deskripsi Invoice <span class="text-danger">*</span></label>
-                    <input type="text" name="deskripsi" class="form-control" required id="invDeskripsi" placeholder="cth: Tagihan Sesi Bulan Juli">
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Nominal (Rp) <span class="text-danger">*</span></label>
-                    <div class="input-group">
-                        <span class="input-group-text">Rp</span>
-                        <input type="number" name="total" class="form-control" required min="1000" placeholder="500000">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Jatuh Tempo <span class="text-danger">*</span></label>
-                    <input type="date" name="jatuh_tempo" class="form-control" required min="{{ date('Y-m-d') }}">
-                </div>
-            </div>
-            <div class="d-flex gap-2 mt-4">
-                <button type="submit" class="btn btn-primary flex-fill fw-semibold"><i class="bi bi-receipt me-2"></i>Terbitkan Invoice</button>
-                <button type="button" onclick="document.getElementById('modalBuatInvoice').style.display='none'"
-                        class="btn btn-outline-secondary fw-semibold">Batal</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-@push('scripts')
-<script>
-function openInvoiceModal(kelasId, kelasNama) {
-    document.getElementById('invoiceForm').action = '/admin/tagihan-siswa/' + kelasId + '/generate-invoice';
-    document.getElementById('invoiceModalDesc').textContent = 'Kelas: ' + kelasNama;
-    document.getElementById('invDeskripsi').value = 'Tagihan Sesi – ' + kelasNama;
-    document.getElementById('modalBuatInvoice').style.display = 'flex';
-}
-document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') document.getElementById('modalBuatInvoice').style.display = 'none';
-});
-</script>
-@endpush
 @endsection

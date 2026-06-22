@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SchoolClass;
 use App\Models\Invoice;
 use App\Models\Branch;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -13,7 +14,7 @@ class TagihanSiswaController extends Controller
 {
     public function index(Request $request)
     {
-        $query = SchoolClass::with(['cabang', 'guru', 'mataPelajaran', 'siswa.user'])
+        $query = SchoolClass::with(['cabang', 'guru', 'mataPelajaran', 'siswa.user', 'siswa.package'])
             ->whereIn('billing_mode', ['postpaid', 'cicilan']);
 
         if (auth()->user()->hasRole('admin')) {
@@ -35,12 +36,16 @@ class TagihanSiswaController extends Controller
             $query->where('cabang_id', $request->cabang_id);
         }
 
-        $classes = $query->with(['siswa.package'])->latest()->paginate(20)->appends($request->all());
+        $classes = $query->latest()->paginate(20)->appends($request->all());
 
         $branches = Branch::orderBy('name')->get();
 
         $totalCicilan  = SchoolClass::where('billing_mode', 'cicilan')->count();
         $totalPostpaid = SchoolClass::where('billing_mode', 'postpaid')->count();
+
+        // Compute payment summary per kelas
+        $kelasIds = $classes->pluck('id')->toArray();
+        $invoicesByKelas = Invoice::whereIn('kelas_id', $kelasIds)->with('pembayaran')->get()->groupBy('kelas_id');
 
         $stats = [
             'total'    => $totalCicilan + $totalPostpaid,
@@ -49,7 +54,7 @@ class TagihanSiswaController extends Controller
             'menunggu' => Invoice::whereIn('status', ['belum_bayar', 'sebagian'])->count(),
         ];
 
-        return view('admin.tagihan-siswa.index', compact('classes', 'branches', 'stats'));
+        return view('admin.tagihan-siswa.index', compact('classes', 'branches', 'stats', 'invoicesByKelas'));
     }
 
     public function show(Request $request, SchoolClass $kelas)
@@ -64,11 +69,33 @@ class TagihanSiswaController extends Controller
         }
 
         $student = $kelas->siswa->first();
-        $invoices = $student
-            ? Invoice::where('siswa_id', $student->id)->orderByDesc('created_at')->get()
-            : collect();
 
-        return view('admin.tagihan-siswa.show', compact('kelas', 'student', 'invoices'));
+        // Only show invoices that belong to THIS kelas (by kelas_id, fall back to cabang filter)
+        $invoices = collect();
+        if ($student) {
+            $invoices = Invoice::where('siswa_id', $student->id)
+                ->where(function ($q) use ($kelas) {
+                    $q->where('kelas_id', $kelas->id)
+                      ->orWhere(function ($q2) use ($kelas) {
+                          $q2->whereNull('kelas_id')->where('cabang_id', $kelas->cabang_id);
+                      });
+                })
+                ->with('pembayaran')
+                ->orderByDesc('created_at')
+                ->get();
+        }
+
+        // Payment summary
+        $hargaPaket      = $student?->package?->harga ?? 0;
+        $totalDibayar    = $invoices->flatMap->pembayaran->where('status', 'verified')->sum('jumlah');
+        $totalTagihan    = $invoices->sum('total');
+        $sisaCicilan     = max(0, $totalTagihan - $totalDibayar);
+        $jumlahInvoiceLunas = $invoices->where('status', 'lunas')->count();
+
+        return view('admin.tagihan-siswa.show', compact(
+            'kelas', 'student', 'invoices',
+            'hargaPaket', 'totalDibayar', 'sisaCicilan', 'jumlahInvoiceLunas', 'totalTagihan'
+        ));
     }
 
     public function generateInvoice(Request $request, SchoolClass $kelas)
@@ -92,6 +119,7 @@ class TagihanSiswaController extends Controller
         Invoice::create([
             'siswa_id'      => $student->id,
             'cabang_id'     => $kelas->cabang_id,
+            'kelas_id'      => $kelas->id,
             'nomor_invoice' => $nomor,
             'deskripsi'     => $request->deskripsi,
             'subtotal'      => $request->total,

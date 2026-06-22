@@ -15,6 +15,7 @@ class Schedule extends Model
     protected $fillable = [
         'kelas_id',
         'paket_id',
+        'module_id',
         'guru_id',
         'cabang_id',
         'pertemuan_ke',
@@ -65,5 +66,10 @@ class Schedule extends Model
     public function absensi()
     {
         return $this->hasMany(AbsensiSiswa::class, 'jadwal_id');
+    }
+
+    public function module()
+    {
+        return $this->belongsTo(Module::class, 'module_id');
     }
 }

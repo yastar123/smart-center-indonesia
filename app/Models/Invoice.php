@@ -15,6 +15,7 @@ class Invoice extends Model
     protected $fillable = [
         'siswa_id',
         'cabang_id',
+        'kelas_id',
         'nomor_invoice',
         'subtotal',
         'diskon',
