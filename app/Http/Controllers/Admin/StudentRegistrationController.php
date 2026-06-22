@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\StudentRegistration;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class StudentRegistrationController extends Controller
 {
@@ -26,8 +28,8 @@ class StudentRegistrationController extends Controller
         $registrations = $query->latest()->paginate(15)->appends($request->query());
 
         $stats = [
-            'total' => StudentRegistration::count(),
-            'pending' => StudentRegistration::where('status', 'pending')->count(),
+            'total'    => StudentRegistration::count(),
+            'pending'  => StudentRegistration::where('status', 'pending')->count(),
             'verified' => StudentRegistration::where('status', 'verified')->count(),
             'rejected' => StudentRegistration::where('status', 'rejected')->count(),
         ];
@@ -39,7 +41,7 @@ class StudentRegistrationController extends Controller
     {
         return response()->json([
             'success' => true,
-            'data' => $studentRegistration,
+            'data'    => $studentRegistration,
         ]);
     }
 
@@ -51,37 +53,50 @@ class StudentRegistrationController extends Controller
 
         DB::transaction(function () use ($studentRegistration) {
             $gender = match ($studentRegistration->gender) {
-                'Perempuan' => 'P',
-                'Laki-laki' => 'L',
-                default => 'L'
+                'Perempuan', 'P' => 'P',
+                'Laki-laki', 'L' => 'L',
+                default          => 'L',
             };
+
+            $baseName  = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $studentRegistration->name));
+            $baseEmail = $baseName . '.' . time() . '@akademibimbel.id';
+            $password  = 'password';
+
+            $user = User::create([
+                'name'     => $studentRegistration->name,
+                'email'    => $baseEmail,
+                'password' => Hash::make($password),
+            ]);
+            $user->assignRole('siswa');
 
             $nis = $studentRegistration->no_reg ?: ('STU-' . now()->format('YmdHis') . '-' . rand(100, 999));
 
             Student::create([
-                'user_id' => null,
-                'nis' => $nis,
-                'name' => $studentRegistration->name,
-                'gender' => $gender,
-                'birth_date' => $studentRegistration->birth_date,
-                'birth_place' => $studentRegistration->birth_place,
-                'address' => $studentRegistration->address,
-                'phone' => $studentRegistration->phone,
-                'parent_name' => $studentRegistration->parent_name,
+                'user_id'      => $user->id,
+                'nis'          => $nis,
+                'name'         => $studentRegistration->name,
+                'gender'       => $gender,
+                'birth_date'   => $studentRegistration->birth_date,
+                'birth_place'  => $studentRegistration->birth_place,
+                'address'      => $studentRegistration->address,
+                'phone'        => $studentRegistration->phone,
+                'parent_name'  => $studentRegistration->parent_name,
                 'parent_phone' => $studentRegistration->parent_phone,
-                'school_name' => null,
-                'grade' => null,
-                'status' => 'aktif',
-                'join_date' => now()->toDateString(),
+                'school_name'  => $studentRegistration->education_level,
+                'grade'        => null,
+                'status'       => 'aktif',
+                'join_date'    => now()->toDateString(),
             ]);
 
             $studentRegistration->update([
-                'status' => 'verified',
+                'status'    => 'verified',
+                'notes'     => ($studentRegistration->notes ? $studentRegistration->notes . "\n" : '') .
+                               '[Auto] Email: ' . $baseEmail . ' | Password: ' . $password,
             ]);
         });
 
         return redirect()->route('admin.student-registrations.index')
-            ->with('success', 'Pendaftaran berhasil diverifikasi dan data siswa telah masuk ke daftar siswa.');
+            ->with('success', 'Pendaftaran berhasil diverifikasi dan akun siswa telah dibuat (email & password otomatis).');
     }
 
     public function destroy(StudentRegistration $studentRegistration)

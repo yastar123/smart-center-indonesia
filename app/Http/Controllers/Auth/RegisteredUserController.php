@@ -4,12 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\LandingWaNumber;
-use App\Models\Student;
-use App\Models\User;
-use Illuminate\Http\RedirectResponse;
+use App\Models\StudentRegistration;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
@@ -34,36 +30,29 @@ class RegisteredUserController extends Controller
             'phone' => ['required', 'string', 'max:30'],
         ]);
 
-        // Auto-generate unique email & password
-        $baseName  = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $request->name));
-        $baseEmail = $baseName . '.' . time() . '@akademibimbel.id';
-        $password  = 'password';
-
-        // Create user account
-        $user = User::create([
-            'name'     => $request->name,
-            'email'    => $baseEmail,
-            'password' => Hash::make($password),
-        ]);
-        $user->assignRole('siswa');
-
-        // Build student record
-        $student = Student::create([
-            'user_id'      => $user->id,
-            'name'         => $request->name,
-            'phone'        => $request->phone,
-            'birth_place'  => $request->birth_place,
-            'birth_date'   => $request->birth_date ?: null,
-            'gender'       => $request->gender,
-            'address'      => $request->address,
-            'parent_name'  => $request->parent_name,
-            'parent_phone' => $request->parent_phone,
-            'school_name'  => $request->school_name,
-            'status'       => 'aktif',
-            'join_date'    => now()->toDateString(),
+        StudentRegistration::create([
+            'no_reg'          => 'REG-' . now()->format('YmdHis') . '-' . rand(100, 999),
+            'name'            => $request->name,
+            'phone'           => $request->phone,
+            'gender'          => $request->gender,
+            'education_level' => $request->education_level,
+            'birth_place'     => $request->birth_place,
+            'birth_date'      => $request->birth_date ?: null,
+            'address'         => $request->address,
+            'parent_name'     => $request->parent_name,
+            'parent_phone'    => $request->parent_phone,
+            'program'         => $request->program_belajar,
+            'system'          => $request->sistem_belajar,
+            'learning_place'  => $request->tempat_belajar,
+            'pickup_mode'     => $request->sistem_paket,
+            'interests'       => $request->program_minat ?? [],
+            'day_preferences' => $request->hari_belajar ?? [],
+            'schedule_time'   => $request->jam_belajar,
+            'start_date'      => $request->tanggal_mulai ?: null,
+            'notes'           => $request->catatan,
+            'status'          => 'pending',
         ]);
 
-        // Save student name for the success page and redirect there.
         $request->session()->put('student_name', $request->name);
 
         return redirect()->route('register.success');

@@ -14,6 +14,7 @@ class StudentRegistration extends Model
         'name',
         'phone',
         'gender',
+        'education_level',
         'birth_place',
         'birth_date',
         'address',

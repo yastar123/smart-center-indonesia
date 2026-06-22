@@ -469,8 +469,36 @@
                             @error('phone')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Jenjang Pendidikan (Sekolah & Kelas) / Umum</label>
-                            <input type="text" name="school_name" class="form-control" value="{{ old('school_name') }}" placeholder="cth. SMA Negeri 1 – Kelas 11 / Umum">
+                            <label class="form-label">Kategori Peserta Didik</label>
+                            <select name="education_level" id="education_level" class="form-select" onchange="handleEducationLevel(this.value)">
+                                <option value="">-- Pilih Kategori --</option>
+                                <option value="Pra Sekolah (PAUD/TK)" {{ old('education_level')=='Pra Sekolah (PAUD/TK)'?'selected':'' }}>Pra Sekolah (PAUD/TK)</option>
+                                <option value="Sekolah Dasar (SD)" {{ old('education_level')=='Sekolah Dasar (SD)'?'selected':'' }}>Sekolah Dasar (SD)</option>
+                                <option value="Sekolah Menengah Pertama (SMP)" {{ old('education_level')=='Sekolah Menengah Pertama (SMP)'?'selected':'' }}>Sekolah Menengah Pertama (SMP)</option>
+                                <option value="Sekolah Menengah Atas/Kejuruan (SMA/SMK)" {{ old('education_level')=='Sekolah Menengah Atas/Kejuruan (SMA/SMK)'?'selected':'' }}>Sekolah Menengah Atas/Kejuruan (SMA/SMK)</option>
+                                <option value="Mahasiswa" {{ old('education_level')=='Mahasiswa'?'selected':'' }}>Mahasiswa</option>
+                                <option value="Umum" {{ old('education_level')=='Umum'?'selected':'' }}>Umum</option>
+                            </select>
+                        </div>
+
+                        {{-- Parent fields shown inline when Pra Sekolah is selected --}}
+                        <div id="praSekolahFields" class="col-12 {{ old('education_level')=='Pra Sekolah (PAUD/TK)' ? '' : 'd-none' }}">
+                            <div class="row g-3 p-3 rounded-3" style="background:#fdf4ff;border:1.5px solid #e9d5ff;">
+                                <div class="col-12" style="font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#461256">
+                                    <i class="bi bi-people-fill me-1"></i> Data Orang Tua / Wali
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Nama Orang Tua / Wali <span class="text-danger">*</span></label>
+                                    <input type="text" name="parent_name" id="parent_name_step1" class="form-control" value="{{ old('parent_name') }}" placeholder="Nama lengkap orang tua/wali">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">HP Orang Tua / Wali <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">+62</span>
+                                        <input type="text" name="parent_phone" id="parent_phone_step1" class="form-control" value="{{ old('parent_phone') }}" placeholder="8xxxxxxxxxx">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -484,6 +512,7 @@
             <div class="step-panel" data-step="2">
                 <div class="section-card">
                     <div class="section-title">Data Orang Tua / Wali</div>
+                    <p class="text-muted mb-3" style="font-size:12px">Kosongkan jika sudah diisi di langkah sebelumnya (Pra Sekolah)</p>
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Nama Orang Tua/Wali</label>
@@ -809,6 +838,17 @@ document.getElementById('regForm').addEventListener('submit', function() {
     document.getElementById('regLoading').classList.remove('d-none');
     document.getElementById('regBtn').disabled = true;
 });
+
+function handleEducationLevel(val) {
+    const praFields = document.getElementById('praSekolahFields');
+    if (val === 'Pra Sekolah (PAUD/TK)') {
+        praFields.classList.remove('d-none');
+    } else {
+        praFields.classList.add('d-none');
+    }
+}
+// Run on load in case of old() repopulation
+handleEducationLevel(document.getElementById('education_level').value);
 </script>
 </body>
 </html>
