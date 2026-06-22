@@ -109,7 +109,8 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::delete('/categories/{category}',[\App\Http\Controllers\Admin\CategoryController::class, 'destroy'])->name('categories.destroy');
 
         // ATTENDANCE ADMIN (Manajemen Absensi)
-        Route::get('/attendance',                         [\App\Http\Controllers\Admin\AdminAttendanceController::class, 'index'])      ->name('attendance.index');
+        Route::get('/attendance',                         [\App\Http\Controllers\Admin\AdminAttendanceController::class, 'packageIndex'])->name('attendance.index');
+        Route::get('/attendance/sessions',                [\App\Http\Controllers\Admin\AdminAttendanceController::class, 'index'])      ->name('attendance.sessions');
         Route::get('/attendance/{schedule}',              [\App\Http\Controllers\Admin\AdminAttendanceController::class, 'show'])       ->name('attendance.show');
         Route::put('/attendance/{absensi}',               [\App\Http\Controllers\Admin\AdminAttendanceController::class, 'update'])     ->name('attendance.update');
         Route::post('/attendance/{schedule}/bulk',        [\App\Http\Controllers\Admin\AdminAttendanceController::class, 'bulkUpdate']) ->name('attendance.bulk');

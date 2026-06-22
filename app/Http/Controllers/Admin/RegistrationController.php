@@ -147,10 +147,30 @@ class RegistrationController extends Controller
                 $temporaryCredentials = null;
             }
 
-            if ($request->filled('package_id')) {
-                $student->update([
-                    'package_id' => $request->package_id,
+            // Handle custom package — create a Package record in DB
+            $resolvedPackageId = $request->package_id;
+            if ($request->is_custom_package == '1' && $request->filled('custom_package_name')) {
+                $customPkg = Package::create([
+                    'cabang_id'         => $request->cabang_id,
+                    'guru_id'           => $request->guru_id,
+                    'nama'              => $request->custom_package_name,
+                    'deskripsi'         => $request->custom_deskripsi ?? null,
+                    'harga'             => (float)($request->custom_package_price ?? 0),
+                    'jumlah_pertemuan'  => (int)($request->jumlah_pertemuan ?? 1),
+                    'durasi_bulan'      => (int)($request->durasi_bulan ?? 3),
+                    'jenis'             => 'privat',
+                    'tipe_kelas'        => $request->jenis ?? 'offline',
+                    'metode_absensi'    => 'manual',
+                    'status'            => 'aktif',
                 ]);
+                if ($request->filled('course_id')) {
+                    $customPkg->mataPelajaran()->syncWithoutDetaching([$request->course_id]);
+                }
+                $resolvedPackageId = $customPkg->id;
+            }
+
+            if ($resolvedPackageId) {
+                $student->update(['package_id' => $resolvedPackageId]);
             }
 
             $kelas = SchoolClass::create([
@@ -178,6 +198,10 @@ class RegistrationController extends Controller
                 $count = Invoice::whereYear('created_at', $year)->whereMonth('created_at', date('m'))->count() + 1;
                 $nomor = 'INV-' . $year . '-' . $month . str_pad($count, 3, '0', STR_PAD_LEFT);
 
+                // If cicilan = 1 (lunas), set status directly to 'lunas'
+                $cicilanCount   = (int)($request->cicilan ?? 1);
+                $invoiceStatus  = ($cicilanCount <= 1) ? 'lunas' : 'belum_bayar';
+
                 Invoice::create([
                     'siswa_id'      => $student->id,
                     'cabang_id'     => $request->cabang_id,
@@ -187,7 +211,7 @@ class RegistrationController extends Controller
                     'diskon'        => 0,
                     'pajak'         => 0,
                     'total'         => $totalTagihan,
-                    'status'        => 'belum_bayar',
+                    'status'        => $invoiceStatus,
                     'jatuh_tempo'   => Carbon::parse($request->tanggal_mulai)->addDays(7),
                     'periode'       => date('Y-m'),
                 ]);

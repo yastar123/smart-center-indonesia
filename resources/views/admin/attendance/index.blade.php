@@ -14,10 +14,22 @@
                     <i class="bi bi-clipboard2-check-fill"></i>
                 </div>
                 <div>
-                    <h5 class="fw-bold mb-0" style="color:white">Manajemen Absensi</h5>
-                    <span style="font-size:12px;opacity:.8">Lihat dan ubah absensi siswa per sesi mata pelajaran</span>
+                    <h5 class="fw-bold mb-0" style="color:white">Sesi Absensi</h5>
+                    <span style="font-size:12px;opacity:.8">
+                        @if(request('paket_id') && ($pkt = \App\Models\Package::find(request('paket_id'))))
+                            Paket: <strong>{{ $pkt->nama }}</strong>
+                        @else
+                            Semua sesi belajar — filter berdasarkan paket atau guru
+                        @endif
+                    </span>
                 </div>
             </div>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{{ route('admin.attendance.index') }}" class="btn fw-semibold px-4"
+               style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
+                <i class="bi bi-arrow-left me-2"></i>Kembali ke Paket
+            </a>
         </div>
     </div>
 </div>
@@ -60,7 +72,7 @@
 
 {{-- FILTER BAR --}}
 <div class="dashboard-card mb-4 fade-up">
-    <form id="filterForm" method="GET" action="{{ route('admin.attendance.index') }}">
+    <form id="filterForm" method="GET" action="{{ route('admin.attendance.sessions') }}">
         <div class="row g-2 align-items-end">
             <div class="col-md-3">
                 <label class="form-label fw-semibold" style="font-size:12px">Paket</label>
@@ -97,7 +109,7 @@
             </div>
             <div class="col-md-2">
                 @if(request()->hasAny(['paket_id','guru_id','status','tanggal']))
-                <a href="{{ route('admin.attendance.index') }}" class="btn btn-outline-secondary w-100" style="border-radius:10px">
+                <a href="{{ route('admin.attendance.sessions') }}" class="btn btn-outline-secondary w-100" style="border-radius:10px">
                     <i class="bi bi-x-lg me-1"></i>Reset
                 </a>
                 @endif

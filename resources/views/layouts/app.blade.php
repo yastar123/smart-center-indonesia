@@ -3291,7 +3291,7 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.attendance.index') }}" class="nav-link {{ request()->routeIs('admin.attendance.*') ? 'active' : '' }}" data-label="Absensi">
+            <a href="{{ route('admin.attendance.index') }}" class="nav-link {{ request()->routeIs('admin.attendance.index') || request()->routeIs('admin.attendance.sessions') ? 'active' : '' }}" data-label="Absensi">
                 <i class="bi bi-clipboard2-check"></i>
                 <span>Absensi</span>
             </a>

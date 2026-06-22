@@ -1,0 +1,63 @@
+di page /admin/registration-create pada form Konfigurasi Kelas & Paket pada menu costom package inputnya itu seperti ini
+Nama Paket *
+Jenis Paket *
+Jumlah Sesi *
+Metode Absensi *
+Tipe Kelas *
+Harga Dasar (Rp) *
+Cabang
+Mata Pelajaran
+Deskripsi
+yang mana itu akan membuat paket baru juga di page /admin/course-package/create
+
+di page /admin/registration-create di form Skema Tagihan & Aktivasi di input Jumlah cicilan jika pilih lunas di page /admin/billing statusnya juga lunas dan di page itu juga tabel Rincian Paket ganti dengan paket saja dan menampilka paket yang di gunakan siswa itu pada page /admin/registration-create
+
+di page /admin/students, /admin/teachers tambahkan tombol preiew di tabel aksi dan jika di klick akan di arahkan ke page preiewnya
+
+di page /siswa/courses/fees jika ada paket yang mana siswanya itu sudah punya paketnya disitu ada penanda terdaftar
+
+di page /admin/salaries/create di input Guru saat sudah pilih guru tertentu di bawahnya akan menampilkan data-data terkait di paket apa saja dia mengajar, berapa sesinya,
+
+di page /guru/payments akan menampilkan data-data
+Periode , Tipe Gaji, Gaji Pokok (Rp), Bonus, Status, Metode Pembayaran, Tanggal Pembayaran, Nama Bank, Nomor Rekening, Bukti Pembayaran
+
+di page /admin/salaries saat akan edit saya ingin langsung di alihkan ke page lain (bukan seperti sekarang yang menampilkan modal component ) dan di page itu full halaman dan inputnya juga seperti di page /admin/salaries/create
+
+tambahkan page dan menu baru yaitu page tagihan di mana page ini itu akan menampilkan sisa pembayaran paket yang blom lunas atau di cicil para siswa
+
+di page /admin/schedule saat akan CRUD akan di pindahkan ke page baru dan disitu akan memasukan input
+Paket (ketika paket sudah di pilih di dropdown ) akan menampilkan data-data
+Nama Paket
+Jenis Paket
+Jumlah Sesi
+Metode Absensi
+Tipe Kelas
+Harga Dasar (Rp)
+Cabang
+Status
+Mata Pelajaran
+Deskripsi
+
+di page /admin/schedule saat akan CRUD akan di pindahkan ke page baru dan disitu akan memasukan input-input Sesi , Tanggal Mulai, Jam Mulai, Jam Selesai, Ruangan (opsional), Link Meeting (opsional), Modul ( opsional )
+
+setelah jadwal sesi di buat di page akan muncul di /guru/classes/id/attendance yang mana Parameter Status Absensi nya seperti ini
+❌❌Tidak Hadir
+✅❌Menunggu Konfirmasi Siswa
+❌✅Tidak Valid
+✅✅Hadir
+✅/❌ pertama = Guru menandai hadir
+✅/❌ kedua = Siswa mengkonfirmasi kehadiran
+
+dan alur absensinya
+Alur Absensi:
+① Guru menandai siswa hadir
+② Siswa klik tombol "Konfirmasi Kehadiran"
+③ Status: Hadir ✅
+
+di page /admin/attendance admin bisa melihat semua paket dan ketika di klick akan di pindahkan ke page lain yang menampilkan semua sesi yang sudah dan belom berlangsun, admin bisa merubah status kehadiran siswanya
+
+di page /admin/reports pastikan keuangannya masuk dan keluar dari situ
+
+di page /siswa/billing saat admin sudah melakukan registrasi di /admin/registration-create muncul invoice di page /siswa/billing baik lunas, cicil, sisa cicilan dll
+
+di role siswa dan guru tambahkan page dan menu Reschedule yang mana di page ini bisa Reschedule jadwal hanya untuk paket jenis privat, Aturan Reschedule Hanya kelas PRIVATE yang bisa di-reschedule Kelas reguler tidak boleh diproses Semua request yang masuk sudah dipastikan valid untuk paket privat

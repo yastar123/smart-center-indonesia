@@ -6,12 +6,42 @@ use App\Http\Controllers\Controller;
 use App\Models\Schedule;
 use App\Models\AbsensiSiswa;
 use App\Models\Course;
+use App\Models\Package;
 use App\Models\Teacher;
 use App\Models\Branch;
 use Illuminate\Http\Request;
 
 class AdminAttendanceController extends Controller
 {
+    public function packageIndex(Request $request)
+    {
+        $user     = auth()->user();
+        $isOwner  = $user->hasRole('owner');
+        $branchId = $isOwner ? null : ($user->branch_id ?? null);
+
+        $pakets = Package::with(['cabang', 'mataPelajaran', 'guru'])
+            ->when($branchId, fn($q) => $q->where('cabang_id', $branchId))
+            ->orderBy('nama')
+            ->get()
+            ->map(function ($p) use ($branchId) {
+                $schedules = Schedule::where('paket_id', $p->id)
+                    ->when($branchId, fn($q) => $q->where('cabang_id', $branchId))
+                    ->get();
+                $p->total_sesi     = $schedules->count();
+                $p->selesai_sesi   = $schedules->where('status', 'selesai')->count();
+                $p->berlangsung    = $schedules->where('status', 'berlangsung')->count();
+                $p->dijadwalkan    = $schedules->where('status', 'dijadwalkan')->count();
+                $absensiIds        = $schedules->pluck('id');
+                $p->hadir_count    = AbsensiSiswa::whereIn('jadwal_id', $absensiIds)->where('status', 'hadir')->count();
+                $p->alpa_count     = AbsensiSiswa::whereIn('jadwal_id', $absensiIds)->whereIn('status', ['alpa', 'tidak_hadir'])->count();
+                return $p;
+            });
+
+        $branches = $isOwner ? Branch::orderBy('name')->get() : collect();
+
+        return view('admin.attendance.packages', compact('pakets', 'isOwner', 'branches', 'branchId'));
+    }
+
     public function index(Request $request)
     {
         $user     = auth()->user();
