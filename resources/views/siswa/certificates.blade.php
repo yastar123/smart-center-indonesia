@@ -25,104 +25,11 @@
     </div>
 </div>
 
-{{-- ENROLLED COURSES WITH CERT STATUS --}}
+@if($certificates->count() > 0)
 <h6 class="fw-bold mb-3" style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted)">
-    <i class="bi bi-journal-bookmark text-primary me-2"></i>Mata Pelajaran yang Diambil
+    <i class="bi bi-award text-warning me-2"></i>Sertifikat
 </h6>
-
-@if($enrolledClasses->isEmpty())
-<div class="dashboard-card fade-up mb-4">
-    <div class="text-center py-5">
-        <i class="bi bi-journal-x" style="font-size:56px;opacity:.2;display:block;margin-bottom:16px;color:var(--primary)"></i>
-        <div class="fw-bold mb-1" style="font-size:16px">Belum Ada Kelas Terdaftar</div>
-        <div class="text-muted" style="font-size:13px">Daftarkan diri ke kelas untuk mendapatkan sertifikat dari admin.</div>
-    </div>
-</div>
-@else
-<div class="row g-3 mb-4 fade-up">
-    @foreach($enrolledClasses as $class)
-    @php
-        $courseName = $class->mataPelajaran?->nama ?? $class->nama_kelas;
-        $courseCode = $class->mataPelajaran?->kode ?? '—';
-        $certForClass = $certificates->first(function($cert) use ($class, $courseName) {
-            if (!is_null($cert->course_id) && !is_null($class->mataPelajaran?->id)) {
-                return (int)$cert->course_id === (int)$class->mataPelajaran->id;
-            }
-            return str_contains(strtolower($cert->judul ?? ''), strtolower($courseName));
-        });
-        $hasCert = !is_null($certForClass);
-    @endphp
-    <div class="col-12 col-md-6 col-xl-4">
-        <div class="dashboard-card h-100" style="border-top:3px solid {{ $hasCert ? '#10b981' : 'var(--card-border)' }};position:relative">
-            {{-- Header row --}}
-            <div class="d-flex align-items-start justify-content-between mb-3">
-                <div class="d-flex align-items-center gap-2">
-                    <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#260632,#68117e);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                        <i class="bi bi-journal-bookmark-fill" style="color:white;font-size:16px"></i>
-                    </div>
-                    <div>
-                        <div class="fw-bold" style="font-size:14px;line-height:1.3">{{ $courseName }}</div>
-                        <div class="text-muted" style="font-size:11px">{{ $class->nama_kelas }}</div>
-                    </div>
-                </div>
-                @if($hasCert)
-                <span style="background:rgba(16,185,129,.1);color:#10b981;border:1px solid rgba(16,185,129,.25);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0">
-                    <i class="bi bi-check-circle-fill me-1"></i>Tersedia
-                </span>
-                @else
-                <span style="background:var(--soft-muted-bg,rgba(100,116,139,.08));color:var(--text-muted);border:1px solid var(--soft-muted-border,rgba(100,116,139,.15));font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0">
-                    <i class="bi bi-clock me-1"></i>Belum Ada
-                </span>
-                @endif
-            </div>
-
-            {{-- Info row --}}
-            <div class="d-flex flex-wrap gap-3 mb-3" style="font-size:12px;color:var(--text-muted)">
-                <div class="d-flex align-items-center gap-1">
-                    <i class="bi bi-person-fill" style="color:var(--primary)"></i>
-                    <span>{{ $class->guru?->name ?? 'Belum ada guru' }}</span>
-                </div>
-                <div class="d-flex align-items-center gap-1">
-                    <i class="bi bi-geo-alt" style="color:var(--primary)"></i>
-                    <span>{{ $class->cabang?->name ?? 'Pusat' }}</span>
-                </div>
-            </div>
-
-            {{-- Action --}}
-            <div class="pt-2 border-top">
-                @if($hasCert)
-                <a href="{{ route('siswa.certificates.download', $certForClass) }}"
-                    class="btn btn-success btn-sm fw-semibold w-100" style="border-radius:8px" target="_blank">
-                    <i class="bi bi-download me-1"></i>Unduh Sertifikat
-                </a>
-                @else
-                <div class="text-center py-1" style="font-size:12px;color:var(--text-muted)">
-                    <i class="bi bi-info-circle me-1"></i>Sertifikat belum diterbitkan admin
-                </div>
-                @endif
-            </div>
-        </div>
-    </div>
-    @endforeach
-</div>
-@endif
-
-{{-- ADDITIONAL CERTIFICATES (admin-issued, not matched to enrolled class) --}}
-@php
-    $matchedCertIds = $enrolledClasses->map(fn($class) => $certificates->first(function($cert) use ($class) {
-        if (!is_null($cert->course_id) && !is_null($class->mataPelajaran?->id)) {
-            return (int)$cert->course_id === (int)$class->mataPelajaran->id;
-        }
-        $courseName = $class->mataPelajaran?->nama ?? $class->nama_kelas;
-        return str_contains(strtolower($cert->judul ?? ''), strtolower($courseName));
-    }))->filter()->pluck('id');
-    $otherCerts = $certificates->whereNotIn('id', $matchedCertIds);
-@endphp
-
-@if($otherCerts->count() > 0)
-<h6 class="fw-bold mb-3" style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted)">
-    <i class="bi bi-award text-warning me-2"></i>Sertifikat Lainnya
-</h6>
+@php $otherCerts = $certificates; @endphp
 <div class="row g-3 fade-up">
     @foreach($otherCerts as $cert)
     @php
@@ -154,7 +61,7 @@
 </div>
 @endif
 
-@if($enrolledClasses->isEmpty() && $certificates->isEmpty())
+@if($certificates->isEmpty())
 <div class="dashboard-card fade-up">
     <div class="text-center py-5">
         <i class="bi bi-award" style="font-size:56px;opacity:.2;display:block;margin-bottom:16px;color:var(--primary)"></i>

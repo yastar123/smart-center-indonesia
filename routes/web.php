@@ -222,6 +222,7 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::get('/billing/{billing}',         [BillingController::class, 'show'])    ->name('billing.show');
         Route::put('/billing/{billing}',         [BillingController::class, 'update'])  ->name('billing.update');
         Route::delete('/billing/{billing}',      [BillingController::class, 'destroy']) ->name('billing.destroy');
+        Route::get('/billing/payments/pending',  [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'index'])->name('billing.payments-pending');
 
         // SCHEDULE LIST & CREATE (aliases to existing schedules)
         Route::get('/schedule-list',  fn() => redirect()->route('admin.schedules.index'))  ->name('schedule-list.index');
@@ -246,6 +247,29 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::post('/tagihan-siswa/{kelas}/generate-invoice', [\App\Http\Controllers\Admin\TagihanSiswaController::class, 'generateInvoice'])->name('tagihan-siswa.generate-invoice');
         Route::get('/riwayat-guru-mengajar', [\App\Http\Controllers\Admin\TeacherHistoryController::class, 'index'])->name('riwayat-guru.index');
         Route::get('/riwayat-guru-mengajar/{teacher}', [\App\Http\Controllers\Admin\TeacherHistoryController::class, 'show'])->name('riwayat-guru.show');
+
+        // RIWAYAT SESI
+        Route::get('/riwayat-sesi', [\App\Http\Controllers\Admin\RiwayatSesiController::class, 'index'])->name('riwayat-sesi.index');
+        Route::get('/riwayat-sesi/{teacher}', [\App\Http\Controllers\Admin\RiwayatSesiController::class, 'show'])->name('riwayat-sesi.show');
+
+        // VERIFIKASI PEMBAYARAN
+        Route::get('/verifikasi-pembayaran', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'index'])->name('verifikasi-pembayaran.index');
+        Route::get('/verifikasi-pembayaran/{payment}', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'show'])->name('verifikasi-pembayaran.show');
+        Route::post('/verifikasi-pembayaran/{payment}/approve', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'approve'])->name('verifikasi-pembayaran.approve');
+        Route::post('/verifikasi-pembayaran/{payment}/reject', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'reject'])->name('verifikasi-pembayaran.reject');
+
+        // AJAX: students by teacher (for schedule create form)
+        Route::get('/schedules/teacher/{teacher}/students', function(\App\Models\Teacher $teacher) {
+            $students = \App\Models\Student::whereHas('schoolClasses', fn($q) => $q->where('guru_id', $teacher->id))
+                ->with('schoolClasses.mataPelajaran')
+                ->get()
+                ->map(fn($s) => [
+                    'id'      => $s->id,
+                    'name'    => $s->name,
+                    'classes' => $s->schoolClasses->where('guru_id', $teacher->id)->map(fn($k) => $k->mataPelajaran?->nama ?? $k->nama_kelas)->values(),
+                ]);
+            return response()->json($students);
+        })->name('schedules.teacher-students');
     });
 
 // CERTIFICATES — accessible by admin, owner, and guru
@@ -439,6 +463,8 @@ Route::middleware(['auth', 'role:siswa'])
 
         // Tagihan (Siswa)
         Route::get('/billing', [\App\Http\Controllers\Siswa\BillingController::class, 'index'])->name('billing.index');
+        Route::get('/billing/invoice/{invoice}', [\App\Http\Controllers\Siswa\BillingController::class, 'invoiceDetail'])->name('billing.invoice-detail');
+        Route::post('/billing/invoice/{invoice}/upload', [\App\Http\Controllers\Siswa\BillingController::class, 'invoiceUpload'])->name('billing.invoice-upload');
         Route::post('/billing/{course}/pay', [\App\Http\Controllers\Siswa\BillingController::class, 'pay'])->name('billing.pay');
         Route::post('/billing/bulk', [\App\Http\Controllers\Siswa\BillingController::class, 'bulkPay'])->name('billing.bulk');
 

@@ -210,4 +210,59 @@ class BillingController extends Controller
         return redirect()->route('siswa.billing.index')
             ->with('success', "Bukti pembayaran berhasil diunggah untuk {$createdCount} mata pelajaran. Menunggu verifikasi admin.");
     }
+
+    public function invoiceDetail(Invoice $invoice)
+    {
+        $student = Student::where('user_id', auth()->id())->firstOrFail();
+        if ((int)$invoice->siswa_id !== (int)$student->id) abort(403);
+
+        $invoice->load(['siswa', 'schoolClass.mataPelajaran', 'schoolClass.cabang', 'pembayaran']);
+
+        $payments = \App\Models\Payment::where('invoice_id', $invoice->id)
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('siswa.billing.invoice-detail', compact('invoice', 'payments', 'student'));
+    }
+
+    public function invoiceUpload(Request $request, Invoice $invoice)
+    {
+        $student = Student::where('user_id', auth()->id())->firstOrFail();
+        if ((int)$invoice->siswa_id !== (int)$student->id) abort(403);
+        if ($invoice->status === 'lunas') {
+            return back()->with('error', 'Invoice ini sudah lunas.');
+        }
+
+        $request->validate([
+            'jumlah'          => 'required|numeric|min:1000',
+            'metode'          => 'required|in:transfer,cash,qris,lainnya',
+            'nama_bank'       => 'nullable|string|max:100',
+            'nomor_rekening'  => 'nullable|string|max:50',
+            'bukti_pembayaran'=> 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
+            'catatan'         => 'nullable|string|max:500',
+        ]);
+
+        $buktiPath = null;
+        if ($request->hasFile('bukti_pembayaran')) {
+            $buktiPath = $request->file('bukti_pembayaran')->store('payments/bukti', 'public');
+        }
+
+        \App\Models\Payment::create([
+            'invoice_id'        => $invoice->id,
+            'siswa_id'          => $student->id,
+            'cabang_id'         => $student->branch_id,
+            'nomor_pembayaran'  => 'PAY-' . strtoupper(uniqid()),
+            'jumlah'            => $request->jumlah,
+            'metode'            => $request->metode,
+            'nama_bank'         => $request->nama_bank,
+            'nomor_rekening'    => $request->nomor_rekening,
+            'bukti_pembayaran'  => $buktiPath,
+            'tanggal_pembayaran'=> now()->toDateString(),
+            'status'            => 'pending',
+            'catatan'           => $request->catatan,
+        ]);
+
+        return redirect()->route('siswa.billing.invoice-detail', $invoice)
+            ->with('success', 'Bukti pembayaran berhasil diunggah. Menunggu verifikasi admin.');
+    }
 }

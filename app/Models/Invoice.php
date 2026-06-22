@@ -54,9 +54,21 @@ class Invoice extends Model
         return $this->belongsTo(Branch::class, 'cabang_id');
     }
 
+    // Relasi ke kelas
+    public function schoolClass()
+    {
+        return $this->belongsTo(SchoolClass::class, 'kelas_id');
+    }
+
     // Relasi ke pembayaran
     public function pembayaran()
     {
         return $this->hasMany(Payment::class, 'invoice_id');
+    }
+
+    // Total yang sudah dibayar (verified payments)
+    public function getJumlahTerbayarAttribute(): float
+    {
+        return (float) $this->pembayaran()->where('status', 'verified')->sum('jumlah');
     }
 }

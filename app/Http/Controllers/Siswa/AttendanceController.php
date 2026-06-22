@@ -106,6 +106,19 @@ class AttendanceController extends Controller
             return response()->json(['success' => false, 'message' => 'Kehadiran sudah dikonfirmasi sebelumnya.'], 422);
         }
 
+        // Check if student has overdue invoice (past jatuh_tempo and not lunas)
+        $overdueInvoice = \App\Models\Invoice::where('siswa_id', $student->id)
+            ->whereIn('status', ['belum_bayar', 'sebagian'])
+            ->whereNotNull('jatuh_tempo')
+            ->where('jatuh_tempo', '<', now()->toDateString())
+            ->first();
+        if ($overdueInvoice) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tagihan Anda sudah melewati jatuh tempo. Silakan lunasi tagihan terlebih dahulu sebelum mengkonfirmasi kehadiran.',
+            ], 403);
+        }
+
         // Confirmation only allowed during class hours
         $now = now();
         $classDate = \Carbon\Carbon::parse($schedule->tanggal)->format('Y-m-d');

@@ -102,14 +102,25 @@
     <div class="row g-3">
         <div class="col-lg-6">
             <label class="form-label fw-semibold">Guru Pengajar <span class="text-danger">*</span></label>
-            <select name="guru_id" id="guru_id" class="form-select">
-                <option value="">— Pilih paket dulu —</option>
+            <select name="guru_id" id="guru_id" class="form-select" required onchange="onGuruChange(this.value)">
+                <option value="">— Pilih Guru —</option>
+                @foreach($teachers as $t)
+                <option value="{{ $t->id }}" {{ old('guru_id') == $t->id ? 'selected' : '' }}>
+                    {{ $t->name }}{{ $t->branch ? ' ('.$t->branch->name.')' : '' }}
+                </option>
+                @endforeach
             </select>
-            <div class="form-text">Guru diambil dari paket yang dipilih. Bisa diubah jika perlu.</div>
+            <div class="form-text">Pilih guru secara manual, atau akan terisi otomatis dari paket.</div>
         </div>
         <div class="col-lg-6">
             <div class="p-3 rounded-3 h-100" style="background:var(--input-bg);border:1px solid var(--card-border)" id="guruInfoBox">
-                <div class="text-muted" style="font-size:12px">Pilih paket untuk melihat info guru pengajar</div>
+                <div class="text-muted" style="font-size:12px">Pilih guru untuk melihat informasinya</div>
+            </div>
+        </div>
+        <div class="col-12" id="daftarSiswaBox" style="display:none">
+            <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
+                <div class="fw-semibold mb-2" style="font-size:13px"><i class="bi bi-people-fill text-primary me-2"></i>Daftar Siswa Guru Ini</div>
+                <div id="daftarSiswaContent" class="d-flex flex-wrap gap-2"></div>
             </div>
         </div>
     </div>
@@ -299,15 +310,15 @@ function onPaketChange(paketId) {
 
     // Guru select & info
     if (pkg.guru_id) {
-        guruSelect.innerHTML = `<option value="${pkg.guru_id}" selected>${pkg.guru_name || '—'}</option>`;
+        guruSelect.value = pkg.guru_id;
         guruInfoBox.innerHTML = `
             <div class="text-muted mb-1" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px">Guru dari Paket</div>
             <div class="fw-semibold">${pkg.guru_name || '—'}</div>
             ${pkg.guru_nig ? `<div class="text-muted" style="font-size:12px">NIG: ${pkg.guru_nig}</div>` : ''}
             ${pkg.guru_email ? `<div class="text-muted" style="font-size:12px">${pkg.guru_email}</div>` : ''}
         `;
+        loadStudentsByGuru(pkg.guru_id);
     } else {
-        guruSelect.innerHTML = '<option value="">— Tidak ada guru pada paket —</option>';
         guruInfoBox.innerHTML = '<div class="text-muted" style="font-size:12px">Paket ini belum memiliki guru pengajar</div>';
     }
 
@@ -338,9 +349,55 @@ function onModuleChange(moduleId) {
     `;
 }
 
+const teacherStudentsUrl = '{{ url("/admin/schedules/teacher") }}';
+
+function onGuruChange(guruId) {
+    const guruInfoBox = document.getElementById('guruInfoBox');
+    if (!guruId) {
+        guruInfoBox.innerHTML = '<div class="text-muted" style="font-size:12px">Pilih guru untuk melihat informasinya</div>';
+        document.getElementById('daftarSiswaBox').style.display = 'none';
+        return;
+    }
+    const sel = document.getElementById('guru_id');
+    const name = sel.options[sel.selectedIndex]?.text || '—';
+    guruInfoBox.innerHTML = `<div class="fw-semibold">${name}</div>`;
+    loadStudentsByGuru(guruId);
+}
+
+function loadStudentsByGuru(guruId) {
+    if (!guruId) return;
+    const box = document.getElementById('daftarSiswaBox');
+    const content = document.getElementById('daftarSiswaContent');
+    content.innerHTML = '<span class="text-muted" style="font-size:12px">Memuat siswa...</span>';
+    box.style.display = 'block';
+
+    fetch(`${teacherStudentsUrl}/${guruId}/students`, {
+        headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+    })
+    .then(r => r.json())
+    .then(students => {
+        if (!students.length) {
+            content.innerHTML = '<span class="text-muted" style="font-size:12px">Belum ada siswa di kelas guru ini.</span>';
+            return;
+        }
+        content.innerHTML = students.map(s =>
+            `<span style="background:var(--soft-primary);color:#461256;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500">
+                <i class="bi bi-person-fill me-1"></i>${s.name}
+                ${s.classes?.length ? '<span style="opacity:.7;font-size:11px"> · '+s.classes.join(', ')+'</span>' : ''}
+            </span>`
+        ).join('');
+    })
+    .catch(() => {
+        content.innerHTML = '<span class="text-muted" style="font-size:12px">Gagal memuat siswa.</span>';
+    });
+}
+
 // Init on validation error
 const initPaket = document.getElementById('paket_id').value;
 if (initPaket) onPaketChange(initPaket);
+
+const initGuru = document.getElementById('guru_id').value;
+if (initGuru && !initPaket) onGuruChange(initGuru);
 
 const initModule = document.getElementById('module_id').value;
 if (initModule) onModuleChange(initModule);

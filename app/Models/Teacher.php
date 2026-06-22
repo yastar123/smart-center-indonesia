@@ -35,6 +35,16 @@ class Teacher extends Model
         return $this->belongsToMany(Student::class, 'student_teachers', 'teacher_id', 'student_id')->withTimestamps();
     }
 
+    public function schedules()
+    {
+        return $this->hasMany(\App\Models\Schedule::class, 'guru_id');
+    }
+
+    public function schoolClasses()
+    {
+        return $this->hasMany(\App\Models\SchoolClass::class, 'guru_id');
+    }
+
     public function getPhotoUrlAttribute()
     {
         return $this->photo

@@ -23,7 +23,11 @@ class ScheduleController extends Controller
             ->where('status', 'aktif')
             ->orderBy('judul')
             ->get();
-        return view('admin.schedules.create', compact('pakets', 'branches', 'modules'));
+        $teachers = \App\Models\Teacher::with('branch')
+            ->where('status', 'aktif')
+            ->orderBy('name')
+            ->get();
+        return view('admin.schedules.create', compact('pakets', 'branches', 'modules', 'teachers'));
     }
 
     public function index(Request $request)

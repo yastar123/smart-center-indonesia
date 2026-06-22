@@ -3319,6 +3319,12 @@
             </a>
         </div>
         <div class="nav-item">
+            <a href="{{ route('admin.riwayat-sesi.index') }}" class="nav-link {{ request()->routeIs('admin.riwayat-sesi.*') ? 'active' : '' }}" data-label="Riwayat Sesi">
+                <i class="bi bi-clock-history"></i>
+                <span>Riwayat Sesi</span>
+            </a>
+        </div>
+        <div class="nav-item">
             <a href="{{ route('admin.certificates.index') }}" class="nav-link {{ request()->routeIs('admin.certificates.*') ? 'active' : '' }}" data-label="Sertifikat">
                 <i class="bi bi-award"></i>
                 <span>Sertifikat</span>
@@ -3341,6 +3347,16 @@
             <a href="{{ route('admin.billing.index') }}" class="nav-link {{ request()->routeIs('admin.billing.*') ? 'active' : '' }}" data-label="Billing Lunas">
                 <i class="bi bi-receipt-cutoff"></i>
                 <span>Billing Lunas</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('admin.verifikasi-pembayaran.index') }}" class="nav-link {{ request()->routeIs('admin.verifikasi-pembayaran.*') ? 'active' : '' }}" data-label="Verifikasi Pembayaran">
+                <i class="bi bi-shield-check"></i>
+                <span>Verifikasi Pembayaran</span>
+                @php $pendingPayments = \App\Models\Payment::where('status','pending')->count(); @endphp
+                @if($pendingPayments > 0)
+                    <span class="menu-badge">{{ $pendingPayments > 99 ? '99+' : $pendingPayments }}</span>
+                @endif
             </a>
         </div>
         @if(auth()->check() && auth()->user()->hasAnyRole(['admin','owner']))
