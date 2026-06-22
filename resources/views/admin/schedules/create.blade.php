@@ -127,22 +127,28 @@
 </div>
 @endsection
 
+@php
+$paketsJson = $pakets->map(function ($p) {
+    return [
+        'id' => $p->id,
+        'nama' => $p->nama,
+        'jenis' => $p->jenis,
+        'jumlah_pertemuan' => $p->jumlah_pertemuan,
+        'metode_absensi' => $p->metode_absensi,
+        'tipe_kelas' => $p->tipe_kelas,
+        'harga' => $p->harga,
+        'deskripsi' => $p->deskripsi,
+        'status' => $p->status,
+        'cabang' => $p->cabang?->name,
+        'guru' => $p->guru?->name,
+        'mata_pelajaran' => $p->mataPelajaran->pluck('nama'),
+    ];
+});
+@endphp
+
 @push('scripts')
 <script>
-const pakets = @json($pakets->map(fn($p) => [
-    'id' => $p->id,
-    'nama' => $p->nama,
-    'jenis' => $p->jenis,
-    'jumlah_pertemuan' => $p->jumlah_pertemuan,
-    'metode_absensi' => $p->metode_absensi,
-    'tipe_kelas' => $p->tipe_kelas,
-    'harga' => $p->harga,
-    'deskripsi' => $p->deskripsi,
-    'status' => $p->status,
-    'cabang' => $p->cabang?->name,
-    'guru' => $p->guru?->name,
-    'mata_pelajaran' => $p->mataPelajaran->pluck('nama'),
-]));
+const pakets = @json($paketsJson);
 
 function onPaketChange(paketId) {
     const detailBox = document.getElementById('paketDetailBox');
