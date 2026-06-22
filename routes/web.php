@@ -80,8 +80,8 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         // ATTENDANCE HISTORY (Admin)
         Route::get('/attendance-history', [AttendanceHistoryController::class, 'index'])->name('attendance-history.index');
 
-        // SCHEDULES
-        Route::get('/schedules',                    [ScheduleController::class, 'index'])   ->name('schedules.index');
+        // SCHEDULES (index redirects to create — list page removed)
+        Route::get('/schedules',                    fn() => redirect()->route('admin.schedules.create')) ->name('schedules.index');
         Route::get('/schedules/create',             [ScheduleController::class, 'create'])  ->name('schedules.create');
         Route::post('/schedules',                   [ScheduleController::class, 'store'])   ->name('schedules.store');
         Route::get('/schedules/{schedule}/edit',    [ScheduleController::class, 'edit'])    ->name('schedules.edit');
@@ -115,12 +115,6 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::put('/attendance/{absensi}',               [\App\Http\Controllers\Admin\AdminAttendanceController::class, 'update'])     ->name('attendance.update');
         Route::post('/attendance/{schedule}/bulk',        [\App\Http\Controllers\Admin\AdminAttendanceController::class, 'bulkUpdate']) ->name('attendance.bulk');
 
-        // CERTIFICATES (Sertifikat)
-        Route::get('/certificates',                  [CertificateController::class, 'index'])   ->name('certificates.index');
-        Route::post('/certificates',                 [CertificateController::class, 'store'])   ->name('certificates.store');
-        Route::get('/certificates/{certificate}',    [CertificateController::class, 'show'])    ->name('certificates.show');
-        Route::put('/certificates/{certificate}',    [CertificateController::class, 'update'])  ->name('certificates.update');
-        Route::delete('/certificates/{certificate}', [CertificateController::class, 'destroy']) ->name('certificates.destroy');
         // API untuk ambil mata pelajaran yang diambil siswa (dipakai di UI admin)
         Route::get('/students/{student}/courses',    [CertificateController::class, 'studentCourses']) ->name('students.courses');
 
@@ -245,6 +239,24 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::post('/landing/wa',                                      [\App\Http\Controllers\Admin\LandingContentController::class, 'storeWa'])              ->name('landing.wa.store');
         Route::put('/landing/wa/{wa}',                                  [\App\Http\Controllers\Admin\LandingContentController::class, 'updateWa'])             ->name('landing.wa.update');
         Route::delete('/landing/wa/{wa}',                               [\App\Http\Controllers\Admin\LandingContentController::class, 'destroyWa'])            ->name('landing.wa.destroy');
+
+        // TAGIHAN SISWA (cicilan & pascabayar)
+        Route::get('/tagihan-siswa', [\App\Http\Controllers\Admin\TagihanSiswaController::class, 'index'])->name('tagihan-siswa.index');
+        Route::post('/tagihan-siswa/{kelas}/generate-invoice', [\App\Http\Controllers\Admin\TagihanSiswaController::class, 'generateInvoice'])->name('tagihan-siswa.generate-invoice');
+    });
+
+// CERTIFICATES — accessible by admin, owner, and guru
+Route::middleware(['auth', 'role:admin|owner|guru'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/certificates',                            [\App\Http\Controllers\Admin\CertificateController::class, 'index'])         ->name('certificates.index');
+        Route::post('/certificates',                          [\App\Http\Controllers\Admin\CertificateController::class, 'store'])         ->name('certificates.store');
+        Route::get('/certificates/students/{student}',        [\App\Http\Controllers\Admin\CertificateController::class, 'studentDetail']) ->name('certificates.student');
+        Route::post('/certificates/students/{student}/upload',[\App\Http\Controllers\Admin\CertificateController::class, 'uploadForStudent'])->name('certificates.student.upload');
+        Route::get('/certificates/{certificate}',             [\App\Http\Controllers\Admin\CertificateController::class, 'show'])          ->name('certificates.show');
+        Route::put('/certificates/{certificate}',             [\App\Http\Controllers\Admin\CertificateController::class, 'update'])        ->name('certificates.update');
+        Route::delete('/certificates/{certificate}',          [\App\Http\Controllers\Admin\CertificateController::class, 'destroy'])       ->name('certificates.destroy');
     });
 
 /*

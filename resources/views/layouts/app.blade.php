@@ -3328,13 +3328,19 @@
         <div class="nav-header">KEUANGAN</div>
 
         <div class="nav-item">
-            <a href="{{ route('admin.billing.index') }}" class="nav-link {{ request()->routeIs('admin.billing.*') ? 'active' : '' }}" data-label="Billing">
-                <i class="bi bi-receipt-cutoff"></i>
-                <span>Billing</span>
-                @php $overdueBilling = \App\Models\Invoice::where('status','belum_bayar')->whereNotNull('jatuh_tempo')->where('jatuh_tempo','<',now()->toDateString())->count(); @endphp
-                @if($overdueBilling > 0)
-                    <span class="menu-badge">{{ $overdueBilling > 99 ? '99+' : $overdueBilling }}</span>
+            <a href="{{ route('admin.tagihan-siswa.index') }}" class="nav-link {{ request()->routeIs('admin.tagihan-siswa.*') ? 'active' : '' }}" data-label="Tagihan Siswa">
+                <i class="bi bi-wallet2"></i>
+                <span>Tagihan Siswa</span>
+                @php $pendingTagihan = \App\Models\Invoice::whereIn('status',['belum_bayar','sebagian'])->count(); @endphp
+                @if($pendingTagihan > 0)
+                    <span class="menu-badge">{{ $pendingTagihan > 99 ? '99+' : $pendingTagihan }}</span>
                 @endif
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('admin.billing.index') }}" class="nav-link {{ request()->routeIs('admin.billing.*') ? 'active' : '' }}" data-label="Billing Lunas">
+                <i class="bi bi-receipt-cutoff"></i>
+                <span>Billing Lunas</span>
             </a>
         </div>
         @if(auth()->check() && auth()->user()->hasAnyRole(['admin','owner']))
@@ -3428,6 +3434,11 @@
         <div class="nav-item">
             <a href="{{ route('guru.messages.index') }}" class="nav-link {{ request()->routeIs('guru.messages.*') ? 'active' : '' }}" data-label="Pesan">
                 <i class="bi bi-chat-dots"></i><span>Pesan</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('admin.certificates.index') }}" class="nav-link {{ request()->routeIs('admin.certificates.*') ? 'active' : '' }}" data-label="Sertifikat">
+                <i class="bi bi-award"></i><span>Sertifikat</span>
             </a>
         </div>
         <div class="nav-item">

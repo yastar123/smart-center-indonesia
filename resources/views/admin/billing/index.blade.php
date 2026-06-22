@@ -16,8 +16,8 @@
                     <i class="bi bi-receipt-cutoff"></i>
                 </div>
                 <div>
-                    <h5 class="fw-bold mb-0" style="color:white">Manajemen E-Billing</h5>
-                    <span style="font-size:12px;opacity:.8">Kelola tagihan, pantau pembayaran, dan verifikasi transaksi</span>
+                    <h5 class="fw-bold mb-0" style="color:white">Billing Lunas</h5>
+                    <span style="font-size:12px;opacity:.8">Riwayat pembayaran yang telah lunas — tagihan aktif ada di menu Tagihan Siswa</span>
                 </div>
             </div>
         </div>
@@ -45,50 +45,38 @@
 {{-- STATS --}}
 <div class="row g-3 mb-4">
     <div class="col-6 col-lg-3 fade-up">
-        <div class="stat-card" style="border-top:3px solid #c84ddf">
+        <div class="stat-card" style="border-top:3px solid #10b981">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <div class="stat-title">Total Piutang</div>
-                    <div class="stat-value text-primary" style="font-size:18px">Rp {{ number_format($stats['total_piutang'],0,',','.') }}</div>
-                    <div class="stat-growth text-muted" style="font-size:11px">Tagihan belum lunas</div>
+                    <div class="stat-title">Total Pendapatan</div>
+                    <div class="stat-value text-success" style="font-size:18px">Rp {{ number_format($stats['pendapatan'],0,',','.') }}</div>
+                    <div class="stat-growth text-success" style="font-size:11px">Semua invoice lunas</div>
                 </div>
-                <div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-cash-stack"></i></div>
+                <div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-cash-stack"></i></div>
             </div>
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.05s">
-        <div class="stat-card" style="border-top:3px solid #f6af23">
+        <div class="stat-card" style="border-top:3px solid #c84ddf">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <div class="stat-title">Menunggu Verifikasi</div>
-                    <div class="stat-value text-warning">{{ $stats['menunggu'] }}</div>
-                    <div class="stat-growth text-warning" style="font-size:11px"><i class="bi bi-hourglass-split me-1"></i>Pending</div>
+                    <div class="stat-title">Invoice Lunas</div>
+                    <div class="stat-value text-primary count-up" data-target="{{ $invoices->total() }}">{{ $invoices->total() }}</div>
+                    <div class="stat-growth text-muted" style="font-size:11px">Halaman ini</div>
                 </div>
-                <div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-hourglass-split"></i></div>
+                <div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-check-circle-fill"></i></div>
             </div>
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.10s">
-        <div class="stat-card" style="border-top:3px solid #ef4444">
+        <div class="stat-card" style="border-top:3px solid #f6af23">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <div class="stat-title">Jatuh Tempo (Overdue)</div>
-                    <div class="stat-value text-danger">{{ $stats['overdue'] }}</div>
-                    <div class="stat-growth text-danger" style="font-size:11px"><i class="bi bi-exclamation-triangle me-1"></i>Melewati tenggat</div>
+                    <div class="stat-title">Belum Lunas (Tagihan)</div>
+                    <div class="stat-value text-warning count-up" data-target="{{ $stats['menunggu'] }}">{{ $stats['menunggu'] }}</div>
+                    <div class="stat-growth" style="font-size:11px"><a href="{{ route('admin.tagihan-siswa.index') }}" class="text-warning">Lihat Tagihan Siswa →</a></div>
                 </div>
-                <div class="stat-icon bg-danger-soft" style="color:white"><i class="bi bi-exclamation-triangle-fill"></i></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-6 col-lg-3 fade-up" style="animation-delay:.15s">
-        <div class="stat-card" style="border-top:3px solid #10b981">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="stat-title">Pendapatan Masuk</div>
-                    <div class="stat-value text-success" style="font-size:18px">Rp {{ number_format($stats['pendapatan'],0,',','.') }}</div>
-                    <div class="stat-growth text-success" style="font-size:11px"><i class="bi bi-graph-up me-1"></i>Lunas</div>
-                </div>
-                <div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-wallet2"></i></div>
+                <div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-hourglass-split"></i></div>
             </div>
         </div>
     </div>
@@ -111,16 +99,7 @@
                 <input type="month" name="periode" value="{{ request('periode') }}" class="form-control"
                     style="border-color:var(--card-border);background:var(--input-bg)">
             </div>
-            <div class="col-md-2">
-                <label class="form-label fw-semibold" style="font-size:12px">Status Tagihan</label>
-                <select name="status" class="form-select" style="border-color:var(--card-border);background:var(--input-bg)">
-                    <option value="">Semua Status</option>
-                    <option value="belum_bayar" {{ request('status')=='belum_bayar'?'selected':'' }}>Belum Bayar</option>
-                    <option value="sebagian"    {{ request('status')=='sebagian'   ?'selected':'' }}>Dibayar Sebagian</option>
-                    <option value="lunas"       {{ request('status')=='lunas'      ?'selected':'' }}>Lunas</option>
-                </select>
-            </div>
-            <div class="col-md-4 d-flex gap-2">
+            <div class="col-md-3 d-flex gap-2">
                 <button type="submit" class="btn btn-primary flex-fill fw-semibold">Filter</button>
                 <a href="{{ route('admin.billing.index') }}" class="btn btn-outline-secondary fw-semibold px-3">Reset</a>
             </div>

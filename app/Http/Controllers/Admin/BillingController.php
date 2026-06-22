@@ -14,7 +14,7 @@ class BillingController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Invoice::with(['siswa', 'cabang']);
+        $query = Invoice::with(['siswa', 'cabang'])->where('status', 'lunas');
 
         if (auth()->user()->hasRole('admin')) {
             $query->where('cabang_id', auth()->user()->admin?->branch_id);
@@ -25,9 +25,6 @@ class BillingController extends Controller
                 $q->where('nomor_invoice', 'like', "%$s%")
                   ->orWhereHas('siswa', fn($sq) => $sq->where('name', 'like', "%$s%"));
             });
-        }
-        if ($request->status) {
-            $query->where('status', $request->status);
         }
         if ($request->periode) {
             $query->where('periode', $request->periode);

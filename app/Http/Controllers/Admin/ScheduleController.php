@@ -85,7 +85,7 @@ class ScheduleController extends Controller
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Jadwal sesi berhasil ditambahkan.', 'data' => $schedule]);
         }
-        return redirect()->route('admin.schedules.index')->with('success', 'Jadwal sesi berhasil ditambahkan!');
+        return redirect()->route('admin.schedules.create')->with('success', 'Jadwal sesi berhasil ditambahkan!');
     }
 
     public function show(Schedule $schedule)
@@ -132,7 +132,7 @@ class ScheduleController extends Controller
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Jadwal sesi berhasil diperbarui']);
         }
-        return redirect()->route('admin.schedules.index')->with('success', 'Jadwal sesi berhasil diperbarui!');
+        return redirect()->route('admin.schedules.create')->with('success', 'Jadwal sesi berhasil diperbarui!');
     }
 
     public function edit(Schedule $schedule)

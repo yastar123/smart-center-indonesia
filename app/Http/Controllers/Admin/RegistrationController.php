@@ -73,7 +73,6 @@ class RegistrationController extends Controller
             'is_new_student'     => 'required|in:0,1',
             'jenis'              => 'required|in:offline,online,private',
             'guru_id'            => 'required|exists:teachers,id',
-            'tanggal_mulai'      => 'required|date',
             'billing_mode'       => 'required|in:prepaid,postpaid',
         ]);
 
@@ -156,15 +155,16 @@ class RegistrationController extends Controller
                     'nama'              => $request->custom_package_name,
                     'deskripsi'         => $request->custom_deskripsi ?? null,
                     'harga'             => (float)($request->custom_package_price ?? 0),
-                    'jumlah_pertemuan'  => (int)($request->jumlah_pertemuan ?? 1),
-                    'durasi_bulan'      => (int)($request->durasi_bulan ?? 3),
-                    'jenis'             => 'privat',
-                    'tipe_kelas'        => $request->jenis ?? 'offline',
-                    'metode_absensi'    => 'manual',
-                    'status'            => 'aktif',
+                    'jumlah_pertemuan'  => (int)($request->jumlah_pertemuan ?? 8),
+                    'durasi_bulan'      => 3,
+                    'jenis'             => $request->custom_jenis ?? 'privat',
+                    'tipe_kelas'        => $request->custom_tipe_kelas ?? ($request->jenis ?? 'offline'),
+                    'metode_absensi'    => $request->custom_metode_absensi ?? 'manual',
+                    'status'            => $request->custom_status ?? 'aktif',
                 ]);
-                if ($request->filled('course_id')) {
-                    $customPkg->mataPelajaran()->syncWithoutDetaching([$request->course_id]);
+                $courseIds = array_filter((array)$request->custom_course_ids);
+                if (!empty($courseIds)) {
+                    $customPkg->mataPelajaran()->syncWithoutDetaching($courseIds);
                 }
                 $resolvedPackageId = $customPkg->id;
             }
@@ -172,6 +172,10 @@ class RegistrationController extends Controller
             if ($resolvedPackageId) {
                 $student->update(['package_id' => $resolvedPackageId]);
             }
+
+            // Determine billing_mode for SchoolClass
+            $billingMode = $request->billing_mode === 'postpaid' ? 'postpaid'
+                : (((int)($request->cicilan ?? 1)) > 1 ? 'cicilan' : 'prepaid');
 
             $kelas = SchoolClass::create([
                 'cabang_id'         => $request->cabang_id,
@@ -182,6 +186,7 @@ class RegistrationController extends Controller
                 'jumlah_pertemuan'  => $request->jumlah_pertemuan ?? 8,
                 'jenis'             => $request->jenis,
                 'status'            => 'aktif',
+                'billing_mode'      => $billingMode,
             ]);
 
             if ($student) {
@@ -212,7 +217,7 @@ class RegistrationController extends Controller
                     'pajak'         => 0,
                     'total'         => $totalTagihan,
                     'status'        => $invoiceStatus,
-                    'jatuh_tempo'   => Carbon::parse($request->tanggal_mulai)->addDays(7),
+                    'jatuh_tempo'   => Carbon::now()->addDays(7),
                     'periode'       => date('Y-m'),
                 ]);
             }

@@ -23,6 +23,7 @@ class SchoolClass extends Model
         'jenis',
         'link_zoom',
         'status',
+        'billing_mode',
     ];
 
     /*
