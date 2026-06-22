@@ -257,6 +257,8 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::get('/verifikasi-pembayaran/{payment}', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'show'])->name('verifikasi-pembayaran.show');
         Route::post('/verifikasi-pembayaran/{payment}/approve', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'approve'])->name('verifikasi-pembayaran.approve');
         Route::post('/verifikasi-pembayaran/{payment}/reject', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'reject'])->name('verifikasi-pembayaran.reject');
+        Route::post('/verifikasi-pembayaran/package/{packagePayment}/approve', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'approvePackage'])->name('verifikasi-pembayaran.package.approve');
+        Route::post('/verifikasi-pembayaran/package/{packagePayment}/reject', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'rejectPackage'])->name('verifikasi-pembayaran.package.reject');
 
         // AJAX: students by teacher (for schedule create form)
         Route::get('/schedules/teacher/{teacher}/students', function(\App\Models\Teacher $teacher, \Illuminate\Http\Request $request) {

@@ -462,50 +462,143 @@
             <span class="badge ms-1" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:11px">{{ $invoices->count() }}</span>
         </h6>
     </div>
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="thead-modern">
-                <tr>
-                    <th>No. Invoice</th>
-                    <th>Deskripsi</th>
-                    <th>Total</th>
-                    <th>Jatuh Tempo</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($invoices as $inv)
-                @php
-                    $sc = match($inv->status) {
-                        'lunas'      => ['bg'=>'var(--soft-success-bg)','color'=>'var(--soft-success-text)','label'=>'Lunas','icon'=>'bi-check-circle-fill'],
-                        'sebagian'   => ['bg'=>'var(--soft-warning-bg)','color'=>'var(--soft-warning-text)','label'=>'Sebagian','icon'=>'bi-dash-circle-fill'],
-                        default      => ['bg'=>'var(--soft-danger-bg)','color'=>'var(--soft-danger-text)','label'=>'Belum Bayar','icon'=>'bi-x-circle-fill'],
-                    };
-                    $isOverdue = $inv->status !== 'lunas' && $inv->jatuh_tempo && $inv->jatuh_tempo->isPast();
-                @endphp
-                <tr>
-                    <td class="fw-semibold" style="font-size:12px">{{ $inv->nomor_invoice ?? '—' }}</td>
-                    <td style="font-size:13px">{{ $inv->deskripsi ?? '—' }}</td>
-                    <td class="fw-bold text-primary">Rp {{ number_format($inv->total,0,',','.') }}</td>
-                    <td>
-                        <span style="font-size:12.5px;{{ $isOverdue ? 'color:#dc2626;font-weight:600' : '' }}">
-                            {{ $inv->jatuh_tempo?->format('d M Y') ?? '—' }}
-                            @if($isOverdue)<i class="bi bi-exclamation-triangle-fill ms-1 text-danger"></i>@endif
+    <div class="row g-3">
+        @foreach($invoices as $inv)
+        @php
+            $sc = match($inv->status) {
+                'lunas'    => ['bg'=>'var(--soft-success-bg)','color'=>'var(--soft-success-text)','label'=>'Lunas','icon'=>'bi-check-circle-fill'],
+                'sebagian' => ['bg'=>'var(--soft-warning-bg)','color'=>'var(--soft-warning-text)','label'=>'Sebagian Bayar','icon'=>'bi-dash-circle-fill'],
+                default    => ['bg'=>'var(--soft-danger-bg)','color'=>'var(--soft-danger-text)','label'=>'Belum Bayar','icon'=>'bi-x-circle-fill'],
+            };
+            $isOverdue = $inv->status !== 'lunas' && $inv->jatuh_tempo && $inv->jatuh_tempo->isPast();
+            $pendingPayment = \App\Models\Payment::where('invoice_id', $inv->id)->where('status','pending')->first();
+        @endphp
+        <div class="col-md-6">
+            <div class="p-4 rounded-3 h-100" style="background:var(--input-bg);border:1.5px solid {{ $isOverdue && $inv->status !== 'lunas' ? '#fca5a5' : 'var(--card-border)' }}">
+                <div class="d-flex align-items-start justify-content-between gap-2 mb-3">
+                    <div>
+                        <div class="fw-bold" style="font-size:13px;color:var(--text-primary)">{{ $inv->deskripsi ?? 'Tagihan Registrasi' }}</div>
+                        <div class="text-muted" style="font-size:11px;font-family:monospace">{{ $inv->nomor_invoice ?? '—' }}</div>
+                    </div>
+                    <span class="badge flex-shrink-0" style="background:{{ $sc['bg'] }};color:{{ $sc['color'] }};padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600">
+                        <i class="bi {{ $sc['icon'] }} me-1"></i>{{ $sc['label'] }}
+                    </span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="fw-bold" style="font-size:17px;color:{{ $inv->status === 'lunas' ? '#059669' : 'var(--text-primary)' }}">
+                            Rp {{ number_format($inv->total, 0, ',', '.') }}
+                        </div>
+                        <div style="font-size:11px;color:{{ $isOverdue ? '#dc2626' : 'var(--text-muted)' }}">
+                            Jatuh tempo: {{ $inv->jatuh_tempo?->format('d M Y') ?? '—' }}
+                            @if($isOverdue)<i class="bi bi-exclamation-triangle-fill ms-1"></i>Lewat jatuh tempo@endif
+                        </div>
+                    </div>
+                    @if($inv->status === 'lunas')
+                        <span class="btn btn-sm" disabled style="background:var(--soft-success-bg);color:var(--soft-success-text);border:none;border-radius:10px;font-size:12px">
+                            <i class="bi bi-check2 me-1"></i>Lunas
                         </span>
-                    </td>
-                    <td>
-                        <span class="badge" style="background:{{ $sc['bg'] }};color:{{ $sc['color'] }};border:1px solid {{ $sc['bg'] }};font-size:11px;padding:4px 10px;border-radius:8px">
-                            <i class="bi {{ $sc['icon'] }} me-1"></i>{{ $sc['label'] }}
+                    @elseif($pendingPayment)
+                        <span class="btn btn-sm" disabled style="background:var(--soft-warning-bg);color:var(--soft-warning-text);border:none;border-radius:10px;font-size:12px">
+                            <i class="bi bi-hourglass me-1"></i>Menunggu
                         </span>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-    <div class="mt-3 p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border);font-size:12px;color:var(--text-muted)">
-        <i class="bi bi-info-circle me-1"></i>
-        Tagihan di atas dibuat dari proses registrasi. Hubungi admin untuk melakukan pembayaran atau jika ada pertanyaan.
+                    @else
+                        <button class="btn btn-primary btn-sm px-3"
+                                data-bs-toggle="modal"
+                                data-bs-target="#invPayModal{{ $inv->id }}"
+                                style="border-radius:10px;font-size:12.5px">
+                            <i class="bi bi-upload me-1"></i>Bayar Sekarang
+                        </button>
+                    @endif
+                </div>
+                @if($inv->status === 'sebagian')
+                @php $paid = \App\Models\Payment::where('invoice_id',$inv->id)->where('status','verified')->sum('jumlah'); @endphp
+                <div class="mt-2 pt-2" style="border-top:1px solid var(--card-border)">
+                    <div class="d-flex justify-content-between" style="font-size:12px;color:var(--text-muted)">
+                        <span>Sudah dibayar</span>
+                        <span class="text-success fw-semibold">Rp {{ number_format($paid,0,',','.') }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between" style="font-size:12px;color:var(--text-muted)">
+                        <span>Sisa tagihan</span>
+                        <span class="fw-semibold" style="color:#dc2626">Rp {{ number_format($inv->total - $paid,0,',','.') }}</span>
+                    </div>
+                </div>
+                @endif
+            </div>
+        </div>
+
+        {{-- PAYMENT MODAL FOR INVOICE --}}
+        @if($inv->status !== 'lunas' && !$pendingPayment)
+        <div class="modal fade" id="invPayModal{{ $inv->id }}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="border-radius:20px;border:none;overflow:hidden">
+                    <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#260632,#68117e);color:white">
+                        <div class="d-flex align-items-center gap-3">
+                            <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center">
+                                <i class="bi bi-upload"></i>
+                            </div>
+                            <div>
+                                <h6 class="modal-title fw-bold mb-0">Upload Bukti Pembayaran</h6>
+                                <div style="font-size:12px;opacity:.75">{{ $inv->deskripsi ?? $inv->nomor_invoice }}</div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="{{ route('siswa.billing.invoice-upload', $inv) }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="modal-body p-4">
+                            <div class="p-3 rounded-3 mb-3" style="background:var(--soft-primary-bg);border:1px solid var(--soft-primary-border)">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span style="font-size:13px;color:var(--soft-primary-text);font-weight:600">
+                                        <i class="bi bi-tag me-1"></i>Total Tagihan
+                                    </span>
+                                    <span style="font-size:16px;font-weight:800;color:var(--primary)">
+                                        Rp {{ number_format($inv->total, 0, ',', '.') }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" style="font-size:13px">Jumlah Dibayar <span class="text-danger">*</span></label>
+                                <input type="number" name="jumlah" class="form-control" required
+                                       value="{{ $inv->total }}" min="1000"
+                                       style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" style="font-size:13px">Metode Pembayaran <span class="text-danger">*</span></label>
+                                <select name="metode" class="form-select" required style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
+                                    <option value="transfer">Transfer Bank</option>
+                                    <option value="cash">Cash</option>
+                                    <option value="qris">QRIS</option>
+                                    <option value="lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" style="font-size:13px">Bukti Pembayaran <span class="text-danger">*</span></label>
+                                <input type="file" name="bukti_pembayaran" class="form-control" required
+                                       accept=".jpg,.jpeg,.png,.pdf"
+                                       style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
+                                <div class="form-text">Format: JPG, PNG, atau PDF. Maks 5MB.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" style="font-size:13px">Catatan <span class="text-muted">(opsional)</span></label>
+                                <input type="text" name="catatan" class="form-control" placeholder="cth: Transfer BCA atas nama Budi"
+                                       style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 p-4 pt-0 gap-2">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:10px">
+                                <i class="bi bi-x me-1"></i>Batal
+                            </button>
+                            <button type="submit" class="btn btn-primary px-4" style="border-radius:10px">
+                                <i class="bi bi-upload me-2"></i>Kirim Bukti
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        @endif
+        @endforeach
     </div>
 </div>
 @endif

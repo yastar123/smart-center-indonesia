@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\Invoice;
 use App\Models\Branch;
+use App\Models\StudentCoursePayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -25,13 +26,31 @@ class VerifikasiPembayaranController extends Controller
         }
 
         $payments = $query->paginate(20)->appends($request->all());
+
         $counts = [
             'pending'  => Payment::where('status', 'pending')->count(),
             'verified' => Payment::where('status', 'verified')->count(),
             'rejected' => Payment::where('status', 'rejected')->count(),
         ];
 
-        return view('admin.verifikasi-pembayaran.index', compact('payments', 'counts'));
+        // Package payments (StudentCoursePayment) - for separate section
+        $pkgQuery = StudentCoursePayment::with(['student', 'course'])
+            ->when($request->pkg_status ?? 'pending', fn($q, $s) => $q->where('status', $s))
+            ->when($request->search, fn($q, $s) =>
+                $q->whereHas('student', fn($sq) => $sq->where('name', 'like', "%$s%")))
+            ->orderByDesc('created_at');
+
+        $packagePayments = $pkgQuery->paginate(20, ['*'], 'pkg_page')->appends($request->all());
+
+        $pkgCounts = [
+            'pending'  => StudentCoursePayment::where('status', 'pending')->count(),
+            'verified' => StudentCoursePayment::where('status', 'verified')->count(),
+            'rejected' => StudentCoursePayment::where('status', 'rejected')->count(),
+        ];
+
+        return view('admin.verifikasi-pembayaran.index', compact(
+            'payments', 'counts', 'packagePayments', 'pkgCounts'
+        ));
     }
 
     public function approve(Request $request, Payment $payment)
@@ -76,5 +95,28 @@ class VerifikasiPembayaranController extends Controller
     {
         $payment->load(['invoice.siswa', 'siswa', 'cabang', 'approver']);
         return view('admin.verifikasi-pembayaran.show', compact('payment'));
+    }
+
+    // --- Package Payment (StudentCoursePayment) ---
+
+    public function approvePackage(Request $request, StudentCoursePayment $packagePayment)
+    {
+        $packagePayment->update([
+            'status'      => 'verified',
+            'verified_by' => auth()->id(),
+        ]);
+
+        return back()->with('success', 'Pembayaran paket berhasil diverifikasi.');
+    }
+
+    public function rejectPackage(Request $request, StudentCoursePayment $packagePayment)
+    {
+        $request->validate(['alasan_penolakan' => 'required|string|max:500']);
+        $packagePayment->update([
+            'status'          => 'rejected',
+            'rejected_reason' => $request->alasan_penolakan,
+        ]);
+
+        return back()->with('success', 'Pembayaran paket ditolak.');
     }
 }

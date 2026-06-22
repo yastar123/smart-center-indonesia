@@ -203,7 +203,7 @@ class RegistrationController extends Controller
                 $nomor = 'INV-' . $year . '-' . $month . str_pad($count, 3, '0', STR_PAD_LEFT);
 
                 $cicilanCount  = (int)($request->cicilan ?? 1);
-                $invoiceStatus = ($cicilanCount <= 1) ? 'lunas' : 'belum_bayar';
+                $invoiceStatus = 'belum_bayar';
 
                 $firstAmount = $totalTagihan;
                 if ($cicilanCount > 1 && $request->filled('cicilan_pertama')) {

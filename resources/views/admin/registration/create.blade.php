@@ -185,6 +185,7 @@
                                     data-status="{{ ucfirst($pk->status ?? '-') }}"
                                     data-courses="{{ e($pk->mataPelajaran->pluck('nama')->implode(', ')) }}"
                                     data-description="{{ e($pk->deskripsi ?? '-') }}"
+                                    data-guru-id="{{ $pk->guru_id ?? '' }}"
                                     {{ old('package_id')==$pk->id?'selected':'' }}>
                                     {{ $pk->nama }}{{ optional($pk->cabang)->name ? ' ('.optional($pk->cabang)->name.')' : '' }} — Rp {{ number_format($pk->harga, 0, ',', '.') }} — {{ $pk->jumlah_pertemuan }} Sesi
                                 </option>
@@ -668,6 +669,17 @@ function onPackageChange(sel) {
     detailStatus.textContent = opt.dataset.status || '—';
     detailCourses.textContent = opt.dataset.courses || '—';
     detailDescription.textContent = opt.dataset.description || '—';
+
+    // Auto-fill teacher if package has a guru_id
+    const guruId = opt.dataset.guruId || '';
+    if (guruId) {
+        const guruSel = document.querySelector('[name=guru_id]');
+        if (guruSel) {
+            guruSel.value = guruId;
+            updateTeacherType(guruSel);
+            updateSelectedTeacherDetails();
+        }
+    }
 
     updateQuote();
 }
