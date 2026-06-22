@@ -21,10 +21,10 @@
             </div>
         </div>
         <div class="col-md-4 text-md-end">
-            <button onclick="openModal()" class="btn fw-semibold px-4"
-                style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
+            <a href="{{ route('admin.schedules.create') }}" class="btn fw-semibold px-4"
+               style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
                 <i class="bi bi-plus-lg me-2"></i>Tambah Jadwal
-            </button>
+            </a>
         </div>
     </div>
 </div>
@@ -112,9 +112,9 @@
                     <i class="bi bi-x-lg me-1"></i>Reset
                 </a>
                 @else
-                <button type="button" onclick="openModal()" class="btn btn-primary w-100 fw-semibold" style="border-radius:10px">
+                <a href="{{ route('admin.schedules.create') }}" class="btn btn-primary w-100 fw-semibold" style="border-radius:10px">
                     <i class="bi bi-plus-lg"></i>
-                </button>
+                </a>
                 @endif
             </div>
         </div>
@@ -414,21 +414,7 @@ function openModal() {
 }
 
 function editSchedule(id) {
-    $.get('/admin/schedules/' + id, function(res) {
-        const s = res.data;
-        document.getElementById('modalTitle').innerHTML = '<i class="bi bi-pencil me-2"></i>Edit Jadwal Sesi';
-        document.getElementById('scheduleId').value    = s.id;
-        document.getElementById('paket_id').value      = s.paket_id ?? '';
-        document.getElementById('tanggal').value       = s.tanggal ? s.tanggal.substr(0,10) : '';
-        document.getElementById('jam_mulai').value     = s.jam_mulai ? s.jam_mulai.substr(0,5) : '';
-        document.getElementById('jam_selesai').value   = s.jam_selesai ? s.jam_selesai.substr(0,5) : '';
-        document.getElementById('ruangan').value       = s.ruangan ?? '';
-        document.getElementById('link_meeting').value  = s.link_meeting ?? '';
-        document.getElementById('sc_status').value     = s.status ?? 'dijadwalkan';
-        document.getElementById('statusScWrap').style.display = 'block';
-        onPaketChange(s.paket_id, s.pertemuan_ke);
-        new bootstrap.Modal('#scheduleModal').show();
-    }).fail(() => showToast('Tidak dapat memuat data jadwal.', 'error'));
+    window.location.href = '/admin/schedules/' + id + '/edit';
 }
 
 function saveSchedule() {

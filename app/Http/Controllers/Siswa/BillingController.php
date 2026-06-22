@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Siswa;
 
 use App\Http\Controllers\Controller;
 use App\Models\Course;
+use App\Models\Invoice;
 use App\Models\Student;
 use App\Models\StudentCoursePayment;
 use Illuminate\Http\Request;
@@ -105,8 +106,12 @@ class BillingController extends Controller
             }
         }
 
+        $invoices = Invoice::where('siswa_id', $student->id)
+            ->orderByDesc('created_at')
+            ->get();
+
         return view('siswa.billing.index', compact(
-            'courses', 'fees', 'payments', 'draftCourses', 'student'
+            'courses', 'fees', 'payments', 'draftCourses', 'student', 'invoices'
         ));
     }
 

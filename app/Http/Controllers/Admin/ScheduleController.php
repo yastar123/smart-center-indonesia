@@ -11,6 +11,16 @@ use Illuminate\Http\Request;
 
 class ScheduleController extends Controller
 {
+    public function create()
+    {
+        $pakets = Package::with(['guru', 'mataPelajaran', 'cabang'])
+            ->where('status', 'aktif')
+            ->orderBy('nama')
+            ->get();
+        $branches = Branch::all();
+        return view('admin.schedules.create', compact('pakets', 'branches'));
+    }
+
     public function index(Request $request)
     {
         $pakets = Package::with(['guru', 'mataPelajaran'])
@@ -72,7 +82,10 @@ class ScheduleController extends Controller
         $schedule = Schedule::create($data);
         $schedule->load(['paket.guru', 'paket.mataPelajaran']);
 
-        return response()->json(['success' => true, 'message' => 'Jadwal sesi berhasil ditambahkan.', 'data' => $schedule]);
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Jadwal sesi berhasil ditambahkan.', 'data' => $schedule]);
+        }
+        return redirect()->route('admin.schedules.index')->with('success', 'Jadwal sesi berhasil ditambahkan!');
     }
 
     public function show(Schedule $schedule)
@@ -116,7 +129,21 @@ class ScheduleController extends Controller
 
         $schedule->update($data);
 
-        return response()->json(['success' => true, 'message' => 'Jadwal sesi berhasil diperbarui']);
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Jadwal sesi berhasil diperbarui']);
+        }
+        return redirect()->route('admin.schedules.index')->with('success', 'Jadwal sesi berhasil diperbarui!');
+    }
+
+    public function edit(Schedule $schedule)
+    {
+        $schedule->load(['paket.guru', 'paket.mataPelajaran', 'paket.cabang', 'guru', 'cabang']);
+        $pakets = Package::with(['guru', 'mataPelajaran', 'cabang'])
+            ->where('status', 'aktif')
+            ->orderBy('nama')
+            ->get();
+        $branches = Branch::all();
+        return view('admin.schedules.edit', compact('schedule', 'pakets', 'branches'));
     }
 
     public function destroy(Schedule $schedule)

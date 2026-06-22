@@ -225,15 +225,7 @@ function openModal(reset=true) {
 }
 
 function editSalary(id) {
-    fetch(`{{ url('admin/salaries') }}/${id}`, { headers:{'X-Requested-With':'XMLHttpRequest'} })
-        .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
-            .then(res => {
-            const s=res.data, f=document.getElementById('salaryForm');
-            ['guru_id','periode','gaji_pokok','tarif_per_jam','tipe_gaji','status','metode_pembayaran','tanggal_pembayaran','nama_bank','nomor_rekening'].forEach(k => { if(f.querySelector(`[name=${k}]`)) f.querySelector(`[name=${k}]`).value=s[k]||''; });
-            document.getElementById('salId').value = id;
-            document.getElementById('modalTitle').textContent = 'Edit Data Gaji';
-            openModal(false);
-        }).catch(()=>showToast('Gagal memuat data gaji.', 'error'));
+    window.location.href = '{{ url('admin/salaries') }}/' + id + '/edit';
 }
 
 function deleteSalary(id) {

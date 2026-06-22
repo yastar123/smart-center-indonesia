@@ -149,10 +149,15 @@ public function store(Request $request)
         ->with('success', 'Siswa berhasil ditambahkan.');
 }
 
-    public function show(Student $student)
+    public function show(Request $request, Student $student)
     {
-        $student->load(['branch', 'user', 'teachers.courses', 'package.cabang', 'package.guru']);
-        return response()->json(['success' => true, 'data' => $student]);
+        if ($request->expectsJson() || $request->ajax()) {
+            $student->load(['branch', 'user', 'teachers.courses', 'package.cabang', 'package.guru']);
+            return response()->json(['success' => true, 'data' => $student]);
+        }
+        $student->load(['branch', 'user', 'package.cabang', 'package.guru', 'package.mataPelajaran']);
+        $invoices = \App\Models\Invoice::where('siswa_id', $student->id)->latest()->get();
+        return view('admin.students.show', compact('student', 'invoices'));
     }
 
     public function update(Request $request, Student $student)

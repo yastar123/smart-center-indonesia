@@ -445,6 +445,8 @@ function loadTeachers(page) {
                         </td>
                         <td class="text-center">
                             <div class="d-flex gap-1 justify-content-center">
+                                <button class="btn btn-sm btn-outline-info" onclick="window.location.href='/admin/teachers/${t.id}'"
+                                        title="Preview" style="border-radius:8px;padding:5px 8px"><i class="bi bi-eye"></i></button>
                                 <button class="btn btn-sm btn-outline-warning" onclick="window.location.href='/admin/teachers/${t.id}/edit'"
                                         title="Edit" style="border-radius:8px;padding:5px 8px"><i class="bi bi-pencil"></i></button>
                                 <button class="btn btn-sm btn-outline-danger" onclick="deleteTeacher(${t.id}, '${t.name.replace(/'/g, "\\\'")}')"

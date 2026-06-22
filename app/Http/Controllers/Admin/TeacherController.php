@@ -140,9 +140,17 @@ class TeacherController extends Controller
             ->with('success', 'Guru dan akun login berhasil ditambahkan!');
     }
 
-    public function show(Teacher $teacher)
+    public function show(Request $request, Teacher $teacher)
     {
-        return response()->json(['success' => true, 'data' => $teacher->load(['branch', 'user', 'courses'])]);
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'data' => $teacher->load(['branch', 'user', 'courses'])]);
+        }
+        $teacher->load(['branch', 'user', 'courses']);
+        $packages = \App\Models\Package::where('guru_id', $teacher->id)
+            ->with('mataPelajaran')
+            ->orderBy('nama')
+            ->get();
+        return view('admin.teachers.show', compact('teacher', 'packages'));
     }
 
     public function update(Request $request, Teacher $teacher)

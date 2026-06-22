@@ -453,4 +453,61 @@
 
 </div>
 
+{{-- TAGIHAN DARI REGISTRASI --}}
+@if(isset($invoices) && $invoices->isNotEmpty())
+<div class="dashboard-card fade-up mt-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h6 class="fw-bold mb-0">
+            <i class="bi bi-receipt me-2 text-primary"></i>Tagihan Registrasi
+            <span class="badge ms-1" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:11px">{{ $invoices->count() }}</span>
+        </h6>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="thead-modern">
+                <tr>
+                    <th>No. Invoice</th>
+                    <th>Deskripsi</th>
+                    <th>Total</th>
+                    <th>Jatuh Tempo</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($invoices as $inv)
+                @php
+                    $sc = match($inv->status) {
+                        'lunas'      => ['bg'=>'var(--soft-success-bg)','color'=>'var(--soft-success-text)','label'=>'Lunas','icon'=>'bi-check-circle-fill'],
+                        'sebagian'   => ['bg'=>'var(--soft-warning-bg)','color'=>'var(--soft-warning-text)','label'=>'Sebagian','icon'=>'bi-dash-circle-fill'],
+                        default      => ['bg'=>'var(--soft-danger-bg)','color'=>'var(--soft-danger-text)','label'=>'Belum Bayar','icon'=>'bi-x-circle-fill'],
+                    };
+                    $isOverdue = $inv->status !== 'lunas' && $inv->jatuh_tempo && $inv->jatuh_tempo->isPast();
+                @endphp
+                <tr>
+                    <td class="fw-semibold" style="font-size:12px">{{ $inv->nomor_invoice ?? '—' }}</td>
+                    <td style="font-size:13px">{{ $inv->deskripsi ?? '—' }}</td>
+                    <td class="fw-bold text-primary">Rp {{ number_format($inv->total,0,',','.') }}</td>
+                    <td>
+                        <span style="font-size:12.5px;{{ $isOverdue ? 'color:#dc2626;font-weight:600' : '' }}">
+                            {{ $inv->jatuh_tempo?->format('d M Y') ?? '—' }}
+                            @if($isOverdue)<i class="bi bi-exclamation-triangle-fill ms-1 text-danger"></i>@endif
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge" style="background:{{ $sc['bg'] }};color:{{ $sc['color'] }};border:1px solid {{ $sc['bg'] }};font-size:11px;padding:4px 10px;border-radius:8px">
+                            <i class="bi {{ $sc['icon'] }} me-1"></i>{{ $sc['label'] }}
+                        </span>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    <div class="mt-3 p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border);font-size:12px;color:var(--text-muted)">
+        <i class="bi bi-info-circle me-1"></i>
+        Tagihan di atas dibuat dari proses registrasi. Hubungi admin untuk melakukan pembayaran atau jika ada pertanyaan.
+    </div>
+</div>
+@endif
+
 @endsection

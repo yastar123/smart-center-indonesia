@@ -119,6 +119,13 @@ class SalaryController extends Controller
         return response()->json(['success' => true, 'data' => $salary->load('guru', 'cabang')]);
     }
 
+    public function edit(Salary $salary)
+    {
+        $teachers = Teacher::where('status', 'aktif')->orderBy('name')->get();
+        $branches = Branch::orderBy('name')->get();
+        return view('admin.salaries.edit', compact('salary', 'teachers', 'branches'));
+    }
+
     public function update(Request $request, Salary $salary)
     {
         $data = $request->validate([
@@ -157,7 +164,11 @@ class SalaryController extends Controller
         }
 
         $salary->update($data);
-        return response()->json(['success' => true, 'message' => 'Data gaji berhasil diperbarui!']);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Data gaji berhasil diperbarui!']);
+        }
+        return redirect()->route('admin.salaries.index')->with('success', 'Data gaji berhasil diperbarui!');
     }
 
     public function destroy(Salary $salary)

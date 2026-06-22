@@ -3416,6 +3416,11 @@
             </a>
         </div>
         <div class="nav-item">
+            <a href="{{ route('guru.schedule-agreements.index') }}" class="nav-link {{ request()->routeIs('guru.schedule-agreements.*') ? 'active' : '' }}" data-label="Reschedule">
+                <i class="bi bi-calendar2-x"></i><span>Reschedule</span>
+            </a>
+        </div>
+        <div class="nav-item">
             <a href="{{ route('guru.payments.index') }}" class="nav-link {{ request()->routeIs('guru.payments.*') ? 'active' : '' }}" data-label="Gaji Saya">
                 <i class="bi bi-cash-coin"></i><span>Gaji Saya</span>
             </a>
@@ -3443,6 +3448,11 @@
         <div class="nav-item">
             <a href="{{ route('siswa.schedules.index') }}" class="nav-link {{ request()->routeIs('siswa.schedules.*') ? 'active' : '' }}" data-label="Jadwal Pertemuan">
                 <i class="bi bi-calendar-check"></i><span>Jadwal Pertemuan</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('siswa.schedule-agreements.index') }}" class="nav-link {{ request()->routeIs('siswa.schedule-agreements.*') ? 'active' : '' }}" data-label="Reschedule">
+                <i class="bi bi-calendar2-x"></i><span>Reschedule</span>
             </a>
         </div>
         <div class="nav-item">

@@ -81,11 +81,13 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::get('/attendance-history', [AttendanceHistoryController::class, 'index'])->name('attendance-history.index');
 
         // SCHEDULES
-        Route::get('/schedules',               [ScheduleController::class, 'index'])   ->name('schedules.index');
-        Route::post('/schedules',              [ScheduleController::class, 'store'])   ->name('schedules.store');
-        Route::get('/schedules/{schedule}',    [ScheduleController::class, 'show'])    ->name('schedules.show');
-        Route::put('/schedules/{schedule}',    [ScheduleController::class, 'update'])  ->name('schedules.update');
-        Route::delete('/schedules/{schedule}', [ScheduleController::class, 'destroy']) ->name('schedules.destroy');
+        Route::get('/schedules',                    [ScheduleController::class, 'index'])   ->name('schedules.index');
+        Route::get('/schedules/create',             [ScheduleController::class, 'create'])  ->name('schedules.create');
+        Route::post('/schedules',                   [ScheduleController::class, 'store'])   ->name('schedules.store');
+        Route::get('/schedules/{schedule}/edit',    [ScheduleController::class, 'edit'])    ->name('schedules.edit');
+        Route::get('/schedules/{schedule}',         [ScheduleController::class, 'show'])    ->name('schedules.show');
+        Route::put('/schedules/{schedule}',         [ScheduleController::class, 'update'])  ->name('schedules.update');
+        Route::delete('/schedules/{schedule}',      [ScheduleController::class, 'destroy']) ->name('schedules.destroy');
 
         // COURSES (Mata Pelajaran)
         Route::get('/courses',            [CourseController::class, 'index'])   ->name('courses.index');
@@ -135,6 +137,7 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
             Route::get('/salaries/create',      [SalaryController::class, 'create'])   ->name('salaries.create');
             Route::get('/salaries/teachers/{teacher}/packages', [SalaryController::class, 'teacherPackages']) ->name('salaries.teacher-packages');
             Route::post('/salaries',            [SalaryController::class, 'store'])    ->name('salaries.store');
+            Route::get('/salaries/{salary}/edit', [SalaryController::class, 'edit'])    ->name('salaries.edit');
             Route::get('/salaries/{salary}',    [SalaryController::class, 'show'])     ->name('salaries.show');
             Route::put('/salaries/{salary}',    [SalaryController::class, 'update'])   ->name('salaries.update');
             Route::delete('/salaries/{salary}', [SalaryController::class, 'destroy'])  ->name('salaries.destroy');

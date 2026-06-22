@@ -245,6 +245,10 @@
                     </td>
                     <td class="text-center">
                         <div class="d-flex gap-1 justify-content-center">
+                            <a href="{{ route('admin.students.show', $s) }}" class="btn btn-sm btn-outline-info"
+                                    title="Preview" style="border-radius:8px;padding:5px 8px">
+                                <i class="bi bi-eye"></i>
+                            </a>
                             <a href="{{ route('admin.students.edit', $s) }}" class="btn btn-sm btn-outline-warning"
                                     title="Edit" style="border-radius:8px;padding:5px 8px">
                                 <i class="bi bi-pencil"></i>

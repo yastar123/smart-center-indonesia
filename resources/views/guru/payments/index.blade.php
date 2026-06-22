@@ -82,10 +82,15 @@
             <thead class="thead-modern">
                 <tr>
                     <th>Periode</th>
+                    <th>Tipe Gaji</th>
+                    <th>Gaji Pokok</th>
+                    <th>Bonus</th>
                     <th>Total Gaji</th>
-                    <th>Tanggal Pembayaran</th>
-                    <th>Metode</th>
                     <th>Status</th>
+                    <th>Metode</th>
+                    <th>Tanggal Bayar</th>
+                    <th>Nama Bank</th>
+                    <th>No. Rekening</th>
                     <th>Bukti</th>
                 </tr>
             </thead>
@@ -93,9 +98,10 @@
                 @forelse($salaries as $s)
                 <tr>
                     <td class="fw-semibold">{{ $s->periode }}</td>
+                    <td><span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);border:1px solid var(--soft-primary-border);font-size:11px">{{ $s->tipe_gaji === 'freelance' ? 'Freelance' : 'Bulanan' }}</span></td>
+                    <td>Rp {{ number_format($s->gaji_pokok,0,',','.') }}</td>
+                    <td>{{ $s->bonus > 0 ? 'Rp '.number_format($s->bonus,0,',','.') : '—' }}</td>
                     <td class="fw-bold text-primary">Rp {{ number_format($s->total_gaji,0,',','.') }}</td>
-                    <td>{{ $s->tanggal_pembayaran?->format('d M Y') ?? '-' }}</td>
-                    <td><span style="font-size:13px">{{ $s->metode_pembayaran ?? '-' }}</span></td>
                     <td>
                         @if($s->status === 'dibayar')
                             <span class="badge" style="background:rgba(16,185,129,.15);color:#059669;border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:5px 10px">
@@ -111,6 +117,10 @@
                             </span>
                         @endif
                     </td>
+                    <td><span style="font-size:13px">{{ $s->metode_pembayaran ?? '—' }}</span></td>
+                    <td>{{ $s->tanggal_pembayaran?->format('d M Y') ?? '—' }}</td>
+                    <td style="font-size:13px">{{ $s->nama_bank ?? '—' }}</td>
+                    <td style="font-size:13px">{{ $s->nomor_rekening ?? '—' }}</td>
                     <td>
                         @if($s->bukti_pembayaran)
                             <a href="{{ asset('storage/'.$s->bukti_pembayaran) }}" target="_blank"
@@ -124,7 +134,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6">
+                    <td colspan="11">
                         <div class="empty-state py-4">
                             <div class="empty-state-icon"><i class="bi bi-receipt-cutoff"></i></div>
                             <div class="empty-state-title">Belum Ada Pembayaran</div>

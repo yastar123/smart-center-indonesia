@@ -173,14 +173,23 @@ class RegistrationController extends Controller
             $totalTagihan = $packagePrice + $adminFee;
 
             if ($request->billing_mode === 'prepaid' && $totalTagihan > 0) {
+                $year  = date('Y');
+                $month = str_pad(date('m'), 2, '0', STR_PAD_LEFT);
+                $count = Invoice::whereYear('created_at', $year)->whereMonth('created_at', date('m'))->count() + 1;
+                $nomor = 'INV-' . $year . '-' . $month . str_pad($count, 3, '0', STR_PAD_LEFT);
+
                 Invoice::create([
-                    'siswa_id'          => $student->id,
-                    'cabang_id'         => $request->cabang_id,
-                    'keterangan'        => 'Registrasi: ' . $namaKelas,
-                    'jumlah'            => $totalTagihan,
-                    'status'            => 'belum_bayar',
-                    'tanggal_tagihan'   => $request->tanggal_mulai,
-                    'tanggal_jatuh_tempo' => Carbon::parse($request->tanggal_mulai)->addDays(7),
+                    'siswa_id'      => $student->id,
+                    'cabang_id'     => $request->cabang_id,
+                    'nomor_invoice' => $nomor,
+                    'deskripsi'     => 'Registrasi: ' . $namaKelas,
+                    'subtotal'      => $totalTagihan,
+                    'diskon'        => 0,
+                    'pajak'         => 0,
+                    'total'         => $totalTagihan,
+                    'status'        => 'belum_bayar',
+                    'jatuh_tempo'   => Carbon::parse($request->tanggal_mulai)->addDays(7),
+                    'periode'       => date('Y-m'),
                 ]);
             }
 

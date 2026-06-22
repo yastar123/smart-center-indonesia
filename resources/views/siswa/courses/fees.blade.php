@@ -87,6 +87,7 @@
     @foreach($packages as $package)
     @php
         $courseNames = $package->mataPelajaran->pluck('nama')->filter()->implode(', ');
+        $isTerdaftar = $student->package_id && $student->package_id == $package->id;
         $statusLabel = match($package->status ?? '') {
             'aktif' => ['text' => 'Aktif', 'class' => 'bg-success'],
             'nonaktif' => ['text' => 'Nonaktif', 'class' => 'bg-secondary'],
@@ -94,17 +95,24 @@
         };
     @endphp
     <div class="col-12 col-md-6 col-xl-4">
-        <div class="h-100" style="background:var(--card-bg);border:1.5px solid var(--card-border);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .2s, transform .2s"
+        <div class="h-100" style="background:var(--card-bg);border:1.5px solid {{ $isTerdaftar ? '#10b981' : 'var(--card-border)' }};border-radius:18px;overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .2s, transform .2s"
              onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 32px rgba(104,17,126,.13)'"
              onmouseout="this.style.transform='';this.style.boxShadow=''">
-            <div style="background:linear-gradient(135deg,#260632,#68117e);padding:18px 20px;position:relative;overflow:hidden">
+            <div style="background:{{ $isTerdaftar ? 'linear-gradient(135deg,#065f46,#10b981)' : 'linear-gradient(135deg,#260632,#68117e)' }};padding:18px 20px;position:relative;overflow:hidden">
                 <div style="position:absolute;right:-20px;top:-20px;width:100px;height:100px;background:rgba(255,255,255,.05);border-radius:50%"></div>
                 <div class="d-flex justify-content-between align-items-start gap-2">
                     <div>
                         <div style="font-size:10px;opacity:.6;text-transform:uppercase;letter-spacing:.07em;color:white;margin-bottom:4px">Paket</div>
                         <div class="fw-bold" style="color:white;font-size:15px;line-height:1.3">{{ $package->nama }}</div>
                     </div>
-                    <span class="badge {{ $statusLabel['class'] }}">{{ $statusLabel['text'] }}</span>
+                    <div class="d-flex flex-column gap-1 align-items-end">
+                        @if($isTerdaftar)
+                        <span class="badge" style="background:rgba(255,255,255,.25);color:white;border:1px solid rgba(255,255,255,.4);font-size:11px;padding:4px 10px;border-radius:8px">
+                            <i class="bi bi-check-circle-fill me-1"></i>Terdaftar
+                        </span>
+                        @endif
+                        <span class="badge {{ $statusLabel['class'] }}">{{ $statusLabel['text'] }}</span>
+                    </div>
                 </div>
             </div>
             <div style="padding:16px 20px;flex:1;display:flex;flex-direction:column;gap:10px">
