@@ -317,5 +317,27 @@ function debounceFilter() {
     clearTimeout(filterTimer);
     filterTimer = setTimeout(() => document.getElementById('filterForm').submit(), 500);
 }
+
+// ---- DELETE STUDENT ----
+function deleteStudent(id, name) {
+    if (!confirm('Hapus siswa "' + name + '"? Akun user-nya juga akan dihapus. Tindakan ini tidak bisa dibatalkan.')) return;
+    fetch('/admin/students/' + id, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json',
+        }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message || 'Siswa berhasil dihapus!', 'success');
+            setTimeout(() => location.reload(), 900);
+        } else {
+            showToast(data.message || 'Gagal menghapus siswa.', 'error');
+        }
+    })
+    .catch(() => showToast('Terjadi kesalahan jaringan.', 'error'));
+}
 </script>
 @endpush

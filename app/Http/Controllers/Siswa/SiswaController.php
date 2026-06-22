@@ -21,7 +21,7 @@ class SiswaController extends Controller
         // Enrolled classes/courses for this student
         $enrolledClasses = $student
             ? \App\Models\SchoolClass::with(['mataPelajaran', 'guru', 'cabang'])
-                ->whereHas('siswa', fn($q) => $q->where('student_id', $student->id))
+                ->whereHas('siswa', fn($q) => $q->where('students.id', $student->id))
                 ->get()
             : collect();
 

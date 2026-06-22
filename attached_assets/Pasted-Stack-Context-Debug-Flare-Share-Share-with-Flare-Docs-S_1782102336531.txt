@@ -1,0 +1,356 @@
+Stack
+Context
+Debug
+Flare
+Share
+Share with Flare
+Docs
+
+Stack
+
+Context
+
+Debug
+Create Share
+Docs
+
+Ignition Settings
+Docs
+Editor
+
+PhpStorm
+Theme
+auto
+Save settings
+Settings will be saved locally in ~/.ignition.json.
+
+syntax error, unexpected token "endif"
+ParseError
+PHP 8.3.8
+9.52.21
+syntax error, unexpected token "endif"
+
+Expand vendor frames
+Illuminate
+ \ 
+Filesystem
+ \ 
+Filesystem
+ 
+: 67
+Illuminate\Filesystem\{closure}
+12 vendor frames
+App
+ \ 
+Http
+ \ 
+Middleware
+ \ 
+CheckBranchAccess
+ 
+: 33
+handle
+42 vendor frames
+C:\Users\Edu Juanda Pratama\Downloads\smart-center-indonesia\smart-center-indonesia\public\index
+.php
+ 
+: 51
+require_once
+1 vendor frame
+C:\Users\Edu Juanda Pratama\Downloads\smart-center-indonesia\smart-center-indonesia\resources\views\admin\schedules\create.blade
+.php
+ 
+: 67
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        </div>
+        <div>
+            <div class="fw-bold" style="font-size:15px">Paket Belajar</div>
+            <div class="text-muted" style="font-size:12px">Pilih paket untuk sesi ini</div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        {{-- PAKET BELAJAR --}}
+        <div class="col-lg-8">
+            <label class="form-label fw-semibold">Paket Belajar <span class="text-danger">*</span></label>
+            <select name="paket_id" id="paket_id" class="form-select" required onchange="onPaketChange(this.value)">
+                <option value="">— Pilih Paket —</option>
+                @foreach($pakets as $p)
+                <option value="{{ $p->id }}" {{ old('paket_id') == $p->id ? 'selected' : '' }}>
+                    {{ $p->nama }}@if($p->guru) – {{ $p->guru->name }}@endif@if($p->cabang) ({{ $p->cabang->name }})@endif
+                </option>
+                @endforeach
+            </select>
+        </div>
+
+        {{-- SESI KE --}}
+        <div class="col-lg-4">
+            <label class="form-label fw-semibold">Sesi Ke- <span class="text-danger">*</span></label>
+            <select name="pertemuan_ke" id="pertemuan_ke" class="form-select" required>
+                <option value="">— Pilih paket dulu —</option>
+            </select>
+        </div>
+
+        {{-- DETAIL PAKET BOX --}}
+App
+Routing
+Views
+Request
+Browser
+Headers
+Body
+Context
+User
+Versions
+App
+Routing
+Controller
+App\Http\Controllers\Admin\ScheduleController@create
+
+Route name
+admin.schedules.create
+
+Middleware
+web
+
+auth
+
+role:admin|owner
+
+check.branch.access
+
+Views
+View
+C:\Users\Edu Juanda Pratama\Downloads\smart-center-indonesia\smart-center-indonesia\resources\views\admin\schedules\create.blade
+.php
+Data
+Request
+http://127.0.0.1:8000/admin/schedules/create
+GET
+curl "http://127.0.0.1:8000/admin/schedules/create" \
+   -X GET \
+   -H 'host: 127.0.0.1:8000' \
+   -H 'connection: keep-alive' \
+   -H 'upgrade-insecure-requests: 1' \
+   -H 'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36' \
+   -H 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' \
+   -H 'sec-fetch-site: same-origin' \
+   -H 'sec-fetch-mode: navigate' \
+   -H 'sec-fetch-user: ?1' \
+   -H 'sec-fetch-dest: document' \
+   -H 'sec-ch-ua: "Google Chrome";v="149", "Chromium";v="149", "Not)A;Brand";v="24"' \
+   -H 'sec-ch-ua-mobile: ?0' \
+   -H 'sec-ch-ua-platform: "Windows"' \
+   -H 'referer: http://127.0.0.1:8000/admin/schedule' \
+   -H 'accept-encoding: gzip, deflate, br, zstd' \
+   -H 'accept-language: id,en-US;q=0.9,en;q=0.8,zh-CN;q=0.7,zh;q=0.6' \
+   -H 'cookie: __stripe_mid=4f94caed-cb32-44a1-999c-9032903e20fa14070c; g_state={"i_l":0,"i_ll":1771073085949,"i_b":"ju0ncsFRJbMlUsWjxqu8pUtlbZBbA+4arJn8mkowluo","i_e":{"enable_itp_optimization":16}}; XSRF-TOKEN=eyJpdiI6IlA3Uy9CclRQSXBXR0tHTjA0Ymh6aHc9PSIsInZhbHVlIjoidlZJSFVqNEVkNVo0eVY4NUt5MWsxemRtaitLZWZndXpwUXN4Q0FTUEVmeEhjOUxnQnZOOEFDaFQ0TXZMcitnS25FQjZvRWxOaWpOLzR6VytNanZ3NXRWSVNEZEo4c3BrR0NvdVRsZDNJcnhVODFTM3FrNGJqWGhYdjllZkg3Zm8iLCJtYWMiOiIyZjgyNjM5NjI5YTc2MWMwOTgxNWU3NmFmZjZmNWNkNDJiY2FkZDc3NDRjNjkzNTFlMDhhZGQ5ZDQ5MDYxZWViIiwidGFnIjoiIn0%3D; laravel_session=eyJpdiI6IkpsYlp6MEFZOVpHUnUwRlNrQ0p0U2c9PSIsInZhbHVlIjoiQldkaTBNNVRhUllrVUdRVTNwUmF6RExPY0RubWNVb0ZNSFVuclRLdnRwK2tyTXA2Ly9NQjZHWGNZcENqWGlKVTlMVEtnKzZKbGNGdnBaOVJrT3ZRdmo3TnlvOXB3RmdaRDBjTjdidHVDUlVYZDZRMi8vdWRNMzF1TVpPWHR5dWgiLCJtYWMiOiIyODMyMjEyYmRiM2Q4ZDRhNWFmZTI2Y2ViMjg4MzM3YTQ1ODRmZTk5ZTcxZTBmNzFhMzFkNTc5ODJiOGEwYTBlIiwidGFnIjoiIn0%3D';
+
+
+Browser
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36
+
+Headers
+host
+127.0.0.1:8000
+
+connection
+keep-alive
+
+upgrade-insecure-requests
+1
+
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36
+
+accept
+text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+
+sec-fetch-site
+same-origin
+
+sec-fetch-mode
+navigate
+
+sec-fetch-user
+?1
+
+sec-fetch-dest
+document
+
+sec-ch-ua
+"Google Chrome";v="149", "Chromium";v="149", "Not)A;Brand";v="24"
+
+sec-ch-ua-mobile
+?0
+
+sec-ch-ua-platform
+"Windows"
+
+referer
+http://127.0.0.1:8000/admin/schedule
+
+accept-encoding
+gzip, deflate, br, zstd
+
+accept-language
+id,en-US;q=0.9,en;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+cookie
+__stripe_mid=4f94caed-cb32-44a1-999c-9032903e20fa14070c; g_state={"i_l":0,"i_ll":1771073085949,"i_b":"ju0ncsFRJbMlUsWjxqu8pUtlbZBbA+4arJn8mkowluo","i_e":{"enable_itp_optimization":16}}; XSRF-TOKEN=eyJpdiI6IlA3Uy9CclRQSXBXR0tHTjA0Ymh6aHc9PSIsInZhbHVlIjoidlZJSFVqNEVkNVo0eVY4NUt5MWsxemRtaitLZWZndXpwUXN4Q0FTUEVmeEhjOUxnQnZOOEFDaFQ0TXZMcitnS25FQjZvRWxOaWpOLzR6VytNanZ3NXRWSVNEZEo4c3BrR0NvdVRsZDNJcnhVODFTM3FrNGJqWGhYdjllZkg3Zm8iLCJtYWMiOiIyZjgyNjM5NjI5YTc2MWMwOTgxNWU3NmFmZjZmNWNkNDJiY2FkZDc3NDRjNjkzNTFlMDhhZGQ5ZDQ5MDYxZWViIiwidGFnIjoiIn0%3D; laravel_session=eyJpdiI6IkpsYlp6MEFZOVpHUnUwRlNrQ0p0U2c9PSIsInZhbHVlIjoiQldkaTBNNVRhUllrVUdRVTNwUmF6RExPY0RubWNVb0ZNSFVuclRLdnRwK2tyTXA2Ly9NQjZHWGNZcENqWGlKVTlMVEtnKzZKbGNGdnBaOVJrT3ZRdmo3TnlvOXB3RmdaRDBjTjdidHVDUlVYZDZRMi8vdWRNMzF1TVpPWHR5dWgiLCJtYWMiOiIyODMyMjEyYmRiM2Q4ZDRhNWFmZTI2Y2ViMjg4MzM3YTQ1ODRmZTk5ZTcxZTBmNzFhMzFkNTc5ODJiOGEwYTBlIiwidGFnIjoiIn0%3D
+
+Body
+[]
+
+Context
+User
+adminpusatsci@akademi.com
+Admin Pusat SCI
+
+adminpusatsci@akademi.com
+
+{
+    "id": 1,
+    "name": "Admin Pusat SCI",
+    "username": null,
+    "email": "adminpusatsci@akademi.com",
+    "phone": null,
+    "avatar": null,
+    "branch_id": null,
+    "is_active": true,
+    "last_login_at": null,
+    "email_verified_at": null,
+    "created_at": "2026-06-22T02:05:42.000000Z",
+    "updated_at": "2026-06-22T02:05:42.000000Z",
+    "deleted_at": null,
+    "roles": [
+        {
+            "id": 1,
+            "name": "owner",
+            "guard_name": "web",
+            "created_at": "2026-06-22T02:05:41.000000Z",
+            "updated_at": "2026-06-22T02:05:41.000000Z",
+            "pivot": {
+                "model_id": 1,
+                "role_id": 1,
+                "model_type": "App\\Models\\User"
+            }
+        }
+    ]
+}
+
+
+Versions
+Php Version
+8.3.8
+
+Laravel Version
+9.52.21
+
+Laravel Locale
+en
+
+Laravel Config Cached
+false
+App Debug
+true
+App Env
+local
+
+
+9
+Queries
+11:25:27 AM
+4.47ms
+mysql
+select * from `users` where `id` = 1 and `users`.`deleted_at` is null limit 1
+
+
+1 query parameter
+11:25:27 AM
+1.21ms
+mysql
+select `roles`.*, `model_has_roles`.`model_id` as `pivot_model_id`, `model_has_roles`.`role_id` as `pivot_role_id`, `model_has_roles`.`model_type` as `pivot_model_type` from `roles` inner join `model_has_roles` on `roles`.`id` = `model_has_roles`.`role_id` where `model_has_roles`.`model_id` in (1) and `model_has_roles`.`model_type` = App\Models\User
+
+
+1 query parameter
+11:25:27 AM
+1.01ms
+mysql
+select * from `packages` where `status` = aktif and `packages`.`deleted_at` is null order by `nama` asc
+
+
+1 query parameter
+11:25:27 AM
+0.94ms
+mysql
+select * from `teachers` where 0 = 1 and `teachers`.`deleted_at` is null
+
+
+11:25:27 AM
+1.11ms
+mysql
+select `courses`.*, `course_package`.`package_id` as `pivot_package_id`, `course_package`.`course_id` as `pivot_course_id` from `courses` inner join `course_package` on `courses`.`id` = `course_package`.`course_id` where `course_package`.`package_id` in (1, 2) and `courses`.`deleted_at` is null
+
+
+11:25:27 AM
+0.82ms
+mysql
+select * from `branches` where `branches`.`id` in (1)
+
+
+11:25:27 AM
+0.46ms
+mysql
+select * from `branches`
+
+
+11:25:27 AM
+0.76ms
+mysql
+select * from `modules` where `status` = aktif and `modules`.`deleted_at` is null order by `judul` asc
+
+
+1 query parameter
+11:25:27 AM
+0.72ms
+mysql
+select * from `courses` where `courses`.`id` in (1) and `courses`.`deleted_at` is null
+
+
+·
+Source
+·
+Docs
+·
+Laravel
+Ignition is built byFlare, the Laravel error reporting service.

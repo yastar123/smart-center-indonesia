@@ -45,7 +45,34 @@ class TagihanSiswaController extends Controller
 
         // Compute payment summary per kelas
         $kelasIds = $classes->pluck('id')->toArray();
-        $invoicesByKelas = Invoice::whereIn('kelas_id', $kelasIds)->with('pembayaran')->get()->groupBy('kelas_id');
+
+        // Fetch invoices that have kelas_id set
+        $invoicesWithKelas = Invoice::whereIn('kelas_id', $kelasIds)->with('pembayaran')->get();
+        $invoicesByKelas   = $invoicesWithKelas->groupBy('kelas_id');
+
+        // Also fetch null-kelas_id invoices for students in these classes (registration invoices)
+        $allStudentIds  = $classes->flatMap(fn($k) => $k->siswa->pluck('id'))->unique()->values()->toArray();
+        $studentKelasMap = $classes->flatMap(fn($k) => $k->siswa->map(fn($s) => [
+            'student_id' => $s->id, 'kelas_id' => $k->id, 'cabang_id' => $k->cabang_id
+        ]))->keyBy('student_id');
+
+        if (!empty($allStudentIds)) {
+            $nullKelasInvoices = Invoice::whereNull('kelas_id')
+                ->whereIn('siswa_id', $allStudentIds)
+                ->with('pembayaran')
+                ->get();
+
+            foreach ($nullKelasInvoices as $inv) {
+                $entry = $studentKelasMap->get($inv->siswa_id);
+                if ($entry && $entry['cabang_id'] == $inv->cabang_id) {
+                    $kelasId = $entry['kelas_id'];
+                    if (!isset($invoicesByKelas[$kelasId])) {
+                        $invoicesByKelas[$kelasId] = collect();
+                    }
+                    $invoicesByKelas[$kelasId]->push($inv);
+                }
+            }
+        }
 
         $stats = [
             'total'    => $totalCicilan + $totalPostpaid,

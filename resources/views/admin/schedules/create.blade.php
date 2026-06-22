@@ -64,7 +64,7 @@
                 <option value="">— Pilih Paket —</option>
                 @foreach($pakets as $p)
                 <option value="{{ $p->id }}" {{ old('paket_id') == $p->id ? 'selected' : '' }}>
-                    {{ $p->nama }}@if($p->guru) – {{ $p->guru->name }}@endif@if($p->cabang) ({{ $p->cabang->name }})@endif
+                    {{ $p->nama . ($p->guru ? ' – '.$p->guru->name : '') . ($p->cabang ? ' ('.$p->cabang->name.')' : '') }}
                 </option>
                 @endforeach
             </select>

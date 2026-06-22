@@ -194,8 +194,7 @@ class RegistrationController extends Controller
             }
 
             $packagePrice = (float)($request->package_price ?? 0);
-            $adminFee     = ($request->is_new_student == '1') ? 150000 : 0;
-            $totalTagihan = $packagePrice + $adminFee;
+            $totalTagihan = $packagePrice;
 
             if ($request->billing_mode === 'prepaid' && $totalTagihan > 0) {
                 $year  = date('Y');
@@ -221,6 +220,7 @@ class RegistrationController extends Controller
                 Invoice::create([
                     'siswa_id'      => $student->id,
                     'cabang_id'     => $request->cabang_id,
+                    'kelas_id'      => $kelas->id,
                     'nomor_invoice' => $nomor,
                     'deskripsi'     => $desc,
                     'subtotal'      => $firstAmount,

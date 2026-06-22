@@ -480,11 +480,6 @@
                     <span class="text-muted" style="font-size:12px">Harga Paket</span>
                     <span style="font-size:12px" id="qPkgPrice">Rp 0</span>
                 </div>
-                <div class="d-flex justify-content-between mb-1" id="adminFeeRow">
-                    <span class="text-muted" style="font-size:12px">Biaya Registrasi <span class="badge" style="background:rgba(246,175,35,.15);color:#e09000;font-size:9px">Siswa Baru</span></span>
-                    <span style="font-size:12px">Rp 150.000</span>
-                </div>
-
                 <div class="border-top my-2"></div>
 
                 <div class="d-flex justify-content-between align-items-center">
@@ -521,7 +516,6 @@ function switchStudent(type) {
     document.getElementById('studentDetailCard').style.display = isNewStudent ? 'none' : '';
     document.getElementById('btnNew').className = 'btn btn-sm flex-fill ' + (isNewStudent ? 'btn-primary' : 'btn-outline-secondary');
     document.getElementById('btnOld').className = 'btn btn-sm flex-fill ' + (!isNewStudent ? 'btn-primary' : 'btn-outline-secondary');
-    document.getElementById('adminFeeRow').style.display = isNewStudent ? '' : 'none';
     if (!isNewStudent) {
         updateSelectedStudentDetails();
     }
@@ -776,12 +770,10 @@ function updateQuote() {
         packagePrice = parseFloat(document.querySelector('[name=custom_package_price]')?.value || 0);
     }
 
-    const adminFee = isNewStudent ? 150000 : 0;
-    const total    = billingMode === 'prepaid' ? packagePrice + adminFee : 0;
+    const total = billingMode === 'prepaid' ? packagePrice : 0;
 
     document.getElementById('qPkgPrice').textContent = formatRupiah(packagePrice);
     document.getElementById('qTotal').textContent    = formatRupiah(total);
-    document.getElementById('adminFeeRow').style.display = isNewStudent ? '' : 'none';
     updateInstallmentBreakdown();
 }
 
