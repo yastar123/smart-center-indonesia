@@ -1,10 +1,9 @@
-@extends('layouts.app')
-@section('title','Tagihan Saya')
-@section('page-title','Tagihan Saya')
+<?php $__env->startSection('title','Tagihan Saya'); ?>
+<?php $__env->startSection('page-title','Tagihan Saya'); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 
-{{-- HEADER BANNER --}}
+
 <div class="dashboard-card mb-4 fade-up"
      style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
     <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%;pointer-events:none"></div>
@@ -32,13 +31,13 @@
     </div>
 </div>
 
-{{-- STATS --}}
-@php
+
+<?php
     $totalCourses  = $courses->count();
     $paidCount     = collect($payments)->filter(fn($p) => $p->status === 'verified')->count();
     $pendingCount  = collect($payments)->filter(fn($p) => $p->status === 'pending')->count();
     $unpaidCount   = $totalCourses - collect($payments)->count();
-@endphp
+?>
 
 <div class="row g-3 mb-4">
     <div class="col-6 col-lg-3 fade-up">
@@ -46,7 +45,7 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Total Mata Pelajaran</div>
-                    <div class="stat-value text-primary">{{ $totalCourses }}</div>
+                    <div class="stat-value text-primary"><?php echo e($totalCourses); ?></div>
                     <div class="stat-label text-muted" style="font-size:11px">terdaftar</div>
                 </div>
                 <div class="stat-icon bg-primary-soft" style="color:white">
@@ -60,7 +59,7 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Sudah Lunas</div>
-                    <div class="stat-value text-success">{{ $paidCount }}</div>
+                    <div class="stat-value text-success"><?php echo e($paidCount); ?></div>
                     <div class="stat-label" style="font-size:11px;color:#10b981">
                         <i class="bi bi-check-circle-fill me-1"></i>Terverifikasi
                     </div>
@@ -76,7 +75,7 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Menunggu Verifikasi</div>
-                    <div class="stat-value text-warning">{{ $pendingCount }}</div>
+                    <div class="stat-value text-warning"><?php echo e($pendingCount); ?></div>
                     <div class="stat-label text-warning" style="font-size:11px">
                         <i class="bi bi-hourglass-split me-1"></i>Sedang diproses
                     </div>
@@ -92,7 +91,7 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Belum Dibayar</div>
-                    <div class="stat-value" style="color:#dc2626">{{ $unpaidCount }}</div>
+                    <div class="stat-value" style="color:#dc2626"><?php echo e($unpaidCount); ?></div>
                     <div class="stat-label" style="font-size:11px;color:#ef4444">
                         <i class="bi bi-exclamation-circle me-1"></i>Segera bayar
                     </div>
@@ -105,11 +104,11 @@
     </div>
 </div>
 
-{{-- BILLING CARDS --}}
+
 <div class="dashboard-card fade-up">
 
-    @if($draftCourses && $draftCourses->isNotEmpty())
-    {{-- DRAFT COURSES SECTION --}}
+    <?php if($draftCourses && $draftCourses->isNotEmpty()): ?>
+    
     <div class="p-4 rounded-3 mb-4" style="background:linear-gradient(135deg,rgba(200,77,223,.08),rgba(104,17,126,.08));border:1.5px solid rgba(200,77,223,.2)">
         <div class="d-flex align-items-center justify-content-between mb-3">
             <div>
@@ -118,17 +117,17 @@
                 </h6>
                 <p class="text-muted mb-0" style="font-size:12px">Mata pelajaran yang ditambahkan untuk dibayar</p>
             </div>
-            <a href="{{ route('siswa.billing.index', ['clear_draft' => 1]) }}" class="btn btn-outline-danger btn-sm" style="border-radius:10px">
+            <a href="<?php echo e(route('siswa.billing.index', ['clear_draft' => 1])); ?>" class="btn btn-outline-danger btn-sm" style="border-radius:10px">
                 <i class="bi bi-trash me-1"></i>Hapus Semua
             </a>
         </div>
 
         <div class="row g-3">
-            @foreach($draftCourses as $course)
-            @php
+            <?php $__currentLoopData = $draftCourses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php
                 $fee = $fees[$course->id] ?? 0;
                 $payment = $payments[$course->id] ?? null;
-            @endphp
+            ?>
             <div class="col-md-6">
                 <div class="p-3 rounded-3" style="background:var(--card-bg);border:1px solid var(--card-border)">
                     <div class="d-flex align-items-start justify-content-between gap-3 mb-2">
@@ -137,52 +136,53 @@
                                 <i class="bi bi-journal-bookmark-fill text-primary" style="font-size:16px"></i>
                             </div>
                             <div>
-                                <div class="fw-bold" style="font-size:13px;color:var(--text-primary)">{{ $course->nama }}</div>
-                                <div class="text-muted" style="font-size:11px">{{ $course->cabang->name ?? 'Pusat' }}</div>
+                                <div class="fw-bold" style="font-size:13px;color:var(--text-primary)"><?php echo e($course->nama); ?></div>
+                                <div class="text-muted" style="font-size:11px"><?php echo e($course->cabang->name ?? 'Pusat'); ?></div>
                             </div>
                         </div>
-                        <a href="{{ route('siswa.billing.index', ['remove_course' => $course->id]) }}" class="text-danger" style="font-size:18px" title="Hapus">
+                        <a href="<?php echo e(route('siswa.billing.index', ['remove_course' => $course->id])); ?>" class="text-danger" style="font-size:18px" title="Hapus">
                             <i class="bi bi-x-circle"></i>
                         </a>
                     </div>
                     <div class="d-flex align-items-center justify-content-between">
                         <div class="fw-bold" style="font-size:15px;color:var(--primary)">
-                            Rp {{ number_format($fee, 0, ',', '.') }}
+                            Rp <?php echo e(number_format($fee, 0, ',', '.')); ?>
+
                         </div>
-                        @if(!$payment || $payment->status === 'rejected')
+                        <?php if(!$payment || $payment->status === 'rejected'): ?>
                         <button class="btn btn-primary btn-sm px-3"
                                 data-bs-toggle="modal"
-                                data-bs-target="#payModal{{ $course->id }}"
+                                data-bs-target="#payModal<?php echo e($course->id); ?>"
                                 style="border-radius:10px;font-size:12px">
                             <i class="bi bi-upload me-1"></i>Bayar
                         </button>
-                        @elseif($payment->status === 'pending')
+                        <?php elseif($payment->status === 'pending'): ?>
                         <span class="badge bg-warning" style="font-size:11px">
                             <i class="bi bi-hourglass-split me-1"></i>Menunggu
                         </span>
-                        @else
+                        <?php else: ?>
                         <span class="badge bg-success" style="font-size:11px">
                             <i class="bi bi-check-circle me-1"></i>Lunas
                         </span>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
 
-        @php $totalDraft = $draftCourses->sum(function($c) use ($fees) { return $fees[$c->id] ?? 0; }); @endphp
+        <?php $totalDraft = $draftCourses->sum(function($c) use ($fees) { return $fees[$c->id] ?? 0; }); ?>
         <div class="mt-3 pt-3 d-flex align-items-center justify-content-between" style="border-top:1px solid rgba(200,77,223,.2)">
-            <span class="fw-bold" style="color:var(--primary)">Total: Rp {{ number_format($totalDraft, 0, ',', '.') }}</span>
-            <a href="{{ route('siswa.courses.fees') }}" class="btn btn-outline-primary btn-sm" style="border-radius:10px">
+            <span class="fw-bold" style="color:var(--primary)">Total: Rp <?php echo e(number_format($totalDraft, 0, ',', '.')); ?></span>
+            <a href="<?php echo e(route('siswa.courses.fees')); ?>" class="btn btn-outline-primary btn-sm" style="border-radius:10px">
                 <i class="bi bi-plus-lg me-1"></i>Tambah Mata Pelajaran
             </a>
         </div>
 
-        {{-- PAYMENT MODALS FOR DRAFT COURSES --}}
-        @foreach($draftCourses as $course)
-        @php $fee = $fees[$course->id] ?? 0; @endphp
-        <div class="modal fade" id="payModal{{ $course->id }}" tabindex="-1" aria-labelledby="payLabel{{ $course->id }}">
+        
+        <?php $__currentLoopData = $draftCourses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <?php $fee = $fees[$course->id] ?? 0; ?>
+        <div class="modal fade" id="payModal<?php echo e($course->id); ?>" tabindex="-1" aria-labelledby="payLabel<?php echo e($course->id); ?>">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content" style="border-radius:20px;border:none;overflow:hidden">
                     <div class="modal-header border-0 p-4"
@@ -192,14 +192,14 @@
                                 <i class="bi bi-upload"></i>
                             </div>
                             <div>
-                                <h6 class="modal-title fw-bold mb-0" id="payLabel{{ $course->id }}">Upload Bukti Pembayaran</h6>
-                                <div style="font-size:12px;opacity:.75">{{ $course->nama }}</div>
+                                <h6 class="modal-title fw-bold mb-0" id="payLabel<?php echo e($course->id); ?>">Upload Bukti Pembayaran</h6>
+                                <div style="font-size:12px;opacity:.75"><?php echo e($course->nama); ?></div>
                             </div>
                         </div>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
-                    <form action="{{ route('siswa.billing.pay', $course->id) }}" method="POST" enctype="multipart/form-data">
-                        @csrf
+                    <form action="<?php echo e(route('siswa.billing.pay', $course->id)); ?>" method="POST" enctype="multipart/form-data">
+                        <?php echo csrf_field(); ?>
                         <div class="modal-body p-4">
                             <div class="p-3 rounded-3 mb-4"
                                  style="background:var(--soft-primary-bg);border:1px solid var(--soft-primary-border)">
@@ -208,9 +208,10 @@
                                         <i class="bi bi-tag me-1"></i>Total Pembayaran
                                     </span>
                                     <span style="font-size:16px;font-weight:800;color:var(--primary)">
-                                        @if($fee > 0) Rp {{ number_format($fee, 0, ',', '.') }}
-                                        @else <span class="text-success">Gratis</span>
-                                        @endif
+                                        <?php if($fee > 0): ?> Rp <?php echo e(number_format($fee, 0, ',', '.')); ?>
+
+                                        <?php else: ?> <span class="text-success">Gratis</span>
+                                        <?php endif; ?>
                                     </span>
                                 </div>
                             </div>
@@ -254,9 +255,9 @@
                 </div>
             </div>
         </div>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
-    @endif
+    <?php endif; ?>
 
     <div class="d-flex align-items-center justify-content-between mb-4">
         <div>
@@ -267,7 +268,7 @@
         </div>
     </div>
 
-    @if($courses->isEmpty())
+    <?php if($courses->isEmpty()): ?>
     <div class="text-center py-5">
         <div style="width:80px;height:80px;border-radius:50%;background:var(--input-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
             <i class="bi bi-journal-x text-muted" style="font-size:2rem;opacity:.5"></i>
@@ -275,20 +276,20 @@
         <h6 class="fw-semibold mb-2" style="color:var(--text-primary)">Belum Ada Tagihan</h6>
         <p class="text-muted mb-0" style="font-size:13px">Anda belum terdaftar di mata pelajaran apapun.</p>
     </div>
-    @else
-    @php
+    <?php else: ?>
+    <?php
         $enrolledCourses = $courses->filter(function($c) use ($draftCourses) {
             return !$draftCourses || !$draftCourses->contains('id', $c->id);
         });
-    @endphp
-    @if($enrolledCourses->isEmpty())
+    ?>
+    <?php if($enrolledCourses->isEmpty()): ?>
     <div class="text-center py-4">
         <p class="text-muted mb-0" style="font-size:13px">Tidak ada tagihan lain selain yang ada di keranjang.</p>
     </div>
-    @else
+    <?php else: ?>
     <div class="row g-3">
-        @foreach($enrolledCourses as $course)
-        @php
+        <?php $__currentLoopData = $enrolledCourses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <?php
             $payment  = $payments[$course->id] ?? null;
             $fee      = $fees[$course->id] ?? 0;
             $statusMap = [
@@ -297,9 +298,9 @@
                 'rejected' => ['bg'=>'var(--soft-danger-bg)','color'=>'var(--soft-danger-text)','icon'=>'bi-x-circle-fill','label'=>'Ditolak'],
             ];
             $badge = $payment ? ($statusMap[$payment->status] ?? $statusMap['pending']) : null;
-        @endphp
+        ?>
         <div class="col-md-6">
-            <div class="p-4 rounded-3 h-100" id="billing-card-{{ $course->id }}"
+            <div class="p-4 rounded-3 h-100" id="billing-card-<?php echo e($course->id); ?>"
                  style="background:var(--input-bg);border:1.5px solid var(--card-border)">
                 <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
                     <div class="d-flex align-items-center gap-3">
@@ -307,74 +308,78 @@
                             <i class="bi bi-journal-bookmark-fill text-primary" style="font-size:18px"></i>
                         </div>
                         <div>
-                            <div class="fw-bold" style="font-size:14px;color:var(--text-primary)">{{ $course->nama }}</div>
+                            <div class="fw-bold" style="font-size:14px;color:var(--text-primary)"><?php echo e($course->nama); ?></div>
                             <div class="text-muted" style="font-size:12px">
-                                @if($course->deskripsi)
-                                    {{ Str::limit($course->deskripsi, 40) }}
-                                @else
+                                <?php if($course->deskripsi): ?>
+                                    <?php echo e(Str::limit($course->deskripsi, 40)); ?>
+
+                                <?php else: ?>
                                     Mata pelajaran
-                                @endif
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
-                    @if($badge)
+                    <?php if($badge): ?>
                     <span class="badge flex-shrink-0"
-                          style="background:{{ $badge['bg'] }};color:{{ $badge['color'] }};padding:5px 11px;border-radius:8px;font-size:11px;font-weight:600;white-space:nowrap">
-                        <i class="bi {{ $badge['icon'] }} me-1"></i>{{ $badge['label'] }}
+                          style="background:<?php echo e($badge['bg']); ?>;color:<?php echo e($badge['color']); ?>;padding:5px 11px;border-radius:8px;font-size:11px;font-weight:600;white-space:nowrap">
+                        <i class="bi <?php echo e($badge['icon']); ?> me-1"></i><?php echo e($badge['label']); ?>
+
                     </span>
-                    @else
+                    <?php else: ?>
                     <span class="badge flex-shrink-0"
                           style="background:var(--soft-danger-bg);color:var(--soft-danger-text);padding:5px 11px;border-radius:8px;font-size:11px;font-weight:600;white-space:nowrap">
                         <i class="bi bi-clock me-1"></i>Belum Bayar
                     </span>
-                    @endif
+                    <?php endif; ?>
                 </div>
 
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <div class="text-muted" style="font-size:11px;margin-bottom:2px">Biaya</div>
-                        <div class="fw-bold" style="font-size:16px;color:{{ $payment && $payment->status==='verified' ? '#059669' : 'var(--text-primary)' }}">
-                            @if($fee > 0)
-                                Rp {{ number_format($fee, 0, ',', '.') }}
-                            @else
+                        <div class="fw-bold" style="font-size:16px;color:<?php echo e($payment && $payment->status==='verified' ? '#059669' : 'var(--text-primary)'); ?>">
+                            <?php if($fee > 0): ?>
+                                Rp <?php echo e(number_format($fee, 0, ',', '.')); ?>
+
+                            <?php else: ?>
                                 <span class="text-success">Gratis</span>
-                            @endif
+                            <?php endif; ?>
                         </div>
                     </div>
 
-                    @if(!$payment || $payment->status === 'rejected')
+                    <?php if(!$payment || $payment->status === 'rejected'): ?>
                         <button class="btn btn-primary btn-sm px-3"
                                 data-bs-toggle="modal"
-                                data-bs-target="#payModal{{ $course->id }}"
+                                data-bs-target="#payModal<?php echo e($course->id); ?>"
                                 style="border-radius:10px;font-size:12.5px">
                             <i class="bi bi-upload me-1"></i>
-                            {{ $payment && $payment->status==='rejected' ? 'Upload Ulang' : 'Bayar Sekarang' }}
+                            <?php echo e($payment && $payment->status==='rejected' ? 'Upload Ulang' : 'Bayar Sekarang'); ?>
+
                         </button>
-                    @elseif($payment->status === 'pending')
+                    <?php elseif($payment->status === 'pending'): ?>
                         <button class="btn btn-sm" disabled
                                 style="background:var(--soft-warning-bg);color:var(--soft-warning-text);border:none;border-radius:10px;font-size:12.5px">
                             <i class="bi bi-hourglass me-1"></i>Menunggu
                         </button>
-                    @else
+                    <?php else: ?>
                         <button class="btn btn-sm" disabled
                                 style="background:var(--soft-success-bg);color:var(--soft-success-text);border:none;border-radius:10px;font-size:12.5px">
                             <i class="bi bi-check2 me-1"></i>Lunas
                         </button>
-                    @endif
+                    <?php endif; ?>
                 </div>
 
-                @if($payment && $payment->status === 'rejected')
+                <?php if($payment && $payment->status === 'rejected'): ?>
                 <div class="mt-2 p-2 rounded-2" style="background:var(--soft-danger-bg);border:1px solid var(--soft-danger-border)">
                     <div style="font-size:11.5px;color:var(--soft-danger-text)">
                         <i class="bi bi-info-circle me-1"></i>Bukti pembayaran ditolak. Silakan upload ulang.
                     </div>
                 </div>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
 
-        {{-- PAYMENT MODAL --}}
-        <div class="modal fade" id="payModal{{ $course->id }}" tabindex="-1" aria-labelledby="payLabel{{ $course->id }}">
+        
+        <div class="modal fade" id="payModal<?php echo e($course->id); ?>" tabindex="-1" aria-labelledby="payLabel<?php echo e($course->id); ?>">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content" style="border-radius:20px;border:none;overflow:hidden">
                     <div class="modal-header border-0 p-4"
@@ -384,14 +389,14 @@
                                 <i class="bi bi-upload"></i>
                             </div>
                             <div>
-                                <h6 class="modal-title fw-bold mb-0" id="payLabel{{ $course->id }}">Upload Bukti Pembayaran</h6>
-                                <div style="font-size:12px;opacity:.75">{{ $course->nama }}</div>
+                                <h6 class="modal-title fw-bold mb-0" id="payLabel<?php echo e($course->id); ?>">Upload Bukti Pembayaran</h6>
+                                <div style="font-size:12px;opacity:.75"><?php echo e($course->nama); ?></div>
                             </div>
                         </div>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
-                    <form action="{{ route('siswa.billing.pay', $course->id) }}" method="POST" enctype="multipart/form-data">
-                        @csrf
+                    <form action="<?php echo e(route('siswa.billing.pay', $course->id)); ?>" method="POST" enctype="multipart/form-data">
+                        <?php echo csrf_field(); ?>
                         <div class="modal-body p-4">
                             <div class="p-3 rounded-3 mb-4"
                                  style="background:var(--soft-primary-bg);border:1px solid var(--soft-primary-border)">
@@ -400,9 +405,10 @@
                                         <i class="bi bi-tag me-1"></i>Total Pembayaran
                                     </span>
                                     <span style="font-size:16px;font-weight:800;color:var(--primary)">
-                                        @if($fee > 0) Rp {{ number_format($fee, 0, ',', '.') }}
-                                        @else <span class="text-success">Gratis</span>
-                                        @endif
+                                        <?php if($fee > 0): ?> Rp <?php echo e(number_format($fee, 0, ',', '.')); ?>
+
+                                        <?php else: ?> <span class="text-success">Gratis</span>
+                                        <?php endif; ?>
                                     </span>
                                 </div>
                             </div>
@@ -446,26 +452,26 @@
                 </div>
             </div>
         </div>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
-    @endif
-    @endif
+    <?php endif; ?>
+    <?php endif; ?>
 
 </div>
 
-{{-- TAGIHAN DARI REGISTRASI --}}
-@if(isset($invoices) && $invoices->isNotEmpty())
+
+<?php if(isset($invoices) && $invoices->isNotEmpty()): ?>
 <div class="dashboard-card fade-up mt-4">
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h6 class="fw-bold mb-0">
             <i class="bi bi-receipt me-2 text-primary"></i>Tagihan Registrasi
-            <span class="badge ms-1" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:11px">{{ $invoices->count() }}</span>
+            <span class="badge ms-1" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:11px"><?php echo e($invoices->count()); ?></span>
         </h6>
     </div>
 
     <div class="row g-3">
-        @foreach($invoices as $inv)
-        @php
+        <?php $__currentLoopData = $invoices; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $inv): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <?php
             $sc = match($inv->status) {
                 'lunas'    => ['bg'=>'var(--soft-success-bg)','color'=>'var(--soft-success-text)','label'=>'Lunas','icon'=>'bi-check-circle-fill'],
                 'sebagian' => ['bg'=>'var(--soft-warning-bg)','color'=>'var(--soft-warning-text)','label'=>'Sebagian Bayar','icon'=>'bi-dash-circle-fill'],
@@ -477,74 +483,77 @@
             if ($inv->status === 'sebagian') {
                 $paid = \App\Models\Payment::where('invoice_id', $inv->id)->where('status', 'verified')->sum('jumlah');
             }
-        @endphp
+        ?>
 
         <div class="col-md-6">
-            <div class="p-4 rounded-3 h-100" style="background:var(--input-bg);border:1.5px solid {{ $isOverdue && $inv->status !== 'lunas' ? '#fca5a5' : 'var(--card-border)' }}">
+            <div class="p-4 rounded-3 h-100" style="background:var(--input-bg);border:1.5px solid <?php echo e($isOverdue && $inv->status !== 'lunas' ? '#fca5a5' : 'var(--card-border)'); ?>">
                 <div class="d-flex align-items-start justify-content-between gap-2 mb-3">
                     <div>
-                        <div class="fw-bold" style="font-size:13px;color:var(--text-primary)">{{ $inv->deskripsi ?? 'Tagihan Registrasi' }}</div>
-                        <div class="text-muted" style="font-size:11px;font-family:monospace">{{ $inv->nomor_invoice ?? '—' }}</div>
+                        <div class="fw-bold" style="font-size:13px;color:var(--text-primary)"><?php echo e($inv->deskripsi ?? 'Tagihan Registrasi'); ?></div>
+                        <div class="text-muted" style="font-size:11px;font-family:monospace"><?php echo e($inv->nomor_invoice ?? '—'); ?></div>
                     </div>
-                    <span class="badge flex-shrink-0" style="background:{{ $sc['bg'] }};color:{{ $sc['color'] }};padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600">
-                        <i class="bi {{ $sc['icon'] }} me-1"></i>{{ $sc['label'] }}
+                    <span class="badge flex-shrink-0" style="background:<?php echo e($sc['bg']); ?>;color:<?php echo e($sc['color']); ?>;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600">
+                        <i class="bi <?php echo e($sc['icon']); ?> me-1"></i><?php echo e($sc['label']); ?>
+
                     </span>
                 </div>
 
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
-                        <div class="fw-bold" style="font-size:17px;color:{{ $inv->status === 'lunas' ? '#059669' : 'var(--text-primary)' }}">
-                            Rp {{ number_format($inv->total, 0, ',', '.') }}
+                        <div class="fw-bold" style="font-size:17px;color:<?php echo e($inv->status === 'lunas' ? '#059669' : 'var(--text-primary)'); ?>">
+                            Rp <?php echo e(number_format($inv->total, 0, ',', '.')); ?>
+
                         </div>
-                        <div style="font-size:11px;color:{{ $isOverdue ? '#dc2626' : 'var(--text-muted)' }}">
-                            Jatuh tempo: {{ $inv->jatuh_tempo?->format('d M Y') ?? '—' }}
-                            @if($isOverdue)
+                        <div style="font-size:11px;color:<?php echo e($isOverdue ? '#dc2626' : 'var(--text-muted)'); ?>">
+                            Jatuh tempo: <?php echo e($inv->jatuh_tempo?->format('d M Y') ?? '—'); ?>
+
+                            <?php if($isOverdue): ?>
                                 <i class="bi bi-exclamation-triangle-fill ms-1"></i>Lewat jatuh tempo
-                            @endif
+                            <?php endif; ?>
                         </div>
                     </div>
 
-                    @if($inv->status === 'lunas')
+                    <?php if($inv->status === 'lunas'): ?>
                         <span class="btn btn-sm" disabled style="background:var(--soft-success-bg);color:var(--soft-success-text);border:none;border-radius:10px;font-size:12px">
                             <i class="bi bi-check2 me-1"></i>Lunas
                         </span>
-                    @elseif($pendingPayment)
+                    <?php elseif($pendingPayment): ?>
                         <span class="btn btn-sm" disabled style="background:var(--soft-warning-bg);color:var(--soft-warning-text);border:none;border-radius:10px;font-size:12px">
                             <i class="bi bi-hourglass me-1"></i>Menunggu
                         </span>
-                    @else
+                    <?php else: ?>
                         <button class="btn btn-primary btn-sm px-3"
                                 data-bs-toggle="modal"
-                                data-bs-target="#invPayModal{{ $inv->id }}"
+                                data-bs-target="#invPayModal<?php echo e($inv->id); ?>"
                                 style="border-radius:10px;font-size:12.5px">
                             <i class="bi bi-upload me-1"></i>Bayar Sekarang
                         </button>
-                    @endif
+                    <?php endif; ?>
                 </div>
 
-                @if($inv->status === 'sebagian')
+                <?php if($inv->status === 'sebagian'): ?>
                 <div class="mt-2 pt-2" style="border-top:1px solid var(--card-border)">
                     <div class="d-flex justify-content-between" style="font-size:12px;color:var(--text-muted)">
                         <span>Sudah dibayar</span>
-                        <span class="text-success fw-semibold">Rp {{ number_format($paid,0,',','.') }}</span>
+                        <span class="text-success fw-semibold">Rp <?php echo e(number_format($paid,0,',','.')); ?></span>
                     </div>
                     <div class="d-flex justify-content-between" style="font-size:12px;color:var(--text-muted)">
                         <span>Sisa tagihan</span>
-                        <span class="fw-semibold" style="color:#dc2626">Rp {{ number_format($inv->total - $paid,0,',','.') }}</span>
+                        <span class="fw-semibold" style="color:#dc2626">Rp <?php echo e(number_format($inv->total - $paid,0,',','.')); ?></span>
                     </div>
                 </div>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
 
-    @foreach($invoices as $inv)
-    @php
+    <?php $__currentLoopData = $invoices; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $inv): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+    <?php
         $pendingPayment = \App\Models\Payment::where('invoice_id', $inv->id)->where('status','pending')->first();
-    @endphp
-    @if($inv->status !== 'lunas' && !$pendingPayment)
-    <div class="modal fade" id="invPayModal{{ $inv->id }}" tabindex="-1">
+    ?>
+    <?php if($inv->status !== 'lunas' && !$pendingPayment): ?>
+    <div class="modal fade" id="invPayModal<?php echo e($inv->id); ?>" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" style="border-radius:20px;border:none;overflow:hidden">
                 <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#260632,#68117e);color:white">
@@ -554,13 +563,13 @@
                         </div>
                         <div>
                             <h6 class="modal-title fw-bold mb-0">Upload Bukti Pembayaran</h6>
-                            <div style="font-size:12px;opacity:.75">{{ $inv->deskripsi ?? $inv->nomor_invoice }}</div>
+                            <div style="font-size:12px;opacity:.75"><?php echo e($inv->deskripsi ?? $inv->nomor_invoice); ?></div>
                         </div>
                     </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="{{ route('siswa.billing.invoice-upload', $inv) }}" method="POST" enctype="multipart/form-data">
-                    @csrf
+                <form action="<?php echo e(route('siswa.billing.invoice-upload', $inv)); ?>" method="POST" enctype="multipart/form-data">
+                    <?php echo csrf_field(); ?>
                     <div class="modal-body p-4">
                         <div class="p-3 rounded-3 mb-3" style="background:var(--soft-primary-bg);border:1px solid var(--soft-primary-border)">
                             <div class="d-flex justify-content-between align-items-center">
@@ -568,14 +577,15 @@
                                     <i class="bi bi-tag me-1"></i>Total Tagihan
                                 </span>
                                 <span style="font-size:16px;font-weight:800;color:var(--primary)">
-                                    Rp {{ number_format($inv->total, 0, ',', '.') }}
+                                    Rp <?php echo e(number_format($inv->total, 0, ',', '.')); ?>
+
                                 </span>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold" style="font-size:13px">Jumlah Dibayar <span class="text-danger">*</span></label>
                             <input type="number" name="jumlah" class="form-control" required
-                                   value="{{ $inv->total }}" min="1000"
+                                   value="<?php echo e($inv->total); ?>" min="1000"
                                    style="border-radius:10px;border-color:var(--card-border);background:var(--input-bg)">
                         </div>
                         <div class="mb-3">
@@ -612,9 +622,11 @@
             </div>
         </div>
     </div>
-    @endif
-    @endforeach
+    <?php endif; ?>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 </div>
-@endif
+<?php endif; ?>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\Edu Juanda Pratama\Downloads\smart-center-indonesia\smart-center-indonesia\resources\views/siswa/billing/index.blade.php ENDPATH**/ ?>
