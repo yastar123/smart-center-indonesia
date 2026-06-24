@@ -50,12 +50,12 @@ class ScheduleDashboardController extends Controller
                 }
 
                 // Display info: prefer kelas, fall back to paket + schedule guru
-                $className   = $s->kelas->nama_kelas
-                    ?? ($s->paket->nama ?? '—');
-                $teacherName = $s->kelas->guru->name
-                    ?? ($s->guru->name ?? ($s->paket->guru->name ?? '—'));
-                $subjectName = $s->kelas->mataPelajaran->nama
-                    ?? ($s->paket->mataPelajaran->first()->nama ?? '—');
+                $className   = $s->kelas?->nama_kelas
+                    ?? ($s->paket?->nama ?? '—');
+                $teacherName = $s->kelas?->guru?->name
+                    ?? ($s->guru?->name ?? ($s->paket?->guru?->name ?? '—'));
+                $subjectName = $s->kelas?->mataPelajaran?->nama
+                    ?? ($s->paket?->mataPelajaran?->first()?->nama ?? '—');
 
                 return [
                     'id'             => $s->id,

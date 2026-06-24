@@ -225,8 +225,8 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::get('/billing/payments/pending',  [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'index'])->name('billing.payments-pending');
 
         // SCHEDULE LIST & CREATE (aliases to existing schedules)
-        Route::get('/schedule-list',  fn() => redirect()->route('admin.schedules.index'))  ->name('schedule-list.index');
-        Route::get('/schedule-create',fn() => redirect()->route('admin.schedules.index'))  ->name('schedule-create.index');
+        Route::get('/schedule-list',   fn() => redirect()->route('admin.schedules.index'))  ->name('schedule-list.index');
+        Route::get('/schedule-create', fn() => redirect()->route('admin.schedules.create'))->name('schedule-create.index');
 
         // LANDING PAGE CONTENT
         Route::get('/landing',                                          [\App\Http\Controllers\Admin\LandingContentController::class, 'index'])             ->name('landing.index');
