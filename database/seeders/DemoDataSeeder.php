@@ -478,6 +478,7 @@ class DemoDataSeeder extends Seeder
         // ------------------------------------------------------------------ //
         // 10. INVOICE & PEMBAYARAN                                             //
         // ------------------------------------------------------------------ //
+        $today          = \Carbon\Carbon::today();
         $invoiceCounter = 1;
         $bulanLalu      = $today->copy()->subMonth();
 
