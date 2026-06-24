@@ -40,6 +40,10 @@ EOF
 
 echo "Generated .env file"
 
+# Ensure required storage directories exist
+mkdir -p storage/framework/views storage/framework/cache/data storage/framework/sessions storage/logs
+chmod -R 775 storage/ bootstrap/cache/
+
 # Clear config cache
 php artisan config:clear 2>/dev/null || true
 php artisan cache:clear 2>/dev/null || true
