@@ -118,10 +118,17 @@ class ScheduleController extends Controller
         return redirect()->route('admin.schedules.create')->with('success', 'Jadwal sesi berhasil ditambahkan!');
     }
 
-    public function show(Schedule $schedule)
+    public function show(Request $request, Schedule $schedule)
     {
-        $schedule->load(['paket.guru', 'paket.mataPelajaran', 'paket.cabang', 'guru', 'cabang']);
-        return response()->json(['success' => true, 'data' => $schedule]);
+        $schedule->load(['paket.guru', 'paket.mataPelajaran', 'paket.cabang', 'guru', 'cabang', 'module']);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'data' => $schedule]);
+        }
+
+        $absensi = $schedule->absensi()->with('siswa')->orderBy('id')->get();
+
+        return view('admin.schedules.show', compact('schedule', 'absensi'));
     }
 
     public function update(Request $request, Schedule $schedule)
