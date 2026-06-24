@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
-    <title>Formulir Pendaftaran | Ayo Kursus</title>
+    <title>Formulir Pendaftaran | Smart Center Indonesia</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
@@ -385,7 +385,7 @@
     <div class="form-layout">
         <section class="visual-panel">
             <div class="visual-content">
-                <span class="visual-badge"><i class="bi bi-stars me-1"></i> Ayo Kursus</span>
+                <span class="visual-badge"><i class="bi bi-mortarboard-fill me-1"></i> Smart Center Indonesia</span>
                 <h2>Daftar sekarang dan mulai perjalanan belajar Anda.</h2>
                 <p>Tim pengajar profesional siap membantu siswa belajar dengan metode yang fleksibel, personal, dan sesuai kebutuhan.</p>
                 <ul class="visual-points">
@@ -399,7 +399,7 @@
         <section class="form-panel">
             <div class="form-card">
                 <div class="form-header">
-                    <div class="brand-badge"><i class="bi bi-stars me-1"></i> Ayo Kursus</div>
+                    <div class="brand-badge"><i class="bi bi-mortarboard-fill me-1"></i> Smart Center Indonesia</div>
                     <div class="brand-logo"><i class="bi bi-mortarboard-fill"></i></div>
                     <h4>Formulir Pendaftaran Siswa Baru</h4>
                     <p>Isi data dengan lengkap dan benar</p>

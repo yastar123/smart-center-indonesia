@@ -1,15 +1,41 @@
 @extends('layouts.app')
 
 @section('title', 'Verifikasi Pembayaran')
+@section('page-title', 'Verifikasi Pembayaran')
 
 @section('content')
-<div class="container-fluid py-4">
+<div>
 
-    {{-- HEADER --}}
-    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
-        <div>
-            <h4 class="fw-bold mb-1" style="font-size:22px">Verifikasi Pembayaran</h4>
-            <p class="text-muted mb-0" style="font-size:13px">Tinjau dan setujui bukti pembayaran yang diunggah siswa.</p>
+    {{-- HEADER BANNER --}}
+    <div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
+        <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%;pointer-events:none"></div>
+        <div style="position:absolute;right:80px;bottom:-50px;width:120px;height:120px;background:rgba(255,255,255,.03);border-radius:50%;pointer-events:none"></div>
+        <div class="row align-items-center g-3" style="position:relative">
+            <div class="col-md-8">
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0" style="color:white">Verifikasi Pembayaran</h5>
+                        <span style="font-size:12px;opacity:.8">Tinjau dan setujui bukti pembayaran yang diunggah siswa</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="d-flex gap-2 justify-content-md-end flex-wrap">
+                    @if(($counts['pending'] ?? 0) > 0)
+                    <span class="badge fw-semibold px-3 py-2" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:10px;font-size:12px">
+                        <i class="bi bi-clock me-1"></i>{{ $counts['pending'] }} Menunggu
+                    </span>
+                    @endif
+                    @if(($pkgCounts['pending'] ?? 0) > 0)
+                    <span class="badge fw-semibold px-3 py-2" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:10px;font-size:12px">
+                        <i class="bi bi-box-seam me-1"></i>{{ $pkgCounts['pending'] }} Paket
+                    </span>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
 

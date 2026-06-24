@@ -53,7 +53,7 @@
                             </div>
                         @endforeach
                     @else
-                        <div class="small text-muted mb-0">Belum sama sekali siswa ini memiliki paket</div>
+                        <div class="small text-muted mb-0">Siswa ini belum memiliki paket</div>
                     @endif
                 </div>
             </div>

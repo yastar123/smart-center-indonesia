@@ -3567,8 +3567,8 @@
 
         <div class="topbar-right">
 
-            {{-- Landing page home link --}}
-            <a href="{{ url('/') }}" class="top-btn d-none d-md-flex" title="Beranda" style="text-decoration:none;align-items:center;">
+            {{-- Dashboard home link --}}
+            <a href="{{ route('dashboard') }}" class="top-btn d-none d-md-flex" title="Dashboard" style="text-decoration:none;align-items:center;">
                 <i class="bi bi-house-door" style="font-size:15px"></i>
             </a>
 

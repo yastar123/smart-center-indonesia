@@ -3,7 +3,7 @@
         'students' => \App\Models\Student::where('status','aktif')->count(),
         'teachers' => \App\Models\Teacher::where('status','aktif')->count(),
         'branches' => \App\Models\Branch::count(),
-        'schedules'=> \App\Models\Schedule::count(),
+        'classes'  => \App\Models\SchoolClass::count(),
     ];
 ?>
 <!DOCTYPE html>
@@ -384,8 +384,8 @@
     
     <div class="login-left">
 
-        <a href="<?php echo e(url('/')); ?>" style="display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,.6);font-size:.78rem;font-weight:600;text-decoration:none;margin-bottom:1.25rem;transition:color .2s;" onmouseover="this.style.color='rgba(255,255,255,.95)'" onmouseout="this.style.color='rgba(255,255,255,.6)'">
-            <i class="bi bi-arrow-left" style="font-size:.8rem"></i> Kembali ke Beranda
+        <a href="<?php echo e(route('register')); ?>" style="display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,.6);font-size:.78rem;font-weight:600;text-decoration:none;margin-bottom:1.25rem;transition:color .2s;" onmouseover="this.style.color='rgba(255,255,255,.95)'" onmouseout="this.style.color='rgba(255,255,255,.6)'">
+            <i class="bi bi-person-plus" style="font-size:.8rem"></i> Daftar sebagai Siswa Baru
         </a>
 
         <div class="brand-badge">
@@ -423,9 +423,9 @@
                 <span>Cabang Aktif</span>
             </div>
             <div class="feature-item">
-                <i class="bi bi-calendar-check-fill" style="color:#ab8db2"></i>
-                <div class="feature-num"><?php echo e($fmtStat($loginStats['schedules'])); ?><?php echo e($loginStats['schedules'] > 0 ? '+' : ''); ?></div>
-                <span>Sesi Belajar</span>
+                <i class="bi bi-journal-bookmark-fill" style="color:#ab8db2"></i>
+                <div class="feature-num"><?php echo e($fmtStat($loginStats['classes'])); ?><?php echo e($loginStats['classes'] > 0 ? '+' : ''); ?></div>
+                <span>Kelas Tersedia</span>
             </div>
             <div class="feature-item">
                 <i class="bi bi-cash-stack" style="color:#f6af23"></i>
@@ -561,9 +561,9 @@ unset($__errorArgs, $__bag); ?>"
                     <span>gurusci@gmail.com / <b>password123</b></span>
                     <i class="bi bi-cursor-fill ms-auto" style="font-size:.65rem;opacity:.4"></i>
                 </div>
-                <div class="demo-row" data-email="siswasci@gmail.com" data-password="password12" title="Klik untuk isi otomatis">
+                <div class="demo-row" data-email="andi.nugroho@siswa.com" data-password="siswa123" title="Klik untuk isi otomatis">
                     <span class="demo-role siswa">Siswa</span>
-                    <span>siswasci@gmail.com / <b>password12</b></span>
+                    <span>andi.nugroho@siswa.com / <b>siswa123</b></span>
                     <i class="bi bi-cursor-fill ms-auto" style="font-size:.65rem;opacity:.4"></i>
                 </div>
             </div>

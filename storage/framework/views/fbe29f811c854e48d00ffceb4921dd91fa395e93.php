@@ -3674,8 +3674,8 @@
     <?php endif; ?>
     <?php if (\Illuminate\Support\Facades\Blade::check('role', 'siswa')): ?>
     
-    <a href="<?php echo e(route('siswa.courses.index')); ?>" class="mob-nav-item <?php echo e(request()->routeIs('siswa.courses*') ? 'active' : ''); ?>">
-        <i class="bi bi-journal-bookmark<?php echo e(request()->routeIs('siswa.courses*') ? '-fill' : ''); ?>"></i>
+    <a href="<?php echo e(route('siswa.courses.index')); ?>" class="mob-nav-item <?php echo e(request()->routeIs('siswa.courses.index') ? 'active' : ''); ?>">
+        <i class="bi bi-journal-bookmark<?php echo e(request()->routeIs('siswa.courses.index') ? '-fill' : ''); ?>"></i>
         <span>Mapel</span>
     </a>
     <a href="<?php echo e(route('siswa.courses.fees')); ?>" class="mob-nav-item <?php echo e(request()->routeIs('siswa.courses.fees') ? 'active' : ''); ?>">
