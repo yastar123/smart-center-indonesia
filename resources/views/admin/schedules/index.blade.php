@@ -264,6 +264,14 @@
                             <option value="">— Pilih dulu paket —</option>
                         </select>
                     </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:12px">Metode Kelas <span class="text-danger">*</span></label>
+                        <select id="sc_jenis" class="form-select">
+                            <option value="offline">🏫 Offline (Tatap Muka)</option>
+                            <option value="online">💻 Online</option>
+                            <option value="private">👤 Private</option>
+                        </select>
+                    </div>
                     <div class="col-md-6" id="statusScWrap" style="display:none">
                         <label class="form-label fw-semibold" style="font-size:12px">Status</label>
                         <select id="sc_status" class="form-select">
@@ -344,11 +352,12 @@ function fmtWib(t) {
 const paketData = {};
 @foreach($pakets as $p)
 paketData[{{ $p->id }}] = {
-    nama:   @json($p->nama),
-    guru:   @json($p->guru?->name ?? '–'),
-    mapel:  @json($p->mataPelajaran->pluck('nama')->join(', ') ?: '–'),
-    jenis:  @json($p->jenis),
-    jumlah: {{ $p->jumlah_pertemuan }},
+    nama:      @json($p->nama),
+    guru:      @json($p->guru?->name ?? '–'),
+    mapel:     @json($p->mataPelajaran->pluck('nama')->join(', ') ?: '–'),
+    jenis:     @json($p->jenis),
+    tipeKelas: @json($p->tipe_kelas ?? 'offline'),
+    jumlah:    {{ $p->jumlah_pertemuan }},
 };
 @endforeach
 
@@ -368,6 +377,13 @@ function onPaketChange(paketId, currentSesi) {
     document.getElementById('paketInfoName').textContent = p.nama + ' — ' + p.mapel;
     document.getElementById('paketInfoMeta').textContent = 'Guru: ' + p.guru + ' | Jenis: ' + p.jenis;
     box.style.display = 'block';
+
+    // Auto-set delivery method from package tipe_kelas
+    const jenisEl = document.getElementById('sc_jenis');
+    if (jenisEl) {
+        const validJenis = ['online', 'offline', 'private'];
+        jenisEl.value = validJenis.includes(p.tipeKelas) ? p.tipeKelas : 'offline';
+    }
 
     fetch(`/admin/schedules?paket_id=${paketId}&all=1`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -408,6 +424,7 @@ function openModal() {
     document.getElementById('jam_selesai').value   = '';
     document.getElementById('ruangan').value       = '';
     document.getElementById('link_meeting').value  = '';
+    document.getElementById('sc_jenis').value      = 'offline';
     document.getElementById('paketInfoBox').style.display  = 'none';
     document.getElementById('statusScWrap').style.display  = 'none';
     new bootstrap.Modal('#scheduleModal').show();
@@ -434,6 +451,7 @@ function saveSchedule() {
     const payload = {
         _token:       document.querySelector('meta[name=csrf-token]').content,
         paket_id:     paketId,
+        jenis:        document.getElementById('sc_jenis').value || 'offline',
         pertemuan_ke: sesiKe,
         tanggal:      tgl,
         jam_mulai:    jMulai,

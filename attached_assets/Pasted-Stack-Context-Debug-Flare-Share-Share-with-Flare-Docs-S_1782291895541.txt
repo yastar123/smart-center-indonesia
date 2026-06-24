@@ -1,0 +1,410 @@
+Stack
+Context
+Debug
+Flare
+Share
+Share with Flare
+Docs
+
+Stack
+
+Context
+
+Debug
+Create Share
+Docs
+
+Ignition Settings
+Docs
+Editor
+
+PhpStorm
+Theme
+auto
+Save settings
+Settings will be saved locally in ~/.ignition.json.
+
+SQLSTATE[01000]: Warning: 1265 Data truncated for column 'jenis' at row 1 (SQL: insert into `schedules` (`paket_id`, `module_id`, `guru_id`, `pertemuan_ke`, `tanggal`, `jam_mulai`, `jam_selesai`, `topik`, `ruangan`, `link_meeting`, `catatan`, `cabang_id`, `jenis`, `status`, `updated_at`, `created_at`) values (1, ?, 1, 1, 2026-06-24 00:00:00, 16:05, 16:10, ?, ?, ?, ?, 2, reguler, dijadwalkan, 2026-06-24 16:04:34, 2026-06-24 16:04:34))
+Illuminate
+ \ 
+Database
+ \ 
+QueryException
+PHP 8.3.8
+9.52.21
+SQLSTATE[01000]: Warning: 1265 Data truncated for column 'jenis' at row 1
+insert into `schedules` (`paket_id`, `module_id`, `guru_id`, `pertemuan_ke`, `tanggal`, `jam_mulai`, `jam_selesai`, `topik`, `ruangan`, `link_meeting`, `catatan`, `cabang_id`, `jenis`, `status`, `updated_at`, `created_at`) values (1, ?, 1, 1, 2026-06-24 00:00:00, 16:05, 16:10, ?, ?, ?, ?, 2, reguler, dijadwalkan, 2026-06-24 16:04:34, 2026-06-24 16:04:34)
+
+
+
+Expand vendor frames
+16 vendor frames
+App
+ \ 
+Http
+ \ 
+Controllers
+ \ 
+Admin
+ \ 
+ScheduleController
+ 
+: 98
+store
+6 vendor frames
+App
+ \ 
+Http
+ \ 
+Middleware
+ \ 
+CheckBranchAccess
+ 
+: 33
+handle
+42 vendor frames
+C:\Users\Edu Juanda Pratama\Downloads\smart-center-indonesia\smart-center-indonesia\public\index
+.php
+ 
+: 51
+require_once
+1 vendor frame
+C:\Users\Edu Juanda Pratama\Downloads\smart-center-indonesia\smart-center-indonesia\app\Http\Controllers\Admin\ScheduleController
+.php
+ 
+: 98
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        if ($data['pertemuan_ke'] > $paket->jumlah_pertemuan) {
+
+            $msg = "Sesi ke-{$data['pertemuan_ke']} melebihi jumlah sesi paket ({$paket->jumlah_pertemuan}).";
+
+            if ($request->wantsJson() || $request->ajax()) {
+
+                return response()->json(['success' => false, 'message' => $msg], 422);
+
+            }
+
+            return back()->withErrors(['pertemuan_ke' => $msg])->withInput();
+
+        }
+
+
+
+        // Use form guru_id if provided, otherwise fall back to package's guru
+
+        $data['guru_id']   = $data['guru_id'] ?? $paket->guru_id;
+
+        $data['cabang_id'] = $paket->cabang_id;
+
+        $data['jenis']     = $paket->jenis;
+
+        $data['status']    = 'dijadwalkan';
+
+
+
+        $schedule = Schedule::create($data);
+
+        $schedule->load(['paket.guru', 'paket.mataPelajaran']);
+
+
+
+        if ($request->wantsJson() || $request->ajax()) {
+
+            return response()->json(['success' => true, 'message' => 'Jadwal sesi berhasil ditambahkan.', 'data' => $schedule]);
+
+        }
+
+        return redirect()->route('admin.schedules.create')->with('success', 'Jadwal sesi berhasil ditambahkan!');
+
+    }
+
+
+
+    public function show(Schedule $schedule)
+
+    {
+
+        $schedule->load(['paket.guru', 'paket.mataPelajaran', 'paket.cabang', 'guru', 'cabang']);
+
+        return response()->json(['success' => true, 'data' => $schedule]);
+
+    }
+
+App
+Routing
+Request
+Browser
+Headers
+Body
+Context
+User
+Versions
+Exception
+App
+Routing
+Controller
+App\Http\Controllers\Admin\ScheduleController@store
+
+Route name
+admin.schedules.store
+
+Middleware
+web
+
+auth
+
+role:admin|owner
+
+check.branch.access
+
+Request
+http://127.0.0.1:8000/admin/schedules
+POST
+curl "http://127.0.0.1:8000/admin/schedules" \
+   -X POST \
+   -H 'host: 127.0.0.1:8000' \
+   -H 'connection: keep-alive' \
+   -H 'content-length: 190' \
+   -H 'cache-control: max-age=0' \
+   -H 'sec-ch-ua: "Google Chrome";v="149", "Chromium";v="149", "Not)A;Brand";v="24"' \
+   -H 'sec-ch-ua-mobile: ?0' \
+   -H 'sec-ch-ua-platform: "Windows"' \
+   -H 'upgrade-insecure-requests: 1' \
+   -H 'content-type: application/x-www-form-urlencoded' \
+   -H 'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36' \
+   -H 'origin: http://127.0.0.1:8000' \
+   -H 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' \
+   -H 'sec-fetch-site: same-origin' \
+   -H 'sec-fetch-mode: navigate' \
+   -H 'sec-fetch-user: ?1' \
+   -H 'sec-fetch-dest: document' \
+   -H 'referer: http://127.0.0.1:8000/admin/schedules/create' \
+   -H 'accept-encoding: gzip, deflate, br, zstd' \
+   -H 'accept-language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7' \
+   -H 'cookie: XSRF-TOKEN=eyJpdiI6IlRsN1dQTVdoSDFzdDczditYZ0swb3c9PSIsInZhbHVlIjoidGdNNFJ4TVdGZC81UTcyaG54bUJBVUFkNW56QnF4RHdCRXNHd1h2K1ByWkhrRHJINGlWNERSQWQ3Y2tEWXlrOXd0Ty92Mm84KzZKRTFzMEMwOXNyZ0ltaFlKMUtoRFVqazhkbXVGa0ZDYXNhQkJWRFF0TjVJcWFsN2RhZ3lFZEwiLCJtYWMiOiIwYjdlZDZhNjMyMzBjNzVhNjc5MTA0MmJkNWZhNDVmYTNmMjFmNDJjYzkyMWEyMjk3YjFmZGY2ZTk5MDkxNzk3IiwidGFnIjoiIn0%3D; laravel_session=eyJpdiI6Imo1VEVGSUtabHp5Q25CUjZYaW9kWGc9PSIsInZhbHVlIjoiT1J2Umt0RXF3VXN3elowRzliK3BHMVRQMytCQkcvemgwL09iK3U5MCtpckl0SWVaWDhlR1UvTnBnd2JDRktDdk52L0pObnJ0WW8rV3lzc0VWanpDeWFHUHFlbDBwU3NEVDErVWJiWTlnUjBTTnVmdSt3T3YyQzFHVkFURzZlRmUiLCJtYWMiOiIzYjJiY2Q2NTVkMThiY2Q0NTgxYTJiNTRmOGIzMGMyMTUxZTM0YjY0MDE5OWExYmY4YzhmMGY5NWQ5YWE4MzViIiwidGFnIjoiIn0%3D' \
+   -F '_token=ReuLqQCelbpiOwDov9xAfJCgUMcb0h2IudAeDeeZ' -F 'paket_id=1' -F 'pertemuan_ke=1' -F 'guru_id=1' -F 'tanggal=2026-06-24' -F 'jam_mulai=16:05' -F 'jam_selesai=16:10' -F 'topik=null' -F 'module_id=null' -F 'ruangan=null' -F 'link_meeting=null' -F 'catatan=null'
+
+
+Browser
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36
+
+Headers
+host
+127.0.0.1:8000
+
+connection
+keep-alive
+
+content-length
+190
+
+cache-control
+max-age=0
+
+sec-ch-ua
+"Google Chrome";v="149", "Chromium";v="149", "Not)A;Brand";v="24"
+
+sec-ch-ua-mobile
+?0
+
+sec-ch-ua-platform
+"Windows"
+
+upgrade-insecure-requests
+1
+
+content-type
+application/x-www-form-urlencoded
+
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36
+
+origin
+http://127.0.0.1:8000
+
+accept
+text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+
+sec-fetch-site
+same-origin
+
+sec-fetch-mode
+navigate
+
+sec-fetch-user
+?1
+
+sec-fetch-dest
+document
+
+referer
+http://127.0.0.1:8000/admin/schedules/create
+
+accept-encoding
+gzip, deflate, br, zstd
+
+accept-language
+id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7
+
+cookie
+XSRF-TOKEN=eyJpdiI6IlRsN1dQTVdoSDFzdDczditYZ0swb3c9PSIsInZhbHVlIjoidGdNNFJ4TVdGZC81UTcyaG54bUJBVUFkNW56QnF4RHdCRXNHd1h2K1ByWkhrRHJINGlWNERSQWQ3Y2tEWXlrOXd0Ty92Mm84KzZKRTFzMEMwOXNyZ0ltaFlKMUtoRFVqazhkbXVGa0ZDYXNhQkJWRFF0TjVJcWFsN2RhZ3lFZEwiLCJtYWMiOiIwYjdlZDZhNjMyMzBjNzVhNjc5MTA0MmJkNWZhNDVmYTNmMjFmNDJjYzkyMWEyMjk3YjFmZGY2ZTk5MDkxNzk3IiwidGFnIjoiIn0%3D; laravel_session=eyJpdiI6Imo1VEVGSUtabHp5Q25CUjZYaW9kWGc9PSIsInZhbHVlIjoiT1J2Umt0RXF3VXN3elowRzliK3BHMVRQMytCQkcvemgwL09iK3U5MCtpckl0SWVaWDhlR1UvTnBnd2JDRktDdk52L0pObnJ0WW8rV3lzc0VWanpDeWFHUHFlbDBwU3NEVDErVWJiWTlnUjBTTnVmdSt3T3YyQzFHVkFURzZlRmUiLCJtYWMiOiIzYjJiY2Q2NTVkMThiY2Q0NTgxYTJiNTRmOGIzMGMyMTUxZTM0YjY0MDE5OWExYmY4YzhmMGY5NWQ5YWE4MzViIiwidGFnIjoiIn0%3D
+
+Body
+{
+    "_token": "ReuLqQCelbpiOwDov9xAfJCgUMcb0h2IudAeDeeZ",
+    "paket_id": "1",
+    "pertemuan_ke": "1",
+    "guru_id": "1",
+    "tanggal": "2026-06-24",
+    "jam_mulai": "16:05",
+    "jam_selesai": "16:10",
+    "topik": null,
+    "module_id": null,
+    "ruangan": null,
+    "link_meeting": null,
+    "catatan": null
+}
+
+
+Context
+User
+adminpusatsci@akademi.com
+Admin Pusat SCI
+
+adminpusatsci@akademi.com
+
+{
+    "id": 10,
+    "name": "Admin Pusat SCI",
+    "username": null,
+    "email": "adminpusatsci@akademi.com",
+    "phone": null,
+    "avatar": null,
+    "branch_id": null,
+    "is_active": true,
+    "last_login_at": null,
+    "email_verified_at": null,
+    "created_at": "2026-06-22T06:46:11.000000Z",
+    "updated_at": "2026-06-22T06:46:11.000000Z",
+    "deleted_at": null,
+    "roles": [
+        {
+            "id": 16,
+            "name": "owner",
+            "guard_name": "web",
+            "created_at": "2026-06-22T06:46:11.000000Z",
+            "updated_at": "2026-06-22T06:46:11.000000Z",
+            "pivot": {
+                "model_id": 10,
+                "role_id": 16,
+                "model_type": "App\\Models\\User"
+            }
+        }
+    ]
+}
+
+
+Versions
+Php Version
+8.3.8
+
+Laravel Version
+9.52.21
+
+Laravel Locale
+en
+
+Laravel Config Cached
+false
+App Debug
+true
+App Env
+local
+
+Exception
+Raw Sql
+insert into `schedules` (`paket_id`, `module_id`, `guru_id`, `pertemuan_ke`, `tanggal`, `jam_mulai`, `jam_selesai`, `topik`, `ruangan`, `link_meeting`, `catatan`, `cabang_id`, `jenis`, `status`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+
+6
+Queries
+4:04:34 PM
+15.25ms
+mysql
+select * from `users` where `id` = 10 and `users`.`deleted_at` is null limit 1
+
+
+1 query parameter
+4:04:34 PM
+1.51ms
+mysql
+select `roles`.*, `model_has_roles`.`model_id` as `pivot_model_id`, `model_has_roles`.`role_id` as `pivot_role_id`, `model_has_roles`.`model_type` as `pivot_model_type` from `roles` inner join `model_has_roles` on `roles`.`id` = `model_has_roles`.`role_id` where `model_has_roles`.`model_id` in (10) and `model_has_roles`.`model_type` = App\Models\User
+
+
+1 query parameter
+4:04:34 PM
+1.26ms
+mysql
+select count(*) as aggregate from `packages` where `id` = 1
+
+
+1 query parameter
+4:04:34 PM
+0.65ms
+mysql
+select count(*) as aggregate from `teachers` where `id` = 1
+
+
+1 query parameter
+4:04:34 PM
+1.23ms
+mysql
+select * from `packages` where `packages`.`id` = 1 and `packages`.`deleted_at` is null limit 1
+
+
+1 query parameter
+4:04:34 PM
+0.91ms
+mysql
+select * from `branches` where `branches`.`id` in (2)
+
+
+·
+Source
+·
+Docs
+·
+Laravel
+Ignition is built byFlare, the Laravel error reporting service.

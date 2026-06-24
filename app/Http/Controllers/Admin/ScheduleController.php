@@ -68,6 +68,7 @@ class ScheduleController extends Controller
             'paket_id'        => 'required|exists:packages,id',
             'module_id'       => 'nullable|exists:modules,id',
             'guru_id'         => 'nullable|exists:teachers,id',
+            'jenis'           => 'required|in:online,offline,private',
             'pertemuan_ke'    => 'required|integer|min:1',
             'tanggal'         => 'required|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal',
@@ -92,7 +93,7 @@ class ScheduleController extends Controller
         // Use form guru_id if provided, otherwise fall back to package's guru
         $data['guru_id']   = $data['guru_id'] ?? $paket->guru_id;
         $data['cabang_id'] = $paket->cabang_id;
-        $data['jenis']     = $paket->jenis;
+        // $data['jenis'] comes from the form (online/offline/private)
         $data['status']    = 'dijadwalkan';
 
         $schedule = Schedule::create($data);
@@ -122,6 +123,7 @@ class ScheduleController extends Controller
 
         $data = $request->validate([
             'paket_id'        => 'required|exists:packages,id',
+            'jenis'           => 'required|in:online,offline,private',
             'pertemuan_ke'    => 'required|integer|min:1',
             'tanggal'         => 'required|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal',
@@ -141,7 +143,7 @@ class ScheduleController extends Controller
 
         $data['guru_id']   = $paket->guru_id;
         $data['cabang_id'] = $paket->cabang_id;
-        $data['jenis']     = $paket->jenis;
+        // $data['jenis'] comes from the form (online/offline/private)
 
         $schedule->update($data);
 

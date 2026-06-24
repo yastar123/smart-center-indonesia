@@ -148,15 +148,23 @@
         </div>
     </div>
     <div class="row g-3">
-        <div class="col-md-4">
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Metode Kelas <span class="text-danger">*</span></label>
+            <select name="jenis" id="jenis" class="form-select" required>
+                <option value="offline" {{ old('jenis','offline') == 'offline' ? 'selected' : '' }}>🏫 Offline (Tatap Muka)</option>
+                <option value="online"  {{ old('jenis') == 'online'  ? 'selected' : '' }}>💻 Online</option>
+                <option value="private" {{ old('jenis') == 'private' ? 'selected' : '' }}>👤 Private</option>
+            </select>
+        </div>
+        <div class="col-md-3">
             <label class="form-label fw-semibold">Tanggal <span class="text-danger">*</span></label>
             <input type="date" name="tanggal" id="tanggal" class="form-control" value="{{ old('tanggal') }}" required>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <label class="form-label fw-semibold">Jam Mulai <span class="text-danger">*</span></label>
             <input type="time" name="jam_mulai" id="jam_mulai" class="form-control" value="{{ old('jam_mulai') }}" required>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <label class="form-label fw-semibold">Jam Selesai <span class="text-danger">*</span></label>
             <input type="time" name="jam_selesai" id="jam_selesai" class="form-control" value="{{ old('jam_selesai') }}" required>
         </div>
@@ -268,6 +276,7 @@ $paketsJson = $pakets->map(function ($p) {
         'guru_name'        => $p->guru?->name,
         'guru_email'       => $p->guru?->email,
         'guru_nig'         => $p->guru?->nig,
+        'tipe_kelas'       => $p->tipe_kelas,
         'mata_pelajaran'   => $p->mataPelajaran->pluck('nama'),
     ];
 });
@@ -328,6 +337,14 @@ function onPaketChange(paketId) {
         sesiOptions += `<option value="${i}">Sesi ke-${i}</option>`;
     }
     sesiSelect.innerHTML = sesiOptions;
+
+    // Auto-set jenis (delivery method) from package tipe_kelas
+    const jenisSelect = document.getElementById('jenis');
+    if (jenisSelect && !jenisSelect.dataset.manuallyChanged) {
+        const validJenis = ['online', 'offline', 'private'];
+        const autoJenis  = validJenis.includes(pkg.tipe_kelas) ? pkg.tipe_kelas : 'offline';
+        jenisSelect.value = autoJenis;
+    }
 
     // Guru info from package
     if (pkg.guru_id) {
