@@ -28,7 +28,12 @@ use App\Http\Controllers\Owner\BranchController;
 use App\Http\Controllers\Guru\AttendanceController;
 use App\Http\Controllers\Siswa\SiswaController;
 
-Route::redirect('/', '/login');
+Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+    return view('landing');
+})->name('landing');
 
 Route::post('/public/student-registrations', [StudentRegistrationPublicController::class, 'store'])
     ->name('public.student-registrations.store');

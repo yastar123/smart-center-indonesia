@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 
-    <title>@yield('title','Dashboard') | Smart Center</title>
+    <title><?php echo $__env->yieldContent('title','Dashboard'); ?> | Smart Center</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -3156,33 +3156,33 @@
 
     </style>
 
-    @stack('styles')
+    <?php echo $__env->yieldPushContent('styles'); ?>
     <script>!function(){var t=localStorage.getItem('theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}();</script>
 </head>
 <body>
-    @if(session()->has('impersonate.original_user'))
+    <?php if(session()->has('impersonate.original_user')): ?>
         <div class="impersonate-banner">
             <i class="bi bi-person-fill-gear me-2"></i>
             Anda sedang <strong>mengakses sebagai admin cabang</strong>.
-            <form method="POST" action="{{ route('impersonate.leave') }}" style="display:inline;margin-left:10px">
-                @csrf
+            <form method="POST" action="<?php echo e(route('impersonate.leave')); ?>" style="display:inline;margin-left:10px">
+                <?php echo csrf_field(); ?>
                 <button class="btn btn-sm btn-danger" style="border-radius:8px;font-size:12px;padding:3px 12px">
                     <i class="bi bi-arrow-left-circle me-1"></i>Kembali ke Pusat
                 </button>
             </form>
         </div>
-    @endif
+    <?php endif; ?>
 
-{{-- NAV PROGRESS BAR --}}
+
 <div id="navProgress"></div>
 
-{{-- SIDEBAR OVERLAY (mobile) --}}
+
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-{{-- SIDEBAR --}}
+
 <nav class="sidebar" id="sidebar">
 
-    <a href="{{ route('dashboard') }}" class="sidebar-brand">
+    <a href="<?php echo e(route('dashboard')); ?>" class="sidebar-brand">
         <div class="brand-logo">
             <i class="bi bi-mortarboard-fill"></i>
         </div>
@@ -3196,136 +3196,136 @@
     </a>
 
     <div class="sidebar-user">
-        <img src="{{ auth()->user()->avatar ? asset('storage/'.auth()->user()->avatar) : 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&background=68117e&color=fff&size=80' }}"
+        <img src="<?php echo e(auth()->user()->avatar ? asset('storage/'.auth()->user()->avatar) : 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&background=68117e&color=fff&size=80'); ?>"
              class="sidebar-avatar" alt="Avatar" id="sidebarAvatar">
         <div>
-            <div class="user-name">{{ auth()->user()->name }}</div>
-            <div class="user-role">{{ ucfirst(auth()->user()->getRoleNames()->first() ?? 'User') }}</div>
+            <div class="user-name"><?php echo e(auth()->user()->name); ?></div>
+            <div class="user-role"><?php echo e(ucfirst(auth()->user()->getRoleNames()->first() ?? 'User')); ?></div>
         </div>
     </div>
 
     <div class="sidebar-nav">
 
-        {{-- DASHBOARD --}}
+        
         <div class="nav-item">
-            <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" data-label="Dashboard">
+            <a href="<?php echo e(route('dashboard')); ?>" class="nav-link <?php echo e(request()->routeIs('dashboard') ? 'active' : ''); ?>" data-label="Dashboard">
                 <i class="bi bi-grid-fill"></i>
                 <span>Dashboard</span>
             </a>
         </div>
 
-        {{-- OWNER --}}
-        @role('owner')
+        
+        <?php if (\Illuminate\Support\Facades\Blade::check('role', 'owner')): ?>
         <div class="nav-header">OWNER PANEL</div>
 
         <div class="nav-item">
-            <a href="{{ route('owner.branches.index') }}" class="nav-link {{ request()->routeIs('owner.branches.*') ? 'active' : '' }}" data-label="Monitoring Cabang">
+            <a href="<?php echo e(route('owner.branches.index')); ?>" class="nav-link <?php echo e(request()->routeIs('owner.branches.*') ? 'active' : ''); ?>" data-label="Monitoring Cabang">
                 <i class="bi bi-building"></i>
                 <span>Monitoring Cabang</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('owner.activity-log') }}" class="nav-link {{ request()->routeIs('owner.activity-log') ? 'active' : '' }}" data-label="Log Aktivitas">
+            <a href="<?php echo e(route('owner.activity-log')); ?>" class="nav-link <?php echo e(request()->routeIs('owner.activity-log') ? 'active' : ''); ?>" data-label="Log Aktivitas">
                 <i class="bi bi-journal-text"></i>
                 <span>Log Aktivitas</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('owner.settings.index') }}" class="nav-link {{ request()->routeIs('owner.settings.*') ? 'active' : '' }}" data-label="Pengaturan">
+            <a href="<?php echo e(route('owner.settings.index')); ?>" class="nav-link <?php echo e(request()->routeIs('owner.settings.*') ? 'active' : ''); ?>" data-label="Pengaturan">
                 <i class="bi bi-gear"></i>
                 <span>Pengaturan</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('owner.analytics') }}" class="nav-link {{ request()->routeIs('owner.analytics') ? 'active' : '' }}" data-label="Analytics">
+            <a href="<?php echo e(route('owner.analytics')); ?>" class="nav-link <?php echo e(request()->routeIs('owner.analytics') ? 'active' : ''); ?>" data-label="Analytics">
                 <i class="bi bi-graph-up-arrow"></i>
                 <span>Analytics</span>
             </a>
         </div>
-        @endrole
+        <?php endif; ?>
 
-        {{-- ADMIN --}}
-        @role('admin|owner')
+        
+        <?php if (\Illuminate\Support\Facades\Blade::check('role', 'admin|owner')): ?>
         <div class="nav-header">AKADEMIK</div>
 
         <div class="nav-item">
-            <a href="{{ route('admin.registration.create') }}" class="nav-link {{ request()->routeIs('admin.registration.*') ? 'active' : '' }}" data-label="Registrasi">
+            <a href="<?php echo e(route('admin.registration.create')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.registration.*') ? 'active' : ''); ?>" data-label="Registrasi">
                 <i class="bi bi-person-plus-fill"></i>
                 <span>Registrasi</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.student-registrations.index') }}" class="nav-link {{ request()->routeIs('admin.student-registrations.*') ? 'active' : '' }}" data-label="Siswa Sementara">
+            <a href="<?php echo e(route('admin.student-registrations.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.student-registrations.*') ? 'active' : ''); ?>" data-label="Siswa Sementara">
                 <i class="bi bi-person-plus"></i>
                 <span>Siswa Sementara</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.students.index') }}" class="nav-link {{ request()->routeIs('admin.students.*') ? 'active' : '' }}" data-label="Siswa">
+            <a href="<?php echo e(route('admin.students.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.students.*') ? 'active' : ''); ?>" data-label="Siswa">
                 <i class="bi bi-mortarboard"></i>
                 <span>Siswa</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.teachers.index') }}" class="nav-link {{ request()->routeIs('admin.teachers.*') ? 'active' : '' }}" data-label="Guru">
+            <a href="<?php echo e(route('admin.teachers.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.teachers.*') ? 'active' : ''); ?>" data-label="Guru">
                 <i class="bi bi-person-workspace"></i>
                 <span>Guru</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.subject.index') }}" class="nav-link {{ request()->routeIs('admin.subject.*') ? 'active' : '' }}" data-label="Mata Pelajaran">
+            <a href="<?php echo e(route('admin.subject.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.subject.*') ? 'active' : ''); ?>" data-label="Mata Pelajaran">
                 <i class="bi bi-journal-bookmark-fill"></i>
                 <span>Mata Pelajaran</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.course-package.index') }}" class="nav-link {{ request()->routeIs('admin.course-package.*') ? 'active' : '' }}" data-label="Paket Belajar">
+            <a href="<?php echo e(route('admin.course-package.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.course-package.*') ? 'active' : ''); ?>" data-label="Paket Belajar">
                 <i class="bi bi-box-seam"></i>
                 <span>Paket Belajar</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.module.index') }}" class="nav-link {{ request()->routeIs('admin.module.*') ? 'active' : '' }}" data-label="Modul Akademik">
+            <a href="<?php echo e(route('admin.module.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.module.*') ? 'active' : ''); ?>" data-label="Modul Akademik">
                 <i class="bi bi-journal-text"></i>
                 <span>Modul Akademik</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.attendance.index') }}" class="nav-link {{ request()->routeIs('admin.attendance.index') || request()->routeIs('admin.attendance.sessions') ? 'active' : '' }}" data-label="Absensi">
+            <a href="<?php echo e(route('admin.attendance.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.attendance.index') || request()->routeIs('admin.attendance.sessions') ? 'active' : ''); ?>" data-label="Absensi">
                 <i class="bi bi-clipboard2-check"></i>
                 <span>Absensi</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.schedule-dashboard.index') }}" class="nav-link {{ request()->routeIs('admin.schedule-dashboard.*') ? 'active' : '' }}" data-label="Jadwal Kelas">
+            <a href="<?php echo e(route('admin.schedule-dashboard.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.schedule-dashboard.*') ? 'active' : ''); ?>" data-label="Jadwal Kelas">
                 <i class="bi bi-calendar-week"></i>
                 <span>Jadwal Kelas</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.reschedule.index') }}" class="nav-link {{ request()->routeIs('admin.reschedule.*') ? 'active' : '' }}" data-label="Reschedule">
+            <a href="<?php echo e(route('admin.reschedule.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.reschedule.*') ? 'active' : ''); ?>" data-label="Reschedule">
                 <i class="bi bi-arrow-left-right"></i>
                 <span>Reschedule</span>
-                @php $pendingReschedule = \App\Models\ScheduleProposal::where('status','pending')->count(); @endphp
-                @if($pendingReschedule > 0)
-                    <span class="menu-badge">{{ $pendingReschedule > 99 ? '99+' : $pendingReschedule }}</span>
-                @endif
+                <?php $pendingReschedule = \App\Models\ScheduleProposal::where('status','pending')->count(); ?>
+                <?php if($pendingReschedule > 0): ?>
+                    <span class="menu-badge"><?php echo e($pendingReschedule > 99 ? '99+' : $pendingReschedule); ?></span>
+                <?php endif; ?>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.attendance-history.index') }}" class="nav-link {{ request()->routeIs('admin.attendance-history.*') ? 'active' : '' }}" data-label="Riwayat Absensi">
+            <a href="<?php echo e(route('admin.attendance-history.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.attendance-history.*') ? 'active' : ''); ?>" data-label="Riwayat Absensi">
                 <i class="bi bi-clipboard2-pulse"></i>
                 <span>Riwayat Absensi</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.riwayat-sesi.index') }}" class="nav-link {{ request()->routeIs('admin.riwayat-sesi.*') ? 'active' : '' }}" data-label="Riwayat Sesi">
+            <a href="<?php echo e(route('admin.riwayat-sesi.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.riwayat-sesi.*') ? 'active' : ''); ?>" data-label="Riwayat Sesi">
                 <i class="bi bi-clock-history"></i>
                 <span>Riwayat Sesi</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.certificates.index') }}" class="nav-link {{ request()->routeIs('admin.certificates.*') ? 'active' : '' }}" data-label="Sertifikat">
+            <a href="<?php echo e(route('admin.certificates.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.certificates.*') ? 'active' : ''); ?>" data-label="Sertifikat">
                 <i class="bi bi-award"></i>
                 <span>Sertifikat</span>
             </a>
@@ -3334,49 +3334,49 @@
         <div class="nav-header">KEUANGAN</div>
 
         <div class="nav-item">
-            <a href="{{ route('admin.tagihan-siswa.index') }}" class="nav-link {{ request()->routeIs('admin.tagihan-siswa.*') ? 'active' : '' }}" data-label="Tagihan Siswa">
+            <a href="<?php echo e(route('admin.tagihan-siswa.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.tagihan-siswa.*') ? 'active' : ''); ?>" data-label="Tagihan Siswa">
                 <i class="bi bi-wallet2"></i>
                 <span>Tagihan Siswa</span>
-                @php $pendingTagihan = \App\Models\Invoice::whereIn('status',['belum_bayar','sebagian'])->count(); @endphp
-                @if($pendingTagihan > 0)
-                    <span class="menu-badge">{{ $pendingTagihan > 99 ? '99+' : $pendingTagihan }}</span>
-                @endif
+                <?php $pendingTagihan = \App\Models\Invoice::whereIn('status',['belum_bayar','sebagian'])->count(); ?>
+                <?php if($pendingTagihan > 0): ?>
+                    <span class="menu-badge"><?php echo e($pendingTagihan > 99 ? '99+' : $pendingTagihan); ?></span>
+                <?php endif; ?>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.billing.index') }}" class="nav-link {{ request()->routeIs('admin.billing.*') ? 'active' : '' }}" data-label="Billing Lunas">
+            <a href="<?php echo e(route('admin.billing.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.billing.*') ? 'active' : ''); ?>" data-label="Billing Lunas">
                 <i class="bi bi-receipt-cutoff"></i>
                 <span>Billing Lunas</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.verifikasi-pembayaran.index') }}" class="nav-link {{ request()->routeIs('admin.verifikasi-pembayaran.*') ? 'active' : '' }}" data-label="Verifikasi Pembayaran">
+            <a href="<?php echo e(route('admin.verifikasi-pembayaran.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.verifikasi-pembayaran.*') ? 'active' : ''); ?>" data-label="Verifikasi Pembayaran">
                 <i class="bi bi-shield-check"></i>
                 <span>Verifikasi Pembayaran</span>
-                @php $pendingPayments = \App\Models\Payment::where('status','pending')->count(); @endphp
-                @if($pendingPayments > 0)
-                    <span class="menu-badge">{{ $pendingPayments > 99 ? '99+' : $pendingPayments }}</span>
-                @endif
+                <?php $pendingPayments = \App\Models\Payment::where('status','pending')->count(); ?>
+                <?php if($pendingPayments > 0): ?>
+                    <span class="menu-badge"><?php echo e($pendingPayments > 99 ? '99+' : $pendingPayments); ?></span>
+                <?php endif; ?>
             </a>
         </div>
-        @if(auth()->check() && auth()->user()->hasAnyRole(['admin','owner']))
+        <?php if(auth()->check() && auth()->user()->hasAnyRole(['admin','owner'])): ?>
         <div class="nav-item">
-            <a href="{{ route('admin.salaries.index') }}" class="nav-link {{ request()->routeIs('admin.salaries.*') ? 'active' : '' }}" data-label="Gaji Guru">
+            <a href="<?php echo e(route('admin.salaries.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.salaries.*') ? 'active' : ''); ?>" data-label="Gaji Guru">
                 <i class="bi bi-cash-stack"></i>
                 <span>Gaji Guru</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.reports.index') }}" class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}" data-label="Laporan Keuangan">
+            <a href="<?php echo e(route('admin.reports.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.reports.*') ? 'active' : ''); ?>" data-label="Laporan Keuangan">
                 <i class="bi bi-bar-chart-line"></i>
                 <span>Laporan Keuangan</span>
             </a>
         </div>
-        @endif
+        <?php endif; ?>
 
         <div class="nav-header">LANDING PAGE</div>
         <div class="nav-item">
-            <a href="{{ route('admin.landing.index') }}" class="nav-link {{ request()->routeIs('admin.landing.*') ? 'active' : '' }}" data-label="Kelola Landing Page">
+            <a href="<?php echo e(route('admin.landing.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.landing.*') ? 'active' : ''); ?>" data-label="Kelola Landing Page">
                 <i class="bi bi-window-fullscreen"></i>
                 <span>Kelola Landing Page</span>
             </a>
@@ -3385,19 +3385,19 @@
         <div class="nav-header">KOMUNIKASI</div>
 
         <div class="nav-item">
-            <a href="{{ route('admin.announcements.index') }}" class="nav-link {{ request()->routeIs('admin.announcements.*') ? 'active' : '' }}" data-label="Pengumuman">
+            <a href="<?php echo e(route('admin.announcements.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.announcements.*') ? 'active' : ''); ?>" data-label="Pengumuman">
                 <i class="bi bi-megaphone"></i>
                 <span>Pengumuman</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.messages.index') }}" class="nav-link {{ request()->routeIs('admin.messages.*') ? 'active' : '' }}" data-label="Pesan">
+            <a href="<?php echo e(route('admin.messages.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.messages.*') ? 'active' : ''); ?>" data-label="Pesan">
                 <i class="bi bi-chat-dots"></i>
                 <span>Pesan Aplikasi</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.videocall.index') }}" class="nav-link {{ request()->routeIs('admin.videocall.*') ? 'active' : '' }}" data-label="Video Call">
+            <a href="<?php echo e(route('admin.videocall.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.videocall.*') ? 'active' : ''); ?>" data-label="Video Call">
                 <i class="bi bi-camera-video"></i>
                 <span>Video Call</span>
             </a>
@@ -3406,137 +3406,137 @@
         <div class="nav-header">TRYOUT CBT</div>
 
         <div class="nav-item">
-            <a href="{{ route('admin.tryouts.index') }}" class="nav-link {{ request()->routeIs('admin.tryouts.*') ? 'active' : '' }}" data-label="Tryout">
+            <a href="<?php echo e(route('admin.tryouts.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.tryouts.*') ? 'active' : ''); ?>" data-label="Tryout">
                 <i class="bi bi-journal-check"></i>
                 <span>Tryout UTBK/PTN</span>
             </a>
         </div>
-        @endrole
+        <?php endif; ?>
 
-        {{-- GURU --}}
-        @role('guru')
+        
+        <?php if (\Illuminate\Support\Facades\Blade::check('role', 'guru')): ?>
         <div class="nav-header">GURU PANEL</div>
         <div class="nav-item">
-            <a href="{{ route('guru.dashboard') }}" class="nav-link {{ request()->routeIs('guru.dashboard') ? 'active' : '' }}" data-label="Dashboard Guru">
+            <a href="<?php echo e(route('guru.dashboard')); ?>" class="nav-link <?php echo e(request()->routeIs('guru.dashboard') ? 'active' : ''); ?>" data-label="Dashboard Guru">
                 <i class="bi bi-speedometer2"></i><span>Dashboard Guru</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('guru.classes.index') }}" class="nav-link {{ request()->routeIs('guru.classes.*') ? 'active' : '' }}" data-label="Kelas">
+            <a href="<?php echo e(route('guru.classes.index')); ?>" class="nav-link <?php echo e(request()->routeIs('guru.classes.*') ? 'active' : ''); ?>" data-label="Kelas">
                 <i class="bi bi-diagram-3"></i><span>Kelas</span>
             </a>
         </div>
         
         <div class="nav-item">
-            <a href="{{ route('guru.attendance.history') }}" class="nav-link {{ request()->routeIs('guru.attendance.*') ? 'active' : '' }}" data-label="Riwayat Absensi">
+            <a href="<?php echo e(route('guru.attendance.history')); ?>" class="nav-link <?php echo e(request()->routeIs('guru.attendance.*') ? 'active' : ''); ?>" data-label="Riwayat Absensi">
                 <i class="bi bi-clipboard2-check"></i><span>Riwayat Absensi</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('guru.schedules.index') }}" class="nav-link {{ request()->routeIs('guru.schedules.*') ? 'active' : '' }}" data-label="Jadwal Saya">
+            <a href="<?php echo e(route('guru.schedules.index')); ?>" class="nav-link <?php echo e(request()->routeIs('guru.schedules.*') ? 'active' : ''); ?>" data-label="Jadwal Saya">
                 <i class="bi bi-calendar3"></i><span>Jadwal Saya</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('guru.schedule-agreements.index') }}" class="nav-link {{ request()->routeIs('guru.schedule-agreements.*') ? 'active' : '' }}" data-label="Reschedule">
+            <a href="<?php echo e(route('guru.schedule-agreements.index')); ?>" class="nav-link <?php echo e(request()->routeIs('guru.schedule-agreements.*') ? 'active' : ''); ?>" data-label="Reschedule">
                 <i class="bi bi-calendar2-x"></i><span>Reschedule</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('guru.grades.index') }}" class="nav-link {{ request()->routeIs('guru.grades.*') ? 'active' : '' }}" data-label="Input Nilai">
+            <a href="<?php echo e(route('guru.grades.index')); ?>" class="nav-link <?php echo e(request()->routeIs('guru.grades.*') ? 'active' : ''); ?>" data-label="Input Nilai">
                 <i class="bi bi-bar-chart-line"></i><span>Input Nilai</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('guru.payments.index') }}" class="nav-link {{ request()->routeIs('guru.payments.*') ? 'active' : '' }}" data-label="Gaji Saya">
+            <a href="<?php echo e(route('guru.payments.index')); ?>" class="nav-link <?php echo e(request()->routeIs('guru.payments.*') ? 'active' : ''); ?>" data-label="Gaji Saya">
                 <i class="bi bi-cash-coin"></i><span>Gaji Saya</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('guru.messages.index') }}" class="nav-link {{ request()->routeIs('guru.messages.*') ? 'active' : '' }}" data-label="Pesan">
+            <a href="<?php echo e(route('guru.messages.index')); ?>" class="nav-link <?php echo e(request()->routeIs('guru.messages.*') ? 'active' : ''); ?>" data-label="Pesan">
                 <i class="bi bi-chat-dots"></i><span>Pesan</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('guru.announcements') }}" class="nav-link {{ request()->routeIs('guru.announcements') ? 'active' : '' }}" data-label="Pengumuman">
+            <a href="<?php echo e(route('guru.announcements')); ?>" class="nav-link <?php echo e(request()->routeIs('guru.announcements') ? 'active' : ''); ?>" data-label="Pengumuman">
                 <i class="bi bi-megaphone"></i><span>Pengumuman</span>
             </a>
         </div>
-        @endrole
+        <?php endif; ?>
 
-        {{-- SISWA --}}
-        @role('siswa')
+        
+        <?php if (\Illuminate\Support\Facades\Blade::check('role', 'siswa')): ?>
         <div class="nav-header">SISWA PANEL</div>
         <div class="nav-item">
-            <a href="{{ route('siswa.dashboard') }}" class="nav-link {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}" data-label="Dashboard">
+            <a href="<?php echo e(route('siswa.dashboard')); ?>" class="nav-link <?php echo e(request()->routeIs('siswa.dashboard') ? 'active' : ''); ?>" data-label="Dashboard">
                 <i class="bi bi-speedometer2"></i><span>Dashboard</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.schedules.index') }}" class="nav-link {{ request()->routeIs('siswa.schedules.*') ? 'active' : '' }}" data-label="Jadwal Pertemuan">
+            <a href="<?php echo e(route('siswa.schedules.index')); ?>" class="nav-link <?php echo e(request()->routeIs('siswa.schedules.*') ? 'active' : ''); ?>" data-label="Jadwal Pertemuan">
                 <i class="bi bi-calendar-check"></i><span>Jadwal Pertemuan</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.schedule-agreements.index') }}" class="nav-link {{ request()->routeIs('siswa.schedule-agreements.*') ? 'active' : '' }}" data-label="Reschedule">
+            <a href="<?php echo e(route('siswa.schedule-agreements.index')); ?>" class="nav-link <?php echo e(request()->routeIs('siswa.schedule-agreements.*') ? 'active' : ''); ?>" data-label="Reschedule">
                 <i class="bi bi-calendar2-x"></i><span>Reschedule</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.courses.index') }}" class="nav-link {{ request()->routeIs('siswa.courses.index') ? 'active' : '' }}" data-label="List Mata Pelajaran">
+            <a href="<?php echo e(route('siswa.courses.index')); ?>" class="nav-link <?php echo e(request()->routeIs('siswa.courses.index') ? 'active' : ''); ?>" data-label="List Mata Pelajaran">
                 <i class="bi bi-journal-bookmark"></i><span>List Mata Pelajaran</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.courses.fees') }}" class="nav-link {{ request()->routeIs('siswa.courses.fees') ? 'active' : '' }}" data-label="Harga Paket">
+            <a href="<?php echo e(route('siswa.courses.fees')); ?>" class="nav-link <?php echo e(request()->routeIs('siswa.courses.fees') ? 'active' : ''); ?>" data-label="Harga Paket">
                 <i class="bi bi-cash-coin"></i><span>Harga Paket</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.attendance') }}" class="nav-link {{ request()->routeIs('siswa.attendance*') ? 'active' : '' }}" data-label="Absensi">
+            <a href="<?php echo e(route('siswa.attendance')); ?>" class="nav-link <?php echo e(request()->routeIs('siswa.attendance*') ? 'active' : ''); ?>" data-label="Absensi">
                 <i class="bi bi-clipboard-check"></i><span>Absensi</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.billing.index') }}" class="nav-link {{ request()->routeIs('siswa.billing.*') ? 'active' : '' }}" data-label="Tagihan">
+            <a href="<?php echo e(route('siswa.billing.index')); ?>" class="nav-link <?php echo e(request()->routeIs('siswa.billing.*') ? 'active' : ''); ?>" data-label="Tagihan">
                 <i class="bi bi-credit-card"></i><span>Tagihan & Bayar</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.certificates.index') }}" class="nav-link {{ request()->routeIs('siswa.certificates.*') ? 'active' : '' }}" data-label="Sertifikat Saya">
+            <a href="<?php echo e(route('siswa.certificates.index')); ?>" class="nav-link <?php echo e(request()->routeIs('siswa.certificates.*') ? 'active' : ''); ?>" data-label="Sertifikat Saya">
                 <i class="bi bi-award"></i><span>Sertifikat Saya</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.announcements') }}" class="nav-link {{ request()->routeIs('siswa.announcements') ? 'active' : '' }}" data-label="Pengumuman">
+            <a href="<?php echo e(route('siswa.announcements')); ?>" class="nav-link <?php echo e(request()->routeIs('siswa.announcements') ? 'active' : ''); ?>" data-label="Pengumuman">
                 <i class="bi bi-megaphone"></i><span>Pengumuman</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.tryout') }}" class="nav-link {{ request()->routeIs('siswa.tryout*') ? 'active' : '' }}" data-label="Tryout CBT">
+            <a href="<?php echo e(route('siswa.tryout')); ?>" class="nav-link <?php echo e(request()->routeIs('siswa.tryout*') ? 'active' : ''); ?>" data-label="Tryout CBT">
                 <i class="bi bi-laptop"></i><span>Tryout CBT</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.messages.index') }}" class="nav-link {{ request()->routeIs('siswa.messages.*') ? 'active' : '' }}" data-label="Pesan">
+            <a href="<?php echo e(route('siswa.messages.index')); ?>" class="nav-link <?php echo e(request()->routeIs('siswa.messages.*') ? 'active' : ''); ?>" data-label="Pesan">
                 <i class="bi bi-chat-dots"></i><span>Pesan</span>
             </a>
         </div>
-        @endrole
+        <?php endif; ?>
 
-        {{-- SYSTEM --}}
+        
         <div class="nav-header">SYSTEM</div>
 
         <div class="nav-item">
-            <a href="{{ route('profile.edit') }}" class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" data-label="Profil Saya">
+            <a href="<?php echo e(route('profile.edit')); ?>" class="nav-link <?php echo e(request()->routeIs('profile.*') ? 'active' : ''); ?>" data-label="Profil Saya">
                 <i class="bi bi-person-circle"></i>
                 <span>Profil Saya</span>
             </a>
         </div>
 
         <div class="nav-item">
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
+            <form method="POST" action="<?php echo e(route('logout')); ?>">
+                <?php echo csrf_field(); ?>
                 <button class="nav-link border-0 bg-transparent w-100 text-start" style="color:#94a3b8" data-label="Logout">
                     <i class="bi bi-box-arrow-left" style="color:#ef4444"></i>
                     <span>Logout</span>
@@ -3548,10 +3548,10 @@
 
 </nav>
 
-{{-- MAIN CONTENT --}}
+
 <div class="main-content">
 
-    {{-- TOPBAR --}}
+    
     <div class="topbar">
 
         <div class="topbar-left">
@@ -3560,26 +3560,26 @@
             </button>
 
             <div>
-                <h4>@yield('page-title','Dashboard')</h4>
+                <h4><?php echo $__env->yieldContent('page-title','Dashboard'); ?></h4>
                 <p class="d-none d-md-block">Smart Center — Sistem Manajemen Bimbel Enterprise</p>
             </div>
         </div>
 
         <div class="topbar-right">
 
-            {{-- Landing page home link --}}
-            <a href="{{ url('/') }}" class="top-btn d-none d-md-flex" title="Beranda" style="text-decoration:none;align-items:center;">
+            
+            <a href="<?php echo e(url('/')); ?>" class="top-btn d-none d-md-flex" title="Beranda" style="text-decoration:none;align-items:center;">
                 <i class="bi bi-house-door" style="font-size:15px"></i>
             </a>
 
-            {{-- Command palette trigger --}}
+            
             <button class="top-btn d-none d-md-flex align-items-center gap-1" onclick="openCmdPalette()" title="Cari (Ctrl+K)"
                 style="width:auto;padding:0 12px;gap:8px;font-size:12.5px;color:var(--text-muted)">
                 <i class="bi bi-search" style="font-size:14px"></i>
                 <span>Cari</span>
                 <span style="display:inline-flex;align-items:center;gap:2px;background:var(--card-border);border-radius:5px;padding:1px 6px;font-size:10px;font-family:monospace;margin-left:4px">⌘K</span>
             </button>
-            {{-- Mobile search icon --}}
+            
             <button class="top-btn d-md-none" onclick="openCmdPalette()" title="Cari">
                 <i class="bi bi-search"></i>
             </button>
@@ -3588,44 +3588,44 @@
                 <i class="bi bi-moon" id="darkIcon"></i>
             </button>
 
-            @php
+            <?php
             $notifAnnouncements = \App\Models\Announcement::where('status','aktif')
                 ->where(function($q){ $q->whereNull('tanggal_mulai')->orWhere('tanggal_mulai','<=',now()); })
                 ->where(function($q){ $q->whereNull('tanggal_selesai')->orWhere('tanggal_selesai','>=',now()); })
                 ->orderByDesc('is_pinned')->orderByDesc('created_at')
                 ->limit(6)->get(['id','judul','jenis','konten','is_pinned','created_at']);
             $notifCount = $notifAnnouncements->count();
-            @endphp
+            ?>
             <button class="top-btn position-relative" title="Notifikasi" id="notifBtn" aria-label="Notifikasi">
                 <i class="bi bi-bell"></i>
-                @if($notifCount > 0)
+                <?php if($notifCount > 0): ?>
                 <span id="notifDot" style="position:absolute;top:5px;right:5px;width:8px;height:8px;background:#ef4444;border-radius:50%;border:1.5px solid var(--card-bg);pointer-events:none"></span>
-                @endif
+                <?php endif; ?>
             </button>
 
             <div class="dropdown">
                 <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border"
                         data-bs-toggle="dropdown" style="border-radius:12px;padding:6px 12px 6px 8px;font-size:13px">
                     <img id="topbarAvatar"
-                         src="{{ auth()->user()->avatar ? asset('storage/'.auth()->user()->avatar) : 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&background=68117e&color=fff&size=64' }}"
+                         src="<?php echo e(auth()->user()->avatar ? asset('storage/'.auth()->user()->avatar) : 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&background=68117e&color=fff&size=64'); ?>"
                          width="32" height="32" class="rounded-circle" style="object-fit:cover">
                     <div class="text-start d-none d-md-block">
-                        <div class="fw-semibold" style="font-size:13px;line-height:1.2">{{ Str::limit(auth()->user()->name, 16) }}</div>
-                        <div style="font-size:10px;color:var(--text-muted)">{{ ucfirst(auth()->user()->getRoleNames()->first() ?? 'User') }}</div>
+                        <div class="fw-semibold" style="font-size:13px;line-height:1.2"><?php echo e(Str::limit(auth()->user()->name, 16)); ?></div>
+                        <div style="font-size:10px;color:var(--text-muted)"><?php echo e(ucfirst(auth()->user()->getRoleNames()->first() ?? 'User')); ?></div>
                     </div>
                     <i class="bi bi-chevron-down small d-none d-md-block ms-1" style="font-size:10px"></i>
                 </button>
 
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius:14px;min-width:180px">
                     <li>
-                        <a class="dropdown-item py-2" href="{{ route('profile.edit') }}">
+                        <a class="dropdown-item py-2" href="<?php echo e(route('profile.edit')); ?>">
                             <i class="bi bi-person me-2 text-primary"></i>Profil Saya
                         </a>
                     </li>
                     <li><hr class="dropdown-divider my-1"></li>
                     <li>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
+                        <form method="POST" action="<?php echo e(route('logout')); ?>">
+                            <?php echo csrf_field(); ?>
                             <button class="dropdown-item py-2 text-danger">
                                 <i class="bi bi-box-arrow-right me-2"></i>Logout
                             </button>
@@ -3638,61 +3638,61 @@
 
     </div>
 
-    {{-- CONTENT --}}
+    
     <div class="content-wrapper fade-in">
-        @yield('content')
+        <?php echo $__env->yieldContent('content'); ?>
     </div>
 
 </div>
 
-{{-- SCROLL TO TOP --}}
+
 <button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Kembali ke atas">
     <i class="bi bi-arrow-up"></i>
 </button>
 
-{{-- MOBILE BOTTOM NAV --}}
+
 <nav class="mobile-bottom-nav" id="mobileBottomNav">
-    <a href="{{ route('dashboard') }}" class="mob-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-        <i class="bi bi-house-door{{ request()->routeIs('dashboard') ? '-fill' : '' }}"></i>
+    <a href="<?php echo e(route('dashboard')); ?>" class="mob-nav-item <?php echo e(request()->routeIs('dashboard') ? 'active' : ''); ?>">
+        <i class="bi bi-house-door<?php echo e(request()->routeIs('dashboard') ? '-fill' : ''); ?>"></i>
         <span>Home</span>
     </a>
-    @role('admin|owner')
-    <a href="{{ route('admin.students.index') }}" class="mob-nav-item {{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
-        <i class="bi bi-people{{ request()->routeIs('admin.students.*') ? '-fill' : '' }}"></i>
+    <?php if (\Illuminate\Support\Facades\Blade::check('role', 'admin|owner')): ?>
+    <a href="<?php echo e(route('admin.students.index')); ?>" class="mob-nav-item <?php echo e(request()->routeIs('admin.students.*') ? 'active' : ''); ?>">
+        <i class="bi bi-people<?php echo e(request()->routeIs('admin.students.*') ? '-fill' : ''); ?>"></i>
         <span>Siswa</span>
     </a>
-    @endrole
-    @role('guru')
-    <a href="{{ route('guru.classes.index') }}" class="mob-nav-item {{ request()->routeIs('guru.classes.*') ? 'active' : '' }}">
+    <?php endif; ?>
+    <?php if (\Illuminate\Support\Facades\Blade::check('role', 'guru')): ?>
+    <a href="<?php echo e(route('guru.classes.index')); ?>" class="mob-nav-item <?php echo e(request()->routeIs('guru.classes.*') ? 'active' : ''); ?>">
         <i class="bi bi-diagram-3"></i>
         <span>Kelas</span>
     </a>
-    <a href="{{ route('guru.announcements') }}" class="mob-nav-item {{ request()->routeIs('guru.announcements') ? 'active' : '' }}">
+    <a href="<?php echo e(route('guru.announcements')); ?>" class="mob-nav-item <?php echo e(request()->routeIs('guru.announcements') ? 'active' : ''); ?>">
         <i class="bi bi-megaphone"></i>
         <span>Pengumuman</span>
     </a>
-    @endrole
-    @role('siswa')
-    {{-- Mobile nav: Jadwal siswa dihapus sesuai permintaan --}}
-    <a href="{{ route('siswa.courses.index') }}" class="mob-nav-item {{ request()->routeIs('siswa.courses.index') ? 'active' : '' }}">
-        <i class="bi bi-journal-bookmark{{ request()->routeIs('siswa.courses.index') ? '-fill' : '' }}"></i>
+    <?php endif; ?>
+    <?php if (\Illuminate\Support\Facades\Blade::check('role', 'siswa')): ?>
+    
+    <a href="<?php echo e(route('siswa.courses.index')); ?>" class="mob-nav-item <?php echo e(request()->routeIs('siswa.courses*') ? 'active' : ''); ?>">
+        <i class="bi bi-journal-bookmark<?php echo e(request()->routeIs('siswa.courses*') ? '-fill' : ''); ?>"></i>
         <span>Mapel</span>
     </a>
-    <a href="{{ route('siswa.courses.fees') }}" class="mob-nav-item {{ request()->routeIs('siswa.courses.fees') ? 'active' : '' }}">
-        <i class="bi bi-cash-coin{{ request()->routeIs('siswa.courses.fees') ? '-fill' : '' }}"></i>
+    <a href="<?php echo e(route('siswa.courses.fees')); ?>" class="mob-nav-item <?php echo e(request()->routeIs('siswa.courses.fees') ? 'active' : ''); ?>">
+        <i class="bi bi-cash-coin<?php echo e(request()->routeIs('siswa.courses.fees') ? '-fill' : ''); ?>"></i>
         <span>Harga</span>
     </a>
-    <a href="{{ route('siswa.attendance') }}" class="mob-nav-item {{ request()->routeIs('siswa.attendance*') ? 'active' : '' }}">
+    <a href="<?php echo e(route('siswa.attendance')); ?>" class="mob-nav-item <?php echo e(request()->routeIs('siswa.attendance*') ? 'active' : ''); ?>">
         <i class="bi bi-clipboard-check"></i>
         <span>Absensi</span>
     </a>
-    <a href="{{ route('siswa.announcements') }}" class="mob-nav-item {{ request()->routeIs('siswa.announcements') ? 'active' : '' }}">
-        <i class="bi bi-megaphone{{ request()->routeIs('siswa.announcements') ? '-fill' : '' }}"></i>
+    <a href="<?php echo e(route('siswa.announcements')); ?>" class="mob-nav-item <?php echo e(request()->routeIs('siswa.announcements') ? 'active' : ''); ?>">
+        <i class="bi bi-megaphone<?php echo e(request()->routeIs('siswa.announcements') ? '-fill' : ''); ?>"></i>
         <span>Pengumuman</span>
     </a>
-    @endrole
-    <a href="{{ route('profile.edit') }}" class="mob-nav-item {{ request()->routeIs('profile.*') ? 'active' : '' }}">
-        <i class="bi bi-person{{ request()->routeIs('profile.*') ? '-fill' : '' }}"></i>
+    <?php endif; ?>
+    <a href="<?php echo e(route('profile.edit')); ?>" class="mob-nav-item <?php echo e(request()->routeIs('profile.*') ? 'active' : ''); ?>">
+        <i class="bi bi-person<?php echo e(request()->routeIs('profile.*') ? '-fill' : ''); ?>"></i>
         <span>Profil</span>
     </a>
     <button class="mob-nav-item border-0" onclick="toggleSidebar()" style="background:none">
@@ -3701,7 +3701,7 @@
     </button>
 </nav>
 
-{{-- COMMAND PALETTE --}}
+
 <div id="cmdOverlay" onclick="closeCmdPalette(event)">
     <div id="cmdBox" role="dialog" aria-label="Command Palette">
         <div id="cmdInputWrap">
@@ -3719,10 +3719,10 @@
     </div>
 </div>
 
-{{-- GLOBAL TOAST WRAPPER --}}
+
 <div id="globalToastWrap"></div>
 
-{{-- CUSTOM CONFIRM DIALOG --}}
+
 <div id="confirmOverlay">
     <div id="confirmBox">
         <div style="padding:24px 24px 0">
@@ -3739,7 +3739,7 @@
     </div>
 </div>
 
-{{-- PAGE LOADER --}}
+
 <div id="pageLoader">
     <div class="text-center">
         <div class="spinner-border text-primary mb-2" role="status"></div>
@@ -3747,17 +3747,18 @@
     </div>
 </div>
 
-{{-- FLASH DATA FOR JS TOAST SYSTEM --}}
+
 <script id="__flash__" type="application/json">
 {
-    "success": {!! json_encode(session('success') ?? '') !!},
-    "error":   {!! json_encode(session('error')   ?? '') !!},
-    "warning": {!! json_encode(session('warning') ?? '') !!},
-    "info":    {!! json_encode(session('info')    ?? '') !!}
+    "success": <?php echo json_encode(session('success') ?? ''); ?>,
+    "error":   <?php echo json_encode(session('error')   ?? ''); ?>,
+    "warning": <?php echo json_encode(session('warning') ?? ''); ?>,
+    "info":    <?php echo json_encode(session('info')    ?? ''); ?>
+
 }
 </script>
 
-{{-- SCRIPTS --}}
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
@@ -4252,7 +4253,7 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
     const btn = document.getElementById('notifBtn');
     if (!btn) return;
 
-    const notifData = @json($notifAnnouncements ?? collect());
+    const notifData = <?php echo json_encode($notifAnnouncements ?? collect(), 15, 512) ?>;
     const jenisMap = {
         info:   { icon:'bi-info-circle-fill', color:'#2563eb' },
         promo:  { icon:'bi-tag-fill',         color:'#f6af23' },
@@ -4309,12 +4310,12 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
             });
         }
 
-        @php
+        <?php
             $announcementsRoute = auth()->user()->hasAnyRole(['admin','owner'])
                 ? route('admin.announcements.index')
                 : (auth()->user()->hasRole('siswa') ? route('siswa.announcements') : '');
-        @endphp
-        const announcementsRoute = @json($announcementsRoute);
+        ?>
+        const announcementsRoute = <?php echo json_encode($announcementsRoute, 15, 512) ?>;
 
         panel.innerHTML = `
             <div style="padding:13px 16px;border-bottom:1px solid var(--card-border);display:flex;justify-content:space-between;align-items:center">
@@ -4332,7 +4333,7 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
 })();
 </script>
 
-<script src="{{ asset('js/modal-fallback.js') }}" defer></script>
+<script src="<?php echo e(asset('js/modal-fallback.js')); ?>" defer></script>
 
 <script>
 // ================================================================
@@ -4340,49 +4341,49 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
 // ================================================================
 (function() {
     const cmdPages = [
-        { label:'Dashboard', desc:'Halaman utama', href:'{{ route("dashboard") }}', icon:'bi-grid-fill', color:'#c84ddf', group:'Navigasi' },
-        @role('admin|owner')
-        { label:'Data Siswa', desc:'Kelola siswa', href:'{{ route("admin.students.index") }}', icon:'bi-mortarboard', color:'#c84ddf', group:'Akademik' },
-        { label:'Data Guru', desc:'Kelola guru & pengajar', href:'{{ route("admin.teachers.index") }}', icon:'bi-person-workspace', color:'#10b981', group:'Akademik' },
-        { label:'Paket Belajar', desc:'Atur paket & harga', href:'{{ route("admin.packages.index") }}', icon:'bi-box-seam', color:'#059669', group:'Akademik' },
-        { label:'Mata Pelajaran', desc:'Kelola mapel', href:'{{ route("admin.courses.index") }}', icon:'bi-journal-bookmark', color:'#10b981', group:'Akademik' },
-        { label:'Absensi', desc:'Kelola absensi siswa per sesi', href:'{{ route("admin.attendance.index") }}', icon:'bi-clipboard2-check', color:'#461256', group:'Akademik' },
-        { label:'Jadwal', desc:'Jadwal mengajar & sesi', href:'{{ route("admin.schedules.index") }}', icon:'bi-calendar-week', color:'#461256', group:'Akademik' },
-        { label:'Sertifikat', desc:'Terbitkan sertifikat siswa', href:'{{ route("admin.certificates.index") }}', icon:'bi-award', color:'#f6af23', group:'Akademik' },
-        { label:'Gaji Guru', desc:'Kelola gaji & slip', href:'{{ route("admin.salaries.index") }}', icon:'bi-cash-stack', color:'#68117e', group:'Keuangan' },
-        { label:'Laporan Keuangan', desc:'Rekap & analitik keuangan', href:'{{ route("admin.reports.index") }}', icon:'bi-bar-chart-line', color:'#260632', group:'Keuangan' },
-        { label:'Pengumuman', desc:'Buat & kelola pengumuman', href:'{{ route("admin.announcements.index") }}', icon:'bi-megaphone', color:'#68117e', group:'Komunikasi' },
-        { label:'Pesan Aplikasi', desc:'Chat internal', href:'{{ route("admin.messages.index") }}', icon:'bi-chat-dots', color:'#0284c7', group:'Komunikasi' },
-        { label:'Video Call', desc:'Kelas virtual online', href:'{{ route("admin.videocall.index") }}', icon:'bi-camera-video', color:'#0d9488', group:'Komunikasi' },
-        { label:'Tryout UTBK/PTN', desc:'Kelola soal & ujian CBT', href:'{{ route("admin.tryouts.index") }}', icon:'bi-journal-check', color:'#c84ddf', group:'Tryout CBT' },
-        { label:'Modul Akademik', desc:'Kelola modul materi pelajaran', href:'{{ route("admin.module.index") }}', icon:'bi-layers', color:'#68117e', group:'Akademik' },
-        { label:'Paket Kursus', desc:'Paket belajar & harga kursus', href:'{{ route("admin.course-package.index") }}', icon:'bi-collection', color:'#059669', group:'Akademik' },
-        { label:'Mata Pelajaran (Subject)', desc:'Kelola bidang studi', href:'{{ route("admin.subject.index") }}', icon:'bi-journal-text', color:'#10b981', group:'Akademik' },
-        { label:'Dashboard Jadwal', desc:'Pantau jadwal kelas harian', href:'{{ route("admin.schedule-dashboard.index") }}', icon:'bi-calendar3', color:'#461256', group:'Akademik' },
-        { label:'Reschedule Kelas', desc:'Kelola permohonan reschedule', href:'{{ route("admin.reschedule.index") }}', icon:'bi-arrow-repeat', color:'#68117e', group:'Akademik' },
-        { label:'Registrasi Siswa Baru', desc:'Daftarkan siswa & buat paket', href:'{{ route("admin.registration.create") }}', icon:'bi-person-plus', color:'#c84ddf', group:'Akademik' },
-        { label:'E-Billing & Invoice', desc:'Manajemen invoice & tagihan siswa', href:'{{ route("admin.billing.index") }}', icon:'bi-receipt', color:'#059669', group:'Keuangan' },
-        @endrole
-        @role('guru')
-        { label:'Dashboard Guru', desc:'Portal guru & jadwal', href:'{{ route("guru.dashboard") }}', icon:'bi-speedometer2', color:'#c84ddf', group:'Guru' },
-        { label:'Kelas', desc:'Kelas yang diajar', href:'{{ route("guru.classes.index") }}', icon:'bi-diagram-3', color:'#68117e', group:'Guru' },
-        { label:'Pengumuman', desc:'Informasi untuk guru', href:'{{ route("guru.announcements") }}', icon:'bi-megaphone', color:'#c84ddf', group:'Guru' },
-        @endrole
-        @role('siswa')
-        { label:'Dashboard Siswa', desc:'Portal siswa & tagihan', href:'{{ route("siswa.dashboard") }}', icon:'bi-speedometer2', color:'#c84ddf', group:'Siswa' },
-        { label:'List Mata Pelajaran', desc:'Mata pelajaran yang diambil', href:'{{ route("siswa.courses.index") }}', icon:'bi-journal-bookmark', color:'#10b981', group:'Siswa' },
-        { label:'Harga Paket', desc:'Daftar harga paket', href:'{{ route("siswa.courses.fees") }}', icon:'bi-cash-coin', color:'#f6af23', group:'Siswa' },
+        { label:'Dashboard', desc:'Halaman utama', href:'<?php echo e(route("dashboard")); ?>', icon:'bi-grid-fill', color:'#c84ddf', group:'Navigasi' },
+        <?php if (\Illuminate\Support\Facades\Blade::check('role', 'admin|owner')): ?>
+        { label:'Data Siswa', desc:'Kelola siswa', href:'<?php echo e(route("admin.students.index")); ?>', icon:'bi-mortarboard', color:'#c84ddf', group:'Akademik' },
+        { label:'Data Guru', desc:'Kelola guru & pengajar', href:'<?php echo e(route("admin.teachers.index")); ?>', icon:'bi-person-workspace', color:'#10b981', group:'Akademik' },
+        { label:'Paket Belajar', desc:'Atur paket & harga', href:'<?php echo e(route("admin.packages.index")); ?>', icon:'bi-box-seam', color:'#059669', group:'Akademik' },
+        { label:'Mata Pelajaran', desc:'Kelola mapel', href:'<?php echo e(route("admin.courses.index")); ?>', icon:'bi-journal-bookmark', color:'#10b981', group:'Akademik' },
+        { label:'Absensi', desc:'Kelola absensi siswa per sesi', href:'<?php echo e(route("admin.attendance.index")); ?>', icon:'bi-clipboard2-check', color:'#461256', group:'Akademik' },
+        { label:'Jadwal', desc:'Jadwal mengajar & sesi', href:'<?php echo e(route("admin.schedules.index")); ?>', icon:'bi-calendar-week', color:'#461256', group:'Akademik' },
+        { label:'Sertifikat', desc:'Terbitkan sertifikat siswa', href:'<?php echo e(route("admin.certificates.index")); ?>', icon:'bi-award', color:'#f6af23', group:'Akademik' },
+        { label:'Gaji Guru', desc:'Kelola gaji & slip', href:'<?php echo e(route("admin.salaries.index")); ?>', icon:'bi-cash-stack', color:'#68117e', group:'Keuangan' },
+        { label:'Laporan Keuangan', desc:'Rekap & analitik keuangan', href:'<?php echo e(route("admin.reports.index")); ?>', icon:'bi-bar-chart-line', color:'#260632', group:'Keuangan' },
+        { label:'Pengumuman', desc:'Buat & kelola pengumuman', href:'<?php echo e(route("admin.announcements.index")); ?>', icon:'bi-megaphone', color:'#68117e', group:'Komunikasi' },
+        { label:'Pesan Aplikasi', desc:'Chat internal', href:'<?php echo e(route("admin.messages.index")); ?>', icon:'bi-chat-dots', color:'#0284c7', group:'Komunikasi' },
+        { label:'Video Call', desc:'Kelas virtual online', href:'<?php echo e(route("admin.videocall.index")); ?>', icon:'bi-camera-video', color:'#0d9488', group:'Komunikasi' },
+        { label:'Tryout UTBK/PTN', desc:'Kelola soal & ujian CBT', href:'<?php echo e(route("admin.tryouts.index")); ?>', icon:'bi-journal-check', color:'#c84ddf', group:'Tryout CBT' },
+        { label:'Modul Akademik', desc:'Kelola modul materi pelajaran', href:'<?php echo e(route("admin.module.index")); ?>', icon:'bi-layers', color:'#68117e', group:'Akademik' },
+        { label:'Paket Kursus', desc:'Paket belajar & harga kursus', href:'<?php echo e(route("admin.course-package.index")); ?>', icon:'bi-collection', color:'#059669', group:'Akademik' },
+        { label:'Mata Pelajaran (Subject)', desc:'Kelola bidang studi', href:'<?php echo e(route("admin.subject.index")); ?>', icon:'bi-journal-text', color:'#10b981', group:'Akademik' },
+        { label:'Dashboard Jadwal', desc:'Pantau jadwal kelas harian', href:'<?php echo e(route("admin.schedule-dashboard.index")); ?>', icon:'bi-calendar3', color:'#461256', group:'Akademik' },
+        { label:'Reschedule Kelas', desc:'Kelola permohonan reschedule', href:'<?php echo e(route("admin.reschedule.index")); ?>', icon:'bi-arrow-repeat', color:'#68117e', group:'Akademik' },
+        { label:'Registrasi Siswa Baru', desc:'Daftarkan siswa & buat paket', href:'<?php echo e(route("admin.registration.create")); ?>', icon:'bi-person-plus', color:'#c84ddf', group:'Akademik' },
+        { label:'E-Billing & Invoice', desc:'Manajemen invoice & tagihan siswa', href:'<?php echo e(route("admin.billing.index")); ?>', icon:'bi-receipt', color:'#059669', group:'Keuangan' },
+        <?php endif; ?>
+        <?php if (\Illuminate\Support\Facades\Blade::check('role', 'guru')): ?>
+        { label:'Dashboard Guru', desc:'Portal guru & jadwal', href:'<?php echo e(route("guru.dashboard")); ?>', icon:'bi-speedometer2', color:'#c84ddf', group:'Guru' },
+        { label:'Kelas', desc:'Kelas yang diajar', href:'<?php echo e(route("guru.classes.index")); ?>', icon:'bi-diagram-3', color:'#68117e', group:'Guru' },
+        { label:'Pengumuman', desc:'Informasi untuk guru', href:'<?php echo e(route("guru.announcements")); ?>', icon:'bi-megaphone', color:'#c84ddf', group:'Guru' },
+        <?php endif; ?>
+        <?php if (\Illuminate\Support\Facades\Blade::check('role', 'siswa')): ?>
+        { label:'Dashboard Siswa', desc:'Portal siswa & tagihan', href:'<?php echo e(route("siswa.dashboard")); ?>', icon:'bi-speedometer2', color:'#c84ddf', group:'Siswa' },
+        { label:'List Mata Pelajaran', desc:'Mata pelajaran yang diambil', href:'<?php echo e(route("siswa.courses.index")); ?>', icon:'bi-journal-bookmark', color:'#10b981', group:'Siswa' },
+        { label:'Harga Paket', desc:'Daftar harga paket', href:'<?php echo e(route("siswa.courses.fees")); ?>', icon:'bi-cash-coin', color:'#f6af23', group:'Siswa' },
         // Jadwal Belajar (siswa) dihapus — entri command palette dihilangkan
-        { label:'Sertifikat Saya', desc:'Lihat sertifikat yang diterbitkan', href:'{{ route("siswa.certificates.index") }}', icon:'bi-award', color:'#f6af23', group:'Siswa' },
-        { label:'Pengumuman', desc:'Informasi & pengumuman terbaru', href:'{{ route("siswa.announcements") }}', icon:'bi-megaphone', color:'#c84ddf', group:'Siswa' },
-        { label:'Tryout CBT', desc:'Ujian online UTBK/PTN', href:'{{ route("siswa.tryout") }}', icon:'bi-laptop', color:'#461256', group:'Siswa' },
-        @endrole
-        @role('owner')
-        { label:'Monitoring Cabang', desc:'Pantau semua cabang', href:'{{ route("owner.branches.index") }}', icon:'bi-building', color:'#c84ddf', group:'Owner' },
-        { label:'Analytics', desc:'Laporan performa bisnis', href:'{{ route("owner.analytics") }}', icon:'bi-graph-up-arrow', color:'#10b981', group:'Owner' },
-        { label:'Log Aktivitas', desc:'Riwayat aktivitas sistem', href:'{{ route("owner.activity-log") }}', icon:'bi-journal-text', color:'#68117e', group:'Owner' },
-        @endrole
-        { label:'Profil Saya', desc:'Edit akun & password', href:'{{ route("profile.edit") }}', icon:'bi-person-circle', color:'#c84ddf', group:'Akun' },
+        { label:'Sertifikat Saya', desc:'Lihat sertifikat yang diterbitkan', href:'<?php echo e(route("siswa.certificates.index")); ?>', icon:'bi-award', color:'#f6af23', group:'Siswa' },
+        { label:'Pengumuman', desc:'Informasi & pengumuman terbaru', href:'<?php echo e(route("siswa.announcements")); ?>', icon:'bi-megaphone', color:'#c84ddf', group:'Siswa' },
+        { label:'Tryout CBT', desc:'Ujian online UTBK/PTN', href:'<?php echo e(route("siswa.tryout")); ?>', icon:'bi-laptop', color:'#461256', group:'Siswa' },
+        <?php endif; ?>
+        <?php if (\Illuminate\Support\Facades\Blade::check('role', 'owner')): ?>
+        { label:'Monitoring Cabang', desc:'Pantau semua cabang', href:'<?php echo e(route("owner.branches.index")); ?>', icon:'bi-building', color:'#c84ddf', group:'Owner' },
+        { label:'Analytics', desc:'Laporan performa bisnis', href:'<?php echo e(route("owner.analytics")); ?>', icon:'bi-graph-up-arrow', color:'#10b981', group:'Owner' },
+        { label:'Log Aktivitas', desc:'Riwayat aktivitas sistem', href:'<?php echo e(route("owner.activity-log")); ?>', icon:'bi-journal-text', color:'#68117e', group:'Owner' },
+        <?php endif; ?>
+        { label:'Profil Saya', desc:'Edit akun & password', href:'<?php echo e(route("profile.edit")); ?>', icon:'bi-person-circle', color:'#c84ddf', group:'Akun' },
     ];
 
     let cmdActive = -1;
@@ -4504,7 +4505,7 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
 })();
 </script>
 
-@stack('scripts')
+<?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
 <script>
 // Sanitize pagination UI: remove ONLY extension-injected SVG chevrons, not Bootstrap Icons
@@ -4533,3 +4534,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 </html>
+<?php /**PATH /home/runner/workspace/resources/views/layouts/app.blade.php ENDPATH**/ ?>
