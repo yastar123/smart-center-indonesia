@@ -14,12 +14,16 @@ class ScheduleDashboardController extends Controller
     {
         $date = $request->date ? Carbon::parse($request->date) : Carbon::today();
 
-        $schedules = Schedule::with(['kelas.guru', 'kelas.mataPelajaran', 'kelas.cabang', 'absensi'])
+        $schedules = Schedule::with([
+                'kelas.guru', 'kelas.mataPelajaran', 'kelas.cabang', 'kelas.siswa',
+                'paket.guru', 'paket.mataPelajaran', 'paket.siswa',
+                'guru', 'absensi',
+            ])
             ->whereDate('tanggal', $date)
             ->orderBy('jam_mulai')
             ->get()
             ->map(function ($s) {
-                $now = now();
+                $now   = now();
                 $start = Carbon::parse($s->tanggal->format('Y-m-d') . ' ' . $s->jam_mulai);
                 $end   = Carbon::parse($s->tanggal->format('Y-m-d') . ' ' . $s->jam_selesai);
 
@@ -33,15 +37,32 @@ class ScheduleDashboardController extends Controller
                     $displayStatus = 'completed';
                 }
 
-                $studentCount = $s->kelas ? $s->kelas->siswa()->count() : 0;
-                $capacity     = $s->kelas->kapasitas ?? $studentCount;
+                // Student count: prefer kelas (class_students pivot), fall back to package enrollment
+                if ($s->kelas) {
+                    $studentCount = $s->kelas->siswa->count();
+                    $capacity     = $s->kelas->kapasitas ?? $studentCount;
+                } elseif ($s->paket) {
+                    $studentCount = $s->paket->siswa->count();
+                    $capacity     = $studentCount;
+                } else {
+                    $studentCount = 0;
+                    $capacity     = 0;
+                }
+
+                // Display info: prefer kelas, fall back to paket + schedule guru
+                $className   = $s->kelas->nama_kelas
+                    ?? ($s->paket->nama ?? '—');
+                $teacherName = $s->kelas->guru->name
+                    ?? ($s->guru->name ?? ($s->paket->guru->name ?? '—'));
+                $subjectName = $s->kelas->mataPelajaran->nama
+                    ?? ($s->paket->mataPelajaran->first()->nama ?? '—');
 
                 return [
                     'id'             => $s->id,
-                    'class_name'     => $s->kelas->nama_kelas ?? '—',
-                    'teacher_name'   => $s->kelas->guru->name ?? '—',
-                    'subject_name'   => $s->kelas->mataPelajaran->nama ?? '—',
-                    'room_name'      => $s->ruangan ?? 'Online',
+                    'class_name'     => $className,
+                    'teacher_name'   => $teacherName,
+                    'subject_name'   => $subjectName,
+                    'room_name'      => $s->ruangan ?? ($s->jenis === 'online' ? 'Online' : 'Offline'),
                     'jam_mulai'      => $s->jam_mulai,
                     'jam_selesai'    => $s->jam_selesai,
                     'jenis'          => $s->jenis,
