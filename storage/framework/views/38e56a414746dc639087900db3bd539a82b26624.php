@@ -1,18 +1,17 @@
-@extends('layouts.app')
-@section('title','Tambah Jadwal Sesi')
-@section('page-title','Tambah Jadwal Sesi')
+<?php $__env->startSection('title','Tambah Jadwal Sesi'); ?>
+<?php $__env->startSection('page-title','Tambah Jadwal Sesi'); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="fade-up">
 
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ route('admin.schedules.index') }}">Jadwal Sesi</a></li>
+        <li class="breadcrumb-item"><a href="<?php echo e(route('admin.schedules.index')); ?>">Jadwal Sesi</a></li>
         <li class="breadcrumb-item active">Tambah Jadwal</li>
     </ol>
 </nav>
 
-{{-- HEADER --}}
+
 <div class="dashboard-card mb-4" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
     <div style="position:absolute;right:-20px;top:-20px;width:160px;height:160px;background:rgba(255,255,255,.05);border-radius:50%;pointer-events:none"></div>
     <div class="d-flex align-items-center justify-content-between" style="position:relative">
@@ -25,26 +24,26 @@
                 <div style="font-size:12px;opacity:.8">Buat jadwal sesi baru untuk paket belajar</div>
             </div>
         </div>
-        <a href="{{ route('admin.schedules.index') }}" class="btn btn-sm"
+        <a href="<?php echo e(route('admin.schedules.index')); ?>" class="btn btn-sm"
            style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.3)">
             <i class="bi bi-arrow-left me-1"></i>Kembali
         </a>
     </div>
 </div>
 
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show mb-4"><i class="bi bi-check-circle me-2"></i>{{ session('success') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
-@endif
+<?php if(session('success')): ?>
+    <div class="alert alert-success alert-dismissible fade show mb-4"><i class="bi bi-check-circle me-2"></i><?php echo e(session('success')); ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+<?php endif; ?>
 
-<form action="{{ route('admin.schedules.store') }}" method="POST" id="scheduleForm">
-@csrf
-@if($errors->any())
+<form action="<?php echo e(route('admin.schedules.store')); ?>" method="POST" id="scheduleForm">
+<?php echo csrf_field(); ?>
+<?php if($errors->any()): ?>
 <div class="alert alert-danger mb-4">
-    <ul class="mb-0 ps-3">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+    <ul class="mb-0 ps-3"><?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $e): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><li><?php echo e($e); ?></li><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?></ul>
 </div>
-@endif
+<?php endif; ?>
 
-{{-- SECTION 1: PAKET --}}
+
 <div class="dashboard-card mb-4">
     <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
         <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#c84ddf,#461256);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
@@ -57,20 +56,21 @@
     </div>
 
     <div class="row g-3">
-        {{-- PAKET BELAJAR --}}
+        
         <div class="col-lg-8">
             <label class="form-label fw-semibold">Paket Belajar <span class="text-danger">*</span></label>
             <select name="paket_id" id="paket_id" class="form-select" required onchange="onPaketChange(this.value)">
                 <option value="">— Pilih Paket —</option>
-                @foreach($pakets as $p)
-                <option value="{{ $p->id }}" {{ old('paket_id') == $p->id ? 'selected' : '' }}>
-                    {{ $p->nama . ($p->guru ? ' – '.$p->guru->name : '') . ($p->cabang ? ' ('.$p->cabang->name.')' : '') }}
+                <?php $__currentLoopData = $pakets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <option value="<?php echo e($p->id); ?>" <?php echo e(old('paket_id') == $p->id ? 'selected' : ''); ?>>
+                    <?php echo e($p->nama . ($p->guru ? ' – '.$p->guru->name : '') . ($p->cabang ? ' ('.$p->cabang->name.')' : '')); ?>
+
                 </option>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </select>
         </div>
 
-        {{-- SESI KE --}}
+        
         <div class="col-lg-4">
             <label class="form-label fw-semibold">Sesi Ke- <span class="text-danger">*</span></label>
             <select name="pertemuan_ke" id="pertemuan_ke" class="form-select" required>
@@ -78,7 +78,7 @@
             </select>
         </div>
 
-        {{-- DETAIL PAKET BOX --}}
+        
         <div class="col-12" id="paketDetailBox" style="display:none">
             <div class="p-3 rounded-3" style="background:var(--soft-primary-bg);border:1.5px solid var(--soft-primary-border)">
                 <div class="fw-semibold mb-2" style="color:var(--soft-primary-text);font-size:13px"><i class="bi bi-info-circle me-2"></i>Detail Paket Terpilih</div>
@@ -86,7 +86,7 @@
             </div>
         </div>
 
-        {{-- SISWA PAKET BOX --}}
+        
         <div class="col-12" id="daftarSiswaPaketBox" style="display:none">
             <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
                 <div class="d-flex align-items-center justify-content-between mb-2">
@@ -104,7 +104,7 @@
     </div>
 </div>
 
-{{-- SECTION 2: GURU PENGAJAR --}}
+
 <div class="dashboard-card mb-4">
     <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
         <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#10b981,#047857);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
@@ -120,11 +120,12 @@
             <label class="form-label fw-semibold">Guru Pengajar <span class="text-danger">*</span></label>
             <select name="guru_id" id="guru_id" class="form-select" required onchange="onGuruChange(this.value)">
                 <option value="">— Pilih Guru —</option>
-                @foreach($teachers as $t)
-                <option value="{{ $t->id }}" {{ old('guru_id') == $t->id ? 'selected' : '' }}>
-                    {{ $t->name }}{{ $t->branch ? ' ('.$t->branch->name.')' : '' }}
+                <?php $__currentLoopData = $teachers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <option value="<?php echo e($t->id); ?>" <?php echo e(old('guru_id') == $t->id ? 'selected' : ''); ?>>
+                    <?php echo e($t->name); ?><?php echo e($t->branch ? ' ('.$t->branch->name.')' : ''); ?>
+
                 </option>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </select>
             <div class="form-text">Pilih guru secara manual, atau akan terisi otomatis dari paket.</div>
         </div>
@@ -136,7 +137,7 @@
     </div>
 </div>
 
-{{-- SECTION 3: WAKTU & JADWAL --}}
+
 <div class="dashboard-card mb-4">
     <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
         <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#0ea5e9,#0369a1);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
@@ -151,31 +152,31 @@
         <div class="col-md-3">
             <label class="form-label fw-semibold">Metode Kelas <span class="text-danger">*</span></label>
             <select name="jenis" id="jenis" class="form-select" required>
-                <option value="offline" {{ old('jenis','offline') == 'offline' ? 'selected' : '' }}>🏫 Offline (Tatap Muka)</option>
-                <option value="online"  {{ old('jenis') == 'online'  ? 'selected' : '' }}>💻 Online</option>
-                <option value="private" {{ old('jenis') == 'private' ? 'selected' : '' }}>👤 Private</option>
+                <option value="offline" <?php echo e(old('jenis','offline') == 'offline' ? 'selected' : ''); ?>>🏫 Offline (Tatap Muka)</option>
+                <option value="online"  <?php echo e(old('jenis') == 'online'  ? 'selected' : ''); ?>>💻 Online</option>
+                <option value="private" <?php echo e(old('jenis') == 'private' ? 'selected' : ''); ?>>👤 Private</option>
             </select>
         </div>
         <div class="col-md-3">
             <label class="form-label fw-semibold">Tanggal <span class="text-danger">*</span></label>
-            <input type="date" name="tanggal" id="tanggal" class="form-control" value="{{ old('tanggal') }}" required>
+            <input type="date" name="tanggal" id="tanggal" class="form-control" value="<?php echo e(old('tanggal')); ?>" required>
         </div>
         <div class="col-md-3">
             <label class="form-label fw-semibold">Jam Mulai <span class="text-danger">*</span></label>
-            <input type="time" name="jam_mulai" id="jam_mulai" class="form-control" value="{{ old('jam_mulai') }}" required>
+            <input type="time" name="jam_mulai" id="jam_mulai" class="form-control" value="<?php echo e(old('jam_mulai')); ?>" required>
         </div>
         <div class="col-md-3">
             <label class="form-label fw-semibold">Jam Selesai <span class="text-danger">*</span></label>
-            <input type="time" name="jam_selesai" id="jam_selesai" class="form-control" value="{{ old('jam_selesai') }}" required>
+            <input type="time" name="jam_selesai" id="jam_selesai" class="form-control" value="<?php echo e(old('jam_selesai')); ?>" required>
         </div>
         <div class="col-12">
             <label class="form-label fw-semibold">Topik / Materi <span class="text-muted fw-normal">(opsional)</span></label>
-            <input type="text" name="topik" class="form-control" value="{{ old('topik') }}" placeholder="Contoh: Persamaan Kuadrat, Past Tense, dll">
+            <input type="text" name="topik" class="form-control" value="<?php echo e(old('topik')); ?>" placeholder="Contoh: Persamaan Kuadrat, Past Tense, dll">
         </div>
     </div>
 </div>
 
-{{-- SECTION 4: MODUL --}}
+
 <div class="dashboard-card mb-4">
     <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
         <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#f6af23,#d97706);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
@@ -191,14 +192,14 @@
             <label class="form-label fw-semibold">Modul <span class="text-muted fw-normal">(opsional)</span></label>
             <select name="module_id" id="module_id" class="form-select" onchange="onModuleChange(this.value)">
                 <option value="">— Tidak ada modul (opsional) —</option>
-                @foreach($modules as $m)
-                <option value="{{ $m->id }}" {{ old('module_id') == $m->id ? 'selected' : '' }}>
-                    {{ $m->judul }}@if($m->mataPelajaran) – {{ $m->mataPelajaran->nama }}@endif
-                    @if($m->kode_modul) [{{ $m->kode_modul }}]@endif
+                <?php $__currentLoopData = $modules; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $m): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <option value="<?php echo e($m->id); ?>" <?php echo e(old('module_id') == $m->id ? 'selected' : ''); ?>>
+                    <?php echo e($m->judul); ?><?php if($m->mataPelajaran): ?> – <?php echo e($m->mataPelajaran->nama); ?><?php endif; ?>
+                    <?php if($m->kode_modul): ?> [<?php echo e($m->kode_modul); ?>]<?php endif; ?>
                 </option>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </select>
-            <div class="form-text">Modul dari halaman <a href="{{ route('admin.module.index') }}" target="_blank">Admin &gt; Modul</a></div>
+            <div class="form-text">Modul dari halaman <a href="<?php echo e(route('admin.module.index')); ?>" target="_blank">Admin &gt; Modul</a></div>
         </div>
         <div class="col-lg-4">
             <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border);min-height:60px" id="moduleInfoBox">
@@ -208,7 +209,7 @@
     </div>
 </div>
 
-{{-- SECTION 5: LOKASI & LINK --}}
+
 <div class="dashboard-card mb-4">
     <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
         <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
@@ -224,29 +225,29 @@
             <label class="form-label fw-semibold">Ruangan <span class="text-muted fw-normal">(opsional)</span></label>
             <div class="input-group">
                 <span class="input-group-text" style="background:var(--input-bg);border-color:var(--card-border)"><i class="bi bi-door-open text-muted"></i></span>
-                <input type="text" name="ruangan" class="form-control" value="{{ old('ruangan') }}" placeholder="misal: Ruang A1, Lab Komputer">
+                <input type="text" name="ruangan" class="form-control" value="<?php echo e(old('ruangan')); ?>" placeholder="misal: Ruang A1, Lab Komputer">
             </div>
         </div>
         <div class="col-md-6">
             <label class="form-label fw-semibold">Link Meeting <span class="text-muted fw-normal">(opsional)</span></label>
             <div class="input-group">
                 <span class="input-group-text" style="background:var(--input-bg);border-color:var(--card-border)"><i class="bi bi-camera-video text-muted"></i></span>
-                <input type="url" name="link_meeting" class="form-control" value="{{ old('link_meeting') }}" placeholder="https://zoom.us/...">
+                <input type="url" name="link_meeting" class="form-control" value="<?php echo e(old('link_meeting')); ?>" placeholder="https://zoom.us/...">
             </div>
         </div>
         <div class="col-12">
             <label class="form-label fw-semibold">Catatan <span class="text-muted fw-normal">(opsional)</span></label>
-            <textarea name="catatan" class="form-control" rows="2" placeholder="Catatan tambahan untuk sesi ini">{{ old('catatan') }}</textarea>
+            <textarea name="catatan" class="form-control" rows="2" placeholder="Catatan tambahan untuk sesi ini"><?php echo e(old('catatan')); ?></textarea>
         </div>
     </div>
 </div>
 
-{{-- SUBMIT --}}
+
 <div class="dashboard-card">
     <div class="d-flex justify-content-between align-items-center">
         <div class="text-muted" style="font-size:13px"><i class="bi bi-info-circle me-1"></i>Field bertanda <span class="text-danger">*</span> wajib diisi</div>
         <div class="d-flex gap-2">
-            <a href="{{ route('admin.schedules.index') }}" class="btn btn-outline-secondary px-4">Batal</a>
+            <a href="<?php echo e(route('admin.schedules.index')); ?>" class="btn btn-outline-secondary px-4">Batal</a>
             <button type="submit" class="btn btn-primary px-5 fw-semibold">
                 <i class="bi bi-calendar-check me-2"></i>Simpan Jadwal
             </button>
@@ -256,9 +257,9 @@
 
 </form>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@php
+<?php
 $paketsJson = $pakets->map(function ($p) {
     return [
         'id'               => $p->id,
@@ -290,13 +291,13 @@ $modulesJson = $modules->map(function ($m) {
         'mata_pelajaran' => $m->mataPelajaran?->nama,
     ];
 });
-@endphp
+?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
-const pakets  = @json($paketsJson);
-const modules = @json($modulesJson);
-const packageStudentsBaseUrl = '/admin/schedules/package';
+const pakets  = <?php echo json_encode($paketsJson, 15, 512) ?>;
+const modules = <?php echo json_encode($modulesJson, 15, 512) ?>;
+const packageStudentsBaseUrl = '<?php echo e(url("/admin/schedules/package")); ?>';
 
 function onPaketChange(paketId) {
     const detailBox     = document.getElementById('paketDetailBox');
@@ -436,4 +437,6 @@ if (initPaket) onPaketChange(initPaket);
 const initModule = document.getElementById('module_id').value;
 if (initModule) onModuleChange(initModule);
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/admin/schedules/create.blade.php ENDPATH**/ ?>
