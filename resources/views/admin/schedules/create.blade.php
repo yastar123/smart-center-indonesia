@@ -73,10 +73,14 @@
         {{-- SESI KE --}}
         <div class="col-lg-4">
             <label class="form-label fw-semibold">Sesi Ke- <span class="text-danger">*</span></label>
-            <select name="pertemuan_ke" id="pertemuan_ke" class="form-select" required>
+            <select name="pertemuan_ke" id="pertemuan_ke" class="form-select" required onchange="onSesiChange(this.value)">
                 <option value="">— Pilih paket dulu —</option>
             </select>
+            <div id="sesiWarning"></div>
         </div>
+
+        {{-- PROGRESS SESI --}}
+        <div class="col-12" id="sesiProgressBar" style="display:none"></div>
 
         {{-- DETAIL PAKET BOX --}}
         <div class="col-12" id="paketDetailBox" style="display:none">
@@ -247,7 +251,7 @@
         <div class="text-muted" style="font-size:13px"><i class="bi bi-info-circle me-1"></i>Field bertanda <span class="text-danger">*</span> wajib diisi</div>
         <div class="d-flex gap-2">
             <a href="{{ route('admin.schedules.index') }}" class="btn btn-outline-secondary px-4">Batal</a>
-            <button type="submit" class="btn btn-primary px-5 fw-semibold">
+            <button type="submit" id="submitBtn" class="btn btn-primary px-5 fw-semibold">
                 <i class="bi bi-calendar-check me-2"></i>Simpan Jadwal
             </button>
         </div>
@@ -296,7 +300,8 @@ $modulesJson = $modules->map(function ($m) {
 <script>
 const pakets  = @json($paketsJson);
 const modules = @json($modulesJson);
-const packageStudentsBaseUrl = '/admin/schedules/package';
+const packageStudentsBaseUrl  = '/admin/schedules/package';
+let   usedSessionsCache       = {};   // paketId → {pertemuan_ke: {tanggal, status, topik}}
 
 function onPaketChange(paketId) {
     const detailBox     = document.getElementById('paketDetailBox');
@@ -312,6 +317,7 @@ function onPaketChange(paketId) {
         sesiSelect.innerHTML = '<option value="">— Pilih paket dulu —</option>';
         guruSelect.value = '';
         guruInfoBox.innerHTML = '<div class="text-muted" style="font-size:12px">Pilih paket untuk melihat info guru pengajar</div>';
+        hideSesiWarning();
         return;
     }
 
@@ -330,13 +336,10 @@ function onPaketChange(paketId) {
         ${pkg.deskripsi ? `<div class="col-12"><strong>Deskripsi:</strong> ${pkg.deskripsi}</div>` : ''}
     `;
 
-    // Session options
-    let sesiOptions = '<option value="">— Pilih Sesi —</option>';
-    const totalSesi = Number(pkg.jumlah_pertemuan || 0);
-    for (let i = 1; i <= totalSesi; i++) {
-        sesiOptions += `<option value="${i}">Sesi ke-${i}</option>`;
-    }
-    sesiSelect.innerHTML = sesiOptions;
+    // Show loading state for sessions
+    sesiSelect.innerHTML = '<option value="">⏳ Memuat sesi...</option>';
+    sesiSelect.disabled = true;
+    hideSesiWarning();
 
     // Auto-set jenis (delivery method) from package tipe_kelas
     const jenisSelect = document.getElementById('jenis');
@@ -360,8 +363,112 @@ function onPaketChange(paketId) {
         guruInfoBox.innerHTML = '<div class="text-muted" style="font-size:12px">Paket ini belum memiliki guru pengajar</div>';
     }
 
+    // Load used sessions then build dropdown
+    loadUsedSessions(paketId, pkg).then(() => {
+        buildSesiOptions(paketId, pkg);
+        sesiSelect.disabled = false;
+    });
+
     // Load students enrolled in this package
     loadStudentsByPackage(paketId);
+}
+
+function loadUsedSessions(paketId, pkg) {
+    if (usedSessionsCache[paketId]) return Promise.resolve();
+    return fetch(`${packageStudentsBaseUrl}/${paketId}/used-sessions`, {
+        headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+    })
+    .then(r => r.ok ? r.json() : { used: {} })
+    .then(data => { usedSessionsCache[paketId] = data.used || {}; })
+    .catch(() => { usedSessionsCache[paketId] = {}; });
+}
+
+function buildSesiOptions(paketId, pkg) {
+    const sesiSelect = document.getElementById('pertemuan_ke');
+    const used       = usedSessionsCache[paketId] || {};
+    const totalSesi  = Number(pkg.jumlah_pertemuan || 0);
+    const usedKeys   = Object.keys(used).map(Number);
+    const sisaCount  = totalSesi - usedKeys.length;
+
+    let sesiOptions = `<option value="">— Pilih Sesi (${sisaCount} tersisa dari ${totalSesi}) —</option>`;
+    for (let i = 1; i <= totalSesi; i++) {
+        if (used[i]) {
+            const info = used[i];
+            const statusIcon = info.status === 'selesai' ? '✅' : (info.status === 'berlangsung' ? '🟡' : '🔵');
+            const topikText  = info.topik ? ` — ${info.topik}` : '';
+            const tglText    = info.tanggal ? ` (${info.tanggal})` : '';
+            sesiOptions += `<option value="${i}" disabled style="color:#999;background:#f5f5f5">
+                ${statusIcon} Sesi ke-${i}${topikText}${tglText} — Sudah dijadwalkan
+            </option>`;
+        } else {
+            sesiOptions += `<option value="${i}">✨ Sesi ke-${i} — Belum dijadwalkan</option>`;
+        }
+    }
+    sesiSelect.innerHTML = sesiOptions;
+
+    // Update sesi info bar
+    updateSesiInfoBar(paketId, pkg);
+}
+
+function updateSesiInfoBar(paketId, pkg) {
+    const used      = usedSessionsCache[paketId] || {};
+    const total     = Number(pkg.jumlah_pertemuan || 0);
+    const usedCount = Object.keys(used).length;
+    const sisa      = total - usedCount;
+    const bar       = document.getElementById('sesiProgressBar');
+    if (!bar) return;
+
+    const pct = total > 0 ? Math.round((usedCount / total) * 100) : 0;
+    bar.style.display = 'block';
+    bar.innerHTML = `
+        <div class="d-flex align-items-center justify-content-between mb-1" style="font-size:12px">
+            <span class="fw-semibold">Progress Sesi Paket</span>
+            <span style="color:var(--text-muted)">${usedCount} / ${total} sudah dijadwalkan</span>
+        </div>
+        <div class="progress" style="height:8px;border-radius:4px;background:var(--input-bg)">
+            <div class="progress-bar" role="progressbar"
+                 style="width:${pct}%;background:${pct >= 100 ? '#dc3545' : pct >= 75 ? '#f6af23' : '#10b981'};border-radius:4px"
+                 aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <div class="mt-1 d-flex gap-3" style="font-size:11px;color:var(--text-muted)">
+            <span>✅ Sudah: ${usedCount} sesi</span>
+            <span>✨ Tersisa: ${sisa} sesi</span>
+            ${pct >= 100 ? '<span class="text-danger fw-semibold">⚠️ Semua sesi sudah dijadwalkan</span>' : ''}
+        </div>
+    `;
+}
+
+function onSesiChange(val) {
+    const paketId = document.getElementById('paket_id').value;
+    if (!paketId || !val) { hideSesiWarning(); return; }
+    const used = usedSessionsCache[paketId] || {};
+    if (used[val]) {
+        const info = used[val];
+        showSesiWarning(`Sesi ke-${val} sudah dijadwalkan pada ${info.tanggal || '—'}${info.topik ? ' ('+info.topik+')' : ''}. Pilih sesi lain.`);
+        document.getElementById('submitBtn').disabled = true;
+    } else {
+        hideSesiWarning();
+        document.getElementById('submitBtn').disabled = false;
+    }
+}
+
+function showSesiWarning(msg) {
+    let el = document.getElementById('sesiWarning');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'sesiWarning';
+        document.getElementById('pertemuan_ke').parentNode.appendChild(el);
+    }
+    el.innerHTML = `<div class="mt-2 p-2 rounded-2" style="background:#fff3cd;border:1px solid #ffc107;font-size:12px;color:#856404">
+        <i class="bi bi-exclamation-triangle-fill me-1"></i>${msg}
+    </div>`;
+}
+
+function hideSesiWarning() {
+    const el = document.getElementById('sesiWarning');
+    if (el) el.innerHTML = '';
+    const btn = document.getElementById('submitBtn');
+    if (btn) btn.disabled = false;
 }
 
 function loadStudentsByPackage(paketId) {

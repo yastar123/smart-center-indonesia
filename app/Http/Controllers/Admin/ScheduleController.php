@@ -90,6 +90,19 @@ class ScheduleController extends Controller
             return back()->withErrors(['pertemuan_ke' => $msg])->withInput();
         }
 
+        // Cegah duplikat sesi pada paket yang sama
+        $sudahAda = Schedule::where('paket_id', $data['paket_id'])
+            ->where('pertemuan_ke', $data['pertemuan_ke'])
+            ->whereNull('deleted_at')
+            ->exists();
+        if ($sudahAda) {
+            $msg = "Sesi ke-{$data['pertemuan_ke']} untuk paket ini sudah pernah dijadwalkan.";
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+            return back()->withErrors(['pertemuan_ke' => $msg])->withInput();
+        }
+
         // Use form guru_id if provided, otherwise fall back to package's guru
         $data['guru_id']   = $data['guru_id'] ?? $paket->guru_id;
         $data['cabang_id'] = $paket->cabang_id;

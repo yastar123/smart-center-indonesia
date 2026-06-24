@@ -260,6 +260,21 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::post('/verifikasi-pembayaran/package/{packagePayment}/approve', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'approvePackage'])->name('verifikasi-pembayaran.package.approve');
         Route::post('/verifikasi-pembayaran/package/{packagePayment}/reject', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'rejectPackage'])->name('verifikasi-pembayaran.package.reject');
 
+        // AJAX: used sessions per package
+        Route::get('/schedules/package/{package}/used-sessions', function(\App\Models\Package $package) {
+            $used = \App\Models\Schedule::where('paket_id', $package->id)
+                ->whereNull('deleted_at')
+                ->orderBy('pertemuan_ke')
+                ->get(['pertemuan_ke', 'tanggal', 'status', 'topik'])
+                ->keyBy('pertemuan_ke')
+                ->map(fn($s) => [
+                    'tanggal' => $s->tanggal ? \Carbon\Carbon::parse($s->tanggal)->format('d/m/Y') : null,
+                    'status'  => $s->status,
+                    'topik'   => $s->topik,
+                ]);
+            return response()->json(['used' => $used]);
+        })->name('schedules.package-used-sessions');
+
         // AJAX: students by package (primary source of truth)
         Route::get('/schedules/package/{package}/students', function(\App\Models\Package $package) {
             $students = \App\Models\Student::where('package_id', $package->id)
