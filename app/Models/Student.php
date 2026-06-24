@@ -33,6 +33,16 @@ class Student extends Model
         return $this->belongsToMany(Teacher::class, 'student_teachers', 'student_id', 'teacher_id')->withTimestamps();
     }
 
+    public function certificates()
+    {
+        return $this->hasMany(Certificate::class, 'siswa_id');
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class, 'siswa_id');
+    }
+
     public function getPhotoUrlAttribute()
     {
         return $this->photo

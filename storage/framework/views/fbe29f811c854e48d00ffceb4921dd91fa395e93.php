@@ -3568,7 +3568,7 @@
         <div class="topbar-right">
 
             
-            <a href="<?php echo e(url('/')); ?>" class="top-btn d-none d-md-flex" title="Beranda" style="text-decoration:none;align-items:center;">
+            <a href="<?php echo e(route('dashboard')); ?>" class="top-btn d-none d-md-flex" title="Dashboard" style="text-decoration:none;align-items:center;">
                 <i class="bi bi-house-door" style="font-size:15px"></i>
             </a>
 

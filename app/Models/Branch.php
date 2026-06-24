@@ -52,6 +52,16 @@ class Branch extends Model
         return $this->hasMany(Student::class);
     }
 
+    public function teachers()
+    {
+        return $this->hasMany(Teacher::class, 'branch_id');
+    }
+
+    public function packages()
+    {
+        return $this->hasMany(Package::class, 'cabang_id');
+    }
+
     public function admin()
     {
         return $this->belongsTo(User::class, 'admin_id');

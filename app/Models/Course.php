@@ -69,12 +69,29 @@ class Course extends Model
     // Relasi ke kelas
     public function kelas()
     {
-        return $this->hasMany(SchoolClass::class, 'course_id');
+        return $this->hasMany(SchoolClass::class, 'mata_pelajaran_id');
+    }
+
+    // Alias snake_case for withCount('school_classes')
+    public function school_classes()
+    {
+        return $this->hasMany(SchoolClass::class, 'mata_pelajaran_id');
+    }
+
+    // Alias for withCount('packages')
+    public function packages()
+    {
+        return $this->belongsToMany(
+            Package::class,
+            'course_package',
+            'course_id',
+            'package_id'
+        );
     }
 
     // Relasi ke nilai
     public function nilai()
     {
-        return $this->hasMany(Grade::class, 'course_id');
+        return $this->hasMany(Grade::class, 'mata_pelajaran_id');
     }
 }

@@ -1,0 +1,114 @@
+<?php $__env->startSection('title', 'Log Aktivitas'); ?>
+<?php $__env->startSection('page-title', 'Log Aktivitas'); ?>
+
+<?php $__env->startSection('content'); ?>
+
+
+<div class="dashboard-card mb-4 fade-up" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
+    <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%;pointer-events:none"></div>
+    <div style="position:absolute;right:80px;bottom:-50px;width:120px;height:120px;background:rgba(255,255,255,.03);border-radius:50%;pointer-events:none"></div>
+    <div class="row align-items-center g-3" style="position:relative">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px">
+                    <i class="bi bi-journal-text"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0" style="color:white">Log Aktivitas Sistem</h5>
+                    <span style="font-size:12px;opacity:.8">Pantau semua perubahan dan aktivitas pengguna</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <span style="background:rgba(255,255,255,.15);color:rgba(255,255,255,.9);padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600">
+                <i class="bi bi-shield-check me-1"></i>Audit Trail Aktif
+            </span>
+        </div>
+    </div>
+</div>
+
+
+<div class="dashboard-card fade-up">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h6 class="fw-bold mb-0">
+            <i class="bi bi-list-ul text-indigo me-2" style="color:#c84ddf"></i>Riwayat Aktivitas
+            <span class="badge ms-2" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:11px"><?php echo e($activities->total()); ?> entri</span>
+        </h6>
+    </div>
+
+    <?php $__empty_1 = true; $__currentLoopData = $activities; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $act): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+    <?php
+        $iconMap = [
+            'created' => ['bi-plus-circle-fill','var(--soft-success-bg)','#16a34a'],
+            'updated' => ['bi-pencil-fill','var(--soft-warning-bg)','#e09000'],
+            'deleted' => ['bi-trash-fill','var(--soft-danger-bg)','#dc2626'],
+        ];
+        $event = $act->event ?? 'updated';
+        [$icon,$ibg,$icol] = $iconMap[$event] ?? ['bi-activity','var(--soft-primary-bg)','#c84ddf'];
+        $causer = $act->causer;
+        $changes = $act->properties['attributes'] ?? [];
+        $subject = $act->subject_type ? class_basename($act->subject_type) : 'System';
+    ?>
+    <div class="d-flex gap-3 mb-3 pb-3" style="border-bottom:1px solid var(--card-border)">
+        <div style="width:36px;height:36px;border-radius:50%;background:<?php echo e($ibg); ?>;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">
+            <i class="bi <?php echo e($icon); ?>" style="font-size:14px;color:<?php echo e($icol); ?>"></i>
+        </div>
+        <div class="flex-grow-1">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-1">
+                <div>
+                    <span class="fw-semibold" style="font-size:13px">
+                        <?php echo e($causer?->name ?? 'System'); ?>
+
+                    </span>
+                    <span class="text-muted" style="font-size:13px"> — <?php echo e($act->description); ?></span>
+                    <span class="badge ms-1" style="background:<?php echo e($ibg); ?>;color:<?php echo e($icol); ?>;font-size:10px;border-radius:6px">
+                        <?php echo e(ucfirst($event)); ?>
+
+                    </span>
+                </div>
+                <span class="text-muted" style="font-size:11px;white-space:nowrap">
+                    <i class="bi bi-clock me-1"></i><?php echo e($act->created_at->diffForHumans()); ?>
+
+                </span>
+            </div>
+            <div class="text-muted" style="font-size:12px;margin-top:3px">
+                <span style="background:var(--soft-muted-bg);padding:2px 8px;border-radius:5px"><?php echo e($subject); ?></span>
+                <?php if($act->subject_id): ?>
+                    <span class="ms-1 text-muted">#<?php echo e($act->subject_id); ?></span>
+                <?php endif; ?>
+                <?php if($causer?->email): ?>
+                    <span class="ms-2"><i class="bi bi-envelope me-1"></i><?php echo e($causer->email); ?></span>
+                <?php endif; ?>
+            </div>
+            <?php if(count($changes) > 0): ?>
+            <div class="mt-2 d-flex flex-wrap gap-1">
+                <?php $__currentLoopData = array_slice($changes, 0, 5); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $field => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <span style="background:var(--soft-muted-bg);border:1px solid var(--soft-muted-border);padding:2px 8px;border-radius:5px;font-size:11px;color:var(--text-primary)">
+                    <span class="text-muted"><?php echo e($field); ?>:</span>
+                    <?php echo e(is_array($value) ? json_encode($value) : (strlen((string)$value) > 40 ? substr($value, 0, 40).'…' : $value)); ?>
+
+                </span>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </div>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+    <div class="text-center py-5">
+        <i class="bi bi-journal-x text-muted" style="font-size:48px;display:block;margin-bottom:12px;opacity:.4"></i>
+        <div class="fw-semibold text-muted mb-1">Belum ada log aktivitas</div>
+        <div class="text-muted" style="font-size:12px">Semua perubahan data sistem akan tercatat di sini</div>
+    </div>
+    <?php endif; ?>
+
+    <?php if($activities->hasPages()): ?>
+    <div class="mt-4 d-flex justify-content-center">
+        <?php echo e($activities->links()); ?>
+
+    </div>
+    <?php endif; ?>
+</div>
+
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/owner/activity-log.blade.php ENDPATH**/ ?>
