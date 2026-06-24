@@ -87,21 +87,13 @@ class CheckBranchAccess
             return redirect()->route('dashboard')->with('error', 'Cabang tidak ditemukan.');
         }
 
-        $allowed = $branch->allowed_pages ?? [];
+        // Only restrict if allowed_pages is explicitly configured as a non-empty array.
+        // Legacy can_* flags are NOT used as a restriction mechanism — they are incomplete
+        // (new pages like billing, modules, messages don't have corresponding flags).
+        $allowed = $branch->allowed_pages;
 
         if (empty($allowed) || ! is_array($allowed)) {
-            // fallback to legacy flags
-            $allowed = [];
-            if ($branch->can_students) $allowed[] = 'student';
-            if ($branch->can_teachers) $allowed[] = 'teacher';
-            if ($branch->can_schedules) $allowed[] = 'schedule';
-            if ($branch->can_payments) $allowed[] = 'payment';
-            if ($branch->can_tryouts) $allowed[] = 'tryout';
-        }
-
-        // If the branch has not configured any page permissions yet, keep access open
-        // so admins can still use the page instead of being redirected to dashboard.
-        if (empty($allowed)) {
+            // No explicit page restrictions configured — allow all pages.
             return $next($request);
         }
 

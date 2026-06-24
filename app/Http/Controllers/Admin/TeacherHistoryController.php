@@ -19,7 +19,7 @@ class TeacherHistoryController extends Controller
             ->with(['branch']);
 
         if (auth()->user()->hasRole('admin')) {
-            $query->where('branch_id', auth()->user()->admin?->branch_id);
+            $query->where('branch_id', auth()->user()->branch_id);
         }
 
         if ($s = $request->search) {

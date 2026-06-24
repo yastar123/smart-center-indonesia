@@ -95,10 +95,13 @@ class RolePermissionSeeder extends Seeder
             $adminUser = new User();
             $adminUser->email = 'admincabangsci@akademi.com';
         }
+        // Assign to first branch (Cabang Pusat) so CheckBranchAccess can resolve the branch
+        $firstBranch = \App\Models\Branch::first();
         $adminUser->forceFill([
             'name'      => 'Admin Cabang SCI',
             'password'  => bcrypt('password'),
             'is_active' => true,
+            'branch_id' => $firstBranch?->id,
         ]);
         $adminUser->save();
         $adminUser->syncRoles(['admin']);
