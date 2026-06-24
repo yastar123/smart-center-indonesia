@@ -456,6 +456,10 @@ Route::middleware(['auth', 'role:guru'])
         Route::get('/schedules/{schedule}',    [\App\Http\Controllers\Guru\ScheduleController::class, 'show'])  ->name('schedules.show');
         Route::put('/schedules/{schedule}',    [\App\Http\Controllers\Guru\ScheduleController::class, 'update'])->name('schedules.update');
 
+        // NILAI SISWA (Guru)
+        Route::get('/grades',         [\App\Http\Controllers\Guru\GradeController::class, 'index'])     ->name('grades.index');
+        Route::post('/grades/batch',  [\App\Http\Controllers\Guru\GradeController::class, 'storeBatch'])->name('grades.storeBatch');
+
         // Absensi: API endpoints used by class attendance page
         Route::get('/attendance/history', [\App\Http\Controllers\Guru\AttendanceHistoryController::class, 'index'])->name('attendance.history');
         Route::get('/attendance/history/{course}', [\App\Http\Controllers\Guru\AttendanceHistoryController::class, 'show'])->name('attendance.history.show');

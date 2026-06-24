@@ -3443,6 +3443,11 @@
             </a>
         </div>
         <div class="nav-item">
+            <a href="{{ route('guru.grades.index') }}" class="nav-link {{ request()->routeIs('guru.grades.*') ? 'active' : '' }}" data-label="Input Nilai">
+                <i class="bi bi-bar-chart-line"></i><span>Input Nilai</span>
+            </a>
+        </div>
+        <div class="nav-item">
             <a href="{{ route('guru.payments.index') }}" class="nav-link {{ request()->routeIs('guru.payments.*') ? 'active' : '' }}" data-label="Gaji Saya">
                 <i class="bi bi-cash-coin"></i><span>Gaji Saya</span>
             </a>
@@ -3450,11 +3455,6 @@
         <div class="nav-item">
             <a href="{{ route('guru.messages.index') }}" class="nav-link {{ request()->routeIs('guru.messages.*') ? 'active' : '' }}" data-label="Pesan">
                 <i class="bi bi-chat-dots"></i><span>Pesan</span>
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="{{ route('admin.certificates.index') }}" class="nav-link {{ request()->routeIs('admin.certificates.*') ? 'active' : '' }}" data-label="Sertifikat">
-                <i class="bi bi-award"></i><span>Sertifikat</span>
             </a>
         </div>
         <div class="nav-item">
