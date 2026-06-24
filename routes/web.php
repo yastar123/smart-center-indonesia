@@ -32,7 +32,7 @@ Route::get('/', function () {
     if (auth()->check()) {
         return redirect()->route('dashboard');
     }
-    return view('landing');
+    return redirect()->route('login');
 })->name('landing');
 
 Route::post('/public/student-registrations', [StudentRegistrationPublicController::class, 'store'])

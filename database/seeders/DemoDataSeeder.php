@@ -15,7 +15,6 @@ use App\Models\Package;
 use App\Models\Teacher;
 use App\Models\Student;
 use App\Models\SchoolClass;
-use App\Models\Schedule;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Module;
@@ -26,7 +25,6 @@ use App\Models\Grade;
 use App\Models\Salary;
 use App\Models\Announcement;
 use App\Models\Certificate;
-use App\Models\AbsensiSiswa;
 
 class DemoDataSeeder extends Seeder
 {
@@ -475,87 +473,7 @@ class DemoDataSeeder extends Seeder
         }
         $this->command->info('  ✅ Siswa (15 siswa)');
 
-        // ------------------------------------------------------------------ //
-        // 9. JADWAL                                                            //
-        // ------------------------------------------------------------------ //
-        $schedules = [];
-        $now   = Carbon::now();
-        $today = Carbon::today();
-
-        // Buat jadwal 8 pertemuan per kelas untuk kelas Pusat
-        $jadwalKelas = [
-            'Matematika SMA Reguler A'  => ['guru_nig' => 'NIG-2020-001', 'hari' => 'Senin & Kamis', 'jam' => ['09:00', '10:30']],
-            'Fisika SMA Reguler A'      => ['guru_nig' => 'NIG-2020-001', 'hari' => 'Selasa & Jumat', 'jam' => ['09:00', '10:30']],
-            'Kimia SMA Reguler A'       => ['guru_nig' => 'NIG-2020-002', 'hari' => 'Rabu & Sabtu', 'jam' => ['10:00', '11:30']],
-            'Bahasa Inggris SMA Reguler'=> ['guru_nig' => 'NIG-2021-003', 'hari' => 'Selasa & Jumat', 'jam' => ['14:00', '15:30']],
-            'Intensif SNBT Batch 1'     => ['guru_nig' => 'NIG-2021-004', 'hari' => 'Senin-Rabu-Jumat', 'jam' => ['16:00', '18:00']],
-            'Matematika Reguler Bandung A' => ['guru_nig' => 'NIG-2022-005', 'hari' => 'Senin & Kamis', 'jam' => ['09:00', '10:30']],
-            'Bahasa Inggris Bandung A'  => ['guru_nig' => 'NIG-2022-006', 'hari' => 'Selasa & Jumat', 'jam' => ['10:00', '11:30']],
-            'Matematika Reguler Surabaya A' => ['guru_nig' => 'NIG-2022-007', 'hari' => 'Senin & Kamis', 'jam' => ['14:00', '15:30']],
-        ];
-
-        $topikMap = [
-            'Matematika' => ['Persamaan Linear', 'Pertidaksamaan', 'Fungsi Kuadrat', 'Trigonometri', 'Vektor', 'Statistika', 'Peluang', 'Ulangan Harian'],
-            'Fisika'     => ['Kinematika', 'Dinamika', 'Usaha & Energi', 'Momentum', 'Gelombang', 'Listrik Statis', 'Listrik Dinamis', 'Ulangan'],
-            'Kimia'      => ['Struktur Atom', 'Ikatan Kimia', 'Stoikiometri', 'Termokimia', 'Reaksi Redoks', 'Larutan', 'Kesetimbangan', 'Ulangan'],
-            'Bahasa Inggris' => ['Grammar Basics', 'Reading Comp.', 'Vocabulary', 'Writing Skills', 'Listening', 'Speaking', 'TOEFL Prep', 'Review'],
-            'Persiapan SNBT' => ['TPS Penalaran', 'TPS Kuantitatif', 'Literasi Ind.', 'Literasi Ing.', 'Penalaran Mat.', 'Tryout 1', 'Tryout 2', 'Pembahasan'],
-            'default'    => ['Pertemuan 1', 'Pertemuan 2', 'Pertemuan 3', 'Pertemuan 4', 'Pertemuan 5', 'Pertemuan 6', 'Pertemuan 7', 'Pertemuan 8'],
-        ];
-
-        foreach ($jadwalKelas as $namaKelas => $info) {
-            if (!isset($classes[$namaKelas])) continue;
-            $kelas    = $classes[$namaKelas];
-            $guru     = $teachers[$info['guru_nig']] ?? null;
-            if (!$guru) continue;
-
-            $matPel  = Course::find($kelas->mata_pelajaran_id);
-            $topiks  = $topikMap[$matPel?->nama] ?? $topikMap['default'];
-            $jumlah  = $kelas->jumlah_pertemuan;
-
-            for ($p = 1; $p <= $jumlah; $p++) {
-                // Jadwal mulai 5 minggu lalu, 2x seminggu
-                $mingguOffset = intval(($p - 1) / 2);
-                $hariOffset   = ($p % 2 === 1) ? 0 : 3;
-                $tgl = $today->copy()->subWeeks(4)->addWeeks($mingguOffset)->addDays($hariOffset);
-
-                $topik = $topiks[$p - 1] ?? "Pertemuan ke-$p";
-                $status = $tgl->isPast() ? 'selesai' : 'dijadwalkan';
-
-                $jadwal = Schedule::firstOrCreate(
-                    ['kelas_id' => $kelas->id, 'pertemuan_ke' => $p],
-                    [
-                        'guru_id'     => $guru->id,
-                        'cabang_id'   => $kelas->cabang_id,
-                        'tanggal'     => $tgl->format('Y-m-d'),
-                        'jam_mulai'   => $info['jam'][0],
-                        'jam_selesai' => $info['jam'][1],
-                        'topik'       => $topik,
-                        'jenis'       => $kelas->jenis,
-                        'status'      => $status,
-                        'ruangan'     => 'Ruang ' . chr(64 + (($kelas->id % 5) + 1)),
-                    ]
-                );
-                $schedules[] = $jadwal;
-
-                // Buat absensi untuk jadwal yang sudah lewat
-                if ($status === 'selesai' && $p <= 5) {
-                    $siswaDiKelas = $kelas->siswa;
-                    foreach ($siswaDiKelas as $siswa) {
-                        $statusAbsen = $p <= 4 ? 'hadir' : (rand(0, 3) === 0 ? 'alpha' : 'hadir');
-                        AbsensiSiswa::firstOrCreate(
-                            ['jadwal_id' => $jadwal->id, 'siswa_id' => $siswa->id],
-                            [
-                                'guru_hadir'           => true,
-                                'siswa_konfirmasi_at'  => $tgl->copy()->setTimeFromTimeString($info['jam'][0])->addMinutes(10),
-                                'status'               => $statusAbsen,
-                            ]
-                        );
-                    }
-                }
-            }
-        }
-        $this->command->info('  ✅ Jadwal & absensi');
+        // Jadwal & absensi tidak di-seed (diisi manual oleh admin/guru)
 
         // ------------------------------------------------------------------ //
         // 10. INVOICE & PEMBAYARAN                                             //
