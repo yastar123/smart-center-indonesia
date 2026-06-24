@@ -58,7 +58,23 @@ class AttendanceController extends Controller
                     ]);
             }
 
-            // Fallback 1: find students by branch if class_students is empty
+            // Fallback 1: students enrolled in the same package as this schedule
+            if ($students->isEmpty() && $schedule->paket_id) {
+                $students = DB::table('students')
+                    ->join('users', 'users.id', '=', 'students.user_id')
+                    ->where('students.package_id', $schedule->paket_id)
+                    ->where('students.status', 'aktif')
+                    ->orderBy('students.name')
+                    ->get([
+                        'students.id',
+                        'students.name',
+                        'students.nis',
+                        'students.photo',
+                        'users.email',
+                    ]);
+            }
+
+            // Fallback 2: find students by branch if still empty and kelas_id is set
             if ($students->isEmpty() && $schedule->kelas_id) {
                 $class = SchoolClass::find($schedule->kelas_id);
                 if ($class && $class->cabang_id) {
@@ -77,7 +93,7 @@ class AttendanceController extends Controller
                 }
             }
 
-            // Fallback 2: show empty — no student profiles exist for this branch.
+            // Fallback 3: show empty — no student profiles exist.
             // We deliberately do NOT use User.id as a proxy for siswa_id because
             // absensi_siswas.siswa_id must reference students.id, not users.id.
 
@@ -133,7 +149,16 @@ class AttendanceController extends Controller
             ->pluck('student_id')
             ->toArray();
 
-        // If class_students is empty, use all students in the branch
+        // Fallback 1: students enrolled in the same package
+        if (empty($studentIds) && $schedule->paket_id) {
+            $studentIds = DB::table('students')
+                ->where('package_id', $schedule->paket_id)
+                ->where('status', 'aktif')
+                ->pluck('id')
+                ->toArray();
+        }
+
+        // Fallback 2: all students in branch if class_students and package both empty
         if (empty($studentIds) && $schedule->kelas_id) {
             $class = SchoolClass::find($schedule->kelas_id);
             if ($class && $class->cabang_id) {

@@ -85,6 +85,22 @@
                 <div class="row g-2" id="paketDetailContent" style="font-size:12px"></div>
             </div>
         </div>
+
+        {{-- SISWA PAKET BOX --}}
+        <div class="col-12" id="daftarSiswaPaketBox" style="display:none">
+            <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="fw-semibold" style="font-size:13px">
+                        <i class="bi bi-people-fill text-primary me-2"></i>
+                        Siswa Terdaftar di Paket Ini
+                        <span id="siswaPaketCount" class="badge ms-1" style="background:var(--soft-primary);color:#461256;font-size:11px"></span>
+                    </div>
+                </div>
+                <div id="daftarSiswaPaketContent" class="d-flex flex-wrap gap-2">
+                    <span class="text-muted" style="font-size:12px">Memuat siswa...</span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -115,12 +131,6 @@
         <div class="col-lg-6">
             <div class="p-3 rounded-3 h-100" style="background:var(--input-bg);border:1px solid var(--card-border)" id="guruInfoBox">
                 <div class="text-muted" style="font-size:12px">Pilih guru untuk melihat informasinya</div>
-            </div>
-        </div>
-        <div class="col-12" id="daftarSiswaBox" style="display:none">
-            <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
-                <div class="fw-semibold mb-2" style="font-size:13px"><i class="bi bi-people-fill text-primary me-2"></i>Daftar Siswa Guru Ini</div>
-                <div id="daftarSiswaContent" class="d-flex flex-wrap gap-2"></div>
             </div>
         </div>
     </div>
@@ -277,6 +287,7 @@ $modulesJson = $modules->map(function ($m) {
 <script>
 const pakets  = @json($paketsJson);
 const modules = @json($modulesJson);
+const packageStudentsBaseUrl = '{{ url("/admin/schedules/package") }}';
 
 function onPaketChange(paketId) {
     const detailBox     = document.getElementById('paketDetailBox');
@@ -284,20 +295,21 @@ function onPaketChange(paketId) {
     const sesiSelect    = document.getElementById('pertemuan_ke');
     const guruSelect    = document.getElementById('guru_id');
     const guruInfoBox   = document.getElementById('guruInfoBox');
-    const siswaBox      = document.getElementById('daftarSiswaBox');
+    const siswaBox      = document.getElementById('daftarSiswaPaketBox');
 
     if (!paketId) {
         detailBox.style.display = 'none';
+        siswaBox.style.display  = 'none';
         sesiSelect.innerHTML = '<option value="">— Pilih paket dulu —</option>';
         guruSelect.value = '';
         guruInfoBox.innerHTML = '<div class="text-muted" style="font-size:12px">Pilih paket untuk melihat info guru pengajar</div>';
-        siswaBox.style.display = 'none';
         return;
     }
 
     const pkg = pakets.find(p => p.id == paketId);
     if (!pkg) return;
 
+    // Package detail box
     detailBox.style.display = 'block';
     detailContent.innerHTML = `
         <div class="col-md-3 col-6"><strong>Jenis:</strong> ${pkg.jenis || '—'}</div>
@@ -309,13 +321,15 @@ function onPaketChange(paketId) {
         ${pkg.deskripsi ? `<div class="col-12"><strong>Deskripsi:</strong> ${pkg.deskripsi}</div>` : ''}
     `;
 
+    // Session options
     let sesiOptions = '<option value="">— Pilih Sesi —</option>';
     const totalSesi = Number(pkg.jumlah_pertemuan || 0);
     for (let i = 1; i <= totalSesi; i++) {
-        sesiOptions += `<option value="${i}">${i}</option>`;
+        sesiOptions += `<option value="${i}">Sesi ke-${i}</option>`;
     }
     sesiSelect.innerHTML = sesiOptions;
 
+    // Guru info from package
     if (pkg.guru_id) {
         guruSelect.value = pkg.guru_id;
         guruInfoBox.innerHTML = `
@@ -324,12 +338,49 @@ function onPaketChange(paketId) {
             ${pkg.guru_nig ? `<div class="text-muted" style="font-size:12px">NIG: ${pkg.guru_nig}</div>` : ''}
             ${pkg.guru_email ? `<div class="text-muted" style="font-size:12px">${pkg.guru_email}</div>` : ''}
         `;
-        loadStudentsByGuru(pkg.guru_id, paketId);
     } else {
         guruSelect.value = '';
         guruInfoBox.innerHTML = '<div class="text-muted" style="font-size:12px">Paket ini belum memiliki guru pengajar</div>';
-        siswaBox.style.display = 'none';
     }
+
+    // Load students enrolled in this package
+    loadStudentsByPackage(paketId);
+}
+
+function loadStudentsByPackage(paketId) {
+    if (!paketId) return;
+    const box     = document.getElementById('daftarSiswaPaketBox');
+    const content = document.getElementById('daftarSiswaPaketContent');
+    const counter = document.getElementById('siswaPaketCount');
+
+    box.style.display = 'block';
+    content.innerHTML = '<span class="text-muted" style="font-size:12px"><i class="bi bi-hourglass-split me-1"></i>Memuat daftar siswa...</span>';
+    counter.textContent = '';
+
+    fetch(`${packageStudentsBaseUrl}/${paketId}/students`, {
+        headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+    })
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(data => {
+        const students = data.students || [];
+        const count    = data.count || 0;
+
+        counter.textContent = count + ' siswa';
+
+        if (!students.length) {
+            content.innerHTML = '<span class="text-muted" style="font-size:12px"><i class="bi bi-info-circle me-1"></i>Belum ada siswa yang terdaftar di paket ini.</span>';
+            return;
+        }
+
+        content.innerHTML = students.map(s =>
+            `<span style="background:var(--soft-primary);color:#461256;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500;display:inline-flex;align-items:center;gap:4px">
+                <i class="bi bi-person-fill"></i>${s.name}${s.nis ? `<span style="opacity:.65;font-size:10px">#${s.nis}</span>` : ''}
+            </span>`
+        ).join('');
+    })
+    .catch(() => {
+        content.innerHTML = '<span class="text-muted" style="font-size:12px"><i class="bi bi-exclamation-circle me-1"></i>Gagal memuat daftar siswa.</span>';
+    });
 }
 
 function onModuleChange(moduleId) {
@@ -350,60 +401,20 @@ function onModuleChange(moduleId) {
     `;
 }
 
-const teacherStudentsUrl = '{{ url("/admin/schedules/teacher") }}';
-
 function onGuruChange(guruId) {
     const guruInfoBox = document.getElementById('guruInfoBox');
     if (!guruId) {
         guruInfoBox.innerHTML = '<div class="text-muted" style="font-size:12px">Pilih guru untuk melihat informasinya</div>';
-        document.getElementById('daftarSiswaBox').style.display = 'none';
         return;
     }
-    const sel = document.getElementById('guru_id');
+    const sel  = document.getElementById('guru_id');
     const name = sel.options[sel.selectedIndex]?.text || '—';
     guruInfoBox.innerHTML = `<div class="fw-semibold">${name}</div>`;
-    loadStudentsByGuru(guruId, document.getElementById('paket_id').value);
 }
 
-function loadStudentsByGuru(guruId, paketId = null) {
-    if (!guruId) return;
-    const box = document.getElementById('daftarSiswaBox');
-    const content = document.getElementById('daftarSiswaContent');
-    content.innerHTML = '<span class="text-muted" style="font-size:12px">Memuat siswa...</span>';
-    box.style.display = 'block';
-
-    const url = new URL(`${teacherStudentsUrl}/${guruId}/students`, window.location.origin);
-    if (paketId) {
-        url.searchParams.set('package_id', paketId);
-    }
-
-    fetch(url, {
-        headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
-    })
-    .then(r => r.json())
-    .then(students => {
-        if (!students.length) {
-            content.innerHTML = '<span class="text-muted" style="font-size:12px">Belum ada siswa di kelas guru ini.</span>';
-            return;
-        }
-        content.innerHTML = students.map(s =>
-            `<span style="background:var(--soft-primary);color:#461256;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500">
-                <i class="bi bi-person-fill me-1"></i>${s.name}
-                ${s.classes?.length ? '<span style="opacity:.7;font-size:11px"> · '+s.classes.join(', ')+'</span>' : ''}
-            </span>`
-        ).join('');
-    })
-    .catch(() => {
-        content.innerHTML = '<span class="text-muted" style="font-size:12px">Gagal memuat siswa.</span>';
-    });
-}
-
-// Init on validation error
+// Init on validation error (re-populate if form was submitted with errors)
 const initPaket = document.getElementById('paket_id').value;
 if (initPaket) onPaketChange(initPaket);
-
-const initGuru = document.getElementById('guru_id').value;
-if (initGuru && !initPaket) onGuruChange(initGuru);
 
 const initModule = document.getElementById('module_id').value;
 if (initModule) onModuleChange(initModule);

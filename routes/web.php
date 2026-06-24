@@ -260,22 +260,43 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::post('/verifikasi-pembayaran/package/{packagePayment}/approve', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'approvePackage'])->name('verifikasi-pembayaran.package.approve');
         Route::post('/verifikasi-pembayaran/package/{packagePayment}/reject', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'rejectPackage'])->name('verifikasi-pembayaran.package.reject');
 
-        // AJAX: students by teacher (for schedule create form)
+        // AJAX: students by package (primary source of truth)
+        Route::get('/schedules/package/{package}/students', function(\App\Models\Package $package) {
+            $students = \App\Models\Student::where('package_id', $package->id)
+                ->where('status', 'aktif')
+                ->orderBy('name')
+                ->get(['id', 'name', 'nis', 'branch_id']);
+
+            return response()->json([
+                'students' => $students->map(fn($s) => [
+                    'id'   => $s->id,
+                    'name' => $s->name,
+                    'nis'  => $s->nis,
+                ]),
+                'count' => $students->count(),
+            ]);
+        })->name('schedules.package-students');
+
+        // AJAX: students by teacher (fallback / legacy)
         Route::get('/schedules/teacher/{teacher}/students', function(\App\Models\Teacher $teacher, \Illuminate\Http\Request $request) {
             $packageId = $request->query('package_id');
 
-            $courseIds = [];
+            // Primary: if package_id given, return students enrolled in that package
             if ($packageId) {
-                $package = \App\Models\Package::with('mataPelajaran')->find($packageId);
-                if ($package) {
-                    $courseIds = $package->mataPelajaran->pluck('id')->all();
-                }
+                $students = \App\Models\Student::where('package_id', $packageId)
+                    ->where('status', 'aktif')
+                    ->orderBy('name')
+                    ->get(['id', 'name', 'nis']);
+
+                return response()->json($students->map(fn($s) => [
+                    'id'      => $s->id,
+                    'name'    => $s->name,
+                    'classes' => [],
+                ])->values());
             }
 
+            // Fallback: find via school_classes assigned to teacher
             $classes = \App\Models\SchoolClass::where('guru_id', $teacher->id)
-                ->when(! empty($courseIds), function ($q) use ($courseIds) {
-                    $q->whereIn('mata_pelajaran_id', $courseIds);
-                })
                 ->with(['mataPelajaran', 'siswa'])
                 ->get();
 
@@ -289,7 +310,6 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
                             'classes' => [],
                         ];
                     }
-
                     $label = $class->mataPelajaran?->nama ?? $class->nama_kelas;
                     if (! in_array($label, $students[$student->id]['classes'], true)) {
                         $students[$student->id]['classes'][] = $label;
