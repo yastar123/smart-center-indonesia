@@ -25,6 +25,7 @@ use App\Models\Grade;
 use App\Models\Salary;
 use App\Models\Announcement;
 use App\Models\Certificate;
+use App\Models\Schedule;
 
 class DemoDataSeeder extends Seeder
 {
