@@ -1,0 +1,431 @@
+Installing Composer dependencies...
+[32mInstalling dependencies from lock file (including require-dev)[39m
+[32mVerifying lock file contents can be installed on current platform.[39m
+[32mPackage operations: 123 installs, 0 updates, 0 removals[39m
+  - Downloading [32mvoku/portable-ascii[39m ([33m2.1.1[39m)
+  - Downloading [32msymfony/polyfill-php80[39m ([33mv1.37.0[39m)
+  - Downloading [32msymfony/polyfill-mbstring[39m ([33mv1.38.0[39m)
+  - Downloading [32msymfony/polyfill-ctype[39m ([33mv1.37.0[39m)
+  - Downloading [32mphpoption/phpoption[39m ([33m1.9.5[39m)
+  - Downloading [32mgraham-campbell/result-type[39m ([33mv1.1.4[39m)
+  - Downloading [32mvlucas/phpdotenv[39m ([33mv5.6.3[39m)
+  - Downloading [32msymfony/css-selector[39m ([33mv6.0.19[39m)
+  - Downloading [32mtijsverkoyen/css-to-inline-styles[39m ([33mv2.4.0[39m)
+  - Downloading [32msymfony/var-dumper[39m ([33mv6.0.19[39m)
+  - Downloading [32msymfony/polyfill-uuid[39m ([33mv1.37.0[39m)
+  - Downloading [32msymfony/uid[39m ([33mv6.0.19[39m)
+  - Downloading [32msymfony/routing[39m ([33mv6.0.19[39m)
+  - Downloading [32msymfony/process[39m ([33mv6.0.19[39m)
+  - Downloading [32msymfony/polyfill-intl-normalizer[39m ([33mv1.38.0[39m)
+  - Downloading [32msymfony/polyfill-intl-idn[39m ([33mv1.37.0[39m)
+  - Downloading [32msymfony/mime[39m ([33mv6.0.19[39m)
+  - Downloading [32mpsr/container[39m ([33m2.0.2[39m)
+  - Downloading [32msymfony/service-contracts[39m ([33mv3.0.2[39m)
+  - Downloading [32mpsr/event-dispatcher[39m ([33m1.0.0[39m)
+  - Downloading [32msymfony/event-dispatcher-contracts[39m ([33mv3.0.2[39m)
+  - Downloading [32msymfony/event-dispatcher[39m ([33mv6.0.19[39m)
+  - Downloading [32mpsr/log[39m ([33m3.0.2[39m)
+  - Downloading [32mdoctrine/deprecations[39m ([33m1.1.6[39m)
+  - Downloading [32mdoctrine/lexer[39m ([33m2.1.1[39m)
+  - Downloading [32megulias/email-validator[39m ([33m3.2.6[39m)
+  - Downloading [32msymfony/mailer[39m ([33mv6.0.19[39m)
+  - Downloading [32msymfony/deprecation-contracts[39m ([33mv3.0.2[39m)
+  - Downloading [32msymfony/http-foundation[39m ([33mv6.0.20[39m)
+  - Downloading [32msymfony/error-handler[39m ([33mv6.0.19[39m)
+  - Downloading [32msymfony/http-kernel[39m ([33mv6.0.20[39m)
+  - Downloading [32msymfony/finder[39m ([33mv6.0.19[39m)
+  - Downloading [32msymfony/polyfill-intl-grapheme[39m ([33mv1.38.0[39m)
+  - Downloading [32msymfony/string[39m ([33mv6.0.19[39m)
+  - Downloading [32msymfony/console[39m ([33mv6.0.19[39m)
+  - Downloading [32msymfony/polyfill-php81[39m ([33mv1.37.0[39m)
+  - Downloading [32mramsey/collection[39m ([33m1.3.0[39m)
+  - Downloading [32mbrick/math[39m ([33m0.11.0[39m)
+  - Downloading [32mramsey/uuid[39m ([33m4.9.2[39m)
+  - Downloading [32mpsr/simple-cache[39m ([33m3.0.0[39m)
+  - Downloading [32mnunomaduro/termwind[39m ([33mv1.15.1[39m)
+  - Downloading [32msymfony/translation-contracts[39m ([33mv3.0.2[39m)
+  - Downloading [32msymfony/translation[39m ([33mv6.0.19[39m)
+  - Downloading [32mpsr/clock[39m ([33m1.0.0[39m)
+  - Downloading [32mcarbonphp/carbon-doctrine-types[39m ([33m2.1.0[39m)
+  - Downloading [32mnesbot/carbon[39m ([33m2.73.0[39m)
+  - Downloading [32mmonolog/monolog[39m ([33m2.11.0[39m)
+  - Downloading [32mleague/mime-type-detection[39m ([33m1.16.0[39m)
+  - Downloading [32mleague/flysystem[39m ([33m3.34.0[39m)
+  - Downloading [32mleague/flysystem-local[39m ([33m3.31.0[39m)
+  - Downloading [32mnette/utils[39m ([33mv4.0.10[39m)
+  - Downloading [32mnette/schema[39m ([33mv1.2.5[39m)
+  - Downloading [32mdflydev/dot-access-data[39m ([33mv3.0.3[39m)
+  - Downloading [32mleague/config[39m ([33mv1.2.0[39m)
+  - Downloading [32mleague/commonmark[39m ([33m2.8.2[39m)
+  - Downloading [32mlaravel/serializable-closure[39m ([33mv1.3.7[39m)
+  - Downloading [32mguzzlehttp/uri-template[39m ([33mv1.0.6[39m)
+  - Downloading [32mfruitcake/php-cors[39m ([33mv1.3.0[39m)
+  - Downloading [32mdragonmantank/cron-expression[39m ([33mv3.5.0[39m)
+  - Downloading [32mdoctrine/inflector[39m ([33m2.1.0[39m)
+  - Downloading [32mlaravel/framework[39m ([33mv9.52.21[39m)
+  - Downloading [32msabberworm/php-css-parser[39m ([33mv8.9.0[39m)
+  - Downloading [32mphenx/php-svg-lib[39m ([33m0.5.4[39m)
+  - Downloading [32mphenx/php-font-lib[39m ([33m0.5.6[39m)
+  - Downloading [32mmasterminds/html5[39m ([33m2.10.0[39m)
+  - Downloading [32mdompdf/dompdf[39m ([33mv2.0.8[39m)
+  - Downloading [32mbarryvdh/laravel-dompdf[39m ([33mv2.2.0[39m)
+  - Downloading [32mfakerphp/faker[39m ([33mv1.24.1[39m)
+  - Downloading [32mpsr/http-message[39m ([33m2.0[39m)
+  - Downloading [32mpsr/http-client[39m ([33m1.0.3[39m)
+  - Downloading [32mralouphie/getallheaders[39m ([33m3.0.3[39m)
+  - Downloading [32mpsr/http-factory[39m ([33m1.1.0[39m)
+  - Downloading [32mguzzlehttp/psr7[39m ([33m2.10.2[39m)
+  - Downloading [32mguzzlehttp/promises[39m ([33m2.4.1[39m)
+  - Downloading [32mguzzlehttp/guzzle[39m ([33m7.10.4[39m)
+  - Downloading [32mlaravel/breeze[39m ([33mv1.19.2[39m)
+  - Downloading [32mlaravel/pint[39m ([33mv1.5.0[39m)
+  - Downloading [32msymfony/yaml[39m ([33mv6.0.19[39m)
+  - Downloading [32mlaravel/sail[39m ([33mv1.60.0[39m)
+  - Downloading [32mlaravel/sanctum[39m ([33mv3.3.3[39m)
+  - Downloading [32mnikic/php-parser[39m ([33mv5.7.0[39m)
+  - Downloading [32mpsy/psysh[39m ([33mv0.12.23[39m)
+  - Downloading [32mlaravel/tinker[39m ([33mv2.11.1[39m)
+  - Downloading [32mphpoffice/phpexcel[39m ([33m1.8.1[39m)
+  - Downloading [32mmaatwebsite/excel[39m ([33mv1.1.5[39m)
+  - Downloading [32mhamcrest/hamcrest-php[39m ([33mv2.1.1[39m)
+  - Downloading [32mmockery/mockery[39m ([33m1.6.12[39m)
+  - Downloading [32mfilp/whoops[39m ([33m2.18.4[39m)
+  - Downloading [32mnunomaduro/collision[39m ([33mv6.4.0[39m)
+  - Downloading [32msebastian/version[39m ([33m3.0.2[39m)
+  - Downloading [32msebastian/type[39m ([33m3.2.1[39m)
+  - Downloading [32msebastian/resource-operations[39m ([33m3.0.4[39m)
+  - Downloading [32msebastian/recursion-context[39m ([33m4.0.6[39m)
+  - Downloading [32msebastian/object-reflector[39m ([33m2.0.4[39m)
+  - Downloading [32msebastian/object-enumerator[39m ([33m4.0.4[39m)
+  - Downloading [32msebastian/global-state[39m ([33m5.0.8[39m)
+  - Downloading [32msebastian/exporter[39m ([33m4.0.8[39m)
+  - Downloading [32msebastian/environment[39m ([33m5.1.5[39m)
+  - Downloading [32msebastian/diff[39m ([33m4.0.6[39m)
+  - Downloading [32msebastian/comparator[39m ([33m4.0.10[39m)
+  - Downloading [32msebastian/code-unit[39m ([33m1.0.8[39m)
+  - Downloading [32msebastian/cli-parser[39m ([33m1.0.2[39m)
+  - Downloading [32mphpunit/php-timer[39m ([33m5.0.3[39m)
+  - Downloading [32mphpunit/php-text-template[39m ([33m2.0.4[39m)
+  - Downloading [32mphpunit/php-invoker[39m ([33m3.1.1[39m)
+  - Downloading [32mphpunit/php-file-iterator[39m ([33m3.0.6[39m)
+  - Downloading [32mtheseer/tokenizer[39m ([33m1.3.1[39m)
+  - Downloading [32msebastian/lines-of-code[39m ([33m1.0.4[39m)
+  - Downloading [32msebastian/complexity[39m ([33m2.0.3[39m)
+  - Downloading [32msebastian/code-unit-reverse-lookup[39m ([33m2.0.3[39m)
+  - Downloading [32mphpunit/php-code-coverage[39m ([33m9.2.32[39m)
+  - Downloading [32mphar-io/version[39m ([33m3.2.1[39m)
+  - Downloading [32mphar-io/manifest[39m ([33m2.0.4[39m)
+  - Downloading [32mmyclabs/deep-copy[39m ([33m1.13.4[39m)
+  - Downloading [32mdoctrine/instantiator[39m ([33m1.5.0[39m)
+  - Downloading [32mphpunit/phpunit[39m ([33m9.6.34[39m)
+  - Downloading [32mspatie/backtrace[39m ([33m1.8.2[39m)
+  - Downloading [32mspatie/laravel-package-tools[39m ([33m1.92.7[39m)
+  - Downloading [32mspatie/laravel-activitylog[39m ([33m4.7.3[39m)
+  - Downloading [32mspatie/flare-client-php[39m ([33m1.11.1[39m)
+  - Downloading [32mspatie/ignition[39m ([33m1.14.2[39m)
+  - Downloading [32mspatie/laravel-ignition[39m ([33m1.7.2[39m)
+  - Downloading [32mspatie/laravel-permission[39m ([33m6.25.0[39m)
+   0/123 [>---------------------------]   0%[1G[2K  15/123 [===>------------------------]  12%[1G[2K  26/123 [=====>----------------------]  21%[1G[2K  38/123 [========>-------------------]  30%[1G[2K  50/123 [===========>----------------]  40%[1G[2K  63/123 [==============>-------------]  51%[1G[2K  75/123 [=================>----------]  60%[1G[2K  91/123 [====================>-------]  73%[1G[2K 102/123 [=======================>----]  82%[1G[2K 113/123 [=========================>--]  91%[1G[2K 123/123 [============================] 100%[1G[2K  - Installing [32mvoku/portable-ascii[39m ([33m2.1.1[39m): Extracting archive
+  - Installing [32msymfony/polyfill-php80[39m ([33mv1.37.0[39m): Extracting archive
+  - Installing [32msymfony/polyfill-mbstring[39m ([33mv1.38.0[39m): Extracting archive
+  - Installing [32msymfony/polyfill-ctype[39m ([33mv1.37.0[39m): Extracting archive
+  - Installing [32mphpoption/phpoption[39m ([33m1.9.5[39m): Extracting archive
+  - Installing [32mgraham-campbell/result-type[39m ([33mv1.1.4[39m): Extracting archive
+  - Installing [32mvlucas/phpdotenv[39m ([33mv5.6.3[39m): Extracting archive
+  - Installing [32msymfony/css-selector[39m ([33mv6.0.19[39m): Extracting archive
+  - Installing [32mtijsverkoyen/css-to-inline-styles[39m ([33mv2.4.0[39m): Extracting archive
+  - Installing [32msymfony/var-dumper[39m ([33mv6.0.19[39m): Extracting archive
+  - Installing [32msymfony/polyfill-uuid[39m ([33mv1.37.0[39m): Extracting archive
+  - Installing [32msymfony/uid[39m ([33mv6.0.19[39m): Extracting archive
+  - Installing [32msymfony/routing[39m ([33mv6.0.19[39m): Extracting archive
+  - Installing [32msymfony/process[39m ([33mv6.0.19[39m): Extracting archive
+  - Installing [32msymfony/polyfill-intl-normalizer[39m ([33mv1.38.0[39m): Extracting archive
+  - Installing [32msymfony/polyfill-intl-idn[39m ([33mv1.37.0[39m): Extracting archive
+  - Installing [32msymfony/mime[39m ([33mv6.0.19[39m): Extracting archive
+  - Installing [32mpsr/container[39m ([33m2.0.2[39m): Extracting archive
+  - Installing [32msymfony/service-contracts[39m ([33mv3.0.2[39m): Extracting archive
+  - Installing [32mpsr/event-dispatcher[39m ([33m1.0.0[39m): Extracting archive
+  - Installing [32msymfony/event-dispatcher-contracts[39m ([33mv3.0.2[39m): Extracting archive
+  - Installing [32msymfony/event-dispatcher[39m ([33mv6.0.19[39m): Extracting archive
+  - Installing [32mpsr/log[39m ([33m3.0.2[39m): Extracting archive
+  - Installing [32mdoctrine/deprecations[39m ([33m1.1.6[39m): Extracting archive
+  - Installing [32mdoctrine/lexer[39m ([33m2.1.1[39m): Extracting archive
+  - Installing [32megulias/email-validator[39m ([33m3.2.6[39m): Extracting archive
+  - Installing [32msymfony/mailer[39m ([33mv6.0.19[39m): Extracting archive
+  - Installing [32msymfony/deprecation-contracts[39m ([33mv3.0.2[39m): Extracting archive
+  - Installing [32msymfony/http-foundation[39m ([33mv6.0.20[39m): Extracting archive
+  - Installing [32msymfony/error-handler[39m ([33mv6.0.19[39m): Extracting archive
+  - Installing [32msymfony/http-kernel[39m ([33mv6.0.20[39m): Extracting archive
+  - Installing [32msymfony/finder[39m ([33mv6.0.19[39m): Extracting archive
+  - Installing [32msymfony/polyfill-intl-grapheme[39m ([33mv1.38.0[39m): Extracting archive
+  - Installing [32msymfony/string[39m ([33mv6.0.19[39m): Extracting archive
+  - Installing [32msymfony/console[39m ([33mv6.0.19[39m): Extracting archive
+  - Installing [32msymfony/polyfill-php81[39m ([33mv1.37.0[39m): Extracting archive
+  - Installing [32mramsey/collection[39m ([33m1.3.0[39m): Extracting archive
+  - Installing [32mbrick/math[39m ([33m0.11.0[39m): Extracting archive
+  - Installing [32mramsey/uuid[39m ([33m4.9.2[39m): Extracting archive
+  - Installing [32mpsr/simple-cache[39m ([33m3.0.0[39m): Extracting archive
+  - Installing [32mnunomaduro/termwind[39m ([33mv1.15.1[39m): Extracting archive
+  - Installing [32msymfony/translation-contracts[39m ([33mv3.0.2[39m): Extracting archive
+  - Installing [32msymfony/translation[39m ([33mv6.0.19[39m): Extracting archive
+  - Installing [32mpsr/clock[39m ([33m1.0.0[39m): Extracting archive
+  - Installing [32mcarbonphp/carbon-doctrine-types[39m ([33m2.1.0[39m): Extracting archive
+  - Installing [32mnesbot/carbon[39m ([33m2.73.0[39m): Extracting archive
+  - Installing [32mmonolog/monolog[39m ([33m2.11.0[39m): Extracting archive
+  - Installing [32mleague/mime-type-detection[39m ([33m1.16.0[39m): Extracting archive
+  - Installing [32mleague/flysystem[39m ([33m3.34.0[39m): Extracting archive
+  - Installing [32mleague/flysystem-local[39m ([33m3.31.0[39m): Extracting archive
+  - Installing [32mnette/utils[39m ([33mv4.0.10[39m): Extracting archive
+  - Installing [32mnette/schema[39m ([33mv1.2.5[39m): Extracting archive
+  - Installing [32mdflydev/dot-access-data[39m ([33mv3.0.3[39m): Extracting archive
+  - Installing [32mleague/config[39m ([33mv1.2.0[39m): Extracting archive
+  - Installing [32mleague/commonmark[39m ([33m2.8.2[39m): Extracting archive
+  - Installing [32mlaravel/serializable-closure[39m ([33mv1.3.7[39m): Extracting archive
+  - Installing [32mguzzlehttp/uri-template[39m ([33mv1.0.6[39m): Extracting archive
+  - Installing [32mfruitcake/php-cors[39m ([33mv1.3.0[39m): Extracting archive
+  - Installing [32mdragonmantank/cron-expression[39m ([33mv3.5.0[39m): Extracting archive
+  - Installing [32mdoctrine/inflector[39m ([33m2.1.0[39m): Extracting archive
+  - Installing [32mlaravel/framework[39m ([33mv9.52.21[39m): Extracting archive
+  - Installing [32msabberworm/php-css-parser[39m ([33mv8.9.0[39m): Extracting archive
+  - Installing [32mphenx/php-svg-lib[39m ([33m0.5.4[39m): Extracting archive
+  - Installing [32mphenx/php-font-lib[39m ([33m0.5.6[39m): Extracting archive
+  - Installing [32mmasterminds/html5[39m ([33m2.10.0[39m): Extracting archive
+  - Installing [32mdompdf/dompdf[39m ([33mv2.0.8[39m): Extracting archive
+  - Installing [32mbarryvdh/laravel-dompdf[39m ([33mv2.2.0[39m): Extracting archive
+  - Installing [32mfakerphp/faker[39m ([33mv1.24.1[39m): Extracting archive
+  - Installing [32mpsr/http-message[39m ([33m2.0[39m): Extracting archive
+  - Installing [32mpsr/http-client[39m ([33m1.0.3[39m): Extracting archive
+  - Installing [32mralouphie/getallheaders[39m ([33m3.0.3[39m): Extracting archive
+  - Installing [32mpsr/http-factory[39m ([33m1.1.0[39m): Extracting archive
+  - Installing [32mguzzlehttp/psr7[39m ([33m2.10.2[39m): Extracting archive
+  - Installing [32mguzzlehttp/promises[39m ([33m2.4.1[39m): Extracting archive
+  - Installing [32mguzzlehttp/guzzle[39m ([33m7.10.4[39m): Extracting archive
+  - Installing [32mlaravel/breeze[39m ([33mv1.19.2[39m): Extracting archive
+  - Installing [32mlaravel/pint[39m ([33mv1.5.0[39m): Extracting archive
+  - Installing [32msymfony/yaml[39m ([33mv6.0.19[39m): Extracting archive
+  - Installing [32mlaravel/sail[39m ([33mv1.60.0[39m): Extracting archive
+  - Installing [32mlaravel/sanctum[39m ([33mv3.3.3[39m): Extracting archive
+  - Installing [32mnikic/php-parser[39m ([33mv5.7.0[39m): Extracting archive
+  - Installing [32mpsy/psysh[39m ([33mv0.12.23[39m): Extracting archive
+  - Installing [32mlaravel/tinker[39m ([33mv2.11.1[39m): Extracting archive
+  - Installing [32mphpoffice/phpexcel[39m ([33m1.8.1[39m): Extracting archive
+  - Installing [32mmaatwebsite/excel[39m ([33mv1.1.5[39m): Extracting archive
+  - Installing [32mhamcrest/hamcrest-php[39m ([33mv2.1.1[39m): Extracting archive
+  - Installing [32mmockery/mockery[39m ([33m1.6.12[39m): Extracting archive
+  - Installing [32mfilp/whoops[39m ([33m2.18.4[39m): Extracting archive
+  - Installing [32mnunomaduro/collision[39m ([33mv6.4.0[39m): Extracting archive
+  - Installing [32msebastian/version[39m ([33m3.0.2[39m): Extracting archive
+  - Installing [32msebastian/type[39m ([33m3.2.1[39m): Extracting archive
+  - Installing [32msebastian/resource-operations[39m ([33m3.0.4[39m): Extracting archive
+  - Installing [32msebastian/recursion-context[39m ([33m4.0.6[39m): Extracting archive
+  - Installing [32msebastian/object-reflector[39m ([33m2.0.4[39m): Extracting archive
+  - Installing [32msebastian/object-enumerator[39m ([33m4.0.4[39m): Extracting archive
+  - Installing [32msebastian/global-state[39m ([33m5.0.8[39m): Extracting archive
+  - Installing [32msebastian/exporter[39m ([33m4.0.8[39m): Extracting archive
+  - Installing [32msebastian/environment[39m ([33m5.1.5[39m): Extracting archive
+  - Installing [32msebastian/diff[39m ([33m4.0.6[39m): Extracting archive
+  - Installing [32msebastian/comparator[39m ([33m4.0.10[39m): Extracting archive
+  - Installing [32msebastian/code-unit[39m ([33m1.0.8[39m): Extracting archive
+  - Installing [32msebastian/cli-parser[39m ([33m1.0.2[39m): Extracting archive
+  - Installing [32mphpunit/php-timer[39m ([33m5.0.3[39m): Extracting archive
+  - Installing [32mphpunit/php-text-template[39m ([33m2.0.4[39m): Extracting archive
+  - Installing [32mphpunit/php-invoker[39m ([33m3.1.1[39m): Extracting archive
+  - Installing [32mphpunit/php-file-iterator[39m ([33m3.0.6[39m): Extracting archive
+  - Installing [32mtheseer/tokenizer[39m ([33m1.3.1[39m): Extracting archive
+  - Installing [32msebastian/lines-of-code[39m ([33m1.0.4[39m): Extracting archive
+  - Installing [32msebastian/complexity[39m ([33m2.0.3[39m): Extracting archive
+  - Installing [32msebastian/code-unit-reverse-lookup[39m ([33m2.0.3[39m): Extracting archive
+  - Installing [32mphpunit/php-code-coverage[39m ([33m9.2.32[39m): Extracting archive
+  - Installing [32mphar-io/version[39m ([33m3.2.1[39m): Extracting archive
+  - Installing [32mphar-io/manifest[39m ([33m2.0.4[39m): Extracting archive
+  - Installing [32mmyclabs/deep-copy[39m ([33m1.13.4[39m): Extracting archive
+  - Installing [32mdoctrine/instantiator[39m ([33m1.5.0[39m): Extracting archive
+  - Installing [32mphpunit/phpunit[39m ([33m9.6.34[39m): Extracting archive
+  - Installing [32mspatie/backtrace[39m ([33m1.8.2[39m): Extracting archive
+  - Installing [32mspatie/laravel-package-tools[39m ([33m1.92.7[39m): Extracting archive
+  - Installing [32mspatie/laravel-activitylog[39m ([33m4.7.3[39m): Extracting archive
+  - Installing [32mspatie/flare-client-php[39m ([33m1.11.1[39m): Extracting archive
+  - Installing [32mspatie/ignition[39m ([33m1.14.2[39m): Extracting archive
+  - Installing [32mspatie/laravel-ignition[39m ([33m1.7.2[39m): Extracting archive
+  - Installing [32mspatie/laravel-permission[39m ([33m6.25.0[39m): Extracting archive
+   0/123 [>---------------------------]   0%[1G[2K  17/123 [===>------------------------]  13%[1G[2K  33/123 [=======>--------------------]  26%[1G[2K  43/123 [=========>------------------]  34%[1G[2K  56/123 [============>---------------]  45%[1G[2K  66/123 [===============>------------]  53%[1G[2K  77/123 [=================>----------]  62%[1G[2K  93/123 [=====================>------]  75%[1G[2K 103/123 [=======================>----]  83%[1G[2K 115/123 [==========================>-]  93%[1G[2K 123/123 [============================] 100%[1G[2K[30;43mPackage phpoffice/phpexcel is abandoned, you should avoid using it. Use phpoffice/phpspreadsheet instead.[39;49m
+[30;43mPackage sebastian/code-unit is abandoned, you should avoid using it. No replacement was suggested.[39;49m
+[30;43mPackage sebastian/code-unit-reverse-lookup is abandoned, you should avoid using it. No replacement was suggested.[39;49m
+[32mGenerating optimized autoload files[39m
+> Illuminate\Foundation\ComposerScripts::postAutoloadDump
+> @php artisan package:discover --ansi
+
+  [37;44m INFO [39;49m Discovering packages.  
+
+  barryvdh/laravel-dompdf [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+  laravel/breeze [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+  laravel/sail [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+  laravel/sanctum [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+  laravel/tinker [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+  nesbot/carbon [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+  nunomaduro/collision [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+  nunomaduro/termwind [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+  spatie/laravel-activitylog [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+  spatie/laravel-ignition [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+  spatie/laravel-permission [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+
+[32m86 packages you are using are looking for funding.[39m
+[32mUse the `composer fund` command to find out more![39m
+Generated .env file
+
+  [37;44m INFO [39;49m Configuration cache cleared successfully.  
+
+
+  [37;44m INFO [39;49m Application cache cleared successfully.  
+
+Running migrations...
+
+  [37;44m INFO [39;49m Preparing database.  
+
+  Creating migration table [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 17ms[39m [32;1mDONE[39;22m
+
+  [37;44m INFO [39;49m Loading stored database schemas.  
+
+  database/schema/pgsql-schema.sql [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 914ms[39m [32;1mDONE[39;22m
+
+  [37;44m INFO [39;49m Running migrations.  
+
+  2026_06_07_100000_create_announcements_table [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 9ms[39m [32;1mDONE[39;22m
+  2026_06_09_000001_add_cv_path_to_teachers_table [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 7ms[39m [32;1mDONE[39;22m
+  2026_06_09_132034_add_columns_to_chat_tables [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 48ms[39m [32;1mDONE[39;22m
+  2026_06_09_200000_add_missing_columns_to_all_tables [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 107ms[39m [32;1mDONE[39;22m
+  2026_06_10_000001_refactor_courses_teachers_modules [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 23ms[39m [32;1mDONE[39;22m
+  2026_06_10_000002_add_student_accounts_private_types_announcement_targets [90m 27ms[39m [32;1mDONE[39;22m
+  2026_06_10_000003_student_teachers_class_sessions [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 23ms[39m [32;1mDONE[39;22m
+  2026_06_10_100000_add_kunci_jawaban_to_questions [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 6ms[39m [32;1mDONE[39;22m
+  2026_06_10_100000_create_class_students_table [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 10ms[39m [32;1mDONE[39;22m
+  2026_06_10_110000_create_course_fees_table [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 18ms[39m [32;1mDONE[39;22m
+  2026_06_10_110100_create_student_course_payments_table [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 10ms[39m [32;1mDONE[39;22m
+  2026_06_10_161434_create_landing_content_tables [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 23ms[39m [32;1mDONE[39;22m
+  2026_06_10_162503_create_landing_wa_numbers_table [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 9ms[39m [32;1mDONE[39;22m
+  2026_06_10_163351_create_system_settings_table [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 11ms[39m [32;1mDONE[39;22m
+  2026_06_11_000000_add_bukti_pembayaran_to_salaries [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 6ms[39m [32;1mDONE[39;22m
+  2026_06_11_100000_create_schedule_agreements_and_payment_fields [90m.[39m[90m.[39m[90m 21ms[39m [32;1mDONE[39;22m
+  2026_06_11_120000_add_allowed_pages_to_branches_table [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 11ms[39m [32;1mDONE[39;22m
+  2026_06_11_120000_add_course_id_to_certificates_table [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 12ms[39m [32;1mDONE[39;22m
+  2026_06_11_120000_add_tipe_gaji_to_salaries [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 7ms[39m [32;1mDONE[39;22m
+  2026_06_11_182851_add_pertemuan_ke_to_schedule_proposals [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 1ms[39m [32;1mDONE[39;22m
+  2026_06_12_000001_create_schedule_proposals_tables [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 20ms[39m [32;1mDONE[39;22m
+  2026_06_12_100000_revamp_attendance_dual_confirmation [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 4ms[39m [32;1mDONE[39;22m
+  2026_06_20_000001_create_student_registrations_table [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 11ms[39m [32;1mDONE[39;22m
+  2026_06_20_000507_add_kategori_to_courses_table [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 5ms[39m [32;1mDONE[39;22m
+  2026_06_20_001742_create_course_package_table [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 7ms[39m [32;1mDONE[39;22m
+  2026_06_20_003643_add_kode_modul_to_modules_table [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 5ms[39m [32;1mDONE[39;22m
+  2026_06_20_100000_add_jenis_guru_to_teachers_table [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 6ms[39m [32;1mDONE[39;22m
+  2026_06_20_152029_add_guru_id_to_packages_and_paket_id_to_schedules [90m 6ms[39m [32;1mDONE[39;22m
+  2026_06_21_000001_add_kategori_peserta_didik_to_students_table [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 5ms[39m [32;1mDONE[39;22m
+  2026_06_21_000002_add_attendance_and_class_type_to_packages_table [90m.[39m[90m 3ms[39m [32;1mDONE[39;22m
+  2026_06_21_000003_add_package_id_to_students_table [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 7ms[39m [32;1mDONE[39;22m
+  2026_06_22_000001_add_billing_mode_to_school_classes [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 5ms[39m [32;1mDONE[39;22m
+  2026_06_22_000001_add_education_level_to_student_registrations [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 6ms[39m [32;1mDONE[39;22m
+  2026_06_22_122921_add_columns_to_payments_table [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m 3ms[39m [32;1mDONE[39;22m
+  2026_06_22_200000_change_diterbitkan_oleh_to_string_in_certificates [90m 12ms[39m [32;1mDONE[39;22m
+  2026_06_22_210000_add_kelas_id_to_invoices_module_id_to_schedules [90m.[39m[90m 9ms[39m [32;1mDONE[39;22m
+
+Seeding database...
+
+  [37;44m INFO [39;49m Seeding database.  
+
+  Database\Seeders\RolePermissionSeeder [90m..............................[39m [33;1mRUNNING[39;22m  
+[32m✅ Roles, Permissions & Users seeded![39m
+  Database\Seeders\RolePermissionSeeder [90m.......................[39m [90m372.71 ms[39m [32;1mDONE[39;22m  
+
+  Database\Seeders\OwnerSeeder [90m.......................................[39m [33;1mRUNNING[39;22m  
+  Database\Seeders\OwnerSeeder [90m.................................[39m [90m65.26 ms[39m [32;1mDONE[39;22m  
+
+  Database\Seeders\DemoDataSeeder [90m....................................[39m [33;1mRUNNING[39;22m  
+[32m🌱 Memulai seeding data demo...[39m
+[32m  ✅ Tahun akademik[39m
+[32m  ✅ Cabang (3 cabang)[39m
+[32m  ✅ User admin cabang[39m
+[32m  ✅ Mata pelajaran & biaya kursus[39m
+[32m  ✅ Paket belajar[39m
+[32m  ✅ Guru (7 guru)[39m
+[32m  ✅ Kelas (8 kelas)[39m
+[32m  ✅ Siswa (15 siswa)[39m
+[32m  ✅ Invoice & pembayaran[39m
+[32m  ✅ Modul belajar[39m
+[32m  ✅ Tryout & soal[39m
+[32m  ✅ Nilai / grade[39m
+[32m  ✅ Gaji guru[39m
+[32m  ✅ Pengumuman[39m
+[32m  ✅ Sertifikat[39m
+
+[32m🎉 Seeding data demo selesai![39m
+
+[32m📊 Ringkasan data yang di-seed:[39m
+[32m   • Tahun Akademik : 2 (2023/2024, 2024/2025)[39m
+[32m   • Cabang         : 3 (Jakarta, Bandung, Surabaya)[39m
+[32m   • Mata Pelajaran : 11[39m
+[32m   • Paket Belajar  : 5[39m
+[32m   • Guru           : 7[39m
+[32m   • Siswa          : 15[39m
+[32m   • Kelas          : 8[39m
+[32m   • Jadwal         : 0[39m
+[32m   • Invoice        : 21[39m
+[32m   • Pembayaran     : 17[39m
+[32m   • Modul          : 13[39m
+[32m   • Tryout         : 2[39m
+[32m   • Soal           : 10[39m
+[32m   • Nilai          : 27[39m
+[32m   • Gaji           : 7[39m
+[32m   • Pengumuman     : 4[39m
+[32m   • Sertifikat     : 3[39m
+
+[32m🔑 Akun demo siswa (semua password: siswa123):[39m
+[32m   andi.nugroho@siswa.com | citra.lestari@siswa.com | fajar.hidayat@siswa.com[39m
+[32m🔑 Akun demo guru (semua password: password123):[39m
+[32m   budi.santoso@guru.akademibimbel.com | gurusci@gmail.com[39m
+[32m🔑 Akun admin cabang (semua password: password):[39m
+[32m   adminpusat@akademibimbel.com | adminbandung@akademibimbel.com | adminsurabaya@akademibimbel.com[39m
+  Database\Seeders\DemoDataSeeder [90m...........................[39m [90m2,577.77 ms[39m [32;1mDONE[39;22m  
+
+  Database\Seeders\PackageSeeder [90m.....................................[39m [33;1mRUNNING[39;22m  
+[32m📦 Seeding package ↔ mata pelajaran...[39m
+[32m  📌 Paket Reguler SMA: 5 mata pelajaran[39m
+[32m  📌 Paket Intensif SNBT: 6 mata pelajaran[39m
+[32m  📌 Paket Online Basic: 2 mata pelajaran[39m
+[32m  📌 Paket Reguler Bandung: 3 mata pelajaran[39m
+[32m  📌 Paket Reguler Surabaya: 2 mata pelajaran[39m
+[32m  ✅ Selesai! Semua paket sudah terhubung ke mata pelajaran.[39m
+  Database\Seeders\PackageSeeder [90m...............................[39m [90m55.72 ms[39m [32;1mDONE[39;22m  
+
+
+  [37;44m INFO [39;49m The [1m[public/storage][22m link has been connected to [1m[storage/app/public][22m.  
+
+Building frontend assets...
+[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K
+added 118 packages in 2s
+[1G[0K⠹[1G[0K
+[1G[0K⠹[1G[0K29 packages are looking for funding
+[1G[0K⠹[1G[0K  run `npm fund` for details
+[1G[0K⠹[1G[0K[1mnpm[22m [96mnotice[39m
+[1mnpm[22m [96mnotice[39m New [31mmajor[39m version of npm available! [31m10.8.2[39m -> [34m11.17.0[39m
+[1mnpm[22m [96mnotice[39m Changelog: [34mhttps://github.com/npm/cli/releases/tag/v11.17.0[39m
+[1mnpm[22m [96mnotice[39m To update run: [4mnpm install -g npm@11.17.0[24m
+[1mnpm[22m [96mnotice[39m
+[1G[0K⠹[1G[0K
+> build
+> vite build
+
+[1G[0K[36mvite v4.5.14 [32mbuilding for production...[36m[39m
+[2K[1Gtransforming (1) [2mresources/js/app.js[22m[2K[1Gtransforming (4) [2mnode_modules/axios/index.js[22m[2K[1Gtransforming (9) [2mnode_modules/axios/lib/helpers/bind.js[22m[2K[1Gtransforming (26) [2mnode_modules/axios/lib/helpers/buildURL.js[22m[2K[1Gtransforming (52) [2mnode_modules/axios/lib/platform/browser/classes/FormData.[2K[1Gtransforming (59) [2mresources/css/app.css[22m[2K[1G[32m✓[39m 59 modules transformed.
+[2K[1Grendering chunks (1)...[2K[1Grendering chunks (2)...[2K[1G[2K[1Gcomputing gzip size (0)...[2K[1Gcomputing gzip size (1)...[2K[1Gcomputing gzip size (2)...[2K[1Gcomputing gzip size (3)...[2K[1G[2mpublic/build/[22m[32mmanifest.json            [39m[1m[2m  0.26 kB[22m[1m[22m[2m │ gzip:  0.13 kB[22m
+[2mpublic/build/[22m[2massets/[22m[35mapp-168eff96.css  [39m[1m[2m 31.46 kB[22m[1m[22m[2m │ gzip:  5.78 kB[22m
+[2mpublic/build/[22m[2massets/[22m[36mapp-3504234f.js   [39m[1m[2m162.63 kB[22m[1m[22m[2m │ gzip: 59.76 kB[22m
+[32m✓ built in 2.43s[39m
+[1G[0K⠙[1G[0KStarting Laravel server on 0.0.0.0:5000...
+
+  [37;44m INFO [39;49m Server running on [1m[http://0.0.0.0:5000][22m.  
+
+[33m  [39m[33;1mPress Ctrl+C to stop the server[39;22m
+
+  [90m2026-06-25[39m 05:08:41 [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [90m~ 0s[39m
+  [90m2026-06-25[39m 05:09:10 [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [90m~ 0s[39m
+  [90m2026-06-25[39m 05:09:10 [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [90m~ 0s[39m
+  [90m2026-06-25[39m 05:09:11 /favicon.ico [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [90m~ 0s[39m
