@@ -14,7 +14,7 @@ class ScheduleController extends Controller
 {
     public function create()
     {
-        $pakets = Package::with(['guru', 'mataPelajaran', 'cabang'])
+        $pakets = Package::with(['guru', 'mataPelajaran', 'cabang', 'courseTeachers'])
             ->where('status', 'aktif')
             ->orderBy('nama')
             ->get();

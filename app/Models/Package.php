@@ -54,8 +54,22 @@ class Package extends Model
         );
     }
 
+    public function courseTeachers()
+    {
+        return $this->hasMany(PackageCourseTeacher::class, 'package_id');
+    }
+
     public function siswa()
     {
         return $this->hasMany(Student::class, 'package_id');
+    }
+
+    public function getTeachersForCourse($courseId)
+    {
+        return $this->courseTeachers()
+            ->where('course_id', $courseId)
+            ->with('teacher')
+            ->get()
+            ->pluck('teacher');
     }
 }

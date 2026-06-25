@@ -191,7 +191,8 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::get('/course-package/{coursePackage}',        [CoursePackageController::class, 'show'])    ->name('course-package.show');
         Route::get('/course-package/{coursePackage}/edit',   [CoursePackageController::class, 'edit'])    ->name('course-package.edit');
         Route::put('/course-package/{coursePackage}',        [CoursePackageController::class, 'update'])  ->name('course-package.update');
-        Route::delete('/course-package/{coursePackage}',     [CoursePackageController::class, 'destroy']) ->name('course-package.destroy');
+        Route::delete('/course-package/{coursePackage}',     [CoursePackageController::class, 'destroy'])         ->name('course-package.destroy');
+        Route::get('/course-package/{coursePackage}/course-teachers', [CoursePackageController::class, 'courseTeachersApi']) ->name('course-package.course-teachers');
 
         // SCHEDULE DASHBOARD (Visual calendar view)
         Route::get('/schedule',              [ScheduleDashboardController::class, 'index']) ->name('schedule-dashboard.index');

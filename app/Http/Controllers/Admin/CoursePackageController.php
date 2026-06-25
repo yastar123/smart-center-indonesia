@@ -4,16 +4,18 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Package;
+use App\Models\PackageCourseTeacher;
 use App\Models\Branch;
 use App\Models\Course;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CoursePackageController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Package::with(['cabang', 'mataPelajaran', 'guru']);
+        $query = Package::with(['cabang', 'mataPelajaran', 'guru', 'courseTeachers.teacher', 'courseTeachers.course']);
 
         if ($s = $request->search) {
             $query->where('nama', 'like', "%$s%");
@@ -61,18 +63,32 @@ class CoursePackageController extends Controller
             'metode_absensi'   => 'required|in:manual,otomatis',
             'tipe_kelas'       => 'required|in:offline,online,private',
             'cabang_id'        => 'nullable|exists:branches,id',
-            'guru_id'          => 'nullable|exists:teachers,id',
             'is_unggulan'      => 'nullable|boolean',
             'status'           => 'required|in:aktif,nonaktif',
         ]);
 
         $data['is_unggulan'] = $request->boolean('is_unggulan');
 
-        $package = Package::create($data);
+        DB::transaction(function () use ($data, $request) {
+            $package = Package::create($data);
 
-        if ($request->course_ids) {
-            $package->mataPelajaran()->sync($request->course_ids);
-        }
+            $courseIds = array_filter((array) $request->course_ids);
+            if (!empty($courseIds)) {
+                $package->mataPelajaran()->sync($courseIds);
+            }
+
+            $courseTeachers = $request->input('course_teachers', []);
+            foreach ($courseTeachers as $courseId => $teacherIds) {
+                if (!is_array($teacherIds)) continue;
+                foreach (array_filter($teacherIds) as $teacherId) {
+                    PackageCourseTeacher::firstOrCreate([
+                        'package_id' => $package->id,
+                        'course_id'  => (int) $courseId,
+                        'teacher_id' => (int) $teacherId,
+                    ]);
+                }
+            }
+        });
 
         return redirect()->route('admin.course-package.index')
             ->with('success', 'Paket belajar berhasil ditambahkan.');
@@ -80,7 +96,7 @@ class CoursePackageController extends Controller
 
     public function show(Package $coursePackage)
     {
-        $coursePackage->load(['cabang', 'mataPelajaran', 'guru']);
+        $coursePackage->load(['cabang', 'mataPelajaran', 'guru', 'courseTeachers.teacher', 'courseTeachers.course']);
         return view('admin.course-package.detail', compact('coursePackage'));
     }
 
@@ -89,6 +105,7 @@ class CoursePackageController extends Controller
         $branches = Branch::orderBy('name')->get();
         $courses  = Course::where('status', 'aktif')->orderBy('nama')->get();
         $teachers = Teacher::where('status', 'aktif')->orderBy('name')->get();
+        $coursePackage->load(['mataPelajaran', 'courseTeachers']);
         return view('admin.course-package.edit', compact('coursePackage', 'branches', 'courses', 'teachers'));
     }
 
@@ -104,17 +121,31 @@ class CoursePackageController extends Controller
             'metode_absensi'   => 'required|in:manual,otomatis',
             'tipe_kelas'       => 'required|in:offline,online,private',
             'cabang_id'        => 'nullable|exists:branches,id',
-            'guru_id'          => 'nullable|exists:teachers,id',
             'is_unggulan'      => 'nullable|boolean',
             'status'           => 'required|in:aktif,nonaktif',
         ]);
 
         $data['is_unggulan'] = $request->boolean('is_unggulan');
-        $coursePackage->update($data);
 
-        if ($request->has('course_ids')) {
-            $coursePackage->mataPelajaran()->sync($request->course_ids ?? []);
-        }
+        DB::transaction(function () use ($data, $request, $coursePackage) {
+            $coursePackage->update($data);
+
+            $courseIds = array_filter((array) $request->course_ids);
+            $coursePackage->mataPelajaran()->sync($courseIds);
+
+            PackageCourseTeacher::where('package_id', $coursePackage->id)->delete();
+            $courseTeachers = $request->input('course_teachers', []);
+            foreach ($courseTeachers as $courseId => $teacherIds) {
+                if (!is_array($teacherIds)) continue;
+                foreach (array_filter($teacherIds) as $teacherId) {
+                    PackageCourseTeacher::firstOrCreate([
+                        'package_id' => $coursePackage->id,
+                        'course_id'  => (int) $courseId,
+                        'teacher_id' => (int) $teacherId,
+                    ]);
+                }
+            }
+        });
 
         return redirect()->route('admin.course-package.index')
             ->with('success', 'Paket belajar berhasil diperbarui.');
@@ -125,5 +156,38 @@ class CoursePackageController extends Controller
         $coursePackage->delete();
         return redirect()->route('admin.course-package.index')
             ->with('success', 'Paket belajar berhasil dihapus.');
+    }
+
+    /**
+     * API: return courses + assigned teachers for a package (used by JS in registration & schedule create)
+     */
+    public function courseTeachersApi(Package $coursePackage)
+    {
+        $coursePackage->load(['mataPelajaran', 'courseTeachers.teacher']);
+
+        $data = $coursePackage->mataPelajaran->map(function ($course) use ($coursePackage) {
+            $teachers = $coursePackage->courseTeachers
+                ->where('course_id', $course->id)
+                ->map(fn($ct) => [
+                    'id'    => optional($ct->teacher)->id,
+                    'name'  => optional($ct->teacher)->name,
+                ])
+                ->filter(fn($t) => $t['id']);
+
+            return [
+                'id'       => $course->id,
+                'nama'     => $course->nama,
+                'teachers' => $teachers->values(),
+            ];
+        });
+
+        return response()->json([
+            'success'          => true,
+            'package_id'       => $coursePackage->id,
+            'nama'             => $coursePackage->nama,
+            'jumlah_pertemuan' => $coursePackage->jumlah_pertemuan,
+            'harga'            => (float) $coursePackage->harga,
+            'courses'          => $data,
+        ]);
     }
 }

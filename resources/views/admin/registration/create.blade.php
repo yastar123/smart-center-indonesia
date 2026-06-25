@@ -299,11 +299,23 @@
                 <h6 class="fw-bold mb-0">Setup Jadwal & Guru</h6>
             </div>
 
+            {{-- Package-aware teacher display --}}
+            <div id="pkgTeacherSummary" style="display:none" class="mb-3">
+                <div class="p-3 rounded-3" style="background:var(--soft-primary-bg,#fdf4ff);border:1.5px solid #e9d5ff">
+                    <div class="fw-semibold mb-2" style="font-size:13px;color:#461256">
+                        <i class="bi bi-people-fill me-2"></i>Guru Pengajar per Mata Pelajaran (dari Paket)
+                    </div>
+                    <div id="pkgTeacherList">
+                        <span class="text-muted" style="font-size:13px">Pilih paket standar terlebih dahulu untuk melihat guru yang mengajar.</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="row g-3">
                 <div class="col-md-8">
-                    <label class="form-label fw-semibold">Assign Guru Pengajar <span class="text-danger">*</span></label>
+                    <label class="form-label fw-semibold">Guru Penanggung Jawab <span class="text-danger">*</span></label>
                     <select name="guru_id" class="form-select @error('guru_id') is-invalid @enderror" required onchange="updateTeacherType(this); updateSelectedTeacherDetails()">
-                        <option value="">— Pilih guru —</option>
+                        <option value="">— Pilih guru utama —</option>
                         @foreach($teachers as $t)
                             @php
                                 $teacherSubjects = collect((array)($t->subjects ?? []))
@@ -324,10 +336,11 @@
                                 data-jenis-guru="{{ $t->jenis_guru ?? '-' }}"
                                 data-address="{{ $t->address ?? '-' }}"
                                 {{ old('guru_id')==$t->id?'selected':'' }}>
-                                {{ $t->name }} - {{ $teacherSubjects ?: '-' }} - {{ $teacherBranch }} - {{ $t->jenis_guru ?? '-' }}
+                                {{ $t->name }} - {{ $teacherSubjects ?: '-' }} - {{ $teacherBranch }}
                             </option>
                         @endforeach
                     </select>
+                    <div class="form-text">Guru utama / penanggung jawab kelas ini. Jika paket memiliki guru per mata pelajaran, detail ditampilkan di atas.</div>
                     @error('guru_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
@@ -681,7 +694,76 @@ function onPackageChange(sel) {
         }
     }
 
+    // Load course-teachers from package and show in Card 3
+    loadPackageCourseTeachers(opt.value);
+
     updateQuote();
+}
+
+function loadPackageCourseTeachers(packageId) {
+    const summaryBox = document.getElementById('pkgTeacherSummary');
+    const listEl     = document.getElementById('pkgTeacherList');
+    if (!summaryBox || !listEl) return;
+
+    if (!packageId) {
+        summaryBox.style.display = 'none';
+        listEl.innerHTML = '<span class="text-muted" style="font-size:13px">Pilih paket standar terlebih dahulu.</span>';
+        return;
+    }
+
+    listEl.innerHTML = '<span class="text-muted" style="font-size:13px"><i class="bi bi-hourglass-split me-1"></i>Memuat data guru...</span>';
+    summaryBox.style.display = '';
+
+    fetch(`/admin/course-package/${packageId}/course-teachers`, {
+        headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+    })
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(data => {
+        const courses = data.courses || [];
+        if (!courses.length) {
+            listEl.innerHTML = '<span class="text-muted" style="font-size:13px">Paket ini belum memiliki mata pelajaran.</span>';
+            return;
+        }
+
+        const hasAssignments = courses.some(c => c.teachers && c.teachers.length > 0);
+
+        if (!hasAssignments) {
+            listEl.innerHTML = '<span class="text-muted" style="font-size:13px"><i class="bi bi-info-circle me-1"></i>Paket ini belum memiliki penetapan guru per mata pelajaran. Silakan pilih guru dari dropdown di bawah.</span>';
+            return;
+        }
+
+        let html = '<div class="row g-2">';
+        courses.forEach(c => {
+            const teacherNames = c.teachers && c.teachers.length
+                ? c.teachers.map(t => `<span class="badge" style="background:rgba(200,77,223,.12);color:#461256;font-weight:500;font-size:11px;border:1px solid #e9d5ff">${t.name}</span>`).join(' ')
+                : '<span class="text-muted" style="font-size:11px">Belum ditetapkan</span>';
+            html += `<div class="col-md-6">
+                <div class="p-2 rounded-2" style="border:1px solid var(--card-border);background:var(--bs-body-bg)">
+                    <div class="text-muted mb-1" style="font-size:11px"><i class="bi bi-book me-1"></i>${c.nama}</div>
+                    <div class="d-flex flex-wrap gap-1">${teacherNames}</div>
+                </div>
+            </div>`;
+
+            // Auto-fill guru_id with the first teacher of the first course that has teachers
+        });
+        html += '</div>';
+        listEl.innerHTML = html;
+
+        // Auto-suggest: pick first teacher from first course that has one
+        const firstCourseWithTeacher = courses.find(c => c.teachers && c.teachers.length > 0);
+        if (firstCourseWithTeacher && firstCourseWithTeacher.teachers.length > 0) {
+            const firstTeacherId = firstCourseWithTeacher.teachers[0].id;
+            const guruSel = document.querySelector('[name=guru_id]');
+            if (guruSel && !guruSel.value) {
+                guruSel.value = firstTeacherId;
+                updateTeacherType(guruSel);
+                updateSelectedTeacherDetails();
+            }
+        }
+    })
+    .catch(() => {
+        listEl.innerHTML = '<span class="text-muted" style="font-size:13px"><i class="bi bi-exclamation-circle me-1"></i>Gagal memuat data guru dari paket.</span>';
+    });
 }
 
 function syncCustomPrice() {

@@ -327,6 +327,8 @@ $paketsJson = $pakets->map(function ($p) {
         'guru_name'        => $p->guru?->name,
         // subjects with ID for the dropdown
         'mata_pelajaran'   => $p->mataPelajaran->map(fn($m) => ['id' => $m->id, 'nama' => $m->nama, 'kategori' => $m->kategori ?? '']),
+        // course_id => [teacher_id, ...] mapping from package_course_teachers
+        'course_teachers'  => $p->courseTeachers->groupBy('course_id')->map(fn($ct) => $ct->pluck('teacher_id')->values()),
     ];
 });
 
@@ -512,13 +514,31 @@ function onMapelChange(mapelId) {
            ${m.kategori ? `<div class="text-muted" style="font-size:12px">Kategori: ${m.kategori}</div>` : ''}`
         : `<div class="fw-semibold">ID: ${mapelId}</div>`;
 
-    // Filter guru: prefer teachers with this course in their courses list
-    const matched   = teachers.filter(t => t.course_ids.includes(parseInt(mapelId)));
-    const unmatched = teachers.filter(t => !t.course_ids.includes(parseInt(mapelId)));
+    // Filter guru: first check package-course-teacher assignments, then fallback to course_ids
+    const pkg = currentPaket;
+    let pkgTeacherIds = [];
+    if (pkg && pkg.course_teachers) {
+        const ct = pkg.course_teachers[parseInt(mapelId)];
+        if (ct && ct.length > 0) pkgTeacherIds = ct.map(Number);
+    }
+
+    let matched, unmatched;
+    if (pkgTeacherIds.length > 0) {
+        // Use package-course-teacher assignments
+        matched   = teachers.filter(t => pkgTeacherIds.includes(t.id));
+        unmatched = teachers.filter(t => !pkgTeacherIds.includes(t.id));
+    } else {
+        // Fallback to teacher's own course_ids
+        matched   = teachers.filter(t => t.course_ids.includes(parseInt(mapelId)));
+        unmatched = teachers.filter(t => !t.course_ids.includes(parseInt(mapelId)));
+    }
 
     let opts = '<option value="">— Pilih Guru —</option>';
     if (matched.length > 0) {
-        opts += `<optgroup label="✅ Guru mapel ini (${matched.length})">`;
+        const groupLabel = pkgTeacherIds.length > 0
+            ? `✅ Guru paket ini untuk mapel ini (${matched.length})`
+            : `✅ Guru mapel ini (${matched.length})`;
+        opts += `<optgroup label="${groupLabel}">`;
         matched.forEach(t => {
             opts += `<option value="${t.id}">${t.name}${t.branch ? ' ('+t.branch+')' : ''}</option>`;
         });
@@ -533,18 +553,20 @@ function onMapelChange(mapelId) {
     }
     guruSelect.innerHTML = opts;
 
-    // Auto-select if package has a default guru and they match this subject
-    if (pkg && pkg.guru_id) {
-        const inMatched = matched.find(t => t.id == pkg.guru_id);
-        if (inMatched) {
-            guruSelect.value = pkg.guru_id;
-            onGuruChange(pkg.guru_id);
-        }
+    // Auto-select if only one assigned teacher in package for this course
+    if (matched.length === 1) {
+        guruSelect.value = matched[0].id;
+        onGuruChange(matched[0].id);
+    } else if (pkg && pkg.guru_id && matched.find(t => t.id == pkg.guru_id)) {
+        guruSelect.value = pkg.guru_id;
+        onGuruChange(pkg.guru_id);
     }
 
-    noteEl.textContent = matched.length > 0
-        ? `${matched.length} guru terdaftar mengajar mata pelajaran ini ditampilkan di atas.`
-        : 'Belum ada guru yang terdaftar khusus untuk mata pelajaran ini. Pilih guru dari daftar.';
+    noteEl.textContent = pkgTeacherIds.length > 0
+        ? `${matched.length} guru ditugaskan untuk mata pelajaran ini dalam paket — ditampilkan di atas.`
+        : (matched.length > 0
+            ? `${matched.length} guru terdaftar mengajar mata pelajaran ini.`
+            : 'Belum ada guru yang ditetapkan untuk mata pelajaran ini dalam paket. Pilih dari daftar.');
 
     guruSection.style.display = '';
     showSections('section-mapel', 'section-guru');
