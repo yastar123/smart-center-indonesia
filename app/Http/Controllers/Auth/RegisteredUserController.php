@@ -13,11 +13,16 @@ class RegisteredUserController extends Controller
 {
     public function create(): View
     {
+        $jenisOrder = ['komputer','bahasa','mapel','kedinasan','akpol','cpns','bumn'];
+
         $subjects = Course::where('status', 'aktif')
-            ->orderBy('kategori')
             ->orderBy('nama')
             ->get()
-            ->groupBy(fn($c) => $c->kategori ?: 'other');
+            ->groupBy(fn($c) => $c->jenis_kursus ?: 'lainnya')
+            ->sortBy(fn($items, $key) => array_search($key, $jenisOrder) !== false
+                ? array_search($key, $jenisOrder)
+                : 99
+            );
 
         return view('auth.register', compact('subjects'));
     }

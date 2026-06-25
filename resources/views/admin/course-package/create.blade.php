@@ -133,11 +133,28 @@
                 Belum ada mata pelajaran aktif. <a href="{{ route('admin.subject.index') }}">Buat mata pelajaran</a> terlebih dahulu.
             </div>
         @else
+        @php
+            $jenisLabels = [
+                'komputer'  => 'Kursus Komputer',
+                'bahasa'    => 'Kursus Bahasa Asing',
+                'mapel'     => 'Mata Pelajaran',
+                'kedinasan' => 'Program Kedinasan',
+                'akpol'     => 'AKPOL / AKMIL / BINTARA',
+                'cpns'      => 'CPNS',
+                'bumn'      => 'BUMN',
+                'lainnya'   => 'Lainnya',
+            ];
+            $oldCourses = old('course_ids', []);
+        @endphp
         <div id="courseTeacherRows">
-            @foreach($courses as $c)
-            @php $oldCourses = old('course_ids', []); @endphp
+            @foreach($coursesGrouped as $jenis => $groupCourses)
+            <div class="mb-2 px-1 py-1 rounded-2" style="background:linear-gradient(135deg,#f8f5ff,#f3eeff);border:1px solid #e9d5ff;">
+                <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#68117e;padding:6px 10px 4px">
+                    <i class="bi bi-folder2-open me-1"></i>{{ $jenisLabels[$jenis] ?? ucfirst($jenis) }}
+                </div>
+            </div>
+            @foreach($groupCourses as $c)
             <div class="mb-3 rounded-3" style="border:1.5px solid var(--card-border);overflow:hidden;transition:.2s" id="card-{{ $c->id }}">
-                {{-- Mapel header row --}}
                 <div class="d-flex align-items-center gap-3 px-3 py-2" style="background:var(--input-bg);cursor:pointer"
                      onclick="document.getElementById('chk-{{ $c->id }}').click()">
                     <input class="form-check-input course-check" type="checkbox"
@@ -157,8 +174,6 @@
                         @endif
                     </div>
                 </div>
-
-                {{-- Teacher selection panel --}}
                 <div class="px-3 py-3 teacher-section border-top" id="teachers-{{ $c->id }}"
                      style="{{ in_array($c->id, $oldCourses) ? '' : 'display:none' }}">
                     <div class="text-muted mb-2" style="font-size:12px">
@@ -170,9 +185,7 @@
                     @else
                     <div class="row g-2">
                         @foreach($teachers as $t)
-                        @php
-                            $oldTeachers = old("course_teachers.{$c->id}", []);
-                        @endphp
+                        @php $oldTeachers = old("course_teachers.{$c->id}", []); @endphp
                         <div class="col-md-4 col-sm-6">
                             <div class="form-check p-2 rounded-2" style="border:1px solid var(--card-border);background:var(--bs-body-bg)">
                                 <input class="form-check-input" type="checkbox"
@@ -191,6 +204,7 @@
                     @endif
                 </div>
             </div>
+            @endforeach
             @endforeach
         </div>
         @endif

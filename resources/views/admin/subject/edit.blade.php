@@ -49,12 +49,22 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label fw-semibold">Kategori Keterampilan <span class="text-danger">*</span></label>
-                <select name="kategori" class="form-select @error('kategori') is-invalid @enderror" required>
-                    <option value="academic" {{ old('kategori',$subject->kategori)=='academic'?'selected':'' }}>Academic</option>
-                    <option value="skill"    {{ old('kategori',$subject->kategori)=='skill'   ?'selected':'' }}>Skill / Soft-Skill</option>
+                <label class="form-label fw-semibold">Jenis Kursus <span class="text-danger">*</span></label>
+                <select name="jenis_kursus" class="form-select @error('jenis_kursus') is-invalid @enderror" required>
+                    <option value="">-- Pilih Jenis --</option>
+                    @foreach([
+                        'komputer'  => 'Kursus Komputer',
+                        'bahasa'    => 'Kursus Bahasa Asing',
+                        'mapel'     => 'Mata Pelajaran',
+                        'kedinasan' => 'Program Kedinasan',
+                        'akpol'     => 'AKPOL / AKMIL / BINTARA',
+                        'cpns'      => 'CPNS',
+                        'bumn'      => 'BUMN',
+                    ] as $val => $label)
+                        <option value="{{ $val }}" {{ old('jenis_kursus',$subject->jenis_kursus)==$val?'selected':'' }}>{{ $label }}</option>
+                    @endforeach
                 </select>
-                @error('kategori')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                @error('jenis_kursus')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
 
             <div class="col-md-6">

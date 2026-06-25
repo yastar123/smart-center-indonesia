@@ -128,10 +128,28 @@
         @if($courses->isEmpty())
             <div class="alert alert-warning mb-0">Belum ada mata pelajaran aktif.</div>
         @else
+        @php
+            $jenisLabels = [
+                'komputer'  => 'Kursus Komputer',
+                'bahasa'    => 'Kursus Bahasa Asing',
+                'mapel'     => 'Mata Pelajaran',
+                'kedinasan' => 'Program Kedinasan',
+                'akpol'     => 'AKPOL / AKMIL / BINTARA',
+                'cpns'      => 'CPNS',
+                'bumn'      => 'BUMN',
+                'lainnya'   => 'Lainnya',
+            ];
+        @endphp
         <div id="courseTeacherRows">
-            @foreach($courses as $c)
+            @foreach($coursesGrouped as $jenis => $groupCourses)
+            <div class="mb-2 px-1 py-1 rounded-2" style="background:linear-gradient(135deg,#f8f5ff,#f3eeff);border:1px solid #e9d5ff;">
+                <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#68117e;padding:6px 10px 4px">
+                    <i class="bi bi-folder2-open me-1"></i>{{ $jenisLabels[$jenis] ?? ucfirst($jenis) }}
+                </div>
+            </div>
+            @foreach($groupCourses as $c)
             @php
-                $isChecked = in_array($c->id, $selectedCourseIds);
+                $isChecked   = in_array($c->id, $selectedCourseIds);
                 $ctForCourse = $existingCTMap->get($c->id, collect())->pluck('teacher_id')->toArray();
                 $oldTeachers = old("course_teachers.{$c->id}", $ctForCourse);
             @endphp
@@ -180,6 +198,7 @@
                     </div>
                 </div>
             </div>
+            @endforeach
             @endforeach
         </div>
         @endif

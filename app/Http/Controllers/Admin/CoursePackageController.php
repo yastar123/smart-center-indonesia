@@ -45,10 +45,11 @@ class CoursePackageController extends Controller
 
     public function create()
     {
-        $branches = Branch::orderBy('name')->get();
-        $courses  = Course::where('status', 'aktif')->orderBy('nama')->get();
-        $teachers = Teacher::where('status', 'aktif')->orderBy('name')->get();
-        return view('admin.course-package.create', compact('branches', 'courses', 'teachers'));
+        $branches      = Branch::orderBy('name')->get();
+        $courses       = Course::where('status', 'aktif')->orderBy('jenis_kursus')->orderBy('nama')->get();
+        $coursesGrouped = $courses->groupBy(fn($c) => $c->jenis_kursus ?: 'lainnya');
+        $teachers      = Teacher::where('status', 'aktif')->orderBy('name')->get();
+        return view('admin.course-package.create', compact('branches', 'courses', 'coursesGrouped', 'teachers'));
     }
 
     public function store(Request $request)
@@ -102,11 +103,12 @@ class CoursePackageController extends Controller
 
     public function edit(Package $coursePackage)
     {
-        $branches = Branch::orderBy('name')->get();
-        $courses  = Course::where('status', 'aktif')->orderBy('nama')->get();
-        $teachers = Teacher::where('status', 'aktif')->orderBy('name')->get();
+        $branches       = Branch::orderBy('name')->get();
+        $courses        = Course::where('status', 'aktif')->orderBy('jenis_kursus')->orderBy('nama')->get();
+        $coursesGrouped = $courses->groupBy(fn($c) => $c->jenis_kursus ?: 'lainnya');
+        $teachers       = Teacher::where('status', 'aktif')->orderBy('name')->get();
         $coursePackage->load(['mataPelajaran', 'courseTeachers']);
-        return view('admin.course-package.edit', compact('coursePackage', 'branches', 'courses', 'teachers'));
+        return view('admin.course-package.edit', compact('coursePackage', 'branches', 'courses', 'coursesGrouped', 'teachers'));
     }
 
     public function update(Request $request, Package $coursePackage)

@@ -17,6 +17,7 @@ class Course extends Model
         'kode',
         'nama',
         'kategori',
+        'jenis_kursus',
         'deskripsi',
         'status',
     ];

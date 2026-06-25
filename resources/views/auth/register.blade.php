@@ -581,31 +581,33 @@
                         <p class="text-muted" style="font-size:.9rem">Belum ada program tersedia. Silakan hubungi admin.</p>
                     @else
                         @php
-                            $categoryLabels = [
-                                'academic' => 'Akademik',
-                                'skill'    => 'Keterampilan / Skill',
-                                'other'    => 'Lainnya',
+                            $jenisLabels = [
+                                'komputer'  => 'Kursus Komputer',
+                                'bahasa'    => 'Kursus Bahasa Asing',
+                                'mapel'     => 'Mata Pelajaran',
+                                'kedinasan' => 'Program Kedinasan',
+                                'akpol'     => 'AKPOL / AKMIL / BINTARA',
+                                'cpns'      => 'CPNS',
+                                'bumn'      => 'BUMN',
+                                'lainnya'   => 'Lainnya',
                             ];
-                            $chunks = $subjects->chunk(2)->values();
                         @endphp
                         <div class="row g-4">
-                            @foreach($chunks as $pair)
-                                @foreach($pair as $kategori => $items)
-                                <div class="col-md-6">
-                                    <div class="program-group">
-                                        <div class="program-group-label">{{ $categoryLabels[$kategori] ?? ucfirst($kategori) }}</div>
-                                        <div class="check-grid">
-                                            @foreach($items as $course)
-                                            <label class="check-pill {{ in_array($course->nama, old('program_minat', [])) ? 'selected' : '' }}" onclick="togglePill(this)">
-                                                <input type="checkbox" name="program_minat[]" value="{{ $course->nama }}"
-                                                       {{ in_array($course->nama, old('program_minat', [])) ? 'checked' : '' }}>
-                                                {{ $course->nama }}
-                                            </label>
-                                            @endforeach
-                                        </div>
+                            @foreach($subjects as $jenis => $items)
+                            <div class="col-md-6">
+                                <div class="program-group">
+                                    <div class="program-group-label">{{ $jenisLabels[$jenis] ?? ucfirst($jenis) }}</div>
+                                    <div class="check-grid">
+                                        @foreach($items as $course)
+                                        <label class="check-pill {{ in_array($course->nama, old('program_minat', [])) ? 'selected' : '' }}" onclick="togglePill(this)">
+                                            <input type="checkbox" name="program_minat[]" value="{{ $course->nama }}"
+                                                   {{ in_array($course->nama, old('program_minat', [])) ? 'checked' : '' }}>
+                                            {{ $course->nama }}
+                                        </label>
+                                        @endforeach
                                     </div>
                                 </div>
-                                @endforeach
+                            </div>
                             @endforeach
                         </div>
                     @endif

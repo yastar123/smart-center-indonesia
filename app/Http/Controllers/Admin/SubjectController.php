@@ -47,12 +47,13 @@ class SubjectController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'kode'      => 'required|string|max:20',
-            'nama'      => 'required|string|max:100',
-            'kategori'  => 'nullable|in:academic,skill',
-            'deskripsi' => 'nullable|string',
-            'cabang_id' => 'nullable|exists:branches,id',
-            'status'    => 'required|in:aktif,nonaktif',
+            'kode'         => 'required|string|max:20',
+            'nama'         => 'required|string|max:100',
+            'jenis_kursus' => 'nullable|string|max:50',
+            'kategori'     => 'nullable|in:academic,skill',
+            'deskripsi'    => 'nullable|string',
+            'cabang_id'    => 'nullable|exists:branches,id',
+            'status'       => 'required|in:aktif,nonaktif',
         ]);
 
         Course::create($data);
@@ -76,12 +77,13 @@ class SubjectController extends Controller
     public function update(Request $request, Course $subject)
     {
         $data = $request->validate([
-            'kode'      => 'required|string|max:20',
-            'nama'      => 'required|string|max:100',
-            'kategori'  => 'nullable|in:academic,skill',
-            'deskripsi' => 'nullable|string',
-            'cabang_id' => 'nullable|exists:branches,id',
-            'status'    => 'required|in:aktif,nonaktif',
+            'kode'         => 'required|string|max:20',
+            'nama'         => 'required|string|max:100',
+            'jenis_kursus' => 'nullable|string|max:50',
+            'kategori'     => 'nullable|in:academic,skill',
+            'deskripsi'    => 'nullable|string',
+            'cabang_id'    => 'nullable|exists:branches,id',
+            'status'       => 'required|in:aktif,nonaktif',
         ]);
 
         $subject->update($data);

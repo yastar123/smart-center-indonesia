@@ -49,6 +49,25 @@
             </div>
 
             <div class="col-md-6">
+                <label class="form-label fw-semibold">Jenis Kursus <span class="text-danger">*</span></label>
+                <select name="jenis_kursus" class="form-select @error('jenis_kursus') is-invalid @enderror" required>
+                    <option value="">-- Pilih Jenis --</option>
+                    @foreach([
+                        'komputer'  => 'Kursus Komputer',
+                        'bahasa'    => 'Kursus Bahasa Asing',
+                        'mapel'     => 'Mata Pelajaran',
+                        'kedinasan' => 'Program Kedinasan',
+                        'akpol'     => 'AKPOL / AKMIL / BINTARA',
+                        'cpns'      => 'CPNS',
+                        'bumn'      => 'BUMN',
+                    ] as $val => $label)
+                        <option value="{{ $val }}" {{ old('jenis_kursus')==$val?'selected':'' }}>{{ $label }}</option>
+                    @endforeach
+                </select>
+                @error('jenis_kursus')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </div>
+
+            <div class="col-md-6">
                 <label class="form-label fw-semibold">Cabang</label>
                 <select name="cabang_id" class="form-select @error('cabang_id') is-invalid @enderror">
                     <option value="">Semua Cabang</option>

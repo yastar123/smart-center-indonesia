@@ -609,32 +609,34 @@ unset($__errorArgs, $__bag); ?>
                         <p class="text-muted" style="font-size:.9rem">Belum ada program tersedia. Silakan hubungi admin.</p>
                     <?php else: ?>
                         <?php
-                            $categoryLabels = [
-                                'academic' => 'Akademik',
-                                'skill'    => 'Keterampilan / Skill',
-                                'other'    => 'Lainnya',
+                            $jenisLabels = [
+                                'komputer'  => 'Kursus Komputer',
+                                'bahasa'    => 'Kursus Bahasa Asing',
+                                'mapel'     => 'Mata Pelajaran',
+                                'kedinasan' => 'Program Kedinasan',
+                                'akpol'     => 'AKPOL / AKMIL / BINTARA',
+                                'cpns'      => 'CPNS',
+                                'bumn'      => 'BUMN',
+                                'lainnya'   => 'Lainnya',
                             ];
-                            $chunks = $subjects->chunk(2)->values();
                         ?>
                         <div class="row g-4">
-                            <?php $__currentLoopData = $chunks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pair): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <?php $__currentLoopData = $pair; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kategori => $items): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <div class="col-md-6">
-                                    <div class="program-group">
-                                        <div class="program-group-label"><?php echo e($categoryLabels[$kategori] ?? ucfirst($kategori)); ?></div>
-                                        <div class="check-grid">
-                                            <?php $__currentLoopData = $items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <label class="check-pill <?php echo e(in_array($course->nama, old('program_minat', [])) ? 'selected' : ''); ?>" onclick="togglePill(this)">
-                                                <input type="checkbox" name="program_minat[]" value="<?php echo e($course->nama); ?>"
-                                                       <?php echo e(in_array($course->nama, old('program_minat', [])) ? 'checked' : ''); ?>>
-                                                <?php echo e($course->nama); ?>
+                            <?php $__currentLoopData = $subjects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $jenis => $items): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <div class="col-md-6">
+                                <div class="program-group">
+                                    <div class="program-group-label"><?php echo e($jenisLabels[$jenis] ?? ucfirst($jenis)); ?></div>
+                                    <div class="check-grid">
+                                        <?php $__currentLoopData = $items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <label class="check-pill <?php echo e(in_array($course->nama, old('program_minat', [])) ? 'selected' : ''); ?>" onclick="togglePill(this)">
+                                            <input type="checkbox" name="program_minat[]" value="<?php echo e($course->nama); ?>"
+                                                   <?php echo e(in_array($course->nama, old('program_minat', [])) ? 'checked' : ''); ?>>
+                                            <?php echo e($course->nama); ?>
 
-                                            </label>
-                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                        </div>
+                                        </label>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </div>
                                 </div>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </div>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                     <?php endif; ?>

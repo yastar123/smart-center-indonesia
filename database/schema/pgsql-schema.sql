@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict puI3IMFFtCYKq0MGCdwHGXeNw3v9c5X1TI9bR2kITcJI55exQrZ6IUUmox1AmyM
+\restrict DdWlYGckQKr94MDHQuyjAurkfNM6y84iAAeh5Ql6gKqJye0iV9GpJIlJc3hM7Dc
 
 -- Dumped from database version 16.10
 -- Dumped by pg_dump version 16.10
@@ -29,7 +29,11 @@ SET default_table_access_method = heap;
 CREATE TABLE public.absensi_gurus (
     id bigint NOT NULL,
     created_at timestamp(0) without time zone,
-    updated_at timestamp(0) without time zone
+    updated_at timestamp(0) without time zone,
+    jadwal_id bigint NOT NULL,
+    guru_id bigint NOT NULL,
+    status character varying(20) DEFAULT 'hadir'::character varying NOT NULL,
+    catatan text
 );
 
 
@@ -59,7 +63,13 @@ ALTER SEQUENCE public.absensi_gurus_id_seq OWNED BY public.absensi_gurus.id;
 CREATE TABLE public.absensi_siswas (
     id bigint NOT NULL,
     created_at timestamp(0) without time zone,
-    updated_at timestamp(0) without time zone
+    updated_at timestamp(0) without time zone,
+    jadwal_id bigint NOT NULL,
+    siswa_id bigint NOT NULL,
+    status character varying(20) DEFAULT 'hadir'::character varying NOT NULL,
+    catatan text,
+    guru_hadir boolean DEFAULT false NOT NULL,
+    siswa_konfirmasi_at timestamp(0) without time zone
 );
 
 
@@ -186,6 +196,49 @@ ALTER SEQUENCE public.activity_logs_id_seq OWNED BY public.activity_logs.id;
 
 
 --
+-- Name: announcements; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.announcements (
+    id bigint NOT NULL,
+    cabang_id bigint,
+    dibuat_oleh bigint,
+    judul character varying(255) NOT NULL,
+    konten text NOT NULL,
+    jenis character varying(30) DEFAULT 'info'::character varying NOT NULL,
+    target character varying(30) DEFAULT 'semua'::character varying NOT NULL,
+    file character varying(255),
+    tanggal_mulai date,
+    tanggal_selesai date,
+    is_pinned boolean DEFAULT false NOT NULL,
+    status character varying(20) DEFAULT 'aktif'::character varying NOT NULL,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone,
+    target_teacher_ids json,
+    target_student_ids json
+);
+
+
+--
+-- Name: announcements_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.announcements_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: announcements_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.announcements_id_seq OWNED BY public.announcements.id;
+
+
+--
 -- Name: branches; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -211,7 +264,8 @@ CREATE TABLE public.branches (
     phone character varying(255),
     created_by bigint,
     updated_by bigint,
-    CONSTRAINT branches_status_check CHECK (((status)::text = ANY ((ARRAY['active'::character varying, 'inactive'::character varying])::text[])))
+    allowed_pages json,
+    CONSTRAINT branches_status_check CHECK (((status)::text = ANY (ARRAY[('active'::character varying)::text, ('inactive'::character varying)::text])))
 );
 
 
@@ -278,7 +332,7 @@ CREATE TABLE public.certificates (
     deleted_at timestamp(0) without time zone,
     siswa_id bigint,
     cabang_id bigint,
-    diterbitkan_oleh bigint,
+    diterbitkan_oleh character varying(200),
     nomor_sertifikat character varying(255),
     jenis character varying(50),
     judul character varying(255),
@@ -286,7 +340,8 @@ CREATE TABLE public.certificates (
     tanggal_terbit date,
     tanggal_expired date,
     file_sertifikat character varying(255),
-    file_qrcode character varying(255)
+    file_qrcode character varying(255),
+    course_id bigint
 );
 
 
@@ -316,7 +371,14 @@ ALTER SEQUENCE public.certificates_id_seq OWNED BY public.certificates.id;
 CREATE TABLE public.chat_messages (
     id bigint NOT NULL,
     created_at timestamp(0) without time zone,
-    updated_at timestamp(0) without time zone
+    updated_at timestamp(0) without time zone,
+    room_id bigint NOT NULL,
+    pengirim_id bigint NOT NULL,
+    jenis character varying(20) DEFAULT 'teks'::character varying NOT NULL,
+    pesan text,
+    file_path character varying(255),
+    dibaca_oleh json,
+    is_deleted boolean DEFAULT false NOT NULL
 );
 
 
@@ -346,7 +408,12 @@ ALTER SEQUENCE public.chat_messages_id_seq OWNED BY public.chat_messages.id;
 CREATE TABLE public.chat_rooms (
     id bigint NOT NULL,
     created_at timestamp(0) without time zone,
-    updated_at timestamp(0) without time zone
+    updated_at timestamp(0) without time zone,
+    nama_room character varying(100) NOT NULL,
+    jenis_room character varying(20) DEFAULT 'grup'::character varying NOT NULL,
+    cabang_id bigint,
+    peserta_id json,
+    waktu_pesan_terakhir timestamp(0) without time zone
 );
 
 
@@ -370,6 +437,80 @@ ALTER SEQUENCE public.chat_rooms_id_seq OWNED BY public.chat_rooms.id;
 
 
 --
+-- Name: class_students; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.class_students (
+    id bigint NOT NULL,
+    class_id bigint NOT NULL,
+    student_id bigint NOT NULL,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone
+);
+
+
+--
+-- Name: class_students_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.class_students_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: class_students_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.class_students_id_seq OWNED BY public.class_students.id;
+
+
+--
+-- Name: course_fees; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.course_fees (
+    id bigint NOT NULL,
+    course_id bigint NOT NULL,
+    amount numeric(12,2) DEFAULT '0'::numeric NOT NULL,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone
+);
+
+
+--
+-- Name: course_fees_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.course_fees_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: course_fees_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.course_fees_id_seq OWNED BY public.course_fees.id;
+
+
+--
+-- Name: course_package; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.course_package (
+    package_id bigint NOT NULL,
+    course_id bigint NOT NULL
+);
+
+
+--
 -- Name: courses; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -381,12 +522,10 @@ CREATE TABLE public.courses (
     kode character varying(20),
     nama character varying(100),
     deskripsi text,
-    kategori character varying(50),
-    icon character varying(255),
-    warna character varying(10),
     status character varying(255) DEFAULT 'aktif'::character varying NOT NULL,
     deleted_at timestamp(0) without time zone,
-    CONSTRAINT courses_status_check CHECK (((status)::text = ANY ((ARRAY['aktif'::character varying, 'nonaktif'::character varying])::text[])))
+    kategori character varying(50) DEFAULT 'academic'::character varying NOT NULL,
+    CONSTRAINT courses_status_check CHECK (((status)::text = ANY (ARRAY[('aktif'::character varying)::text, ('nonaktif'::character varying)::text])))
 );
 
 
@@ -480,7 +619,18 @@ ALTER SEQUENCE public.gajis_id_seq OWNED BY public.gajis.id;
 CREATE TABLE public.grades (
     id bigint NOT NULL,
     created_at timestamp(0) without time zone,
-    updated_at timestamp(0) without time zone
+    updated_at timestamp(0) without time zone,
+    siswa_id bigint NOT NULL,
+    mata_pelajaran_id bigint,
+    guru_id bigint,
+    semester_id bigint,
+    jenis_penilaian character varying(50) NOT NULL,
+    nama_penilaian character varying(100),
+    nilai numeric(5,2) NOT NULL,
+    nilai_maksimal numeric(5,2) DEFAULT '100'::numeric NOT NULL,
+    bobot numeric(5,2) DEFAULT '1'::numeric NOT NULL,
+    tanggal date,
+    catatan text
 );
 
 
@@ -584,7 +734,8 @@ CREATE TABLE public.invoices (
     status character varying(255) DEFAULT 'belum_bayar'::character varying NOT NULL,
     catatan text,
     deleted_at timestamp(0) without time zone,
-    CONSTRAINT invoices_status_check CHECK (((status)::text = ANY ((ARRAY['belum_bayar'::character varying, 'sebagian'::character varying, 'lunas'::character varying])::text[])))
+    kelas_id bigint,
+    CONSTRAINT invoices_status_check CHECK (((status)::text = ANY (ARRAY[('belum_bayar'::character varying)::text, ('sebagian'::character varying)::text, ('lunas'::character varying)::text])))
 );
 
 
@@ -695,6 +846,155 @@ CREATE SEQUENCE public.kelas_siswa_id_seq
 --
 
 ALTER SEQUENCE public.kelas_siswa_id_seq OWNED BY public.kelas_siswa.id;
+
+
+--
+-- Name: landing_programs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.landing_programs (
+    id bigint NOT NULL,
+    title character varying(255) NOT NULL,
+    description text NOT NULL,
+    badge_label character varying(80) DEFAULT 'PROGRAM'::character varying NOT NULL,
+    badge_bg character varying(255) DEFAULT 'rgba(200,77,223,.1)'::character varying NOT NULL,
+    badge_color character varying(255) DEFAULT '#68117e'::character varying NOT NULL,
+    icon_emoji character varying(10) DEFAULT '📖'::character varying NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    is_popular boolean DEFAULT false NOT NULL,
+    is_new boolean DEFAULT false NOT NULL,
+    sort_order smallint DEFAULT '0'::smallint NOT NULL,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone
+);
+
+
+--
+-- Name: landing_programs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.landing_programs_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: landing_programs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.landing_programs_id_seq OWNED BY public.landing_programs.id;
+
+
+--
+-- Name: landing_settings; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.landing_settings (
+    id bigint NOT NULL,
+    section character varying(60) NOT NULL,
+    key character varying(100) NOT NULL,
+    value text,
+    type character varying(30) DEFAULT 'text'::character varying NOT NULL,
+    label character varying(150) NOT NULL,
+    sort_order smallint DEFAULT '0'::smallint NOT NULL,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone
+);
+
+
+--
+-- Name: landing_settings_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.landing_settings_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: landing_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.landing_settings_id_seq OWNED BY public.landing_settings.id;
+
+
+--
+-- Name: landing_testimonials; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.landing_testimonials (
+    id bigint NOT NULL,
+    name character varying(255) NOT NULL,
+    role character varying(255) NOT NULL,
+    text text NOT NULL,
+    gradient character varying(255) DEFAULT 'linear-gradient(135deg,#c84ddf,#68117e)'::character varying NOT NULL,
+    initial character varying(5) DEFAULT 'A'::character varying NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    sort_order smallint DEFAULT '0'::smallint NOT NULL,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone
+);
+
+
+--
+-- Name: landing_testimonials_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.landing_testimonials_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: landing_testimonials_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.landing_testimonials_id_seq OWNED BY public.landing_testimonials.id;
+
+
+--
+-- Name: landing_wa_numbers; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.landing_wa_numbers (
+    id bigint NOT NULL,
+    label character varying(255) NOT NULL,
+    number character varying(30) NOT NULL,
+    description character varying(255),
+    is_primary boolean DEFAULT false NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    sort_order smallint DEFAULT '0'::smallint NOT NULL,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone
+);
+
+
+--
+-- Name: landing_wa_numbers_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.landing_wa_numbers_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: landing_wa_numbers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.landing_wa_numbers_id_seq OWNED BY public.landing_wa_numbers.id;
 
 
 --
@@ -817,7 +1117,20 @@ CREATE TABLE public.model_has_roles (
 CREATE TABLE public.modules (
     id bigint NOT NULL,
     created_at timestamp(0) without time zone,
-    updated_at timestamp(0) without time zone
+    updated_at timestamp(0) without time zone,
+    mata_pelajaran_id bigint,
+    diupload_oleh bigint,
+    judul character varying(200) NOT NULL,
+    deskripsi text,
+    jenis character varying(20) NOT NULL,
+    file_path character varying(255),
+    file_url character varying(255),
+    ukuran_file bigint,
+    is_gratis boolean DEFAULT false NOT NULL,
+    status character varying(20) DEFAULT 'draft'::character varying NOT NULL,
+    jumlah_download integer DEFAULT 0 NOT NULL,
+    deleted_at timestamp(0) without time zone,
+    kode_modul character varying(30)
 );
 
 
@@ -901,13 +1214,60 @@ ALTER SEQUENCE public.nilais_id_seq OWNED BY public.nilais.id;
 
 
 --
+-- Name: package_course_teachers; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.package_course_teachers (
+    id bigint NOT NULL,
+    package_id bigint NOT NULL,
+    course_id bigint NOT NULL,
+    teacher_id bigint NOT NULL,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone
+);
+
+
+--
+-- Name: package_course_teachers_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.package_course_teachers_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: package_course_teachers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.package_course_teachers_id_seq OWNED BY public.package_course_teachers.id;
+
+
+--
 -- Name: packages; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.packages (
     id bigint NOT NULL,
     created_at timestamp(0) without time zone,
-    updated_at timestamp(0) without time zone
+    updated_at timestamp(0) without time zone,
+    cabang_id bigint,
+    nama character varying(150) NOT NULL,
+    deskripsi text,
+    harga numeric(12,2) DEFAULT '0'::numeric NOT NULL,
+    durasi_bulan integer DEFAULT 1 NOT NULL,
+    jumlah_pertemuan integer DEFAULT 1 NOT NULL,
+    jenis character varying(50) NOT NULL,
+    fitur json,
+    is_unggulan boolean DEFAULT false NOT NULL,
+    status character varying(20) DEFAULT 'aktif'::character varying NOT NULL,
+    deleted_at timestamp(0) without time zone,
+    guru_id bigint,
+    metode_absensi character varying(30) DEFAULT 'manual'::character varying NOT NULL,
+    tipe_kelas character varying(30) DEFAULT 'offline'::character varying NOT NULL
 );
 
 
@@ -995,8 +1355,8 @@ CREATE TABLE public.payments (
     disetujui_oleh bigint,
     tanggal_disetujui timestamp(0) without time zone,
     deleted_at timestamp(0) without time zone,
-    CONSTRAINT payments_metode_check CHECK (((metode)::text = ANY ((ARRAY['cash'::character varying, 'transfer'::character varying, 'qris'::character varying])::text[]))),
-    CONSTRAINT payments_status_check CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'verified'::character varying, 'rejected'::character varying])::text[])))
+    CONSTRAINT payments_metode_check CHECK (((metode)::text = ANY (ARRAY[('cash'::character varying)::text, ('transfer'::character varying)::text, ('qris'::character varying)::text]))),
+    CONSTRAINT payments_status_check CHECK (((status)::text = ANY (ARRAY[('pending'::character varying)::text, ('verified'::character varying)::text, ('rejected'::character varying)::text])))
 );
 
 
@@ -1125,7 +1485,17 @@ ALTER SEQUENCE public.personal_access_tokens_id_seq OWNED BY public.personal_acc
 CREATE TABLE public.questions (
     id bigint NOT NULL,
     created_at timestamp(0) without time zone,
-    updated_at timestamp(0) without time zone
+    updated_at timestamp(0) without time zone,
+    tryout_id bigint NOT NULL,
+    teks_pertanyaan text NOT NULL,
+    gambar_pertanyaan character varying(255),
+    jenis character varying(30) DEFAULT 'pilihan_ganda'::character varying NOT NULL,
+    pilihan_jawaban json,
+    penjelasan text,
+    poin numeric(5,2) DEFAULT '1'::numeric NOT NULL,
+    urutan integer DEFAULT 1 NOT NULL,
+    tingkat_kesulitan character varying(20) DEFAULT 'sedang'::character varying NOT NULL,
+    kunci_jawaban character varying(10)
 );
 
 
@@ -1197,7 +1567,27 @@ ALTER SEQUENCE public.roles_id_seq OWNED BY public.roles.id;
 CREATE TABLE public.salaries (
     id bigint NOT NULL,
     created_at timestamp(0) without time zone,
-    updated_at timestamp(0) without time zone
+    updated_at timestamp(0) without time zone,
+    guru_id bigint NOT NULL,
+    cabang_id bigint,
+    periode character varying(20) NOT NULL,
+    gaji_pokok numeric(12,2) DEFAULT '0'::numeric NOT NULL,
+    jam_mengajar numeric(6,1),
+    tarif_per_jam numeric(12,2),
+    total_gaji_mengajar numeric(12,2) DEFAULT '0'::numeric NOT NULL,
+    bonus numeric(12,2) DEFAULT '0'::numeric NOT NULL,
+    potongan numeric(12,2) DEFAULT '0'::numeric NOT NULL,
+    total_gaji numeric(12,2) DEFAULT '0'::numeric NOT NULL,
+    metode_pembayaran character varying(50),
+    nama_bank character varying(50),
+    nomor_rekening character varying(50),
+    tanggal_pembayaran date,
+    status character varying(20) DEFAULT 'pending'::character varying NOT NULL,
+    catatan text,
+    dibayar_oleh bigint,
+    deleted_at timestamp(0) without time zone,
+    bukti_pembayaran character varying(255),
+    tipe_gaji character varying(50) DEFAULT 'bulanan'::character varying NOT NULL
 );
 
 
@@ -1218,6 +1608,131 @@ CREATE SEQUENCE public.salaries_id_seq
 --
 
 ALTER SEQUENCE public.salaries_id_seq OWNED BY public.salaries.id;
+
+
+--
+-- Name: schedule_proposal_approvals; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.schedule_proposal_approvals (
+    id bigint NOT NULL,
+    proposal_id bigint NOT NULL,
+    approver_type character varying(255) NOT NULL,
+    approver_id bigint NOT NULL,
+    status character varying(255) DEFAULT 'pending'::character varying NOT NULL,
+    responded_at timestamp(0) without time zone,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone,
+    CONSTRAINT schedule_proposal_approvals_approver_type_check CHECK (((approver_type)::text = ANY ((ARRAY['guru'::character varying, 'siswa'::character varying])::text[]))),
+    CONSTRAINT schedule_proposal_approvals_status_check CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'approved'::character varying, 'rejected'::character varying])::text[])))
+);
+
+
+--
+-- Name: schedule_proposal_approvals_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.schedule_proposal_approvals_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: schedule_proposal_approvals_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.schedule_proposal_approvals_id_seq OWNED BY public.schedule_proposal_approvals.id;
+
+
+--
+-- Name: schedule_proposals; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.schedule_proposals (
+    id bigint NOT NULL,
+    class_id bigint NOT NULL,
+    pertemuan_ke smallint,
+    proposed_by_type character varying(255) NOT NULL,
+    proposed_by_id bigint NOT NULL,
+    tanggal date NOT NULL,
+    jam_mulai time(0) without time zone NOT NULL,
+    jam_selesai time(0) without time zone NOT NULL,
+    jenis character varying(255) DEFAULT 'offline'::character varying NOT NULL,
+    ruangan character varying(255),
+    link_meeting character varying(255),
+    status character varying(255) DEFAULT 'pending'::character varying NOT NULL,
+    schedule_id bigint,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone,
+    CONSTRAINT schedule_proposals_jenis_check CHECK (((jenis)::text = ANY ((ARRAY['online'::character varying, 'offline'::character varying, 'private'::character varying])::text[]))),
+    CONSTRAINT schedule_proposals_proposed_by_type_check CHECK (((proposed_by_type)::text = ANY ((ARRAY['guru'::character varying, 'siswa'::character varying])::text[]))),
+    CONSTRAINT schedule_proposals_status_check CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'approved'::character varying, 'rejected'::character varying])::text[])))
+);
+
+
+--
+-- Name: COLUMN schedule_proposals.schedule_id; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.schedule_proposals.schedule_id IS 'Filled after approved';
+
+
+--
+-- Name: schedule_proposals_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.schedule_proposals_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: schedule_proposals_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.schedule_proposals_id_seq OWNED BY public.schedule_proposals.id;
+
+
+--
+-- Name: schedule_student_agreements; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.schedule_student_agreements (
+    id bigint NOT NULL,
+    schedule_id bigint NOT NULL,
+    student_id bigint NOT NULL,
+    guru_confirmed_at timestamp(0) without time zone,
+    siswa_confirmed_at timestamp(0) without time zone,
+    status character varying(255) DEFAULT 'pending'::character varying NOT NULL,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone,
+    CONSTRAINT schedule_student_agreements_status_check CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'agreed'::character varying])::text[])))
+);
+
+
+--
+-- Name: schedule_student_agreements_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.schedule_student_agreements_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: schedule_student_agreements_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.schedule_student_agreements_id_seq OWNED BY public.schedule_student_agreements.id;
 
 
 --
@@ -1242,8 +1757,13 @@ CREATE TABLE public.schedules (
     catatan text,
     reminder_terkirim boolean DEFAULT false NOT NULL,
     deleted_at timestamp(0) without time zone,
-    CONSTRAINT schedules_jenis_check CHECK (((jenis)::text = ANY ((ARRAY['online'::character varying, 'offline'::character varying])::text[]))),
-    CONSTRAINT schedules_status_check CHECK (((status)::text = ANY ((ARRAY['dijadwalkan'::character varying, 'berlangsung'::character varying, 'selesai'::character varying, 'dibatalkan'::character varying])::text[])))
+    pertemuan_ke smallint,
+    tanggal_selesai date,
+    paket_id bigint,
+    module_id bigint,
+    mata_pelajaran_id bigint,
+    CONSTRAINT schedules_jenis_check CHECK (((jenis)::text = ANY ((ARRAY['online'::character varying, 'offline'::character varying, 'private'::character varying])::text[]))),
+    CONSTRAINT schedules_status_check CHECK (((status)::text = ANY (ARRAY[('dijadwalkan'::character varying)::text, ('berlangsung'::character varying)::text, ('selesai'::character varying)::text, ('dibatalkan'::character varying)::text])))
 );
 
 
@@ -1282,12 +1802,13 @@ CREATE TABLE public.school_classes (
     nama_kelas character varying(255),
     kapasitas smallint DEFAULT '30'::smallint NOT NULL,
     jenis character varying(255) DEFAULT 'offline'::character varying NOT NULL,
-    ruangan character varying(255),
     link_zoom character varying(255),
     status character varying(255) DEFAULT 'aktif'::character varying NOT NULL,
     deleted_at timestamp(0) without time zone,
-    CONSTRAINT school_classes_jenis_check CHECK (((jenis)::text = ANY ((ARRAY['online'::character varying, 'offline'::character varying])::text[]))),
-    CONSTRAINT school_classes_status_check CHECK (((status)::text = ANY ((ARRAY['aktif'::character varying, 'nonaktif'::character varying])::text[])))
+    jumlah_pertemuan smallint DEFAULT '1'::smallint NOT NULL,
+    billing_mode character varying(20) DEFAULT 'prepaid'::character varying,
+    CONSTRAINT school_classes_jenis_check CHECK (((jenis)::text = ANY ((ARRAY['online'::character varying, 'offline'::character varying, 'private'::character varying])::text[]))),
+    CONSTRAINT school_classes_status_check CHECK (((status)::text = ANY (ARRAY[('aktif'::character varying)::text, ('nonaktif'::character varying)::text])))
 );
 
 
@@ -1377,6 +1898,129 @@ ALTER SEQUENCE public.siswas_id_seq OWNED BY public.siswas.id;
 
 
 --
+-- Name: student_course_payments; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.student_course_payments (
+    id bigint NOT NULL,
+    student_id bigint NOT NULL,
+    course_id bigint NOT NULL,
+    amount numeric(12,2) DEFAULT '0'::numeric NOT NULL,
+    proof character varying(255),
+    status character varying(255) DEFAULT 'pending'::character varying NOT NULL,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone,
+    catatan text,
+    rejected_reason text,
+    verified_by bigint,
+    CONSTRAINT student_course_payments_status_check CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'verified'::character varying, 'rejected'::character varying])::text[])))
+);
+
+
+--
+-- Name: student_course_payments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.student_course_payments_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: student_course_payments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.student_course_payments_id_seq OWNED BY public.student_course_payments.id;
+
+
+--
+-- Name: student_registrations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.student_registrations (
+    id bigint NOT NULL,
+    no_reg character varying(255) NOT NULL,
+    name character varying(255) NOT NULL,
+    phone character varying(255),
+    gender character varying(255),
+    birth_place character varying(255),
+    birth_date date,
+    address text,
+    parent_name character varying(255),
+    parent_phone character varying(255),
+    job character varying(255),
+    program character varying(255),
+    system character varying(255),
+    learning_place character varying(255),
+    pickup_mode character varying(255),
+    branch character varying(255),
+    interests json,
+    day_preferences json,
+    schedule_time character varying(255),
+    start_date date,
+    notes text,
+    status character varying(255) DEFAULT 'pending'::character varying NOT NULL,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone,
+    education_level character varying(255)
+);
+
+
+--
+-- Name: student_registrations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.student_registrations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: student_registrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.student_registrations_id_seq OWNED BY public.student_registrations.id;
+
+
+--
+-- Name: student_teachers; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.student_teachers (
+    id bigint NOT NULL,
+    student_id bigint NOT NULL,
+    teacher_id bigint NOT NULL,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone
+);
+
+
+--
+-- Name: student_teachers_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.student_teachers_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: student_teachers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.student_teachers_id_seq OWNED BY public.student_teachers.id;
+
+
+--
 -- Name: students; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1401,7 +2045,9 @@ CREATE TABLE public.students (
     join_date date,
     school_name character varying(255),
     grade character varying(255),
-    CONSTRAINT students_gender_check CHECK (((gender)::text = ANY ((ARRAY['L'::character varying, 'P'::character varying])::text[])))
+    kategori_peserta_didik character varying(255),
+    package_id bigint,
+    CONSTRAINT students_gender_check CHECK (((gender)::text = ANY (ARRAY[('L'::character varying)::text, ('P'::character varying)::text])))
 );
 
 
@@ -1422,6 +2068,38 @@ CREATE SEQUENCE public.students_id_seq
 --
 
 ALTER SEQUENCE public.students_id_seq OWNED BY public.students.id;
+
+
+--
+-- Name: system_settings; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.system_settings (
+    id bigint NOT NULL,
+    key character varying(100) NOT NULL,
+    value text,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone
+);
+
+
+--
+-- Name: system_settings_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.system_settings_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: system_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.system_settings_id_seq OWNED BY public.system_settings.id;
 
 
 --
@@ -1485,6 +2163,38 @@ ALTER SEQUENCE public.tahun_ajarans_id_seq OWNED BY public.tahun_ajarans.id;
 
 
 --
+-- Name: teacher_courses; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.teacher_courses (
+    id bigint NOT NULL,
+    teacher_id bigint NOT NULL,
+    course_id bigint NOT NULL,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone
+);
+
+
+--
+-- Name: teacher_courses_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.teacher_courses_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: teacher_courses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.teacher_courses_id_seq OWNED BY public.teacher_courses.id;
+
+
+--
 -- Name: teachers; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1509,8 +2219,10 @@ CREATE TABLE public.teachers (
     created_at timestamp(0) without time zone,
     updated_at timestamp(0) without time zone,
     user_id bigint,
-    CONSTRAINT teachers_gender_check CHECK (((gender)::text = ANY ((ARRAY['L'::character varying, 'P'::character varying])::text[]))),
-    CONSTRAINT teachers_status_check CHECK (((status)::text = ANY ((ARRAY['aktif'::character varying, 'nonaktif'::character varying])::text[])))
+    cv_path character varying(255),
+    jenis_guru character varying(20),
+    CONSTRAINT teachers_gender_check CHECK (((gender)::text = ANY (ARRAY[('L'::character varying)::text, ('P'::character varying)::text]))),
+    CONSTRAINT teachers_status_check CHECK (((status)::text = ANY (ARRAY[('aktif'::character varying)::text, ('nonaktif'::character varying)::text])))
 );
 
 
@@ -1540,7 +2252,18 @@ ALTER SEQUENCE public.teachers_id_seq OWNED BY public.teachers.id;
 CREATE TABLE public.tryout_attempts (
     id bigint NOT NULL,
     created_at timestamp(0) without time zone,
-    updated_at timestamp(0) without time zone
+    updated_at timestamp(0) without time zone,
+    tryout_id bigint NOT NULL,
+    siswa_id bigint NOT NULL,
+    waktu_mulai timestamp(0) without time zone,
+    waktu_selesai timestamp(0) without time zone,
+    nilai numeric(5,2),
+    jawaban_benar integer DEFAULT 0 NOT NULL,
+    jawaban_salah integer DEFAULT 0 NOT NULL,
+    tidak_dijawab integer DEFAULT 0 NOT NULL,
+    percobaan_ke integer DEFAULT 1 NOT NULL,
+    status character varying(20) DEFAULT 'berlangsung'::character varying NOT NULL,
+    jawaban json
 );
 
 
@@ -1570,7 +2293,23 @@ ALTER SEQUENCE public.tryout_attempts_id_seq OWNED BY public.tryout_attempts.id;
 CREATE TABLE public.tryouts (
     id bigint NOT NULL,
     created_at timestamp(0) without time zone,
-    updated_at timestamp(0) without time zone
+    updated_at timestamp(0) without time zone,
+    cabang_id bigint,
+    dibuat_oleh bigint,
+    judul character varying(200) NOT NULL,
+    deskripsi text,
+    kategori character varying(50) NOT NULL,
+    durasi_menit integer DEFAULT 60 NOT NULL,
+    total_soal integer DEFAULT 0 NOT NULL,
+    nilai_kelulusan numeric(5,2),
+    waktu_mulai timestamp(0) without time zone,
+    waktu_selesai timestamp(0) without time zone,
+    is_random boolean DEFAULT false NOT NULL,
+    tampilkan_hasil_langsung boolean DEFAULT true NOT NULL,
+    tampilkan_kunci_jawaban boolean DEFAULT false NOT NULL,
+    maksimal_percobaan integer,
+    status character varying(20) DEFAULT 'draft'::character varying NOT NULL,
+    deleted_at timestamp(0) without time zone
 );
 
 
@@ -1671,6 +2410,13 @@ ALTER TABLE ONLY public.activity_logs ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
+-- Name: announcements id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.announcements ALTER COLUMN id SET DEFAULT nextval('public.announcements_id_seq'::regclass);
+
+
+--
 -- Name: branches id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1703,6 +2449,20 @@ ALTER TABLE ONLY public.chat_messages ALTER COLUMN id SET DEFAULT nextval('publi
 --
 
 ALTER TABLE ONLY public.chat_rooms ALTER COLUMN id SET DEFAULT nextval('public.chat_rooms_id_seq'::regclass);
+
+
+--
+-- Name: class_students id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.class_students ALTER COLUMN id SET DEFAULT nextval('public.class_students_id_seq'::regclass);
+
+
+--
+-- Name: course_fees id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.course_fees ALTER COLUMN id SET DEFAULT nextval('public.course_fees_id_seq'::regclass);
 
 
 --
@@ -1776,6 +2536,34 @@ ALTER TABLE ONLY public.kelas_siswa ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: landing_programs id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.landing_programs ALTER COLUMN id SET DEFAULT nextval('public.landing_programs_id_seq'::regclass);
+
+
+--
+-- Name: landing_settings id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.landing_settings ALTER COLUMN id SET DEFAULT nextval('public.landing_settings_id_seq'::regclass);
+
+
+--
+-- Name: landing_testimonials id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.landing_testimonials ALTER COLUMN id SET DEFAULT nextval('public.landing_testimonials_id_seq'::regclass);
+
+
+--
+-- Name: landing_wa_numbers id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.landing_wa_numbers ALTER COLUMN id SET DEFAULT nextval('public.landing_wa_numbers_id_seq'::regclass);
+
+
+--
 -- Name: mapel_paket id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1815,6 +2603,13 @@ ALTER TABLE ONLY public.moduls ALTER COLUMN id SET DEFAULT nextval('public.modul
 --
 
 ALTER TABLE ONLY public.nilais ALTER COLUMN id SET DEFAULT nextval('public.nilais_id_seq'::regclass);
+
+
+--
+-- Name: package_course_teachers id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.package_course_teachers ALTER COLUMN id SET DEFAULT nextval('public.package_course_teachers_id_seq'::regclass);
 
 
 --
@@ -1881,6 +2676,27 @@ ALTER TABLE ONLY public.salaries ALTER COLUMN id SET DEFAULT nextval('public.sal
 
 
 --
+-- Name: schedule_proposal_approvals id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.schedule_proposal_approvals ALTER COLUMN id SET DEFAULT nextval('public.schedule_proposal_approvals_id_seq'::regclass);
+
+
+--
+-- Name: schedule_proposals id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.schedule_proposals ALTER COLUMN id SET DEFAULT nextval('public.schedule_proposals_id_seq'::regclass);
+
+
+--
+-- Name: schedule_student_agreements id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.schedule_student_agreements ALTER COLUMN id SET DEFAULT nextval('public.schedule_student_agreements_id_seq'::regclass);
+
+
+--
 -- Name: schedules id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1909,10 +2725,38 @@ ALTER TABLE ONLY public.siswas ALTER COLUMN id SET DEFAULT nextval('public.siswa
 
 
 --
+-- Name: student_course_payments id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.student_course_payments ALTER COLUMN id SET DEFAULT nextval('public.student_course_payments_id_seq'::regclass);
+
+
+--
+-- Name: student_registrations id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.student_registrations ALTER COLUMN id SET DEFAULT nextval('public.student_registrations_id_seq'::regclass);
+
+
+--
+-- Name: student_teachers id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.student_teachers ALTER COLUMN id SET DEFAULT nextval('public.student_teachers_id_seq'::regclass);
+
+
+--
 -- Name: students id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.students ALTER COLUMN id SET DEFAULT nextval('public.students_id_seq'::regclass);
+
+
+--
+-- Name: system_settings id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.system_settings ALTER COLUMN id SET DEFAULT nextval('public.system_settings_id_seq'::regclass);
 
 
 --
@@ -1927,6 +2771,13 @@ ALTER TABLE ONLY public.tagihans ALTER COLUMN id SET DEFAULT nextval('public.tag
 --
 
 ALTER TABLE ONLY public.tahun_ajarans ALTER COLUMN id SET DEFAULT nextval('public.tahun_ajarans_id_seq'::regclass);
+
+
+--
+-- Name: teacher_courses id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.teacher_courses ALTER COLUMN id SET DEFAULT nextval('public.teacher_courses_id_seq'::regclass);
 
 
 --
@@ -1998,6 +2849,14 @@ ALTER TABLE ONLY public.activity_logs
 
 
 --
+-- Name: announcements announcements_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.announcements
+    ADD CONSTRAINT announcements_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: branches branches_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2043,6 +2902,46 @@ ALTER TABLE ONLY public.chat_messages
 
 ALTER TABLE ONLY public.chat_rooms
     ADD CONSTRAINT chat_rooms_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: class_students class_students_class_id_student_id_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.class_students
+    ADD CONSTRAINT class_students_class_id_student_id_unique UNIQUE (class_id, student_id);
+
+
+--
+-- Name: class_students class_students_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.class_students
+    ADD CONSTRAINT class_students_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: course_fees course_fees_course_id_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.course_fees
+    ADD CONSTRAINT course_fees_course_id_unique UNIQUE (course_id);
+
+
+--
+-- Name: course_fees course_fees_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.course_fees
+    ADD CONSTRAINT course_fees_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: course_package course_package_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.course_package
+    ADD CONSTRAINT course_package_pkey PRIMARY KEY (package_id, course_id);
 
 
 --
@@ -2142,6 +3041,46 @@ ALTER TABLE ONLY public.kelas_siswa
 
 
 --
+-- Name: landing_programs landing_programs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.landing_programs
+    ADD CONSTRAINT landing_programs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: landing_settings landing_settings_key_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.landing_settings
+    ADD CONSTRAINT landing_settings_key_unique UNIQUE (key);
+
+
+--
+-- Name: landing_settings landing_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.landing_settings
+    ADD CONSTRAINT landing_settings_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: landing_testimonials landing_testimonials_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.landing_testimonials
+    ADD CONSTRAINT landing_testimonials_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: landing_wa_numbers landing_wa_numbers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.landing_wa_numbers
+    ADD CONSTRAINT landing_wa_numbers_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: mapel_paket mapel_paket_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2182,6 +3121,14 @@ ALTER TABLE ONLY public.model_has_roles
 
 
 --
+-- Name: modules modules_kode_modul_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.modules
+    ADD CONSTRAINT modules_kode_modul_unique UNIQUE (kode_modul);
+
+
+--
 -- Name: modules modules_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2203,6 +3150,22 @@ ALTER TABLE ONLY public.moduls
 
 ALTER TABLE ONLY public.nilais
     ADD CONSTRAINT nilais_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: package_course_teachers package_course_teachers_package_id_course_id_teacher_id_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.package_course_teachers
+    ADD CONSTRAINT package_course_teachers_package_id_course_id_teacher_id_unique UNIQUE (package_id, course_id, teacher_id);
+
+
+--
+-- Name: package_course_teachers package_course_teachers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.package_course_teachers
+    ADD CONSTRAINT package_course_teachers_pkey PRIMARY KEY (id);
 
 
 --
@@ -2286,6 +3249,14 @@ ALTER TABLE ONLY public.personal_access_tokens
 
 
 --
+-- Name: schedule_proposal_approvals proposal_approvals_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.schedule_proposal_approvals
+    ADD CONSTRAINT proposal_approvals_unique UNIQUE (proposal_id, approver_type, approver_id);
+
+
+--
 -- Name: questions questions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2326,6 +3297,38 @@ ALTER TABLE ONLY public.salaries
 
 
 --
+-- Name: schedule_proposal_approvals schedule_proposal_approvals_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.schedule_proposal_approvals
+    ADD CONSTRAINT schedule_proposal_approvals_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: schedule_proposals schedule_proposals_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.schedule_proposals
+    ADD CONSTRAINT schedule_proposals_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: schedule_student_agreements schedule_student_agreements_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.schedule_student_agreements
+    ADD CONSTRAINT schedule_student_agreements_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: schedule_student_agreements schedule_student_agreements_schedule_id_student_id_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.schedule_student_agreements
+    ADD CONSTRAINT schedule_student_agreements_schedule_id_student_id_unique UNIQUE (schedule_id, student_id);
+
+
+--
 -- Name: schedules schedules_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2358,6 +3361,46 @@ ALTER TABLE ONLY public.siswas
 
 
 --
+-- Name: student_course_payments student_course_payments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.student_course_payments
+    ADD CONSTRAINT student_course_payments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: student_registrations student_registrations_no_reg_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.student_registrations
+    ADD CONSTRAINT student_registrations_no_reg_unique UNIQUE (no_reg);
+
+
+--
+-- Name: student_registrations student_registrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.student_registrations
+    ADD CONSTRAINT student_registrations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: student_teachers student_teachers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.student_teachers
+    ADD CONSTRAINT student_teachers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: student_teachers student_teachers_student_id_teacher_id_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.student_teachers
+    ADD CONSTRAINT student_teachers_student_id_teacher_id_unique UNIQUE (student_id, teacher_id);
+
+
+--
 -- Name: students students_nis_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2374,6 +3417,22 @@ ALTER TABLE ONLY public.students
 
 
 --
+-- Name: system_settings system_settings_key_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.system_settings
+    ADD CONSTRAINT system_settings_key_unique UNIQUE (key);
+
+
+--
+-- Name: system_settings system_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.system_settings
+    ADD CONSTRAINT system_settings_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: tagihans tagihans_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2387,6 +3446,22 @@ ALTER TABLE ONLY public.tagihans
 
 ALTER TABLE ONLY public.tahun_ajarans
     ADD CONSTRAINT tahun_ajarans_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: teacher_courses teacher_courses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.teacher_courses
+    ADD CONSTRAINT teacher_courses_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: teacher_courses teacher_courses_teacher_id_course_id_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.teacher_courses
+    ADD CONSTRAINT teacher_courses_teacher_id_course_id_unique UNIQUE (teacher_id, course_id);
 
 
 --
@@ -2614,6 +3689,38 @@ CREATE INDEX subject ON public.activity_log USING btree (subject_type, subject_i
 
 
 --
+-- Name: absensi_gurus absensi_gurus_guru_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.absensi_gurus
+    ADD CONSTRAINT absensi_gurus_guru_id_foreign FOREIGN KEY (guru_id) REFERENCES public.teachers(id) ON DELETE CASCADE;
+
+
+--
+-- Name: absensi_gurus absensi_gurus_jadwal_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.absensi_gurus
+    ADD CONSTRAINT absensi_gurus_jadwal_id_foreign FOREIGN KEY (jadwal_id) REFERENCES public.schedules(id) ON DELETE CASCADE;
+
+
+--
+-- Name: absensi_siswas absensi_siswas_jadwal_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.absensi_siswas
+    ADD CONSTRAINT absensi_siswas_jadwal_id_foreign FOREIGN KEY (jadwal_id) REFERENCES public.schedules(id) ON DELETE CASCADE;
+
+
+--
+-- Name: absensi_siswas absensi_siswas_siswa_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.absensi_siswas
+    ADD CONSTRAINT absensi_siswas_siswa_id_foreign FOREIGN KEY (siswa_id) REFERENCES public.students(id) ON DELETE CASCADE;
+
+
+--
 -- Name: branches branches_admin_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2638,6 +3745,102 @@ ALTER TABLE ONLY public.branches
 
 
 --
+-- Name: certificates certificates_course_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.certificates
+    ADD CONSTRAINT certificates_course_id_foreign FOREIGN KEY (course_id) REFERENCES public.courses(id) ON DELETE SET NULL;
+
+
+--
+-- Name: chat_messages chat_messages_pengirim_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.chat_messages
+    ADD CONSTRAINT chat_messages_pengirim_id_foreign FOREIGN KEY (pengirim_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: chat_messages chat_messages_room_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.chat_messages
+    ADD CONSTRAINT chat_messages_room_id_foreign FOREIGN KEY (room_id) REFERENCES public.chat_rooms(id) ON DELETE CASCADE;
+
+
+--
+-- Name: class_students class_students_class_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.class_students
+    ADD CONSTRAINT class_students_class_id_foreign FOREIGN KEY (class_id) REFERENCES public.school_classes(id) ON DELETE CASCADE;
+
+
+--
+-- Name: class_students class_students_student_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.class_students
+    ADD CONSTRAINT class_students_student_id_foreign FOREIGN KEY (student_id) REFERENCES public.students(id) ON DELETE CASCADE;
+
+
+--
+-- Name: course_fees course_fees_course_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.course_fees
+    ADD CONSTRAINT course_fees_course_id_foreign FOREIGN KEY (course_id) REFERENCES public.courses(id) ON DELETE CASCADE;
+
+
+--
+-- Name: course_package course_package_course_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.course_package
+    ADD CONSTRAINT course_package_course_id_foreign FOREIGN KEY (course_id) REFERENCES public.courses(id) ON DELETE CASCADE;
+
+
+--
+-- Name: course_package course_package_package_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.course_package
+    ADD CONSTRAINT course_package_package_id_foreign FOREIGN KEY (package_id) REFERENCES public.packages(id) ON DELETE CASCADE;
+
+
+--
+-- Name: grades grades_guru_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.grades
+    ADD CONSTRAINT grades_guru_id_foreign FOREIGN KEY (guru_id) REFERENCES public.teachers(id) ON DELETE SET NULL;
+
+
+--
+-- Name: grades grades_mata_pelajaran_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.grades
+    ADD CONSTRAINT grades_mata_pelajaran_id_foreign FOREIGN KEY (mata_pelajaran_id) REFERENCES public.courses(id) ON DELETE SET NULL;
+
+
+--
+-- Name: grades grades_semester_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.grades
+    ADD CONSTRAINT grades_semester_id_foreign FOREIGN KEY (semester_id) REFERENCES public.semesters(id) ON DELETE SET NULL;
+
+
+--
+-- Name: grades grades_siswa_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.grades
+    ADD CONSTRAINT grades_siswa_id_foreign FOREIGN KEY (siswa_id) REFERENCES public.students(id) ON DELETE CASCADE;
+
+
+--
 -- Name: model_has_permissions model_has_permissions_permission_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2651,6 +3854,70 @@ ALTER TABLE ONLY public.model_has_permissions
 
 ALTER TABLE ONLY public.model_has_roles
     ADD CONSTRAINT model_has_roles_role_id_foreign FOREIGN KEY (role_id) REFERENCES public.roles(id) ON DELETE CASCADE;
+
+
+--
+-- Name: modules modules_diupload_oleh_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.modules
+    ADD CONSTRAINT modules_diupload_oleh_foreign FOREIGN KEY (diupload_oleh) REFERENCES public.users(id) ON DELETE SET NULL;
+
+
+--
+-- Name: modules modules_mata_pelajaran_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.modules
+    ADD CONSTRAINT modules_mata_pelajaran_id_foreign FOREIGN KEY (mata_pelajaran_id) REFERENCES public.courses(id) ON DELETE SET NULL;
+
+
+--
+-- Name: package_course_teachers package_course_teachers_course_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.package_course_teachers
+    ADD CONSTRAINT package_course_teachers_course_id_foreign FOREIGN KEY (course_id) REFERENCES public.courses(id) ON DELETE CASCADE;
+
+
+--
+-- Name: package_course_teachers package_course_teachers_package_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.package_course_teachers
+    ADD CONSTRAINT package_course_teachers_package_id_foreign FOREIGN KEY (package_id) REFERENCES public.packages(id) ON DELETE CASCADE;
+
+
+--
+-- Name: package_course_teachers package_course_teachers_teacher_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.package_course_teachers
+    ADD CONSTRAINT package_course_teachers_teacher_id_foreign FOREIGN KEY (teacher_id) REFERENCES public.teachers(id) ON DELETE CASCADE;
+
+
+--
+-- Name: packages packages_cabang_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.packages
+    ADD CONSTRAINT packages_cabang_id_foreign FOREIGN KEY (cabang_id) REFERENCES public.branches(id) ON DELETE SET NULL;
+
+
+--
+-- Name: packages packages_guru_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.packages
+    ADD CONSTRAINT packages_guru_id_foreign FOREIGN KEY (guru_id) REFERENCES public.teachers(id) ON DELETE SET NULL;
+
+
+--
+-- Name: questions questions_tryout_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.questions
+    ADD CONSTRAINT questions_tryout_id_foreign FOREIGN KEY (tryout_id) REFERENCES public.tryouts(id) ON DELETE CASCADE;
 
 
 --
@@ -2670,11 +3937,131 @@ ALTER TABLE ONLY public.role_has_permissions
 
 
 --
+-- Name: salaries salaries_cabang_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.salaries
+    ADD CONSTRAINT salaries_cabang_id_foreign FOREIGN KEY (cabang_id) REFERENCES public.branches(id) ON DELETE SET NULL;
+
+
+--
+-- Name: salaries salaries_dibayar_oleh_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.salaries
+    ADD CONSTRAINT salaries_dibayar_oleh_foreign FOREIGN KEY (dibayar_oleh) REFERENCES public.users(id) ON DELETE SET NULL;
+
+
+--
+-- Name: salaries salaries_guru_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.salaries
+    ADD CONSTRAINT salaries_guru_id_foreign FOREIGN KEY (guru_id) REFERENCES public.teachers(id) ON DELETE CASCADE;
+
+
+--
+-- Name: schedule_proposal_approvals schedule_proposal_approvals_proposal_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.schedule_proposal_approvals
+    ADD CONSTRAINT schedule_proposal_approvals_proposal_id_foreign FOREIGN KEY (proposal_id) REFERENCES public.schedule_proposals(id) ON DELETE CASCADE;
+
+
+--
+-- Name: schedule_proposals schedule_proposals_class_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.schedule_proposals
+    ADD CONSTRAINT schedule_proposals_class_id_foreign FOREIGN KEY (class_id) REFERENCES public.school_classes(id) ON DELETE CASCADE;
+
+
+--
+-- Name: schedule_proposals schedule_proposals_schedule_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.schedule_proposals
+    ADD CONSTRAINT schedule_proposals_schedule_id_foreign FOREIGN KEY (schedule_id) REFERENCES public.schedules(id) ON DELETE SET NULL;
+
+
+--
+-- Name: schedule_student_agreements schedule_student_agreements_schedule_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.schedule_student_agreements
+    ADD CONSTRAINT schedule_student_agreements_schedule_id_foreign FOREIGN KEY (schedule_id) REFERENCES public.schedules(id) ON DELETE CASCADE;
+
+
+--
+-- Name: schedule_student_agreements schedule_student_agreements_student_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.schedule_student_agreements
+    ADD CONSTRAINT schedule_student_agreements_student_id_foreign FOREIGN KEY (student_id) REFERENCES public.students(id) ON DELETE CASCADE;
+
+
+--
+-- Name: schedules schedules_mata_pelajaran_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.schedules
+    ADD CONSTRAINT schedules_mata_pelajaran_id_foreign FOREIGN KEY (mata_pelajaran_id) REFERENCES public.courses(id) ON DELETE SET NULL;
+
+
+--
+-- Name: schedules schedules_paket_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.schedules
+    ADD CONSTRAINT schedules_paket_id_foreign FOREIGN KEY (paket_id) REFERENCES public.packages(id) ON DELETE SET NULL;
+
+
+--
 -- Name: semesters semesters_academic_year_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.semesters
     ADD CONSTRAINT semesters_academic_year_id_foreign FOREIGN KEY (academic_year_id) REFERENCES public.academic_years(id) ON DELETE CASCADE;
+
+
+--
+-- Name: student_course_payments student_course_payments_course_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.student_course_payments
+    ADD CONSTRAINT student_course_payments_course_id_foreign FOREIGN KEY (course_id) REFERENCES public.courses(id) ON DELETE CASCADE;
+
+
+--
+-- Name: student_course_payments student_course_payments_student_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.student_course_payments
+    ADD CONSTRAINT student_course_payments_student_id_foreign FOREIGN KEY (student_id) REFERENCES public.students(id) ON DELETE CASCADE;
+
+
+--
+-- Name: student_course_payments student_course_payments_verified_by_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.student_course_payments
+    ADD CONSTRAINT student_course_payments_verified_by_foreign FOREIGN KEY (verified_by) REFERENCES public.users(id) ON DELETE SET NULL;
+
+
+--
+-- Name: student_teachers student_teachers_student_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.student_teachers
+    ADD CONSTRAINT student_teachers_student_id_foreign FOREIGN KEY (student_id) REFERENCES public.students(id) ON DELETE CASCADE;
+
+
+--
+-- Name: student_teachers student_teachers_teacher_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.student_teachers
+    ADD CONSTRAINT student_teachers_teacher_id_foreign FOREIGN KEY (teacher_id) REFERENCES public.teachers(id) ON DELETE CASCADE;
 
 
 --
@@ -2686,6 +4073,14 @@ ALTER TABLE ONLY public.students
 
 
 --
+-- Name: students students_package_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.students
+    ADD CONSTRAINT students_package_id_foreign FOREIGN KEY (package_id) REFERENCES public.packages(id) ON DELETE SET NULL;
+
+
+--
 -- Name: students students_user_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2694,16 +4089,64 @@ ALTER TABLE ONLY public.students
 
 
 --
+-- Name: teacher_courses teacher_courses_course_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.teacher_courses
+    ADD CONSTRAINT teacher_courses_course_id_foreign FOREIGN KEY (course_id) REFERENCES public.courses(id) ON DELETE CASCADE;
+
+
+--
+-- Name: teacher_courses teacher_courses_teacher_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.teacher_courses
+    ADD CONSTRAINT teacher_courses_teacher_id_foreign FOREIGN KEY (teacher_id) REFERENCES public.teachers(id) ON DELETE CASCADE;
+
+
+--
+-- Name: tryout_attempts tryout_attempts_siswa_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tryout_attempts
+    ADD CONSTRAINT tryout_attempts_siswa_id_foreign FOREIGN KEY (siswa_id) REFERENCES public.students(id) ON DELETE CASCADE;
+
+
+--
+-- Name: tryout_attempts tryout_attempts_tryout_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tryout_attempts
+    ADD CONSTRAINT tryout_attempts_tryout_id_foreign FOREIGN KEY (tryout_id) REFERENCES public.tryouts(id) ON DELETE CASCADE;
+
+
+--
+-- Name: tryouts tryouts_cabang_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tryouts
+    ADD CONSTRAINT tryouts_cabang_id_foreign FOREIGN KEY (cabang_id) REFERENCES public.branches(id) ON DELETE SET NULL;
+
+
+--
+-- Name: tryouts tryouts_dibuat_oleh_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tryouts
+    ADD CONSTRAINT tryouts_dibuat_oleh_foreign FOREIGN KEY (dibuat_oleh) REFERENCES public.users(id) ON DELETE SET NULL;
+
+
+--
 -- PostgreSQL database dump complete
 --
 
-\unrestrict puI3IMFFtCYKq0MGCdwHGXeNw3v9c5X1TI9bR2kITcJI55exQrZ6IUUmox1AmyM
+\unrestrict DdWlYGckQKr94MDHQuyjAurkfNM6y84iAAeh5Ql6gKqJye0iV9GpJIlJc3hM7Dc
 
 --
 -- PostgreSQL database dump
 --
 
-\restrict lUPNc0Yhl2zPJ2sYVB9haavqTNvgH5TeLy3Yg3tldbOB2fSsabYdd0JnsJYTjTd
+\restrict GBZe3VjRbu0raLvxH6WbRZ0Nf6iYJtJazGngobeOiidvSySP6Urjtm7F3ayGBq6
 
 -- Dumped from database version 16.10
 -- Dumped by pg_dump version 16.10
@@ -2784,6 +4227,44 @@ COPY public.migrations (id, migration, batch) FROM stdin;
 58	2026_06_06_010000_modify_courses_icon_length	2
 59	2026_06_06_150000_add_deleted_at_to_certificates_table	2
 60	2026_06_06_160000_update_certificates_add_columns	2
+61	2026_06_07_100000_create_announcements_table	3
+62	2026_06_09_000001_add_cv_path_to_teachers_table	3
+63	2026_06_09_132034_add_columns_to_chat_tables	3
+64	2026_06_09_200000_add_missing_columns_to_all_tables	3
+65	2026_06_10_000001_refactor_courses_teachers_modules	3
+66	2026_06_10_000002_add_student_accounts_private_types_announcement_targets	3
+67	2026_06_10_000003_student_teachers_class_sessions	3
+68	2026_06_10_100000_add_kunci_jawaban_to_questions	3
+69	2026_06_10_100000_create_class_students_table	3
+70	2026_06_10_110000_create_course_fees_table	3
+71	2026_06_10_110100_create_student_course_payments_table	3
+72	2026_06_10_161434_create_landing_content_tables	3
+73	2026_06_10_162503_create_landing_wa_numbers_table	3
+74	2026_06_10_163351_create_system_settings_table	3
+75	2026_06_11_000000_add_bukti_pembayaran_to_salaries	3
+76	2026_06_11_100000_create_schedule_agreements_and_payment_fields	3
+77	2026_06_11_120000_add_allowed_pages_to_branches_table	3
+78	2026_06_11_120000_add_course_id_to_certificates_table	3
+79	2026_06_11_120000_add_tipe_gaji_to_salaries	3
+80	2026_06_11_182851_add_pertemuan_ke_to_schedule_proposals	3
+81	2026_06_12_000001_create_schedule_proposals_tables	3
+82	2026_06_12_100000_revamp_attendance_dual_confirmation	3
+83	2026_06_20_000001_create_student_registrations_table	3
+84	2026_06_20_000507_add_kategori_to_courses_table	3
+85	2026_06_20_001742_create_course_package_table	3
+86	2026_06_20_003643_add_kode_modul_to_modules_table	3
+87	2026_06_20_100000_add_jenis_guru_to_teachers_table	3
+88	2026_06_20_152029_add_guru_id_to_packages_and_paket_id_to_schedules	3
+89	2026_06_21_000001_add_kategori_peserta_didik_to_students_table	3
+90	2026_06_21_000002_add_attendance_and_class_type_to_packages_table	3
+91	2026_06_21_000003_add_package_id_to_students_table	3
+92	2026_06_22_000001_add_billing_mode_to_school_classes	3
+93	2026_06_22_000001_add_education_level_to_student_registrations	3
+94	2026_06_22_122921_add_columns_to_payments_table	3
+95	2026_06_22_200000_change_diterbitkan_oleh_to_string_in_certificates	3
+96	2026_06_22_210000_add_kelas_id_to_invoices_module_id_to_schedules	3
+97	2026_06_25_000001_add_mata_pelajaran_id_to_schedules	3
+98	2026_06_25_100001_create_package_course_teachers_table	3
 \.
 
 
@@ -2791,12 +4272,12 @@ COPY public.migrations (id, migration, batch) FROM stdin;
 -- Name: migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.migrations_id_seq', 60, true);
+SELECT pg_catalog.setval('public.migrations_id_seq', 98, true);
 
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict lUPNc0Yhl2zPJ2sYVB9haavqTNvgH5TeLy3Yg3tldbOB2fSsabYdd0JnsJYTjTd
+\unrestrict GBZe3VjRbu0raLvxH6WbRZ0Nf6iYJtJazGngobeOiidvSySP6Urjtm7F3ayGBq6
 
