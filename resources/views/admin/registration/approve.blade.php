@@ -348,7 +348,7 @@ function onTeacherChange(sel) {
     document.getElementById('teacherSubjects').textContent = subjects || 'Semua Mapel';
     document.getElementById('teacherAvatar').textContent   = name.charAt(0).toUpperCase();
 
-    if (jenis === 'freelance') {
+    if (jenis.toLowerCase() === 'freelance') {
         infoFree.classList.remove('d-none');
         recalcTotal();
     } else {

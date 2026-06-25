@@ -215,21 +215,29 @@
 
                         
                         <div id="infoFreelance" class="d-none">
-                            <div class="row g-2">
+                            <div class="mb-2">
+                                <label class="form-label fw-semibold" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Jumlah Sesi</label>
+                                <input type="number" id="totalSessions" name="total_sessions" class="form-control form-control-sm"
+                                       placeholder="0" min="1" value="8" oninput="recalcTotal()" style="max-width:120px">
+                            </div>
+                            <div class="row g-3 align-items-end">
                                 <div class="col-6">
-                                    <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Biaya Per Sesi (Rp)</label>
-                                    <input type="number" id="biayaPerSesi" name="biaya_per_sesi" class="form-control form-control-sm"
-                                           placeholder="0" min="0" oninput="recalcTotal()">
+                                    <label class="form-label fw-semibold" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">
+                                        Biaya Per Sesi (Rp) <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text" style="font-size:.82rem;color:var(--text-muted);background:var(--input-bg);border-color:var(--card-border)">Rp</span>
+                                        <input type="number" id="biayaPerSesi" name="biaya_per_sesi" class="form-control"
+                                               placeholder="0" min="0" oninput="recalcTotal()"
+                                               style="font-size:.88rem;background:var(--input-bg);color:var(--text-primary);border-color:var(--card-border)">
+                                    </div>
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Jumlah Sesi</label>
-                                    <input type="number" id="totalSessions" name="total_sessions" class="form-control form-control-sm"
-                                           placeholder="0" min="1" value="8" oninput="recalcTotal()">
-                                </div>
-                                <div class="col-12">
-                                    <div class="p-2 rounded-2 d-flex align-items-center justify-content-between" style="background:var(--card-bg);border:1px solid var(--card-border)">
-                                        <span class="text-muted" style="font-size:.82rem">Total Biaya Per Sesi</span>
-                                        <span id="totalSesiDisplay" class="fw-bold text-primary" style="font-size:.9rem">Rp 0</span>
+                                    <label class="form-label fw-semibold" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Total Biaya (Otomatis)</label>
+                                    <div class="p-2 rounded-2 d-flex align-items-center justify-content-between"
+                                         style="background:var(--card-bg);border:1px solid var(--card-border);min-height:38px">
+                                        <span id="totalSesiLabel" class="text-muted" style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em">TOTAL (8 SESI)</span>
+                                        <span id="totalSesiDisplay" class="fw-bold text-primary" style="font-size:.92rem">Rp 0</span>
                                     </div>
                                 </div>
                             </div>
@@ -351,9 +359,10 @@ function onTeacherChange(sel) {
 }
 
 function recalcTotal() {
-    const bps      = parseFloat(document.getElementById('biayaPerSesi').value || 0);
-    const sesi     = parseFloat(document.getElementById('totalSessions').value || 0);
-    const total    = bps * sesi;
+    const bps   = parseFloat(document.getElementById('biayaPerSesi').value || 0);
+    const sesi  = parseInt(document.getElementById('totalSessions').value || 0);
+    const total = bps * sesi;
+    document.getElementById('totalSesiLabel').textContent   = 'TOTAL (' + (sesi || 0) + ' SESI)';
     document.getElementById('totalSesiDisplay').textContent = 'Rp ' + total.toLocaleString('id-ID');
     document.getElementById('totalBiaya').value = total > 0 ? total : '';
 }
