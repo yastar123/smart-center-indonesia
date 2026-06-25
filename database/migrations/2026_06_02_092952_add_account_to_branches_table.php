@@ -30,18 +30,33 @@ return new class extends Migration
     public function down()
     {
         Schema::table('branches', function (Blueprint $table) {
-
-            $table->dropColumn([
-                'regency',
-                'user_id',
-                'email',
-                'password',
-                'can_students',
-                'can_teachers',
-                'can_schedules',
-                'can_payments',
-                'can_tryouts'
-            ]);
+            if (Schema::hasColumn('branches', 'regency')) {
+                $table->dropColumn('regency');
+            }
+            if (Schema::hasColumn('branches', 'user_id')) {
+                $table->dropColumn('user_id');
+            }
+            if (Schema::hasColumn('branches', 'email')) {
+                $table->dropColumn('email');
+            }
+            if (Schema::hasColumn('branches', 'password')) {
+                $table->dropColumn('password');
+            }
+            if (Schema::hasColumn('branches', 'can_students')) {
+                $table->dropColumn('can_students');
+            }
+            if (Schema::hasColumn('branches', 'can_teachers')) {
+                $table->dropColumn('can_teachers');
+            }
+            if (Schema::hasColumn('branches', 'can_schedules')) {
+                $table->dropColumn('can_schedules');
+            }
+            if (Schema::hasColumn('branches', 'can_payments')) {
+                $table->dropColumn('can_payments');
+            }
+            if (Schema::hasColumn('branches', 'can_tryouts')) {
+                $table->dropColumn('can_tryouts');
+            }
         });
     }
 };
