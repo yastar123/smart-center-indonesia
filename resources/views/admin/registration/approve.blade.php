@@ -119,15 +119,25 @@
                 </div>
                 @endif
 
-                {{-- Minat --}}
+                {{-- Minat + Harga --}}
                 @if($registration->interests && count($registration->interests))
                 <div style="border-top:1px solid var(--card-border);padding-top:12px">
                     <div class="fw-semibold mb-2" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Program Diminati</div>
-                    <div class="d-flex flex-wrap gap-1">
+                    <div class="d-flex flex-column gap-2">
                         @foreach($registration->interests as $int)
-                        <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);padding:4px 10px;border-radius:12px;font-size:.75rem">
-                            <i class="bi bi-check2 me-1"></i>{{ $int }}
-                        </span>
+                        @php $harga = $coursePrices[$int] ?? null; @endphp
+                        <div class="d-flex align-items-center justify-content-between px-2 py-1 rounded-2" style="background:var(--card-bg);border:1px solid var(--card-border)">
+                            <span style="font-size:.8rem;color:var(--text-primary)">
+                                <i class="bi bi-check2 text-primary me-1"></i>{{ $int }}
+                            </span>
+                            @if($harga !== null)
+                            <span class="fw-bold" style="font-size:.8rem;color:var(--primary)">
+                                Rp {{ number_format($harga, 0, ',', '.') }}
+                            </span>
+                            @else
+                            <span class="text-muted" style="font-size:.75rem">Harga belum diset</span>
+                            @endif
+                        </div>
                         @endforeach
                     </div>
                 </div>
@@ -198,14 +208,6 @@
                                 <div id="teacherName" class="fw-semibold" style="font-size:.9rem"></div>
                                 <div id="teacherJenis" class="text-muted" style="font-size:.75rem"></div>
                                 <div id="teacherSubjects" class="text-muted" style="font-size:.72rem"></div>
-                            </div>
-                        </div>
-
-                        {{-- Kontrak: show gaji bulanan --}}
-                        <div id="infoKontrak" class="d-none">
-                            <div class="d-flex align-items-center justify-content-between p-2 rounded-2" style="background:var(--card-bg);border:1px solid var(--card-border)">
-                                <span class="text-muted" style="font-size:.82rem">Gaji Bulanan</span>
-                                <span id="salaryDisplay" class="fw-bold text-success" style="font-size:.9rem"></span>
                             </div>
                         </div>
 
@@ -323,7 +325,6 @@
 function onTeacherChange(sel) {
     const opt = sel.options[sel.selectedIndex];
     const infoCard   = document.getElementById('teacherInfoCard');
-    const infoKon    = document.getElementById('infoKontrak');
     const infoFree   = document.getElementById('infoFreelance');
 
     if (!opt.value) { infoCard.classList.add('d-none'); return; }
@@ -340,15 +341,10 @@ function onTeacherChange(sel) {
     document.getElementById('teacherAvatar').textContent   = name.charAt(0).toUpperCase();
 
     if (jenis === 'freelance') {
-        infoKon.classList.add('d-none');
         infoFree.classList.remove('d-none');
         recalcTotal();
     } else {
         infoFree.classList.add('d-none');
-        infoKon.classList.remove('d-none');
-        document.getElementById('salaryDisplay').textContent = 'Rp ' + salary.toLocaleString('id-ID');
-        // For kontrak, suggest salary as total biaya
-        document.getElementById('totalBiaya').value = salary > 0 ? salary : '';
     }
 }
 

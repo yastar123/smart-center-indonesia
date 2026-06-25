@@ -368,7 +368,6 @@
                                 <div><span class="text-muted" style="min-width:110px;display:inline-block">Program</span> <strong>{{ $reg->program ?? '–' }}</strong></div>
                                 <div><span class="text-muted" style="min-width:110px;display:inline-block">Sistem</span> {{ $reg->system ?? '–' }}</div>
                                 <div><span class="text-muted" style="min-width:110px;display:inline-block">Tempat Belajar</span> {{ $reg->learning_place ?? '–' }}</div>
-                                @if($reg->pickup_mode)<div><span class="text-muted" style="min-width:110px;display:inline-block">Pengambilan</span> {{ $reg->pickup_mode }}</div>@endif
                                 <div><span class="text-muted" style="min-width:110px;display:inline-block">Cabang</span> {{ $reg->branch ?? '–' }}</div>
                             </div>
                         </div>
@@ -530,13 +529,6 @@
                             <i class="bi bi-copy"></i>
                         </button>
                     </div>
-                    <div class="p-3 rounded-3 d-flex align-items-center justify-content-between gap-2"
-                         style="background:var(--input-bg);border:1px solid var(--card-border)">
-                        <div>
-                            <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px">NIS</div>
-                            <div id="cred-nis" class="fw-semibold" style="font-size:.88rem;font-family:monospace"></div>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="d-grid gap-2">
@@ -593,14 +585,12 @@ function openRegDetail(id) {
                     <tr><td class="text-muted">Alamat</td><td>${d.address||'–'}</td></tr>
                     <tr><td class="text-muted">Orang Tua</td><td>${d.parent_name||'–'}</td></tr>
                     <tr><td class="text-muted">HP Ortu</td><td>${d.parent_phone||'–'}</td></tr>
-                    <tr><td class="text-muted">Pekerjaan</td><td>${d.job||'–'}</td></tr>
                 </table></div>
                 <div class="col-md-6"><h6 class="text-muted fw-semibold" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em">Info Program</h6>
                 <table class="table table-sm table-borderless" style="font-size:.83rem">
                     <tr><td class="text-muted" style="width:120px">Program</td><td><strong>${d.program||'–'}</strong></td></tr>
                     <tr><td class="text-muted">Sistem</td><td>${d.system||'–'}</td></tr>
                     <tr><td class="text-muted">Tempat</td><td>${d.learning_place||'–'}</td></tr>
-                    <tr><td class="text-muted">Pengambilan</td><td>${d.pickup_mode||'–'}</td></tr>
                     <tr><td class="text-muted">Cabang</td><td>${d.branch||'–'}</td></tr>
                     <tr><td class="text-muted">Hari</td><td>${(d.day_preferences||[]).join(', ')||'–'}</td></tr>
                     <tr><td class="text-muted">Jam</td><td>${d.schedule_time||'–'}</td></tr>
@@ -634,7 +624,6 @@ function verifyReg(id, btn) {
                 document.getElementById('cred-name').textContent     = d.name     || '–';
                 document.getElementById('cred-email').textContent    = d.email    || '–';
                 document.getElementById('cred-password').textContent = d.password || '–';
-                document.getElementById('cred-nis').textContent      = d.nis      || '–';
                 new bootstrap.Modal(document.getElementById('regCredModal')).show();
             } else {
                 showToast(d.message || 'Gagal memverifikasi.', 'error');
@@ -659,20 +648,19 @@ function sendToWA() {
     const phone = (_credData.phone || '').replace(/\D/g, '');
     if (!phone) { showToast('Nomor HP siswa tidak tersedia.', 'error'); return; }
     const wa = phone.startsWith('0') ? '62' + phone.slice(1) : phone;
-    const loginUrl = 'https://admin.smartcenterindonesia.com/login';
+    const loginUrl = '{{ url("/login") }}';
     const msg = encodeURIComponent(
-        `Halo ${_credData.name || 'Siswa'},\n\n` +
-        `Selamat datang di Smart Center Indonesia! 🎉\n\n` +
-        `Pendaftaran Anda telah *diverifikasi*. Berikut data akun login Anda:\n\n` +
-        `📧 *Email:* ${_credData.email || '-'}\n` +
-        `🔑 *Password:* ${_credData.password || '-'}\n` +
-        `🪪 *NIS:* ${_credData.nis || '-'}\n` +
-        `📝 *No. Registrasi:* ${_credData.no_reg || '-'}\n\n` +
-        `🔗 *Link Login:*\n${loginUrl}\n\n` +
-        `Segera login dan lengkapi profil Anda. Jangan bagikan password kepada siapapun.\n\n` +
-        `Terima kasih & selamat belajar! 📚`
+        'Halo ' + (_credData.name || 'Siswa') + ',\n\n' +
+        'Selamat datang di Smart Center Indonesia!\n\n' +
+        'Pendaftaran Anda telah *diverifikasi*. Berikut data akun login Anda:\n\n' +
+        '*Email:* ' + (_credData.email || '-') + '\n' +
+        '*Password:* ' + (_credData.password || '-') + '\n' +
+        '*No. Registrasi:* ' + (_credData.no_reg || '-') + '\n\n' +
+        '*Link Login:*\n' + loginUrl + '\n\n' +
+        'Segera login dan lengkapi profil Anda. Jangan bagikan password kepada siapapun.\n\n' +
+        'Terima kasih & selamat belajar!'
     );
-    window.open(`https://wa.me/${wa}?text=${msg}`, '_blank');
+    window.open('https://wa.me/' + wa + '?text=' + msg, '_blank');
 }
 
 function deleteReg(id, btn) {

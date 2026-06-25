@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Models\Package;
 use App\Models\Schedule;
 use App\Models\Student;
+use App\Models\StudentRegistration;
 use App\Models\Teacher;
 use App\Services\ScheduleAgreementService;
 use App\Services\ScheduleLockService;
@@ -31,7 +32,18 @@ class CourseController extends Controller
                 ->get();
         }
 
-        return view('siswa.courses.index', compact('packages', 'student'));
+        // Load courses from approved/active registrations
+        $registrationCourses = collect();
+        $registration = StudentRegistration::where('student_id', $student->id)
+            ->whereIn('academic_status', ['menunggu_kelas', 'terjadwal'])
+            ->latest()
+            ->first();
+
+        if ($registration && !empty($registration->interests)) {
+            $registrationCourses = Course::whereIn('nama', $registration->interests)->get();
+        }
+
+        return view('siswa.courses.index', compact('packages', 'student', 'registrationCourses', 'registration'));
     }
 
     public function fees(Request $request)

@@ -49,7 +49,28 @@ class RegistrationListController extends Controller
     public function approve(StudentRegistration $registration)
     {
         $teachers = Teacher::where('status', 'aktif')->orderBy('name')->get();
-        return view('admin.registration.approve', compact('registration', 'teachers'));
+
+        // Look up prices for each interest by matching course name
+        $interests   = $registration->interests ?? [];
+        $coursePrices = [];
+        if (!empty($interests)) {
+            $courses = \App\Models\Course::whereIn('nama', $interests)->get()->keyBy('nama');
+            foreach ($interests as $interest) {
+                $course = $courses->get($interest);
+                $price  = null;
+                if ($course) {
+                    $price = \Illuminate\Support\Facades\DB::table('course_fees')
+                        ->where('course_id', $course->id)
+                        ->value('amount');
+                    if ($price === null) {
+                        $price = $course->harga ?? $course->biaya ?? null;
+                    }
+                }
+                $coursePrices[$interest] = $price;
+            }
+        }
+
+        return view('admin.registration.approve', compact('registration', 'teachers', 'coursePrices'));
     }
 
     public function sendInvoice(Request $request, StudentRegistration $registration)
