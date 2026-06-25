@@ -1,0 +1,475 @@
+Stack
+Context
+Debug
+Flare
+Share
+Share with Flare
+Docs
+
+Stack
+
+Context
+
+Debug
+Create Share
+Docs
+
+Ignition Settings
+Docs
+Editor
+
+PhpStorm
+Theme
+auto
+Save settings
+Settings will be saved locally in ~/.ignition.json.
+
+syntax error, unexpected token "endforeach", expecting "elseif" or "else" or "endif"
+ParseError
+PHP 8.2.23
+9.52.21
+syntax error, unexpected token "endforeach", expecting "elseif" or "else" or "endif"
+
+Expand vendor frames
+Illuminate
+ \ 
+Filesystem
+ \ 
+Filesystem
+ 
+: 526
+Illuminate\Filesystem\{closure}
+53 vendor frames
+public
+ / 
+index
+.php
+ 
+: 51
+require_once
+1 vendor frame
+resources
+ / 
+views
+ / 
+siswa
+ / 
+billing
+ / 
+index.blade
+.php
+ 
+: 526
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    </div>
+
+                    @if($inv->status === 'sebagian')
+
+                    <div class="mt-2 pt-2" style="border-top:1px solid var(--card-border)">
+
+                        <div class="d-flex justify-content-between" style="font-size:12px;color:var(--text-muted)">
+
+                            <span>Sudah dibayar</span>
+
+                            <span class="text-success fw-semibold">Rp {{ number_format($paid,0,',','.') }}</span>
+
+                        </div>
+
+                        <div class="d-flex justify-content-between" style="font-size:12px;color:var(--text-muted)">
+
+                            <span>Sisa tagihan</span>
+
+                            <span class="fw-semibold" style="color:#dc2626">Rp {{ number_format($inv->total - $paid,0,',','.') }}</span>
+
+                        </div>
+
+                    </div>
+
+                    @endif
+
+                </div>
+
+            </div>
+
+            @endforeach
+
+        </div>
+
+    </div>
+
+
+
+    {{-- Payment modals for invoices --}}
+
+    @foreach($invoices as $inv)
+
+    @php $pendingPayment = \App\Models\Payment::where('invoice_id', $inv->id)->where('status','pending')->first(); @endphp
+
+    @if($inv->status !== 'lunas' && !$pendingPayment)
+
+    <div class="modal fade" id="invPayModal{{ $inv->id }}" tabindex="-1">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content" style="border-radius:20px;border:none;overflow:hidden">
+
+                <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#260632,#68117e);color:white">
+
+                    <div class="d-flex align-items-center gap-3">
+
+                        <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center"><i class="bi bi-upload"></i></div>
+
+                        <div>
+App
+Routing
+Views
+Request
+Browser
+Headers
+Body
+Context
+User
+Git
+Versions
+App
+Routing
+Controller
+App\Http\Controllers\Siswa\BillingController@index
+
+Route name
+siswa.billing.index
+
+Middleware
+web
+
+auth
+
+role:siswa
+
+Views
+View
+resources
+ / 
+views
+ / 
+siswa
+ / 
+billing
+ / 
+index.blade
+.php
+Data
+errors
+Illuminate\Support\ViewErrorBag {#683 ▼
+  #bags: []
+}
+courses
+Illuminate\Database\Eloquent\Collection {#1446 ▼
+  #items: []
+  #escapeWhenCastingToString: false
+}
+fees
+array:11 [▼
+  1 => "350000.00"
+  2 => "350000.00"
+  3 => "350000.00"
+  4 => "350000.00"
+  5 => "300000.00"
+  6 => "500000.00"
+  7 => "300000.00"
+  8 => "275000.00"
+  9 => "300000.00"
+  10 => "325000.00"
+  11 => "275000.00"
+]
+payments
+Illuminate\Database\Eloquent\Collection {#1424 ▼
+  #items: []
+  #escapeWhenCastingToString: false
+}
+draftCourses
+Illuminate\Support\Collection {#1439 ▼
+  #items: []
+  #escapeWhenCastingToString: false
+}
+student
+App\Models\Student {#1414 ▼
+  #connection: "pgsql"
+  #table: "students"
+  #primaryKey: "id"
+  #keyType: "int"
+  +incrementing: true
+  #with: []
+  #withCount: []
+  +preventsLazyLoading: false
+  #perPage: 15
+  +exists: true
+  +wasRecentlyCreated: false
+  #escapeWhenCastingToString: false
+  #attributes: array:22 [▶]
+  #original: array:22 [▶]
+  #changes: []
+  #casts: array:2 [▶]
+  #classCastCache: []
+  #attributeCastCache: []
+  #dates: []
+  #dateFormat: null
+  #appends: []
+  #dispatchesEvents: []
+  #observables: []
+  #relations: []
+  #touches: []
+  +timestamps: true
+  #hidden: []
+  #visible: []
+  #fillable: array:18 [▶]
+  #guarded: array:1 [▶]
+}
+invoices
+Illuminate\Database\Eloquent\Collection {#1462 ▼
+  #items: array:1 [▶]
+  #escapeWhenCastingToString: false
+}
+Request
+https://4b22b795-924a-4d1c-a4ab-5907a445dd53-00-fqbj62p5tb2f.sisko.replit.dev/siswa/billing
+GET
+curl "https://4b22b795-924a-4d1c-a4ab-5907a445dd53-00-fqbj62p5tb2f.sisko.replit.dev/siswa/billing" \
+   -X GET \
+   -H 'host: 4b22b795-924a-4d1c-a4ab-5907a445dd53-00-fqbj62p5tb2f.sisko.replit.dev' \
+   -H 'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36' \
+   -H 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' \
+   -H 'accept-encoding: gzip, deflate, br, zstd' \
+   -H 'accept-language: en-US,en;q=0.9,id;q=0.8' \
+   -H 'cookie: XSRF-TOKEN=eyJpdiI6ImhBVU5CMEVwWDkvRkZjRkJYU1grNEE9PSIsInZhbHVlIjoiRVdqYThVU3JuY3g3TDZZdVN1N0cvU3ZpRFlXZGNrbUpLL1NEd00vdElOcDd1WUZxMndnRk9yL2RjWFVyZWhaaDRuTjB6M3pFRTdHZVZwTmZZRTR4cjREQk1RRkZ0WnU1MFpwSXlSZ1NZKzRESGluQjJoSXZJUUFBTW0xcjJUV2YiLCJtYWMiOiJmODQ3YjkzOTZiZTIyZTcyZjZkNDQ1YzhmMTQ5MDVmNGRkYzZlNjUyMjNhMjM4ODYyZGU4YzVlYzE5YjdjOWM0IiwidGFnIjoiIn0%3D; akademi_bimbel_session=eyJpdiI6IjNWVENrTUFYMXJUR2cydUZsWlBFeFE9PSIsInZhbHVlIjoicitWMW1UUE14UjFVUVhmQi9XZU5zejIycS95cWdrbTJCQmVsSnMwU1kyMVJqK3F1NDZRbTZtQUcxcVp0V0xPcGlKY1VOakNLNWQrZVdwRC9janVid3VxQWo0TGJjbUV3Tk5zVW00Mk1BeDJKMUlUTjIrdmZ6cCt5RWJ1dGY0b0wiLCJtYWMiOiJlYzczY2QyZDU1MThjOGJiODcxN2JhMjdiY2M5ODUyYWViZjRmOGNkZDhjOWI5Mjk3NTYyOWEzMDFiM2JlMzU5IiwidGFnIjoiIn0%3D' \
+   -H 'referer: https://4b22b795-924a-4d1c-a4ab-5907a445dd53-00-fqbj62p5tb2f.sisko.replit.dev/siswa/certificates' \
+   -H 'sec-ch-ua: "Google Chrome";v="149", "Chromium";v="149", "Not)A;Brand";v="24"' \
+   -H 'sec-ch-ua-mobile: ?0' \
+   -H 'sec-ch-ua-platform: "Windows"' \
+   -H 'sec-fetch-dest: document' \
+   -H 'sec-fetch-mode: navigate' \
+   -H 'sec-fetch-site: same-origin' \
+   -H 'sec-fetch-user: ?1' \
+   -H 'upgrade-insecure-requests: 1' \
+   -H 'x-forwarded-for: 103.105.82.1, 10.84.0.18, 10.62.1.212, 127.0.0.1' \
+   -H 'x-forwarded-host: 4b22b795-924a-4d1c-a4ab-5907a445dd53-00-fqbj62p5tb2f.sisko.replit.dev' \
+   -H 'x-forwarded-proto: https';
+
+
+Browser
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36
+
+Headers
+host
+4b22b795-924a-4d1c-a4ab-5907a445dd53-00-fqbj62p5tb2f.sisko.replit.dev
+
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36
+
+accept
+text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+
+accept-encoding
+gzip, deflate, br, zstd
+
+accept-language
+en-US,en;q=0.9,id;q=0.8
+
+cookie
+XSRF-TOKEN=eyJpdiI6ImhBVU5CMEVwWDkvRkZjRkJYU1grNEE9PSIsInZhbHVlIjoiRVdqYThVU3JuY3g3TDZZdVN1N0cvU3ZpRFlXZGNrbUpLL1NEd00vdElOcDd1WUZxMndnRk9yL2RjWFVyZWhaaDRuTjB6M3pFRTdHZVZwTmZZRTR4cjREQk1RRkZ0WnU1MFpwSXlSZ1NZKzRESGluQjJoSXZJUUFBTW0xcjJUV2YiLCJtYWMiOiJmODQ3YjkzOTZiZTIyZTcyZjZkNDQ1YzhmMTQ5MDVmNGRkYzZlNjUyMjNhMjM4ODYyZGU4YzVlYzE5YjdjOWM0IiwidGFnIjoiIn0%3D; akademi_bimbel_session=eyJpdiI6IjNWVENrTUFYMXJUR2cydUZsWlBFeFE9PSIsInZhbHVlIjoicitWMW1UUE14UjFVUVhmQi9XZU5zejIycS95cWdrbTJCQmVsSnMwU1kyMVJqK3F1NDZRbTZtQUcxcVp0V0xPcGlKY1VOakNLNWQrZVdwRC9janVid3VxQWo0TGJjbUV3Tk5zVW00Mk1BeDJKMUlUTjIrdmZ6cCt5RWJ1dGY0b0wiLCJtYWMiOiJlYzczY2QyZDU1MThjOGJiODcxN2JhMjdiY2M5ODUyYWViZjRmOGNkZDhjOWI5Mjk3NTYyOWEzMDFiM2JlMzU5IiwidGFnIjoiIn0%3D
+
+referer
+https://4b22b795-924a-4d1c-a4ab-5907a445dd53-00-fqbj62p5tb2f.sisko.replit.dev/siswa/certificates
+
+sec-ch-ua
+"Google Chrome";v="149", "Chromium";v="149", "Not)A;Brand";v="24"
+
+sec-ch-ua-mobile
+?0
+
+sec-ch-ua-platform
+"Windows"
+
+sec-fetch-dest
+document
+
+sec-fetch-mode
+navigate
+
+sec-fetch-site
+same-origin
+
+sec-fetch-user
+?1
+
+upgrade-insecure-requests
+1
+
+x-forwarded-for
+103.105.82.1, 10.84.0.18, 10.62.1.212, 127.0.0.1
+
+x-forwarded-host
+4b22b795-924a-4d1c-a4ab-5907a445dd53-00-fqbj62p5tb2f.sisko.replit.dev
+
+x-forwarded-proto
+https
+
+Body
+[]
+
+Context
+User
+edu.195253@siswa.akademi.com
+edu
+
+edu.195253@siswa.akademi.com
+
+{
+    "id": 47,
+    "name": "edu",
+    "email": "edu.195253@siswa.akademi.com",
+    "email_verified_at": null,
+    "created_at": "2026-06-25T12:52:53.000000Z",
+    "updated_at": "2026-06-25T12:55:22.000000Z",
+    "deleted_at": null,
+    "phone": "85366195381",
+    "avatar": null,
+    "branch_id": null,
+    "is_active": true,
+    "last_login_at": null,
+    "username": null,
+    "roles": [
+        {
+            "id": 4,
+            "name": "siswa",
+            "guard_name": "web",
+            "created_at": "2026-06-25T12:10:37.000000Z",
+            "updated_at": "2026-06-25T12:10:37.000000Z",
+            "pivot": {
+                "model_id": 47,
+                "role_id": 4,
+                "model_type": "App\\Models\\User"
+            }
+        }
+    ]
+}
+
+
+Git
+Improve student billing and course views
+de5c5ed86ebd7c11f22815d24cbf9a539edf7fef
+
+View commit de5c5ed
+Last commit is dirty. (Un)staged changes have been made since this commit.
+
+Versions
+Php Version
+8.2.23
+
+Laravel Version
+9.52.21
+
+Laravel Locale
+en
+
+Laravel Config Cached
+false
+App Debug
+true
+App Env
+local
+
+
+8
+Queries
+8:16:58 PM
+15.92ms
+pgsql
+select * from "users" where "id" = 47 and "users"."deleted_at" is null limit 1
+
+
+1 query parameter
+8:16:58 PM
+1.84ms
+pgsql
+select "roles".*, "model_has_roles"."model_id" as "pivot_model_id", "model_has_roles"."role_id" as "pivot_role_id", "model_has_roles"."model_type" as "pivot_model_type" from "roles" inner join "model_has_roles" on "roles"."id" = "model_has_roles"."role_id" where "model_has_roles"."model_id" in (47) and "model_has_roles"."model_type" = App\Models\User
+
+
+1 query parameter
+8:16:58 PM
+0.93ms
+pgsql
+select * from "students" where "user_id" = 47 limit 1
+
+
+1 query parameter
+8:16:58 PM
+1.57ms
+pgsql
+select * from "courses" where "id" in (select "mata_pelajaran_id" from "school_classes" where "id" in (select "class_id" from "class_students" where "student_id" = 28)) and "courses"."deleted_at" is null
+
+
+1 query parameter
+8:16:58 PM
+0.9ms
+pgsql
+select "amount", "course_id" from "course_fees"
+
+
+8:16:58 PM
+0.94ms
+pgsql
+select * from "student_course_payments" where "student_id" = 28 order by "created_at" desc
+
+
+1 query parameter
+8:16:58 PM
+0.84ms
+pgsql
+select * from "student_course_payments" where "student_id" = 28 and "status" = verified and "course_id" not in (select "mata_pelajaran_id" from "school_classes" where "id" in (select "class_id" from "class_students" where "student_id" = 28))
+
+
+3 query parameters
+8:16:59 PM
+0.86ms
+pgsql
+select * from "invoices" where "siswa_id" = 28 and "invoices"."deleted_at" is null order by "created_at" desc
+
+
+1 query parameter
+·
+Source
+·
+Docs
+·
+Laravel
+Ignition is built byFlare, the Laravel error reporting service.
