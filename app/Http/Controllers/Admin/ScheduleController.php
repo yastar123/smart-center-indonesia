@@ -36,34 +36,57 @@ class ScheduleController extends Controller
 
     public function index(Request $request)
     {
-        $pakets = Package::with(['guru', 'mataPelajaran'])
+        $user      = auth()->user();
+        $branchId  = $user->hasRole('admin') ? optional($user->admin)->branch_id : null;
+
+        $pakets = Package::with(['guru', 'mataPelajaran', 'cabang'])
             ->where('status', 'aktif')
+            ->when($branchId, fn($q) => $q->where('cabang_id', $branchId))
             ->orderBy('nama')
             ->get();
 
-        $branches = Branch::all();
+        $branches = $branchId
+            ? Branch::where('id', $branchId)->get()
+            : Branch::all();
 
-        $schedules = Schedule::with(['paket.guru', 'paket.mataPelajaran', 'paket.cabang', 'guru', 'cabang'])
+        $teachers = \App\Models\Teacher::with('branch')
+            ->where('status', 'aktif')
+            ->when($branchId, fn($q) => $q->where('branch_id', $branchId))
+            ->orderBy('name')->get();
+
+        $classes = \App\Models\SchoolClass::with(['mataPelajaran', 'cabang'])
+            ->where('status', 'aktif')
+            ->when($branchId, fn($q) => $q->where('cabang_id', $branchId))
+            ->orderBy('nama_kelas')->get();
+
+        $modules = Module::with('mataPelajaran')
+            ->where('status', 'aktif')
+            ->orderBy('judul')->get();
+
+        $schedules = Schedule::with(['paket.guru', 'paket.mataPelajaran', 'paket.cabang', 'guru', 'cabang', 'kelas'])
+            ->when($branchId, fn($q) => $q->where('cabang_id', $branchId))
             ->when($request->search, fn($q) =>
                 $q->where('topik', 'like', "%{$request->search}%")
                   ->orWhere('ruangan', 'like', "%{$request->search}%")
                   ->orWhereHas('paket', fn($gq) =>
                       $gq->where('nama', 'like', "%{$request->search}%")))
-            ->when($request->status,   fn($q) => $q->where('status',   $request->status))
-            ->when($request->paket_id, fn($q) => $q->where('paket_id', $request->paket_id))
-            ->when($request->tanggal,  fn($q) => $q->whereDate('tanggal', $request->tanggal))
+            ->when($request->status,    fn($q) => $q->where('status',    $request->status))
+            ->when($request->paket_id,  fn($q) => $q->where('paket_id',  $request->paket_id))
+            ->when($request->cabang_id, fn($q) => $q->where('cabang_id', $request->cabang_id))
+            ->when($request->tanggal,   fn($q) => $q->whereDate('tanggal', $request->tanggal))
             ->orderByDesc('tanggal')
             ->orderBy('pertemuan_ke')
-            ->paginate(12)->withQueryString();
+            ->paginate(15)->withQueryString();
 
+        $baseQ = fn() => Schedule::when($branchId, fn($q) => $q->where('cabang_id', $branchId));
         $stats = [
-            'total'       => Schedule::count(),
-            'hari_ini'    => Schedule::whereDate('tanggal', today())->count(),
-            'dijadwalkan' => Schedule::where('status', 'dijadwalkan')->count(),
-            'selesai'     => Schedule::where('status', 'selesai')->count(),
+            'total'       => $baseQ()->count(),
+            'hari_ini'    => $baseQ()->whereDate('tanggal', today())->count(),
+            'dijadwalkan' => $baseQ()->where('status', 'dijadwalkan')->count(),
+            'selesai'     => $baseQ()->where('status', 'selesai')->count(),
         ];
 
-        return view('admin.schedules.index', compact('schedules', 'pakets', 'branches', 'stats'));
+        return view('admin.schedule.index', compact('schedules', 'pakets', 'branches', 'teachers', 'classes', 'modules', 'stats'));
     }
 
     public function store(Request $request)
