@@ -7,6 +7,7 @@ use App\Models\Salary;
 use App\Models\Teacher;
 use App\Models\Branch;
 use App\Models\Package;
+use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
@@ -50,20 +51,45 @@ class SalaryController extends Controller
 
     public function teacherPackages(Teacher $teacher)
     {
-        $packages = Package::where('guru_id', $teacher->id)
-            ->where('status', 'aktif')
+        // Cari paket yang pernah diajarkan guru ini melalui jadwal
+        $paketIds = Schedule::where('guru_id', $teacher->id)
+            ->whereNotNull('paket_id')
+            ->distinct()
+            ->pluck('paket_id');
+
+        $packages = Package::whereIn('id', $paketIds)
+            ->with('mataPelajaran')
             ->orderBy('nama')
-            ->get([
-                'id',
-                'nama',
-                'jenis',
-                'jumlah_pertemuan',
-                'durasi_bulan',
-            ]);
+            ->get(['id', 'nama', 'jenis', 'jumlah_pertemuan', 'durasi_bulan']);
+
+        $data = $packages->map(function ($pkg) use ($teacher) {
+            $totalSesi   = (int) ($pkg->jumlah_pertemuan ?? 0);
+            // Hitung sesi yang sudah selesai oleh guru ini di paket ini
+            $selesai     = Schedule::where('guru_id', $teacher->id)
+                ->where('paket_id', $pkg->id)
+                ->where('status', 'selesai')
+                ->count();
+            $dijadwalkan = Schedule::where('guru_id', $teacher->id)
+                ->where('paket_id', $pkg->id)
+                ->where('status', 'dijadwalkan')
+                ->count();
+
+            return [
+                'id'               => $pkg->id,
+                'nama'             => $pkg->nama,
+                'jenis'            => $pkg->jenis,
+                'jumlah_pertemuan' => $totalSesi,
+                'durasi_bulan'     => $pkg->durasi_bulan,
+                'mata_pelajaran'   => $pkg->mataPelajaran->pluck('nama'),
+                'sesi_selesai'     => $selesai,
+                'sesi_dijadwalkan' => $dijadwalkan,
+                'sesi_belum'       => max(0, $totalSesi - $selesai - $dijadwalkan),
+            ];
+        });
 
         return response()->json([
             'success' => true,
-            'data' => $packages,
+            'data'    => $data,
         ]);
     }
 
