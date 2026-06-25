@@ -18,15 +18,17 @@
 </div>
 
 @php
-function attendanceIcon($status) {
-    return match($status) {
-        'hadir'                => '<span title="Hadir" style="color:#10b981;font-size:16px">✅</span>',
-        'menunggu_konfirmasi'  => '<span title="Menunggu Konfirmasi Siswa" style="color:#f59e0b;font-size:14px">⏳</span>',
-        'tidak_valid'          => '<span title="Tidak Valid" style="color:#ef4444;font-size:14px">⚠️</span>',
-        'izin'                 => '<span title="Izin" style="color:#3b82f6;font-size:14px">📋</span>',
-        'sakit'                => '<span title="Sakit" style="color:#8b5cf6;font-size:14px">🏥</span>',
-        default                => '<span title="Tidak Hadir" style="color:#cbd5e1;font-size:16px">❌</span>',
-    };
+if (!function_exists('attendanceIcon')) {
+    function attendanceIcon($status) {
+        return match($status) {
+            'hadir'                => '<span title="Hadir" style="color:#10b981;font-size:16px">✅</span>',
+            'menunggu_konfirmasi'  => '<span title="Menunggu Konfirmasi Siswa" style="color:#f59e0b;font-size:14px">⏳</span>',
+            'tidak_valid'          => '<span title="Tidak Valid" style="color:#ef4444;font-size:14px">⚠️</span>',
+            'izin'                 => '<span title="Izin" style="color:#3b82f6;font-size:14px">📋</span>',
+            'sakit'                => '<span title="Sakit" style="color:#8b5cf6;font-size:14px">🏥</span>',
+            default                => '<span title="Tidak Hadir" style="color:#cbd5e1;font-size:16px">❌</span>',
+        };
+    }
 }
 @endphp
 
@@ -46,7 +48,7 @@ function attendanceIcon($status) {
         <p class="text-muted mb-0">Belum ada siswa di kelas ini.</p>
     @else
     <div class="table-responsive" style="overflow-x:auto">
-        <table class="table table-bordered align-middle mb-0" style="min-width:600px;font-size:13px">
+        <table class="table table-modern align-middle mb-0" style="min-width:600px;font-size:13px">
             <thead>
                 <tr style="background:var(--input-bg)">
                     <th style="min-width:160px;position:sticky;left:0;background:var(--input-bg);z-index:2;color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em">Nama Siswa</th>

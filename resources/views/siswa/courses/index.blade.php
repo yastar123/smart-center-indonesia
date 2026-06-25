@@ -34,11 +34,11 @@
     </div>
     @else
     <div class="table-responsive">
-        <table class="table table-bordered align-middle mb-0">
+        <table class="table table-modern align-middle mb-0">
             <thead>
                 <tr>
                     <th>Nama Paket</th>
-                    <th>Jumlah Sesi</th>
+                    <th class="text-center">Jumlah Sesi</th>
                     <th>Metode Absensi</th>
                     <th>Tipe Kelas</th>
                     <th>Mata Pelajaran</th>
@@ -50,11 +50,43 @@
                     $courseNames = $package->mataPelajaran->pluck('nama')->filter()->implode(', ');
                 @endphp
                 <tr>
-                    <td class="fw-semibold">{{ $package->nama }}</td>
-                    <td>{{ $package->jumlah_pertemuan ?? 0 }}</td>
-                    <td>{{ $package->metode_absensi ?? '-' }}</td>
-                    <td>{{ $package->tipe_kelas ?? '-' }}</td>
-                    <td>{{ $courseNames ?: '-' }}</td>
+                    <td>
+                        <div class="fw-semibold">{{ $package->nama }}</div>
+                        @if($package->deskripsi)
+                            <div class="text-muted" style="font-size:11px;margin-top:2px">{{ Str::limit($package->deskripsi, 60) }}</div>
+                        @endif
+                    </td>
+                    <td class="text-center">
+                        <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);border:1px solid var(--soft-primary-border);border-radius:8px;padding:4px 10px;font-weight:700">
+                            {{ $package->jumlah_pertemuan ?? 0 }}x
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge" style="background:var(--soft-info-bg);color:var(--soft-info-text);border:1px solid var(--soft-info-border);border-radius:8px;padding:4px 10px;font-size:11px">
+                            {{ $package->metode_absensi ?? '-' }}
+                        </span>
+                    </td>
+                    <td>
+                        @php
+                            $tipeBg = match(strtolower($package->tipe_kelas ?? '')) {
+                                'private' => ['bg'=>'var(--soft-warning-bg)','color'=>'var(--soft-warning-text)','border'=>'var(--soft-warning-border)'],
+                                'reguler','regular','group' => ['bg'=>'var(--soft-success-bg)','color'=>'var(--soft-success-text)','border'=>'var(--soft-success-border)'],
+                                default   => ['bg'=>'var(--soft-muted-bg)','color'=>'var(--soft-muted-text)','border'=>'var(--soft-muted-border)'],
+                            };
+                        @endphp
+                        <span class="badge" style="background:{{ $tipeBg['bg'] }};color:{{ $tipeBg['color'] }};border:1px solid {{ $tipeBg['border'] }};border-radius:8px;padding:4px 10px;font-size:11px">
+                            {{ $package->tipe_kelas ?? '-' }}
+                        </span>
+                    </td>
+                    <td>
+                        @if($courseNames)
+                            @foreach($package->mataPelajaran->pluck('nama')->filter() as $nama)
+                                <span class="badge me-1 mb-1" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);border:1px solid var(--soft-primary-border);border-radius:6px;font-weight:500">{{ $nama }}</span>
+                            @endforeach
+                        @else
+                            <span class="text-muted">—</span>
+                        @endif
+                    </td>
                 </tr>
                 @endforeach
             </tbody>

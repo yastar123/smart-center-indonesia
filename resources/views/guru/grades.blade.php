@@ -3,19 +3,23 @@
 @section('page-title', 'Input Nilai')
 
 @php
-function getGradeLetter($n) {
-    if ($n >= 90) return 'A';
-    if ($n >= 75) return 'B';
-    if ($n >= 60) return 'C';
-    if ($n >= 50) return 'D';
-    return 'E';
+if (!function_exists('getGradeLetter')) {
+    function getGradeLetter($n) {
+        if ($n >= 90) return 'A';
+        if ($n >= 75) return 'B';
+        if ($n >= 60) return 'C';
+        if ($n >= 50) return 'D';
+        return 'E';
+    }
 }
-function getGradeColor($n) {
-    if ($n >= 90) return '#10b981';
-    if ($n >= 75) return '#2563eb';
-    if ($n >= 60) return '#f6af23';
-    if ($n >= 50) return '#f97316';
-    return '#ef4444';
+if (!function_exists('getGradeColor')) {
+    function getGradeColor($n) {
+        if ($n >= 90) return '#10b981';
+        if ($n >= 75) return '#2563eb';
+        if ($n >= 60) return '#f6af23';
+        if ($n >= 50) return '#f97316';
+        return '#ef4444';
+    }
 }
 @endphp
 

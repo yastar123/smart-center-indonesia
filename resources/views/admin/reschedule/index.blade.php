@@ -89,8 +89,8 @@
         <p class="text-muted mb-0" style="font-size:13px">Belum ada data guru aktif.</p>
     @else
     <div class="table-responsive">
-        <table class="table table-bordered align-middle mb-0" style="font-size:12px">
-            <thead class="thead-modern">
+        <table class="table table-modern align-middle mb-0" style="font-size:12px">
+            <thead>
                 <tr>
                     <th style="min-width:160px">Guru</th>
                     <th class="text-center">Sen</th>
