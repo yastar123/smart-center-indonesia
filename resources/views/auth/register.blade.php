@@ -639,7 +639,7 @@
                                 @php $items = $subjects[$jenis]; @endphp
                                 <div class="col-md-6 {{ $jenis === 'mapel' ? 'mapel-section' : '' }}"
                                      id="section-{{ $jenis }}"
-                                     style="{{ $jenis === 'mapel' && old('program_belajar','kelas') === 'kelas' ? 'display:none' : '' }}">
+                                     style="">
                                     <div class="program-group">
                                         <div class="program-group-label">{{ $jenisLabels[$jenis] }}</div>
                                         <div class="check-grid">
@@ -801,11 +801,6 @@ function pickProgram(val, el) {
         document.getElementById('tempat_belajar').value = 'kantor';
     }
 
-    // Show/hide Mata Pelajaran section in Step 4
-    const mapelSection = document.getElementById('section-mapel');
-    if (mapelSection) {
-        mapelSection.style.display = (val === 'kelas') ? 'none' : '';
-    }
 }
 
 (function initProgramState() {
@@ -814,11 +809,6 @@ function pickProgram(val, el) {
     if (prog.value === 'privat') {
         const rumahBtn = document.getElementById('tempatRumahBtn');
         if (rumahBtn) rumahBtn.classList.remove('d-none');
-    }
-    // Init mapel visibility
-    const mapelSection = document.getElementById('section-mapel');
-    if (mapelSection) {
-        mapelSection.style.display = (prog.value === 'kelas') ? 'none' : '';
     }
 })();
 

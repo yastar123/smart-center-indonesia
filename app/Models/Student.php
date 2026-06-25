@@ -43,6 +43,16 @@ class Student extends Model
         return $this->hasMany(Invoice::class, 'siswa_id');
     }
 
+    public function schoolClasses()
+    {
+        return $this->belongsToMany(
+            \App\Models\SchoolClass::class,
+            'class_students',
+            'student_id',
+            'class_id'
+        )->with('mataPelajaran');
+    }
+
     public function getPhotoUrlAttribute()
     {
         return $this->photo

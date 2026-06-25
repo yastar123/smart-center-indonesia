@@ -37,7 +37,7 @@
     $lulus   = \App\Models\Student::where('status','lulus')->when($branchId, fn($q) => $q->where('branch_id', $branchId))->count();
 
     // Recent students
-    $recentStudents = \App\Models\Student::with('branch')
+    $recentStudents = \App\Models\Student::with(['branch', 'schoolClasses.mataPelajaran'])
         ->when($branchId, fn($q) => $q->where('branch_id', $branchId))
         ->latest()->limit(5)->get();
 
@@ -303,69 +303,116 @@
             Lihat Semua <i class="bi bi-arrow-right ms-1"></i>
         </a>
     </div>
-    <div class="table-responsive">
-        <table class="table table-hover table-modern align-middle mb-0">
-            <thead class="thead-modern">
-                <tr>
-                    <th>Siswa</th>
-                    <th>NIS</th>
-                    <th class="d-none d-md-table-cell">Cabang</th>
-                    <th class="d-none d-lg-table-cell">Kelas</th>
-                    <th>Status</th>
-                    <th class="d-none d-md-table-cell">Bergabung</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($recentStudents as $s)
-                @php
-                    $avatar = 'https://ui-avatars.com/api/?name='.urlencode($s->name).'&background='.($s->gender==='P'?'ec4899':'c84ddf').'&color=fff&size=40';
-                    $statusColors = ['aktif'=>['var(--soft-success-bg)','var(--soft-success-text)'],'nonaktif'=>['var(--soft-muted-bg)','var(--text-muted)'],'lulus'=>['var(--soft-primary-bg)','var(--soft-primary-text)']];
-                    $sc = $statusColors[$s->status] ?? ['#f3f4f6','#6b7280'];
-                @endphp
-                <tr>
-                    <td class="py-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <img src="{{ $s->photo ? Storage::url($s->photo) : $avatar }}"
-                                 class="rounded-circle flex-shrink-0" width="36" height="36"
-                                 style="object-fit:cover;border:2px solid #e2e8f0">
-                            <div>
-                                <div class="fw-semibold">{{ $s->name }}</div>
-                                <div class="text-muted" style="font-size:.72rem">
-                                    {{ $s->gender === 'L' ? '👦' : ($s->gender === 'P' ? '👧' : '') }}
-                                    {{ $s->grade ?? '–' }}
+
+    @forelse($recentStudents as $idx => $s)
+    @php
+        $avatar = 'https://ui-avatars.com/api/?name='.urlencode($s->name).'&background='.($s->gender==='P'?'ec4899':'c84ddf').'&color=fff&size=40';
+        $statusColors = ['aktif'=>['var(--soft-success-bg)','var(--soft-success-text)'],'nonaktif'=>['var(--soft-muted-bg)','var(--text-muted)'],'lulus'=>['var(--soft-primary-bg)','var(--soft-primary-text)']];
+        $sc = $statusColors[$s->status] ?? ['var(--soft-muted-bg)','var(--text-muted)'];
+        $courses = $s->schoolClasses ?? collect();
+        $accId = 'recentStudent-'.$s->id;
+    @endphp
+    <div class="recent-student-item {{ $idx > 0 ? 'mt-2' : '' }}" style="border:1px solid var(--card-border);border-radius:12px;overflow:hidden;background:var(--card-bg)">
+        {{-- Accordion Header --}}
+        <div class="d-flex align-items-center justify-content-between px-3 py-3 recent-student-toggle"
+             onclick="toggleRecentStudent('{{ $accId }}')"
+             style="cursor:pointer;user-select:none;transition:background .15s">
+            <div class="d-flex align-items-center gap-3">
+                <img src="{{ $s->photo ? Storage::url($s->photo) : $avatar }}"
+                     class="rounded-circle flex-shrink-0" width="40" height="40"
+                     style="object-fit:cover;border:2px solid var(--card-border)">
+                <div>
+                    <div class="fw-semibold" style="font-size:.93rem">{{ $s->name }}</div>
+                    <div class="text-muted" style="font-size:.73rem;line-height:1.3">
+                        {{ $s->gender === 'L' ? '👦' : ($s->gender === 'P' ? '👧' : '') }}
+                        <code style="background:var(--input-bg);padding:1px 5px;border-radius:4px;font-size:.7rem">{{ $s->nis }}</code>
+                        &nbsp;·&nbsp;{{ $s->branch->name ?? '–' }}
+                        &nbsp;·&nbsp;{{ $s->created_at->format('d M Y') }}
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                <span class="badge" style="background:{{ $sc[0] }};color:{{ $sc[1] }};padding:4px 10px;border-radius:20px;font-size:.72rem">
+                    {{ ucfirst($s->status) }}
+                </span>
+                <span class="badge {{ $courses->isEmpty() ? 'text-muted' : 'text-primary' }}"
+                      style="background:var(--input-bg);font-size:.72rem;padding:4px 9px;border-radius:20px">
+                    <i class="bi bi-journal-bookmark me-1"></i>{{ $courses->count() }} Kursus
+                </span>
+                <i class="bi bi-chevron-down recent-student-chevron" id="chevron-{{ $accId }}"
+                   style="font-size:.85rem;color:var(--text-muted);transition:transform .25s"></i>
+            </div>
+        </div>
+
+        {{-- Accordion Body: Courses --}}
+        <div id="{{ $accId }}" class="recent-student-body" style="display:none;border-top:1px solid var(--card-border)">
+            @if($courses->isEmpty())
+                <div class="text-center py-4 text-muted" style="font-size:.83rem">
+                    <i class="bi bi-journal-x d-block mb-2" style="font-size:1.6rem;opacity:.35"></i>
+                    Belum terdaftar di kelas manapun
+                </div>
+            @else
+                <div class="px-3 py-3">
+                    <div class="row g-2">
+                        @foreach($courses as $cls)
+                        @php
+                            $jenisMap = ['komputer'=>'Kursus Komputer','bahasa'=>'Kursus Bahasa Asing','mapel'=>'Mata Pelajaran','kedinasan'=>'Kedinasan','cpns'=>'CPNS','bumn'=>'BUMN','akpol'=>'AKPOL/AKMIL'];
+                            $kategoriColors = [
+                                'komputer'  => ['var(--soft-info-bg)','var(--soft-info-text)','bi-pc-display'],
+                                'bahasa'    => ['var(--soft-success-bg)','var(--soft-success-text)','bi-translate'],
+                                'mapel'     => ['var(--soft-primary-bg)','var(--soft-primary-text)','bi-book'],
+                                'kedinasan' => ['var(--soft-warning-bg)','var(--soft-warning-text)','bi-shield'],
+                                'cpns'      => ['var(--soft-warning-bg)','var(--soft-warning-text)','bi-file-earmark-person'],
+                                'bumn'      => ['var(--soft-danger-bg)','var(--soft-danger-text)','bi-building'],
+                                'akpol'     => ['var(--soft-danger-bg)','var(--soft-danger-text)','bi-star'],
+                            ];
+                            $cat  = $cls->mataPelajaran->jenis ?? ($cls->jenis ?? 'mapel');
+                            $cc   = $kategoriColors[$cat] ?? ['var(--soft-primary-bg)','var(--soft-primary-text)','bi-journal'];
+                            $nama = $cls->mataPelajaran->nama ?? $cls->nama_kelas ?? '–';
+                        @endphp
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-3"
+                                 style="background:var(--input-bg);border:1px solid var(--card-border)">
+                                <span style="width:30px;height:30px;border-radius:8px;background:{{ $cc[0] }};color:{{ $cc[1] }};display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0">
+                                    <i class="bi {{ $cc[2] }}"></i>
+                                </span>
+                                <div style="min-width:0">
+                                    <div class="fw-semibold text-truncate" style="font-size:.82rem">{{ $nama }}</div>
+                                    <div class="text-muted" style="font-size:.7rem">{{ $jenisMap[$cat] ?? ucfirst($cat) }} · {{ $cls->nama_kelas }}</div>
                                 </div>
                             </div>
                         </div>
-                    </td>
-                    <td><code class="small" style="background:var(--input-bg);padding:2px 7px;border-radius:5px">{{ $s->nis }}</code></td>
-                    <td class="d-none d-md-table-cell">
-                        <span class="badge" style="background:var(--input-bg);color:var(--text-muted);font-weight:500;border:1px solid var(--card-border)">
-                            {{ $s->branch->name ?? '–' }}
-                        </span>
-                    </td>
-                    <td class="d-none d-lg-table-cell text-muted small">{{ $s->grade ?? '–' }}</td>
-                    <td>
-                        <span class="badge" style="background:{{ $sc[0] }};color:{{ $sc[1] }};padding:4px 10px;border-radius:20px">
-                            {{ ucfirst($s->status) }}
-                        </span>
-                    </td>
-                    <td class="d-none d-md-table-cell small text-muted">{{ $s->created_at->format('d M Y') }}</td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="6" class="text-center py-5">
-                        <i class="bi bi-inbox d-block mb-3" style="font-size:3rem;opacity:.2"></i>
-                        <div class="fw-semibold mb-1">Belum ada siswa terdaftar</div>
-                        <a href="{{ route('admin.students.index') }}" class="btn btn-sm btn-primary mt-1">
-                            <i class="bi bi-plus-circle me-1"></i>Tambah Siswa
-                        </a>
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+        </div>
     </div>
+    @empty
+    <div class="text-center py-5">
+        <i class="bi bi-inbox d-block mb-3" style="font-size:3rem;opacity:.2"></i>
+        <div class="fw-semibold mb-1">Belum ada siswa terdaftar</div>
+        <a href="{{ route('admin.students.index') }}" class="btn btn-sm btn-primary mt-1">
+            <i class="bi bi-plus-circle me-1"></i>Tambah Siswa
+        </a>
+    </div>
+    @endforelse
 </div>
+
+<style>
+.recent-student-toggle:hover { background: rgba(104,17,126,.04); }
+[data-theme="dark"] .recent-student-toggle:hover { background: rgba(200,77,223,.06); }
+.recent-student-chevron.open { transform: rotate(180deg); }
+</style>
+<script>
+function toggleRecentStudent(id) {
+    const body    = document.getElementById(id);
+    const chevron = document.getElementById('chevron-' + id);
+    const isOpen  = body.style.display !== 'none';
+    body.style.display = isOpen ? 'none' : 'block';
+    if (chevron) chevron.classList.toggle('open', !isOpen);
+}
+</script>
 @endif
 
 {{-- GURU REDIRECT CARD --}}
