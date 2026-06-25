@@ -27,7 +27,11 @@ class ScheduleController extends Controller
             ->where('status', 'aktif')
             ->orderBy('name')
             ->get();
-        return view('admin.schedules.create', compact('pakets', 'branches', 'modules', 'teachers'));
+        $classes = \App\Models\SchoolClass::with(['mataPelajaran', 'cabang', 'guru'])
+            ->where('status', 'aktif')
+            ->orderBy('nama_kelas')
+            ->get();
+        return view('admin.schedules.create', compact('pakets', 'branches', 'modules', 'teachers', 'classes'));
     }
 
     public function index(Request $request)
@@ -66,6 +70,7 @@ class ScheduleController extends Controller
     {
         $data = $request->validate([
             'paket_id'        => 'required|exists:packages,id',
+            'kelas_id'        => 'nullable|exists:school_classes,id',
             'module_id'       => 'nullable|exists:modules,id',
             'guru_id'         => 'nullable|exists:teachers,id',
             'jenis'           => 'required|in:online,offline,private',

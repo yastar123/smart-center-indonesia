@@ -123,12 +123,12 @@
                     <td class="text-muted" style="font-size:12px">{{ ($schedules->currentPage()-1)*$schedules->perPage() + $i + 1 }}</td>
                     <td>
                         <div class="fw-semibold" style="font-size:13px">
-                            {{ $s->kelas->mataPelajaran->nama ?? '—' }}
+                            {{ $s->kelas?->mataPelajaran?->nama ?? $s->paket?->nama ?? '—' }}
                             @if($isNew)
                             <span class="badge ms-1" style="background:var(--soft-success-bg);color:var(--soft-success-text);font-size:9px;border-radius:5px;padding:2px 6px">Baru</span>
                             @endif
                         </div>
-                        <div class="text-muted" style="font-size:11px">{{ $s->kelas->nama_kelas ?? '—' }}</div>
+                        <div class="text-muted" style="font-size:11px">{{ $s->kelas?->nama_kelas ?? ($s->paket?->cabang?->name ?? '—') }}</div>
                     </td>
                     <td>
                         @if($s->pertemuan_ke)

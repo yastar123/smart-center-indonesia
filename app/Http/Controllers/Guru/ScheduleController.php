@@ -14,7 +14,7 @@ class ScheduleController extends Controller
     {
         $teacher = Teacher::where('user_id', auth()->id())->firstOrFail();
 
-        $schedules = Schedule::with(['kelas.mataPelajaran', 'kelas.cabang'])
+        $schedules = Schedule::with(['kelas.mataPelajaran', 'kelas.cabang', 'paket'])
             ->where('guru_id', $teacher->id)
             ->when($request->status, fn($q) => $q->where('status', $request->status))
             ->when($request->bulan, fn($q) => $q->whereMonth('tanggal', $request->bulan))
@@ -32,7 +32,7 @@ class ScheduleController extends Controller
         if ($schedule->guru_id !== $teacher->id) {
             return response()->json(['success' => false, 'message' => 'Akses ditolak.'], 403);
         }
-        $schedule->load(['kelas.mataPelajaran', 'kelas.cabang']);
+        $schedule->load(['kelas.mataPelajaran', 'kelas.cabang', 'paket']);
         return response()->json(['success' => true, 'data' => $schedule]);
     }
 
