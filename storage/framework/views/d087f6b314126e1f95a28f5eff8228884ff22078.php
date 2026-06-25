@@ -656,43 +656,31 @@ unset($__errorArgs, $__bag); ?>
                                 'cpns'      => 'CPNS',
                                 'bumn'      => 'BUMN',
                             ];
-                            $jenisAccordion = ['kedinasan','cpns','bumn','akpol'];
-                            $jenisFlat      = ['komputer','bahasa','mapel'];
+                            $jenisIcons = [
+                                'komputer'  => 'bi-pc-display',
+                                'bahasa'    => 'bi-translate',
+                                'mapel'     => 'bi-journal-bookmark',
+                                'kedinasan' => 'bi-building',
+                                'cpns'      => 'bi-file-earmark-person',
+                                'bumn'      => 'bi-briefcase',
+                                'akpol'     => 'bi-shield',
+                            ];
+                            $jenisOrder = ['komputer','bahasa','mapel','kedinasan','cpns','bumn','akpol'];
                         ?>
 
                         
-                        <div class="row g-4" id="flatProgramsRow">
-                            <?php $__currentLoopData = $jenisFlat; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $jenis): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="mt-2">
+                            <?php $__currentLoopData = $jenisOrder; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $jenis): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <?php if(!$subjects->has($jenis)): ?> <?php continue; ?> <?php endif; ?>
                                 <?php $items = $subjects[$jenis]; ?>
-                                <div class="col-md-6 <?php echo e($jenis === 'mapel' ? 'mapel-section' : ''); ?>"
-                                     id="section-<?php echo e($jenis); ?>"
-                                     style="">
-                                    <div class="program-group">
-                                        <div class="program-group-label"><?php echo e($jenisLabels[$jenis]); ?></div>
-                                        <div class="check-grid">
-                                            <?php $__currentLoopData = $items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <label class="check-pill <?php echo e(in_array($course->nama, old('program_minat', [])) ? 'selected' : ''); ?>" onclick="togglePill(this)">
-                                                <input type="checkbox" name="program_minat[]" value="<?php echo e($course->nama); ?>"
-                                                       <?php echo e(in_array($course->nama, old('program_minat', [])) ? 'checked' : ''); ?>>
-                                                <?php echo e($course->nama); ?>
-
-                                            </label>
-                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                        </div>
-                                    </div>
-                                </div>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                        </div>
-
-                        
-                        <div class="mt-3">
-                            <?php $__currentLoopData = $jenisAccordion; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $jenis): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <?php if(!$subjects->has($jenis)): ?> <?php continue; ?> <?php endif; ?>
-                                <?php $items = $subjects[$jenis]; ?>
-                                <div>
+                                <div class="mb-2" id="section-<?php echo e($jenis); ?>">
                                     <div class="accordion-cat" onclick="toggleAccordion('acc-<?php echo e($jenis); ?>', this)">
-                                        <span><i class="bi bi-building me-2" style="color:#c84ddf"></i><?php echo e($jenisLabels[$jenis] ?? ucfirst($jenis)); ?></span>
+                                        <span>
+                                            <i class="bi <?php echo e($jenisIcons[$jenis] ?? 'bi-journal'); ?> me-2" style="color:#c84ddf"></i>
+                                            <?php echo e($jenisLabels[$jenis] ?? ucfirst($jenis)); ?>
+
+                                            <span class="badge ms-2" style="background:rgba(200,77,223,.12);color:#c84ddf;font-size:.63rem;font-weight:600;border-radius:10px;padding:2px 7px"><?php echo e($items->count()); ?></span>
+                                        </span>
                                         <i class="bi bi-chevron-right acc-arrow"></i>
                                     </div>
                                     <div class="accordion-body <?php echo e(collect(old('program_minat', []))->intersect($items->pluck('nama'))->isNotEmpty() ? 'open' : ''); ?>" id="acc-<?php echo e($jenis); ?>">

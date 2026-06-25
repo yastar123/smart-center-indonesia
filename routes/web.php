@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\CoursePackageController;
 use App\Http\Controllers\Admin\ScheduleDashboardController;
 use App\Http\Controllers\Admin\RescheduleController;
 use App\Http\Controllers\Admin\RegistrationController;
+use App\Http\Controllers\Admin\RegistrationListController;
 use App\Http\Controllers\Admin\StudentRegistrationController;
 use App\Http\Controllers\Admin\AcademicModuleController;
 use App\Http\Controllers\Admin\BillingController;
@@ -205,6 +206,13 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         // REGISTRATION (Registrasi Siswa)
         Route::get('/registration-create',       [RegistrationController::class, 'create']) ->name('registration.create');
         Route::post('/registration-create',      [RegistrationController::class, 'store'])  ->name('registration.store');
+
+        // REGISTRATION LIST (Daftar Registrasi dari Form Publik)
+        Route::get('/registration-list',                                [RegistrationListController::class, 'index'])       ->name('registration-list.index');
+        Route::get('/registration-list/{registration}/approve',         [RegistrationListController::class, 'approve'])     ->name('registration-list.approve');
+        Route::post('/registration-list/{registration}/send-invoice',   [RegistrationListController::class, 'sendInvoice']) ->name('registration-list.send-invoice');
+        Route::post('/registration-list/{registration}/mark-lunas',     [RegistrationListController::class, 'markLunas'])   ->name('registration-list.mark-lunas');
+        Route::post('/registration-list/{registration}/reject',         [RegistrationListController::class, 'reject'])      ->name('registration-list.reject');
 
         // STUDENT REGISTRATIONS (pendaftar dari form publik)
         Route::get('/student-registrations/{studentRegistration}',        [StudentRegistrationController::class, 'show'])    ->name('student-registrations.show');

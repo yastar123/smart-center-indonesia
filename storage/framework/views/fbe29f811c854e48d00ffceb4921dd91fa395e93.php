@@ -3249,7 +3249,7 @@
         <div class="nav-header">AKADEMIK</div>
 
         <div class="nav-item">
-            <a href="<?php echo e(route('admin.registration.create')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.registration.*') ? 'active' : ''); ?>" data-label="Registrasi">
+            <a href="<?php echo e(route('admin.registration-list.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.registration-list.*') ? 'active' : ''); ?>" data-label="Registrasi">
                 <i class="bi bi-person-plus-fill"></i>
                 <span>Registrasi</span>
             </a>

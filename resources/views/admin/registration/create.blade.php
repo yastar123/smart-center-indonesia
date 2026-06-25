@@ -9,6 +9,7 @@
 {{-- BREADCRUMB --}}
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ route('admin.registration-list.index') }}" class="text-decoration-none">Daftar Registrasi</a></li>
         <li class="breadcrumb-item active">Registrasi Baru</li>
     </ol>
 </nav>

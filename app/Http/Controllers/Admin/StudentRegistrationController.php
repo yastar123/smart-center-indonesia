@@ -86,7 +86,7 @@ class StudentRegistrationController extends Controller
             } while (Student::where('nis', $nis)->exists());
 
             // Create student record
-            Student::create([
+            $student = Student::create([
                 'user_id'      => $user->id,
                 'nis'          => $nis,
                 'name'         => $studentRegistration->name,
@@ -103,8 +103,13 @@ class StudentRegistrationController extends Controller
                 'kategori_peserta_didik' => $studentRegistration->education_level,
             ]);
 
-            // Mark registration as verified
-            $studentRegistration->update(['status' => 'verified']);
+            // Mark registration as verified and link the created student
+            $studentRegistration->update([
+                'status'          => 'verified',
+                'student_id'      => $student->id,
+                'payment_status'  => 'belum_bayar',
+                'academic_status' => 'pending',
+            ]);
 
             DB::commit();
 

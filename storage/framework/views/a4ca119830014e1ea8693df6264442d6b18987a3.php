@@ -490,6 +490,75 @@
     </div>
 </div>
 
+
+<div class="modal fade" id="regCredModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:480px">
+        <div class="modal-content" style="border-radius:18px;border:1px solid var(--card-border);background:var(--card-bg);overflow:hidden">
+            <div class="modal-header border-0 pb-0" style="background:linear-gradient(135deg,#1a4731,#166534,#22c55e);padding:20px 24px 16px">
+                <div>
+                    <div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.08em;color:white;margin-bottom:4px">Verifikasi Berhasil</div>
+                    <h5 class="modal-title text-white fw-bold mb-0" style="font-size:1.05rem"><i class="bi bi-check-circle-fill me-2"></i>Akun Siswa Dibuat</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" onclick="location.reload()"></button>
+            </div>
+            <div class="modal-body px-4 py-4">
+                <p class="text-muted mb-3" style="font-size:.84rem">Akun login siswa telah berhasil dibuat. Bagikan kredensial berikut kepada siswa.</p>
+
+                
+                <div class="d-flex flex-column gap-2 mb-3">
+                    <div class="p-3 rounded-3 d-flex align-items-center justify-content-between gap-2"
+                         style="background:var(--input-bg);border:1px solid var(--card-border)">
+                        <div>
+                            <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px">Nama Siswa</div>
+                            <div id="cred-name" class="fw-semibold" style="font-size:.9rem"></div>
+                        </div>
+                        <i class="bi bi-person-fill text-primary" style="font-size:1.3rem;flex-shrink:0"></i>
+                    </div>
+                    <div class="p-3 rounded-3 d-flex align-items-center justify-content-between gap-2"
+                         style="background:var(--input-bg);border:1px solid var(--card-border)">
+                        <div>
+                            <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px">Email Login</div>
+                            <div id="cred-email" class="fw-semibold" style="font-size:.88rem;word-break:break-all"></div>
+                        </div>
+                        <button onclick="copyText('cred-email')" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;padding:3px 10px;font-size:.75rem;flex-shrink:0">
+                            <i class="bi bi-copy"></i>
+                        </button>
+                    </div>
+                    <div class="p-3 rounded-3 d-flex align-items-center justify-content-between gap-2"
+                         style="background:var(--input-bg);border:1px solid var(--card-border)">
+                        <div>
+                            <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px">Password</div>
+                            <div id="cred-password" class="fw-semibold" style="font-size:.9rem;letter-spacing:.05em;font-family:monospace"></div>
+                        </div>
+                        <button onclick="copyText('cred-password')" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;padding:3px 10px;font-size:.75rem;flex-shrink:0">
+                            <i class="bi bi-copy"></i>
+                        </button>
+                    </div>
+                    <div class="p-3 rounded-3 d-flex align-items-center justify-content-between gap-2"
+                         style="background:var(--input-bg);border:1px solid var(--card-border)">
+                        <div>
+                            <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px">NIS</div>
+                            <div id="cred-nis" class="fw-semibold" style="font-size:.88rem;font-family:monospace"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button id="cred-wa-btn" onclick="sendToWA()"
+                            class="btn fw-semibold"
+                            style="background:linear-gradient(135deg,#25d366,#128c7e);color:white;border:none;border-radius:12px;padding:11px">
+                        <i class="bi bi-whatsapp me-2"></i>Kirim ke WhatsApp Siswa
+                    </button>
+                    <button class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="location.reload()"
+                            style="border-radius:12px;padding:11px;font-size:.88rem">
+                        <i class="bi bi-x me-1"></i>Tutup & Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
 .reg-acc-toggle:hover { background: rgba(104,17,126,.04); }
 [data-theme="dark"] .reg-acc-toggle:hover { background: rgba(200,77,223,.06); }
@@ -552,20 +621,62 @@ function openRegDetail(id) {
         });
 }
 
+let _credData = {};
+
 function verifyReg(id, btn) {
-    confirmAction('Tandai pendaftaran ini sebagai <strong>terverifikasi</strong>?', function() {
+    confirmAction('Verifikasi pendaftaran ini dan <strong>buat akun siswa</strong>?', function() {
         btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Memproses...';
         fetch(`${_regVerifyUrl}/${id}/verify`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': _regCsrf }
         })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(d => {
-            if (d.success) { showToast(d.message, 'success'); setTimeout(() => location.reload(), 800); }
-            else { showToast(d.message || 'Gagal memverifikasi.', 'error'); btn.disabled = false; }
+            if (d.success) {
+                _credData = d;
+                document.getElementById('cred-name').textContent     = d.name     || '–';
+                document.getElementById('cred-email').textContent    = d.email    || '–';
+                document.getElementById('cred-password').textContent = d.password || '–';
+                document.getElementById('cred-nis').textContent      = d.nis      || '–';
+                new bootstrap.Modal(document.getElementById('regCredModal')).show();
+            } else {
+                showToast(d.message || 'Gagal memverifikasi.', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check-circle me-1"></i>Verifikasi';
+            }
         })
-        .catch(() => { showToast('Terjadi kesalahan.', 'error'); btn.disabled = false; });
-    }, null, { title: 'Verifikasi Pendaftaran', okText: '<i class="bi bi-check-circle me-1"></i>Verifikasi', btnClass: 'btn-success', type: 'warning' });
+        .catch(() => {
+            showToast('Terjadi kesalahan.', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-check-circle me-1"></i>Verifikasi';
+        });
+    }, null, { title: 'Verifikasi Pendaftaran', okText: '<i class="bi bi-check-circle me-1"></i>Verifikasi & Buat Akun', btnClass: 'btn-success', type: 'warning' });
+}
+
+function copyText(elId) {
+    const text = document.getElementById(elId).textContent.trim();
+    navigator.clipboard.writeText(text).then(() => showToast('Disalin!', 'success'));
+}
+
+function sendToWA() {
+    const phone = (_credData.phone || '').replace(/\D/g, '');
+    if (!phone) { showToast('Nomor HP siswa tidak tersedia.', 'error'); return; }
+    const wa = phone.startsWith('0') ? '62' + phone.slice(1) : phone;
+    const loginUrl = 'https://admin.smartcenterindonesia.com/login';
+    const msg = encodeURIComponent(
+        `Halo ${_credData.name || 'Siswa'},\n\n` +
+        `Selamat datang di Smart Center Indonesia! 🎉\n\n` +
+        `Pendaftaran Anda telah *diverifikasi*. Berikut data akun login Anda:\n\n` +
+        `📧 *Email:* ${_credData.email || '-'}\n` +
+        `🔑 *Password:* ${_credData.password || '-'}\n` +
+        `🪪 *NIS:* ${_credData.nis || '-'}\n` +
+        `📝 *No. Registrasi:* ${_credData.no_reg || '-'}\n\n` +
+        `🔗 *Link Login:*\n${loginUrl}\n\n` +
+        `Segera login dan lengkapi profil Anda. Jangan bagikan password kepada siapapun.\n\n` +
+        `Terima kasih & selamat belajar! 📚`
+    );
+    window.open(`https://wa.me/${wa}?text=${msg}`, '_blank');
 }
 
 function deleteReg(id, btn) {
