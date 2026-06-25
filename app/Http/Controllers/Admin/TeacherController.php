@@ -226,7 +226,7 @@ class TeacherController extends Controller
             }
         });
 
-        return response()->json(['success' => true, 'message' => 'Data guru dan akun login berhasil diupdate!']);
+        return redirect()->route('admin.teachers.index')->with('success', 'Data guru dan akun login berhasil diupdate!');
     }
 
     public function destroy(Teacher $teacher)

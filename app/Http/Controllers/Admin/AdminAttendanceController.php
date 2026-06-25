@@ -81,32 +81,40 @@ class AdminAttendanceController extends Controller
         return view('admin.attendance.index', compact('query', 'teachers', 'pakets', 'stats', 'isOwner', 'branchId'));
     }
 
-    public function show(Schedule $schedule)
+    public function show(Request $request, Schedule $schedule)
     {
         $schedule->load([
             'paket.mataPelajaran',
             'paket.guru',
+            'paket.cabang',
+            'kelas.mataPelajaran',
             'guru',
             'cabang',
             'absensi.siswa',
+            'module',
         ]);
 
-        return response()->json([
-            'success' => true,
-            'data'    => [
-                'schedule' => $schedule,
-                'absensi'  => $schedule->absensi->map(fn($ab) => [
-                    'id'         => $ab->id,
-                    'siswa_id'   => $ab->siswa_id,
-                    'siswa_name' => $ab->siswa?->name ?? '–',
-                    'siswa_nis'  => $ab->siswa?->nis ?? '–',
-                    'guru_hadir' => $ab->guru_hadir,
-                    'status'     => $ab->status,
-                    'catatan'    => $ab->catatan,
-                    'konfirmasi_at' => $ab->siswa_konfirmasi_at,
-                ]),
-            ],
-        ]);
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'data'    => [
+                    'schedule' => $schedule,
+                    'absensi'  => $schedule->absensi->map(fn($ab) => [
+                        'id'            => $ab->id,
+                        'siswa_id'      => $ab->siswa_id,
+                        'siswa_name'    => $ab->siswa?->name ?? '–',
+                        'siswa_nis'     => $ab->siswa?->nis ?? '–',
+                        'guru_hadir'    => $ab->guru_hadir,
+                        'status'        => $ab->status,
+                        'catatan'       => $ab->catatan,
+                        'konfirmasi_at' => $ab->siswa_konfirmasi_at,
+                    ]),
+                ],
+            ]);
+        }
+
+        $absensi = $schedule->absensi;
+        return view('admin.attendance.show', compact('schedule', 'absensi'));
     }
 
     public function update(Request $request, AbsensiSiswa $absensi)

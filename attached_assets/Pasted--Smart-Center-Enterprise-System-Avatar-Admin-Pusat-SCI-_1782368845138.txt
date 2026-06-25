@@ -1,0 +1,127 @@
+
+Smart Center
+Enterprise System
+
+Avatar
+Admin Pusat SCI
+Owner
+Dashboard
+OWNER PANEL
+Monitoring Cabang
+Log Aktivitas
+Pengaturan
+Analytics
+AKADEMIK
+Registrasi
+Siswa Sementara
+Siswa
+Guru
+Mata Pelajaran
+Paket Belajar
+Modul Akademik
+Absensi
+Jadwal Kelas
+Reschedule
+Riwayat Absensi
+Riwayat Sesi
+Sertifikat
+KEUANGAN
+Tagihan Siswa
+9
+Billing Lunas
+Verifikasi Pembayaran
+Gaji Guru
+Laporan Keuangan
+LANDING PAGE
+Kelola Landing Page
+KOMUNIKASI
+Pengumuman
+Pesan Aplikasi
+Video Call
+TRYOUT CBT
+Tryout UTBK/PTN
+SYSTEM
+Profil Saya
+
+Logout
+Tambah Jadwal Sesi
+Smart Center — Sistem Manajemen Bimbel Enterprise
+
+
+Cari
+⌘K
+
+
+Jadwal Sesi
+Tambah Jadwal
+Tambah Jadwal Sesi
+Buat jadwal sesi baru untuk paket belajar
+Paket Belajar
+Pilih paket untuk sesi ini
+Paket Belajar *
+Paket Reguler Surabaya (Cabang Surabaya)
+Sesi Ke- *
+✨ Sesi ke-1 — Belum dijadwalkan
+Progress Sesi Paket
+0 / 8 sudah dijadwalkan
+✅ Sudah: 0 sesi
+✨ Tersisa: 8 sesi
+Kelas (opsional — untuk absensi berbasis kelas)
+Matematika Reguler Surabaya A — Matematika (Cabang Surabaya)
+Pilih kelas agar jadwal ini muncul di halaman absensi guru untuk kelas tersebut.
+Detail Paket Terpilih
+Jenis: reguler
+Total Sesi: 8
+Tipe Kelas: offline
+Harga: Rp 725.000
+Mata Pelajaran: Matematika, Bahasa Inggris
+Cabang: Cabang Surabaya
+Deskripsi: Paket bimbel reguler untuk siswa di cabang Surabaya.
+ Siswa Terdaftar di Paket Ini 3 siswa
+Prasetyo Adi
+#SIS-2024-013
+Rini Agustina
+#SIS-2024-014
+Sandi Kurniawan
+#SIS-2024-015
+Guru Pengajar
+Guru yang mengajar sesi ini (otomatis dari paket)
+Guru Pengajar *
+Ahmad Fauzi, S.Si. (Cabang Pusat Jakarta)
+Pilih guru secara manual, atau akan terisi otomatis dari paket.
+Ahmad Fauzi, S.Si. (Cabang Pusat Jakarta)
+Waktu & Jadwal
+Tanggal dan jam pelaksanaan sesi
+Metode Kelas *
+🏫 Offline (Tatap Muka)
+Tanggal *
+06/25/2026
+Jam Mulai *
+01:27 PM
+Jam Selesai *
+01:30 PM
+Topik / Materi (opsional)
+Contoh: Persamaan Kuadrat, Past Tense, dll
+Modul Belajar Opsional
+Pilih modul materi untuk sesi ini
+Modul (opsional)
+Modul 3 - Trigonometri – Matematika [MAT-001-M3]
+Modul dari halaman Admin > Modul
+Modul Dipilih
+Modul 3 - Trigonometri
+Kode: MAT-001-M3
+Mapel: Matematika
+Jenis: video
+Sudut, sinus, cosinus, tangen dan aplikasinya
+Lokasi & Link Meeting Opsional
+Lokasi fisik atau tautan kelas online
+Ruangan (opsional)
+misal: Ruang A1, Lab Komputer
+Link Meeting (opsional)
+https://zoom.us/...
+Catatan (opsional)
+Catatan tambahan untuk sesi ini
+Field bertanda * wajib diisi
+
+Loading...
+Made with ReplitBuild for free

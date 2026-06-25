@@ -83,6 +83,15 @@
         <div class="col-12" id="sesiProgressBar" style="display:none"></div>
 
         
+        <div class="col-12" id="kelasPickerWrapper" style="display:none">
+            <label class="form-label fw-semibold">Kelas <span class="text-muted fw-normal">(opsional — untuk absensi berbasis kelas)</span></label>
+            <select name="kelas_id" id="kelas_id" class="form-select">
+                <option value="">— Tidak terhubung ke kelas tertentu —</option>
+            </select>
+            <div class="form-text">Pilih kelas agar jadwal ini muncul di halaman absensi guru untuk kelas tersebut.</div>
+        </div>
+
+        
         <div class="col-12" id="paketDetailBox" style="display:none">
             <div class="p-3 rounded-3" style="background:var(--soft-primary-bg);border:1.5px solid var(--soft-primary-border)">
                 <div class="fw-semibold mb-2" style="color:var(--soft-primary-text);font-size:13px"><i class="bi bi-info-circle me-2"></i>Detail Paket Terpilih</div>
@@ -281,8 +290,18 @@ $paketsJson = $pakets->map(function ($p) {
         'guru_name'        => $p->guru?->name,
         'guru_email'       => $p->guru?->email,
         'guru_nig'         => $p->guru?->nig,
-        'tipe_kelas'       => $p->tipe_kelas,
         'mata_pelajaran'   => $p->mataPelajaran->pluck('nama'),
+    ];
+});
+$classesJson = $classes->map(function ($c) {
+    return [
+        'id'         => $c->id,
+        'nama'       => $c->nama_kelas,
+        'mapel'      => $c->mataPelajaran?->nama,
+        'cabang_id'  => $c->cabang_id,
+        'cabang'     => $c->cabang?->name,
+        'guru_id'    => $c->guru_id,
+        'guru_name'  => $c->guru?->name,
     ];
 });
 $modulesJson = $modules->map(function ($m) {
@@ -301,6 +320,7 @@ $modulesJson = $modules->map(function ($m) {
 <script>
 const pakets  = <?php echo json_encode($paketsJson, 15, 512) ?>;
 const modules = <?php echo json_encode($modulesJson, 15, 512) ?>;
+const classes = <?php echo json_encode($classesJson, 15, 512) ?>;
 const packageStudentsBaseUrl  = '/admin/schedules/package';
 let   usedSessionsCache       = {};   // paketId → {pertemuan_ke: {tanggal, status, topik}}
 
@@ -372,6 +392,31 @@ function onPaketChange(paketId) {
 
     // Load students enrolled in this package
     loadStudentsByPackage(paketId);
+
+    // Filter kelas dropdown by cabang/guru from package
+    filterKelasOptions(pkg);
+}
+
+function filterKelasOptions(pkg) {
+    const wrapper  = document.getElementById('kelasPickerWrapper');
+    const select   = document.getElementById('kelas_id');
+    if (!wrapper || !select) return;
+
+    // Filter classes matching the same cabang and/or guru
+    const filtered = classes.filter(c =>
+        c.cabang_id == pkg.cabang_id ||
+        (pkg.guru_id && c.guru_id == pkg.guru_id)
+    );
+
+    wrapper.style.display = 'block';
+    let opts = '<option value="">— Tidak terhubung ke kelas tertentu —</option>';
+    filtered.forEach(c => {
+        opts += `<option value="${c.id}">${c.nama}${c.mapel ? ' — '+c.mapel : ''}${c.cabang ? ' ('+c.cabang+')' : ''}</option>`;
+    });
+    if (filtered.length === 0) {
+        opts = '<option value="">— Tidak ada kelas sesuai paket ini —</option>';
+    }
+    select.innerHTML = opts;
 }
 
 function loadUsedSessions(paketId, pkg) {
