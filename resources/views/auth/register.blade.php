@@ -577,120 +577,38 @@
                     <div class="section-title">Program yang Diminati</div>
                     <p class="text-muted mb-3" style="font-size:13px">Pilih satu atau lebih program yang ingin diikuti</p>
 
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="program-group">
-                                <div class="program-group-label">Kursus Komputer</div>
-                                <div class="check-grid">
-                                    @php $komputerOptions = ['Microsoft Office Perkantoran','Word','Excel','PowerPoint','Desain Grafis','CorelDraw','Photoshop','AutoCAD','Programmer / Coding']; @endphp
-                                    @foreach($komputerOptions as $opt)
-                                    <label class="check-pill" onclick="togglePill(this)">
-                                        <input type="checkbox" name="program_minat[]" value="{{ $opt }}"
-                                               {{ in_array($opt, old('program_minat', [])) ? 'checked' : '' }}>
-                                        {{ $opt }}
-                                    </label>
-                                    @endforeach
+                    @if($subjects->isEmpty())
+                        <p class="text-muted" style="font-size:.9rem">Belum ada program tersedia. Silakan hubungi admin.</p>
+                    @else
+                        @php
+                            $categoryLabels = [
+                                'academic' => 'Akademik',
+                                'skill'    => 'Keterampilan / Skill',
+                                'other'    => 'Lainnya',
+                            ];
+                            $chunks = $subjects->chunk(2)->values();
+                        @endphp
+                        <div class="row g-4">
+                            @foreach($chunks as $pair)
+                                @foreach($pair as $kategori => $items)
+                                <div class="col-md-6">
+                                    <div class="program-group">
+                                        <div class="program-group-label">{{ $categoryLabels[$kategori] ?? ucfirst($kategori) }}</div>
+                                        <div class="check-grid">
+                                            @foreach($items as $course)
+                                            <label class="check-pill {{ in_array($course->nama, old('program_minat', [])) ? 'selected' : '' }}" onclick="togglePill(this)">
+                                                <input type="checkbox" name="program_minat[]" value="{{ $course->nama }}"
+                                                       {{ in_array($course->nama, old('program_minat', [])) ? 'checked' : '' }}>
+                                                {{ $course->nama }}
+                                            </label>
+                                            @endforeach
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                                @endforeach
+                            @endforeach
                         </div>
-                        <div class="col-md-6">
-                            <div class="program-group">
-                                <div class="program-group-label">Kursus Bahasa Asing</div>
-                                <div class="check-grid">
-                                    @php $bahasaOptions = ['Bahasa Inggris','Bahasa Arab','Bahasa Mandarin','Bahasa Jepang','Bahasa Korea']; @endphp
-                                    @foreach($bahasaOptions as $opt)
-                                    <label class="check-pill" onclick="togglePill(this)">
-                                        <input type="checkbox" name="program_minat[]" value="{{ $opt }}"
-                                               {{ in_array($opt, old('program_minat', [])) ? 'checked' : '' }}>
-                                        {{ $opt }}
-                                    </label>
-                                    @endforeach
-                                </div>
-                            </div>
-
-                            <div class="program-group mt-3">
-                                <div class="program-group-label">Mata Pelajaran</div>
-                                <div class="check-grid">
-                                    @php $mapelOptions = ['Matematika','Kimia','Biologi','Bahasa Indonesia','Fisika','Akuntansi / Ekonomi','Geografi','Bahasa Inggris','IPA','IPS']; @endphp
-                                    @foreach($mapelOptions as $opt)
-                                    <label class="check-pill" onclick="togglePill(this)">
-                                        <input type="checkbox" name="program_minat[]" value="{{ $opt }}"
-                                               {{ in_array($opt, old('program_minat', [])) ? 'checked' : '' }}>
-                                        {{ $opt }}
-                                    </label>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="program-group">
-                                <div class="program-group-label">Program Kedinasan</div>
-                                <div class="check-grid">
-                                    @php $kedinasanSkdOptions = ['SKD TIU','SKD TWK','SKD TKP']; @endphp
-                                    @foreach($kedinasanSkdOptions as $opt)
-                                    <label class="check-pill" onclick="togglePill(this)">
-                                        <input type="checkbox" name="program_minat[]" value="{{ $opt }}"
-                                               {{ in_array($opt, old('program_minat', [])) ? 'checked' : '' }}>
-                                        {{ $opt }}
-                                    </label>
-                                    @endforeach
-                                    @php $kedinasanOtherOptions = ['TPA','Psikotes','TBI']; @endphp
-                                    @foreach($kedinasanOtherOptions as $opt)
-                                    <label class="check-pill" onclick="togglePill(this)">
-                                        <input type="checkbox" name="program_minat[]" value="{{ $opt }}"
-                                               {{ in_array($opt, old('program_minat', [])) ? 'checked' : '' }}>
-                                        {{ $opt }}
-                                    </label>
-                                    @endforeach
-                                </div>
-                            </div>
-
-                            <div class="program-group mt-3">
-                                <div class="program-group-label">AKPOL / AKMIL / BINTARA</div>
-                                <div class="check-grid">
-                                    @php $akpolOptions = ['Pengetahuan Umum','Wawasan Kebangsaan','Bahasa Indonesia','Bahasa Inggris','TKD','Tes Akademik']; @endphp
-                                    @foreach($akpolOptions as $opt)
-                                    <label class="check-pill" onclick="togglePill(this)">
-                                        <input type="checkbox" name="program_minat[]" value="{{ $opt }}"
-                                               {{ in_array($opt, old('program_minat', [])) ? 'checked' : '' }}>
-                                        {{ $opt }}
-                                    </label>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="program-group">
-                                <div class="program-group-label">CPNS</div>
-                                <div class="check-grid">
-                                    @php $cpnsSkdOptions = ['SKD TIU','SKD TWK','SKD TKP']; @endphp
-                                    @foreach($cpnsSkdOptions as $opt)
-                                    <label class="check-pill" onclick="togglePill(this)">
-                                        <input type="checkbox" name="program_minat[]" value="{{ $opt }}"
-                                               {{ in_array($opt, old('program_minat', [])) ? 'checked' : '' }}>
-                                        {{ $opt }}
-                                    </label>
-                                    @endforeach
-                                </div>
-                            </div>
-
-                            <div class="program-group mt-3">
-                                <div class="program-group-label">BUMN</div>
-                                <div class="check-grid">
-                                    @php $bumnOptions = ['TKD BUMN','Tes AKHLAK','TWK BUMN']; @endphp
-                                    @foreach($bumnOptions as $opt)
-                                    <label class="check-pill" onclick="togglePill(this)">
-                                        <input type="checkbox" name="program_minat[]" value="{{ $opt }}"
-                                               {{ in_array($opt, old('program_minat', [])) ? 'checked' : '' }}>
-                                        {{ $opt }}
-                                    </label>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    @endif
                 </div>
                 <div class="step-actions">
                     <button type="button" class="btn-step btn-prev" data-action="prev">Sebelumnya</button>

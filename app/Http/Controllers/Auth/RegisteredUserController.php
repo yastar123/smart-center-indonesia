@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Course;
 use App\Models\LandingWaNumber;
 use App\Models\StudentRegistration;
 use Illuminate\Http\Request;
@@ -12,7 +13,13 @@ class RegisteredUserController extends Controller
 {
     public function create(): View
     {
-        return view('auth.register');
+        $subjects = Course::where('status', 'aktif')
+            ->orderBy('kategori')
+            ->orderBy('nama')
+            ->get()
+            ->groupBy(fn($c) => $c->kategori ?: 'other');
+
+        return view('auth.register', compact('subjects'));
     }
 
     public function success(): View
