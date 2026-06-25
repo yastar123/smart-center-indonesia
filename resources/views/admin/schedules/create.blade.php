@@ -36,6 +36,33 @@
     <div class="alert alert-success alert-dismissible fade show mb-4"><i class="bi bi-check-circle me-2"></i>{{ session('success') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
 @endif
 
+{{-- FLOW STEPS INDICATOR --}}
+<div class="dashboard-card mb-4 py-3">
+    <div class="d-flex align-items-center justify-content-center gap-0">
+        @php
+        $steps = [
+            ['num'=>1,'label'=>'Pilih Paket','icon'=>'bi-box-seam'],
+            ['num'=>2,'label'=>'Mata Pelajaran','icon'=>'bi-book'],
+            ['num'=>3,'label'=>'Guru Pengajar','icon'=>'bi-person-badge'],
+            ['num'=>4,'label'=>'Waktu & Detail','icon'=>'bi-clock'],
+        ];
+        @endphp
+        @foreach($steps as $i => $step)
+        <div class="d-flex align-items-center">
+            <div id="step-indicator-{{ $step['num'] }}" class="d-flex flex-column align-items-center" style="min-width:80px">
+                <div style="width:36px;height:36px;border-radius:50%;background:var(--input-bg);border:2px solid var(--card-border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text-muted);transition:.3s" id="step-circle-{{ $step['num'] }}">
+                    {{ $step['num'] }}
+                </div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:4px;text-align:center;font-weight:500" id="step-label-{{ $step['num'] }}">{{ $step['label'] }}</div>
+            </div>
+            @if(!$loop->last)
+            <div style="width:40px;height:2px;background:var(--card-border);margin-bottom:20px;flex-shrink:0" id="step-line-{{ $step['num'] }}"></div>
+            @endif
+        </div>
+        @endforeach
+    </div>
+</div>
+
 <form action="{{ route('admin.schedules.store') }}" method="POST" id="scheduleForm">
 @csrf
 @if($errors->any())
@@ -45,14 +72,14 @@
 @endif
 
 {{-- SECTION 1: PAKET --}}
-<div class="dashboard-card mb-4">
+<div class="dashboard-card mb-4" id="section-paket">
     <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
         <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#c84ddf,#461256);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
             <i class="bi bi-box-seam"></i>
         </div>
         <div>
-            <div class="fw-bold" style="font-size:15px">Paket Belajar</div>
-            <div class="text-muted" style="font-size:12px">Pilih paket untuk sesi ini</div>
+            <div class="fw-bold" style="font-size:15px">1. Pilih Paket Belajar <span class="text-danger">*</span></div>
+            <div class="text-muted" style="font-size:12px">Paket yang menentukan mata pelajaran, sesi, dan siswa terdaftar</div>
         </div>
     </div>
 
@@ -64,7 +91,7 @@
                 <option value="">— Pilih Paket —</option>
                 @foreach($pakets as $p)
                 <option value="{{ $p->id }}" {{ old('paket_id') == $p->id ? 'selected' : '' }}>
-                    {{ $p->nama . ($p->guru ? ' – '.$p->guru->name : '') . ($p->cabang ? ' ('.$p->cabang->name.')' : '') }}
+                    {{ $p->nama }}{{ $p->cabang ? ' ('.$p->cabang->name.')' : '' }}
                 </option>
                 @endforeach
             </select>
@@ -81,15 +108,6 @@
 
         {{-- PROGRESS SESI --}}
         <div class="col-12" id="sesiProgressBar" style="display:none"></div>
-
-        {{-- KELAS --}}
-        <div class="col-12" id="kelasPickerWrapper" style="display:none">
-            <label class="form-label fw-semibold">Kelas <span class="text-muted fw-normal">(opsional — untuk absensi berbasis kelas)</span></label>
-            <select name="kelas_id" id="kelas_id" class="form-select">
-                <option value="">— Tidak terhubung ke kelas tertentu —</option>
-            </select>
-            <div class="form-text">Pilih kelas agar jadwal ini muncul di halaman absensi guru untuk kelas tersebut.</div>
-        </div>
 
         {{-- DETAIL PAKET BOX --}}
         <div class="col-12" id="paketDetailBox" style="display:none">
@@ -117,15 +135,43 @@
     </div>
 </div>
 
-{{-- SECTION 2: GURU PENGAJAR --}}
-<div class="dashboard-card mb-4">
+{{-- SECTION 2: MATA PELAJARAN --}}
+<div class="dashboard-card mb-4" id="section-mapel" style="display:none">
+    <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
+        <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
+            <i class="bi bi-book"></i>
+        </div>
+        <div>
+            <div class="fw-bold" style="font-size:15px">2. Mata Pelajaran Sesi Ini <span class="text-danger">*</span></div>
+            <div class="text-muted" style="font-size:12px">Pilih satu mata pelajaran dari paket yang diajarkan pada sesi ini</div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <label class="form-label fw-semibold">Mata Pelajaran <span class="text-danger">*</span></label>
+            <select name="mata_pelajaran_id" id="mata_pelajaran_id" class="form-select" required onchange="onMapelChange(this.value)">
+                <option value="">— Pilih mata pelajaran dari paket —</option>
+            </select>
+            <div class="form-text">Mata pelajaran yang akan diajarkan di sesi ini. Daftar diambil dari paket yang dipilih.</div>
+        </div>
+        <div class="col-lg-4">
+            <div class="p-3 rounded-3 h-100" style="background:var(--input-bg);border:1px solid var(--card-border);min-height:60px" id="mapelInfoBox">
+                <div class="text-muted" style="font-size:12px">Pilih mata pelajaran untuk melihat info</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- SECTION 3: GURU PENGAJAR --}}
+<div class="dashboard-card mb-4" id="section-guru" style="display:none">
     <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
         <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#10b981,#047857);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
             <i class="bi bi-person-badge"></i>
         </div>
         <div>
-            <div class="fw-bold" style="font-size:15px">Guru Pengajar</div>
-            <div class="text-muted" style="font-size:12px">Guru yang mengajar sesi ini (otomatis dari paket)</div>
+            <div class="fw-bold" style="font-size:15px">3. Guru Pengajar <span class="text-danger">*</span></div>
+            <div class="text-muted" style="font-size:12px">Guru yang mengajarkan mata pelajaran ini pada sesi ini</div>
         </div>
     </div>
     <div class="row g-3">
@@ -133,13 +179,8 @@
             <label class="form-label fw-semibold">Guru Pengajar <span class="text-danger">*</span></label>
             <select name="guru_id" id="guru_id" class="form-select" required onchange="onGuruChange(this.value)">
                 <option value="">— Pilih Guru —</option>
-                @foreach($teachers as $t)
-                <option value="{{ $t->id }}" {{ old('guru_id') == $t->id ? 'selected' : '' }}>
-                    {{ $t->name }}{{ $t->branch ? ' ('.$t->branch->name.')' : '' }}
-                </option>
-                @endforeach
             </select>
-            <div class="form-text">Pilih guru secara manual, atau akan terisi otomatis dari paket.</div>
+            <div class="form-text" id="guruFilterNote">Menampilkan semua guru aktif. Pilih mata pelajaran terlebih dahulu untuk menyaring guru sesuai keahlian.</div>
         </div>
         <div class="col-lg-6">
             <div class="p-3 rounded-3 h-100" style="background:var(--input-bg);border:1px solid var(--card-border)" id="guruInfoBox">
@@ -149,15 +190,15 @@
     </div>
 </div>
 
-{{-- SECTION 3: WAKTU & JADWAL --}}
-<div class="dashboard-card mb-4">
+{{-- SECTION 4: WAKTU & JADWAL --}}
+<div class="dashboard-card mb-4" id="section-waktu" style="display:none">
     <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
         <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#0ea5e9,#0369a1);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
             <i class="bi bi-clock"></i>
         </div>
         <div>
-            <div class="fw-bold" style="font-size:15px">Waktu & Jadwal</div>
-            <div class="text-muted" style="font-size:12px">Tanggal dan jam pelaksanaan sesi</div>
+            <div class="fw-bold" style="font-size:15px">4. Waktu & Detail Sesi</div>
+            <div class="text-muted" style="font-size:12px">Tanggal, jam, metode, dan info tambahan</div>
         </div>
     </div>
     <div class="row g-3">
@@ -171,7 +212,7 @@
         </div>
         <div class="col-md-3">
             <label class="form-label fw-semibold">Tanggal <span class="text-danger">*</span></label>
-            <input type="date" name="tanggal" id="tanggal" class="form-control" value="{{ old('tanggal') }}" required>
+            <input type="date" name="tanggal" id="tanggal" class="form-control" value="{{ old('tanggal', date('Y-m-d')) }}" required>
         </div>
         <div class="col-md-3">
             <label class="form-label fw-semibold">Jam Mulai <span class="text-danger">*</span></label>
@@ -186,76 +227,75 @@
             <input type="text" name="topik" class="form-control" value="{{ old('topik') }}" placeholder="Contoh: Persamaan Kuadrat, Past Tense, dll">
         </div>
     </div>
-</div>
 
-{{-- SECTION 4: MODUL --}}
-<div class="dashboard-card mb-4">
-    <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
-        <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#f6af23,#d97706);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
-            <i class="bi bi-journals"></i>
-        </div>
-        <div>
-            <div class="fw-bold" style="font-size:15px">Modul Belajar <span class="badge text-muted fw-normal ms-1" style="font-size:11px;background:var(--input-bg)">Opsional</span></div>
-            <div class="text-muted" style="font-size:12px">Pilih modul materi untuk sesi ini</div>
-        </div>
-    </div>
-    <div class="row g-3">
-        <div class="col-lg-8">
-            <label class="form-label fw-semibold">Modul <span class="text-muted fw-normal">(opsional)</span></label>
-            <select name="module_id" id="module_id" class="form-select" onchange="onModuleChange(this.value)">
-                <option value="">— Tidak ada modul (opsional) —</option>
-                @foreach($modules as $m)
-                <option value="{{ $m->id }}" {{ old('module_id') == $m->id ? 'selected' : '' }}>
-                    {{ $m->judul }}@if($m->mataPelajaran) – {{ $m->mataPelajaran->nama }}@endif
-                    @if($m->kode_modul) [{{ $m->kode_modul }}]@endif
-                </option>
-                @endforeach
-            </select>
-            <div class="form-text">Modul dari halaman <a href="{{ route('admin.module.index') }}" target="_blank">Admin &gt; Modul</a></div>
-        </div>
-        <div class="col-lg-4">
-            <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border);min-height:60px" id="moduleInfoBox">
-                <div class="text-muted" style="font-size:12px">Tidak ada modul dipilih</div>
+    {{-- Kelas (optional, for attendance) --}}
+    <div class="mt-3 pt-3 border-top">
+        <div class="fw-semibold mb-1" style="font-size:13px"><i class="bi bi-building me-1 text-muted"></i>Kelas <span class="text-muted fw-normal">(opsional — untuk absensi berbasis kelas)</span></div>
+        <div class="row g-3">
+            <div class="col-lg-8">
+                <select name="kelas_id" id="kelas_id" class="form-select">
+                    <option value="">— Tidak terhubung ke kelas tertentu —</option>
+                    @foreach($classes as $c)
+                    <option value="{{ $c->id }}" {{ old('kelas_id') == $c->id ? 'selected' : '' }}>
+                        {{ $c->nama_kelas }}{{ $c->mataPelajaran ? ' — '.$c->mataPelajaran->nama : '' }}{{ $c->cabang ? ' ('.$c->cabang->name.')' : '' }}
+                    </option>
+                    @endforeach
+                </select>
+                <div class="form-text">Pilih kelas agar jadwal ini muncul di halaman absensi guru untuk kelas tersebut.</div>
             </div>
         </div>
     </div>
-</div>
 
-{{-- SECTION 5: LOKASI & LINK --}}
-<div class="dashboard-card mb-4">
-    <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
-        <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
-            <i class="bi bi-geo-alt"></i>
-        </div>
-        <div>
-            <div class="fw-bold" style="font-size:15px">Lokasi & Link Meeting <span class="badge text-muted fw-normal ms-1" style="font-size:11px;background:var(--input-bg)">Opsional</span></div>
-            <div class="text-muted" style="font-size:12px">Lokasi fisik atau tautan kelas online</div>
+    {{-- Modul --}}
+    <div class="mt-3 pt-3 border-top">
+        <div class="fw-semibold mb-1" style="font-size:13px"><i class="bi bi-journals me-1 text-muted"></i>Modul Belajar <span class="text-muted fw-normal">(opsional)</span></div>
+        <div class="row g-3">
+            <div class="col-lg-8">
+                <select name="module_id" id="module_id" class="form-select" onchange="onModuleChange(this.value)">
+                    <option value="">— Tidak ada modul —</option>
+                    @foreach($modules as $m)
+                    <option value="{{ $m->id }}" {{ old('module_id') == $m->id ? 'selected' : '' }}>
+                        {{ $m->judul }}@if($m->mataPelajaran) – {{ $m->mataPelajaran->nama }}@endif
+                        @if($m->kode_modul) [{{ $m->kode_modul }}]@endif
+                    </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-lg-4">
+                <div class="p-2 rounded-2" style="background:var(--input-bg);border:1px solid var(--card-border);min-height:40px;font-size:12px" id="moduleInfoBox">
+                    <span class="text-muted">Tidak ada modul dipilih</span>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label class="form-label fw-semibold">Ruangan <span class="text-muted fw-normal">(opsional)</span></label>
-            <div class="input-group">
-                <span class="input-group-text" style="background:var(--input-bg);border-color:var(--card-border)"><i class="bi bi-door-open text-muted"></i></span>
-                <input type="text" name="ruangan" class="form-control" value="{{ old('ruangan') }}" placeholder="misal: Ruang A1, Lab Komputer">
+
+    {{-- Lokasi / Link --}}
+    <div class="mt-3 pt-3 border-top">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Ruangan <span class="text-muted fw-normal">(opsional)</span></label>
+                <div class="input-group">
+                    <span class="input-group-text" style="background:var(--input-bg);border-color:var(--card-border)"><i class="bi bi-door-open text-muted"></i></span>
+                    <input type="text" name="ruangan" class="form-control" value="{{ old('ruangan') }}" placeholder="misal: Ruang A1">
+                </div>
             </div>
-        </div>
-        <div class="col-md-6">
-            <label class="form-label fw-semibold">Link Meeting <span class="text-muted fw-normal">(opsional)</span></label>
-            <div class="input-group">
-                <span class="input-group-text" style="background:var(--input-bg);border-color:var(--card-border)"><i class="bi bi-camera-video text-muted"></i></span>
-                <input type="url" name="link_meeting" class="form-control" value="{{ old('link_meeting') }}" placeholder="https://zoom.us/...">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Link Meeting <span class="text-muted fw-normal">(opsional)</span></label>
+                <div class="input-group">
+                    <span class="input-group-text" style="background:var(--input-bg);border-color:var(--card-border)"><i class="bi bi-camera-video text-muted"></i></span>
+                    <input type="url" name="link_meeting" class="form-control" value="{{ old('link_meeting') }}" placeholder="https://zoom.us/...">
+                </div>
             </div>
-        </div>
-        <div class="col-12">
-            <label class="form-label fw-semibold">Catatan <span class="text-muted fw-normal">(opsional)</span></label>
-            <textarea name="catatan" class="form-control" rows="2" placeholder="Catatan tambahan untuk sesi ini">{{ old('catatan') }}</textarea>
+            <div class="col-12">
+                <label class="form-label fw-semibold">Catatan <span class="text-muted fw-normal">(opsional)</span></label>
+                <textarea name="catatan" class="form-control" rows="2" placeholder="Catatan tambahan">{{ old('catatan') }}</textarea>
+            </div>
         </div>
     </div>
 </div>
 
 {{-- SUBMIT --}}
-<div class="dashboard-card">
+<div class="dashboard-card" id="section-submit" style="display:none">
     <div class="d-flex justify-content-between align-items-center">
         <div class="text-muted" style="font-size:13px"><i class="bi bi-info-circle me-1"></i>Field bertanda <span class="text-danger">*</span> wajib diisi</div>
         <div class="d-flex gap-2">
@@ -278,38 +318,36 @@ $paketsJson = $pakets->map(function ($p) {
         'nama'             => $p->nama,
         'jenis'            => $p->jenis,
         'jumlah_pertemuan' => $p->jumlah_pertemuan,
-        'metode_absensi'   => $p->metode_absensi,
         'tipe_kelas'       => $p->tipe_kelas,
         'harga'            => $p->harga,
         'deskripsi'        => $p->deskripsi,
-        'status'           => $p->status,
         'cabang'           => $p->cabang?->name,
         'cabang_id'        => $p->cabang_id,
         'guru_id'          => $p->guru_id,
         'guru_name'        => $p->guru?->name,
-        'guru_email'       => $p->guru?->email,
-        'guru_nig'         => $p->guru?->nig,
-        'mata_pelajaran'   => $p->mataPelajaran->pluck('nama'),
+        // subjects with ID for the dropdown
+        'mata_pelajaran'   => $p->mataPelajaran->map(fn($m) => ['id' => $m->id, 'nama' => $m->nama, 'kategori' => $m->kategori ?? '']),
     ];
 });
-$classesJson = $classes->map(function ($c) {
+
+$teachersJson = $teachers->map(function ($t) {
     return [
-        'id'         => $c->id,
-        'nama'       => $c->nama_kelas,
-        'mapel'      => $c->mataPelajaran?->nama,
-        'cabang_id'  => $c->cabang_id,
-        'cabang'     => $c->cabang?->name,
-        'guru_id'    => $c->guru_id,
-        'guru_name'  => $c->guru?->name,
+        'id'         => $t->id,
+        'name'       => $t->name,
+        'branch'     => $t->branch?->name,
+        'branch_id'  => $t->branch_id,
+        'nig'        => $t->nig,
+        'email'      => $t->email,
+        // course IDs this teacher is linked to
+        'course_ids' => $t->courses->pluck('id')->values()->toArray(),
     ];
 });
+
 $modulesJson = $modules->map(function ($m) {
     return [
-        'id'           => $m->id,
-        'judul'        => $m->judul,
-        'jenis'        => $m->jenis,
-        'kode_modul'   => $m->kode_modul,
-        'deskripsi'    => $m->deskripsi,
+        'id'             => $m->id,
+        'judul'          => $m->judul,
+        'kode_modul'     => $m->kode_modul,
         'mata_pelajaran' => $m->mataPelajaran?->nama,
     ];
 });
@@ -317,107 +355,233 @@ $modulesJson = $modules->map(function ($m) {
 
 @push('scripts')
 <script>
-const pakets  = @json($paketsJson);
-const modules = @json($modulesJson);
-const classes = @json($classesJson);
-const packageStudentsBaseUrl  = '/admin/schedules/package';
-let   usedSessionsCache       = {};   // paketId → {pertemuan_ke: {tanggal, status, topik}}
+const pakets   = @json($paketsJson);
+const teachers = @json($teachersJson);
+const modules  = @json($modulesJson);
+const packageStudentsBaseUrl = '/admin/schedules/package';
+let usedSessionsCache = {};
+let currentPaket = null;
+let currentMapelId = null;
 
+// ── Step indicator helpers ──────────────────────────────────────────────────
+function activateStep(n) {
+    for (let i = 1; i <= 4; i++) {
+        const circle = document.getElementById('step-circle-' + i);
+        const label  = document.getElementById('step-label-' + i);
+        const line   = document.getElementById('step-line-' + i);
+        if (!circle) continue;
+        if (i < n) {
+            circle.style.background = 'linear-gradient(135deg,#10b981,#047857)';
+            circle.style.color      = 'white';
+            circle.style.border     = '2px solid #10b981';
+            circle.innerHTML        = '<i class="bi bi-check-lg"></i>';
+            label.style.color       = '#10b981';
+        } else if (i === n) {
+            circle.style.background = 'linear-gradient(135deg,#c84ddf,#461256)';
+            circle.style.color      = 'white';
+            circle.style.border     = '2px solid #c84ddf';
+            circle.innerHTML        = i;
+            label.style.color       = '#c84ddf';
+        } else {
+            circle.style.background = 'var(--input-bg)';
+            circle.style.color      = 'var(--text-muted)';
+            circle.style.border     = '2px solid var(--card-border)';
+            circle.innerHTML        = i;
+            label.style.color       = 'var(--text-muted)';
+        }
+        if (line) {
+            line.style.background = i < n ? '#10b981' : 'var(--card-border)';
+        }
+    }
+}
+
+function showSections(...ids) {
+    ['section-mapel','section-guru','section-waktu','section-submit'].forEach(id => {
+        document.getElementById(id).style.display = ids.includes(id) ? '' : 'none';
+    });
+}
+
+// ── Paket change ────────────────────────────────────────────────────────────
 function onPaketChange(paketId) {
+    currentPaket    = null;
+    currentMapelId  = null;
+
+    // Reset downstream sections
+    showSections();
+    activateStep(1);
+
+    document.getElementById('mata_pelajaran_id').value = '';
+    document.getElementById('mapelInfoBox').innerHTML = '<div class="text-muted" style="font-size:12px">Pilih mata pelajaran untuk melihat info</div>';
+    document.getElementById('guru_id').innerHTML = '<option value="">— Pilih Guru —</option>';
+    document.getElementById('guruInfoBox').innerHTML = '<div class="text-muted" style="font-size:12px">Pilih guru untuk melihat informasinya</div>';
+
     const detailBox     = document.getElementById('paketDetailBox');
     const detailContent = document.getElementById('paketDetailContent');
     const sesiSelect    = document.getElementById('pertemuan_ke');
-    const guruSelect    = document.getElementById('guru_id');
-    const guruInfoBox   = document.getElementById('guruInfoBox');
     const siswaBox      = document.getElementById('daftarSiswaPaketBox');
+    const mapelSection  = document.getElementById('section-mapel');
 
     if (!paketId) {
         detailBox.style.display = 'none';
         siswaBox.style.display  = 'none';
+        mapelSection.style.display = 'none';
         sesiSelect.innerHTML = '<option value="">— Pilih paket dulu —</option>';
-        guruSelect.value = '';
-        guruInfoBox.innerHTML = '<div class="text-muted" style="font-size:12px">Pilih paket untuk melihat info guru pengajar</div>';
         hideSesiWarning();
         return;
     }
 
     const pkg = pakets.find(p => p.id == paketId);
     if (!pkg) return;
+    currentPaket = pkg;
 
     // Package detail box
     detailBox.style.display = 'block';
+    const mapelNames = pkg.mata_pelajaran.map(m => m.nama).join(', ') || '—';
     detailContent.innerHTML = `
         <div class="col-md-3 col-6"><strong>Jenis:</strong> ${pkg.jenis || '—'}</div>
         <div class="col-md-3 col-6"><strong>Total Sesi:</strong> ${pkg.jumlah_pertemuan || '—'}</div>
         <div class="col-md-3 col-6"><strong>Tipe Kelas:</strong> ${pkg.tipe_kelas || '—'}</div>
         <div class="col-md-3 col-6"><strong>Harga:</strong> Rp ${pkg.harga ? parseInt(pkg.harga).toLocaleString('id-ID') : '—'}</div>
-        <div class="col-md-6 col-12"><strong>Mata Pelajaran:</strong> ${pkg.mata_pelajaran?.join(', ') || '—'}</div>
+        <div class="col-md-6 col-12"><strong>Mata Pelajaran:</strong> ${mapelNames}</div>
         <div class="col-md-6 col-12"><strong>Cabang:</strong> ${pkg.cabang || 'Pusat'}</div>
         ${pkg.deskripsi ? `<div class="col-12"><strong>Deskripsi:</strong> ${pkg.deskripsi}</div>` : ''}
     `;
 
-    // Show loading state for sessions
+    // Auto-set jenis from package
+    const jenisSelect = document.getElementById('jenis');
+    if (jenisSelect && !jenisSelect.dataset.manuallyChanged) {
+        const validJenis = ['online', 'offline', 'private'];
+        jenisSelect.value = validJenis.includes(pkg.tipe_kelas) ? pkg.tipe_kelas : 'offline';
+    }
+
+    // Populate mata pelajaran dropdown
+    const mapelSelect = document.getElementById('mata_pelajaran_id');
+    if (pkg.mata_pelajaran.length === 0) {
+        mapelSelect.innerHTML = '<option value="">— Paket ini belum memiliki mata pelajaran —</option>';
+    } else {
+        let opts = '<option value="">— Pilih mata pelajaran —</option>';
+        pkg.mata_pelajaran.forEach(m => {
+            opts += `<option value="${m.id}">${m.nama}${m.kategori ? ' ('+m.kategori+')' : ''}</option>`;
+        });
+        mapelSelect.innerHTML = opts;
+        // Auto-select if only one subject
+        if (pkg.mata_pelajaran.length === 1) {
+            mapelSelect.value = pkg.mata_pelajaran[0].id;
+            onMapelChange(pkg.mata_pelajaran[0].id);
+        }
+    }
+    mapelSection.style.display = '';
+
+    // Show sessions dropdown
     sesiSelect.innerHTML = '<option value="">⏳ Memuat sesi...</option>';
     sesiSelect.disabled = true;
     hideSesiWarning();
 
-    // Auto-set jenis (delivery method) from package tipe_kelas
-    const jenisSelect = document.getElementById('jenis');
-    if (jenisSelect && !jenisSelect.dataset.manuallyChanged) {
-        const validJenis = ['online', 'offline', 'private'];
-        const autoJenis  = validJenis.includes(pkg.tipe_kelas) ? pkg.tipe_kelas : 'offline';
-        jenisSelect.value = autoJenis;
-    }
-
-    // Guru info from package
-    if (pkg.guru_id) {
-        guruSelect.value = pkg.guru_id;
-        guruInfoBox.innerHTML = `
-            <div class="text-muted mb-1" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px">Guru dari Paket</div>
-            <div class="fw-semibold">${pkg.guru_name || '—'}</div>
-            ${pkg.guru_nig ? `<div class="text-muted" style="font-size:12px">NIG: ${pkg.guru_nig}</div>` : ''}
-            ${pkg.guru_email ? `<div class="text-muted" style="font-size:12px">${pkg.guru_email}</div>` : ''}
-        `;
-    } else {
-        guruSelect.value = '';
-        guruInfoBox.innerHTML = '<div class="text-muted" style="font-size:12px">Paket ini belum memiliki guru pengajar</div>';
-    }
-
-    // Load used sessions then build dropdown
     loadUsedSessions(paketId, pkg).then(() => {
         buildSesiOptions(paketId, pkg);
         sesiSelect.disabled = false;
     });
 
-    // Load students enrolled in this package
+    // Load students
     loadStudentsByPackage(paketId);
-
-    // Filter kelas dropdown by cabang/guru from package
-    filterKelasOptions(pkg);
+    activateStep(2);
 }
 
-function filterKelasOptions(pkg) {
-    const wrapper  = document.getElementById('kelasPickerWrapper');
-    const select   = document.getElementById('kelas_id');
-    if (!wrapper || !select) return;
+// ── Mata Pelajaran change ───────────────────────────────────────────────────
+function onMapelChange(mapelId) {
+    currentMapelId = mapelId ? parseInt(mapelId) : null;
+    const infoBox     = document.getElementById('mapelInfoBox');
+    const guruSection = document.getElementById('section-guru');
+    const guruSelect  = document.getElementById('guru_id');
+    const noteEl      = document.getElementById('guruFilterNote');
 
-    // Filter classes matching the same cabang and/or guru
-    const filtered = classes.filter(c =>
-        c.cabang_id == pkg.cabang_id ||
-        (pkg.guru_id && c.guru_id == pkg.guru_id)
-    );
-
-    wrapper.style.display = 'block';
-    let opts = '<option value="">— Tidak terhubung ke kelas tertentu —</option>';
-    filtered.forEach(c => {
-        opts += `<option value="${c.id}">${c.nama}${c.mapel ? ' — '+c.mapel : ''}${c.cabang ? ' ('+c.cabang+')' : ''}</option>`;
-    });
-    if (filtered.length === 0) {
-        opts = '<option value="">— Tidak ada kelas sesuai paket ini —</option>';
+    if (!mapelId) {
+        infoBox.innerHTML = '<div class="text-muted" style="font-size:12px">Pilih mata pelajaran untuk melihat info</div>';
+        guruSection.style.display = 'none';
+        showSections('section-mapel');
+        activateStep(2);
+        return;
     }
-    select.innerHTML = opts;
+
+    // Show mapel info
+    const pkg = currentPaket;
+    const m   = pkg ? pkg.mata_pelajaran.find(x => x.id == mapelId) : null;
+    infoBox.innerHTML = m
+        ? `<div class="text-muted mb-1" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px">Mata Pelajaran Dipilih</div>
+           <div class="fw-semibold">${m.nama}</div>
+           ${m.kategori ? `<div class="text-muted" style="font-size:12px">Kategori: ${m.kategori}</div>` : ''}`
+        : `<div class="fw-semibold">ID: ${mapelId}</div>`;
+
+    // Filter guru: prefer teachers with this course in their courses list
+    const matched   = teachers.filter(t => t.course_ids.includes(parseInt(mapelId)));
+    const unmatched = teachers.filter(t => !t.course_ids.includes(parseInt(mapelId)));
+
+    let opts = '<option value="">— Pilih Guru —</option>';
+    if (matched.length > 0) {
+        opts += `<optgroup label="✅ Guru mapel ini (${matched.length})">`;
+        matched.forEach(t => {
+            opts += `<option value="${t.id}">${t.name}${t.branch ? ' ('+t.branch+')' : ''}</option>`;
+        });
+        opts += '</optgroup>';
+    }
+    if (unmatched.length > 0) {
+        opts += `<optgroup label="— Guru lainnya (${unmatched.length})">`;
+        unmatched.forEach(t => {
+            opts += `<option value="${t.id}">${t.name}${t.branch ? ' ('+t.branch+')' : ''}</option>`;
+        });
+        opts += '</optgroup>';
+    }
+    guruSelect.innerHTML = opts;
+
+    // Auto-select if package has a default guru and they match this subject
+    if (pkg && pkg.guru_id) {
+        const inMatched = matched.find(t => t.id == pkg.guru_id);
+        if (inMatched) {
+            guruSelect.value = pkg.guru_id;
+            onGuruChange(pkg.guru_id);
+        }
+    }
+
+    noteEl.textContent = matched.length > 0
+        ? `${matched.length} guru terdaftar mengajar mata pelajaran ini ditampilkan di atas.`
+        : 'Belum ada guru yang terdaftar khusus untuk mata pelajaran ini. Pilih guru dari daftar.';
+
+    guruSection.style.display = '';
+    showSections('section-mapel', 'section-guru');
+    activateStep(3);
 }
 
+// ── Guru change ─────────────────────────────────────────────────────────────
+function onGuruChange(guruId) {
+    const guruInfoBox   = document.getElementById('guruInfoBox');
+    const waktuSection  = document.getElementById('section-waktu');
+    const submitSection = document.getElementById('section-submit');
+
+    if (!guruId) {
+        guruInfoBox.innerHTML = '<div class="text-muted" style="font-size:12px">Pilih guru untuk melihat informasinya</div>';
+        waktuSection.style.display  = 'none';
+        submitSection.style.display = 'none';
+        showSections('section-mapel', 'section-guru');
+        activateStep(3);
+        return;
+    }
+
+    const t = teachers.find(x => x.id == guruId);
+    if (t) {
+        guruInfoBox.innerHTML = `
+            <div class="text-muted mb-1" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px">Guru Terpilih</div>
+            <div class="fw-semibold">${t.name}</div>
+            ${t.nig  ? `<div class="text-muted" style="font-size:12px">NIG: ${t.nig}</div>`   : ''}
+            ${t.email ? `<div class="text-muted" style="font-size:12px">${t.email}</div>`     : ''}
+            ${t.branch ? `<div class="text-muted" style="font-size:12px">Cabang: ${t.branch}</div>` : ''}
+        `;
+    }
+
+    showSections('section-mapel', 'section-guru', 'section-waktu', 'section-submit');
+    activateStep(4);
+}
+
+// ── Session dropdown ─────────────────────────────────────────────────────────
 function loadUsedSessions(paketId, pkg) {
     if (usedSessionsCache[paketId]) return Promise.resolve();
     return fetch(`${packageStudentsBaseUrl}/${paketId}/used-sessions`, {
@@ -438,7 +602,7 @@ function buildSesiOptions(paketId, pkg) {
     let sesiOptions = `<option value="">— Pilih Sesi (${sisaCount} tersisa dari ${totalSesi}) —</option>`;
     for (let i = 1; i <= totalSesi; i++) {
         if (used[i]) {
-            const info = used[i];
+            const info       = used[i];
             const statusIcon = info.status === 'selesai' ? '✅' : (info.status === 'berlangsung' ? '🟡' : '🔵');
             const topikText  = info.topik ? ` — ${info.topik}` : '';
             const tglText    = info.tanggal ? ` (${info.tanggal})` : '';
@@ -450,8 +614,6 @@ function buildSesiOptions(paketId, pkg) {
         }
     }
     sesiSelect.innerHTML = sesiOptions;
-
-    // Update sesi info bar
     updateSesiInfoBar(paketId, pkg);
 }
 
@@ -498,17 +660,10 @@ function onSesiChange(val) {
 }
 
 function showSesiWarning(msg) {
-    let el = document.getElementById('sesiWarning');
-    if (!el) {
-        el = document.createElement('div');
-        el.id = 'sesiWarning';
-        document.getElementById('pertemuan_ke').parentNode.appendChild(el);
-    }
+    const el = document.getElementById('sesiWarning');
     el.innerHTML = `<div class="mt-2 p-2 rounded-2" style="background:#fff3cd;border:1px solid #ffc107;font-size:12px;color:#856404">
-        <i class="bi bi-exclamation-triangle-fill me-1"></i>${msg}
-    </div>`;
+        <i class="bi bi-exclamation-triangle-fill me-1"></i>${msg}</div>`;
 }
-
 function hideSesiWarning() {
     const el = document.getElementById('sesiWarning');
     if (el) el.innerHTML = '';
@@ -516,12 +671,12 @@ function hideSesiWarning() {
     if (btn) btn.disabled = false;
 }
 
+// ── Students box ────────────────────────────────────────────────────────────
 function loadStudentsByPackage(paketId) {
     if (!paketId) return;
     const box     = document.getElementById('daftarSiswaPaketBox');
     const content = document.getElementById('daftarSiswaPaketContent');
     const counter = document.getElementById('siswaPaketCount');
-
     box.style.display = 'block';
     content.innerHTML = '<span class="text-muted" style="font-size:12px"><i class="bi bi-hourglass-split me-1"></i>Memuat daftar siswa...</span>';
     counter.textContent = '';
@@ -533,14 +688,11 @@ function loadStudentsByPackage(paketId) {
     .then(data => {
         const students = data.students || [];
         const count    = data.count || 0;
-
         counter.textContent = count + ' siswa';
-
         if (!students.length) {
             content.innerHTML = '<span class="text-muted" style="font-size:12px"><i class="bi bi-info-circle me-1"></i>Belum ada siswa yang terdaftar di paket ini.</span>';
             return;
         }
-
         content.innerHTML = students.map(s =>
             `<span style="background:var(--soft-primary);color:#461256;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500;display:inline-flex;align-items:center;gap:4px">
                 <i class="bi bi-person-fill"></i>${s.name}${s.nis ? `<span style="opacity:.65;font-size:10px">#${s.nis}</span>` : ''}
@@ -552,40 +704,38 @@ function loadStudentsByPackage(paketId) {
     });
 }
 
+// ── Module info ──────────────────────────────────────────────────────────────
 function onModuleChange(moduleId) {
     const box = document.getElementById('moduleInfoBox');
-    if (!moduleId) {
-        box.innerHTML = '<div class="text-muted" style="font-size:12px">Tidak ada modul dipilih</div>';
-        return;
-    }
+    if (!moduleId) { box.innerHTML = '<span class="text-muted">Tidak ada modul dipilih</span>'; return; }
     const m = modules.find(x => x.id == moduleId);
     if (!m) return;
-    box.innerHTML = `
-        <div class="text-muted mb-1" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px">Modul Dipilih</div>
-        <div class="fw-semibold" style="font-size:13px">${m.judul}</div>
-        ${m.kode_modul ? `<div class="text-muted" style="font-size:11px">Kode: ${m.kode_modul}</div>` : ''}
-        ${m.mata_pelajaran ? `<div class="text-muted" style="font-size:11px">Mapel: ${m.mata_pelajaran}</div>` : ''}
-        ${m.jenis ? `<div class="text-muted" style="font-size:11px">Jenis: ${m.jenis}</div>` : ''}
-        ${m.deskripsi ? `<div class="text-muted mt-1" style="font-size:11px">${m.deskripsi}</div>` : ''}
-    `;
+    box.innerHTML = `<strong>${m.judul}</strong>${m.kode_modul ? ` <span style="opacity:.6">[${m.kode_modul}]</span>` : ''}${m.mata_pelajaran ? `<br><span class="text-muted">${m.mata_pelajaran}</span>` : ''}`;
 }
 
-function onGuruChange(guruId) {
-    const guruInfoBox = document.getElementById('guruInfoBox');
-    if (!guruId) {
-        guruInfoBox.innerHTML = '<div class="text-muted" style="font-size:12px">Pilih guru untuk melihat informasinya</div>';
-        return;
-    }
-    const sel  = document.getElementById('guru_id');
-    const name = sel.options[sel.selectedIndex]?.text || '—';
-    guruInfoBox.innerHTML = `<div class="fw-semibold">${name}</div>`;
-}
-
-// Init on validation error (re-populate if form was submitted with errors)
+// ── Init on validation error ─────────────────────────────────────────────────
 const initPaket = document.getElementById('paket_id').value;
-if (initPaket) onPaketChange(initPaket);
-
+if (initPaket) {
+    onPaketChange(initPaket);
+    // Restore mata_pelajaran_id after async loads
+    const initMapel = '{{ old("mata_pelajaran_id") }}';
+    const initGuru  = '{{ old("guru_id") }}';
+    if (initMapel) {
+        setTimeout(() => {
+            document.getElementById('mata_pelajaran_id').value = initMapel;
+            onMapelChange(initMapel);
+            if (initGuru) {
+                setTimeout(() => {
+                    document.getElementById('guru_id').value = initGuru;
+                    onGuruChange(initGuru);
+                }, 100);
+            }
+        }, 600);
+    }
+}
 const initModule = document.getElementById('module_id').value;
 if (initModule) onModuleChange(initModule);
+
+activateStep(1);
 </script>
 @endpush

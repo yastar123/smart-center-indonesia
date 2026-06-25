@@ -49,6 +49,7 @@ class AdminAttendanceController extends Controller
         $branchId = $isOwner ? null : ($user->branch_id ?? null);
 
         $query = Schedule::with([
+            'mataPelajaran',
             'paket.mataPelajaran',
             'paket.guru',
             'guru',
@@ -84,10 +85,11 @@ class AdminAttendanceController extends Controller
     public function show(Request $request, Schedule $schedule)
     {
         $schedule->load([
+            'mataPelajaran',
             'paket.mataPelajaran',
             'paket.guru',
             'paket.cabang',
-            'kelas.mataPelajaran',
+            'kelas',
             'guru',
             'cabang',
             'absensi.siswa',

@@ -15,9 +15,11 @@ class ScheduleDashboardController extends Controller
         $date = $request->date ? Carbon::parse($request->date) : Carbon::today();
 
         $schedules = Schedule::with([
-                'kelas.guru', 'kelas.mataPelajaran', 'kelas.cabang', 'kelas.siswa',
-                'paket.guru', 'paket.mataPelajaran', 'paket.siswa',
-                'guru', 'absensi',
+                'mataPelajaran',
+                'guru',
+                'kelas.siswa', 'kelas.guru',
+                'paket.siswa', 'paket.guru', 'paket.mataPelajaran',
+                'absensi',
             ])
             ->whereDate('tanggal', $date)
             ->orderBy('jam_mulai')
@@ -50,15 +52,13 @@ class ScheduleDashboardController extends Controller
                 }
 
                 // Display info:
-                // - class_name: kelas name if linked, else paket name
-                // - teacher_name: schedule's own guru_id FIRST (admin may override), then kelas guru, then paket guru
-                // - subject_name: paket mata pelajaran first (schedule is always paket-based), then kelas mapel
-                $className   = $s->kelas?->nama_kelas
-                    ?? ($s->paket?->nama ?? '—');
-                $teacherName = $s->guru?->name
-                    ?? ($s->kelas?->guru?->name ?? ($s->paket?->guru?->name ?? '—'));
-                $subjectName = $s->paket?->mataPelajaran?->first()?->nama
-                    ?? ($s->kelas?->mataPelajaran?->nama ?? '—');
+                // - class_name : kelas name if linked, else paket name
+                // - teacher_name: schedule's own guru_id FIRST, then paket guru
+                // - subject_name: schedule's own mata_pelajaran_id FIRST (the specific subject for this session)
+                $className   = $s->kelas?->nama_kelas ?? ($s->paket?->nama ?? '—');
+                $teacherName = $s->guru?->name ?? ($s->paket?->guru?->name ?? '—');
+                $subjectName = $s->mataPelajaran?->nama
+                    ?? ($s->paket?->mataPelajaran?->first()?->nama ?? '—');
 
                 return [
                     'id'             => $s->id,

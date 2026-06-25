@@ -23,7 +23,7 @@ class ScheduleController extends Controller
             ->where('status', 'aktif')
             ->orderBy('judul')
             ->get();
-        $teachers = \App\Models\Teacher::with('branch')
+        $teachers = \App\Models\Teacher::with(['branch', 'courses'])
             ->where('status', 'aktif')
             ->orderBy('name')
             ->get();
@@ -63,7 +63,7 @@ class ScheduleController extends Controller
             ->where('status', 'aktif')
             ->orderBy('judul')->get();
 
-        $schedules = Schedule::with(['paket.guru', 'paket.mataPelajaran', 'paket.cabang', 'guru', 'cabang', 'kelas'])
+        $schedules = Schedule::with(['mataPelajaran', 'paket.guru', 'paket.mataPelajaran', 'paket.cabang', 'guru', 'cabang', 'kelas'])
             ->when($branchId, fn($q) => $q->where('cabang_id', $branchId))
             ->when($request->search, fn($q) =>
                 $q->where('topik', 'like', "%{$request->search}%")
@@ -92,20 +92,21 @@ class ScheduleController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'paket_id'        => 'required|exists:packages,id',
-            'kelas_id'        => 'nullable|exists:school_classes,id',
-            'module_id'       => 'nullable|exists:modules,id',
-            'guru_id'         => 'nullable|exists:teachers,id',
-            'jenis'           => 'required|in:online,offline,private',
-            'pertemuan_ke'    => 'required|integer|min:1',
-            'tanggal'         => 'required|date',
-            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal',
-            'jam_mulai'       => 'required',
-            'jam_selesai'     => 'required',
-            'topik'           => 'nullable|string|max:200',
-            'ruangan'         => 'nullable|string|max:100',
-            'link_meeting'    => 'nullable|url|max:500',
-            'catatan'         => 'nullable|string',
+            'paket_id'          => 'required|exists:packages,id',
+            'mata_pelajaran_id' => 'required|exists:courses,id',
+            'kelas_id'          => 'nullable|exists:school_classes,id',
+            'module_id'         => 'nullable|exists:modules,id',
+            'guru_id'           => 'required|exists:teachers,id',
+            'jenis'             => 'required|in:online,offline,private',
+            'pertemuan_ke'      => 'required|integer|min:1',
+            'tanggal'           => 'required|date',
+            'tanggal_selesai'   => 'nullable|date|after_or_equal:tanggal',
+            'jam_mulai'         => 'required',
+            'jam_selesai'       => 'required',
+            'topik'             => 'nullable|string|max:200',
+            'ruangan'           => 'nullable|string|max:100',
+            'link_meeting'      => 'nullable|url|max:500',
+            'catatan'           => 'nullable|string',
         ]);
 
         $paket = Package::with('cabang')->findOrFail($data['paket_id']);
@@ -131,8 +132,6 @@ class ScheduleController extends Controller
             return back()->withErrors(['pertemuan_ke' => $msg])->withInput();
         }
 
-        // Use form guru_id if provided, otherwise fall back to package's guru
-        $data['guru_id']   = $data['guru_id'] ?? $paket->guru_id;
         $data['cabang_id'] = $paket->cabang_id;
         // $data['jenis'] comes from the form (online/offline/private)
         $data['status']    = 'dijadwalkan';
@@ -148,7 +147,7 @@ class ScheduleController extends Controller
 
     public function show(Request $request, Schedule $schedule)
     {
-        $schedule->load(['paket.guru', 'paket.mataPelajaran', 'paket.cabang', 'guru', 'cabang', 'module']);
+        $schedule->load(['mataPelajaran', 'paket.guru', 'paket.mataPelajaran', 'paket.cabang', 'guru', 'cabang', 'module']);
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json(['success' => true, 'data' => $schedule]);
@@ -170,18 +169,21 @@ class ScheduleController extends Controller
         }
 
         $data = $request->validate([
-            'paket_id'        => 'required|exists:packages,id',
-            'jenis'           => 'required|in:online,offline,private',
-            'pertemuan_ke'    => 'required|integer|min:1',
-            'tanggal'         => 'required|date',
-            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal',
-            'jam_mulai'       => 'required',
-            'jam_selesai'     => 'required',
-            'topik'           => 'nullable|string|max:200',
-            'ruangan'         => 'nullable|string|max:100',
-            'link_meeting'    => 'nullable|string|max:500',
-            'status'          => 'required|in:dijadwalkan,berlangsung,selesai,dibatalkan',
-            'catatan'         => 'nullable|string',
+            'paket_id'          => 'required|exists:packages,id',
+            'mata_pelajaran_id' => 'required|exists:courses,id',
+            'guru_id'           => 'required|exists:teachers,id',
+            'kelas_id'          => 'nullable|exists:school_classes,id',
+            'jenis'             => 'required|in:online,offline,private',
+            'pertemuan_ke'      => 'required|integer|min:1',
+            'tanggal'           => 'required|date',
+            'tanggal_selesai'   => 'nullable|date|after_or_equal:tanggal',
+            'jam_mulai'         => 'required',
+            'jam_selesai'       => 'required',
+            'topik'             => 'nullable|string|max:200',
+            'ruangan'           => 'nullable|string|max:100',
+            'link_meeting'      => 'nullable|string|max:500',
+            'status'            => 'required|in:dijadwalkan,berlangsung,selesai,dibatalkan',
+            'catatan'           => 'nullable|string',
         ]);
 
         $paket = Package::with('cabang')->findOrFail($data['paket_id']);
@@ -189,9 +191,7 @@ class ScheduleController extends Controller
             return response()->json(['success' => false, 'message' => "Sesi ke-{$data['pertemuan_ke']} melebihi jumlah sesi paket ({$paket->jumlah_pertemuan})."], 422);
         }
 
-        $data['guru_id']   = $paket->guru_id;
         $data['cabang_id'] = $paket->cabang_id;
-        // $data['jenis'] comes from the form (online/offline/private)
 
         $schedule->update($data);
 

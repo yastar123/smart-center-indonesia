@@ -152,7 +152,7 @@
                     ];
                     $st = $statusMap[$sc->status] ?? ['bg'=>'var(--soft-muted-bg)','color'=>'var(--soft-muted-text)','label'=>$sc->status];
                     $isToday = $sc->tanggal && $sc->tanggal->isToday();
-                    $mapelNames = $sc->paket?->mataPelajaran->pluck('nama')->join(', ') ?? '–';
+                    $mapelNames = $sc->mataPelajaran?->nama ?? ($sc->paket?->mataPelajaran->pluck('nama')->join(', ') ?? '–');
                 @endphp
                 <tr style="border-bottom:1px solid var(--card-border);transition:background .15s{{ $isToday ? ';background:rgba(104,17,126,.03)' : '' }}">
                     <td class="ps-3">
@@ -174,7 +174,7 @@
                         <div class="text-muted" style="font-size:11px"><i class="bi bi-clock me-1"></i>{{ str_replace(':', '.', substr($sc->jam_mulai ?? '', 0, 5)) ?: '–' }} – {{ str_replace(':', '.', substr($sc->jam_selesai ?? '', 0, 5)) ?: '–' }} WIB</div>
                     </td>
                     <td class="d-none d-md-table-cell">
-                        <div style="font-size:12.5px">{{ $sc->paket?->guru?->name ?? $sc->guru?->name ?? '–' }}</div>
+                        <div style="font-size:12.5px">{{ $sc->guru?->name ?? $sc->paket?->guru?->name ?? '–' }}</div>
                     </td>
                     <td class="d-none d-lg-table-cell text-muted" style="font-size:.82rem">
                         @if($sc->ruangan)
@@ -498,7 +498,7 @@ function showDetail(id) {
         };
         const [sbg,scol,slbl] = (statusMap[s.status]||'rgba(148,163,184,.15):#64748b:'+s.status).split(':');
         const tgl = s.tanggal ? s.tanggal.substr(0,10) : '–';
-        const mapelNames = s.paket?.mata_pelajaran?.map(m => m.nama).join(', ') ?? '–';
+        const mapelNames = s.mata_pelajaran?.nama ?? s.paket?.mata_pelajaran?.map(m => m.nama).join(', ') ?? '–';
         document.getElementById('detailBody').innerHTML = `
             <div style="padding:20px">
                 <div class="d-flex justify-content-between align-items-start mb-3">
@@ -511,7 +511,7 @@ function showDetail(id) {
                 <table style="width:100%;border-collapse:collapse;font-size:13px">
                     ${drow('Paket', s.paket?.nama ?? '–')}
                     ${drow('Mata Pelajaran', mapelNames)}
-                    ${drow('Guru', s.paket?.guru?.name ?? s.guru?.name ?? '–')}
+                    ${drow('Guru', s.guru?.name ?? s.paket?.guru?.name ?? '–')}
                     ${drow('Cabang', s.paket?.cabang?.name ?? s.cabang?.name ?? '–')}
                     ${drow('Jenis', s.paket?.jenis ? (s.paket.jenis.charAt(0).toUpperCase() + s.paket.jenis.slice(1)) : '–')}
                     ${s.link_meeting ? drow('Link Meeting', '<a href="'+s.link_meeting+'" target="_blank">Buka Link</a>') : drow('Ruangan', s.ruangan || '–')}

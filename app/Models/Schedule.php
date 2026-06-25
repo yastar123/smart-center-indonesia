@@ -15,6 +15,7 @@ class Schedule extends Model
     protected $fillable = [
         'kelas_id',
         'paket_id',
+        'mata_pelajaran_id',
         'module_id',
         'guru_id',
         'cabang_id',
@@ -71,5 +72,10 @@ class Schedule extends Model
     public function module()
     {
         return $this->belongsTo(Module::class, 'module_id');
+    }
+
+    public function mataPelajaran()
+    {
+        return $this->belongsTo(\App\Models\Course::class, 'mata_pelajaran_id');
     }
 }

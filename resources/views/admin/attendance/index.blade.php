@@ -149,7 +149,7 @@
                         'dibatalkan'  => ['bg'=>'var(--soft-danger-bg)','color'=>'var(--soft-danger-text)','label'=>'Dibatalkan'],
                     ];
                     $st = $statusMap[$sc->status] ?? ['bg'=>'var(--soft-muted-bg)','color'=>'var(--soft-muted-text)','label'=>$sc->status];
-                    $mapelNames = $sc->paket?->mataPelajaran->pluck('nama')->join(', ') ?? '–';
+                    $mapelNames = $sc->mataPelajaran?->nama ?? ($sc->paket?->mataPelajaran->pluck('nama')->join(', ') ?? '–');
                     $absensiCount = $sc->absensi->count();
                     $hadirCount   = $sc->absensi->where('status', 'hadir')->count();
                     $alpaCount    = $sc->absensi->whereIn('status', ['alpa','tidak_hadir'])->count();
@@ -173,7 +173,7 @@
                         <div class="text-muted" style="font-size:11px">{{ str_replace(':', '.', substr($sc->jam_mulai ?? '', 0, 5)) ?: '–' }} – {{ str_replace(':', '.', substr($sc->jam_selesai ?? '', 0, 5)) ?: '–' }} WIB</div>
                     </td>
                     <td>
-                        <div style="font-size:12.5px">{{ $sc->paket?->guru?->name ?? $sc->guru?->name ?? '–' }}</div>
+                        <div style="font-size:12.5px">{{ $sc->guru?->name ?? $sc->paket?->guru?->name ?? '–' }}</div>
                     </td>
                     <td>
                         @if($absensiCount > 0)

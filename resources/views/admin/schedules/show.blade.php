@@ -285,10 +285,16 @@
                     <span class="text-muted">Tipe Kelas</span>
                     <span class="fw-semibold">{{ ucfirst($schedule->paket->tipe_kelas ?? '—') }}</span>
                 </div>
-                @if($schedule->paket->mataPelajaran->isNotEmpty())
                 <div class="d-flex justify-content-between align-items-start">
-                    <span class="text-muted">Mata Pelajaran</span>
-                    <span class="fw-semibold text-end">{{ $schedule->paket->mataPelajaran->pluck('nama')->join(', ') }}</span>
+                    <span class="text-muted">Mata Pelajaran Sesi</span>
+                    <span class="fw-semibold text-end" style="color:var(--soft-primary-text)">
+                        {{ $schedule->mataPelajaran?->nama ?? ($schedule->paket?->mataPelajaran->pluck('nama')->join(', ') ?? '—') }}
+                    </span>
+                </div>
+                @if($schedule->paket?->mataPelajaran->isNotEmpty())
+                <div class="d-flex justify-content-between align-items-start">
+                    <span class="text-muted">Semua Mapel Paket</span>
+                    <span class="fw-semibold text-end" style="font-size:12px">{{ $schedule->paket->mataPelajaran->pluck('nama')->join(', ') }}</span>
                 </div>
                 @endif
             </div>
