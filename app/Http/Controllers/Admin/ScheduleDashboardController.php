@@ -49,13 +49,16 @@ class ScheduleDashboardController extends Controller
                     $capacity     = 0;
                 }
 
-                // Display info: prefer kelas, fall back to paket + schedule guru
+                // Display info:
+                // - class_name: kelas name if linked, else paket name
+                // - teacher_name: schedule's own guru_id FIRST (admin may override), then kelas guru, then paket guru
+                // - subject_name: paket mata pelajaran first (schedule is always paket-based), then kelas mapel
                 $className   = $s->kelas?->nama_kelas
                     ?? ($s->paket?->nama ?? '—');
-                $teacherName = $s->kelas?->guru?->name
-                    ?? ($s->guru?->name ?? ($s->paket?->guru?->name ?? '—'));
-                $subjectName = $s->kelas?->mataPelajaran?->nama
-                    ?? ($s->paket?->mataPelajaran?->first()?->nama ?? '—');
+                $teacherName = $s->guru?->name
+                    ?? ($s->kelas?->guru?->name ?? ($s->paket?->guru?->name ?? '—'));
+                $subjectName = $s->paket?->mataPelajaran?->first()?->nama
+                    ?? ($s->kelas?->mataPelajaran?->nama ?? '—');
 
                 return [
                     'id'             => $s->id,
