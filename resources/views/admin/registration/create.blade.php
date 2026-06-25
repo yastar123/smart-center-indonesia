@@ -260,26 +260,44 @@
                                 </select>
                             </div>
                             <div class="col-12">
-                                <label class="form-label fw-semibold">Mata Pelajaran</label>
-                                <div class="p-3 rounded-3" style="background:var(--input-bg);border:1.5px solid var(--card-border)">
-                                    <div class="row g-2">
-                                        @foreach($courses as $c)
-                                        <div class="col-6 col-md-4">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="custom_course_ids[]"
-                                                       value="{{ $c->id }}" id="cus_course_{{ $c->id }}"
-                                                       {{ in_array($c->id, old('custom_course_ids', [])) ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="cus_course_{{ $c->id }}" style="font-size:13px">
-                                                    {{ $c->nama }}
-                                                </label>
-                                            </div>
+                                <label class="form-label fw-semibold">Mata Pelajaran & Guru Pengajar</label>
+                                <div class="text-muted mb-2" style="font-size:12px"><i class="bi bi-info-circle me-1"></i>Centang mata pelajaran lalu pilih guru yang mengajar mapel tersebut.</div>
+                                @if($courses->isEmpty())
+                                    <div class="text-muted" style="font-size:13px">Belum ada mata pelajaran aktif.</div>
+                                @else
+                                <div id="customCourseRows">
+                                    @foreach($courses as $c)
+                                    @php $oldCC = old('custom_course_ids', []); @endphp
+                                    <div class="mb-2 rounded-3" style="border:1.5px solid {{ in_array($c->id, $oldCC)?'#c84ddf':'var(--card-border)' }};overflow:hidden" id="cuscard-{{ $c->id }}">
+                                        <div class="d-flex align-items-center gap-2 px-3 py-2" style="background:var(--input-bg);cursor:pointer"
+                                             onclick="document.getElementById('cus_course_{{ $c->id }}').click()">
+                                            <input class="form-check-input cus-course-check" type="checkbox"
+                                                   name="custom_course_ids[]" value="{{ $c->id }}"
+                                                   id="cus_course_{{ $c->id }}"
+                                                   {{ in_array($c->id, $oldCC) ? 'checked' : '' }}
+                                                   onchange="toggleCustomCourseTeacher({{ $c->id }}, this.checked)"
+                                                   onclick="event.stopPropagation()">
+                                            <span class="fw-semibold" style="font-size:13px">
+                                                <i class="bi bi-book text-primary me-1"></i>{{ $c->nama }}
+                                            </span>
                                         </div>
-                                        @endforeach
+                                        <div class="px-3 py-2 border-top" id="custeacher-{{ $c->id }}"
+                                             style="{{ in_array($c->id, $oldCC)?'':'display:none' }}">
+                                            <label style="font-size:12px;color:var(--text-muted)">Guru pengajar:</label>
+                                            <select name="custom_course_teachers[{{ $c->id }}]" class="form-select form-select-sm mt-1">
+                                                <option value="">— Pilih guru —</option>
+                                                @foreach($teachers as $t)
+                                                <option value="{{ $t->id }}"
+                                                    {{ old("custom_course_teachers.{$c->id}") == $t->id ? 'selected' : '' }}>
+                                                    {{ $t->name }}{{ $t->branch ? ' ('.$t->branch->name.')' : '' }}
+                                                </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
-                                    @if($courses->isEmpty())
-                                        <div class="text-muted" style="font-size:13px">Belum ada mata pelajaran aktif.</div>
-                                    @endif
+                                    @endforeach
                                 </div>
+                                @endif
                             </div>
                             <div class="col-12">
                                 <label class="form-label fw-semibold">Deskripsi</label>
@@ -296,7 +314,7 @@
         <div class="dashboard-card mb-3">
             <div class="d-flex align-items-center gap-2 mb-3">
                 <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#461256,#c84ddf);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:700">3</div>
-                <h6 class="fw-bold mb-0">Setup Jadwal & Guru</h6>
+                <h6 class="fw-bold mb-0">Guru</h6>
             </div>
 
             {{-- Package-aware teacher display --}}
@@ -534,6 +552,17 @@ function switchStudent(type) {
         updateSelectedStudentDetails();
     }
     updateQuote();
+}
+
+function toggleCustomCourseTeacher(courseId, checked) {
+    const section = document.getElementById('custeacher-' + courseId);
+    const card    = document.getElementById('cuscard-' + courseId);
+    if (section) section.style.display = checked ? '' : 'none';
+    if (card)    card.style.borderColor = checked ? '#c84ddf' : 'var(--card-border)';
+    if (!checked && section) {
+        const sel = section.querySelector('select');
+        if (sel) sel.value = '';
+    }
 }
 
 function switchPackage(type) {

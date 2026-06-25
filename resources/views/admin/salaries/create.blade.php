@@ -141,9 +141,43 @@
             const pctDone   = total > 0 ? Math.round((selesai / total) * 100) : 0;
             const pctSched  = total > 0 ? Math.round((dijadwal / total) * 100) : 0;
 
-            const mapelTags = (pkg.mata_pelajaran || []).map(m =>
-                `<span class="badge rounded-pill me-1 mb-1" style="background:var(--soft-primary,#f0e6ff);color:var(--bs-primary)">${m}</span>`
-            ).join('') || '<span class="text-muted small">—</span>';
+            // Per-mapel breakdown rows
+            const perMapel = pkg.per_mapel || [];
+            const mapelRows = perMapel.length > 0
+                ? `<div class="mt-3">
+                    <div class="small fw-semibold text-muted mb-2"><i class="bi bi-table me-1"></i>Detail per Mata Pelajaran</div>
+                    <div class="table-responsive">
+                    <table class="table table-sm mb-0" style="font-size:12px">
+                        <thead style="background:var(--input-bg)">
+                            <tr>
+                                <th class="text-muted fw-semibold">Mata Pelajaran</th>
+                                <th class="text-muted fw-semibold text-center">Total Sesi Paket</th>
+                                <th class="text-muted fw-semibold text-center">Sesi Dijadwalkan</th>
+                                <th class="text-muted fw-semibold text-center">Sudah Selesai</th>
+                                <th class="text-muted fw-semibold text-center">Progress</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${perMapel.map(m => {
+                                const pct = m.sesi_dijadwal > 0 ? Math.round((m.sesi_selesai / m.sesi_dijadwal) * 100) : 0;
+                                return `<tr>
+                                    <td><span class="badge rounded-pill" style="background:rgba(200,77,223,.1);color:#461256;font-weight:500">${m.nama}</span></td>
+                                    <td class="text-center fw-semibold">${m.total_sesi}</td>
+                                    <td class="text-center">${m.sesi_dijadwal}</td>
+                                    <td class="text-center text-success fw-semibold">${m.sesi_selesai}</td>
+                                    <td class="text-center">
+                                        <div class="progress rounded-pill" style="height:6px;width:60px;display:inline-flex">
+                                            <div class="progress-bar bg-success" style="width:${pct}%"></div>
+                                        </div>
+                                        <span class="ms-1" style="font-size:10px">${pct}%</span>
+                                    </td>
+                                </tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                    </div>
+                   </div>`
+                : `<div class="mt-2 small text-muted"><i class="bi bi-info-circle me-1"></i>Guru ini belum memiliki jadwal di paket ini.</div>`;
 
             return `
             <div class="border rounded-3 p-3 mb-2 bg-white">
@@ -153,36 +187,32 @@
                         <div class="d-flex flex-wrap gap-1 align-items-center">
                             <span class="badge bg-secondary-subtle text-secondary">${jenisLabel(pkg.jenis)}</span>
                             <span class="text-muted small"><i class="bi bi-calendar3 me-1"></i>${pkg.durasi_bulan ?? '-'} bulan</span>
+                            <span class="text-muted small"><i class="bi bi-collection me-1"></i>${total} sesi total</span>
                         </div>
                     </div>
                     <div class="text-end">
-                        <div class="small text-muted mb-1">Progress Sesi</div>
-                        <div class="fs-5 fw-bold text-primary">${selesai}<span class="fs-6 fw-normal text-muted"> / ${total}</span></div>
-                        <div class="small text-muted">sesi selesai</div>
+                        <div class="small text-muted mb-1">Sesi Selesai</div>
+                        <div class="fs-5 fw-bold text-success">${selesai}<span class="fs-6 fw-normal text-muted"> / ${total}</span></div>
                     </div>
-                </div>
-
-                <div class="mb-2">
-                    <div class="small text-muted mb-1"><i class="bi bi-book me-1"></i>Mata Pelajaran</div>
-                    <div class="d-flex flex-wrap">${mapelTags}</div>
                 </div>
 
                 <div>
                     <div class="d-flex justify-content-between small text-muted mb-1">
-                        <span>Progress Sesi Kelas</span>
+                        <span>Progress Keseluruhan</span>
                         <span>${pctDone}% selesai</span>
                     </div>
-                    <div class="progress rounded-pill" style="height:8px;">
+                    <div class="progress rounded-pill" style="height:6px;">
                         <div class="progress-bar bg-success" style="width:${pctDone}%" title="${selesai} selesai"></div>
                         <div class="progress-bar bg-warning" style="width:${pctSched}%" title="${dijadwal} dijadwalkan"></div>
                     </div>
-                    <div class="d-flex flex-wrap gap-3 mt-2 small">
-                        <span><span class="d-inline-block rounded-circle me-1" style="width:9px;height:9px;background:#198754;"></span>${selesai} Selesai</span>
-                        <span><span class="d-inline-block rounded-circle me-1" style="width:9px;height:9px;background:#ffc107;"></span>${dijadwal} Dijadwalkan</span>
-                        <span><span class="d-inline-block rounded-circle me-1" style="width:9px;height:9px;background:#dee2e6;"></span>${belum} Belum</span>
-                        <span class="ms-auto fw-semibold">Total: ${total} sesi</span>
+                    <div class="d-flex flex-wrap gap-3 mt-1 small">
+                        <span style="color:#198754">● ${selesai} Selesai</span>
+                        <span style="color:#ffc107">● ${dijadwal} Dijadwalkan</span>
+                        <span style="color:#dee2e6">● ${belum} Belum</span>
                     </div>
                 </div>
+
+                ${mapelRows}
             </div>`;
         }).join('');
 

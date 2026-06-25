@@ -74,6 +74,26 @@ class SalaryController extends Controller
                 ->where('status', 'dijadwalkan')
                 ->count();
 
+            // Per-mapel breakdown
+            $perMapel = $pkg->mataPelajaran->map(function ($mapel) use ($teacher, $pkg) {
+                $totalMapel  = Schedule::where('guru_id', $teacher->id)
+                    ->where('paket_id', $pkg->id)
+                    ->where('mata_pelajaran_id', $mapel->id)
+                    ->count();
+                $selesaiMapel = Schedule::where('guru_id', $teacher->id)
+                    ->where('paket_id', $pkg->id)
+                    ->where('mata_pelajaran_id', $mapel->id)
+                    ->where('status', 'selesai')
+                    ->count();
+                return [
+                    'id'             => $mapel->id,
+                    'nama'           => $mapel->nama,
+                    'total_sesi'     => $pkg->jumlah_pertemuan, // total sesi di paket
+                    'sesi_dijadwal'  => $totalMapel,            // sesi guru di mapel ini
+                    'sesi_selesai'   => $selesaiMapel,          // sudah selesai
+                ];
+            })->filter(fn($m) => $m['sesi_dijadwal'] > 0)->values();
+
             return [
                 'id'               => $pkg->id,
                 'nama'             => $pkg->nama,
@@ -81,6 +101,7 @@ class SalaryController extends Controller
                 'jumlah_pertemuan' => $totalSesi,
                 'durasi_bulan'     => $pkg->durasi_bulan,
                 'mata_pelajaran'   => $pkg->mataPelajaran->pluck('nama'),
+                'per_mapel'        => $perMapel,
                 'sesi_selesai'     => $selesai,
                 'sesi_dijadwalkan' => $dijadwalkan,
                 'sesi_belum'       => max(0, $totalSesi - $selesai - $dijadwalkan),
