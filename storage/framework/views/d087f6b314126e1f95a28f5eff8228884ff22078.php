@@ -570,8 +570,8 @@ unset($__errorArgs, $__bag); ?>
                         <div class="col-md-6">
                             <label class="form-label">Program Belajar</label>
                             <div class="option-btn-group" id="programGroup">
-                                <div class="option-btn active" data-val="kelas" onclick="pickOption('program','kelas',this)">Kelas</div>
-                                <div class="option-btn" data-val="privat" onclick="pickOption('program','privat',this)">Privat</div>
+                                <div class="option-btn <?php echo e(old('program_belajar','kelas') == 'kelas' ? 'active' : ''); ?>" data-val="kelas" onclick="pickProgram('kelas',this)">Kelas</div>
+                                <div class="option-btn <?php echo e(old('program_belajar','kelas') == 'privat' ? 'active' : ''); ?>" data-val="privat" onclick="pickProgram('privat',this)">Privat</div>
                             </div>
                             <input type="hidden" name="program_belajar" id="program_belajar" value="<?php echo e(old('program_belajar','kelas')); ?>">
                         </div>
@@ -583,25 +583,13 @@ unset($__errorArgs, $__bag); ?>
                             </div>
                             <input type="hidden" name="sistem_belajar" id="sistem_belajar" value="<?php echo e(old('sistem_belajar','online')); ?>">
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-12" id="tempatBelajarSection">
                             <label class="form-label">Tempat Belajar</label>
                             <div class="option-btn-group" id="tempatGroup">
                                 <div class="option-btn active" data-val="kantor" onclick="pickOption('tempat','kantor',this)">Belajar di Kantor</div>
-                                <div class="option-btn" data-val="rumah" onclick="pickOption('tempat','rumah',this)">Guru ke Rumah</div>
+                                <div class="option-btn d-none" data-val="rumah" id="tempatRumahBtn" onclick="pickOption('tempat','rumah',this)">Guru ke Rumah</div>
                             </div>
                             <input type="hidden" name="tempat_belajar" id="tempat_belajar" value="<?php echo e(old('tempat_belajar','kantor')); ?>">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Sistem Pengambilan</label>
-                            <div class="option-btn-group" id="sistemPaketGroup">
-                                <div class="option-btn active" data-val="paket" onclick="pickOption('sistem_paket','paket',this)">Paket</div>
-                                <div class="option-btn" data-val="sesi" onclick="pickOption('sistem_paket','sesi',this)">Pertemuan / Sesi</div>
-                            </div>
-                            <input type="hidden" name="sistem_paket" id="sistem_paket" value="<?php echo e(old('sistem_paket','paket')); ?>">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Jumlah Paket / Pertemuan</label>
-                            <input type="text" name="jumlah_paket" class="form-control" value="<?php echo e(old('jumlah_paket')); ?>" placeholder="cth. 12 sesi / 1 paket">
                         </div>
                     </div>
                 </div>
@@ -805,15 +793,39 @@ unset($__errorArgs, $__bag); ?>
 <script>
 function pickOption(group, val, el) {
     const groupMap = {
-        'program': 'program_belajar',
         'sistem': 'sistem_belajar',
         'tempat': 'tempat_belajar',
-        'sistem_paket': 'sistem_paket',
     };
     el.closest('.option-btn-group').querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
     el.classList.add('active');
     document.getElementById(groupMap[group]).value = val;
 }
+
+function pickProgram(val, el) {
+    el.closest('.option-btn-group').querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('program_belajar').value = val;
+
+    const rumahBtn = document.getElementById('tempatRumahBtn');
+    const kantorBtn = document.querySelector('#tempatGroup .option-btn[data-val="kantor"]');
+
+    if (val === 'privat') {
+        rumahBtn.classList.remove('d-none');
+    } else {
+        rumahBtn.classList.add('d-none');
+        rumahBtn.classList.remove('active');
+        kantorBtn.classList.add('active');
+        document.getElementById('tempat_belajar').value = 'kantor';
+    }
+}
+
+(function initProgramState() {
+    const prog = document.getElementById('program_belajar');
+    if (prog && prog.value === 'privat') {
+        const rumahBtn = document.getElementById('tempatRumahBtn');
+        if (rumahBtn) rumahBtn.classList.remove('d-none');
+    }
+})();
 
 function togglePill(el) {
     const cb = el.querySelector('input[type=checkbox]');
