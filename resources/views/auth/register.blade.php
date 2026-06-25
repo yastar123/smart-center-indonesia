@@ -335,6 +335,44 @@
             letter-spacing: .06em; color: #9ca3af; margin-bottom: 8px;
         }
 
+        .accordion-cat {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 8px; padding: 10px 14px; border: 1.5px solid #e7e3ff;
+            border-radius: 12px; cursor: pointer; background: #fcfbff;
+            font-size: .88rem; font-weight: 700; color: #461256;
+            transition: all .2s; user-select: none; margin-bottom: 6px;
+        }
+        .accordion-cat:hover { border-color: #c84ddf; background: #fdf4ff; }
+        .accordion-cat.open { border-color: #c84ddf; background: linear-gradient(135deg,#fdf4ff,#f7e7ff); }
+        .accordion-cat .acc-arrow { transition: transform .2s; font-size: .7rem; color: #9ca3af; }
+        .accordion-cat.open .acc-arrow { transform: rotate(90deg); color: #c84ddf; }
+        .accordion-body { display: none; padding: 6px 2px 10px; }
+        .accordion-body.open { display: block; }
+
+        .schedule-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 12px; border: 1.5px solid #e7e3ff;
+            border-radius: 12px; background: #fcfbff; margin-bottom: 8px;
+        }
+        .schedule-row .day-label {
+            min-width: 62px; font-size: .82rem; font-weight: 700; color: #461256;
+        }
+        .schedule-row .form-control { font-size: .85rem; border-radius: 8px; }
+        .schedule-row .btn-add-slot {
+            flex-shrink: 0; border: 1.5px dashed #c84ddf; background: none;
+            color: #c84ddf; border-radius: 8px; padding: 5px 10px;
+            font-size: .75rem; font-weight: 700; white-space: nowrap;
+            cursor: pointer; transition: all .2s;
+        }
+        .schedule-row .btn-add-slot:hover { background: #fdf4ff; }
+        .time-slot { display: flex; align-items: center; gap: 6px; }
+        .time-slot .btn-remove-slot {
+            background: none; border: none; color: #ef4444; cursor: pointer;
+            font-size: .75rem; padding: 2px 4px; border-radius: 4px;
+            transition: background .2s;
+        }
+        .time-slot .btn-remove-slot:hover { background: #fef2f2; }
+
         .btn-submit {
             background: linear-gradient(135deg, #68117e, #c84ddf 50%, #c84ddf);
             background-size: 200% auto; border: none; border-radius: 12px; padding: 1rem;
@@ -589,25 +627,57 @@
                                 'akpol'     => 'AKPOL / AKMIL / BINTARA',
                                 'cpns'      => 'CPNS',
                                 'bumn'      => 'BUMN',
-                                'lainnya'   => 'Lainnya',
                             ];
+                            $jenisAccordion = ['kedinasan','cpns','bumn','akpol'];
+                            $jenisFlat      = ['komputer','bahasa','mapel'];
                         @endphp
-                        <div class="row g-4">
-                            @foreach($subjects as $jenis => $items)
-                            <div class="col-md-6">
-                                <div class="program-group">
-                                    <div class="program-group-label">{{ $jenisLabels[$jenis] ?? ucfirst($jenis) }}</div>
-                                    <div class="check-grid">
-                                        @foreach($items as $course)
-                                        <label class="check-pill {{ in_array($course->nama, old('program_minat', [])) ? 'selected' : '' }}" onclick="togglePill(this)">
-                                            <input type="checkbox" name="program_minat[]" value="{{ $course->nama }}"
-                                                   {{ in_array($course->nama, old('program_minat', [])) ? 'checked' : '' }}>
-                                            {{ $course->nama }}
-                                        </label>
-                                        @endforeach
+
+                        {{-- Flat sections: Komputer, Bahasa, Mata Pelajaran --}}
+                        <div class="row g-4" id="flatProgramsRow">
+                            @foreach($jenisFlat as $jenis)
+                                @if(!$subjects->has($jenis)) @continue @endif
+                                @php $items = $subjects[$jenis]; @endphp
+                                <div class="col-md-6 {{ $jenis === 'mapel' ? 'mapel-section' : '' }}"
+                                     id="section-{{ $jenis }}"
+                                     style="{{ $jenis === 'mapel' && old('program_belajar','kelas') === 'kelas' ? 'display:none' : '' }}">
+                                    <div class="program-group">
+                                        <div class="program-group-label">{{ $jenisLabels[$jenis] }}</div>
+                                        <div class="check-grid">
+                                            @foreach($items as $course)
+                                            <label class="check-pill {{ in_array($course->nama, old('program_minat', [])) ? 'selected' : '' }}" onclick="togglePill(this)">
+                                                <input type="checkbox" name="program_minat[]" value="{{ $course->nama }}"
+                                                       {{ in_array($course->nama, old('program_minat', [])) ? 'checked' : '' }}>
+                                                {{ $course->nama }}
+                                            </label>
+                                            @endforeach
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endforeach
+                        </div>
+
+                        {{-- Accordion sections: Kedinasan, CPNS, BUMN, AKPOL --}}
+                        <div class="mt-3">
+                            @foreach($jenisAccordion as $jenis)
+                                @if(!$subjects->has($jenis)) @continue @endif
+                                @php $items = $subjects[$jenis]; @endphp
+                                <div>
+                                    <div class="accordion-cat" onclick="toggleAccordion('acc-{{ $jenis }}', this)">
+                                        <span><i class="bi bi-building me-2" style="color:#c84ddf"></i>{{ $jenisLabels[$jenis] ?? ucfirst($jenis) }}</span>
+                                        <i class="bi bi-chevron-right acc-arrow"></i>
+                                    </div>
+                                    <div class="accordion-body {{ collect(old('program_minat', []))->intersect($items->pluck('nama'))->isNotEmpty() ? 'open' : '' }}" id="acc-{{ $jenis }}">
+                                        <div class="check-grid">
+                                            @foreach($items as $course)
+                                            <label class="check-pill {{ in_array($course->nama, old('program_minat', [])) ? 'selected' : '' }}" onclick="togglePill(this)">
+                                                <input type="checkbox" name="program_minat[]" value="{{ $course->nama }}"
+                                                       {{ in_array($course->nama, old('program_minat', [])) ? 'checked' : '' }}>
+                                                {{ $course->nama }}
+                                            </label>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
                             @endforeach
                         </div>
                     @endif
@@ -626,21 +696,55 @@
                         <div class="col-12">
                             <label class="form-label">Hari Belajar</label>
                             <div class="day-check-group">
-                                @php $days = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
-                                     $dayVals = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu']; @endphp
+                                @php
+                                    $days    = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+                                    $dayVals = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+                                    $oldHari = old('hari_belajar', []);
+                                @endphp
                                 @foreach($days as $i => $d)
-                                <label class="day-pill {{ in_array($dayVals[$i], old('hari_belajar', [])) ? 'selected' : '' }}" onclick="toggleDay(this)">
+                                <label class="day-pill {{ in_array($dayVals[$i], $oldHari) ? 'selected' : '' }}"
+                                       onclick="toggleDay(this, '{{ $dayVals[$i] }}')">
                                     <input type="checkbox" name="hari_belajar[]" value="{{ $dayVals[$i] }}" style="display:none"
-                                           {{ in_array($dayVals[$i], old('hari_belajar', [])) ? 'checked' : '' }}>
+                                           {{ in_array($dayVals[$i], $oldHari) ? 'checked' : '' }}>
                                     {{ $d }}
                                 </label>
                                 @endforeach
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Jam Belajar <span class="text-muted fw-normal">(Fleksibel / Sesuai Kesepakatan)</span></label>
-                            <input type="text" name="jam_belajar" class="form-control" value="{{ old('jam_belajar') }}" placeholder="cth. 15.00 – 17.00 / Fleksibel">
+
+                        {{-- Per-day time schedule --}}
+                        <div class="col-12" id="dayScheduleWrapper" style="{{ empty($oldHari) ? 'display:none' : '' }}">
+                            <label class="form-label">Jam Belajar per Hari
+                                <span class="text-muted fw-normal" style="font-size:.75rem">(isi jam untuk setiap hari yang dipilih)</span>
+                            </label>
+                            <div id="dayScheduleContainer">
+                                @foreach($dayVals as $dayVal)
+                                    @if(in_array($dayVal, $oldHari))
+                                    @php $oldSlots = old("jam_detail.{$dayVal}", ['']); @endphp
+                                    <div class="schedule-row" id="srow-{{ $dayVal }}">
+                                        <div class="day-label">{{ $dayVal }}</div>
+                                        <div class="flex-fill" id="slots-{{ $dayVal }}">
+                                            @foreach((array)$oldSlots as $si => $slot)
+                                            <div class="time-slot {{ $si > 0 ? 'mt-1' : '' }}">
+                                                <input type="text" name="jam_detail[{{ $dayVal }}][]"
+                                                       class="form-control"
+                                                       placeholder="cth. 10:00 - 12:00"
+                                                       value="{{ $slot }}" autocomplete="off">
+                                                @if($si > 0)
+                                                <button type="button" class="btn-remove-slot" onclick="removeSlot(this)" title="Hapus"><i class="bi bi-x"></i></button>
+                                                @endif
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                        <button type="button" class="btn-add-slot" onclick="addSlot('{{ $dayVal }}')">
+                                            <i class="bi bi-plus me-1"></i>Tambah
+                                        </button>
+                                    </div>
+                                    @endif
+                                @endforeach
+                            </div>
                         </div>
+
                         <div class="col-md-6">
                             <label class="form-label">Tanggal Mulai Belajar</label>
                             <input type="date" name="tanggal_mulai" class="form-control" value="{{ old('tanggal_mulai') }}">
@@ -675,10 +779,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 function pickOption(group, val, el) {
-    const groupMap = {
-        'sistem': 'sistem_belajar',
-        'tempat': 'tempat_belajar',
-    };
+    const groupMap = { 'sistem': 'sistem_belajar', 'tempat': 'tempat_belajar' };
     el.closest('.option-btn-group').querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
     el.classList.add('active');
     document.getElementById(groupMap[group]).value = val;
@@ -689,9 +790,8 @@ function pickProgram(val, el) {
     el.classList.add('active');
     document.getElementById('program_belajar').value = val;
 
-    const rumahBtn = document.getElementById('tempatRumahBtn');
+    const rumahBtn  = document.getElementById('tempatRumahBtn');
     const kantorBtn = document.querySelector('#tempatGroup .option-btn[data-val="kantor"]');
-
     if (val === 'privat') {
         rumahBtn.classList.remove('d-none');
     } else {
@@ -700,28 +800,127 @@ function pickProgram(val, el) {
         kantorBtn.classList.add('active');
         document.getElementById('tempat_belajar').value = 'kantor';
     }
+
+    // Show/hide Mata Pelajaran section in Step 4
+    const mapelSection = document.getElementById('section-mapel');
+    if (mapelSection) {
+        mapelSection.style.display = (val === 'kelas') ? 'none' : '';
+    }
 }
 
 (function initProgramState() {
     const prog = document.getElementById('program_belajar');
-    if (prog && prog.value === 'privat') {
+    if (!prog) return;
+    if (prog.value === 'privat') {
         const rumahBtn = document.getElementById('tempatRumahBtn');
         if (rumahBtn) rumahBtn.classList.remove('d-none');
+    }
+    // Init mapel visibility
+    const mapelSection = document.getElementById('section-mapel');
+    if (mapelSection) {
+        mapelSection.style.display = (prog.value === 'kelas') ? 'none' : '';
     }
 })();
 
 function togglePill(el) {
     const cb = el.querySelector('input[type=checkbox]');
+    setTimeout(() => { el.classList.toggle('selected', cb.checked); }, 0);
+}
+
+// Accordion for government program categories
+function toggleAccordion(id, headerEl) {
+    const body = document.getElementById(id);
+    if (!body) return;
+    const isOpen = body.classList.toggle('open');
+    if (headerEl) headerEl.classList.toggle('open', isOpen);
+}
+
+// Auto-open accordion if any item was pre-checked (old() repopulation)
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.accordion-body').forEach(body => {
+        if (body.querySelector('input:checked')) {
+            body.classList.add('open');
+            const header = body.previousElementSibling;
+            if (header && header.classList.contains('accordion-cat')) header.classList.add('open');
+        }
+    });
+});
+
+// ── Per-day schedule ──────────────────────────────────────────────
+const DAY_ORDER = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+
+function toggleDay(el, dayName) {
+    const cb = el.querySelector('input[type=checkbox]');
     setTimeout(() => {
-        el.classList.toggle('selected', cb.checked);
+        const checked = cb.checked;
+        el.classList.toggle('selected', checked);
+        if (checked) addDayRow(dayName);
+        else removeDayRow(dayName);
+        updateScheduleWrapper();
     }, 0);
 }
 
-function toggleDay(el) {
-    const cb = el.querySelector('input[type=checkbox]');
-    setTimeout(() => {
-        el.classList.toggle('selected', cb.checked);
-    }, 0);
+function addDayRow(dayName) {
+    if (document.getElementById('srow-' + dayName)) return;
+    const container = document.getElementById('dayScheduleContainer');
+
+    const row = document.createElement('div');
+    row.className = 'schedule-row';
+    row.id = 'srow-' + dayName;
+    row.innerHTML = `
+        <div class="day-label">${dayName}</div>
+        <div class="flex-fill" id="slots-${dayName}">
+            <div class="time-slot">
+                <input type="text" name="jam_detail[${dayName}][]"
+                       class="form-control" placeholder="cth. 10:00 - 12:00" autocomplete="off">
+            </div>
+        </div>
+        <button type="button" class="btn-add-slot" onclick="addSlot('${dayName}')">
+            <i class="bi bi-plus me-1"></i>Tambah
+        </button>`;
+
+    // Insert in day order
+    let inserted = false;
+    const existing = container.querySelectorAll('.schedule-row');
+    for (const existRow of existing) {
+        const existDay = existRow.id.replace('srow-', '');
+        if (DAY_ORDER.indexOf(dayName) < DAY_ORDER.indexOf(existDay)) {
+            container.insertBefore(row, existRow);
+            inserted = true;
+            break;
+        }
+    }
+    if (!inserted) container.appendChild(row);
+}
+
+function removeDayRow(dayName) {
+    const row = document.getElementById('srow-' + dayName);
+    if (row) row.remove();
+}
+
+function updateScheduleWrapper() {
+    const wrapper   = document.getElementById('dayScheduleWrapper');
+    const container = document.getElementById('dayScheduleContainer');
+    if (!wrapper || !container) return;
+    wrapper.style.display = container.querySelectorAll('.schedule-row').length > 0 ? '' : 'none';
+}
+
+function addSlot(dayName) {
+    const slotsDiv = document.getElementById('slots-' + dayName);
+    if (!slotsDiv) return;
+    const div = document.createElement('div');
+    div.className = 'time-slot mt-1';
+    div.innerHTML = `
+        <input type="text" name="jam_detail[${dayName}][]"
+               class="form-control" placeholder="cth. 15:00 - 17:00" autocomplete="off">
+        <button type="button" class="btn-remove-slot" onclick="removeSlot(this)" title="Hapus">
+            <i class="bi bi-x"></i>
+        </button>`;
+    slotsDiv.appendChild(div);
+}
+
+function removeSlot(btn) {
+    btn.closest('.time-slot')?.remove();
 }
 
 function showStep(step) {

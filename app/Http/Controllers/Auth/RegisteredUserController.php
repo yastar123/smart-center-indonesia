@@ -59,7 +59,18 @@ class RegisteredUserController extends Controller
             'pickup_mode'     => $request->sistem_paket,
             'interests'       => $request->program_minat ?? [],
             'day_preferences' => $request->hari_belajar ?? [],
-            'schedule_time'   => $request->jam_belajar,
+            'schedule_time'   => (function() use ($request) {
+                $detail = $request->input('jam_detail', []);
+                if (empty($detail)) return null;
+                $lines = [];
+                foreach ($detail as $day => $slots) {
+                    $slots = array_filter((array) $slots);
+                    if (!empty($slots)) {
+                        $lines[] = $day . ': ' . implode(' dan ', $slots);
+                    }
+                }
+                return implode("\n", $lines) ?: null;
+            })(),
             'start_date'      => $request->tanggal_mulai ?: null,
             'notes'           => $request->catatan,
             'status'          => 'pending',
