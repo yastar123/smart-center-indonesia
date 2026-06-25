@@ -36,10 +36,8 @@
     $nonaktif= \App\Models\Student::where('status','nonaktif')->when($branchId, fn($q) => $q->where('branch_id', $branchId))->count();
     $lulus   = \App\Models\Student::where('status','lulus')->when($branchId, fn($q) => $q->where('branch_id', $branchId))->count();
 
-    // Recent students
-    $recentStudents = \App\Models\Student::with(['branch', 'schoolClasses.mataPelajaran'])
-        ->when($branchId, fn($q) => $q->where('branch_id', $branchId))
-        ->latest()->limit(5)->get();
+    // Recent registrations from public /register form
+    $recentRegistrations = \App\Models\StudentRegistration::latest()->limit(10)->get();
 
     // Invoice revenue
     $revenueThisMonthInvoice = \App\Models\Payment::where('status', 'verified')
@@ -292,125 +290,294 @@
 </div>
 @endif
 
-{{-- RECENT STUDENTS (owner & admin) --}}
+{{-- RECENT REGISTRATIONS (owner & admin) --}}
 @if($isOwnerAdmin)
 <div class="dashboard-card fade-up">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h6 class="fw-bold mb-0">
             <i class="bi bi-clock-history text-primary me-2"></i>Siswa Terbaru Mendaftar
         </h6>
-        <a href="{{ route('admin.students.index') }}" class="btn btn-sm btn-outline-primary" style="border-radius:8px;font-size:12px;padding:4px 14px">
-            Lihat Semua <i class="bi bi-arrow-right ms-1"></i>
-        </a>
+        @php $pendingCount = $recentRegistrations->where('status','pending')->count(); @endphp
+        @if($pendingCount > 0)
+        <span class="badge" style="background:var(--soft-warning-bg);color:var(--soft-warning-text);font-size:.73rem;padding:5px 12px;border-radius:20px">
+            <i class="bi bi-clock me-1"></i>{{ $pendingCount }} Menunggu
+        </span>
+        @endif
     </div>
 
-    @forelse($recentStudents as $idx => $s)
+    @forelse($recentRegistrations as $idx => $reg)
     @php
-        $avatar = 'https://ui-avatars.com/api/?name='.urlencode($s->name).'&background='.($s->gender==='P'?'ec4899':'c84ddf').'&color=fff&size=40';
-        $statusColors = ['aktif'=>['var(--soft-success-bg)','var(--soft-success-text)'],'nonaktif'=>['var(--soft-muted-bg)','var(--text-muted)'],'lulus'=>['var(--soft-primary-bg)','var(--soft-primary-text)']];
-        $sc = $statusColors[$s->status] ?? ['var(--soft-muted-bg)','var(--text-muted)'];
-        $courses = $s->schoolClasses ?? collect();
-        $accId = 'recentStudent-'.$s->id;
+        $avatar = 'https://ui-avatars.com/api/?name='.urlencode($reg->name).'&background='.($reg->gender==='P'?'ec4899':'c84ddf').'&color=fff&size=40';
+        $regStatusColors = [
+            'pending'  => ['var(--soft-warning-bg)','var(--soft-warning-text)'],
+            'verified' => ['var(--soft-success-bg)','var(--soft-success-text)'],
+            'rejected' => ['var(--soft-danger-bg)','var(--soft-danger-text)'],
+        ];
+        $rsc   = $regStatusColors[$reg->status] ?? ['var(--soft-muted-bg)','var(--text-muted)'];
+        $accId = 'reg-acc-'.$reg->id;
+        $interests = $reg->interests ?? [];
     @endphp
-    <div class="recent-student-item {{ $idx > 0 ? 'mt-2' : '' }}" style="border:1px solid var(--card-border);border-radius:12px;overflow:hidden;background:var(--card-bg)">
+    <div class="{{ $idx > 0 ? 'mt-2' : '' }}" style="border:1px solid var(--card-border);border-radius:12px;overflow:hidden;background:var(--card-bg)">
+
         {{-- Accordion Header --}}
-        <div class="d-flex align-items-center justify-content-between px-3 py-3 recent-student-toggle"
-             onclick="toggleRecentStudent('{{ $accId }}')"
-             style="cursor:pointer;user-select:none;transition:background .15s">
-            <div class="d-flex align-items-center gap-3">
-                <img src="{{ $s->photo ? Storage::url($s->photo) : $avatar }}"
-                     class="rounded-circle flex-shrink-0" width="40" height="40"
-                     style="object-fit:cover;border:2px solid var(--card-border)">
-                <div>
-                    <div class="fw-semibold" style="font-size:.93rem">{{ $s->name }}</div>
-                    <div class="text-muted" style="font-size:.73rem;line-height:1.3">
-                        {{ $s->gender === 'L' ? '👦' : ($s->gender === 'P' ? '👧' : '') }}
-                        <code style="background:var(--input-bg);padding:1px 5px;border-radius:4px;font-size:.7rem">{{ $s->nis }}</code>
-                        &nbsp;·&nbsp;{{ $s->branch->name ?? '–' }}
-                        &nbsp;·&nbsp;{{ $s->created_at->format('d M Y') }}
-                    </div>
+        <div class="d-flex align-items-center gap-3 px-3 py-3 reg-acc-toggle"
+             style="cursor:pointer;user-select:none;transition:background .15s"
+             onclick="toggleRegAcc('{{ $accId }}')">
+
+            {{-- Avatar --}}
+            <img src="{{ $avatar }}" class="rounded-circle flex-shrink-0" width="38" height="38"
+                 style="object-fit:cover;border:2px solid var(--card-border)">
+
+            {{-- Info --}}
+            <div class="flex-grow-1 min-width-0">
+                <div class="fw-semibold" style="font-size:.9rem">{{ $reg->name }}</div>
+                <div class="text-muted" style="font-size:.72rem;line-height:1.4">
+                    <code style="background:var(--input-bg);padding:1px 5px;border-radius:4px;font-size:.68rem">{{ $reg->no_reg }}</code>
+                    @if($reg->phone) &nbsp;·&nbsp; <i class="bi bi-telephone" style="font-size:.65rem"></i> {{ $reg->phone }} @endif
+                    @if($reg->branch) &nbsp;·&nbsp; <i class="bi bi-building" style="font-size:.65rem"></i> {{ $reg->branch }} @endif
+                    &nbsp;·&nbsp; {{ $reg->created_at->format('d M Y') }}
                 </div>
             </div>
+
+            {{-- Status badge + chevron --}}
             <div class="d-flex align-items-center gap-2 flex-shrink-0">
-                <span class="badge" style="background:{{ $sc[0] }};color:{{ $sc[1] }};padding:4px 10px;border-radius:20px;font-size:.72rem">
-                    {{ ucfirst($s->status) }}
+                <span class="badge" style="background:{{ $rsc[0] }};color:{{ $rsc[1] }};padding:4px 10px;border-radius:20px;font-size:.7rem">
+                    {{ $reg->status === 'pending' ? 'Menunggu' : ($reg->status === 'verified' ? 'Terverifikasi' : ucfirst($reg->status)) }}
                 </span>
-                <span class="badge {{ $courses->isEmpty() ? 'text-muted' : 'text-primary' }}"
-                      style="background:var(--input-bg);font-size:.72rem;padding:4px 9px;border-radius:20px">
-                    <i class="bi bi-journal-bookmark me-1"></i>{{ $courses->count() }} Kursus
+                @if(count($interests) > 0)
+                <span class="badge d-none d-sm-inline-block" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);padding:4px 9px;border-radius:20px;font-size:.7rem">
+                    <i class="bi bi-journal-bookmark me-1"></i>{{ count($interests) }} Minat
                 </span>
-                <i class="bi bi-chevron-down recent-student-chevron" id="chevron-{{ $accId }}"
-                   style="font-size:.85rem;color:var(--text-muted);transition:transform .25s"></i>
+                @endif
+                <i class="bi bi-chevron-down reg-acc-chevron" id="chevron-{{ $accId }}"
+                   style="font-size:.8rem;color:var(--text-muted);transition:transform .22s"></i>
             </div>
         </div>
 
-        {{-- Accordion Body: Courses --}}
-        <div id="{{ $accId }}" class="recent-student-body" style="display:none;border-top:1px solid var(--card-border)">
-            @if($courses->isEmpty())
-                <div class="text-center py-4 text-muted" style="font-size:.83rem">
-                    <i class="bi bi-journal-x d-block mb-2" style="font-size:1.6rem;opacity:.35"></i>
-                    Belum terdaftar di kelas manapun
-                </div>
-            @else
-                <div class="px-3 py-3">
-                    <div class="row g-2">
-                        @foreach($courses as $cls)
-                        @php
-                            $jenisMap = ['komputer'=>'Kursus Komputer','bahasa'=>'Kursus Bahasa Asing','mapel'=>'Mata Pelajaran','kedinasan'=>'Kedinasan','cpns'=>'CPNS','bumn'=>'BUMN','akpol'=>'AKPOL/AKMIL'];
-                            $kategoriColors = [
-                                'komputer'  => ['var(--soft-info-bg)','var(--soft-info-text)','bi-pc-display'],
-                                'bahasa'    => ['var(--soft-success-bg)','var(--soft-success-text)','bi-translate'],
-                                'mapel'     => ['var(--soft-primary-bg)','var(--soft-primary-text)','bi-book'],
-                                'kedinasan' => ['var(--soft-warning-bg)','var(--soft-warning-text)','bi-shield'],
-                                'cpns'      => ['var(--soft-warning-bg)','var(--soft-warning-text)','bi-file-earmark-person'],
-                                'bumn'      => ['var(--soft-danger-bg)','var(--soft-danger-text)','bi-building'],
-                                'akpol'     => ['var(--soft-danger-bg)','var(--soft-danger-text)','bi-star'],
-                            ];
-                            $cat  = $cls->mataPelajaran->jenis ?? ($cls->jenis ?? 'mapel');
-                            $cc   = $kategoriColors[$cat] ?? ['var(--soft-primary-bg)','var(--soft-primary-text)','bi-journal'];
-                            $nama = $cls->mataPelajaran->nama ?? $cls->nama_kelas ?? '–';
-                        @endphp
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-3"
-                                 style="background:var(--input-bg);border:1px solid var(--card-border)">
-                                <span style="width:30px;height:30px;border-radius:8px;background:{{ $cc[0] }};color:{{ $cc[1] }};display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0">
-                                    <i class="bi {{ $cc[2] }}"></i>
-                                </span>
-                                <div style="min-width:0">
-                                    <div class="fw-semibold text-truncate" style="font-size:.82rem">{{ $nama }}</div>
-                                    <div class="text-muted" style="font-size:.7rem">{{ $jenisMap[$cat] ?? ucfirst($cat) }} · {{ $cls->nama_kelas }}</div>
-                                </div>
+        {{-- Accordion Body --}}
+        <div id="{{ $accId }}" style="display:none;border-top:1px solid var(--card-border)">
+
+            {{-- Detail rows --}}
+            <div class="px-3 pt-3 pb-2">
+                <div class="row g-3">
+                    {{-- Program info --}}
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
+                            <div class="fw-semibold mb-2" style="font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Info Program</div>
+                            <div class="d-flex flex-column gap-1" style="font-size:.82rem">
+                                <div><span class="text-muted" style="min-width:110px;display:inline-block">Program</span> <strong>{{ $reg->program ?? '–' }}</strong></div>
+                                <div><span class="text-muted" style="min-width:110px;display:inline-block">Sistem</span> {{ $reg->system ?? '–' }}</div>
+                                <div><span class="text-muted" style="min-width:110px;display:inline-block">Tempat Belajar</span> {{ $reg->learning_place ?? '–' }}</div>
+                                @if($reg->pickup_mode)<div><span class="text-muted" style="min-width:110px;display:inline-block">Pengambilan</span> {{ $reg->pickup_mode }}</div>@endif
+                                <div><span class="text-muted" style="min-width:110px;display:inline-block">Cabang</span> {{ $reg->branch ?? '–' }}</div>
                             </div>
                         </div>
-                        @endforeach
                     </div>
+
+                    {{-- Personal info --}}
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
+                            <div class="fw-semibold mb-2" style="font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Data Pribadi</div>
+                            <div class="d-flex flex-column gap-1" style="font-size:.82rem">
+                                <div><span class="text-muted" style="min-width:110px;display:inline-block">Jenis Kelamin</span> {{ $reg->gender === 'L' ? '👦 Laki-laki' : ($reg->gender === 'P' ? '👧 Perempuan' : ($reg->gender ?? '–')) }}</div>
+                                @if($reg->birth_date)<div><span class="text-muted" style="min-width:110px;display:inline-block">Tgl Lahir</span> {{ $reg->birth_date->format('d M Y') }}</div>@endif
+                                @if($reg->address)<div><span class="text-muted" style="min-width:110px;display:inline-block">Alamat</span> <span style="white-space:pre-line">{{ $reg->address }}</span></div>@endif
+                                @if($reg->parent_name)<div><span class="text-muted" style="min-width:110px;display:inline-block">Orang Tua</span> {{ $reg->parent_name }}</div>@endif
+                                @if($reg->parent_phone)<div><span class="text-muted" style="min-width:110px;display:inline-block">HP Ortu</span> {{ $reg->parent_phone }}</div>@endif
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Interests --}}
+                    @if(count($interests) > 0)
+                    <div class="col-12">
+                        <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
+                            <div class="fw-semibold mb-2" style="font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Program yang Diminati</div>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach($interests as $interest)
+                                <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);padding:5px 11px;border-radius:20px;font-size:.75rem;font-weight:500">
+                                    <i class="bi bi-check2 me-1"></i>{{ $interest }}
+                                </span>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Schedule --}}
+                    @if(($reg->day_preferences && count($reg->day_preferences) > 0) || $reg->schedule_time || $reg->start_date)
+                    <div class="col-12">
+                        <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
+                            <div class="fw-semibold mb-2" style="font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Jadwal Belajar</div>
+                            <div class="d-flex flex-wrap gap-2 align-items-center" style="font-size:.82rem">
+                                @if($reg->day_preferences && count($reg->day_preferences) > 0)
+                                    @foreach($reg->day_preferences as $day)
+                                    <span class="badge" style="background:var(--soft-info-bg);color:var(--soft-info-text);padding:4px 10px;border-radius:20px;font-size:.73rem">{{ $day }}</span>
+                                    @endforeach
+                                @endif
+                                @if($reg->schedule_time) <span class="text-muted">·</span> <span>🕐 {{ $reg->schedule_time }}</span> @endif
+                                @if($reg->start_date) <span class="text-muted">·</span> <span>📅 Mulai {{ $reg->start_date->format('d M Y') }}</span> @endif
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Notes --}}
+                    @if($reg->notes)
+                    <div class="col-12">
+                        <div class="p-3 rounded-3" style="background:var(--soft-warning-bg);border:1px solid rgba(245,158,11,.15)">
+                            <div class="fw-semibold mb-1" style="font-size:.78rem;color:var(--soft-warning-text);text-transform:uppercase;letter-spacing:.05em"><i class="bi bi-chat-text me-1"></i>Catatan</div>
+                            <div style="font-size:.82rem;color:var(--text-primary)">{{ $reg->notes }}</div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
-            @endif
+            </div>
+
+            {{-- Action buttons --}}
+            <div class="px-3 pb-3 d-flex gap-2 justify-content-end">
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                        onclick="openRegDetail({{ $reg->id }})"
+                        style="border-radius:8px;font-size:.78rem;padding:5px 14px">
+                    <i class="bi bi-eye me-1"></i>Detail
+                </button>
+                @if($reg->status === 'pending')
+                <button type="button" class="btn btn-sm btn-outline-success"
+                        onclick="verifyReg({{ $reg->id }}, this)"
+                        data-id="{{ $reg->id }}"
+                        style="border-radius:8px;font-size:.78rem;padding:5px 14px">
+                    <i class="bi bi-check-circle me-1"></i>Verifikasi
+                </button>
+                @else
+                <button type="button" class="btn btn-sm btn-outline-success" disabled
+                        style="border-radius:8px;font-size:.78rem;padding:5px 14px;opacity:.5">
+                    <i class="bi bi-check-circle-fill me-1"></i>Terverifikasi
+                </button>
+                @endif
+                <button type="button" class="btn btn-sm btn-outline-danger"
+                        onclick="deleteReg({{ $reg->id }}, this)"
+                        style="border-radius:8px;font-size:.78rem;padding:5px 14px">
+                    <i class="bi bi-trash me-1"></i>Hapus
+                </button>
+            </div>
         </div>
     </div>
     @empty
     <div class="text-center py-5">
         <i class="bi bi-inbox d-block mb-3" style="font-size:3rem;opacity:.2"></i>
-        <div class="fw-semibold mb-1">Belum ada siswa terdaftar</div>
-        <a href="{{ route('admin.students.index') }}" class="btn btn-sm btn-primary mt-1">
-            <i class="bi bi-plus-circle me-1"></i>Tambah Siswa
-        </a>
+        <div class="fw-semibold mb-1">Belum ada pendaftar</div>
+        <p class="text-muted" style="font-size:.83rem">Data akan muncul ketika calon siswa mengisi form pendaftaran di halaman /register</p>
     </div>
     @endforelse
 </div>
 
+{{-- DETAIL MODAL --}}
+<div class="modal fade" id="regDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content" style="border-radius:16px;border:1px solid var(--card-border);background:var(--card-bg)">
+            <div class="modal-header" style="background:linear-gradient(135deg,#260632,#461256,#c84ddf);border-radius:16px 16px 0 0;border:none">
+                <h5 class="modal-title text-white fw-bold" style="font-size:1rem"><i class="bi bi-person-vcard me-2"></i>Detail Pendaftaran</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="regDetailBody">
+                <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
-.recent-student-toggle:hover { background: rgba(104,17,126,.04); }
-[data-theme="dark"] .recent-student-toggle:hover { background: rgba(200,77,223,.06); }
-.recent-student-chevron.open { transform: rotate(180deg); }
+.reg-acc-toggle:hover { background: rgba(104,17,126,.04); }
+[data-theme="dark"] .reg-acc-toggle:hover { background: rgba(200,77,223,.06); }
+.reg-acc-chevron.open { transform: rotate(180deg); }
 </style>
 <script>
-function toggleRecentStudent(id) {
+const _regDetailUrl = '{{ url("admin/student-registrations") }}';
+const _regVerifyUrl = '{{ url("admin/student-registrations") }}';
+const _regCsrf      = '{{ csrf_token() }}';
+
+function toggleRegAcc(id) {
     const body    = document.getElementById(id);
     const chevron = document.getElementById('chevron-' + id);
     const isOpen  = body.style.display !== 'none';
     body.style.display = isOpen ? 'none' : 'block';
     if (chevron) chevron.classList.toggle('open', !isOpen);
+}
+
+function openRegDetail(id) {
+    const modal = new bootstrap.Modal(document.getElementById('regDetailModal'));
+    document.getElementById('regDetailBody').innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>';
+    modal.show();
+    fetch(`${_regDetailUrl}/${id}`, { headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': _regCsrf } })
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(d => {
+            document.getElementById('regDetailBody').innerHTML = `
+            <div class="row g-3">
+                <div class="col-md-6"><h6 class="text-muted fw-semibold" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em">Data Diri</h6>
+                <table class="table table-sm table-borderless" style="font-size:.83rem">
+                    <tr><td class="text-muted" style="width:120px">No. Registrasi</td><td><code>${d.no_reg||'–'}</code></td></tr>
+                    <tr><td class="text-muted">Nama</td><td>${d.name||'–'}</td></tr>
+                    <tr><td class="text-muted">No. HP</td><td>${d.phone||'–'}</td></tr>
+                    <tr><td class="text-muted">Jenis Kelamin</td><td>${d.gender==='L'?'Laki-laki':d.gender==='P'?'Perempuan':(d.gender||'–')}</td></tr>
+                    <tr><td class="text-muted">Tempat Lahir</td><td>${d.birth_place||'–'}</td></tr>
+                    <tr><td class="text-muted">Tgl Lahir</td><td>${d.birth_date||'–'}</td></tr>
+                    <tr><td class="text-muted">Alamat</td><td>${d.address||'–'}</td></tr>
+                    <tr><td class="text-muted">Orang Tua</td><td>${d.parent_name||'–'}</td></tr>
+                    <tr><td class="text-muted">HP Ortu</td><td>${d.parent_phone||'–'}</td></tr>
+                    <tr><td class="text-muted">Pekerjaan</td><td>${d.job||'–'}</td></tr>
+                </table></div>
+                <div class="col-md-6"><h6 class="text-muted fw-semibold" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em">Info Program</h6>
+                <table class="table table-sm table-borderless" style="font-size:.83rem">
+                    <tr><td class="text-muted" style="width:120px">Program</td><td><strong>${d.program||'–'}</strong></td></tr>
+                    <tr><td class="text-muted">Sistem</td><td>${d.system||'–'}</td></tr>
+                    <tr><td class="text-muted">Tempat</td><td>${d.learning_place||'–'}</td></tr>
+                    <tr><td class="text-muted">Pengambilan</td><td>${d.pickup_mode||'–'}</td></tr>
+                    <tr><td class="text-muted">Cabang</td><td>${d.branch||'–'}</td></tr>
+                    <tr><td class="text-muted">Hari</td><td>${(d.day_preferences||[]).join(', ')||'–'}</td></tr>
+                    <tr><td class="text-muted">Jam</td><td>${d.schedule_time||'–'}</td></tr>
+                    <tr><td class="text-muted">Tgl Mulai</td><td>${d.start_date||'–'}</td></tr>
+                    <tr><td class="text-muted">Status</td><td><span class="badge bg-${d.status==='verified'?'success':d.status==='rejected'?'danger':'warning'}">${d.status}</span></td></tr>
+                    <tr><td class="text-muted">Mendaftar</td><td>${d.created_at||'–'}</td></tr>
+                </table></div>
+                ${(d.interests||[]).length ? `<div class="col-12"><h6 class="text-muted fw-semibold" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em">Program yang Diminati</h6><div class="d-flex flex-wrap gap-2">${(d.interests||[]).map(i=>`<span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);padding:5px 12px;border-radius:20px">${i}</span>`).join('')}</div></div>` : ''}
+                ${d.notes ? `<div class="col-12"><h6 class="text-muted fw-semibold" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em">Catatan</h6><p style="font-size:.85rem">${d.notes}</p></div>` : ''}
+            </div>`;
+        })
+        .catch(() => {
+            document.getElementById('regDetailBody').innerHTML = '<div class="text-center py-4 text-danger"><i class="bi bi-x-circle-fill d-block mb-2" style="font-size:2rem"></i>Gagal memuat data.</div>';
+        });
+}
+
+function verifyReg(id, btn) {
+    confirmAction('Tandai pendaftaran ini sebagai <strong>terverifikasi</strong>?', function() {
+        btn.disabled = true;
+        fetch(`${_regVerifyUrl}/${id}/verify`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': _regCsrf }
+        })
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(d => {
+            if (d.success) { showToast(d.message, 'success'); setTimeout(() => location.reload(), 800); }
+            else { showToast(d.message || 'Gagal memverifikasi.', 'error'); btn.disabled = false; }
+        })
+        .catch(() => { showToast('Terjadi kesalahan.', 'error'); btn.disabled = false; });
+    }, null, { title: 'Verifikasi Pendaftaran', okText: '<i class="bi bi-check-circle me-1"></i>Verifikasi', btnClass: 'btn-success', type: 'warning' });
+}
+
+function deleteReg(id, btn) {
+    confirmAction('Data pendaftaran ini akan <strong>dihapus permanen</strong>. Lanjutkan?', function() {
+        btn.disabled = true;
+        fetch(`${_regVerifyUrl}/${id}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': _regCsrf }
+        })
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(d => {
+            if (d.success) { showToast(d.message, 'success'); setTimeout(() => location.reload(), 800); }
+            else { showToast(d.message || 'Gagal menghapus.', 'error'); btn.disabled = false; }
+        })
+        .catch(() => { showToast('Terjadi kesalahan.', 'error'); btn.disabled = false; });
+    }, null, { title: 'Hapus Pendaftaran', okText: '<i class="bi bi-trash me-1"></i>Hapus', btnClass: 'btn-danger' });
 }
 </script>
 @endif

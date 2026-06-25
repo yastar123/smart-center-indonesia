@@ -667,7 +667,7 @@ unset($__errorArgs, $__bag); ?>
                                 <?php $items = $subjects[$jenis]; ?>
                                 <div class="col-md-6 <?php echo e($jenis === 'mapel' ? 'mapel-section' : ''); ?>"
                                      id="section-<?php echo e($jenis); ?>"
-                                     style="<?php echo e($jenis === 'mapel' && old('program_belajar','kelas') === 'kelas' ? 'display:none' : ''); ?>">
+                                     style="">
                                     <div class="program-group">
                                         <div class="program-group-label"><?php echo e($jenisLabels[$jenis]); ?></div>
                                         <div class="check-grid">
@@ -832,11 +832,6 @@ function pickProgram(val, el) {
         document.getElementById('tempat_belajar').value = 'kantor';
     }
 
-    // Show/hide Mata Pelajaran section in Step 4
-    const mapelSection = document.getElementById('section-mapel');
-    if (mapelSection) {
-        mapelSection.style.display = (val === 'kelas') ? 'none' : '';
-    }
 }
 
 (function initProgramState() {
@@ -845,11 +840,6 @@ function pickProgram(val, el) {
     if (prog.value === 'privat') {
         const rumahBtn = document.getElementById('tempatRumahBtn');
         if (rumahBtn) rumahBtn.classList.remove('d-none');
-    }
-    // Init mapel visibility
-    const mapelSection = document.getElementById('section-mapel');
-    if (mapelSection) {
-        mapelSection.style.display = (prog.value === 'kelas') ? 'none' : '';
     }
 })();
 

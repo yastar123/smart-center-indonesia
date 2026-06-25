@@ -628,42 +628,30 @@
                                 'cpns'      => 'CPNS',
                                 'bumn'      => 'BUMN',
                             ];
-                            $jenisAccordion = ['kedinasan','cpns','bumn','akpol'];
-                            $jenisFlat      = ['komputer','bahasa','mapel'];
+                            $jenisIcons = [
+                                'komputer'  => 'bi-pc-display',
+                                'bahasa'    => 'bi-translate',
+                                'mapel'     => 'bi-journal-bookmark',
+                                'kedinasan' => 'bi-building',
+                                'cpns'      => 'bi-file-earmark-person',
+                                'bumn'      => 'bi-briefcase',
+                                'akpol'     => 'bi-shield',
+                            ];
+                            $jenisOrder = ['komputer','bahasa','mapel','kedinasan','cpns','bumn','akpol'];
                         @endphp
 
-                        {{-- Flat sections: Komputer, Bahasa, Mata Pelajaran --}}
-                        <div class="row g-4" id="flatProgramsRow">
-                            @foreach($jenisFlat as $jenis)
+                        {{-- All program types as accordion --}}
+                        <div class="mt-2">
+                            @foreach($jenisOrder as $jenis)
                                 @if(!$subjects->has($jenis)) @continue @endif
                                 @php $items = $subjects[$jenis]; @endphp
-                                <div class="col-md-6 {{ $jenis === 'mapel' ? 'mapel-section' : '' }}"
-                                     id="section-{{ $jenis }}"
-                                     style="">
-                                    <div class="program-group">
-                                        <div class="program-group-label">{{ $jenisLabels[$jenis] }}</div>
-                                        <div class="check-grid">
-                                            @foreach($items as $course)
-                                            <label class="check-pill {{ in_array($course->nama, old('program_minat', [])) ? 'selected' : '' }}" onclick="togglePill(this)">
-                                                <input type="checkbox" name="program_minat[]" value="{{ $course->nama }}"
-                                                       {{ in_array($course->nama, old('program_minat', [])) ? 'checked' : '' }}>
-                                                {{ $course->nama }}
-                                            </label>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-
-                        {{-- Accordion sections: Kedinasan, CPNS, BUMN, AKPOL --}}
-                        <div class="mt-3">
-                            @foreach($jenisAccordion as $jenis)
-                                @if(!$subjects->has($jenis)) @continue @endif
-                                @php $items = $subjects[$jenis]; @endphp
-                                <div>
+                                <div class="mb-2" id="section-{{ $jenis }}">
                                     <div class="accordion-cat" onclick="toggleAccordion('acc-{{ $jenis }}', this)">
-                                        <span><i class="bi bi-building me-2" style="color:#c84ddf"></i>{{ $jenisLabels[$jenis] ?? ucfirst($jenis) }}</span>
+                                        <span>
+                                            <i class="bi {{ $jenisIcons[$jenis] ?? 'bi-journal' }} me-2" style="color:#c84ddf"></i>
+                                            {{ $jenisLabels[$jenis] ?? ucfirst($jenis) }}
+                                            <span class="badge ms-2" style="background:rgba(200,77,223,.12);color:#c84ddf;font-size:.63rem;font-weight:600;border-radius:10px;padding:2px 7px">{{ $items->count() }}</span>
+                                        </span>
                                         <i class="bi bi-chevron-right acc-arrow"></i>
                                     </div>
                                     <div class="accordion-body {{ collect(old('program_minat', []))->intersect($items->pluck('nama'))->isNotEmpty() ? 'open' : '' }}" id="acc-{{ $jenis }}">

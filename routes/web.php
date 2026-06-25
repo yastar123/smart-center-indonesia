@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\CoursePackageController;
 use App\Http\Controllers\Admin\ScheduleDashboardController;
 use App\Http\Controllers\Admin\RescheduleController;
 use App\Http\Controllers\Admin\RegistrationController;
+use App\Http\Controllers\Admin\StudentRegistrationController;
 use App\Http\Controllers\Admin\AcademicModuleController;
 use App\Http\Controllers\Admin\BillingController;
 use App\Http\Controllers\Admin\TryoutController;
@@ -204,6 +205,11 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         // REGISTRATION (Registrasi Siswa)
         Route::get('/registration-create',       [RegistrationController::class, 'create']) ->name('registration.create');
         Route::post('/registration-create',      [RegistrationController::class, 'store'])  ->name('registration.store');
+
+        // STUDENT REGISTRATIONS (pendaftar dari form publik)
+        Route::get('/student-registrations/{studentRegistration}',        [StudentRegistrationController::class, 'show'])    ->name('student-registrations.show');
+        Route::post('/student-registrations/{studentRegistration}/verify', [StudentRegistrationController::class, 'verify'])  ->name('student-registrations.verify');
+        Route::delete('/student-registrations/{studentRegistration}',      [StudentRegistrationController::class, 'destroy']) ->name('student-registrations.destroy');
 
         // ACADEMIC MODULE (Modul Akademik)
         Route::get('/module',                    [AcademicModuleController::class, 'index'])   ->name('module.index');

@@ -3255,12 +3255,6 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="<?php echo e(route('admin.student-registrations.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.student-registrations.*') ? 'active' : ''); ?>" data-label="Siswa Sementara">
-                <i class="bi bi-person-plus"></i>
-                <span>Siswa Sementara</span>
-            </a>
-        </div>
-        <div class="nav-item">
             <a href="<?php echo e(route('admin.students.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.students.*') ? 'active' : ''); ?>" data-label="Siswa">
                 <i class="bi bi-mortarboard"></i>
                 <span>Siswa</span>
