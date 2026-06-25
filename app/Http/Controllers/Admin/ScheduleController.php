@@ -198,18 +198,30 @@ class ScheduleController extends Controller
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Jadwal sesi berhasil diperbarui']);
         }
-        return redirect()->route('admin.schedules.create')->with('success', 'Jadwal sesi berhasil diperbarui!');
+        return redirect()->route('admin.schedules.index')->with('success', 'Jadwal sesi berhasil diperbarui!');
     }
 
     public function edit(Schedule $schedule)
     {
-        $schedule->load(['paket.guru', 'paket.mataPelajaran', 'paket.cabang', 'guru', 'cabang']);
+        $schedule->load(['mataPelajaran', 'paket.guru', 'paket.mataPelajaran', 'paket.cabang', 'guru', 'cabang', 'kelas', 'module']);
         $pakets = Package::with(['guru', 'mataPelajaran', 'cabang'])
             ->where('status', 'aktif')
             ->orderBy('nama')
             ->get();
         $branches = Branch::all();
-        return view('admin.schedules.edit', compact('schedule', 'pakets', 'branches'));
+        $teachers = \App\Models\Teacher::with(['branch', 'courses'])
+            ->where('status', 'aktif')
+            ->orderBy('name')
+            ->get();
+        $classes = \App\Models\SchoolClass::with(['mataPelajaran', 'cabang', 'guru'])
+            ->where('status', 'aktif')
+            ->orderBy('nama_kelas')
+            ->get();
+        $modules = Module::with('mataPelajaran')
+            ->where('status', 'aktif')
+            ->orderBy('judul')
+            ->get();
+        return view('admin.schedules.edit', compact('schedule', 'pakets', 'branches', 'teachers', 'classes', 'modules'));
     }
 
     public function destroy(Schedule $schedule)
