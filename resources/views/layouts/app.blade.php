@@ -3248,6 +3248,12 @@
                 <span>Master Kurikulum & Silabus</span>
             </a>
         </div>
+        <div class="nav-item">
+            <a href="{{ route('owner.promo.index') }}" class="nav-link {{ request()->routeIs('owner.promo.*') ? 'active' : '' }}" data-label="Manajemen Promo">
+                <i class="bi bi-megaphone-fill"></i>
+                <span>Manajemen Promo</span>
+            </a>
+        </div>
         @endrole
 
         {{-- ADMIN --}}

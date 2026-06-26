@@ -3242,6 +3242,12 @@
                 <span>Analytics</span>
             </a>
         </div>
+        <div class="nav-item">
+            <a href="<?php echo e(route('owner.curriculum.index')); ?>" class="nav-link <?php echo e(request()->routeIs('owner.curriculum.*') ? 'active' : ''); ?>" data-label="Master Kurikulum & Silabus">
+                <i class="bi bi-journal-richtext"></i>
+                <span>Master Kurikulum & Silabus</span>
+            </a>
+        </div>
         <?php endif; ?>
 
         
@@ -3285,9 +3291,9 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="<?php echo e(route('admin.attendance.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.attendance.index') || request()->routeIs('admin.attendance.sessions') ? 'active' : ''); ?>" data-label="Absensi">
+            <a href="<?php echo e(route('admin.attendance.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.attendance.index') || request()->routeIs('admin.attendance.sessions') ? 'active' : ''); ?>" data-label="Manajemen Absensi">
                 <i class="bi bi-clipboard2-check"></i>
-                <span>Absensi</span>
+                <span>Manajemen Absensi</span>
             </a>
         </div>
         <div class="nav-item">
@@ -3297,9 +3303,9 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="<?php echo e(route('admin.reschedule.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.reschedule.*') ? 'active' : ''); ?>" data-label="Reschedule">
+            <a href="<?php echo e(route('admin.reschedule.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.reschedule.*') ? 'active' : ''); ?>" data-label="Manajemen Reschedule">
                 <i class="bi bi-arrow-left-right"></i>
-                <span>Reschedule</span>
+                <span>Manajemen Reschedule</span>
                 <?php $pendingReschedule = \App\Models\ScheduleProposal::where('status','pending')->count(); ?>
                 <?php if($pendingReschedule > 0): ?>
                     <span class="menu-badge"><?php echo e($pendingReschedule > 99 ? '99+' : $pendingReschedule); ?></span>

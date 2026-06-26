@@ -429,6 +429,15 @@ Route::middleware(['auth', 'role:owner'])
         })->name('settings.update');
         Route::get('/analytics', fn() => view('owner.analytics'))->name('analytics');
 
+        // PROMO & KONTEN
+        Route::get('/promo',              [\App\Http\Controllers\Owner\PromoController::class, 'index'])   ->name('promo.index');
+        Route::get('/promo/create',       [\App\Http\Controllers\Owner\PromoController::class, 'create'])  ->name('promo.create');
+        Route::post('/promo',             [\App\Http\Controllers\Owner\PromoController::class, 'store'])   ->name('promo.store');
+        Route::get('/promo/{promo}',      [\App\Http\Controllers\Owner\PromoController::class, 'show'])    ->name('promo.show');
+        Route::get('/promo/{promo}/edit', [\App\Http\Controllers\Owner\PromoController::class, 'edit'])    ->name('promo.edit');
+        Route::post('/promo/{promo}',     [\App\Http\Controllers\Owner\PromoController::class, 'update'])  ->name('promo.update');
+        Route::delete('/promo/{promo}',   [\App\Http\Controllers\Owner\PromoController::class, 'destroy']) ->name('promo.destroy');
+
         // KURIKULUM & SILABUS
         Route::get('/curriculum',                         [\App\Http\Controllers\Owner\CurriculumController::class, 'index'])           ->name('curriculum.index');
         Route::get('/curriculum/create',                  [\App\Http\Controllers\Owner\CurriculumController::class, 'create'])          ->name('curriculum.create');
