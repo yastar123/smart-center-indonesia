@@ -61,45 +61,6 @@ endif;
 unset($__errorArgs, $__bag); ?>
             </div>
             <div class="col-md-4">
-                <label class="form-label fw-semibold">Jenis Paket <span class="text-danger">*</span></label>
-                <select name="jenis" class="form-select <?php $__errorArgs = ['jenis'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>" required>
-                    <option value="">Pilih jenis…</option>
-                    <?php $__currentLoopData = ['reguler'=>'Reguler','intensif'=>'Intensif','privat'=>'Privat (1 Siswa)','online'=>'Online']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val=>$label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <option value="<?php echo e($val); ?>" <?php echo e(old('jenis')==$val?'selected':''); ?>><?php echo e($label); ?></option>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </select>
-                <?php $__errorArgs = ['jenis'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?><div class="invalid-feedback"><?php echo e($message); ?></div><?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label fw-semibold">Metode Absensi <span class="text-danger">*</span></label>
-                <select name="metode_absensi" class="form-select" required>
-                    <option value="manual"   <?php echo e(old('metode_absensi','manual')=='manual'  ?'selected':''); ?>>Manual</option>
-                    <option value="otomatis" <?php echo e(old('metode_absensi')=='otomatis'         ?'selected':''); ?>>Otomatis</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label fw-semibold">Tipe Kelas <span class="text-danger">*</span></label>
-                <select name="tipe_kelas" class="form-select" required>
-                    <option value="offline" <?php echo e(old('tipe_kelas','offline')=='offline'?'selected':''); ?>>Offline</option>
-                    <option value="online"  <?php echo e(old('tipe_kelas')=='online'            ?'selected':''); ?>>Online</option>
-                    <option value="private" <?php echo e(old('tipe_kelas')=='private'           ?'selected':''); ?>>Private</option>
-                </select>
-            </div>
-            <div class="col-md-4">
                 <label class="form-label fw-semibold">Harga Dasar (Rp) <span class="text-danger">*</span></label>
                 <input type="number" name="harga" class="form-control <?php $__errorArgs = ['harga'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -139,10 +100,6 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
             </div>
-            <div class="col-md-4">
-                <label class="form-label fw-semibold">Durasi (bulan)</label>
-                <input type="number" name="durasi_bulan" class="form-control" value="<?php echo e(old('durasi_bulan', 3)); ?>" min="1">
-            </div>
             <div class="col-md-6">
                 <label class="form-label fw-semibold">Cabang</label>
                 <select name="cabang_id" class="form-select">
@@ -158,12 +115,6 @@ unset($__errorArgs, $__bag); ?>
                     <option value="aktif"    <?php echo e(old('status','aktif')=='aktif'   ?'selected':''); ?>>Aktif</option>
                     <option value="nonaktif" <?php echo e(old('status')=='nonaktif'         ?'selected':''); ?>>Non Aktif</option>
                 </select>
-            </div>
-            <div class="col-md-3 d-flex align-items-end pb-1">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" name="is_unggulan" id="isUnggulan" value="1" <?php echo e(old('is_unggulan')?'checked':''); ?>>
-                    <label class="form-check-label" for="isUnggulan">Paket Unggulan ⭐</label>
-                </div>
             </div>
             <div class="col-12">
                 <label class="form-label fw-semibold">Deskripsi</label>

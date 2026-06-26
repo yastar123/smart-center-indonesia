@@ -261,40 +261,52 @@
                                 </select>
                             </div>
                             <div class="col-12">
-                                <label class="form-label fw-semibold">Mata Pelajaran & Guru Pengajar</label>
-                                <div class="text-muted mb-2" style="font-size:12px"><i class="bi bi-info-circle me-1"></i>Centang mata pelajaran lalu pilih guru yang mengajar mapel tersebut.</div>
+                                <label class="form-label fw-semibold">Mata Pelajaran</label>
+                                <div class="text-muted mb-2" style="font-size:12px"><i class="bi bi-info-circle me-1"></i>Klik kategori untuk melihat mata pelajaran, lalu centang yang ingin dimasukkan.</div>
                                 @if($courses->isEmpty())
                                     <div class="text-muted" style="font-size:13px">Belum ada mata pelajaran aktif.</div>
                                 @else
+                                @php
+                                    $jenisLabelsReg = [
+                                        'komputer'  => 'Kursus Komputer',
+                                        'bahasa'    => 'Kursus Bahasa Asing',
+                                        'mapel'     => 'Mata Pelajaran',
+                                        'kedinasan' => 'Program Kedinasan',
+                                        'akpol'     => 'AKPOL / AKMIL / BINTARA',
+                                        'cpns'      => 'CPNS',
+                                        'bumn'      => 'BUMN',
+                                        'lainnya'   => 'Lainnya',
+                                    ];
+                                    $coursesGroupedCustom = $courses->groupBy('jenis');
+                                    $oldCC = old('custom_course_ids', []);
+                                @endphp
                                 <div id="customCourseRows">
-                                    @foreach($courses as $c)
-                                    @php $oldCC = old('custom_course_ids', []); @endphp
-                                    <div class="mb-2 rounded-3" style="border:1.5px solid {{ in_array($c->id, $oldCC)?'#c84ddf':'var(--card-border)' }};overflow:hidden" id="cuscard-{{ $c->id }}">
-                                        <div class="d-flex align-items-center gap-2 px-3 py-2" style="background:var(--input-bg);cursor:pointer"
-                                             onclick="document.getElementById('cus_course_{{ $c->id }}').click()">
-                                            <input class="form-check-input cus-course-check" type="checkbox"
-                                                   name="custom_course_ids[]" value="{{ $c->id }}"
-                                                   id="cus_course_{{ $c->id }}"
-                                                   {{ in_array($c->id, $oldCC) ? 'checked' : '' }}
-                                                   onchange="toggleCustomCourseTeacher({{ $c->id }}, this.checked)"
-                                                   onclick="event.stopPropagation()">
-                                            <span class="fw-semibold" style="font-size:13px">
-                                                <i class="bi bi-book text-primary me-1"></i>{{ $c->nama }}
-                                            </span>
+                                    @foreach($coursesGroupedCustom as $jenis => $groupCourses)
+                                    @php $gKey = 'cus'.preg_replace('/[^a-z0-9]/','', $jenis); @endphp
+                                    <div class="mb-1 px-1 py-1 rounded-2" style="background:linear-gradient(135deg,#f8f5ff,#f3eeff);border:1px solid #e9d5ff;cursor:pointer"
+                                         onclick="toggleCustomGroup('{{ $gKey }}')">
+                                        <div class="d-flex align-items-center justify-content-between" style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#68117e;padding:6px 10px 4px">
+                                            <span><i class="bi bi-folder2-open me-1"></i>{{ $jenisLabelsReg[$jenis] ?? ucfirst($jenis) }}</span>
+                                            <i class="bi bi-chevron-down" id="cusgroup-icon-{{ $gKey }}" style="transition:.2s"></i>
                                         </div>
-                                        <div class="px-3 py-2 border-top" id="custeacher-{{ $c->id }}"
-                                             style="{{ in_array($c->id, $oldCC)?'':'display:none' }}">
-                                            <label style="font-size:12px;color:var(--text-muted)">Guru pengajar:</label>
-                                            <select name="custom_course_teachers[{{ $c->id }}]" class="form-select form-select-sm mt-1">
-                                                <option value="">— Pilih guru —</option>
-                                                @foreach($teachers as $t)
-                                                <option value="{{ $t->id }}"
-                                                    {{ old("custom_course_teachers.{$c->id}") == $t->id ? 'selected' : '' }}>
-                                                    {{ $t->name }}{{ $t->branch ? ' ('.$t->branch->name.')' : '' }}
-                                                </option>
-                                                @endforeach
-                                            </select>
+                                    </div>
+                                    <div id="cusgroup-{{ $gKey }}" class="mb-3" style="display:none">
+                                        @foreach($groupCourses as $c)
+                                        <div class="mb-2 rounded-3" style="border:1.5px solid {{ in_array($c->id, $oldCC)?'#c84ddf':'var(--card-border)' }};overflow:hidden;transition:.2s" id="cuscard-{{ $c->id }}">
+                                            <div class="d-flex align-items-center gap-2 px-3 py-2" style="background:var(--input-bg);cursor:pointer"
+                                                 onclick="document.getElementById('cus_course_{{ $c->id }}').click()">
+                                                <input class="form-check-input cus-course-check" type="checkbox"
+                                                       name="custom_course_ids[]" value="{{ $c->id }}"
+                                                       id="cus_course_{{ $c->id }}"
+                                                       {{ in_array($c->id, $oldCC) ? 'checked' : '' }}
+                                                       onchange="toggleCustomCourseCheck({{ $c->id }}, this.checked)"
+                                                       onclick="event.stopPropagation()">
+                                                <span class="fw-semibold" style="font-size:13px">
+                                                    <i class="bi bi-book text-primary me-1"></i>{{ $c->nama }}
+                                                </span>
+                                            </div>
                                         </div>
+                                        @endforeach
                                     </div>
                                     @endforeach
                                 </div>
@@ -555,15 +567,18 @@ function switchStudent(type) {
     updateQuote();
 }
 
-function toggleCustomCourseTeacher(courseId, checked) {
-    const section = document.getElementById('custeacher-' + courseId);
-    const card    = document.getElementById('cuscard-' + courseId);
-    if (section) section.style.display = checked ? '' : 'none';
-    if (card)    card.style.borderColor = checked ? '#c84ddf' : 'var(--card-border)';
-    if (!checked && section) {
-        const sel = section.querySelector('select');
-        if (sel) sel.value = '';
-    }
+function toggleCustomGroup(key) {
+    const el   = document.getElementById('cusgroup-' + key);
+    const icon = document.getElementById('cusgroup-icon-' + key);
+    if (!el) return;
+    const hidden = el.style.display === 'none';
+    el.style.display = hidden ? '' : 'none';
+    if (icon) icon.style.transform = hidden ? 'rotate(180deg)' : '';
+}
+
+function toggleCustomCourseCheck(courseId, checked) {
+    const card = document.getElementById('cuscard-' + courseId);
+    if (card) card.style.borderColor = checked ? '#c84ddf' : 'var(--card-border)';
 }
 
 function switchPackage(type) {

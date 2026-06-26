@@ -42,14 +42,6 @@
                 </div>
 
                 <div class="col-md-3">
-                    <label class="form-label fw-semibold">Jenis</label>
-                    <select name="jenis" class="form-select">
-                        <option value="materi" {{ old('jenis','materi')=='materi'?'selected':'' }}>Materi</option>
-                        <option value="video"  {{ old('jenis')=='video' ?'selected':'' }}>Video</option>
-                    </select>
-                </div>
-
-                <div class="col-md-3">
                     <label class="form-label fw-semibold">Status <span class="text-danger">*</span></label>
                     <select name="status" class="form-select @error('status') is-invalid @enderror" required>
                         <option value="aktif"   {{ old('status','aktif')=='aktif'   ?'selected':'' }}>Aktif</option>
@@ -76,10 +68,6 @@
                     @error('video_url')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
-                <div class="col-12">
-                    <label class="form-label fw-semibold">Deskripsi / Silabus</label>
-                    <textarea name="deskripsi" rows="4" class="form-control" placeholder="Isi silabus, bab, atau deskripsi singkat modul...">{{ old('deskripsi') }}</textarea>
-                </div>
             </div>
 
             <div class="d-flex gap-2 mt-4">

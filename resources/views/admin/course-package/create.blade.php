@@ -82,15 +82,15 @@
         </div>
     </div>
 
-    {{-- CARD 2: Mata Pelajaran & Guru per Mapel --}}
+    {{-- CARD 2: Mata Pelajaran --}}
     <div class="dashboard-card mb-4">
         <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
             <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#461256,#c84ddf);display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700">2</div>
-            <h6 class="fw-bold mb-0">Mata Pelajaran & Guru Pengajar</h6>
+            <h6 class="fw-bold mb-0">Mata Pelajaran</h6>
         </div>
         <p class="text-muted mb-3" style="font-size:13px">
             <i class="bi bi-info-circle me-1"></i>
-            Centang mata pelajaran yang termasuk dalam paket ini, lalu pilih guru yang mengajar setiap mata pelajaran (bisa lebih dari satu guru per mapel).
+            Klik kategori untuk melihat mata pelajaran, lalu centang yang termasuk dalam paket ini.
         </p>
 
         @if($courses->isEmpty())
@@ -113,63 +113,39 @@
         @endphp
         <div id="courseTeacherRows">
             @foreach($coursesGrouped as $jenis => $groupCourses)
-            <div class="mb-2 px-1 py-1 rounded-2" style="background:linear-gradient(135deg,#f8f5ff,#f3eeff);border:1px solid #e9d5ff;">
-                <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#68117e;padding:6px 10px 4px">
-                    <i class="bi bi-folder2-open me-1"></i>{{ $jenisLabels[$jenis] ?? ucfirst($jenis) }}
+            @php $gKey = preg_replace('/[^a-z0-9]/','', $jenis); @endphp
+            <div class="mb-1 px-1 py-1 rounded-2" style="background:linear-gradient(135deg,#f8f5ff,#f3eeff);border:1px solid #e9d5ff;cursor:pointer"
+                 onclick="toggleGroupCourses('{{ $gKey }}')">
+                <div class="d-flex align-items-center justify-content-between" style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#68117e;padding:6px 10px 4px">
+                    <span><i class="bi bi-folder2-open me-1"></i>{{ $jenisLabels[$jenis] ?? ucfirst($jenis) }}</span>
+                    <i class="bi bi-chevron-down" id="group-icon-{{ $gKey }}" style="transition:.2s"></i>
                 </div>
             </div>
-            @foreach($groupCourses as $c)
-            <div class="mb-3 rounded-3" style="border:1.5px solid var(--card-border);overflow:hidden;transition:.2s" id="card-{{ $c->id }}">
-                <div class="d-flex align-items-center gap-3 px-3 py-2" style="background:var(--input-bg);cursor:pointer"
-                     onclick="document.getElementById('chk-{{ $c->id }}').click()">
-                    <input class="form-check-input course-check" type="checkbox"
-                           name="course_ids[]" value="{{ $c->id }}"
-                           id="chk-{{ $c->id }}"
-                           {{ in_array($c->id, $oldCourses) ? 'checked' : '' }}
-                           onchange="toggleTeacherSection({{ $c->id }}, this.checked)"
-                           onclick="event.stopPropagation()">
-                    <div class="flex-fill fw-semibold" style="font-size:14px">
-                        <i class="bi bi-book text-primary me-2"></i>{{ $c->nama }}
-                    </div>
-                    <div class="text-muted" style="font-size:12px" id="badge-{{ $c->id }}">
-                        @if(in_array($c->id, $oldCourses))
-                            <span class="badge bg-success-subtle text-success">Dipilih</span>
-                        @else
-                            <span class="badge bg-secondary-subtle text-muted">Tidak dipilih</span>
-                        @endif
-                    </div>
-                </div>
-                <div class="px-3 py-3 teacher-section border-top" id="teachers-{{ $c->id }}"
-                     style="{{ in_array($c->id, $oldCourses) ? '' : 'display:none' }}">
-                    <div class="text-muted mb-2" style="font-size:12px">
-                        <i class="bi bi-person-badge me-1 text-primary"></i>
-                        Guru yang mengajar <strong>{{ $c->nama }}</strong> dalam paket ini:
-                    </div>
-                    @if($teachers->isEmpty())
-                        <div class="text-muted" style="font-size:12px">Belum ada guru aktif.</div>
-                    @else
-                    <div class="row g-2">
-                        @foreach($teachers as $t)
-                        @php $oldTeachers = old("course_teachers.{$c->id}", []); @endphp
-                        <div class="col-md-4 col-sm-6">
-                            <div class="form-check p-2 rounded-2" style="border:1px solid var(--card-border);background:var(--bs-body-bg)">
-                                <input class="form-check-input" type="checkbox"
-                                       name="course_teachers[{{ $c->id }}][]"
-                                       value="{{ $t->id }}"
-                                       id="ct_{{ $c->id }}_{{ $t->id }}"
-                                       {{ is_array($oldTeachers) && in_array($t->id, $oldTeachers) ? 'checked' : '' }}>
-                                <label class="form-check-label" for="ct_{{ $c->id }}_{{ $t->id }}" style="font-size:12px;cursor:pointer">
-                                    <span class="fw-semibold">{{ $t->name }}</span>
-                                    @if($t->nig)<br><span class="text-muted" style="font-size:11px">NIG: {{ $t->nig }}</span>@endif
-                                </label>
-                            </div>
+            <div id="group-courses-{{ $gKey }}" class="mb-3" style="display:none">
+                @foreach($groupCourses as $c)
+                <div class="mb-2 rounded-3" style="border:1.5px solid var(--card-border);overflow:hidden;transition:.2s" id="card-{{ $c->id }}">
+                    <div class="d-flex align-items-center gap-3 px-3 py-2" style="background:var(--input-bg);cursor:pointer"
+                         onclick="document.getElementById('chk-{{ $c->id }}').click()">
+                        <input class="form-check-input course-check" type="checkbox"
+                               name="course_ids[]" value="{{ $c->id }}"
+                               id="chk-{{ $c->id }}"
+                               {{ in_array($c->id, $oldCourses) ? 'checked' : '' }}
+                               onchange="toggleCourseCheck({{ $c->id }}, this.checked)"
+                               onclick="event.stopPropagation()">
+                        <div class="flex-fill fw-semibold" style="font-size:14px">
+                            <i class="bi bi-book text-primary me-2"></i>{{ $c->nama }}
                         </div>
-                        @endforeach
+                        <div style="font-size:12px" id="badge-{{ $c->id }}">
+                            @if(in_array($c->id, $oldCourses))
+                                <span class="badge bg-success-subtle text-success">Dipilih</span>
+                            @else
+                                <span class="badge bg-secondary-subtle text-muted">Tidak dipilih</span>
+                            @endif
+                        </div>
                     </div>
-                    @endif
                 </div>
+                @endforeach
             </div>
-            @endforeach
             @endforeach
         </div>
         @endif
@@ -188,23 +164,35 @@
 
 @push('scripts')
 <script>
-function toggleTeacherSection(courseId, checked) {
-    const section = document.getElementById('teachers-' + courseId);
-    const card    = document.getElementById('card-' + courseId);
-    const badge   = document.getElementById('badge-' + courseId);
-    if (section) section.style.display = checked ? '' : 'none';
-    if (card)    card.style.borderColor = checked ? '#c84ddf' : 'var(--card-border)';
-    if (badge)   badge.innerHTML = checked
-        ? '<span class="badge bg-success-subtle text-success">Dipilih</span>'
-        : '<span class="badge bg-secondary-subtle text-muted">Tidak dipilih</span>';
-    if (!checked && section) {
-        section.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
-    }
+function toggleGroupCourses(key) {
+    const el   = document.getElementById('group-courses-' + key);
+    const icon = document.getElementById('group-icon-' + key);
+    if (!el) return;
+    const hidden = el.style.display === 'none';
+    el.style.display = hidden ? '' : 'none';
+    if (icon) icon.style.transform = hidden ? 'rotate(180deg)' : '';
 }
 
-// Apply border on load for already-checked items
+function toggleCourseCheck(courseId, checked) {
+    const card  = document.getElementById('card-' + courseId);
+    const badge = document.getElementById('badge-' + courseId);
+    if (card)  card.style.borderColor = checked ? '#c84ddf' : 'var(--card-border)';
+    if (badge) badge.innerHTML = checked
+        ? '<span class="badge bg-success-subtle text-success">Dipilih</span>'
+        : '<span class="badge bg-secondary-subtle text-muted">Tidak dipilih</span>';
+}
+
+// On load: expand groups that have pre-checked items (old input)
 document.querySelectorAll('.course-check').forEach(cb => {
-    if (cb.checked) toggleTeacherSection(cb.value, true);
+    if (!cb.checked) return;
+    toggleCourseCheck(cb.value, true);
+    const group = cb.closest('[id^="group-courses-"]');
+    if (group) {
+        group.style.display = '';
+        const key  = group.id.replace('group-courses-', '');
+        const icon = document.getElementById('group-icon-' + key);
+        if (icon) icon.style.transform = 'rotate(180deg)';
+    }
 });
 </script>
 @endpush
