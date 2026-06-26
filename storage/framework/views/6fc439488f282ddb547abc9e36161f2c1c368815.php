@@ -7,51 +7,81 @@
 use App\Models\Student;
 use App\Models\Invoice;
 use App\Models\Schedule;
+use App\Models\SchoolClass;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
-$student = Student::where('user_id', auth()->id())->first();
-
-$invoices = $student
-    ? Invoice::where('siswa_id', $student->id)
-        ->latest()
-        ->limit(5)
-        ->get()
-    : collect();
-
-$totalTagihan = $student
-    ? Invoice::where('siswa_id', $student->id)->sum('total')
-    : 0;
-$totalLunas   = $student
-    ? Invoice::where('siswa_id', $student->id)->where('status','lunas')->sum('total')
-    : 0;
-$sisaTunggakan = $totalTagihan - $totalLunas;
-
-// Schedules for classes student is enrolled in this week
+$student  = Student::where('user_id', auth()->id())->first();
 $classIds = $student
     ? DB::table('class_students')->where('student_id', $student->id)->pluck('class_id')
     : collect();
-$weekSchedules = $classIds->isNotEmpty()
-    ? Schedule::with(['kelas.mataPelajaran', 'kelas.guru'])
-        ->whereIn('kelas_id', $classIds)
-        ->whereBetween('tanggal', [now()->startOfWeek(), now()->endOfWeek()])
-        ->where('status','!=','dibatalkan')
-        ->orderBy('tanggal')->orderBy('jam_mulai')
-        ->limit(10)->get()
-    : collect();
 
-// Pending attendance confirmations (guru marked hadir, student hasn't confirmed)
-$pendingAttendances = $student ? DB::table('absensi_siswas as ab')
+// Next upcoming schedule
+$nextClass = $classIds->isNotEmpty()
+    ? Schedule::with(['kelas.mataPelajaran', 'guru'])
+        ->whereIn('kelas_id', $classIds)
+        ->where('tanggal', '>=', now()->toDateString())
+        ->where('status', '!=', 'dibatalkan')
+        ->orderBy('tanggal')->orderBy('jam_mulai')
+        ->first()
+    : null;
+
+// Pending absensi for the next class
+$nextPending = null;
+if ($nextClass && $student) {
+    $nextPending = DB::table('absensi_siswas')
+        ->where('jadwal_id', $nextClass->id)
+        ->where('siswa_id', $student->id)
+        ->where('guru_hadir', true)
+        ->whereNull('siswa_konfirmasi_at')
+        ->first();
+}
+
+// Active class (first non-draft class student is enrolled in)
+$activeKelas = $classIds->isNotEmpty()
+    ? SchoolClass::with(['mataPelajaran', 'jadwal'])
+        ->whereIn('id', $classIds)
+        ->where('status', '!=', 'draft')
+        ->orderBy('nama_kelas')
+        ->first()
+    : null;
+
+$sesiSelesai  = 0;
+$sisaKuota    = 0;
+$totalSesi    = 0;
+$progresKelas = 0;
+if ($activeKelas) {
+    $done        = $activeKelas->jadwal->where('status', 'selesai')->count();
+    $totalSesi   = $activeKelas->jumlah_pertemuan ?: $activeKelas->jadwal->count();
+    $sesiSelesai = $done;
+    $sisaKuota   = max(0, $totalSesi - $done);
+    $progresKelas = $totalSesi > 0 ? round($done / $totalSesi * 100) : 0;
+}
+
+// All subjects from enrolled classes
+$allKelas     = $classIds->isNotEmpty()
+    ? SchoolClass::with(['mataPelajaran'])->whereIn('id', $classIds)->where('status','!=','draft')->get()
+    : collect();
+$subjectNames = $allKelas->pluck('mataPelajaran.nama')->filter()->unique()->values();
+
+// Last confirmed attendance
+$lastAttendance = $student ? DB::table('absensi_siswas as ab')
     ->join('schedules as s', 's.id', '=', 'ab.jadwal_id')
     ->join('school_classes as sc', 'sc.id', '=', 's.kelas_id')
     ->leftJoin('courses as c', 'c.id', '=', 'sc.mata_pelajaran_id')
     ->where('ab.siswa_id', $student->id)
-    ->where('ab.guru_hadir', true)
-    ->whereNull('ab.siswa_konfirmasi_at')
-    ->select('ab.jadwal_id', 's.tanggal', 's.jam_mulai', 's.jam_selesai', 's.pertemuan_ke', 'sc.nama_kelas', 'c.nama as mapel')
+    ->where('ab.status', 'hadir')
     ->orderByDesc('s.tanggal')
-    ->limit(5)
-    ->get() : collect();
+    ->select('s.tanggal', 'c.nama as mapel')
+    ->first() : null;
+
+// Last invoice
+$lastInvoice = $student ? Invoice::where('siswa_id', $student->id)->latest()->first() : null;
+
+// Simple referral code from student name
+$referralCode = $student
+    ? strtoupper(preg_replace('/[^A-Z0-9]/i','',explode(' ',$student->name)[0])) . ($student->nis ? substr($student->nis,-4) : '2026')
+    : 'SCI2026';
 ?>
 
 
@@ -65,276 +95,294 @@ $pendingAttendances = $student ? DB::table('absensi_siswas as ab')
                 <img src="<?php echo e(asset('storage/'.$student->photo)); ?>" alt="Foto"
                      style="width:64px;height:64px;border-radius:16px;object-fit:cover;border:2px solid rgba(255,255,255,.2);flex-shrink:0">
             <?php else: ?>
-                <div style="width:64px;height:64px;border-radius:16px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">
-                    <i class="bi bi-mortarboard-fill"></i>
+                <div style="width:64px;height:64px;border-radius:16px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">
+                    <i class="bi bi-person-fill"></i>
                 </div>
             <?php endif; ?>
             <div>
-                <div style="font-size:11px;opacity:.6;margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">
-                    Portal Siswa · <?php echo e(now()->locale('id')->isoFormat('dddd, D MMMM Y')); ?>
-
-                </div>
+                <div style="font-size:11px;opacity:.6;margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">Portal Siswa</div>
                 <h4 style="font-weight:800;margin-bottom:4px;color:white;letter-spacing:-.02em">
                     Halo, <?php echo e(explode(' ', auth()->user()->name)[0]); ?>! 👋
                 </h4>
-                <p style="opacity:.65;margin:0;font-size:13px">
-                    <?php if($student): ?>
-                        NIS: <?php echo e($student->nis ?? '-'); ?> · <?php echo e($student->branch?->name ?? 'N/A'); ?>
+                <p style="opacity:.7;margin:0;font-size:13px">
+                    <?php echo e($student?->branch?->name ?? 'SCI'); ?>
 
-                        <?php if($student->grade): ?> · Kelas <?php echo e($student->grade); ?> <?php endif; ?>
-                    <?php else: ?>
-                        Selamat belajar di Smart Center Indonesia
-                    <?php endif; ?>
+                    <?php if($student?->grade): ?> · Kelas <?php echo e($student->grade); ?> <?php endif; ?>
                 </p>
             </div>
         </div>
-        <div style="font-size:64px;opacity:.08;line-height:1;flex-shrink:0">
+        <div style="font-size:64px;opacity:.07;line-height:1;flex-shrink:0">
             <i class="bi bi-mortarboard"></i>
         </div>
     </div>
 </div>
 
 
-<div class="row g-3 mb-4">
-    <div class="col-6 col-lg-3 fade-up">
-        <div class="stat-card" style="border-top:3px solid #c84ddf">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="stat-title">Total Tagihan</div>
-                    <div class="stat-value text-primary" style="font-size:20px">
-                        Rp <?php echo e(number_format($totalTagihan, 0, ',', '.')); ?>
-
-                    </div>
-                    <div class="stat-label" style="font-size:11px"><?php echo e($invoices->count()); ?> invoice</div>
-                </div>
-                <div class="stat-icon bg-primary-soft" style="color:white">
-                    <i class="bi bi-receipt"></i>
-                </div>
-            </div>
-        </div>
+<div class="dashboard-card mb-4 fade-up" style="padding-bottom:20px">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h6 class="fw-bold mb-0" style="font-size:14px">
+            <i class="bi bi-stars text-warning me-2"></i>Penawaran Spesial HQ
+        </h6>
+        <a href="<?php echo e(route('siswa.courses.fees')); ?>" class="text-primary fw-semibold" style="font-size:12px;text-decoration:none">
+            Lihat Semua <i class="bi bi-chevron-right" style="font-size:10px"></i>
+        </a>
     </div>
-    <div class="col-6 col-lg-3 fade-up" style="animation-delay:.05s">
-        <div class="stat-card" style="border-top:3px solid #10b981">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="stat-title">Sudah Dibayar</div>
-                    <div class="stat-value" style="color:#059669;font-size:20px">
-                        Rp <?php echo e(number_format($totalLunas, 0, ',', '.')); ?>
+    <div class="d-flex gap-3 overflow-auto pb-2" style="scrollbar-width:thin">
 
-                    </div>
-                    <div class="stat-label" style="font-size:11px;color:#10b981">
-                        <i class="bi bi-check-circle-fill me-1"></i>Terverifikasi
-                    </div>
-                </div>
-                <div class="stat-icon bg-success-soft" style="color:white">
-                    <i class="bi bi-check-circle"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-6 col-lg-3 fade-up" style="animation-delay:.10s">
-        <div class="stat-card" style="border-top:3px solid <?php echo e($sisaTunggakan > 0 ? '#ef4444' : '#10b981'); ?>">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="stat-title">Sisa Tunggakan</div>
-                    <div class="stat-value" style="color:<?php echo e($sisaTunggakan > 0 ? '#dc2626' : '#059669'); ?>;font-size:20px">
-                        Rp <?php echo e(number_format($sisaTunggakan, 0, ',', '.')); ?>
-
-                    </div>
-                    <div class="stat-label" style="font-size:11px">
-                        <?php if($sisaTunggakan > 0): ?>
-                            <i class="bi bi-exclamation-circle text-danger me-1"></i>Belum lunas
-                        <?php else: ?>
-                            <i class="bi bi-check2-all text-success me-1"></i>Lunas semua
-                        <?php endif; ?>
-                    </div>
-                </div>
-                <div class="stat-icon <?php echo e($sisaTunggakan > 0 ? 'bg-danger-soft' : 'bg-success-soft'); ?>" style="color:white">
-                    <i class="bi bi-wallet2"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-6 col-lg-3 fade-up" style="animation-delay:.15s">
-        <div class="stat-card" style="border-top:3px solid #68117e">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="stat-title">Jadwal Minggu Ini</div>
-                    <div class="stat-value" style="color:#c84ddf"><?php echo e($weekSchedules->count()); ?></div>
-                    <div class="stat-label" style="font-size:11px">sesi belajar</div>
-                </div>
-                <div class="stat-icon bg-primary-soft" style="color:white">
-                    <i class="bi bi-calendar-week"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<?php if($pendingAttendances->isNotEmpty()): ?>
-<div class="dashboard-card mb-4 fade-up" style="border-left:4px solid #f6af23;background:var(--soft-warning-bg)">
-    <div class="d-flex align-items-start gap-3">
-        <div style="width:40px;height:40px;border-radius:12px;background:#f6af231a;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <i class="bi bi-hand-thumbs-up-fill" style="color:#f6af23;font-size:18px"></i>
-        </div>
-        <div style="flex:1;min-width:0">
-            <div class="fw-bold mb-1" style="font-size:14px;color:var(--text-primary)">
-                <?php echo e($pendingAttendances->count()); ?> Kehadiran Menunggu Konfirmasimu
-            </div>
-            <p class="text-muted mb-2" style="font-size:12.5px">
-                Guru telah menandai kamu hadir pada sesi berikut. Konfirmasi kehadiranmu agar status menjadi <strong>Hadir</strong>.
-            </p>
-            <div class="d-flex flex-column gap-1 mb-2">
-                <?php $__currentLoopData = $pendingAttendances; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pa): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <div class="d-flex align-items-center gap-2" style="font-size:12px;color:var(--text-muted)">
-                    <i class="bi bi-calendar3" style="color:#f6af23;flex-shrink:0"></i>
-                    <span class="fw-semibold" style="color:var(--text-primary)"><?php echo e($pa->mapel ?? 'Kelas'); ?></span>
-                    <span>·</span>
-                    <?php if($pa->pertemuan_ke): ?>
-                    <span>Pertemuan ke-<?php echo e($pa->pertemuan_ke); ?></span>
-                    <span>·</span>
-                    <?php endif; ?>
-                    <span><?php echo e(\Carbon\Carbon::parse($pa->tanggal)->locale('id')->isoFormat('D MMM Y')); ?></span>
-                    <span>·</span>
-                    <span><?php echo e(\Carbon\Carbon::parse($pa->jam_mulai)->format('H:i')); ?></span>
-                </div>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-            </div>
-            <a href="<?php echo e(route('siswa.attendance')); ?>" class="btn btn-sm" style="border-radius:9px;background:#f6af23;color:white;border:none;font-weight:600;font-size:12.5px">
-                <i class="bi bi-hand-thumbs-up me-1"></i>Konfirmasi Sekarang
+        
+        <div class="flex-shrink-0 p-3 rounded-3 position-relative overflow-hidden"
+             style="min-width:240px;max-width:260px;background:linear-gradient(135deg,#461256,#c84ddf);color:white">
+            <div style="position:absolute;right:-20px;top:-20px;width:100px;height:100px;background:rgba(255,255,255,.07);border-radius:50%"></div>
+            <span class="badge mb-2" style="background:rgba(255,255,255,.25);color:white;font-size:10px;border-radius:6px">
+                🔥 Hemat 20%
+            </span>
+            <div class="fw-bold mb-1" style="font-size:13px;line-height:1.3">Upgrade Paket Intensif SNBT 2026</div>
+            <div style="font-size:11px;opacity:.7;margin-bottom:12px">Berlaku s/d 30 April 2026</div>
+            <a href="<?php echo e(route('siswa.courses.fees')); ?>" class="btn btn-sm fw-semibold"
+               style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.35);border-radius:8px;font-size:11px">
+                Klaim Promo
             </a>
         </div>
+
+        
+        <div class="flex-shrink-0 p-3 rounded-3 position-relative overflow-hidden"
+             style="min-width:240px;max-width:260px;background:var(--input-bg);border:1.5px solid var(--card-border)">
+            <span class="badge mb-2" style="background:var(--soft-success-bg);color:var(--soft-success-text);font-size:10px;border-radius:6px">
+                🎁 Beli 5 Sesi Gratis 1
+            </span>
+            <div class="fw-bold mb-1" style="font-size:13px;line-height:1.3;color:var(--text-primary)">Extra Class: Private Khusus IPA</div>
+            <div class="text-muted mb-3" style="font-size:11px">Beli via Portal Siswa Sekarang</div>
+            <a href="<?php echo e(route('siswa.schedule-agreements.index')); ?>" class="btn btn-sm btn-outline-primary fw-semibold"
+               style="border-radius:8px;font-size:11px">
+                Detail
+            </a>
+        </div>
+
+        
+        <div class="flex-shrink-0 p-3 rounded-3 position-relative overflow-hidden"
+             style="min-width:240px;max-width:260px;background:linear-gradient(135deg,rgba(246,175,35,.12),rgba(200,77,223,.08));border:1.5px solid rgba(246,175,35,.3)">
+            <span class="badge mb-2" style="background:rgba(246,175,35,.2);color:#92600a;font-size:10px;border-radius:6px">
+                👥 Free Diagnostic Test
+            </span>
+            <div class="fw-bold mb-1" style="font-size:13px;line-height:1.3;color:var(--text-primary)">Ajak Teman &amp; Dapatkan Bonus</div>
+            <div class="text-muted mb-1" style="font-size:11px">Gunakan Kode Referral:</div>
+            <div class="fw-bold mb-3" style="font-size:14px;color:#c84ddf;letter-spacing:.05em;font-family:monospace"><?php echo e($referralCode); ?></div>
+            <button onclick="navigator.clipboard.writeText('<?php echo e($referralCode); ?>').then(()=>showToast('Kode disalin!','success'))"
+                    class="btn btn-sm fw-semibold"
+                    style="background:rgba(246,175,35,.2);color:#92600a;border:1px solid rgba(246,175,35,.4);border-radius:8px;font-size:11px">
+                <i class="bi bi-share me-1"></i>Bagikan
+            </button>
+        </div>
+
     </div>
 </div>
-<?php endif; ?>
 
-<div class="row g-4" id="pembayaran">
+
+<div class="row g-4 mb-4">
 
     
-    <div class="col-lg-5 fade-up">
-        <div class="dashboard-card h-100">
-            <h6 class="fw-bold mb-3" style="font-size:14px">
-                <i class="bi bi-credit-card text-primary me-2"></i>Tagihan Saya
-            </h6>
-            <?php $__empty_1 = true; $__currentLoopData = $invoices; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $inv): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-            <?php
-                $stClr = ['lunas'=>'#10b981','belum_bayar'=>'#f6af23','sebagian'=>'#c84ddf'][$inv->status] ?? '#94a3b8';
-                $stBg  = ['lunas'=>'var(--soft-success-bg)','belum_bayar'=>'var(--soft-warning-bg)','sebagian'=>'var(--soft-primary-bg)'][$inv->status] ?? 'var(--soft-muted-bg)';
-                $stLbl = ['lunas'=>'Lunas','belum_bayar'=>'Belum Bayar','sebagian'=>'Sebagian'][$inv->status] ?? $inv->status;
-                $overdue = $inv->status !== 'lunas' && $inv->jatuh_tempo && \Carbon\Carbon::parse($inv->jatuh_tempo)->isPast();
-            ?>
-            <div class="d-flex align-items-center justify-content-between p-3 rounded-3 mb-2 <?php echo e($overdue ? 'row-overdue' : ''); ?>"
-                 style="background:<?php echo e($overdue ? 'var(--overdue-bg,#fef2f2)' : 'var(--input-bg)'); ?>;border:1px solid <?php echo e($overdue ? 'var(--overdue-border,#fecaca)' : 'var(--card-border)'); ?>">
-                <div style="min-width:0">
-                    <div class="fw-semibold" style="font-size:13px"><?php echo e($inv->nomor_invoice); ?></div>
-                    <div style="font-size:11px;color:var(--text-muted)">
-                        <?php if($overdue): ?>
-                            <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i>Jatuh tempo: terlambat
-                        <?php elseif($inv->jatuh_tempo): ?>
-                            <i class="bi bi-calendar3 me-1"></i><?php echo e(\Carbon\Carbon::parse($inv->jatuh_tempo)->locale('id')->isoFormat('D MMMM Y')); ?>
+    <div class="col-lg-6 fade-up">
 
-                        <?php endif; ?>
+        
+        <div class="row g-3 mb-3">
+            <div class="col-6">
+                <div class="stat-card" style="border-top:3px solid #c84ddf">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-title">Sisa Kuota</div>
+                            <div class="stat-value text-primary" data-auto-count="<?php echo e($sisaKuota); ?>"><?php echo e($sisaKuota); ?></div>
+                            <div class="text-muted" style="font-size:11px">sesi tersisa</div>
+                        </div>
+                        <div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-collection-fill"></i></div>
                     </div>
                 </div>
-                <div class="text-end flex-shrink-0 ms-2">
-                    <div class="fw-bold" style="font-size:13.5px">Rp <?php echo e(number_format($inv->total, 0, ',', '.')); ?></div>
-                    <span class="badge mt-1" style="background:<?php echo e($stBg); ?>;color:<?php echo e($stClr); ?>;font-size:10px;border-radius:6px;padding:2px 8px">
-                        <?php echo e($stLbl); ?>
-
-                    </span>
+            </div>
+            <div class="col-6">
+                <div class="stat-card" style="border-top:3px solid #10b981">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-title">Sesi Selesai</div>
+                            <div class="stat-value text-success" data-auto-count="<?php echo e($sesiSelesai); ?>"><?php echo e($sesiSelesai); ?></div>
+                            <div class="text-muted" style="font-size:11px">dari <?php echo e($totalSesi ?: '?'); ?> total</div>
+                        </div>
+                        <div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-check-circle-fill"></i></div>
+                    </div>
                 </div>
             </div>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-            <div class="empty-state" style="padding:2rem">
-                <i class="bi bi-receipt-cutoff" style="font-size:2.5rem;color:#cbd5e1;display:block;margin-bottom:8px"></i>
-                <p class="text-muted mb-0" style="font-size:13px">
-                    <?php if(!$student): ?> Akun belum terhubung ke data siswa. <?php else: ?> Belum ada tagihan. <?php endif; ?>
-                </p>
+        </div>
+
+        
+        <div class="dashboard-card h-auto">
+            <h6 class="fw-bold mb-3" style="font-size:14px">
+                <i class="bi bi-alarm text-primary me-2"></i>Kelas Terdekat
+            </h6>
+            <?php if($nextClass): ?>
+            <?php
+                $nc      = $nextClass;
+                $kelasNm = $nc->kelas?->nama_kelas ?? $nc->topik ?? 'Sesi Belajar';
+                $guru    = $nc->guru ?? $nc->kelas?->guru;
+                $guruNm  = $guru?->name ?? '—';
+                $room    = $nc->ruangan ?? ($nc->jenis === 'online' ? 'Online' : 'Ruangan');
+                $isToday = $nc->tanggal?->isToday();
+                $tglStr  = $isToday ? 'Hari Ini' : $nc->tanggal?->locale('id')->isoFormat('ddd, D MMM');
+            ?>
+            <div class="p-3 rounded-3 mb-3" style="background:linear-gradient(135deg,rgba(200,77,223,.07),rgba(70,18,86,.05));border:1.5px solid rgba(200,77,223,.18)">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <div class="fw-bold" style="font-size:14px;color:var(--text-primary)"><?php echo e($kelasNm); ?></div>
+                        <div class="text-muted" style="font-size:12px"><?php echo e($guruNm); ?></div>
+                    </div>
+                    <?php if($isToday): ?>
+                    <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:10px;border-radius:6px">Hari Ini</span>
+                    <?php else: ?>
+                    <span class="badge" style="background:var(--soft-muted-bg);color:var(--soft-muted-text);font-size:10px;border-radius:6px"><?php echo e($tglStr); ?></span>
+                    <?php endif; ?>
+                </div>
+                <div class="d-flex align-items-center gap-3" style="font-size:12px;color:var(--text-muted)">
+                    <span><i class="bi bi-clock me-1"></i><?php echo e(substr($nc->jam_mulai,0,5)); ?> – <?php echo e(substr($nc->jam_selesai,0,5)); ?></span>
+                    <span>·</span>
+                    <span><i class="bi bi-geo-alt me-1"></i><?php echo e($room); ?></span>
+                </div>
+            </div>
+
+            <?php if($nextPending): ?>
+            <div class="d-flex gap-2 mb-3">
+                <form method="POST" action="<?php echo e(route('siswa.attendance.confirm', $nextClass->id)); ?>" class="flex-fill">
+                    <?php echo csrf_field(); ?>
+                    <input type="hidden" name="status" value="hadir">
+                    <button type="submit" class="btn btn-success fw-bold w-100" style="border-radius:10px;font-size:13px">
+                        <i class="bi bi-check-lg me-1"></i>HADIR
+                    </button>
+                </form>
+                <form method="POST" action="<?php echo e(route('siswa.attendance.confirm', $nextClass->id)); ?>" class="flex-fill">
+                    <?php echo csrf_field(); ?>
+                    <input type="hidden" name="status" value="izin">
+                    <button type="submit" class="btn btn-outline-secondary fw-bold w-100" style="border-radius:10px;font-size:13px">
+                        <i class="bi bi-x-lg me-1"></i>TDK HADIR
+                    </button>
+                </form>
+            </div>
+            <div class="text-muted" style="font-size:12px"><i class="bi bi-info-circle me-1 text-warning"></i>Konfirmasi kehadiran diperlukan.</div>
+            <?php else: ?>
+            <div class="d-flex gap-2 mb-3">
+                <a href="<?php echo e(route('siswa.attendance')); ?>" class="btn btn-success fw-bold flex-fill" style="border-radius:10px;font-size:13px;opacity:.45" disabled>
+                    <i class="bi bi-check-lg me-1"></i>HADIR
+                </a>
+                <a href="<?php echo e(route('siswa.attendance')); ?>" class="btn btn-outline-secondary fw-bold flex-fill" style="border-radius:10px;font-size:13px;opacity:.45">
+                    <i class="bi bi-x-lg me-1"></i>TDK HADIR
+                </a>
+            </div>
+            <div class="text-muted" style="font-size:12px"><i class="bi bi-info-circle me-1"></i>Pastikan Anda hadir tepat waktu.</div>
+            <?php endif; ?>
+            <?php else: ?>
+            <div class="text-center py-3">
+                <i class="bi bi-calendar-x" style="font-size:36px;color:var(--text-muted);opacity:.4;display:block;margin-bottom:8px"></i>
+                <div class="text-muted" style="font-size:13px">Tidak ada kelas terdekat</div>
             </div>
             <?php endif; ?>
         </div>
     </div>
 
     
-    <div class="col-lg-7 fade-up" id="jadwal" style="animation-delay:.05s">
-        <div class="dashboard-card h-100">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="fw-bold mb-0" style="font-size:14px">
-                    <i class="bi bi-calendar-week text-primary me-2"></i>Jadwal Belajar Minggu Ini
-                </h6>
-                <span class="text-muted" style="font-size:11.5px">
-                    <?php echo e(now()->startOfWeek()->locale('id')->isoFormat('D MMM')); ?> – <?php echo e(now()->endOfWeek()->locale('id')->isoFormat('D MMM')); ?>
+    <div class="col-lg-6 fade-up" style="animation-delay:.05s">
 
-                </span>
+        
+        <div class="dashboard-card mb-3">
+            <h6 class="fw-bold mb-3" style="font-size:14px">
+                <i class="bi bi-bookmark-fill text-primary me-2"></i>Paket Aktif
+            </h6>
+            <?php if($activeKelas): ?>
+            <div class="d-flex align-items-start gap-3 mb-3">
+                <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#461256,#c84ddf);color:white;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0">
+                    <?php echo e(strtoupper(mb_substr(preg_replace('/[^A-Za-z]/','', $activeKelas->mataPelajaran?->nama ?? $activeKelas->nama_kelas),0,2)) ?: 'KL'); ?>
+
+                </div>
+                <div style="flex:1;min-width:0">
+                    <div class="fw-bold text-truncate" style="font-size:14px;color:var(--text-primary)"><?php echo e($activeKelas->nama_kelas); ?></div>
+                    <div class="text-muted" style="font-size:12px">
+                        <?php echo e($subjectNames->take(3)->join(' & ')); ?>
+
+                        <?php if($subjectNames->count() > 3): ?> <span style="color:var(--soft-primary-text)">+<?php echo e($subjectNames->count()-3); ?> lainnya</span> <?php endif; ?>
+                    </div>
+                </div>
+                <span style="background:var(--soft-success-bg);color:var(--soft-success-text);padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600;flex-shrink:0;white-space:nowrap">Aktif</span>
             </div>
-
-            <?php if($weekSchedules->isEmpty()): ?>
-            <div class="empty-state" style="padding:2rem">
-                <i class="bi bi-calendar3" style="font-size:2.5rem;color:#cbd5e1;display:block;margin-bottom:8px"></i>
-                <p class="text-muted mb-0" style="font-size:13px">
-                    <?php if(!$student): ?> Profil siswa belum dikonfigurasi. <?php else: ?> Tidak ada jadwal minggu ini. <?php endif; ?>
-                </p>
+            <div class="mb-1 d-flex justify-content-between align-items-center" style="font-size:12px">
+                <span class="fw-semibold" style="color:var(--text-muted)">Progres Belajar</span>
+                <span class="fw-bold" style="color:#c84ddf"><?php echo e($progresKelas); ?>%</span>
+            </div>
+            <div style="height:8px;background:var(--card-border);border-radius:99px;overflow:hidden;margin-bottom:6px">
+                <div style="height:100%;width:<?php echo e($progresKelas); ?>%;background:linear-gradient(90deg,#461256,#c84ddf);border-radius:99px;transition:width .5s"></div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted" style="font-size:12px"><?php echo e($sesiSelesai); ?> dari <?php echo e($totalSesi ?: '?'); ?> Pertemuan Selesai</div>
+                <a href="<?php echo e(route('siswa.kelas.index')); ?>" class="btn btn-sm btn-primary fw-semibold" style="border-radius:8px;font-size:11px">
+                    <i class="bi bi-info-circle me-1"></i>Detail
+                </a>
             </div>
             <?php else: ?>
-            <div class="d-flex flex-column gap-2">
-                <?php $__currentLoopData = $weekSchedules; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <?php
-                    $isToday = $sch->tanggal->isToday();
-                    $statusClr = ['dijadwalkan'=>'#c84ddf','berlangsung'=>'#10b981','selesai'=>'#94a3b8'][$sch->status] ?? '#94a3b8';
-                ?>
-                <div class="d-flex gap-3 align-items-center p-3 rounded-3"
-                     style="background:<?php echo e($isToday ? 'rgba(200,77,223,.07)' : 'var(--input-bg)'); ?>;border:1px solid <?php echo e($isToday ? '#e8b4f5' : 'var(--card-border)'); ?>">
-                    <div class="text-center flex-shrink-0" style="min-width:48px">
-                        <div class="fw-bold" style="font-size:13px;color:<?php echo e($isToday ? '#68117e' : 'var(--text-primary)'); ?>">
-                            <?php echo e($sch->tanggal->locale('id')->isoFormat('ddd')); ?>
-
-                        </div>
-                        <div style="font-size:11px;color:var(--text-muted)">
-                            <?php echo e(\Carbon\Carbon::parse($sch->jam_mulai)->format('H:i')); ?>
-
-                        </div>
-                    </div>
-                    <div style="flex:1;min-width:0">
-                        <div class="fw-semibold text-truncate" style="font-size:13px">
-                            <?php echo e($sch->topik ?? 'Sesi Belajar'); ?>
-
-                            <?php if($isToday): ?>
-                                <span class="badge ms-1" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:9px">Hari Ini</span>
-                            <?php endif; ?>
-                        </div>
-                        <div style="font-size:11px;color:var(--text-muted)">
-                            <?php echo e(\Carbon\Carbon::parse($sch->jam_mulai)->format('H:i')); ?>–<?php echo e(\Carbon\Carbon::parse($sch->jam_selesai)->format('H:i')); ?>
-
-                            <?php if($sch->jenis === 'online'): ?>
-                                · <i class="bi bi-camera-video me-1" style="color:#c84ddf"></i>Online
-                            <?php else: ?>
-                                · <i class="bi bi-building me-1"></i><?php echo e($sch->ruangan ?? 'Kelas'); ?>
-
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    <span class="badge flex-shrink-0" style="background:<?php echo e($statusClr); ?>20;color:<?php echo e($statusClr); ?>;font-size:10px;border-radius:6px">
-                        <?php echo e(ucfirst($sch->status)); ?>
-
-                    </span>
-                </div>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            <div class="text-center py-3">
+                <i class="bi bi-journal-x" style="font-size:36px;color:var(--text-muted);opacity:.4;display:block;margin-bottom:8px"></i>
+                <div class="text-muted" style="font-size:13px">Belum ada paket aktif</div>
             </div>
             <?php endif; ?>
+        </div>
+
+        
+        <div class="dashboard-card">
+            <h6 class="fw-bold mb-3" style="font-size:14px">
+                <i class="bi bi-clock-history text-primary me-2"></i>Riwayat Terakhir
+            </h6>
+            <div class="d-flex flex-column gap-2">
+                <?php if($lastAttendance): ?>
+                <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
+                    <div style="width:36px;height:36px;border-radius:10px;background:var(--soft-success-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                        <i class="bi bi-check2-circle" style="color:var(--soft-success-text);font-size:16px"></i>
+                    </div>
+                    <div style="flex:1;min-width:0">
+                        <div class="fw-semibold" style="font-size:13px;color:var(--text-primary)">Hadir: <?php echo e($lastAttendance->mapel ?? 'Kelas'); ?></div>
+                        <div class="text-muted" style="font-size:11px">
+                            <?php echo e($lastAttendance->tanggal ? \Carbon\Carbon::parse($lastAttendance->tanggal)->locale('id')->isoFormat('dddd, D MMM Y') : '—'); ?>
+
+                        </div>
+                    </div>
+                </div>
+                <?php else: ?>
+                <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
+                    <div style="width:36px;height:36px;border-radius:10px;background:var(--soft-muted-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                        <i class="bi bi-calendar3" style="color:var(--soft-muted-text);font-size:15px"></i>
+                    </div>
+                    <div class="text-muted" style="font-size:13px">Belum ada riwayat kehadiran</div>
+                </div>
+                <?php endif; ?>
+
+                <?php if($lastInvoice): ?>
+                <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
+                    <div style="width:36px;height:36px;border-radius:10px;background:var(--soft-warning-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                        <i class="bi bi-receipt" style="color:var(--soft-warning-text);font-size:15px"></i>
+                    </div>
+                    <div style="flex:1;min-width:0">
+                        <div class="fw-semibold" style="font-size:13px;color:var(--text-primary)">Tagihan Diterbitkan</div>
+                        <div class="text-muted" style="font-size:11px">
+                            <?php echo e($lastInvoice->nomor_invoice); ?> · Rp <?php echo e(number_format($lastInvoice->total, 0, ',', '.')); ?>
+
+                        </div>
+                    </div>
+                    <a href="<?php echo e(route('siswa.billing.index')); ?>" class="btn btn-sm btn-outline-primary flex-shrink-0" style="font-size:11px;border-radius:8px">Lihat</a>
+                </div>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 
 </div>
 
 <?php if(!$student): ?>
-<div class="alert alert-warning d-flex gap-3 align-items-start mt-4 fade-up" style="border-radius:14px;border:none">
+<div class="alert alert-warning d-flex gap-3 align-items-start mt-2 fade-up" style="border-radius:14px;border:none">
     <i class="bi bi-exclamation-triangle-fill text-warning mt-1" style="font-size:18px;flex-shrink:0"></i>
     <div>
         <div class="fw-bold mb-1">Profil Siswa Belum Terhubung</div>
-        <div style="font-size:13px">
-            Akun Anda belum terhubung ke data siswa. Hubungi administrator cabang Anda untuk menghubungkan akun ini.
-        </div>
+        <div style="font-size:13px">Akun Anda belum terhubung ke data siswa. Hubungi administrator cabang Anda.</div>
     </div>
 </div>
 <?php endif; ?>
