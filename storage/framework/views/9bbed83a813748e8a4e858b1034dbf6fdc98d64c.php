@@ -71,33 +71,33 @@
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.10s">
-        <div class="stat-card" style="border-top:3px solid #c84ddf">
+        <div class="stat-card" style="border-top:3px solid #f59e0b">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <div class="stat-title">Laki-laki</div>
-                    <div class="stat-value text-primary"><?php echo e($stats['male']); ?></div>
-                    <div class="stat-growth text-muted">
-                        <i class="bi bi-gender-male me-1"></i>Siswa putra
+                    <div class="stat-title">Siswa Cuti</div>
+                    <div class="stat-value text-warning"><?php echo e($stats['cuti']); ?></div>
+                    <div class="stat-growth text-warning">
+                        <i class="bi bi-pause-circle me-1"></i>Sementara berhenti
                     </div>
                 </div>
-                <div class="stat-icon bg-primary-soft" style="color:white">
-                    <i class="bi bi-person-fill"></i>
+                <div class="stat-icon bg-warning-soft" style="color:white">
+                    <i class="bi bi-person-dash-fill"></i>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-6 col-lg-3 fade-up" style="animation-delay:.15s">
-        <div class="stat-card" style="border-top:3px solid #ec4899">
+        <div class="stat-card" style="border-top:3px solid #ef4444">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <div class="stat-title">Perempuan</div>
-                    <div class="stat-value" style="color:#ec4899"><?php echo e($stats['female']); ?></div>
-                    <div class="stat-growth text-muted">
-                        <i class="bi bi-gender-female me-1"></i>Siswa putri
+                    <div class="stat-title">Tidak Aktif</div>
+                    <div class="stat-value text-danger"><?php echo e($stats['tidak_aktif']); ?></div>
+                    <div class="stat-growth text-danger">
+                        <i class="bi bi-x-circle me-1"></i>Tidak berkegiatan
                     </div>
                 </div>
                 <div class="stat-icon bg-danger-soft" style="color:white">
-                    <i class="bi bi-person-fill"></i>
+                    <i class="bi bi-person-x-fill"></i>
                 </div>
             </div>
         </div>
@@ -222,9 +222,10 @@
                 <?php $__empty_1 = true; $__currentLoopData = $students; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $s): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <?php
                     $statusColor = match($s->status ?? 'aktif') {
-                        'aktif'    => ['bg'=>'var(--soft-success-bg)','text'=>'var(--soft-success-text)','border'=>'var(--soft-success-border)','label'=>'Aktif'],
-                        'nonaktif' => ['bg'=>'var(--soft-danger-bg)', 'text'=>'var(--soft-danger-text)', 'border'=>'var(--soft-danger-border)', 'label'=>'Non Aktif'],
-                        default    => ['bg'=>'var(--soft-muted-bg)', 'text'=>'var(--text-muted)', 'border'=>'var(--soft-border)', 'label'=>ucfirst($s->status ?? '-')],
+                        'aktif'                    => ['bg'=>'var(--soft-success-bg)','text'=>'var(--soft-success-text)','border'=>'var(--soft-success-border)','label'=>'Aktif'],
+                        'cuti'                     => ['bg'=>'var(--soft-warning-bg)','text'=>'var(--soft-warning-text)','border'=>'var(--soft-warning-border)','label'=>'Cuti'],
+                        'nonaktif','tidak_aktif'   => ['bg'=>'var(--soft-danger-bg)', 'text'=>'var(--soft-danger-text)', 'border'=>'var(--soft-danger-border)', 'label'=>'Tidak Aktif'],
+                        default                    => ['bg'=>'var(--soft-muted-bg)', 'text'=>'var(--text-muted)', 'border'=>'var(--soft-border)', 'label'=>ucfirst($s->status ?? '-')],
                     };
                 ?>
                 <tr>

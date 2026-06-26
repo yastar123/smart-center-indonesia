@@ -16,12 +16,12 @@
                 </div>
                 <div>
                     <h5 class="fw-bold mb-0" style="color:white">Jadwal Kelas</h5>
-                    <span style="font-size:12px;opacity:.8">Kelola dan pantau seluruh sesi kelas cabang hari ini</span>
+                    <span style="font-size:12px;opacity:.8">Kelola dan pantau seluruh sesi kelas cabang hari ini.</span>
                 </div>
             </div>
         </div>
         <div class="col-md-5 text-md-end d-flex justify-content-md-end gap-2 flex-wrap">
-            <a href="<?php echo e(route('admin.schedules.index')); ?>" class="btn fw-semibold px-3" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.25);border-radius:10px;font-size:13px">
+            <a href="<?php echo e(route('admin.schedule-list.index')); ?>" class="btn fw-semibold px-3" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.25);border-radius:10px;font-size:13px">
                 <i class="bi bi-list-ul me-1"></i>Kelola Daftar Kelas
             </a>
             <a href="<?php echo e(route('admin.schedule-create.index')); ?>" class="btn fw-semibold px-3" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;font-size:13px">
@@ -68,10 +68,10 @@
 <div class="row g-3 mb-4">
     <?php
         $qStats = [
-            ['label'=>'Total Sesi',  'value'=>$stats['total'],     'icon'=>'bi-calendar-check', 'color'=>'#c84ddf', 'bg'=>'bg-primary-soft'],
-            ['label'=>'Berlangsung', 'value'=>$stats['ongoing'],   'icon'=>'bi-play-circle-fill','color'=>'#10b981', 'bg'=>'bg-success-soft'],
-            ['label'=>'Menunggu',    'value'=>$stats['scheduled'], 'icon'=>'bi-hourglass-split', 'color'=>'#f6af23', 'bg'=>'bg-warning-soft'],
-            ['label'=>'Selesai',     'value'=>$stats['completed'], 'icon'=>'bi-check-circle-fill','color'=>'#6b7280','bg'=>'bg-muted-bg'],
+            ['label'=>'Total Sesi',  'value'=>$stats['total'],     'icon'=>'bi-calendar-check',  'color'=>'#c84ddf', 'bg'=>'bg-primary-soft'],
+            ['label'=>'Berlangsung', 'value'=>$stats['ongoing'],   'icon'=>'bi-play-circle-fill', 'color'=>'#10b981', 'bg'=>'bg-success-soft'],
+            ['label'=>'Menunggu',    'value'=>$stats['scheduled'], 'icon'=>'bi-hourglass-split',  'color'=>'#f6af23', 'bg'=>'bg-warning-soft'],
+            ['label'=>'Selesai',     'value'=>$stats['completed'], 'icon'=>'bi-check-circle-fill','color'=>'#6b7280', 'bg'=>'bg-muted-bg'],
         ];
     ?>
     <?php $__currentLoopData = $qStats; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $qs): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -103,70 +103,87 @@
 <div class="row g-3">
     <?php $__currentLoopData = $schedules; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     <?php
-        $barColor    = match($sc['status']) { 'ongoing' => '#10b981', 'scheduled' => '#f6af23', default => '#9ca3af' };
-        $badgeStyle  = match($sc['status']) { 'ongoing' => 'background:rgba(16,185,129,.15);color:#059669', 'scheduled' => 'background:rgba(246,175,35,.15);color:#d97706', default => 'background:rgba(107,114,128,.15);color:#6b7280' };
-        $badgeLabel  = match($sc['status']) { 'ongoing' => 'Sedang Berlangsung', 'scheduled' => 'Dijadwalkan', default => 'Selesai' };
-        $timeStyle   = match($sc['status']) { 'ongoing' => 'color:#10b981;font-weight:700', 'completed' => 'text-decoration:line-through;color:#9ca3af', default => '' };
-        $btnPrimary  = match($sc['status']) { 'ongoing' => ['icon'=>'bi-eye','label'=>'Pantau Kelas','class'=>'btn-success'], 'completed' => ['icon'=>'bi-file-text','label'=>'Lihat Laporan','class'=>'btn-outline-secondary'], default => ['icon'=>'bi-pencil','label'=>'Edit','class'=>'btn-outline-primary'] };
+        $barColor   = match($sc['status']) { 'ongoing' => '#10b981', 'scheduled' => '#c84ddf', default => '#9ca3af' };
+        $badgeStyle = match($sc['status']) { 'ongoing' => 'background:rgba(16,185,129,.15);color:#059669', 'scheduled' => 'background:rgba(200,77,223,.15);color:#8b1dc5', default => 'background:rgba(107,114,128,.15);color:#6b7280' };
+        $badgeLabel = match($sc['status']) { 'ongoing' => 'Sedang Berlangsung', 'scheduled' => 'Dijadwalkan', default => 'Selesai' };
+        $timeStyle  = match($sc['status']) { 'ongoing' => 'color:#10b981', 'completed' => 'color:#9ca3af', default => 'color:var(--text-color)' };
+
+        $parts    = preg_split('/[\s]+/', trim($sc['teacher_name']));
+        $tInitials = strtoupper(
+            (isset($parts[0][0]) ? $parts[0][0] : '') .
+            (isset($parts[1][0]) ? $parts[1][0] : (isset($parts[0][1]) ? $parts[0][1] : ''))
+        );
+
+        [$cur, $cap] = explode('/', $sc['students_count']);
+        $cur = (int)$cur; $cap = (int)$cap;
     ?>
     <div class="col-md-6 col-xl-4 fade-up">
         <div class="dashboard-card h-100" style="padding:0;overflow:hidden;border-top:4px solid <?php echo e($barColor); ?>">
             <div style="padding:16px">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <div>
-                        <h6 class="fw-bold mb-0" style="font-size:14px"><?php echo e($sc['class_name']); ?></h6>
-                        <div class="text-muted" style="font-size:12px"><?php echo e($sc['subject_name']); ?></div>
+
+                
+                <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                    <div style="min-width:0">
+                        <h6 class="fw-bold mb-0 text-truncate" style="font-size:14px"><?php echo e($sc['class_name']); ?></h6>
+                        <div class="text-muted text-truncate" style="font-size:12px"><?php echo e($sc['subject_name']); ?></div>
                     </div>
-                    <span class="badge" style="<?php echo e($badgeStyle); ?>;font-size:10px;white-space:nowrap"><?php echo e($badgeLabel); ?></span>
+                    <span class="badge flex-shrink-0" style="<?php echo e($badgeStyle); ?>;font-size:10px;padding:5px 9px;border-radius:8px"><?php echo e($badgeLabel); ?></span>
                 </div>
 
-                <div class="d-flex gap-3 mb-3" style="font-size:12px">
-                    <div>
-                        <i class="bi bi-person-fill text-muted me-1"></i>
-                        <span><?php echo e($sc['teacher_name']); ?></span>
-                    </div>
-                    <div>
-                        <i class="bi bi-geo-alt-fill text-muted me-1"></i>
-                        <span><?php echo e($sc['room_name']); ?></span>
-                    </div>
-                </div>
-
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <div style="<?php echo e($timeStyle); ?>;font-size:16px">
-                        <i class="bi bi-clock me-1"></i>
-                        <?php echo e($sc['jam_mulai']); ?> – <?php echo e($sc['jam_selesai']); ?>
+                
+                <div class="d-flex align-items-start gap-3 mb-3 p-2 rounded-3" style="background:var(--input-bg)">
+                    <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#461256,#c84ddf);color:white;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;letter-spacing:.5px">
+                        <?php echo e($tInitials ?: '?'); ?>
 
                     </div>
-                    <div style="font-size:12px;color:var(--text-muted)">
-                        Pertemuan <?php echo e($sc['pertemuan_ke']); ?>
+                    <div style="flex:1;min-width:0">
+                        <div class="fw-semibold text-truncate" style="font-size:13px"><?php echo e($sc['teacher_name']); ?></div>
+                        <div class="text-muted text-truncate" style="font-size:11px">
+                            <i class="bi bi-geo-alt-fill me-1"></i><?php echo e($sc['room_name']); ?>
 
+                        </div>
+                        <div class="fw-bold mt-1" style="font-size:13px;<?php echo e($timeStyle); ?>">
+                            <i class="bi bi-clock me-1"></i><?php echo e(substr($sc['jam_mulai'],0,5)); ?> – <?php echo e(substr($sc['jam_selesai'],0,5)); ?>
+
+                        </div>
                     </div>
                 </div>
 
+                
                 <div class="d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center gap-1">
-                        <?php [$cur, $cap] = explode('/', $sc['students_count']); ?>
-                        <?php for($av = 0; $av < min((int)$cur, 4); $av++): ?>
-                            <div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#461256,#c84ddf);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-left:<?php echo e($av > 0 ? '-6px' : '0'); ?>;border:2px solid var(--card-bg)">
-                                <?php echo e(substr('ABCDEFGHIJ', $av, 1)); ?>
-
-                            </div>
-                        <?php endfor; ?>
-                        <?php if((int)$cur > 4): ?>
-                        <div style="width:26px;height:26px;border-radius:50%;background:var(--soft-primary);color:#461256;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-left:-6px;border:2px solid var(--card-bg)">
-                            +<?php echo e((int)$cur - 4); ?>
+                        <?php if($cur > 0): ?>
+                        <div style="width:28px;height:28px;border-radius:50%;background:var(--soft-primary-bg);border:2px solid var(--card-bg);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--soft-primary-text)">
+                            +<?php echo e($cur); ?>
 
                         </div>
                         <?php endif; ?>
-                        <span class="text-muted ms-1" style="font-size:11px"><?php echo e($sc['students_count']); ?> siswa</span>
+                        <span class="text-muted" style="font-size:11px"><?php echo e($cur); ?>/<?php echo e($cap); ?> murid</span>
                     </div>
-
-                    <a href="<?php echo e(route('admin.schedules.show', $sc['schedule_id'])); ?>"
-                       class="btn btn-sm <?php echo e($btnPrimary['class']); ?>" style="font-size:11px">
-                        <i class="bi <?php echo e($btnPrimary['icon']); ?> me-1"></i><?php echo e($btnPrimary['label']); ?>
-
-                    </a>
+                    <div class="d-flex gap-1 flex-wrap justify-content-end">
+                        <?php if($sc['status'] === 'ongoing'): ?>
+                            <a href="<?php echo e(route('admin.schedules.show', $sc['schedule_id'])); ?>"
+                               class="btn btn-sm btn-success fw-semibold" style="font-size:11px;border-radius:8px">
+                                <i class="bi bi-eye me-1"></i>Pantau Kelas
+                            </a>
+                        <?php elseif($sc['status'] === 'completed'): ?>
+                            <a href="<?php echo e(route('admin.schedules.show', $sc['schedule_id'])); ?>"
+                               class="btn btn-sm btn-outline-secondary" style="font-size:11px;border-radius:8px">
+                                <i class="bi bi-file-text me-1"></i>Lihat Laporan Sesi
+                            </a>
+                        <?php else: ?>
+                            <a href="<?php echo e(route('admin.schedules.edit', $sc['schedule_id'])); ?>"
+                               class="btn btn-sm btn-outline-primary" style="font-size:11px;border-radius:8px">
+                                <i class="bi bi-pencil me-1"></i>Edit
+                            </a>
+                            <a href="<?php echo e(route('admin.schedules.show', $sc['schedule_id'])); ?>"
+                               class="btn btn-sm btn-primary fw-semibold" style="font-size:11px;border-radius:8px">
+                                <i class="bi bi-info-circle me-1"></i>Detail Kelas
+                            </a>
+                        <?php endif; ?>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>

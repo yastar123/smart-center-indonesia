@@ -107,6 +107,14 @@
                         </select>
                     </div>
                     <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Status <span class="text-danger">*</span></label>
+                        <select name="status" class="form-select form-select-sm" required>
+                            <option value="aktif"       <?php echo e(old('status', $student->status) == 'aktif'       ? 'selected' : ''); ?>>Aktif</option>
+                            <option value="cuti"        <?php echo e(old('status', $student->status) == 'cuti'        ? 'selected' : ''); ?>>Cuti</option>
+                            <option value="tidak_aktif" <?php echo e(old('status', $student->status) == 'tidak_aktif' || old('status', $student->status) == 'nonaktif' ? 'selected' : ''); ?>>Tidak Aktif</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
                         <label class="form-label small fw-semibold">No. HP Siswa</label>
                         <div class="input-group input-group-sm">
                             <span class="input-group-text">+62</span>

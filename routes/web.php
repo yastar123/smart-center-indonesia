@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\CoursePackageController;
 use App\Http\Controllers\Admin\ScheduleDashboardController;
+use App\Http\Controllers\Admin\ScheduleListController;
 use App\Http\Controllers\Admin\RescheduleController;
 use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\RegistrationListController;
@@ -238,7 +239,7 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::get('/billing/payments/pending',  [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'index'])->name('billing.payments-pending');
 
         // SCHEDULE LIST & CREATE (aliases to existing schedules)
-        Route::get('/schedule-list',   fn() => redirect()->route('admin.schedules.index'))  ->name('schedule-list.index');
+        Route::get('/schedule-list',   [ScheduleListController::class, 'index'])              ->name('schedule-list.index');
         Route::get('/schedule-create', fn() => redirect()->route('admin.schedules.create'))->name('schedule-create.index');
 
         // LANDING PAGE CONTENT

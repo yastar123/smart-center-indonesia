@@ -69,14 +69,6 @@ unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <div class="col-md-3">
-                    <label class="form-label fw-semibold">Jenis</label>
-                    <select name="jenis" class="form-select">
-                        <option value="materi" <?php echo e(old('jenis','materi')=='materi'?'selected':''); ?>>Materi</option>
-                        <option value="video"  <?php echo e(old('jenis')=='video' ?'selected':''); ?>>Video</option>
-                    </select>
-                </div>
-
-                <div class="col-md-3">
                     <label class="form-label fw-semibold">Status <span class="text-danger">*</span></label>
                     <select name="status" class="form-select <?php $__errorArgs = ['status'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -145,10 +137,6 @@ endif;
 unset($__errorArgs, $__bag); ?>
                 </div>
 
-                <div class="col-12">
-                    <label class="form-label fw-semibold">Deskripsi / Silabus</label>
-                    <textarea name="deskripsi" rows="4" class="form-control" placeholder="Isi silabus, bab, atau deskripsi singkat modul..."><?php echo e(old('deskripsi')); ?></textarea>
-                </div>
             </div>
 
             <div class="d-flex gap-2 mt-4">
