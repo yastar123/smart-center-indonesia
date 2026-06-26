@@ -11,11 +11,26 @@ class Student extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'branch_id', 'package_id', 'nis', 'name', 'gender',
+        'user_id', 'branch_id', 'package_id', 'total_sesi', 'nis', 'name', 'gender',
         'birth_date', 'birth_place', 'address', 'phone',
         'parent_name', 'parent_phone', 'photo', 'status',
         'join_date', 'school_name', 'grade', 'kategori_peserta_didik',
     ];
+
+    public function sisaSesei(): int
+    {
+        $used = \App\Models\AbsensiSiswa::where('siswa_id', $this->id)
+            ->whereIn('status', ['hadir'])
+            ->count();
+        return max(0, ($this->total_sesi ?? 0) - $used);
+    }
+
+    public function sesiTerpakai(): int
+    {
+        return \App\Models\AbsensiSiswa::where('siswa_id', $this->id)
+            ->whereIn('status', ['hadir'])
+            ->count();
+    }
 
     protected $casts = [
         'birth_date' => 'date',

@@ -19,7 +19,6 @@ class Schedule extends Model
         'module_id',
         'guru_id',
         'cabang_id',
-        'pertemuan_ke',
         'tanggal',
         'tanggal_selesai',
         'jam_mulai',

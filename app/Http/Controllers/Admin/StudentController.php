@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\Branch;
+use App\Models\Package;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -55,14 +56,16 @@ $stats = [
 public function create()
 {
     $branches = Branch::all();
-    return view('admin.students.create', compact('branches'));
+    $packages = Package::orderBy('nama')->get();
+    return view('admin.students.create', compact('branches', 'packages'));
 }
 
 public function edit(Student $student)
 {
     $student->load(['branch', 'user', 'package.cabang', 'package.guru']);
     $branches = Branch::all();
-    return view('admin.students.edit', compact('student', 'branches'));
+    $packages = Package::orderBy('nama')->get();
+    return view('admin.students.edit', compact('student', 'branches', 'packages'));
 }
 
 public function store(Request $request)
@@ -90,6 +93,8 @@ public function store(Request $request)
         'teacher_ids.*'           => 'exists:teachers,id',
         'email'                   => ['required', 'email', 'unique:users,email'],
         'password'                => 'required|string|min:8',
+        'package_id'              => 'nullable|exists:packages,id',
+        'total_sesi'              => 'nullable|integer|min:0|max:9999',
     ]);
 
     $password = $data['password'];
@@ -184,6 +189,8 @@ public function store(Request $request)
             'teacher_ids.*'          => 'exists:teachers,id',
             'email'                  => ['nullable', 'email', Rule::unique('users', 'email')->ignore($student->user_id)],
             'password'               => 'nullable|string|min:8',
+            'package_id'             => 'nullable|exists:packages,id',
+            'total_sesi'             => 'nullable|integer|min:0|max:9999',
         ]);
 
         // prefer explicit pairs if provided, else teacher_ids

@@ -89,6 +89,27 @@
                             @endforeach
                         </select>
                     </div>
+                    <div class="col-md-8">
+                        <label class="form-label small fw-semibold">Paket Belajar</label>
+                        <select name="package_id" id="package_id" class="form-select form-select-sm" onchange="onPackageChange(this.value)">
+                            <option value="">— Tidak ada / pilih nanti —</option>
+                            @foreach($packages as $pkg)
+                                <option value="{{ $pkg->id }}"
+                                    data-sesi="{{ $pkg->jumlah_pertemuan ?? 0 }}"
+                                    {{ old('package_id') == $pkg->id ? 'selected' : '' }}>
+                                    {{ $pkg->nama }}
+                                    @if($pkg->jumlah_pertemuan) ({{ $pkg->jumlah_pertemuan }} sesi)@endif
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Total Sesi Dialokasikan</label>
+                        <input type="number" name="total_sesi" id="total_sesi" class="form-control form-control-sm"
+                               min="0" max="9999" value="{{ old('total_sesi', 0) }}"
+                               placeholder="0">
+                        <div class="form-text" style="font-size:10px">Berapa sesi yang diberikan ke siswa ini. Otomatis terisi dari paket.</div>
+                    </div>
                     <div class="col-md-4">
                         <label class="form-label small fw-semibold">Kategori Peserta Didik</label>
                         <select name="kategori_peserta_didik" class="form-select form-select-sm">

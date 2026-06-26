@@ -61,7 +61,7 @@ $modulesJson = $modules->map(fn($m) => [
             <div>
                 <h5 class="fw-bold mb-0" style="color:white">Edit Jadwal Sesi #{{ $schedule->id }}</h5>
                 <div style="font-size:12px;opacity:.8">
-                    {{ $schedule->paket?->nama ?? '—' }} — Sesi ke-{{ $schedule->pertemuan_ke }}
+                    {{ $schedule->paket?->nama ?? '—' }}
                 </div>
             </div>
         </div>
@@ -119,7 +119,6 @@ $modulesJson = $modules->map(fn($m) => [
                     <div class="row g-2 small" id="paketInfoContent">
                         @if($schedule->paket)
                         <div class="col-6"><span class="text-muted">Jenis:</span> <strong>{{ ucfirst($schedule->paket->jenis ?? '—') }}</strong></div>
-                        <div class="col-6"><span class="text-muted">Total Sesi:</span> <strong>{{ $schedule->paket->jumlah_pertemuan ?? '—' }}</strong></div>
                         <div class="col-6"><span class="text-muted">Cabang:</span> <strong>{{ $schedule->paket->cabang?->name ?? 'Pusat' }}</strong></div>
                         <div class="col-6"><span class="text-muted">Harga:</span> <strong>Rp {{ number_format($schedule->paket->harga ?? 0,0,',','.') }}</strong></div>
                         <div class="col-12"><span class="text-muted">Mapel Paket:</span> <strong>{{ $schedule->paket->mataPelajaran->pluck('nama')->join(', ') ?: '—' }}</strong></div>
@@ -189,14 +188,6 @@ $modulesJson = $modules->map(fn($m) => [
             </div>
 
             <div class="row g-3">
-                {{-- SESI KE --}}
-                <div class="col-md-3">
-                    <label class="form-label fw-semibold">Sesi Ke- <span class="text-danger">*</span></label>
-                    <select name="pertemuan_ke" id="pertemuan_ke" class="form-select" required>
-                        <option value="">—</option>
-                    </select>
-                </div>
-
                 {{-- TANGGAL --}}
                 <div class="col-md-5">
                     <label class="form-label fw-semibold">Tanggal <span class="text-danger">*</span></label>
@@ -359,10 +350,9 @@ const modules  = @json($modulesJson);
 const CURRENT_PAKET_ID   = {{ $schedule->paket_id ?? 'null' }};
 const CURRENT_MAPEL_ID   = {{ $schedule->mata_pelajaran_id ?? 'null' }};
 const CURRENT_GURU_ID    = {{ $schedule->guru_id ?? 'null' }};
-const CURRENT_SESI       = {{ $schedule->pertemuan_ke ?? 'null' }};
 
 /* ── Paket changed ─────────────────────────────────────── */
-function onPaketChange(paketId, keepMapelId, keepGuruId, keepSesi) {
+function onPaketChange(paketId, keepMapelId, keepGuruId) {
     const pkg = pakets.find(p => p.id == paketId);
     const infoBox  = document.getElementById('paketInfoBox');
     const infoContent = document.getElementById('paketInfoContent');
@@ -389,7 +379,6 @@ function onPaketChange(paketId, keepMapelId, keepGuruId, keepSesi) {
     infoBox.style.display = '';
     infoContent.innerHTML = `
         <div class="col-6"><span class="text-muted">Jenis:</span> <strong>${pkg.jenis||'—'}</strong></div>
-        <div class="col-6"><span class="text-muted">Total Sesi:</span> <strong>${pkg.jumlah_pertemuan||'—'}</strong></div>
         <div class="col-6"><span class="text-muted">Cabang:</span> <strong>${pkg.cabang||'Pusat'}</strong></div>
         <div class="col-6"><span class="text-muted">Harga:</span> <strong>Rp ${pkg.harga ? parseInt(pkg.harga).toLocaleString('id-ID') : '—'}</strong></div>
         <div class="col-12"><span class="text-muted">Mapel Paket:</span> <strong>${pkg.mata_pelajaran.map(m=>m.nama).join(', ')||'—'}</strong></div>
@@ -407,9 +396,6 @@ function onPaketChange(paketId, keepMapelId, keepGuruId, keepSesi) {
     if (pkg.mata_pelajaran.length === 1) {
         mapelSel.value = pkg.mata_pelajaran[0].id;
     }
-
-    // sesi options
-    buildSesiOptions(pkg.jumlah_pertemuan, keepSesi ?? CURRENT_SESI);
 
     // trigger guru filter if mapel already selected
     if (mapelSel.value) {
@@ -497,16 +483,6 @@ function onGuruChange(guruId) {
     }
 }
 
-/* ── Sesi ke options ───────────────────────────────────── */
-function buildSesiOptions(total, selected) {
-    const sel = document.getElementById('pertemuan_ke');
-    let opts = '<option value="">— Pilih Sesi —</option>';
-    for (let i = 1; i <= (parseInt(total)||0); i++) {
-        opts += `<option value="${i}" ${i==selected?'selected':''}>${i}</option>`;
-    }
-    sel.innerHTML = opts;
-}
-
 /* ── Filter modules by mapel ───────────────────────────── */
 function filterModules(mapelId) {
     const sel = document.getElementById('module_id');
@@ -529,7 +505,7 @@ document.getElementById('guru_id').addEventListener('change', function() {
 document.addEventListener('DOMContentLoaded', function() {
     const paketId = document.getElementById('paket_id').value;
     if (paketId) {
-        onPaketChange(paketId, CURRENT_MAPEL_ID, CURRENT_GURU_ID, CURRENT_SESI);
+        onPaketChange(paketId, CURRENT_MAPEL_ID, CURRENT_GURU_ID);
     }
 });
 </script>

@@ -133,7 +133,6 @@
             <thead class="thead-modern">
                 <tr>
                     <th class="ps-3">Paket</th>
-                    <th>Sesi</th>
                     <th>Tanggal &amp; Waktu</th>
                     <th class="d-none d-md-table-cell">Guru</th>
                     <th class="d-none d-lg-table-cell">Ruangan / Link</th>
@@ -162,11 +161,6 @@
                         </div>
                     </td>
                     <td>
-                        <span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:13px;font-weight:700">
-                            {{ $sc->pertemuan_ke ?? '–' }}
-                        </span>
-                    </td>
-                    <td>
                         <div class="fw-semibold" style="font-size:13px">
                             {{ $sc->tanggal ? $sc->tanggal->format('d M Y') : '–' }}
                             @if($isToday)<span class="badge ms-1" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);font-size:10px">Hari ini</span>@endif
@@ -192,7 +186,7 @@
                         <div class="d-flex justify-content-center gap-1">
                             <button onclick="showDetail({{ $sc->id }})" class="btn btn-sm btn-act-view" title="Detail"><i class="bi bi-eye-fill"></i></button>
                             <button onclick="editSchedule({{ $sc->id }})" class="btn btn-sm btn-act-edit" title="Edit"><i class="bi bi-pencil-fill"></i></button>
-                            <button onclick="deleteSchedule({{ $sc->id }}, '{{ addslashes($sc->paket?->nama ?? 'Jadwal ini') }}', {{ $sc->pertemuan_ke ?? 0 }})" class="btn btn-sm btn-act-del" title="Hapus"><i class="bi bi-trash-fill"></i></button>
+                            <button onclick="deleteSchedule({{ $sc->id }}, '{{ addslashes($sc->paket?->nama ?? 'Jadwal ini') }}')" class="btn btn-sm btn-act-del" title="Hapus"><i class="bi bi-trash-fill"></i></button>
                         </div>
                     </td>
                 </tr>
@@ -234,10 +228,6 @@
                             <div class="fw-bold" id="paketInfoName" style="font-size:14px;color:var(--soft-primary-text)"></div>
                             <div style="font-size:12px;color:var(--text-muted)" id="paketInfoMeta"></div>
                         </div>
-                        <div id="paketInfoProgress" style="text-align:right">
-                            <div style="font-size:12px;color:var(--text-muted)">Sesi terjadwal</div>
-                            <div class="fw-bold" id="paketInfoCount" style="font-size:15px;color:var(--soft-primary-text)">– / –</div>
-                        </div>
                     </div>
                 </div>
 
@@ -251,17 +241,10 @@
                                 data-nama="{{ $p->nama }}"
                                 data-guru="{{ $p->guru?->name ?? '–' }}"
                                 data-mapel="{{ $p->mataPelajaran->pluck('nama')->join(', ') ?: '–' }}"
-                                data-jenis="{{ $p->jenis }}"
-                                data-jumlah="{{ $p->jumlah_pertemuan }}">
+                                data-jenis="{{ $p->jenis }}">
                                 {{ $p->nama }} — {{ $p->mataPelajaran->pluck('nama')->join(', ') ?: '–' }} — {{ $p->guru?->name ?? 'belum ada guru' }} — {{ ucfirst($p->jenis) }}
                             </option>
                             @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold" style="font-size:12px">Sesi Ke <span class="text-danger">*</span></label>
-                        <select id="pertemuan_ke" class="form-select">
-                            <option value="">— Pilih dulu paket —</option>
                         </select>
                     </div>
                     <div class="col-md-6">
@@ -357,17 +340,14 @@ paketData[{{ $p->id }}] = {
     mapel:     @json($p->mataPelajaran->pluck('nama')->join(', ') ?: '–'),
     jenis:     @json($p->jenis),
     tipeKelas: @json($p->tipe_kelas ?? 'offline'),
-    jumlah:    {{ $p->jumlah_pertemuan }},
 };
 @endforeach
 
-function onPaketChange(paketId, currentSesi) {
+function onPaketChange(paketId) {
     const box = document.getElementById('paketInfoBox');
-    const sel = document.getElementById('pertemuan_ke');
 
     if (!paketId) {
         box.style.display = 'none';
-        sel.innerHTML = '<option value="">— Pilih dulu paket —</option>';
         return;
     }
 
@@ -384,41 +364,12 @@ function onPaketChange(paketId, currentSesi) {
         const validJenis = ['online', 'offline', 'private'];
         jenisEl.value = validJenis.includes(p.tipeKelas) ? p.tipeKelas : 'offline';
     }
-
-    fetch(`/admin/schedules?paket_id=${paketId}&all=1`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(data => {
-            const used = (data.data || []).map(s => s.pertemuan_ke);
-            document.getElementById('paketInfoCount').textContent = used.length + ' / ' + p.jumlah;
-
-            sel.innerHTML = '';
-            for (let i = 1; i <= p.jumlah; i++) {
-                const opt = document.createElement('option');
-                opt.value = i;
-                const alreadyScheduled = used.includes(i) && i !== Number(currentSesi);
-                opt.textContent = 'Sesi ke-' + i + (alreadyScheduled ? ' (sudah dijadwalkan)' : '');
-                if (alreadyScheduled) opt.style.color = 'var(--text-muted)';
-                if (i === Number(currentSesi)) opt.selected = true;
-                sel.appendChild(opt);
-            }
-        })
-        .catch(() => {
-            sel.innerHTML = '';
-            for (let i = 1; i <= p.jumlah; i++) {
-                const opt = document.createElement('option');
-                opt.value = i;
-                opt.textContent = 'Sesi ke-' + i;
-                if (i === Number(currentSesi)) opt.selected = true;
-                sel.appendChild(opt);
-            }
-        });
 }
 
 function openModal() {
     document.getElementById('scheduleId').value    = '';
     document.getElementById('modalTitle').innerHTML= '<i class="bi bi-calendar-plus me-2"></i>Tambah Jadwal Sesi';
     document.getElementById('paket_id').value      = '';
-    document.getElementById('pertemuan_ke').innerHTML = '<option value="">— Pilih dulu paket —</option>';
     document.getElementById('tanggal').value       = '';
     document.getElementById('jam_mulai').value     = '';
     document.getElementById('jam_selesai').value   = '';
@@ -438,13 +389,11 @@ function saveSchedule() {
     const id     = document.getElementById('scheduleId').value;
     const url    = id ? '/admin/schedules/' + id : '{{ route("admin.schedules.store") }}';
     const paketId = document.getElementById('paket_id').value;
-    const sesiKe  = document.getElementById('pertemuan_ke').value;
     const tgl     = document.getElementById('tanggal').value;
     const jMulai  = document.getElementById('jam_mulai').value;
     const jSelesai= document.getElementById('jam_selesai').value;
 
     if (!paketId)  { showToast('Pilih paket belajar terlebih dahulu.', 'warning'); return; }
-    if (!sesiKe)   { showToast('Pilih sesi ke berapa.', 'warning'); return; }
     if (!tgl)      { showToast('Tanggal wajib diisi.', 'warning'); return; }
     if (!jMulai || !jSelesai) { showToast('Jam mulai dan selesai wajib diisi.', 'warning'); return; }
 
@@ -452,7 +401,6 @@ function saveSchedule() {
         _token:       document.querySelector('meta[name=csrf-token]').content,
         paket_id:     paketId,
         jenis:        document.getElementById('sc_jenis').value || 'offline',
-        pertemuan_ke: sesiKe,
         tanggal:      tgl,
         jam_mulai:    jMulai,
         jam_selesai:  jSelesai,
@@ -503,7 +451,7 @@ function showDetail(id) {
             <div style="padding:20px">
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
-                        <div class="fw-bold" style="font-size:15px">${s.paket?.nama ?? 'Paket'} — Sesi ke-${s.pertemuan_ke ?? '?'}</div>
+                        <div class="fw-bold" style="font-size:15px">${s.paket?.nama ?? 'Paket'}</div>
                         <div style="font-size:12px;color:var(--text-muted)">${tgl} · ${fmtWib(s.jam_mulai)} – ${fmtWib(s.jam_selesai)}</div>
                     </div>
                     <span style="background:${sbg};color:${scol};padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600">${slbl}</span>

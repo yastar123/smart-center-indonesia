@@ -45,13 +45,9 @@
                 <div style="font-size:12px;opacity:.7;margin-bottom:2px">Jadwal Sesi #{{ $schedule->id }}</div>
                 <h5 class="fw-bold mb-0" style="color:white">
                     {{ $schedule->paket?->nama ?? 'Tanpa Paket' }}
-                    <span style="font-size:14px;font-weight:400;opacity:.85">— Sesi ke-{{ $schedule->pertemuan_ke }}</span>
                 </h5>
                 <div style="font-size:12px;opacity:.8;margin-top:3px">
                     {{ $schedule->cabang?->name ?? '—' }}
-                    @if($schedule->paket)
-                        · Total {{ $schedule->paket->jumlah_pertemuan }} sesi
-                    @endif
                 </div>
             </div>
         </div>
@@ -269,14 +265,6 @@
                 <div class="text-muted" style="font-size:12px">{{ $schedule->paket->deskripsi }}</div>
             </div>
             <div class="d-flex flex-column gap-2 mt-3" style="font-size:12px">
-                <div class="d-flex justify-content-between">
-                    <span class="text-muted">Sesi ini</span>
-                    <span class="fw-semibold">ke-{{ $schedule->pertemuan_ke }} / {{ $schedule->paket->jumlah_pertemuan }}</span>
-                </div>
-                <div class="progress" style="height:6px;border-radius:3px">
-                    @php $pct = $schedule->paket->jumlah_pertemuan > 0 ? round(($schedule->pertemuan_ke / $schedule->paket->jumlah_pertemuan) * 100) : 0; @endphp
-                    <div class="progress-bar" style="width:{{ $pct }}%;background:linear-gradient(90deg,#c84ddf,#461256);border-radius:3px"></div>
-                </div>
                 <div class="d-flex justify-content-between">
                     <span class="text-muted">Jenis</span>
                     <span class="fw-semibold">{{ ucfirst($schedule->paket->jenis ?? '—') }}</span>
