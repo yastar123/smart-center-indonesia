@@ -1,0 +1,224 @@
+di page /admin/schedule buat agar seperti ini
+
+Jadwal Kelas
+Kelola dan pantau seluruh sesi kelas cabang hari ini.
+
+Kelola Daftar Kelas
+Buat Jadwal Baru
+Sen
+06
+Sel
+07
+Rab
+08
+Kam
+09
+Jum
+10
+
+Pilih Tanggal
+Total Sesi
+
+5
+
+Berlangsung
+
+1
+
+Menunggu
+
+3
+
+Selesai
+
+1
+
+Matematika Intensif
+Budi Santoso • Ruang A1
+
+Dijadwalkan
+BU
+Budi Santoso
+Ruang A1
+15:00 - 16:30
+
++10
+Edit
+Detail Kelas
+Fisika Dasar
+Siti Aminah • Ruang B2
+
+Sedang Berlangsung
+SI
+Siti Aminah
+Ruang B2
+10:00 - 11:30
+
++13
+Pantau Kelas
+Bahasa Inggris Intensif
+Andi Wijaya • Ruang C3
+
+Dijadwalkan
+AN
+Andi Wijaya
+Ruang C3
+13:00 - 14:30
+
++6
+Edit
+Detail Kelas
+Kimia Lanjutan
+Lisa Kurnia • Laboratorium 1
+
+Selesai
+LI
+Lisa Kurnia
+Laboratorium 1
+08:00 - 09:30
+
++8
+Lihat Laporan Sesi
+Sejarah Indonesia
+Rina Putri • Ruang D4
+
+Dijadwalkan
+RI
+Rina Putri
+Ruang D4
+17:00 - 18:30
+
++7
+Edit
+Detail Kelas
+
+saat menekan tombol kelola daftar kelas akan ke page schedule-list yang berisi
+
+Avatar of Mockup Admin
+Jadwal Kelas
+Daftar Kelas Aktif
+Manajemen Kelas
+Kelola semua kelas aktif: setup guru, ruangan, jadwal, dan daftar murid.
+
+Tampilan Kalender
+Tambah Kelas Baru
+Total Kelas
+
+6
+
+Aktif
+
+2
+
+Penuh
+
+3
+
+Total Murid
+
+55
+
+Cari nama kelas, guru, atau kode...
+
+Semua Status
+
+Semua Mapel
+Kelas & Paket Guru Ruangan & Jadwal Detail Sesi Kapasitas Murid Status Aksi
+Ma
+Matematika Intensif
+In-Class
+MTK-INT-A Paket Matematika Intensif (12 Sesi)
+BS
+Budi Santoso, S.Pd.
+Ruang A1
+Senin, Rabu · 15:00 – 16:30
+4 dari 12 Sesi
+
+12 murid
+/ 15
+80% terisi
+Aktif
+Tambah Murid
+
+Fi
+Fisika Dasar
+Online
+FIS-DAS-B Paket Fisika Dasar (16 Sesi)
+SA
+Siti Aminah, M.Si.
+Link Meeting
+Selasa, Kamis · 10:00 – 11:30
+12 dari 16 Sesi
+
+15 murid
+/ 15
+100% terisi
+Penuh
+Tambah Murid
+
+Ba
+Bahasa Inggris Conversation
+Home Visit
+ENG-CON-A Paket Bahasa Inggris Pro (12 Sesi)
+AW
+Andi Wijaya, B.Ed.
+Jl. Merdeka No. 45, Jakarta
+Senin, Jumat · 13:00 – 14:30
+2 dari 12 Sesi
+
+8 murid
+/ 12
+67% terisi
+Aktif
+Tambah Murid
+
+Ki
+Kimia Lanjutan
+In-Class
+KIM-LAN-A Paket Kimia Lanjutan (16 Sesi)
+LK
+Lisa Kurnia, S.Si.
+Laboratorium 1
+Sabtu · 08:00 – 09:30
+16 dari 16 Sesi
+
+10 murid
+/ 10
+100% terisi
+Penuh
+Tambah Murid
+
+Ma
+Matematika SMP
+Online
+MTK-SMP-B Paket Persiapan Ujian (6 Sesi)
+BS
+Budi Santoso, S.Pd.
+Link Meeting
+Rabu, Sabtu · 17:00 – 18:30
+0 dari 6 Sesi
+
+9 murid
+/ 20
+45% terisi
+Draft
+Tambah Murid
+
+Fi
+Privat Fisika (Ananda Budi)
+Home Visit
+FIS-PVT-01 Paket Privat Platinum (8 Sesi)
+SA
+Siti Aminah, M.Si.
+Apartemen Mediterania, Tower A-12
+Minggu · 09:00 – 11:00
+5 dari 8 Sesi
+
+1 murid
+/ 1
+100% terisi
+Penuh
+Tambah Murid
+
+Menampilkan 1 sampai 6 dari 6 kelas
+

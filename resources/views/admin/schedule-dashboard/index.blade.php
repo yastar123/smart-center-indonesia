@@ -127,7 +127,7 @@
                 <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
                     <div style="min-width:0">
                         <h6 class="fw-bold mb-0 text-truncate" style="font-size:14px">{{ $sc['class_name'] }}</h6>
-                        <div class="text-muted text-truncate" style="font-size:12px">{{ $sc['subject_name'] }}</div>
+                        <div class="text-muted text-truncate" style="font-size:12px">{{ $sc['teacher_name'] }} • {{ $sc['room_name'] }}</div>
                     </div>
                     <span class="badge flex-shrink-0" style="{{ $badgeStyle }};font-size:10px;padding:5px 9px;border-radius:8px">{{ $badgeLabel }}</span>
                 </div>
@@ -152,11 +152,12 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center gap-1">
                         @if($cur > 0)
-                        <div style="width:28px;height:28px;border-radius:50%;background:var(--soft-primary-bg);border:2px solid var(--card-bg);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--soft-primary-text)">
+                        <div style="width:32px;height:32px;border-radius:50%;background:var(--soft-primary-bg);border:2px solid var(--card-bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--soft-primary-text)">
                             +{{ $cur }}
                         </div>
+                        @else
+                        <div style="width:32px;height:32px;border-radius:50%;background:var(--input-bg);border:2px dashed var(--card-border);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-muted)">0</div>
                         @endif
-                        <span class="text-muted" style="font-size:11px">{{ $cur }}/{{ $cap }} murid</span>
                     </div>
                     <div class="d-flex gap-1 flex-wrap justify-content-end">
                         @if($sc['status'] === 'ongoing')
