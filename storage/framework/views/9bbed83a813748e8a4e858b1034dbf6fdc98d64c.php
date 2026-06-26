@@ -210,49 +210,68 @@
         <table class="table table-hover align-middle mb-0">
             <thead class="thead-modern">
                 <tr>
-                    <th class="small text-muted fw-semibold py-3" style="width:80px">No Siswa</th>
+                    <th class="small text-muted fw-semibold py-3">Siswa</th>
                     <th class="small text-muted fw-semibold py-3">Kategori Peserta Didik</th>
-                    <th class="small text-muted fw-semibold py-3">Cabang</th>
-                    <th class="small text-muted fw-semibold py-3">Paket yang Diambil</th>
-                    <th class="small text-muted fw-semibold py-3">Orang Tua</th>
-                    <th class="small text-muted fw-semibold py-3 text-center" style="width:110px">AKSI</th>
+                    <th class="small text-muted fw-semibold py-3">Paket Aktif</th>
+                    <th class="small text-muted fw-semibold py-3 text-center">Status</th>
+                    <th class="small text-muted fw-semibold py-3">Wali / Kontak</th>
+                    <th class="small text-muted fw-semibold py-3 text-center" style="width:110px">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 <?php $__empty_1 = true; $__currentLoopData = $students; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $s): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                <?php
+                    $statusColor = match($s->status ?? 'aktif') {
+                        'aktif'    => ['bg'=>'var(--soft-success-bg)','text'=>'var(--soft-success-text)','border'=>'var(--soft-success-border)','label'=>'Aktif'],
+                        'nonaktif' => ['bg'=>'var(--soft-danger-bg)', 'text'=>'var(--soft-danger-text)', 'border'=>'var(--soft-danger-border)', 'label'=>'Non Aktif'],
+                        default    => ['bg'=>'var(--soft-muted-bg)', 'text'=>'var(--text-muted)', 'border'=>'var(--soft-border)', 'label'=>ucfirst($s->status ?? '-')],
+                    };
+                ?>
                 <tr>
-                    <td class="text-muted small fw-semibold text-center">
-                        <?php echo e($students->firstItem() + $i); ?>
-
-                    </td>
                     <td>
-                        <div class="d-flex flex-column gap-1">
-                            <span class="fw-semibold" style="font-size:13px"><?php echo e($s->name); ?></span>
-                            <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);border:1px solid var(--soft-primary-border);font-size:11px;width:max-content">
-                                <?php echo e($s->kategori_peserta_didik ?: '–'); ?>
+                        <div class="fw-semibold" style="font-size:13px"><?php echo e($s->name); ?></div>
+                        <div class="text-muted" style="font-size:11px">
+                            <i class="bi bi-hash" style="font-size:10px"></i><?php echo e($s->nis ?: '–'); ?>
 
-                            </span>
                         </div>
                     </td>
                     <td>
-                        <span class="badge" style="background:var(--input-bg);color:var(--text-muted);border:1px solid var(--card-border);font-size:11px">
-                            <i class="bi bi-building me-1"></i><?php echo e($s->branch->name ?? 'Pusat'); ?>
+                        <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);border:1px solid var(--soft-primary-border);font-size:11px;white-space:normal;max-width:160px">
+                            <?php echo e($s->kategori_peserta_didik ?: '–'); ?>
 
                         </span>
                     </td>
                     <td>
-                        <span style="font-size:13px"><?php echo e($s->package->nama ?? 'Belum memiliki paket'); ?></span>
+                        <?php if($s->package): ?>
+                            <div style="font-size:13px;font-weight:500"><?php echo e($s->package->nama); ?></div>
+                            <div class="text-muted" style="font-size:11px">
+                                <i class="bi bi-building me-1"></i><?php echo e($s->branch->name ?? 'Pusat'); ?>
+
+                            </div>
+                        <?php else: ?>
+                            <span class="text-muted" style="font-size:12px">Belum ada paket</span>
+                        <?php endif; ?>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge" style="background:<?php echo e($statusColor['bg']); ?>;color:<?php echo e($statusColor['text']); ?>;border:1px solid <?php echo e($statusColor['border']); ?>;font-size:11px;padding:5px 10px;border-radius:8px">
+                            <?php echo e($statusColor['label']); ?>
+
+                        </span>
                     </td>
                     <td>
                         <div style="font-size:13px"><?php echo e($s->parent_name ?? '–'); ?></div>
                         <?php if($s->parent_phone): ?>
-                        <div class="text-muted" style="font-size:11px"><i class="bi bi-telephone me-1"></i><?php echo e($s->parent_phone); ?></div>
+                        <a href="https://wa.me/<?php echo e(preg_replace('/[^0-9]/','',$s->parent_phone)); ?>" target="_blank"
+                           class="text-muted text-decoration-none" style="font-size:11px">
+                            <i class="bi bi-whatsapp me-1" style="color:#25d366"></i><?php echo e($s->parent_phone); ?>
+
+                        </a>
                         <?php endif; ?>
                     </td>
                     <td class="text-center">
                         <div class="d-flex gap-1 justify-content-center">
                             <a href="<?php echo e(route('admin.students.show', $s)); ?>" class="btn btn-sm btn-outline-info"
-                                    title="Preview" style="border-radius:8px;padding:5px 8px">
+                                    title="Detail" style="border-radius:8px;padding:5px 8px">
                                 <i class="bi bi-eye"></i>
                             </a>
                             <a href="<?php echo e(route('admin.students.edit', $s)); ?>" class="btn btn-sm btn-outline-warning"

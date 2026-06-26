@@ -42,10 +42,12 @@ public function index(Request $request)
         ->paginate(10);
 
 $stats = [
-    'total'  => Student::count(),
-    'aktif'  => Student::where('status', 'aktif')->count(),
-    'male'   => Student::where('gender', 'L')->count(),
-    'female' => Student::where('gender', 'P')->count(),
+    'total'       => Student::count(),
+    'aktif'       => Student::where('status', 'aktif')->count(),
+    'cuti'        => Student::where('status', 'cuti')->count(),
+    'tidak_aktif' => Student::whereIn('status', ['nonaktif', 'tidak_aktif'])->count(),
+    'male'        => Student::where('gender', 'L')->count(),
+    'female'      => Student::where('gender', 'P')->count(),
 ];
     return view('admin.students.index', compact('branches', 'teachers', 'students', 'stats'));
 }
