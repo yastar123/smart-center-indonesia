@@ -14,11 +14,15 @@ class TagihanSiswaController extends Controller
 {
     public function index(Request $request)
     {
+        $isAdmin  = auth()->user()->hasRole('admin');
+        $branchId = $isAdmin ? auth()->user()->admin?->branch_id : null;
+
+        // --- Kelas (cicilan / postpaid) ---
         $query = SchoolClass::with(['cabang', 'guru', 'mataPelajaran', 'siswa.user', 'siswa.package'])
             ->whereIn('billing_mode', ['postpaid', 'cicilan']);
 
-        if (auth()->user()->hasRole('admin')) {
-            $query->where('cabang_id', auth()->user()->admin?->branch_id);
+        if ($isAdmin) {
+            $query->where('cabang_id', $branchId);
         }
 
         if ($s = $request->search) {
@@ -46,23 +50,21 @@ class TagihanSiswaController extends Controller
         // Compute payment summary per kelas
         $kelasIds = $classes->pluck('id')->toArray();
 
-        // Fetch invoices that have kelas_id set
         $invoicesWithKelas = Invoice::whereIn('kelas_id', $kelasIds)->with('pembayaran')->get();
         $invoicesByKelas   = $invoicesWithKelas->groupBy('kelas_id');
 
-        // Also fetch null-kelas_id invoices for students in these classes (registration invoices)
-        $allStudentIds  = $classes->flatMap(fn($k) => $k->siswa->pluck('id'))->unique()->values()->toArray();
+        $allStudentIds   = $classes->flatMap(fn($k) => $k->siswa->pluck('id'))->unique()->values()->toArray();
         $studentKelasMap = $classes->flatMap(fn($k) => $k->siswa->map(fn($s) => [
             'student_id' => $s->id, 'kelas_id' => $k->id, 'cabang_id' => $k->cabang_id
         ]))->keyBy('student_id');
 
         if (!empty($allStudentIds)) {
-            $nullKelasInvoices = Invoice::whereNull('kelas_id')
+            $nullKelasInvoicesForKelas = Invoice::whereNull('kelas_id')
                 ->whereIn('siswa_id', $allStudentIds)
                 ->with('pembayaran')
                 ->get();
 
-            foreach ($nullKelasInvoices as $inv) {
+            foreach ($nullKelasInvoicesForKelas as $inv) {
                 $entry = $studentKelasMap->get($inv->siswa_id);
                 if ($entry && $entry['cabang_id'] == $inv->cabang_id) {
                     $kelasId = $entry['kelas_id'];
@@ -74,14 +76,40 @@ class TagihanSiswaController extends Controller
             }
         }
 
+        // --- Invoice Registrasi (kelas_id IS NULL, dari alur pendaftaran) ---
+        $regInvQuery = Invoice::whereNull('kelas_id')
+            ->with(['siswa', 'siswa.user', 'cabang'])
+            ->orderByDesc('created_at');
+
+        if ($isAdmin) {
+            $regInvQuery->where('cabang_id', $branchId);
+        }
+
+        if ($s = $request->search) {
+            $regInvQuery->where(function ($q) use ($s) {
+                $q->whereHas('siswa', fn($sq) => $sq->where('name', 'like', "%$s%"))
+                  ->orWhere('nomor_invoice', 'like', "%$s%");
+            });
+        }
+
+        if ($request->reg_status) {
+            $regInvQuery->where('status', $request->reg_status);
+        }
+
+        $registrationInvoices = $regInvQuery->paginate(20, ['*'], 'reg_page')->appends($request->all());
+
         $stats = [
-            'total'    => $totalCicilan + $totalPostpaid,
-            'postpaid' => $totalPostpaid,
-            'cicilan'  => $totalCicilan,
-            'menunggu' => Invoice::whereIn('status', ['belum_bayar', 'sebagian'])->count(),
+            'total'     => $totalCicilan + $totalPostpaid,
+            'postpaid'  => $totalPostpaid,
+            'cicilan'   => $totalCicilan,
+            'menunggu'  => Invoice::whereIn('status', ['belum_bayar', 'sebagian'])->count(),
+            'reg_total' => Invoice::whereNull('kelas_id')->count(),
+            'reg_belum' => Invoice::whereNull('kelas_id')->where('status', 'belum_bayar')->count(),
         ];
 
-        return view('admin.tagihan-siswa.index', compact('classes', 'branches', 'stats', 'invoicesByKelas'));
+        return view('admin.tagihan-siswa.index', compact(
+            'classes', 'branches', 'stats', 'invoicesByKelas', 'registrationInvoices'
+        ));
     }
 
     public function show(Request $request, SchoolClass $kelas)
