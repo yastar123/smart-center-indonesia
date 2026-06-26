@@ -3324,6 +3324,12 @@
                 <span>Sertifikat</span>
             </a>
         </div>
+        <div class="nav-item">
+            <a href="<?php echo e(route('admin.rooms.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.rooms.*') ? 'active' : ''); ?>" data-label="Fasilitas Ruangan">
+                <i class="bi bi-door-open-fill"></i>
+                <span>Fasilitas Ruangan</span>
+            </a>
+        </div>
 
         <div class="nav-header">KEUANGAN</div>
 

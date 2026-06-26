@@ -126,6 +126,15 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::get('/students/{student}/courses',    [CertificateController::class, 'studentCourses']) ->name('students.courses');
 
 
+        // ROOMS (Fasilitas Ruangan)
+        Route::get('/rooms',              [\App\Http\Controllers\Admin\RoomController::class, 'index'])   ->name('rooms.index');
+        Route::get('/rooms/create',       [\App\Http\Controllers\Admin\RoomController::class, 'create'])  ->name('rooms.create');
+        Route::post('/rooms',             [\App\Http\Controllers\Admin\RoomController::class, 'store'])   ->name('rooms.store');
+        Route::get('/rooms/{room}',       [\App\Http\Controllers\Admin\RoomController::class, 'show'])    ->name('rooms.show');
+        Route::get('/rooms/{room}/edit',  [\App\Http\Controllers\Admin\RoomController::class, 'edit'])    ->name('rooms.edit');
+        Route::put('/rooms/{room}',       [\App\Http\Controllers\Admin\RoomController::class, 'update'])  ->name('rooms.update');
+        Route::delete('/rooms/{room}',    [\App\Http\Controllers\Admin\RoomController::class, 'destroy']) ->name('rooms.destroy');
+
         // PACKAGES (Paket Belajar)
         Route::get('/packages',              [PackageController::class, 'index'])   ->name('packages.index');
         Route::post('/packages',             [PackageController::class, 'store'])   ->name('packages.store');
