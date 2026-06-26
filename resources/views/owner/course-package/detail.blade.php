@@ -8,7 +8,7 @@
 
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ route('admin.course-package.index') }}">Paket Belajar</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('owner.course-package.index') }}">Paket Belajar</a></li>
         <li class="breadcrumb-item active">{{ $coursePackage->nama }}</li>
     </ol>
 </nav>
@@ -62,10 +62,10 @@
             @endif
 
             <div class="d-grid gap-2 mt-3">
-                <a href="{{ route('admin.course-package.edit', $coursePackage) }}" class="btn btn-primary">
+                <a href="{{ route('owner.course-package.edit', $coursePackage) }}" class="btn btn-primary">
                     <i class="bi bi-pencil me-2"></i>Edit Paket
                 </a>
-                <a href="{{ route('admin.course-package.index') }}" class="btn btn-outline-secondary">
+                <a href="{{ route('owner.course-package.index') }}" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left me-2"></i>Kembali
                 </a>
             </div>

@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Branch;
 use App\Models\AcademicYear;
@@ -22,7 +21,6 @@ use App\Models\Salary;
 use App\Models\Announcement;
 use App\Models\Tryout;
 use App\Models\Certificate;
-use App\Models\Schedule;
 
 class SlimSeeder extends Seeder
 {
@@ -32,7 +30,6 @@ class SlimSeeder extends Seeder
 
         $this->command->info('🌱 SlimSeeder: 2 data per entitas...');
 
-        // ── TRUNCATE (urutan: child dulu) ─────────────────────────────────── //
         DB::statement('SET session_replication_role = replica');
 
         $tables = [
@@ -46,10 +43,9 @@ class SlimSeeder extends Seeder
         ];
 
         foreach ($tables as $t) {
-            try { DB::table($t)->truncate(); } catch (\Exception $e) { /* skip */ }
+            try { DB::table($t)->truncate(); } catch (\Exception $e) { }
         }
 
-        // Hapus semua user kecuali owner & admin demo account
         $keepEmails = ['adminpusatsci@akademi.com', 'admincabangasci@akademi.com'];
         User::whereNotIn('email', $keepEmails)->delete();
 
@@ -57,13 +53,13 @@ class SlimSeeder extends Seeder
 
         $this->command->info('  ✅ Tabel dikosongkan');
 
-        // ── TAHUN AKADEMIK ────────────────────────────────────────────────── //
+        // ── TAHUN AKADEMIK ─────────────────────────────────────────────── //
         $tahun = AcademicYear::firstOrCreate(
             ['name' => '2025/2026'],
             ['year_start' => 2025, 'year_end' => 2026, 'is_active' => true]
         );
 
-        // ── 2 CABANG ─────────────────────────────────────────────────────── //
+        // ── 2 CABANG ──────────────────────────────────────────────────── //
         $cabangA = Branch::firstOrCreate(['name' => 'Cabang Jakarta'], [
             'address' => 'Jl. Sudirman No. 1, Jakarta Pusat',
             'phone'   => '021-5555001',
@@ -82,7 +78,6 @@ class SlimSeeder extends Seeder
             'can_payments' => true, 'can_tryouts' => true,
         ]);
 
-        // ── LINK ADMIN KE CABANG ──────────────────────────────────────────── //
         $adminUser = User::where('email', 'admincabangasci@akademi.com')->first();
         if ($adminUser) {
             $adminUser->update(['branch_id' => $cabangA->id]);
@@ -91,7 +86,7 @@ class SlimSeeder extends Seeder
 
         $this->command->info('  ✅ 2 Cabang');
 
-        // ── 2 MATA PELAJARAN ─────────────────────────────────────────────── //
+        // ── 2 MATA PELAJARAN ─────────────────────────────────────────── //
         $mapelA = Course::create([
             'cabang_id' => $cabangA->id, 'kode' => 'MAT-001',
             'nama' => 'Matematika', 'kategori' => 'Saintek',
@@ -100,7 +95,7 @@ class SlimSeeder extends Seeder
         CourseFee::create(['course_id' => $mapelA->id, 'amount' => 350000]);
 
         $mapelB = Course::create([
-            'cabang_id' => $cabangA->id, 'kode' => 'ING-001',
+            'cabang_id' => $cabangB->id, 'kode' => 'ING-001',
             'nama' => 'Bahasa Inggris', 'kategori' => 'Umum',
             'deskripsi' => 'Grammar, reading, writing, dan speaking skills.', 'status' => 'aktif',
         ]);
@@ -108,8 +103,8 @@ class SlimSeeder extends Seeder
 
         $this->command->info('  ✅ 2 Mata Pelajaran');
 
-        // ── 2 PAKET BELAJAR ──────────────────────────────────────────────── //
-        $paketA = Package::create([
+        // ── 2 PAKET BELAJAR ──────────────────────────────────────────── //
+        Package::create([
             'cabang_id' => $cabangA->id, 'nama' => 'Paket Reguler SMA',
             'jenis' => 'reguler', 'harga' => 750000, 'durasi_bulan' => 1,
             'jumlah_pertemuan' => 8, 'tipe_kelas' => 'offline',
@@ -129,7 +124,7 @@ class SlimSeeder extends Seeder
 
         $this->command->info('  ✅ 2 Paket Belajar');
 
-        // ── 2 GURU ───────────────────────────────────────────────────────── //
+        // ── 2 GURU ───────────────────────────────────────────────────── //
         $userGuruA = User::create([
             'name' => 'Budi Santoso, S.Pd.', 'email' => 'budi.santoso@guru.akademisci.com',
             'password' => Hash::make('password123'), 'is_active' => true, 'branch_id' => $cabangA->id,
@@ -160,7 +155,7 @@ class SlimSeeder extends Seeder
 
         $this->command->info('  ✅ 2 Guru');
 
-        // ── 2 SISWA ──────────────────────────────────────────────────────── //
+        // ── 2 SISWA ──────────────────────────────────────────────────── //
         $userSiswaA = User::create([
             'name' => 'Andi Nugroho', 'email' => 'andi.nugroho@siswa.com',
             'password' => Hash::make('password'), 'is_active' => true, 'branch_id' => $cabangA->id,
@@ -170,7 +165,6 @@ class SlimSeeder extends Seeder
             'user_id' => $userSiswaA->id, 'name' => 'Andi Nugroho',
             'nis' => 'SIS-2025-001', 'gender' => 'L', 'branch_id' => $cabangA->id,
             'phone' => '081200000001', 'status' => 'aktif',
-            'package_id' => $paketA->id,
         ]);
 
         $userSiswaB = User::create([
@@ -182,12 +176,11 @@ class SlimSeeder extends Seeder
             'user_id' => $userSiswaB->id, 'name' => 'Citra Lestari',
             'nis' => 'SIS-2025-002', 'gender' => 'P', 'branch_id' => $cabangA->id,
             'phone' => '081200000002', 'status' => 'aktif',
-            'package_id' => $paketB->id,
         ]);
 
         $this->command->info('  ✅ 2 Siswa');
 
-        // ── 2 KELAS ───────────────────────────────────────────────────────── //
+        // ── 2 KELAS ──────────────────────────────────────────────────── //
         $kelasA = SchoolClass::create([
             'nama_kelas' => 'Matematika Reguler A', 'cabang_id' => $cabangA->id,
             'mata_pelajaran_id' => $mapelA->id, 'guru_id' => $guruA->id,
@@ -197,7 +190,7 @@ class SlimSeeder extends Seeder
         ]);
         $kelasA->siswa()->sync([$siswaA->id, $siswaB->id]);
 
-        $kelasB = SchoolClass::create([
+        SchoolClass::create([
             'nama_kelas' => 'Bahasa Inggris Reguler A', 'cabang_id' => $cabangB->id,
             'mata_pelajaran_id' => $mapelB->id, 'guru_id' => $guruB->id,
             'tahun_akademik_id' => $tahun->id, 'kapasitas' => 12,
@@ -207,7 +200,7 @@ class SlimSeeder extends Seeder
 
         $this->command->info('  ✅ 2 Kelas');
 
-        // ── 2 MODUL AKADEMIK ─────────────────────────────────────────────── //
+        // ── 2 MODUL AKADEMIK ─────────────────────────────────────────── //
         Module::create([
             'kode_modul' => 'MOD-001', 'mata_pelajaran_id' => $mapelA->id,
             'diupload_oleh' => $userGuruA->id, 'judul' => 'Modul Aljabar Dasar',
@@ -223,7 +216,9 @@ class SlimSeeder extends Seeder
 
         $this->command->info('  ✅ 2 Modul Akademik');
 
-        // ── 2 INVOICE & PAYMENT ───────────────────────────────────────────── //
+        // ── 2 INVOICE & PAYMENT ──────────────────────────────────────── //
+        $ownerUser = User::where('email', 'adminpusatsci@akademi.com')->first();
+
         $invA = Invoice::create([
             'siswa_id' => $siswaA->id, 'cabang_id' => $cabangA->id,
             'nomor_invoice' => 'INV-2025-0001',
@@ -238,7 +233,7 @@ class SlimSeeder extends Seeder
             'tanggal_pembayaran' => '2025-01-10',
         ]);
 
-        $invB = Invoice::create([
+        Invoice::create([
             'siswa_id' => $siswaB->id, 'cabang_id' => $cabangA->id,
             'nomor_invoice' => 'INV-2025-0002',
             'deskripsi' => 'Biaya Paket Intensif SNBT - Februari 2025',
@@ -248,7 +243,7 @@ class SlimSeeder extends Seeder
 
         $this->command->info('  ✅ 2 Invoice + 1 Payment');
 
-        // ── 2 GAJI GURU ───────────────────────────────────────────────────── //
+        // ── 2 GAJI GURU ──────────────────────────────────────────────── //
         Salary::create([
             'guru_id' => $guruA->id, 'cabang_id' => $cabangA->id,
             'periode' => '2025-01', 'tipe_gaji' => 'bulanan',
@@ -265,8 +260,7 @@ class SlimSeeder extends Seeder
 
         $this->command->info('  ✅ 2 Gaji Guru');
 
-        // ── 2 PENGUMUMAN ─────────────────────────────────────────────────── //
-        $ownerUser = User::where('email', 'adminpusatsci@akademi.com')->first();
+        // ── 2 PENGUMUMAN ─────────────────────────────────────────────── //
         Announcement::create([
             'cabang_id' => $cabangA->id, 'dibuat_oleh' => $ownerUser?->id ?? 1,
             'judul' => 'Selamat Datang di Akademi SCI',
@@ -288,9 +282,9 @@ class SlimSeeder extends Seeder
 
         $this->command->info('  ✅ 2 Pengumuman');
 
-        // ── 2 TRYOUT ─────────────────────────────────────────────────────── //
+        // ── 2 TRYOUT ─────────────────────────────────────────────────── //
         Tryout::create([
-            'cabang_id' => $cabangA->id, 'dibuat_oleh' => $adminUser?->id ?? 1,
+            'cabang_id' => $cabangA->id, 'dibuat_oleh' => $adminUser?->id ?? $ownerUser?->id ?? 1,
             'judul' => 'Tryout SNBT Februari 2025',
             'deskripsi' => 'Simulasi SNBT dengan soal terkini.',
             'kategori' => 'SNBT', 'durasi_menit' => 120, 'total_soal' => 40,
@@ -301,7 +295,7 @@ class SlimSeeder extends Seeder
             'tampilkan_kunci_jawaban' => false, 'status' => 'aktif',
         ]);
         Tryout::create([
-            'cabang_id' => $cabangA->id, 'dibuat_oleh' => $adminUser?->id ?? 1,
+            'cabang_id' => $cabangA->id, 'dibuat_oleh' => $adminUser?->id ?? $ownerUser?->id ?? 1,
             'judul' => 'Tryout Matematika Reguler',
             'deskripsi' => 'Latihan soal matematika untuk penilaian bulanan.',
             'kategori' => 'Reguler', 'durasi_menit' => 60, 'total_soal' => 20,
@@ -314,7 +308,7 @@ class SlimSeeder extends Seeder
 
         $this->command->info('  ✅ 2 Tryout');
 
-        // ── 2 SERTIFIKAT ─────────────────────────────────────────────────── //
+        // ── 2 SERTIFIKAT ─────────────────────────────────────────────── //
         Certificate::create([
             'siswa_id' => $siswaA->id, 'cabang_id' => $cabangA->id,
             'course_id' => $mapelA->id, 'diterbitkan_oleh' => $ownerUser?->id ?? 1,
@@ -334,7 +328,7 @@ class SlimSeeder extends Seeder
 
         $this->command->info('  ✅ 2 Sertifikat');
 
-        // ── 2 GURU DEMO LOGIN (gurusci@gmail.com) ────────────────────────── //
+        // ── GURU DEMO (gurusci@gmail.com) ────────────────────────────── //
         $guruDemo = User::firstOrCreate(['email' => 'gurusci@gmail.com'], [
             'name' => 'Ahmad Fauzi, S.Si.', 'password' => Hash::make('password123'),
             'is_active' => true, 'branch_id' => $cabangA->id,

@@ -12,20 +12,20 @@ use App\Http\Controllers\Admin\ModuleController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Admin\SalaryController;
 use App\Http\Controllers\Admin\AnnouncementController;
-use App\Http\Controllers\Admin\SubjectController;
-use App\Http\Controllers\Admin\CoursePackageController;
 use App\Http\Controllers\Admin\ScheduleDashboardController;
 use App\Http\Controllers\Admin\ScheduleListController;
 use App\Http\Controllers\Admin\RescheduleController;
 use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\RegistrationListController;
 use App\Http\Controllers\Admin\StudentRegistrationController;
-use App\Http\Controllers\Admin\AcademicModuleController;
 use App\Http\Controllers\Admin\BillingController;
 use App\Http\Controllers\Admin\TryoutController;
 use App\Http\Controllers\Public\StudentRegistrationPublicController;
 use App\Http\Controllers\Admin\MessageController;
 use App\Http\Controllers\Owner\BranchController;
+use App\Http\Controllers\Owner\SubjectController as OwnerSubjectController;
+use App\Http\Controllers\Owner\CoursePackageController as OwnerCoursePackageController;
+use App\Http\Controllers\Owner\AcademicModuleController as OwnerAcademicModuleController;
 use App\Http\Controllers\Guru\AttendanceController;
 use App\Http\Controllers\Siswa\SiswaController;
 
@@ -189,24 +189,6 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         // REPORTS
         Route::get('/reports', fn() => view('admin.reports.index'))->middleware('role:admin|owner')->name('reports.index');
 
-        // SUBJECT (Mata Pelajaran — new UI)
-        Route::get('/subject',               [SubjectController::class, 'index'])   ->name('subject.index');
-        Route::get('/subject/create',        [SubjectController::class, 'create'])  ->name('subject.create');
-        Route::post('/subject',              [SubjectController::class, 'store'])   ->name('subject.store');
-        Route::get('/subject/{subject}',     [SubjectController::class, 'show'])    ->name('subject.show');
-        Route::get('/subject/{subject}/edit',[SubjectController::class, 'edit'])    ->name('subject.edit');
-        Route::put('/subject/{subject}',     [SubjectController::class, 'update'])  ->name('subject.update');
-        Route::delete('/subject/{subject}',  [SubjectController::class, 'destroy']) ->name('subject.destroy');
-
-        // COURSE PACKAGE (Paket Belajar — new UI)
-        Route::get('/course-package',                        [CoursePackageController::class, 'index'])   ->name('course-package.index');
-        Route::get('/course-package/create',                 [CoursePackageController::class, 'create'])  ->name('course-package.create');
-        Route::post('/course-package',                       [CoursePackageController::class, 'store'])   ->name('course-package.store');
-        Route::get('/course-package/{coursePackage}',        [CoursePackageController::class, 'show'])    ->name('course-package.show');
-        Route::get('/course-package/{coursePackage}/edit',   [CoursePackageController::class, 'edit'])    ->name('course-package.edit');
-        Route::put('/course-package/{coursePackage}',        [CoursePackageController::class, 'update'])  ->name('course-package.update');
-        Route::delete('/course-package/{coursePackage}',     [CoursePackageController::class, 'destroy'])         ->name('course-package.destroy');
-        Route::get('/course-package/{coursePackage}/course-teachers', [CoursePackageController::class, 'courseTeachersApi']) ->name('course-package.course-teachers');
 
         // SCHEDULE DASHBOARD (Visual calendar view)
         Route::get('/schedule',              [ScheduleDashboardController::class, 'index']) ->name('schedule-dashboard.index');
@@ -232,14 +214,6 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::post('/student-registrations/{studentRegistration}/verify', [StudentRegistrationController::class, 'verify'])  ->name('student-registrations.verify');
         Route::delete('/student-registrations/{studentRegistration}',      [StudentRegistrationController::class, 'destroy']) ->name('student-registrations.destroy');
 
-        // ACADEMIC MODULE (Modul Akademik)
-        Route::get('/module',                    [AcademicModuleController::class, 'index'])   ->name('module.index');
-        Route::get('/module/create',             [AcademicModuleController::class, 'create'])  ->name('module.create');
-        Route::post('/module',                   [AcademicModuleController::class, 'store'])   ->name('module.store');
-        Route::get('/module/{module}',           [AcademicModuleController::class, 'show'])    ->name('module.show');
-        Route::get('/module/{module}/edit',      [AcademicModuleController::class, 'edit'])    ->name('module.edit');
-        Route::put('/module/{module}',           [AcademicModuleController::class, 'update'])  ->name('module.update');
-        Route::delete('/module/{module}',        [AcademicModuleController::class, 'destroy']) ->name('module.destroy');
 
         // BILLING (Manajemen E-Billing)
         Route::get('/billing',                   [BillingController::class, 'index'])   ->name('billing.index');
@@ -447,6 +421,34 @@ Route::middleware(['auth', 'role:owner'])
         Route::post('/curriculum/{curriculum}',           [\App\Http\Controllers\Owner\CurriculumController::class, 'update'])          ->name('curriculum.update');
         Route::delete('/curriculum/{curriculum}',         [\App\Http\Controllers\Owner\CurriculumController::class, 'destroy'])         ->name('curriculum.destroy');
         Route::post('/curriculum-chapter/{chapter}/pdf',  [\App\Http\Controllers\Owner\CurriculumController::class, 'uploadChapterPdf'])->name('curriculum.chapter.pdf');
+
+        // MATA PELAJARAN (pindah dari admin)
+        Route::get('/subject',               [OwnerSubjectController::class, 'index'])   ->name('subject.index');
+        Route::get('/subject/create',        [OwnerSubjectController::class, 'create'])  ->name('subject.create');
+        Route::post('/subject',              [OwnerSubjectController::class, 'store'])   ->name('subject.store');
+        Route::get('/subject/{subject}',     [OwnerSubjectController::class, 'show'])    ->name('subject.show');
+        Route::get('/subject/{subject}/edit',[OwnerSubjectController::class, 'edit'])    ->name('subject.edit');
+        Route::put('/subject/{subject}',     [OwnerSubjectController::class, 'update'])  ->name('subject.update');
+        Route::delete('/subject/{subject}',  [OwnerSubjectController::class, 'destroy']) ->name('subject.destroy');
+
+        // PAKET BELAJAR (pindah dari admin)
+        Route::get('/course-package',                        [OwnerCoursePackageController::class, 'index'])            ->name('course-package.index');
+        Route::get('/course-package/create',                 [OwnerCoursePackageController::class, 'create'])           ->name('course-package.create');
+        Route::post('/course-package',                       [OwnerCoursePackageController::class, 'store'])            ->name('course-package.store');
+        Route::get('/course-package/{coursePackage}',        [OwnerCoursePackageController::class, 'show'])             ->name('course-package.show');
+        Route::get('/course-package/{coursePackage}/edit',   [OwnerCoursePackageController::class, 'edit'])             ->name('course-package.edit');
+        Route::put('/course-package/{coursePackage}',        [OwnerCoursePackageController::class, 'update'])           ->name('course-package.update');
+        Route::delete('/course-package/{coursePackage}',     [OwnerCoursePackageController::class, 'destroy'])          ->name('course-package.destroy');
+        Route::get('/course-package/{coursePackage}/course-teachers', [OwnerCoursePackageController::class, 'courseTeachersApi']) ->name('course-package.course-teachers');
+
+        // MODUL AKADEMIK (pindah dari admin)
+        Route::get('/module',               [OwnerAcademicModuleController::class, 'index'])   ->name('module.index');
+        Route::get('/module/create',        [OwnerAcademicModuleController::class, 'create'])  ->name('module.create');
+        Route::post('/module',              [OwnerAcademicModuleController::class, 'store'])   ->name('module.store');
+        Route::get('/module/{module}',      [OwnerAcademicModuleController::class, 'show'])    ->name('module.show');
+        Route::get('/module/{module}/edit', [OwnerAcademicModuleController::class, 'edit'])    ->name('module.edit');
+        Route::put('/module/{module}',      [OwnerAcademicModuleController::class, 'update'])  ->name('module.update');
+        Route::delete('/module/{module}',   [OwnerAcademicModuleController::class, 'destroy']) ->name('module.destroy');
     });
 
 /*

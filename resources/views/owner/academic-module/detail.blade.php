@@ -7,7 +7,7 @@
 
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ route('admin.module.index') }}">Modul Akademik</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('owner.module.index') }}">Modul Akademik</a></li>
         <li class="breadcrumb-item active">Detail Modul</li>
     </ol>
 </nav>
@@ -64,10 +64,10 @@
             </div>
 
             <div class="d-flex gap-2 mt-4 pt-3 border-top">
-                <a href="{{ route('admin.module.edit', $module) }}" class="btn btn-primary fw-semibold">
+                <a href="{{ route('owner.module.edit', $module) }}" class="btn btn-primary fw-semibold">
                     <i class="bi bi-pencil me-2"></i>Edit Modul
                 </a>
-                <a href="{{ route('admin.module.index') }}" class="btn btn-outline-secondary fw-semibold">
+                <a href="{{ route('owner.module.index') }}" class="btn btn-outline-secondary fw-semibold">
                     <i class="bi bi-arrow-left me-2"></i>Kembali
                 </a>
             </div>

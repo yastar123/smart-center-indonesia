@@ -7,7 +7,7 @@
 
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ route('admin.course-package.index') }}">Paket Belajar</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('owner.course-package.index') }}">Paket Belajar</a></li>
         <li class="breadcrumb-item active">Edit — {{ $coursePackage->nama }}</li>
     </ol>
 </nav>
@@ -33,7 +33,7 @@
     $existingCTMap       = $coursePackage->courseTeachers->groupBy('course_id');
 @endphp
 
-<form method="POST" action="{{ route('admin.course-package.update', $coursePackage) }}" id="pkgForm">
+<form method="POST" action="{{ route('owner.course-package.update', $coursePackage) }}" id="pkgForm">
     @csrf @method('PUT')
 
     {{-- CARD 1: Info Dasar --}}
@@ -208,7 +208,7 @@
         <button type="submit" class="btn btn-primary px-4">
             <i class="bi bi-check-lg me-2"></i>Simpan Perubahan
         </button>
-        <a href="{{ route('admin.course-package.show', $coursePackage) }}" class="btn btn-outline-secondary px-4">
+        <a href="{{ route('owner.course-package.show', $coursePackage) }}" class="btn btn-outline-secondary px-4">
             <i class="bi bi-arrow-left me-2"></i>Batal
         </a>
     </div>

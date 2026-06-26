@@ -8,8 +8,8 @@
 
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ route('admin.subject.index') }}">Mata Pelajaran</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('admin.subject.show', $subject) }}">{{ $subject->nama }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('owner.subject.index') }}">Mata Pelajaran</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('owner.subject.show', $subject) }}">{{ $subject->nama }}</a></li>
         <li class="breadcrumb-item active">Edit</li>
     </ol>
 </nav>
@@ -31,7 +31,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('admin.subject.update', $subject) }}">
+    <form method="POST" action="{{ route('owner.subject.update', $subject) }}">
         @csrf @method('PUT')
 
         <div class="row g-3">
@@ -95,7 +95,7 @@
             <button type="submit" class="btn btn-primary px-4">
                 <i class="bi bi-check-lg me-2"></i>Simpan Perubahan
             </button>
-            <a href="{{ route('admin.subject.show', $subject) }}" class="btn btn-outline-secondary px-4">
+            <a href="{{ route('owner.subject.show', $subject) }}" class="btn btn-outline-secondary px-4">
                 <i class="bi bi-arrow-left me-2"></i>Batal & Kembali
             </a>
         </div>

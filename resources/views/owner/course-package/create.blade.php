@@ -7,7 +7,7 @@
 
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ route('admin.course-package.index') }}">Paket Belajar</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('owner.course-package.index') }}">Paket Belajar</a></li>
         <li class="breadcrumb-item active">Tambah Paket</li>
     </ol>
 </nav>
@@ -31,7 +31,7 @@
     <div class="alert alert-success mb-3"><i class="bi bi-check-circle me-2"></i>{{ session('success') }}</div>
 @endif
 
-<form method="POST" action="{{ route('admin.course-package.store') }}" id="pkgForm">
+<form method="POST" action="{{ route('owner.course-package.store') }}" id="pkgForm">
     @csrf
 
     {{-- CARD 1: Info Dasar --}}
@@ -95,7 +95,7 @@
 
         @if($courses->isEmpty())
             <div class="alert alert-warning mb-0">
-                Belum ada mata pelajaran aktif. <a href="{{ route('admin.subject.index') }}">Buat mata pelajaran</a> terlebih dahulu.
+                Belum ada mata pelajaran aktif. <a href="{{ route('owner.subject.index') }}">Buat mata pelajaran</a> terlebih dahulu.
             </div>
         @else
         @php
@@ -155,7 +155,7 @@
         <button type="submit" class="btn btn-primary px-4">
             <i class="bi bi-check-lg me-2"></i>Simpan Paket
         </button>
-        <a href="{{ route('admin.course-package.index') }}" class="btn btn-outline-secondary px-4">
+        <a href="{{ route('owner.course-package.index') }}" class="btn btn-outline-secondary px-4">
             <i class="bi bi-arrow-left me-2"></i>Batal
         </a>
     </div>

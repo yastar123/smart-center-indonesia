@@ -23,7 +23,7 @@
             </div>
         </div>
         <div class="col-md-4 text-md-end d-flex justify-content-md-end gap-2">
-            <a href="{{ route('admin.subject.create') }}" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
+            <a href="{{ route('owner.subject.create') }}" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
                 <i class="bi bi-plus-lg me-2"></i>Tambah Mapel
             </a>
         </div>
@@ -119,8 +119,8 @@
                     </td>
                     <td class="text-center">
                         <div class="d-flex gap-1 justify-content-center">
-                            <a href="{{ route('admin.subject.edit', $s) }}" class="btn btn-sm btn-outline-secondary" title="Edit">Edit</a>
-                            <form method="POST" action="{{ route('admin.subject.destroy', $s) }}" class="d-inline" onsubmit="return confirm('Hapus mata pelajaran ini?')">
+                            <a href="{{ route('owner.subject.edit', $s) }}" class="btn btn-sm btn-outline-secondary" title="Edit">Edit</a>
+                            <form method="POST" action="{{ route('owner.subject.destroy', $s) }}" class="d-inline" onsubmit="return confirm('Hapus mata pelajaran ini?')">
                                 @csrf @method('DELETE')
                                 <button class="btn btn-sm btn-outline-danger">Hapus</button>
                             </form>

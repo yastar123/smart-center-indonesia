@@ -99,6 +99,26 @@
                 <span>Pengaturan</span>
             </a>
         </li>
+
+        <li class="nav-header">AKADEMIK</li>
+        <li class="nav-item {{ request()->routeIs('owner.subject.*') ? 'active' : '' }}">
+            <a href="{{ route('owner.subject.index') }}" class="nav-link">
+                <i class="nav-icon bi bi-book"></i>
+                <span>Mata Pelajaran</span>
+            </a>
+        </li>
+        <li class="nav-item {{ request()->routeIs('owner.course-package.*') ? 'active' : '' }}">
+            <a href="{{ route('owner.course-package.index') }}" class="nav-link">
+                <i class="nav-icon bi bi-box-seam"></i>
+                <span>Paket Belajar</span>
+            </a>
+        </li>
+        <li class="nav-item {{ request()->routeIs('owner.module.*') ? 'active' : '' }}">
+            <a href="{{ route('owner.module.index') }}" class="nav-link">
+                <i class="nav-icon bi bi-layers"></i>
+                <span>Modul Akademik</span>
+            </a>
+        </li>
         @endrole
 
         {{-- ADMIN MENU --}}
@@ -107,9 +127,6 @@
             $showAkademik = $isOwner ||
                 in_array('student', (array)$allowedPages) ||
                 in_array('teacher', (array)$allowedPages) ||
-                in_array('module', (array)$allowedPages) ||
-                in_array('package', (array)$allowedPages) ||
-                in_array('course', (array)$allowedPages) ||
                 in_array('course_fee', (array)$allowedPages) ||
                 in_array('class', (array)$allowedPages) ||
                 in_array('schedule', (array)$allowedPages) ||
@@ -152,23 +169,6 @@
         @endif
 
 
-        @if($isOwner || in_array('package', (array)$allowedPages))
-        <li class="nav-item {{ request()->routeIs('admin.packages.*') ? 'active' : '' }}">
-            <a href="{{ route('admin.packages.index') }}" class="nav-link">
-                <i class="nav-icon bi bi-box-seam"></i>
-                <span>Paket Belajar</span>
-            </a>
-        </li>
-        @endif
-
-        @if($isOwner || in_array('course', (array)$allowedPages))
-        <li class="nav-item {{ request()->routeIs('admin.courses.*') ? 'active' : '' }}">
-            <a href="{{ route('admin.courses.index') }}" class="nav-link">
-                <i class="nav-icon bi bi-book"></i>
-                <span>Mata Pelajaran</span>
-            </a>
-        </li>
-        @endif
 
 
         @if($isOwner || in_array('class', (array)$allowedPages))

@@ -3255,19 +3255,19 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.subject.index') }}" class="nav-link {{ request()->routeIs('admin.subject.*') ? 'active' : '' }}" data-label="Mata Pelajaran">
+            <a href="{{ route('owner.subject.index') }}" class="nav-link {{ request()->routeIs('owner.subject.*') ? 'active' : '' }}" data-label="Mata Pelajaran">
                 <i class="bi bi-journal-bookmark-fill"></i>
                 <span>Mata Pelajaran</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.course-package.index') }}" class="nav-link {{ request()->routeIs('admin.course-package.*') ? 'active' : '' }}" data-label="Paket Belajar">
+            <a href="{{ route('owner.course-package.index') }}" class="nav-link {{ request()->routeIs('owner.course-package.*') ? 'active' : '' }}" data-label="Paket Belajar">
                 <i class="bi bi-box-seam"></i>
                 <span>Paket Belajar</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.module.index') }}" class="nav-link {{ request()->routeIs('admin.module.*') ? 'active' : '' }}" data-label="Modul Akademik">
+            <a href="{{ route('owner.module.index') }}" class="nav-link {{ request()->routeIs('owner.module.*') ? 'active' : '' }}" data-label="Modul Akademik">
                 <i class="bi bi-journal-text"></i>
                 <span>Modul Akademik</span>
             </a>
@@ -4370,9 +4370,11 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         { label:'Pesan Aplikasi', desc:'Chat internal', href:'{{ route("admin.messages.index") }}', icon:'bi-chat-dots', color:'#0284c7', group:'Komunikasi' },
         { label:'Video Call', desc:'Kelas virtual online', href:'{{ route("admin.videocall.index") }}', icon:'bi-camera-video', color:'#0d9488', group:'Komunikasi' },
         { label:'Tryout UTBK/PTN', desc:'Kelola soal & ujian CBT', href:'{{ route("admin.tryouts.index") }}', icon:'bi-journal-check', color:'#c84ddf', group:'Tryout CBT' },
-        { label:'Modul Akademik', desc:'Kelola modul materi pelajaran', href:'{{ route("admin.module.index") }}', icon:'bi-layers', color:'#68117e', group:'Akademik' },
-        { label:'Paket Kursus', desc:'Paket belajar & harga kursus', href:'{{ route("admin.course-package.index") }}', icon:'bi-collection', color:'#059669', group:'Akademik' },
-        { label:'Mata Pelajaran (Subject)', desc:'Kelola bidang studi', href:'{{ route("admin.subject.index") }}', icon:'bi-journal-text', color:'#10b981', group:'Akademik' },
+        @role('owner')
+        { label:'Modul Akademik', desc:'Kelola modul materi pelajaran', href:'{{ route("owner.module.index") }}', icon:'bi-layers', color:'#68117e', group:'Akademik' },
+        { label:'Paket Kursus', desc:'Paket belajar & harga kursus', href:'{{ route("owner.course-package.index") }}', icon:'bi-collection', color:'#059669', group:'Akademik' },
+        { label:'Mata Pelajaran (Subject)', desc:'Kelola bidang studi', href:'{{ route("owner.subject.index") }}', icon:'bi-journal-text', color:'#10b981', group:'Akademik' },
+        @endrole
         { label:'Dashboard Jadwal', desc:'Pantau jadwal kelas harian', href:'{{ route("admin.schedule-dashboard.index") }}', icon:'bi-calendar3', color:'#461256', group:'Akademik' },
         { label:'Reschedule Kelas', desc:'Kelola permohonan reschedule', href:'{{ route("admin.reschedule.index") }}', icon:'bi-arrow-repeat', color:'#68117e', group:'Akademik' },
         { label:'Registrasi Siswa Baru', desc:'Daftarkan siswa & buat paket', href:'{{ route("admin.registration.create") }}', icon:'bi-person-plus', color:'#c84ddf', group:'Akademik' },
