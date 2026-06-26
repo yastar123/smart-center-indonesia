@@ -3242,6 +3242,12 @@
                 <span>Analytics</span>
             </a>
         </div>
+        <div class="nav-item">
+            <a href="{{ route('owner.curriculum.index') }}" class="nav-link {{ request()->routeIs('owner.curriculum.*') ? 'active' : '' }}" data-label="Master Kurikulum & Silabus">
+                <i class="bi bi-journal-richtext"></i>
+                <span>Master Kurikulum & Silabus</span>
+            </a>
+        </div>
         @endrole
 
         {{-- ADMIN --}}
@@ -3285,9 +3291,9 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.attendance.index') }}" class="nav-link {{ request()->routeIs('admin.attendance.index') || request()->routeIs('admin.attendance.sessions') ? 'active' : '' }}" data-label="Absensi">
+            <a href="{{ route('admin.attendance.index') }}" class="nav-link {{ request()->routeIs('admin.attendance.index') || request()->routeIs('admin.attendance.sessions') ? 'active' : '' }}" data-label="Manajemen Absensi">
                 <i class="bi bi-clipboard2-check"></i>
-                <span>Absensi</span>
+                <span>Manajemen Absensi</span>
             </a>
         </div>
         <div class="nav-item">
@@ -3297,9 +3303,9 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.reschedule.index') }}" class="nav-link {{ request()->routeIs('admin.reschedule.*') ? 'active' : '' }}" data-label="Reschedule">
+            <a href="{{ route('admin.reschedule.index') }}" class="nav-link {{ request()->routeIs('admin.reschedule.*') ? 'active' : '' }}" data-label="Manajemen Reschedule">
                 <i class="bi bi-arrow-left-right"></i>
-                <span>Reschedule</span>
+                <span>Manajemen Reschedule</span>
                 @php $pendingReschedule = \App\Models\ScheduleProposal::where('status','pending')->count(); @endphp
                 @if($pendingReschedule > 0)
                     <span class="menu-badge">{{ $pendingReschedule > 99 ? '99+' : $pendingReschedule }}</span>

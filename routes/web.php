@@ -428,6 +428,16 @@ Route::middleware(['auth', 'role:owner'])
             return back()->with('success', 'Pengaturan sistem berhasil disimpan.');
         })->name('settings.update');
         Route::get('/analytics', fn() => view('owner.analytics'))->name('analytics');
+
+        // KURIKULUM & SILABUS
+        Route::get('/curriculum',                         [\App\Http\Controllers\Owner\CurriculumController::class, 'index'])           ->name('curriculum.index');
+        Route::get('/curriculum/create',                  [\App\Http\Controllers\Owner\CurriculumController::class, 'create'])          ->name('curriculum.create');
+        Route::post('/curriculum',                        [\App\Http\Controllers\Owner\CurriculumController::class, 'store'])           ->name('curriculum.store');
+        Route::get('/curriculum/{curriculum}',            [\App\Http\Controllers\Owner\CurriculumController::class, 'show'])            ->name('curriculum.show');
+        Route::get('/curriculum/{curriculum}/edit',       [\App\Http\Controllers\Owner\CurriculumController::class, 'edit'])            ->name('curriculum.edit');
+        Route::post('/curriculum/{curriculum}',           [\App\Http\Controllers\Owner\CurriculumController::class, 'update'])          ->name('curriculum.update');
+        Route::delete('/curriculum/{curriculum}',         [\App\Http\Controllers\Owner\CurriculumController::class, 'destroy'])         ->name('curriculum.destroy');
+        Route::post('/curriculum-chapter/{chapter}/pdf',  [\App\Http\Controllers\Owner\CurriculumController::class, 'uploadChapterPdf'])->name('curriculum.chapter.pdf');
     });
 
 /*
