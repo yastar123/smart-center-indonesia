@@ -3254,6 +3254,24 @@
                 <span>Manajemen Promo</span>
             </a>
         </div>
+        <div class="nav-item">
+            <a href="{{ route('admin.subject.index') }}" class="nav-link {{ request()->routeIs('admin.subject.*') ? 'active' : '' }}" data-label="Mata Pelajaran">
+                <i class="bi bi-journal-bookmark-fill"></i>
+                <span>Mata Pelajaran</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('admin.course-package.index') }}" class="nav-link {{ request()->routeIs('admin.course-package.*') ? 'active' : '' }}" data-label="Paket Belajar">
+                <i class="bi bi-box-seam"></i>
+                <span>Paket Belajar</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('admin.module.index') }}" class="nav-link {{ request()->routeIs('admin.module.*') ? 'active' : '' }}" data-label="Modul Akademik">
+                <i class="bi bi-journal-text"></i>
+                <span>Modul Akademik</span>
+            </a>
+        </div>
         @endrole
 
         {{-- ADMIN --}}
@@ -3276,24 +3294,6 @@
             <a href="{{ route('admin.teachers.index') }}" class="nav-link {{ request()->routeIs('admin.teachers.*') ? 'active' : '' }}" data-label="Guru">
                 <i class="bi bi-person-workspace"></i>
                 <span>Guru</span>
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="{{ route('admin.subject.index') }}" class="nav-link {{ request()->routeIs('admin.subject.*') ? 'active' : '' }}" data-label="Mata Pelajaran">
-                <i class="bi bi-journal-bookmark-fill"></i>
-                <span>Mata Pelajaran</span>
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="{{ route('admin.course-package.index') }}" class="nav-link {{ request()->routeIs('admin.course-package.*') ? 'active' : '' }}" data-label="Paket Belajar">
-                <i class="bi bi-box-seam"></i>
-                <span>Paket Belajar</span>
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="{{ route('admin.module.index') }}" class="nav-link {{ request()->routeIs('admin.module.*') ? 'active' : '' }}" data-label="Modul Akademik">
-                <i class="bi bi-journal-text"></i>
-                <span>Modul Akademik</span>
             </a>
         </div>
         <div class="nav-item">

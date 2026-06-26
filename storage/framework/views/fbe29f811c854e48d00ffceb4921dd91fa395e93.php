@@ -3248,6 +3248,30 @@
                 <span>Master Kurikulum & Silabus</span>
             </a>
         </div>
+        <div class="nav-item">
+            <a href="<?php echo e(route('owner.promo.index')); ?>" class="nav-link <?php echo e(request()->routeIs('owner.promo.*') ? 'active' : ''); ?>" data-label="Manajemen Promo">
+                <i class="bi bi-megaphone-fill"></i>
+                <span>Manajemen Promo</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="<?php echo e(route('admin.subject.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.subject.*') ? 'active' : ''); ?>" data-label="Mata Pelajaran">
+                <i class="bi bi-journal-bookmark-fill"></i>
+                <span>Mata Pelajaran</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="<?php echo e(route('admin.course-package.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.course-package.*') ? 'active' : ''); ?>" data-label="Paket Belajar">
+                <i class="bi bi-box-seam"></i>
+                <span>Paket Belajar</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="<?php echo e(route('admin.module.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.module.*') ? 'active' : ''); ?>" data-label="Modul Akademik">
+                <i class="bi bi-journal-text"></i>
+                <span>Modul Akademik</span>
+            </a>
+        </div>
         <?php endif; ?>
 
         
@@ -3270,24 +3294,6 @@
             <a href="<?php echo e(route('admin.teachers.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.teachers.*') ? 'active' : ''); ?>" data-label="Guru">
                 <i class="bi bi-person-workspace"></i>
                 <span>Guru</span>
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="<?php echo e(route('admin.subject.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.subject.*') ? 'active' : ''); ?>" data-label="Mata Pelajaran">
-                <i class="bi bi-journal-bookmark-fill"></i>
-                <span>Mata Pelajaran</span>
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="<?php echo e(route('admin.course-package.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.course-package.*') ? 'active' : ''); ?>" data-label="Paket Belajar">
-                <i class="bi bi-box-seam"></i>
-                <span>Paket Belajar</span>
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="<?php echo e(route('admin.module.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.module.*') ? 'active' : ''); ?>" data-label="Modul Akademik">
-                <i class="bi bi-journal-text"></i>
-                <span>Modul Akademik</span>
             </a>
         </div>
         <div class="nav-item">
