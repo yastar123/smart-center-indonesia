@@ -25,7 +25,6 @@ use App\Http\Controllers\Admin\BillingController;
 use App\Http\Controllers\Admin\TryoutController;
 use App\Http\Controllers\Public\StudentRegistrationPublicController;
 use App\Http\Controllers\Admin\MessageController;
-use App\Http\Controllers\Admin\AttendanceHistoryController;
 use App\Http\Controllers\Owner\BranchController;
 use App\Http\Controllers\Guru\AttendanceController;
 use App\Http\Controllers\Siswa\SiswaController;
