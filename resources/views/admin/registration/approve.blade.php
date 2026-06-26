@@ -119,25 +119,16 @@
                 </div>
                 @endif
 
-                {{-- Minat + Harga --}}
+                {{-- Minat (nama saja, tanpa harga) --}}
                 @if($registration->interests && count($registration->interests))
                 <div style="border-top:1px solid var(--card-border);padding-top:12px">
                     <div class="fw-semibold mb-2" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Program Diminati</div>
-                    <div class="d-flex flex-column gap-2">
+                    <div class="d-flex flex-wrap gap-2">
                         @foreach($registration->interests as $int)
-                        @php $harga = $coursePrices[$int] ?? null; @endphp
-                        <div class="d-flex align-items-center justify-content-between px-2 py-1 rounded-2" style="background:var(--card-bg);border:1px solid var(--card-border)">
-                            <span style="font-size:.8rem;color:var(--text-primary)">
-                                <i class="bi bi-check2 text-primary me-1"></i>{{ $int }}
-                            </span>
-                            @if($harga !== null)
-                            <span class="fw-bold" style="font-size:.8rem;color:var(--primary)">
-                                Rp {{ number_format($harga, 0, ',', '.') }}
-                            </span>
-                            @else
-                            <span class="text-muted" style="font-size:.75rem">Harga belum diset</span>
-                            @endif
-                        </div>
+                        <span class="d-inline-flex align-items-center gap-1 px-2 py-1 rounded-2"
+                              style="background:var(--card-bg);border:1px solid var(--card-border);font-size:.8rem;color:var(--text-primary)">
+                            <i class="bi bi-check2 text-primary"></i>{{ $int }}
+                        </span>
                         @endforeach
                     </div>
                 </div>

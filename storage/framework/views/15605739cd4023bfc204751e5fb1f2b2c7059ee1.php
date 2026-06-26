@@ -177,6 +177,31 @@
                 </div>
             </div>
 
+            
+            <?php
+                $allInterests = $registration->interests ?? [];
+                if (empty($allInterests) && $registration->program) {
+                    $allInterests = [$registration->program];
+                }
+            ?>
+            <?php if(!empty($allInterests)): ?>
+            <div class="mb-4 p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
+                <div class="fw-semibold mb-2" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">
+                    <i class="bi bi-bookmark-star me-1" style="color:var(--primary)"></i>Program Diminati Siswa
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <?php $__currentLoopData = $allInterests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prog): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <span class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill fw-semibold"
+                          style="background:linear-gradient(135deg,rgba(38,6,50,.08),rgba(200,77,223,.12));color:var(--primary);border:1px solid rgba(200,77,223,.25);font-size:.8rem">
+                        <i class="bi bi-check2-circle"></i> <?php echo e($prog); ?>
+
+                    </span>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </div>
+                <div class="text-muted mt-2" style="font-size:.72rem"><i class="bi bi-info-circle me-1"></i>Program yang dipilih siswa saat mendaftar</div>
+            </div>
+            <?php endif; ?>
+
             <form id="approveForm">
                 <?php echo csrf_field(); ?>
 
