@@ -28,7 +28,7 @@
             </div>
         </div>
         <div class="col-md-4 text-md-end">
-            <a href="{{ route('admin.students.create') }}" class="btn fw-semibold px-4"
+            <a href="{{ route('admin.registration.create') }}" class="btn fw-semibold px-4"
                 style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
                 <i class="bi bi-plus-lg me-2"></i>Tambah Siswa
             </a>
@@ -119,7 +119,7 @@
             <button class="btn btn-outline-secondary btn-sm" onclick="window.print()" title="Print">
                 <i class="bi bi-printer me-1"></i><span class="d-none d-md-inline">Print</span>
             </button>
-            <a href="{{ route('admin.students.create') }}" class="btn btn-primary btn-sm">
+            <a href="{{ route('admin.registration.create') }}" class="btn btn-primary btn-sm">
                 <i class="bi bi-plus-lg me-1"></i>Tambah Siswa
             </a>
         </div>
@@ -297,7 +297,7 @@
                                 <i class="bi bi-x me-1"></i>Reset Filter
                             </a>
                             @endif
-                            <a href="{{ route('admin.students.create') }}" class="btn btn-sm btn-primary">
+                            <a href="{{ route('admin.registration.create') }}" class="btn btn-sm btn-primary">
                                 <i class="bi bi-plus-lg me-1"></i>Tambah Siswa
                             </a>
                         </div>

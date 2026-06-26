@@ -3330,6 +3330,16 @@
                 <span>Fasilitas Ruangan</span>
             </a>
         </div>
+        <div class="nav-item">
+            <a href="<?php echo e(route('admin.leave.index')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.leave.*') ? 'active' : ''); ?>" data-label="Cuti & Freeze">
+                <i class="bi bi-snow2"></i>
+                <span>Cuti & Freeze</span>
+                <?php $pendingLeave = \App\Models\StudentLeave::where('status','pending')->count(); ?>
+                <?php if($pendingLeave > 0): ?>
+                    <span class="menu-badge"><?php echo e($pendingLeave > 99 ? '99+' : $pendingLeave); ?></span>
+                <?php endif; ?>
+            </a>
+        </div>
 
         <div class="nav-header">KEUANGAN</div>
 
@@ -3515,6 +3525,11 @@
         <div class="nav-item">
             <a href="<?php echo e(route('siswa.tryout')); ?>" class="nav-link <?php echo e(request()->routeIs('siswa.tryout*') ? 'active' : ''); ?>" data-label="Tryout CBT">
                 <i class="bi bi-laptop"></i><span>Tryout CBT</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="<?php echo e(route('siswa.leave.index')); ?>" class="nav-link <?php echo e(request()->routeIs('siswa.leave.*') ? 'active' : ''); ?>" data-label="Cuti & Freeze">
+                <i class="bi bi-snow2"></i><span>Cuti & Freeze</span>
             </a>
         </div>
         <div class="nav-item">

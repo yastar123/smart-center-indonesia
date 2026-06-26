@@ -126,6 +126,11 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::get('/students/{student}/courses',    [CertificateController::class, 'studentCourses']) ->name('students.courses');
 
 
+        // CUTI & FREEZE PAKET (Admin)
+        Route::get('/leave',                    [\App\Http\Controllers\Admin\LeaveController::class, 'index'])  ->name('leave.index');
+        Route::patch('/leave/{leave}/approve',  [\App\Http\Controllers\Admin\LeaveController::class, 'approve'])->name('leave.approve');
+        Route::patch('/leave/{leave}/reject',   [\App\Http\Controllers\Admin\LeaveController::class, 'reject']) ->name('leave.reject');
+
         // ROOMS (Fasilitas Ruangan)
         Route::get('/rooms',              [\App\Http\Controllers\Admin\RoomController::class, 'index'])   ->name('rooms.index');
         Route::get('/rooms/create',       [\App\Http\Controllers\Admin\RoomController::class, 'create'])  ->name('rooms.create');
@@ -567,6 +572,11 @@ Route::middleware(['auth', 'role:siswa'])
         Route::get('/tryout/{tryout}',                 [\App\Http\Controllers\Siswa\TryoutController::class, 'show'])  ->name('tryout.show');
         Route::post('/tryout/{tryout}/submit',         [\App\Http\Controllers\Siswa\TryoutController::class, 'submit'])->name('tryout.submit');
         Route::get('/tryout/{tryout}/result/{attempt}',[\App\Http\Controllers\Siswa\TryoutController::class, 'result'])->name('tryout.result');
+
+        // CUTI & FREEZE (Siswa)
+        Route::get('/leave',        [\App\Http\Controllers\Siswa\LeaveController::class, 'index']) ->name('leave.index');
+        Route::get('/leave/create', [\App\Http\Controllers\Siswa\LeaveController::class, 'create'])->name('leave.create');
+        Route::post('/leave',       [\App\Http\Controllers\Siswa\LeaveController::class, 'store']) ->name('leave.store');
 
         // Schedule Agreements (Proposals)
         Route::get('/schedule-agreements', [\App\Http\Controllers\Siswa\ScheduleProposalController::class, 'index'])->name('schedule-agreements.index');
