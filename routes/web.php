@@ -84,8 +84,7 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::put('/teachers/{teacher}',    [TeacherController::class, 'update'])  ->name('teachers.update');
         Route::delete('/teachers/{teacher}', [TeacherController::class, 'destroy']) ->name('teachers.destroy');
 
-        // ATTENDANCE HISTORY (Admin)
-        Route::get('/attendance-history', [AttendanceHistoryController::class, 'index'])->name('attendance-history.index');
+        // ATTENDANCE HISTORY (Admin) — removed
 
         // SCHEDULES (index redirects to create — list page removed)
         Route::get('/schedules',                    fn() => redirect()->route('admin.schedules.create')) ->name('schedules.index');
@@ -276,9 +275,7 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::get('/riwayat-guru-mengajar', [\App\Http\Controllers\Admin\TeacherHistoryController::class, 'index'])->name('riwayat-guru.index');
         Route::get('/riwayat-guru-mengajar/{teacher}', [\App\Http\Controllers\Admin\TeacherHistoryController::class, 'show'])->name('riwayat-guru.show');
 
-        // RIWAYAT SESI
-        Route::get('/riwayat-sesi', [\App\Http\Controllers\Admin\RiwayatSesiController::class, 'index'])->name('riwayat-sesi.index');
-        Route::get('/riwayat-sesi/{teacher}', [\App\Http\Controllers\Admin\RiwayatSesiController::class, 'show'])->name('riwayat-sesi.show');
+        // RIWAYAT SESI — removed
 
         // VERIFIKASI PEMBAYARAN
         Route::get('/verifikasi-pembayaran', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'index'])->name('verifikasi-pembayaran.index');

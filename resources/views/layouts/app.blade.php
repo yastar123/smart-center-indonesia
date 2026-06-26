@@ -3307,18 +3307,6 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('admin.attendance-history.index') }}" class="nav-link {{ request()->routeIs('admin.attendance-history.*') ? 'active' : '' }}" data-label="Riwayat Absensi">
-                <i class="bi bi-clipboard2-pulse"></i>
-                <span>Riwayat Absensi</span>
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="{{ route('admin.riwayat-sesi.index') }}" class="nav-link {{ request()->routeIs('admin.riwayat-sesi.*') ? 'active' : '' }}" data-label="Riwayat Sesi">
-                <i class="bi bi-clock-history"></i>
-                <span>Riwayat Sesi</span>
-            </a>
-        </div>
-        <div class="nav-item">
             <a href="{{ route('admin.certificates.index') }}" class="nav-link {{ request()->routeIs('admin.certificates.*') ? 'active' : '' }}" data-label="Sertifikat">
                 <i class="bi bi-award"></i>
                 <span>Sertifikat</span>
@@ -3432,8 +3420,8 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('guru.classes.index') }}" class="nav-link {{ request()->routeIs('guru.classes.*') ? 'active' : '' }}" data-label="Kelas">
-                <i class="bi bi-diagram-3"></i><span>Kelas</span>
+            <a href="{{ route('guru.classes.index') }}" class="nav-link {{ request()->routeIs('guru.classes.*') ? 'active' : '' }}" data-label="Kelas Absensi">
+                <i class="bi bi-diagram-3"></i><span>Kelas Absensi</span>
             </a>
         </div>
         
@@ -3680,7 +3668,7 @@
     @role('guru')
     <a href="{{ route('guru.classes.index') }}" class="mob-nav-item {{ request()->routeIs('guru.classes.*') ? 'active' : '' }}">
         <i class="bi bi-diagram-3"></i>
-        <span>Kelas</span>
+        <span>Kelas Absensi</span>
     </a>
     <a href="{{ route('guru.announcements') }}" class="mob-nav-item {{ request()->routeIs('guru.announcements') ? 'active' : '' }}">
         <i class="bi bi-megaphone"></i>
