@@ -122,23 +122,13 @@
                 <?php if($registration->interests && count($registration->interests)): ?>
                 <div style="border-top:1px solid var(--card-border);padding-top:12px">
                     <div class="fw-semibold mb-2" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Program Diminati</div>
-                    <div class="d-flex flex-column gap-2">
+                    <div class="d-flex flex-wrap gap-2">
                         <?php $__currentLoopData = $registration->interests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $int): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <?php $harga = $coursePrices[$int] ?? null; ?>
-                        <div class="d-flex align-items-center justify-content-between px-2 py-1 rounded-2" style="background:var(--card-bg);border:1px solid var(--card-border)">
-                            <span style="font-size:.8rem;color:var(--text-primary)">
-                                <i class="bi bi-check2 text-primary me-1"></i><?php echo e($int); ?>
+                        <span class="d-inline-flex align-items-center gap-1 px-2 py-1 rounded-2"
+                              style="background:var(--card-bg);border:1px solid var(--card-border);font-size:.8rem;color:var(--text-primary)">
+                            <i class="bi bi-check2 text-primary"></i><?php echo e($int); ?>
 
-                            </span>
-                            <?php if($harga !== null): ?>
-                            <span class="fw-bold" style="font-size:.8rem;color:var(--primary)">
-                                Rp <?php echo e(number_format($harga, 0, ',', '.')); ?>
-
-                            </span>
-                            <?php else: ?>
-                            <span class="text-muted" style="font-size:.75rem">Harga belum diset</span>
-                            <?php endif; ?>
-                        </div>
+                        </span>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
