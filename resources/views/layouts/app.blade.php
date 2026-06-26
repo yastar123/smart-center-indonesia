@@ -3477,8 +3477,8 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{{ route('siswa.courses.index') }}" class="nav-link {{ request()->routeIs('siswa.courses.index') ? 'active' : '' }}" data-label="List Mata Pelajaran">
-                <i class="bi bi-journal-bookmark"></i><span>List Mata Pelajaran</span>
+            <a href="{{ route('siswa.kelas.index') }}" class="nav-link {{ request()->routeIs('siswa.kelas.*') ? 'active' : '' }}" data-label="Kelas Saya">
+                <i class="bi bi-collection"></i><span>Kelas Saya</span>
             </a>
         </div>
         <div class="nav-item">
@@ -3668,9 +3668,9 @@
     @endrole
     @role('siswa')
     {{-- Mobile nav: Jadwal siswa dihapus sesuai permintaan --}}
-    <a href="{{ route('siswa.courses.index') }}" class="mob-nav-item {{ request()->routeIs('siswa.courses.index') ? 'active' : '' }}">
-        <i class="bi bi-journal-bookmark{{ request()->routeIs('siswa.courses.index') ? '-fill' : '' }}"></i>
-        <span>Mapel</span>
+    <a href="{{ route('siswa.kelas.index') }}" class="mob-nav-item {{ request()->routeIs('siswa.kelas.*') ? 'active' : '' }}">
+        <i class="bi bi-collection{{ request()->routeIs('siswa.kelas.*') ? '-fill' : '' }}"></i>
+        <span>Kelas</span>
     </a>
     <a href="{{ route('siswa.courses.fees') }}" class="mob-nav-item {{ request()->routeIs('siswa.courses.fees') ? 'active' : '' }}">
         <i class="bi bi-cash-coin{{ request()->routeIs('siswa.courses.fees') ? '-fill' : '' }}"></i>
@@ -4364,7 +4364,7 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         @endrole
         @role('siswa')
         { label:'Dashboard Siswa', desc:'Portal siswa & tagihan', href:'{{ route("siswa.dashboard") }}', icon:'bi-speedometer2', color:'#c84ddf', group:'Siswa' },
-        { label:'List Mata Pelajaran', desc:'Mata pelajaran yang diambil', href:'{{ route("siswa.courses.index") }}', icon:'bi-journal-bookmark', color:'#10b981', group:'Siswa' },
+        { label:'Kelas Saya', desc:'Kelas yang diikuti & progres belajar', href:'{{ route("siswa.kelas.index") }}', icon:'bi-collection', color:'#c84ddf', group:'Siswa' },
         { label:'Harga Paket', desc:'Daftar harga paket', href:'{{ route("siswa.courses.fees") }}', icon:'bi-cash-coin', color:'#f6af23', group:'Siswa' },
         // Jadwal Belajar (siswa) dihapus — entri command palette dihilangkan
         { label:'Sertifikat Saya', desc:'Lihat sertifikat yang diterbitkan', href:'{{ route("siswa.certificates.index") }}', icon:'bi-award', color:'#f6af23', group:'Siswa' },

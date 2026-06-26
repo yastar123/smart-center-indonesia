@@ -539,7 +539,10 @@ Route::middleware(['auth', 'role:siswa'])
         Route::get('/attendance/{course}', [\App\Http\Controllers\Siswa\AttendanceController::class, 'show'])->name('attendance.show');
         Route::post('/attendance/{schedule}/confirm', [\App\Http\Controllers\Siswa\AttendanceController::class, 'confirmAttendance'])->name('attendance.confirm');
 
-        // List Mata Pelajaran
+        // Kelas Saya
+        Route::get('/kelas', [\App\Http\Controllers\Siswa\KelasController::class, 'index'])->name('kelas.index');
+
+        // Harga Paket (courses fees kept for reference, courses.index kept for legacy links)
         Route::get('/courses', [\App\Http\Controllers\Siswa\CourseController::class, 'index'])->name('courses.index');
         Route::get('/courses/fees', [\App\Http\Controllers\Siswa\CourseController::class, 'fees'])->name('courses.fees');
 

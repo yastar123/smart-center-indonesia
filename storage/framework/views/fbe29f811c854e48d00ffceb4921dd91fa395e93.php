@@ -3477,8 +3477,8 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="<?php echo e(route('siswa.courses.index')); ?>" class="nav-link <?php echo e(request()->routeIs('siswa.courses.index') ? 'active' : ''); ?>" data-label="List Mata Pelajaran">
-                <i class="bi bi-journal-bookmark"></i><span>List Mata Pelajaran</span>
+            <a href="<?php echo e(route('siswa.kelas.index')); ?>" class="nav-link <?php echo e(request()->routeIs('siswa.kelas.*') ? 'active' : ''); ?>" data-label="Kelas Saya">
+                <i class="bi bi-collection"></i><span>Kelas Saya</span>
             </a>
         </div>
         <div class="nav-item">
@@ -3668,9 +3668,9 @@
     <?php endif; ?>
     <?php if (\Illuminate\Support\Facades\Blade::check('role', 'siswa')): ?>
     
-    <a href="<?php echo e(route('siswa.courses.index')); ?>" class="mob-nav-item <?php echo e(request()->routeIs('siswa.courses.index') ? 'active' : ''); ?>">
-        <i class="bi bi-journal-bookmark<?php echo e(request()->routeIs('siswa.courses.index') ? '-fill' : ''); ?>"></i>
-        <span>Mapel</span>
+    <a href="<?php echo e(route('siswa.kelas.index')); ?>" class="mob-nav-item <?php echo e(request()->routeIs('siswa.kelas.*') ? 'active' : ''); ?>">
+        <i class="bi bi-collection<?php echo e(request()->routeIs('siswa.kelas.*') ? '-fill' : ''); ?>"></i>
+        <span>Kelas</span>
     </a>
     <a href="<?php echo e(route('siswa.courses.fees')); ?>" class="mob-nav-item <?php echo e(request()->routeIs('siswa.courses.fees') ? 'active' : ''); ?>">
         <i class="bi bi-cash-coin<?php echo e(request()->routeIs('siswa.courses.fees') ? '-fill' : ''); ?>"></i>
@@ -4365,7 +4365,7 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         <?php endif; ?>
         <?php if (\Illuminate\Support\Facades\Blade::check('role', 'siswa')): ?>
         { label:'Dashboard Siswa', desc:'Portal siswa & tagihan', href:'<?php echo e(route("siswa.dashboard")); ?>', icon:'bi-speedometer2', color:'#c84ddf', group:'Siswa' },
-        { label:'List Mata Pelajaran', desc:'Mata pelajaran yang diambil', href:'<?php echo e(route("siswa.courses.index")); ?>', icon:'bi-journal-bookmark', color:'#10b981', group:'Siswa' },
+        { label:'Kelas Saya', desc:'Kelas yang diikuti & progres belajar', href:'<?php echo e(route("siswa.kelas.index")); ?>', icon:'bi-collection', color:'#c84ddf', group:'Siswa' },
         { label:'Harga Paket', desc:'Daftar harga paket', href:'<?php echo e(route("siswa.courses.fees")); ?>', icon:'bi-cash-coin', color:'#f6af23', group:'Siswa' },
         // Jadwal Belajar (siswa) dihapus — entri command palette dihilangkan
         { label:'Sertifikat Saya', desc:'Lihat sertifikat yang diterbitkan', href:'<?php echo e(route("siswa.certificates.index")); ?>', icon:'bi-award', color:'#f6af23', group:'Siswa' },
