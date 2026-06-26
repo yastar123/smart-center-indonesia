@@ -20,7 +20,7 @@
             </div>
         </div>
         <div class="col-md-4 text-md-end">
-            <a href="<?php echo e(route('admin.module.create')); ?>" class="btn fw-semibold px-4"
+            <a href="<?php echo e(route('owner.module.create')); ?>" class="btn fw-semibold px-4"
                style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
                 <i class="bi bi-plus-lg me-2"></i>Tambah Modul
             </a>
@@ -58,7 +58,7 @@
 
 
 <div class="dashboard-card mb-4 fade-up">
-    <form method="GET" action="<?php echo e(route('admin.module.index')); ?>">
+    <form method="GET" action="<?php echo e(route('owner.module.index')); ?>">
         <div class="row g-2 align-items-end">
             <div class="col-md-5">
                 <label class="form-label fw-semibold" style="font-size:12px">Cari Modul</label>
@@ -87,7 +87,7 @@
             </div>
             <div class="col-md-2 d-flex gap-2">
                 <button type="submit" class="btn btn-primary flex-fill fw-semibold">Filter</button>
-                <a href="<?php echo e(route('admin.module.index')); ?>" class="btn btn-outline-secondary fw-semibold">Reset</a>
+                <a href="<?php echo e(route('owner.module.index')); ?>" class="btn btn-outline-secondary fw-semibold">Reset</a>
             </div>
         </div>
     </form>
@@ -176,13 +176,13 @@
                         <?php endif; ?>
                     </td>
                     <td class="text-center">
-                        <a href="<?php echo e(route('admin.module.show', $m)); ?>" class="btn btn-sm btn-outline-primary me-1" title="Detail">
+                        <a href="<?php echo e(route('owner.module.show', $m)); ?>" class="btn btn-sm btn-outline-primary me-1" title="Detail">
                             <i class="bi bi-eye"></i>
                         </a>
-                        <a href="<?php echo e(route('admin.module.edit', $m)); ?>" class="btn btn-sm btn-outline-secondary me-1" title="Edit">
+                        <a href="<?php echo e(route('owner.module.edit', $m)); ?>" class="btn btn-sm btn-outline-secondary me-1" title="Edit">
                             <i class="bi bi-pencil"></i>
                         </a>
-                        <form method="POST" action="<?php echo e(route('admin.module.destroy', $m)); ?>" class="d-inline"
+                        <form method="POST" action="<?php echo e(route('owner.module.destroy', $m)); ?>" class="d-inline"
                               onsubmit="return confirm('Hapus modul ini?')">
                             <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
                             <button class="btn btn-sm btn-outline-danger" title="Hapus"><i class="bi bi-trash"></i></button>
@@ -194,7 +194,7 @@
                     <td colspan="8" class="text-center py-5">
                         <div style="font-size:40px;opacity:.3;margin-bottom:8px"><i class="bi bi-journal-x"></i></div>
                         <div class="text-muted">Belum ada modul akademik</div>
-                        <a href="<?php echo e(route('admin.module.create')); ?>" class="btn btn-sm btn-primary mt-2">Tambah Modul</a>
+                        <a href="<?php echo e(route('owner.module.create')); ?>" class="btn btn-sm btn-primary mt-2">Tambah Modul</a>
                     </td>
                 </tr>
                 <?php endif; ?>
@@ -209,4 +209,4 @@
 </div>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/admin/academic-module/index.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/owner/academic-module/index.blade.php ENDPATH**/ ?>

@@ -6,7 +6,7 @@
 
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="<?php echo e(route('admin.course-package.index')); ?>">Paket Belajar</a></li>
+        <li class="breadcrumb-item"><a href="<?php echo e(route('owner.course-package.index')); ?>">Paket Belajar</a></li>
         <li class="breadcrumb-item active">Edit — <?php echo e($coursePackage->nama); ?></li>
     </ol>
 </nav>
@@ -32,7 +32,7 @@
     $existingCTMap       = $coursePackage->courseTeachers->groupBy('course_id');
 ?>
 
-<form method="POST" action="<?php echo e(route('admin.course-package.update', $coursePackage)); ?>" id="pkgForm">
+<form method="POST" action="<?php echo e(route('owner.course-package.update', $coursePackage)); ?>" id="pkgForm">
     <?php echo csrf_field(); ?> <?php echo method_field('PUT'); ?>
 
     
@@ -224,7 +224,7 @@ unset($__errorArgs, $__bag); ?>
         <button type="submit" class="btn btn-primary px-4">
             <i class="bi bi-check-lg me-2"></i>Simpan Perubahan
         </button>
-        <a href="<?php echo e(route('admin.course-package.show', $coursePackage)); ?>" class="btn btn-outline-secondary px-4">
+        <a href="<?php echo e(route('owner.course-package.show', $coursePackage)); ?>" class="btn btn-outline-secondary px-4">
             <i class="bi bi-arrow-left me-2"></i>Batal
         </a>
     </div>
@@ -250,4 +250,4 @@ function toggleTeacherSection(courseId, checked) {
 <?php $__env->stopPush(); ?>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/admin/course-package/edit.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/owner/course-package/edit.blade.php ENDPATH**/ ?>

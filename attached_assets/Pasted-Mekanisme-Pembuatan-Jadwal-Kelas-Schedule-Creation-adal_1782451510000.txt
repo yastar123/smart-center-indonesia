@@ -1,0 +1,32 @@
+Mekanisme Pembuatan Jadwal Kelas (Schedule Creation) adalah proses paling krusial di sistem bimbingan belajar, karena proses ini seperti sebuah "persimpangan" yang menghubungkan hampir semua elemen penting dalam bisnis: siswa, guru, ruangan, dan uang.
+
+Berikut adalah penjelasan mekanisme pembuatannya dan elemen apa saja yang terkait dengannya:
+
+1. Mekanisme Pembuatan Jadwal (Cara Kerjanya)
+Saat admin membuat jadwal baru (melalui /admin/schedule-create-mockup), sistem akan meminta admin melakukan setup beruntun:
+
+Pilih Siswa & Paket: Menentukan siapa saja siswa yang tergabung di jadwal ini (bisa satu untuk privat, atau banyak untuk kelas grup) dan paket apa yang mereka pelajari (misal: Bahasa Inggris 8 Sesi). Pilihan paket ini akan mengunci Mata Pelajaran apa yang diajarkan.
+Tentukan Ruang & Waktu: Menentukan hari rutin (misal: setiap Selasa & Kamis), jam belajar, serta lokasinya. Lokasi bersifat dinamis:
+Jika Offline: Harus mengunci Ruangan fisik di cabang.
+Jika Online: Harus memasukkan link Zoom/Gmeet.
+Jika Home Visit: Memasukkan alamat rumah.
+Conflict Check (Pengecekan Bentrok): Sistem akan mengecek apakah di hari dan jam tersebut Ruangan sudah dipakai kelas lain, dan apakah Guru yang dituju sedang mengajar di kelas lain.
+Tugaskan Guru & Kunci Honor (Fee): Sistem memunculkan daftar guru yang relevan dengan mata pelajaran dan tidak bentrok. Admin lalu menugaskan satu guru dan sistem akan mengunci kesepakatan nominal Honor/Fee yang akan didapat guru tersebut untuk setiap sesinya di jadwal ini.
+2. Apa Saja yang Terkait / Terdampak dari Jadwal Ini?
+Setelah jadwal berhasil disimpan, jadwal tersebut tidak berdiri sendiri. Ia akan secara otomatis mengaktifkan dan terhubung dengan 5 Modul Utama lainnya di dalam sistem:
+
+🧑‍🎓 A. Terkait dengan Data & Kuota Siswa
+Jadwal yang dibuat akan langsung muncul di Dashboard Siswa (aplikasi milik siswa/orang tua).
+Jadwal menjadi acuan untuk Sisa Kuota Sesi. (Jika siswa beli paket 8 sesi, maka 8 sesi tersebut akan dihabiskan melalui jadwal ini).
+👨‍🏫 B. Terkait dengan Guru & Penggajian (Payroll)
+Jadwal akan mengunci Ketersediaan (Availability) guru. Guru tidak akan bisa di-booking oleh admin lain di jam yang sama.
+Sistem Penggajian/Payroll: Jadwal adalah dasar penggajian guru lepas (freelance). Jika guru memiliki jadwal 4 kali dalam sebulan, sistem akan menyiapkan saldo honor untuk 4 kali kedatangan tersebut (yang baru akan cair jika kelas benar-benar terlaksana).
+🏢 C. Terkait dengan Manajemen Ruangan (Fasilitas)
+Sistem manajemen ruangan cabang akan menandai bahwa ruang kelas tersebut Terisi (Booked) pada hari dan jam yang telah disetup, sehingga mencegah terjadinya bentrok atau saling rebutan kelas fisik antar guru.
+📝 D. Terkait dengan Jurnal Mengajar & Absensi
+Jadwal yang dibuat akan melahirkan tugas bagi guru. Di hari H, jadwal tersebut akan muncul di aplikasi guru dan mewajibkan guru untuk mengisi Jurnal Mengajar & Absensi setelah jam kelas selesai.
+Tanpa adanya jadwal yang dibuat di awal, guru tidak punya akses untuk melakukan absen.
+💰 E. Terkait dengan Tagihan / Keuangan (Billing)
+Jika menggunakan sistem Pascabayar (Postpaid), setiap kali jadwal ini terlaksana, sistem akan otomatis mencetak Invoice Tagihan yang dikirimkan ke orang tua (orang tua ditagih berdasarkan jumlah kelas yang sudah dihadiri anak dari jadwal tersebut).
+Kesimpulan Singkat
+Membuat jadwal kelas di sistem ini bukan sekadar membuat "pengingat kalender". Saat sebuah jadwal ditekan Simpan, sistem secara serentak mem-booking ruangan, mem-booking waktu guru, menyiapkan draft gaji guru, menyiapkan draft form absen, dan memperbarui data tagihan/kuota siswa.

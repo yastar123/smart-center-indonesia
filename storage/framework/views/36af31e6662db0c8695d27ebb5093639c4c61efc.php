@@ -6,7 +6,7 @@
 
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="<?php echo e(route('admin.module.index')); ?>">Modul Akademik</a></li>
+        <li class="breadcrumb-item"><a href="<?php echo e(route('owner.module.index')); ?>">Modul Akademik</a></li>
         <li class="breadcrumb-item active">Edit Modul</li>
     </ol>
 </nav>
@@ -19,7 +19,7 @@
 
 <div class="row g-4">
     <div class="col-lg-8">
-        <form method="POST" action="<?php echo e(route('admin.module.update', $module)); ?>" enctype="multipart/form-data">
+        <form method="POST" action="<?php echo e(route('owner.module.update', $module)); ?>" enctype="multipart/form-data">
         <?php echo csrf_field(); ?> <?php echo method_field('PUT'); ?>
         <div class="dashboard-card">
             <h6 class="fw-bold mb-4 pb-2 border-bottom">Edit Modul: <?php echo e($module->judul); ?></h6>
@@ -181,7 +181,7 @@ unset($__errorArgs, $__bag); ?>
                 <button type="submit" class="btn btn-primary fw-semibold px-4">
                     <i class="bi bi-check-lg me-2"></i>Perbarui Modul
                 </button>
-                <a href="<?php echo e(route('admin.module.show', $module)); ?>" class="btn btn-outline-secondary fw-semibold px-4">
+                <a href="<?php echo e(route('owner.module.show', $module)); ?>" class="btn btn-outline-secondary fw-semibold px-4">
                     <i class="bi bi-arrow-left me-2"></i>Batal
                 </a>
             </div>
@@ -213,4 +213,4 @@ unset($__errorArgs, $__bag); ?>
 </div>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/admin/academic-module/edit.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/owner/academic-module/edit.blade.php ENDPATH**/ ?>

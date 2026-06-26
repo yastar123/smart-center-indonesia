@@ -6,8 +6,8 @@
 
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="<?php echo e(route('admin.subject.index')); ?>">Mata Pelajaran</a></li>
-        <li class="breadcrumb-item"><a href="<?php echo e(route('admin.subject.show', $subject)); ?>"><?php echo e($subject->nama); ?></a></li>
+        <li class="breadcrumb-item"><a href="<?php echo e(route('owner.subject.index')); ?>">Mata Pelajaran</a></li>
+        <li class="breadcrumb-item"><a href="<?php echo e(route('owner.subject.show', $subject)); ?>"><?php echo e($subject->nama); ?></a></li>
         <li class="breadcrumb-item active">Edit</li>
     </ol>
 </nav>
@@ -29,7 +29,7 @@
         </div>
     <?php endif; ?>
 
-    <form method="POST" action="<?php echo e(route('admin.subject.update', $subject)); ?>">
+    <form method="POST" action="<?php echo e(route('owner.subject.update', $subject)); ?>">
         <?php echo csrf_field(); ?> <?php echo method_field('PUT'); ?>
 
         <div class="row g-3">
@@ -135,7 +135,7 @@ unset($__errorArgs, $__bag); ?>
             <button type="submit" class="btn btn-primary px-4">
                 <i class="bi bi-check-lg me-2"></i>Simpan Perubahan
             </button>
-            <a href="<?php echo e(route('admin.subject.show', $subject)); ?>" class="btn btn-outline-secondary px-4">
+            <a href="<?php echo e(route('owner.subject.show', $subject)); ?>" class="btn btn-outline-secondary px-4">
                 <i class="bi bi-arrow-left me-2"></i>Batal & Kembali
             </a>
         </div>
@@ -145,4 +145,4 @@ unset($__errorArgs, $__bag); ?>
 </div>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/admin/subject/edit.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/owner/subject/edit.blade.php ENDPATH**/ ?>

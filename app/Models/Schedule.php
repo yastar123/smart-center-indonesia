@@ -30,6 +30,8 @@ class Schedule extends Model
         'link_meeting',
         'status',
         'catatan',
+        'honor_per_sesi',
+        'alamat_kunjungan',
         'reminder_terkirim',
     ];
 

@@ -1,5 +1,5 @@
-<?php $__env->startSection('title','Kelas Saya'); ?>
-<?php $__env->startSection('page-title','Kelas Saya'); ?>
+<?php $__env->startSection('title','Kelas Absensi'); ?>
+<?php $__env->startSection('page-title','Kelas Absensi'); ?>
 
 <?php $__env->startSection('content'); ?>
 

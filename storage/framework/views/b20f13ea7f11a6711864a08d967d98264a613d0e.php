@@ -6,7 +6,7 @@
 
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="<?php echo e(route('admin.course-package.index')); ?>">Paket Belajar</a></li>
+        <li class="breadcrumb-item"><a href="<?php echo e(route('owner.course-package.index')); ?>">Paket Belajar</a></li>
         <li class="breadcrumb-item active">Tambah Paket</li>
     </ol>
 </nav>
@@ -30,7 +30,7 @@
     <div class="alert alert-success mb-3"><i class="bi bi-check-circle me-2"></i><?php echo e(session('success')); ?></div>
 <?php endif; ?>
 
-<form method="POST" action="<?php echo e(route('admin.course-package.store')); ?>" id="pkgForm">
+<form method="POST" action="<?php echo e(route('owner.course-package.store')); ?>" id="pkgForm">
     <?php echo csrf_field(); ?>
 
     
@@ -136,7 +136,7 @@ unset($__errorArgs, $__bag); ?>
 
         <?php if($courses->isEmpty()): ?>
             <div class="alert alert-warning mb-0">
-                Belum ada mata pelajaran aktif. <a href="<?php echo e(route('admin.subject.index')); ?>">Buat mata pelajaran</a> terlebih dahulu.
+                Belum ada mata pelajaran aktif. <a href="<?php echo e(route('owner.subject.index')); ?>">Buat mata pelajaran</a> terlebih dahulu.
             </div>
         <?php else: ?>
         <?php
@@ -198,7 +198,7 @@ unset($__errorArgs, $__bag); ?>
         <button type="submit" class="btn btn-primary px-4">
             <i class="bi bi-check-lg me-2"></i>Simpan Paket
         </button>
-        <a href="<?php echo e(route('admin.course-package.index')); ?>" class="btn btn-outline-secondary px-4">
+        <a href="<?php echo e(route('owner.course-package.index')); ?>" class="btn btn-outline-secondary px-4">
             <i class="bi bi-arrow-left me-2"></i>Batal
         </a>
     </div>
@@ -241,4 +241,4 @@ document.querySelectorAll('.course-check').forEach(cb => {
 <?php $__env->stopPush(); ?>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/admin/course-package/create.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/owner/course-package/create.blade.php ENDPATH**/ ?>

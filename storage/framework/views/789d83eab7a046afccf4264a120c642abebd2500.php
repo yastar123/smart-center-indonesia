@@ -6,7 +6,7 @@
 
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="<?php echo e(route('admin.module.index')); ?>">Modul Akademik</a></li>
+        <li class="breadcrumb-item"><a href="<?php echo e(route('owner.module.index')); ?>">Modul Akademik</a></li>
         <li class="breadcrumb-item active">Tambah Modul</li>
     </ol>
 </nav>
@@ -19,7 +19,7 @@
 
 <div class="row g-4">
     <div class="col-lg-8">
-        <form method="POST" action="<?php echo e(route('admin.module.store')); ?>" enctype="multipart/form-data">
+        <form method="POST" action="<?php echo e(route('owner.module.store')); ?>" enctype="multipart/form-data">
         <?php echo csrf_field(); ?>
         <div class="dashboard-card">
             <h6 class="fw-bold mb-4 pb-2 border-bottom">Informasi Modul Akademik</h6>
@@ -59,6 +59,34 @@ endif;
 unset($__errorArgs, $__bag); ?>"
                            value="<?php echo e(old('judul')); ?>" placeholder="Misal: Aljabar Linear Lanjut" required>
                     <?php $__errorArgs = ['judul'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="invalid-feedback"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Mata Pelajaran <span class="text-danger">*</span></label>
+                    <select name="mata_pelajaran_id" class="form-select <?php $__errorArgs = ['mata_pelajaran_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" required>
+                        <option value="">-- Pilih Mata Pelajaran --</option>
+                        <?php $__currentLoopData = $courses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $c): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($c->id); ?>" <?php echo e(old('mata_pelajaran_id') == $c->id ? 'selected' : ''); ?>>
+                                <?php echo e($c->nama); ?><?php echo e($c->cabang ? ' – '.$c->cabang->name : ''); ?>
+
+                            </option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </select>
+                    <?php $__errorArgs = ['mata_pelajaran_id'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -143,7 +171,7 @@ unset($__errorArgs, $__bag); ?>
                 <button type="submit" class="btn btn-primary fw-semibold px-4">
                     <i class="bi bi-check-lg me-2"></i>Simpan Modul
                 </button>
-                <a href="<?php echo e(route('admin.module.index')); ?>" class="btn btn-outline-secondary fw-semibold px-4">
+                <a href="<?php echo e(route('owner.module.index')); ?>" class="btn btn-outline-secondary fw-semibold px-4">
                     <i class="bi bi-arrow-left me-2"></i>Batal
                 </a>
             </div>
@@ -175,4 +203,4 @@ unset($__errorArgs, $__bag); ?>
 </div>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/admin/academic-module/create.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/owner/academic-module/create.blade.php ENDPATH**/ ?>

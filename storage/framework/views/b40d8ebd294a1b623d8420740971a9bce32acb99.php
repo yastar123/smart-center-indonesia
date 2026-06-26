@@ -21,7 +21,7 @@
             </div>
         </div>
         <div class="col-md-4 text-md-end">
-            <a href="<?php echo e(route('admin.course-package.create')); ?>" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
+            <a href="<?php echo e(route('owner.course-package.create')); ?>" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
                 <i class="bi bi-plus-lg me-2"></i>Tambah Paket
             </a>
         </div>
@@ -92,7 +92,7 @@
             <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel"></i></button>
         </div>
         <div class="col-3 col-md-1">
-            <a href="<?php echo e(route('admin.course-package.index')); ?>" class="btn btn-outline-secondary w-100"><i class="bi bi-x-lg"></i></a>
+            <a href="<?php echo e(route('owner.course-package.index')); ?>" class="btn btn-outline-secondary w-100"><i class="bi bi-x-lg"></i></a>
         </div>
     </form>
 </div>
@@ -186,14 +186,14 @@
                     <td class="text-center">
                         <div class="d-flex gap-1 justify-content-center">
                             <?php if($p->status === 'aktif'): ?>
-                                <a href="<?php echo e(route('admin.course-package.show', $p)); ?>" class="btn btn-sm btn-outline-primary">
+                                <a href="<?php echo e(route('owner.course-package.show', $p)); ?>" class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-eye"></i> Detail
                                 </a>
                             <?php endif; ?>
-                            <a href="<?php echo e(route('admin.course-package.edit', $p)); ?>" class="btn btn-sm btn-outline-secondary">
+                            <a href="<?php echo e(route('owner.course-package.edit', $p)); ?>" class="btn btn-sm btn-outline-secondary">
                                 <i class="bi bi-pencil"></i> Edit
                             </a>
-                            <form method="POST" action="<?php echo e(route('admin.course-package.destroy', $p)); ?>" class="d-inline" onsubmit="return confirm('Hapus paket ini?')">
+                            <form method="POST" action="<?php echo e(route('owner.course-package.destroy', $p)); ?>" class="d-inline" onsubmit="return confirm('Hapus paket ini?')">
                                 <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
                                 <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
                             </form>
@@ -220,4 +220,4 @@
 </div>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/admin/course-package/index.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/owner/course-package/index.blade.php ENDPATH**/ ?>

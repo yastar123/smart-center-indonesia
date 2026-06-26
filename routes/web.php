@@ -89,6 +89,7 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::get('/schedules',                    fn() => redirect()->route('admin.schedules.create')) ->name('schedules.index');
         Route::get('/schedules/create',             [ScheduleController::class, 'create'])  ->name('schedules.create');
         Route::post('/schedules',                   [ScheduleController::class, 'store'])   ->name('schedules.store');
+        Route::post('/schedules/conflict-check',    [ScheduleController::class, 'conflictCheck'])->name('schedules.conflict-check');
         Route::get('/schedules/{schedule}/edit',    [ScheduleController::class, 'edit'])    ->name('schedules.edit');
         Route::get('/schedules/{schedule}',         [ScheduleController::class, 'show'])    ->name('schedules.show');
         Route::put('/schedules/{schedule}',         [ScheduleController::class, 'update'])  ->name('schedules.update');

@@ -89,6 +89,76 @@ class ScheduleController extends Controller
         return view('admin.schedule.index', compact('schedules', 'pakets', 'branches', 'teachers', 'classes', 'modules', 'stats'));
     }
 
+    public function conflictCheck(Request $request)
+    {
+        $request->validate([
+            'tanggal'            => 'required|date',
+            'jam_mulai'          => 'required',
+            'jam_selesai'        => 'required',
+            'guru_id'            => 'nullable|exists:teachers,id',
+            'ruangan'            => 'nullable|string',
+            'cabang_id'          => 'nullable|exists:branches,id',
+            'exclude_id'         => 'nullable|exists:schedules,id',
+        ]);
+
+        $result = ['room' => null, 'teacher' => null, 'busy_teacher_ids' => [], 'has_conflict' => false];
+
+        $overlapQuery = function ($q) use ($request) {
+            $q->where(function ($inner) use ($request) {
+                $inner->whereBetween('jam_mulai', [$request->jam_mulai, $request->jam_selesai])
+                      ->orWhereBetween('jam_selesai', [$request->jam_mulai, $request->jam_selesai])
+                      ->orWhere(function ($i2) use ($request) {
+                          $i2->where('jam_mulai', '<=', $request->jam_mulai)
+                             ->where('jam_selesai', '>=', $request->jam_selesai);
+                      });
+            });
+        };
+
+        if ($request->filled('ruangan') && $request->filled('cabang_id')) {
+            $roomConflict = Schedule::where('tanggal', $request->tanggal)
+                ->where('ruangan', $request->ruangan)
+                ->where('cabang_id', $request->cabang_id)
+                ->where('status', '!=', 'dibatalkan')
+                ->when($request->exclude_id, fn($q) => $q->where('id', '!=', $request->exclude_id))
+                ->where($overlapQuery)
+                ->with(['paket', 'guru'])
+                ->first();
+
+            $result['room'] = $roomConflict
+                ? ['conflict' => true, 'detail' => "Ruangan \"{$request->ruangan}\" sudah dipakai: {$roomConflict->paket?->nama} — Guru: {$roomConflict->guru?->name} ({$roomConflict->jam_mulai}–{$roomConflict->jam_selesai})"]
+                : ['conflict' => false, 'detail' => "Ruangan \"{$request->ruangan}\" tersedia di waktu ini."];
+        }
+
+        if ($request->filled('guru_id')) {
+            $teacherConflict = Schedule::where('tanggal', $request->tanggal)
+                ->where('guru_id', $request->guru_id)
+                ->where('status', '!=', 'dibatalkan')
+                ->when($request->exclude_id, fn($q) => $q->where('id', '!=', $request->exclude_id))
+                ->where($overlapQuery)
+                ->with('paket')
+                ->first();
+
+            $result['teacher'] = $teacherConflict
+                ? ['conflict' => true, 'detail' => "Guru sedang mengajar: {$teacherConflict->paket?->nama} ({$teacherConflict->jam_mulai}–{$teacherConflict->jam_selesai})"]
+                : ['conflict' => false, 'detail' => 'Guru tersedia di waktu ini.'];
+        }
+
+        $busyIds = Schedule::where('tanggal', $request->tanggal)
+            ->where('status', '!=', 'dibatalkan')
+            ->when($request->exclude_id, fn($q) => $q->where('id', '!=', $request->exclude_id))
+            ->where($overlapQuery)
+            ->whereNotNull('guru_id')
+            ->pluck('guru_id')
+            ->unique()
+            ->values()
+            ->toArray();
+        $result['busy_teacher_ids'] = $busyIds;
+
+        $result['has_conflict'] = ($result['room']['conflict'] ?? false) || ($result['teacher']['conflict'] ?? false);
+
+        return response()->json(['success' => true, 'data' => $result]);
+    }
+
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -106,6 +176,8 @@ class ScheduleController extends Controller
             'topik'             => 'nullable|string|max:200',
             'ruangan'           => 'nullable|string|max:100',
             'link_meeting'      => 'nullable|url|max:500',
+            'alamat_kunjungan'  => 'nullable|string|max:500',
+            'honor_per_sesi'    => 'nullable|numeric|min:0',
             'catatan'           => 'nullable|string',
         ]);
 

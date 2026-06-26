@@ -7,7 +7,7 @@
 
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="<?php echo e(route('admin.subject.index')); ?>">Mata Pelajaran</a></li>
+        <li class="breadcrumb-item"><a href="<?php echo e(route('owner.subject.index')); ?>">Mata Pelajaran</a></li>
         <li class="breadcrumb-item active">Tambah Mapel</li>
     </ol>
 </nav>
@@ -29,7 +29,7 @@
         </div>
     <?php endif; ?>
 
-    <form method="POST" action="<?php echo e(route('admin.subject.store')); ?>">
+    <form method="POST" action="<?php echo e(route('owner.subject.store')); ?>">
         <?php echo csrf_field(); ?>
 
         <div class="row g-3">
@@ -181,7 +181,7 @@ unset($__errorArgs, $__bag); ?>
             <button type="submit" class="btn btn-primary px-4">
                 <i class="bi bi-check-lg me-2"></i>Simpan Mata Pelajaran
             </button>
-            <a href="<?php echo e(route('admin.subject.index')); ?>" class="btn btn-outline-secondary px-4">
+            <a href="<?php echo e(route('owner.subject.index')); ?>" class="btn btn-outline-secondary px-4">
                 <i class="bi bi-arrow-left me-2"></i>Batal & Kembali
             </a>
         </div>
@@ -191,4 +191,4 @@ unset($__errorArgs, $__bag); ?>
 </div>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/admin/subject/create.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/owner/subject/create.blade.php ENDPATH**/ ?>

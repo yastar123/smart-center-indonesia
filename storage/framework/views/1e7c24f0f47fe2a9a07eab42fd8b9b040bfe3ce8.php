@@ -6,7 +6,7 @@
 
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="<?php echo e(route('admin.course-package.index')); ?>">Paket Belajar</a></li>
+        <li class="breadcrumb-item"><a href="<?php echo e(route('owner.course-package.index')); ?>">Paket Belajar</a></li>
         <li class="breadcrumb-item active"><?php echo e($coursePackage->nama); ?></li>
     </ol>
 </nav>
@@ -61,10 +61,10 @@
             <?php endif; ?>
 
             <div class="d-grid gap-2 mt-3">
-                <a href="<?php echo e(route('admin.course-package.edit', $coursePackage)); ?>" class="btn btn-primary">
+                <a href="<?php echo e(route('owner.course-package.edit', $coursePackage)); ?>" class="btn btn-primary">
                     <i class="bi bi-pencil me-2"></i>Edit Paket
                 </a>
-                <a href="<?php echo e(route('admin.course-package.index')); ?>" class="btn btn-outline-secondary">
+                <a href="<?php echo e(route('owner.course-package.index')); ?>" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left me-2"></i>Kembali
                 </a>
             </div>
@@ -109,4 +109,4 @@
 </div>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/admin/course-package/detail.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/owner/course-package/detail.blade.php ENDPATH**/ ?>
