@@ -48,31 +48,6 @@
                 @error('nama')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-4">
-                <label class="form-label fw-semibold">Jenis Paket <span class="text-danger">*</span></label>
-                <select name="jenis" class="form-select @error('jenis') is-invalid @enderror" required>
-                    <option value="">Pilih jenis…</option>
-                    @foreach(['reguler'=>'Reguler','intensif'=>'Intensif','privat'=>'Privat (1 Siswa)','online'=>'Online'] as $val=>$label)
-                    <option value="{{ $val }}" {{ old('jenis')==$val?'selected':'' }}>{{ $label }}</option>
-                    @endforeach
-                </select>
-                @error('jenis')<div class="invalid-feedback">{{ $message }}</div>@enderror
-            </div>
-            <div class="col-md-4">
-                <label class="form-label fw-semibold">Metode Absensi <span class="text-danger">*</span></label>
-                <select name="metode_absensi" class="form-select" required>
-                    <option value="manual"   {{ old('metode_absensi','manual')=='manual'  ?'selected':'' }}>Manual</option>
-                    <option value="otomatis" {{ old('metode_absensi')=='otomatis'         ?'selected':'' }}>Otomatis</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label fw-semibold">Tipe Kelas <span class="text-danger">*</span></label>
-                <select name="tipe_kelas" class="form-select" required>
-                    <option value="offline" {{ old('tipe_kelas','offline')=='offline'?'selected':'' }}>Offline</option>
-                    <option value="online"  {{ old('tipe_kelas')=='online'            ?'selected':'' }}>Online</option>
-                    <option value="private" {{ old('tipe_kelas')=='private'           ?'selected':'' }}>Private</option>
-                </select>
-            </div>
-            <div class="col-md-4">
                 <label class="form-label fw-semibold">Harga Dasar (Rp) <span class="text-danger">*</span></label>
                 <input type="number" name="harga" class="form-control @error('harga') is-invalid @enderror"
                        value="{{ old('harga', 0) }}" min="0" required>
@@ -83,10 +58,6 @@
                 <input type="number" name="jumlah_pertemuan" class="form-control @error('jumlah_pertemuan') is-invalid @enderror"
                        value="{{ old('jumlah_pertemuan', 8) }}" min="1" required>
                 @error('jumlah_pertemuan')<div class="invalid-feedback">{{ $message }}</div>@enderror
-            </div>
-            <div class="col-md-4">
-                <label class="form-label fw-semibold">Durasi (bulan)</label>
-                <input type="number" name="durasi_bulan" class="form-control" value="{{ old('durasi_bulan', 3) }}" min="1">
             </div>
             <div class="col-md-6">
                 <label class="form-label fw-semibold">Cabang</label>
@@ -103,12 +74,6 @@
                     <option value="aktif"    {{ old('status','aktif')=='aktif'   ?'selected':'' }}>Aktif</option>
                     <option value="nonaktif" {{ old('status')=='nonaktif'         ?'selected':'' }}>Non Aktif</option>
                 </select>
-            </div>
-            <div class="col-md-3 d-flex align-items-end pb-1">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" name="is_unggulan" id="isUnggulan" value="1" {{ old('is_unggulan')?'checked':'' }}>
-                    <label class="form-check-label" for="isUnggulan">Paket Unggulan ⭐</label>
-                </div>
             </div>
             <div class="col-12">
                 <label class="form-label fw-semibold">Deskripsi</label>

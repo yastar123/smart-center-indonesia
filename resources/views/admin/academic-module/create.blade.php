@@ -41,17 +41,6 @@
                     @error('judul')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Mata Pelajaran <span class="text-danger">*</span></label>
-                    <select name="mata_pelajaran_id" class="form-select @error('mata_pelajaran_id') is-invalid @enderror" required>
-                        <option value="">— Pilih Mata Pelajaran —</option>
-                        @foreach($courses as $c)
-                            <option value="{{ $c->id }}" {{ old('mata_pelajaran_id')==$c->id?'selected':'' }}>{{ $c->nama }}</option>
-                        @endforeach
-                    </select>
-                    @error('mata_pelajaran_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
-
                 <div class="col-md-3">
                     <label class="form-label fw-semibold">Jenis</label>
                     <select name="jenis" class="form-select">
