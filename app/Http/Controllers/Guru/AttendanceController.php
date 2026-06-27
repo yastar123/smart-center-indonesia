@@ -103,6 +103,28 @@ class AttendanceController extends Controller
                 ->get(['siswa_id', 'guru_hadir', 'siswa_konfirmasi_at', 'status'])
                 ->keyBy('siswa_id');
 
+            // Attach sisa_sesi info for each student
+            $studentIds = $students->pluck('id')->toArray();
+            $sesiTerpakai = DB::table('absensi_siswas')
+                ->whereIn('siswa_id', $studentIds)
+                ->where('status', 'hadir')
+                ->select('siswa_id', DB::raw('COUNT(*) as terpakai'))
+                ->groupBy('siswa_id')
+                ->pluck('terpakai', 'siswa_id');
+
+            $totalSesi = DB::table('students')
+                ->whereIn('id', $studentIds)
+                ->pluck('total_sesi', 'id');
+
+            $students = $students->map(function ($s) use ($sesiTerpakai, $totalSesi) {
+                $total  = $totalSesi[$s->id] ?? 0;
+                $pakai  = $sesiTerpakai[$s->id] ?? 0;
+                $s->total_sesi = $total;
+                $s->sesi_terpakai = $pakai;
+                $s->sisa_sesi = max(0, $total - $pakai);
+                return $s;
+            });
+
             return response()->json([
                 'success'  => true,
                 'students' => $students->values(),
@@ -179,8 +201,35 @@ class AttendanceController extends Controller
 
         $now = now();
 
+        // Pre-load sisa sesi for all students in one query
+        $sesiTerpakai = DB::table('absensi_siswas')
+            ->whereIn('siswa_id', $allIds)
+            ->where('status', 'hadir')
+            ->select('siswa_id', DB::raw('COUNT(*) as terpakai'))
+            ->groupBy('siswa_id')
+            ->pluck('terpakai', 'siswa_id');
+
+        $totalSesiMap = DB::table('students')
+            ->whereIn('id', $allIds)
+            ->pluck('total_sesi', 'id');
+
+        $blockedNames = []; // students blocked due to 0 remaining sessions
+
         foreach ($allIds as $siswaId) {
             $guruHadir = in_array($siswaId, $hadirIds);
+
+            // If guru tries to mark hadir but student has no remaining sessions, block it
+            if ($guruHadir) {
+                $total = $totalSesiMap[$siswaId] ?? 0;
+                $pakai = $sesiTerpakai[$siswaId] ?? 0;
+                $sisa  = max(0, $total - $pakai);
+
+                if ($sisa <= 0) {
+                    $guruHadir = false; // force tidak_hadir
+                    $siswaName = DB::table('students')->where('id', $siswaId)->value('name') ?? "ID $siswaId";
+                    $blockedNames[] = $siswaName . " (sesi habis: $pakai/$total)";
+                }
+            }
 
             $existing = DB::table('absensi_siswas')
                 ->where('jadwal_id', $schedule->id)
@@ -211,7 +260,12 @@ class AttendanceController extends Controller
             }
         }
 
-        return response()->json(['success' => true, 'message' => 'Absensi berhasil disimpan!']);
+        $message = 'Absensi berhasil disimpan!';
+        if (!empty($blockedNames)) {
+            $message .= ' Catatan: siswa berikut tidak dapat ditandai hadir karena sesi sudah habis: ' . implode(', ', $blockedNames) . '.';
+        }
+
+        return response()->json(['success' => true, 'message' => $message]);
     }
 
     private function computeStatus(bool $guruHadir, $siswaKonfirmasiAt): string

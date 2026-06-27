@@ -27,6 +27,40 @@
     </div>
 </div>
 
+{{-- SISA SESI BANNER --}}
+@php
+    $sisaSesiShow  = $student ? $student->sisaSesei() : 0;
+    $sesiPakaiShow = $student ? $student->sesiTerpakai() : 0;
+    $totalSesiShow = $student ? ($student->total_sesi ?? 0) : 0;
+@endphp
+@if($sisaSesiShow <= 0)
+<div class="dashboard-card mb-4 fade-up" style="border-left:4px solid #ef4444;background:var(--soft-danger-bg)">
+    <div class="d-flex align-items-center gap-3">
+        <i class="bi bi-x-octagon-fill text-danger" style="font-size:1.8rem;flex-shrink:0"></i>
+        <div>
+            <div class="fw-bold" style="color:#ef4444;font-size:14px">Sesi Anda Sudah Habis</div>
+            <div style="font-size:12.5px;color:var(--text-primary)">
+                Anda telah menggunakan <strong>{{ $sesiPakaiShow }}/{{ $totalSesiShow }}</strong> sesi.
+                Anda tidak dapat mengkonfirmasi kehadiran. Silakan hubungi admin untuk menambah sesi.
+            </div>
+        </div>
+    </div>
+</div>
+@elseif($sisaSesiShow <= 3)
+<div class="dashboard-card mb-4 fade-up" style="border-left:4px solid #f6af23;background:var(--soft-warning-bg)">
+    <div class="d-flex align-items-center gap-3">
+        <i class="bi bi-exclamation-triangle-fill" style="color:#f6af23;font-size:1.6rem;flex-shrink:0"></i>
+        <div>
+            <div class="fw-bold" style="color:#d97706;font-size:14px">Sesi Hampir Habis</div>
+            <div style="font-size:12.5px;color:var(--text-primary)">
+                Sisa <strong>{{ $sisaSesiShow }}</strong> sesi dari total <strong>{{ $totalSesiShow }}</strong> sesi.
+                Segera hubungi admin untuk perpanjangan.
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
 {{-- STATUS LEGEND --}}
 <div class="dashboard-card mb-4 fade-up" style="border-left:4px solid #c84ddf">
     <div class="fw-semibold mb-2" style="font-size:13px;color:var(--text-primary)">
@@ -88,7 +122,7 @@
                     ];
                     $sm = $statusMap[$status] ?? $statusMap['tidak_hadir'];
 
-                    $canConfirm = $guruHadir && !$siswaKonfirm;
+                    $canConfirm = $guruHadir && !$siswaKonfirm && $sisaSesiShow > 0;
                 @endphp
                 <tr>
                     <td>{{ $i + 1 }}</td>

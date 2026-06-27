@@ -223,33 +223,61 @@ function loadAttendance(id, areaEl) {
             }
 
             let rows = students.map((s, i) => {
-                const rec   = existing[s.id] || {};
-                const checked = rec.guru_hadir ? 'checked' : '';
-                const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(s.name)}&background=68117e&color=fff&size=40`;
-                const sl = statusLabel(rec.guru_hadir, rec.siswa_konfirmasi_at);
-                return `<tr id="row-${s.id}">
+                const rec      = existing[s.id] || {};
+                const sisaSesi = s.sisa_sesi ?? 0;
+                const totalSesi = s.total_sesi ?? 0;
+                const sesiHabis = sisaSesi <= 0;
+                const checked   = (!sesiHabis && rec.guru_hadir) ? 'checked' : '';
+                const avatar    = `https://ui-avatars.com/api/?name=${encodeURIComponent(s.name)}&background=68117e&color=fff&size=40`;
+                const sl        = statusLabel(rec.guru_hadir, rec.siswa_konfirmasi_at);
+
+                // Sesi badge color
+                let sesiBg, sesiClr, sesiFmt;
+                if (sesiHabis) {
+                    sesiBg = 'var(--soft-danger-bg)'; sesiClr = '#ef4444';
+                    sesiFmt = `<i class="bi bi-x-circle-fill me-1"></i>Sesi habis (${s.sesi_terpakai}/${totalSesi})`;
+                } else if (sisaSesi <= 3) {
+                    sesiBg = 'var(--soft-warning-bg)'; sesiClr = '#d97706';
+                    sesiFmt = `<i class="bi bi-exclamation-triangle-fill me-1"></i>${sisaSesi} sesi tersisa`;
+                } else {
+                    sesiBg = 'var(--soft-success-bg)'; sesiClr = '#16a34a';
+                    sesiFmt = `<i class="bi bi-check-circle-fill me-1"></i>${sisaSesi} sesi tersisa`;
+                }
+
+                return `<tr id="row-${s.id}" ${sesiHabis ? 'style="opacity:.7"' : ''}>
                     <td style="white-space:nowrap;padding:10px 12px">
                         <div class="d-flex align-items-center gap-2">
                             <span class="text-muted" style="font-size:12px;min-width:22px">${i + 1}</span>
                             <img src="${s.photo ? '/storage/' + s.photo : avatar}" class="rounded-circle flex-shrink-0" width="32" height="32" style="object-fit:cover">
-                            <span class="fw-semibold" style="font-size:13px">${s.name}</span>
+                            <div>
+                                <div class="fw-semibold" style="font-size:13px">${s.name}</div>
+                                <span style="font-size:10px;font-weight:600;padding:1px 7px;border-radius:5px;background:${sesiBg};color:${sesiClr}">${sesiFmt}</span>
+                            </div>
                         </div>
                     </td>
                     <td class="text-center" style="min-width:80px">
-                        <label style="display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer">
-                            <input type="checkbox" name="hadir_ids[]" value="${s.id}" ${checked}
-                                   class="abs-check" data-sid="${s.id}"
-                                   style="width:18px;height:18px;accent-color:#10b981;cursor:pointer">
-                            <span style="font-size:11px;color:#10b981;font-weight:600">Hadir</span>
-                        </label>
+                        ${sesiHabis
+                            ? `<span style="font-size:11px;color:#ef4444;font-weight:600"><i class="bi bi-slash-circle me-1"></i>Tidak dapat hadir</span>`
+                            : `<label style="display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer">
+                                <input type="checkbox" name="hadir_ids[]" value="${s.id}" ${checked}
+                                       class="abs-check" data-sid="${s.id}"
+                                       style="width:18px;height:18px;accent-color:#10b981;cursor:pointer">
+                                <span style="font-size:11px;color:#10b981;font-weight:600">Hadir</span>
+                               </label>`
+                        }
                     </td>
                     <td id="status-${s.id}">
-                        <span style="background:${sl.bg};color:${sl.clr};padding:3px 10px;border-radius:7px;font-size:12px;font-weight:600">${sl.label}</span>
+                        ${sesiHabis
+                            ? `<span style="background:var(--soft-danger-bg);color:#ef4444;padding:3px 10px;border-radius:7px;font-size:12px;font-weight:600">Sesi Habis</span>`
+                            : `<span style="background:${sl.bg};color:${sl.clr};padding:3px 10px;border-radius:7px;font-size:12px;font-weight:600">${sl.label}</span>`
+                        }
                     </td>
                     <td style="font-size:11px;color:var(--text-muted)">
-                        ${rec.siswa_konfirmasi_at
-                            ? '<i class="bi bi-check2-circle text-success me-1"></i>Dikonfirmasi siswa'
-                            : '<span style="opacity:.5">Menunggu siswa</span>'}
+                        ${sesiHabis
+                            ? '<span style="color:#ef4444;font-size:11px">Perlu perpanjang sesi</span>'
+                            : (rec.siswa_konfirmasi_at
+                                ? '<i class="bi bi-check2-circle text-success me-1"></i>Dikonfirmasi siswa'
+                                : '<span style="opacity:.5">Menunggu siswa</span>')}
                     </td>
                 </tr>`;
             }).join('');

@@ -106,6 +106,21 @@ class AttendanceController extends Controller
             return response()->json(['success' => false, 'message' => 'Kehadiran sudah dikonfirmasi sebelumnya.'], 422);
         }
 
+        // Check if student still has remaining sessions
+        $sesiTerpakai = DB::table('absensi_siswas')
+            ->where('siswa_id', $student->id)
+            ->where('status', 'hadir')
+            ->count();
+        $totalSesi = $student->total_sesi ?? 0;
+        $sisaSesi  = max(0, $totalSesi - $sesiTerpakai);
+
+        if ($sisaSesi <= 0) {
+            return response()->json([
+                'success' => false,
+                'message' => "Sesi Anda sudah habis ($sesiTerpakai/$totalSesi sesi terpakai). Silakan hubungi admin untuk menambah sesi.",
+            ], 403);
+        }
+
         // Check if student has overdue invoice (past jatuh_tempo and not lunas)
         $overdueInvoice = \App\Models\Invoice::where('siswa_id', $student->id)
             ->whereIn('status', ['belum_bayar', 'sebagian'])

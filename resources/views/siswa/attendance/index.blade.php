@@ -64,20 +64,29 @@
             </div>
         </div>
     </div>
+    @php
+        $sisaSesi  = $student ? $student->sisaSesei() : 0;
+        $sesiPakai = $student ? $student->sesiTerpakai() : 0;
+        $totalSesi = $student ? ($student->total_sesi ?? 0) : 0;
+    @endphp
     <div class="col-6 col-md-3 fade-up" style="animation-delay:.10s">
-        <div class="stat-card" style="border-top:3px solid #f6af23">
+        @php
+            $sesiClr   = $sisaSesi <= 0 ? '#ef4444' : ($sisaSesi <= 3 ? '#f6af23' : '#10b981');
+            $sesiBrd   = $sisaSesi <= 0 ? '#ef4444' : ($sisaSesi <= 3 ? '#f6af23' : '#10b981');
+            $sesiIcon  = $sisaSesi <= 0 ? 'bg-danger-soft' : ($sisaSesi <= 3 ? 'bg-warning-soft' : 'bg-success-soft');
+            $sesiLabel = $sisaSesi <= 0 ? 'Habis' : 'Tersisa';
+        @endphp
+        <div class="stat-card" style="border-top:3px solid {{ $sesiBrd }}">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <div class="stat-title">Semester</div>
-                    <div class="stat-value" style="color:#e09000;font-size:16px">
-                        {{ now()->month <= 6 ? 'Genap' : 'Ganjil' }}
-                    </div>
+                    <div class="stat-title">Sisa Sesi</div>
+                    <div class="stat-value" style="color:{{ $sesiClr }}">{{ $sisaSesi }}</div>
                     <div class="stat-label text-muted" style="font-size:11px">
-                        <i class="bi bi-calendar me-1"></i>{{ now()->format('Y') }}
+                        <i class="bi bi-layers me-1"></i>{{ $sesiLabel }} dari {{ $totalSesi }}
                     </div>
                 </div>
-                <div class="stat-icon bg-warning-soft" style="color:white">
-                    <i class="bi bi-calendar3"></i>
+                <div class="stat-icon {{ $sesiIcon }}" style="color:white">
+                    <i class="bi bi-hourglass-split"></i>
                 </div>
             </div>
         </div>
@@ -86,16 +95,14 @@
         <div class="stat-card" style="border-top:3px solid #0284c7">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <div class="stat-title">Bulan Ini</div>
-                    <div class="stat-value" style="color:#0284c7;font-size:16px">
-                        {{ now()->locale('id')->isoFormat('MMMM') }}
-                    </div>
+                    <div class="stat-title">Sesi Terpakai</div>
+                    <div class="stat-value" style="color:#0284c7">{{ $sesiPakai }}</div>
                     <div class="stat-label text-muted" style="font-size:11px">
-                        <i class="bi bi-calendar-week me-1"></i>{{ now()->format('Y') }}
+                        <i class="bi bi-check2-circle me-1"></i>dari {{ $totalSesi }} total sesi
                     </div>
                 </div>
                 <div class="stat-icon bg-info-soft" style="color:white">
-                    <i class="bi bi-calendar-week-fill"></i>
+                    <i class="bi bi-bar-chart-fill"></i>
                 </div>
             </div>
         </div>
