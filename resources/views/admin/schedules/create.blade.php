@@ -91,7 +91,7 @@ $packageStudentsBaseUrl = '/admin/schedules/package';
     </div>
 
     <div class="row g-3">
-        <div class="col-lg-8">
+        <div class="col-12">
             <label class="form-label fw-semibold">Paket Belajar <span class="text-danger">*</span></label>
             <select name="paket_id" id="paket_id" class="form-select" required onchange="onPaketChange(this.value)">
                 <option value="">— Pilih Paket —</option>
@@ -102,24 +102,6 @@ $packageStudentsBaseUrl = '/admin/schedules/package';
                 </option>
                 @endforeach
             </select>
-        </div>
-        <div class="col-lg-4">
-            <label class="form-label fw-semibold">Sesi Ke- <span class="text-danger">*</span></label>
-            <select name="pertemuan_ke" id="pertemuan_ke" class="form-select" required onchange="onSesiChange(this.value)">
-                <option value="">— Pilih paket dulu —</option>
-            </select>
-            <div id="sesiWarning"></div>
-        </div>
-
-        {{-- PROGRESS BAR --}}
-        <div class="col-12" id="sesiProgressBar" style="display:none"></div>
-
-        {{-- DETAIL PAKET --}}
-        <div class="col-12" id="paketDetailBox" style="display:none">
-            <div class="p-3 rounded-3" style="background:var(--soft-primary-bg);border:1.5px solid var(--soft-primary-border)">
-                <div class="fw-semibold mb-2" style="color:var(--soft-primary-text);font-size:13px"><i class="bi bi-info-circle me-2"></i>Detail Paket</div>
-                <div class="row g-2" id="paketDetailContent" style="font-size:12px"></div>
-            </div>
         </div>
 
         {{-- MATA PELAJARAN (auto-locked jika 1 mapel, dropdown jika banyak) --}}
@@ -451,7 +433,6 @@ let currentPaket    = null;
 let currentMapelId  = null;
 let busyTeacherIds  = [];
 let selectedGuruId  = null;
-let usedSessionsCache = {};
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
@@ -493,13 +474,9 @@ function onPaketChange(paketId) {
     hideSection('section-waktu');
     hideSection('section-konflik');
     hideSection('section-guru');
-    hideSection('paketDetailBox');
     hideSection('mapelBox');
     hideSection('siswaPaketBox');
     hideSection('step1NextBtn');
-    hideSection('sesiProgressBar');
-    document.getElementById('pertemuan_ke').innerHTML = '<option value="">— Pilih paket dulu —</option>';
-    document.getElementById('sesiWarning').innerHTML = '';
     activateStep(1);
 
     if (!paketId) return;
@@ -507,19 +484,6 @@ function onPaketChange(paketId) {
     const pkg = pakets.find(p => p.id == paketId);
     if (!pkg) return;
     currentPaket = pkg;
-
-    // Package detail
-    showSection('paketDetailBox');
-    const mapelNames = pkg.mata_pelajaran.map(m => m.nama).join(', ') || '—';
-    document.getElementById('paketDetailContent').innerHTML = `
-        <div class="col-md-3 col-6"><span class="text-muted">Jenis:</span> <strong>${pkg.jenis || '—'}</strong></div>
-        <div class="col-md-3 col-6"><span class="text-muted">Total Sesi:</span> <strong>${pkg.jumlah_pertemuan || '—'}</strong></div>
-        <div class="col-md-3 col-6"><span class="text-muted">Tipe Kelas:</span> <strong>${pkg.tipe_kelas || '—'}</strong></div>
-        <div class="col-md-3 col-6"><span class="text-muted">Harga:</span> <strong>Rp ${pkg.harga ? parseInt(pkg.harga).toLocaleString('id-ID') : '—'}</strong></div>
-        <div class="col-md-6 col-12"><span class="text-muted">Mapel:</span> <strong>${mapelNames}</strong></div>
-        <div class="col-md-6 col-12"><span class="text-muted">Cabang:</span> <strong>${pkg.cabang || 'Pusat'}</strong></div>
-        ${pkg.deskripsi ? `<div class="col-12"><span class="text-muted">Deskripsi:</span> ${pkg.deskripsi}</div>` : ''}
-    `;
 
     // Mata pelajaran: single lock vs multi pick
     showSection('mapelBox');
@@ -544,15 +508,6 @@ function onPaketChange(paketId) {
         showSection('mapelMultiPick');
     }
 
-    // Sessions dropdown
-    const sesiSel = document.getElementById('pertemuan_ke');
-    sesiSel.innerHTML = '<option value="">⏳ Memuat sesi...</option>';
-    sesiSel.disabled = true;
-    loadUsedSessions(paketId, pkg).then(() => {
-        buildSesiOptions(paketId, pkg);
-        sesiSel.disabled = false;
-    });
-
     // Students
     showSection('siswaPaketBox');
     loadStudentsByPackage(paketId);
@@ -561,32 +516,15 @@ function onPaketChange(paketId) {
     const validJenis = ['online', 'offline', 'private'];
     const autoJenis  = validJenis.includes(pkg.tipe_kelas) ? pkg.tipe_kelas : 'offline';
     selectMetode(autoJenis);
-}
 
-function onSesiChange(val) {
-    const paketId = document.getElementById('paket_id').value;
-    if (!paketId || !val) { document.getElementById('sesiWarning').innerHTML = ''; checkStep1Complete(); return; }
-    const used = usedSessionsCache[paketId] || {};
-    if (used[val]) {
-        const info = used[val];
-        document.getElementById('sesiWarning').innerHTML = `
-            <div class="mt-2 p-2 rounded-2" style="background:#fff3cd;border:1px solid #ffc107;font-size:12px;color:#856404">
-                <i class="bi bi-exclamation-triangle-fill me-1"></i>Sesi ke-${val} sudah dijadwalkan (${info.tanggal || ''}${info.topik ? ' — '+info.topik : ''}). Pilih sesi lain.
-            </div>`;
-    } else {
-        document.getElementById('sesiWarning').innerHTML = '';
-    }
     checkStep1Complete();
 }
 
 function checkStep1Complete() {
     const paketId = document.getElementById('paket_id').value;
-    const sesiVal = document.getElementById('pertemuan_ke').value;
-    const used    = usedSessionsCache[paketId] || {};
     const mapelOk = currentPaket && (currentPaket.mata_pelajaran.length === 1 ? true : !!currentMapelId);
-    const sesiOk  = sesiVal && !used[sesiVal];
 
-    if (paketId && sesiOk && mapelOk) {
+    if (paketId && mapelOk) {
         showSection('step1NextBtn');
     } else {
         hideSection('step1NextBtn');
@@ -882,53 +820,14 @@ function selectGuru(guruId) {
 
 // ─── Sessions / progress bar ─────────────────────────────────────────────
 
-function loadUsedSessions(paketId, pkg) {
-    if (usedSessionsCache[paketId]) return Promise.resolve();
-    return fetch(`${packageStudentsBaseUrl}/${paketId}/used-sessions`, {
-        headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf }
-    })
-    .then(r => r.ok ? r.json() : { used: {} })
-    .then(data => { usedSessionsCache[paketId] = data.used || {}; })
-    .catch(() => { usedSessionsCache[paketId] = {}; });
-}
-
 function buildSesiOptions(paketId, pkg) {
-    const sesiSel = document.getElementById('pertemuan_ke');
-    const used    = usedSessionsCache[paketId] || {};
-    const total   = Number(pkg.jumlah_pertemuan || 0);
-    const usedKeys= Object.keys(used).map(Number);
-    const sisa    = total - usedKeys.length;
-
-    let opts = `<option value="">— Pilih Sesi (${sisa} tersisa dari ${total}) —</option>`;
-    for (let i = 1; i <= total; i++) {
-        if (used[i]) {
-            const info = used[i];
-            const icon = info.status === 'selesai' ? '✅' : (info.status === 'berlangsung' ? '🟡' : '🔵');
-            opts += `<option value="${i}" disabled style="color:#999;background:#f5f5f5">${icon} Sesi ke-${i}${info.topik ? ' — '+info.topik : ''}${info.tanggal ? ' ('+info.tanggal+')' : ''} — Sudah dijadwalkan</option>`;
-        } else {
-            opts += `<option value="${i}">✨ Sesi ke-${i} — Belum dijadwalkan</option>`;
-        }
-    }
-    sesiSel.innerHTML = opts;
-
-    // Progress bar
-    const pct = total > 0 ? Math.round((usedKeys.length / total) * 100) : 0;
-    const bar = document.getElementById('sesiProgressBar');
-    bar.style.display = 'block';
-    bar.innerHTML = `
-        <div class="d-flex align-items-center justify-content-between mb-1" style="font-size:12px">
-            <span class="fw-semibold">Progress Sesi Paket</span>
-            <span style="color:var(--text-muted)">${usedKeys.length} / ${total} sudah dijadwalkan</span>
-        </div>
-        <div class="progress" style="height:8px;border-radius:4px;background:var(--input-bg)">
-            <div class="progress-bar" role="progressbar" style="width:${pct}%;background:${pct>=100?'#dc3545':pct>=75?'#f6af23':'#10b981'};border-radius:4px"></div>
-        </div>
-        <div class="mt-1 d-flex gap-3" style="font-size:11px;color:var(--text-muted)">
-            <span>✅ Sudah: ${usedKeys.length} sesi</span>
-            <span>✨ Tersisa: ${sisa} sesi</span>
-            ${pct >= 100 ? '<span class="text-danger fw-semibold">⚠️ Semua sesi sudah dijadwalkan</span>' : ''}
-        </div>`;
+    // kept as stub for legacy references; no-op now
 }
+
+function loadUsedSessions(paketId, pkg) {
+    return Promise.resolve();
+}
+
 
 // ─── Students box ────────────────────────────────────────────────────────
 
