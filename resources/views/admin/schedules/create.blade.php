@@ -27,7 +27,7 @@ $packageStudentsBaseUrl = '/admin/schedules/package';
             </div>
             <div>
                 <h5 class="fw-bold mb-0" style="color:white">Buat Jadwal Kelas</h5>
-                <div style="font-size:12px;opacity:.8">Booking ruang, guru, dan sesi belajar secara terintegrasi</div>
+                <div style="font-size:12px;opacity:.8">Isi semua informasi jadwal di bawah lalu simpan</div>
             </div>
         </div>
         <a href="{{ route('admin.schedules.index') }}" class="btn btn-sm"
@@ -41,33 +41,6 @@ $packageStudentsBaseUrl = '/admin/schedules/package';
     <div class="alert alert-success alert-dismissible fade show mb-4"><i class="bi bi-check-circle me-2"></i>{{ session('success') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
 @endif
 
-{{-- STEP INDICATOR --}}
-<div class="dashboard-card mb-4 py-3">
-    <div class="d-flex align-items-center justify-content-center gap-0">
-        @php
-        $steps = [
-            ['num'=>1,'label'=>'Paket & Siswa','icon'=>'bi-box-seam'],
-            ['num'=>2,'label'=>'Waktu & Lokasi','icon'=>'bi-clock'],
-            ['num'=>3,'label'=>'Cek Konflik','icon'=>'bi-shield-check'],
-            ['num'=>4,'label'=>'Guru & Honor','icon'=>'bi-person-badge'],
-        ];
-        @endphp
-        @foreach($steps as $step)
-        <div class="d-flex align-items-center">
-            <div class="d-flex flex-column align-items-center" style="min-width:80px">
-                <div style="width:36px;height:36px;border-radius:50%;background:var(--input-bg);border:2px solid var(--card-border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text-muted);transition:.3s" id="step-circle-{{ $step['num'] }}">
-                    {{ $step['num'] }}
-                </div>
-                <div style="font-size:11px;color:var(--text-muted);margin-top:4px;text-align:center;font-weight:500" id="step-label-{{ $step['num'] }}">{{ $step['label'] }}</div>
-            </div>
-            @if(!$loop->last)
-            <div style="width:40px;height:2px;background:var(--card-border);margin-bottom:20px;flex-shrink:0" id="step-line-{{ $step['num'] }}"></div>
-            @endif
-        </div>
-        @endforeach
-    </div>
-</div>
-
 <form action="{{ route('admin.schedules.store') }}" method="POST" id="scheduleForm">
 @csrf
 @if($errors->any())
@@ -76,17 +49,17 @@ $packageStudentsBaseUrl = '/admin/schedules/package';
 </div>
 @endif
 
-{{-- ═══════════════════════════════════════════════════════════ --}}
-{{-- STEP 1: PAKET & SISWA                                       --}}
-{{-- ═══════════════════════════════════════════════════════════ --}}
-<div class="dashboard-card mb-4" id="section-paket">
+{{-- ══════════════════════════════════════════════════════ --}}
+{{-- BAGIAN 1: PAKET & MATA PELAJARAN                       --}}
+{{-- ══════════════════════════════════════════════════════ --}}
+<div class="dashboard-card mb-4">
     <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
         <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#c84ddf,#461256);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
             <i class="bi bi-box-seam"></i>
         </div>
         <div>
-            <div class="fw-bold" style="font-size:15px">1. Pilih Paket Belajar & Siswa <span class="text-danger">*</span></div>
-            <div class="text-muted" style="font-size:12px">Paket menentukan mata pelajaran, total sesi, dan siswa yang ikut</div>
+            <div class="fw-bold" style="font-size:15px">Paket Belajar & Siswa</div>
+            <div class="text-muted" style="font-size:12px">Paket menentukan mata pelajaran dan siswa yang ikut</div>
         </div>
     </div>
 
@@ -104,10 +77,10 @@ $packageStudentsBaseUrl = '/admin/schedules/package';
             </select>
         </div>
 
-        {{-- MATA PELAJARAN (auto-locked jika 1 mapel, dropdown jika banyak) --}}
+        {{-- MATA PELAJARAN --}}
         <div class="col-12" id="mapelBox" style="display:none">
             <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
-                <div class="fw-semibold mb-2" style="font-size:13px"><i class="bi bi-book me-2 text-primary"></i>Mata Pelajaran Sesi Ini <span class="text-danger">*</span></div>
+                <div class="fw-semibold mb-2" style="font-size:13px"><i class="bi bi-book me-2 text-primary"></i>Mata Pelajaran <span class="text-danger">*</span></div>
                 <div id="mapelSingleLock" style="display:none">
                     <div class="d-flex align-items-center gap-2">
                         <span id="mapelSingleBadge" style="background:var(--soft-primary);color:#461256;padding:5px 14px;border-radius:20px;font-size:13px;font-weight:600"></span>
@@ -127,42 +100,33 @@ $packageStudentsBaseUrl = '/admin/schedules/package';
         {{-- SISWA TERDAFTAR --}}
         <div class="col-12" id="siswaPaketBox" style="display:none">
             <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <div class="fw-semibold" style="font-size:13px">
-                        <i class="bi bi-people-fill text-primary me-2"></i>Siswa Terdaftar di Paket Ini
-                        <span id="siswaPaketCount" class="badge ms-1" style="background:var(--soft-primary);color:#461256;font-size:11px"></span>
-                    </div>
+                <div class="fw-semibold mb-2" style="font-size:13px">
+                    <i class="bi bi-people-fill text-primary me-2"></i>Siswa Terdaftar di Paket Ini
+                    <span id="siswaPaketCount" class="badge ms-1" style="background:var(--soft-primary);color:#461256;font-size:11px"></span>
                 </div>
                 <div id="siswaPaketContent" class="d-flex flex-wrap gap-2">
                     <span class="text-muted" style="font-size:12px">Memuat siswa...</span>
                 </div>
             </div>
         </div>
-
-        {{-- TOMBOL LANJUT STEP 1 --}}
-        <div class="col-12" id="step1NextBtn" style="display:none">
-            <button type="button" class="btn btn-primary px-4" onclick="goToStep2()">
-                Lanjut: Tentukan Waktu & Lokasi <i class="bi bi-arrow-right ms-2"></i>
-            </button>
-        </div>
     </div>
 </div>
 
-{{-- ═══════════════════════════════════════════════════════════ --}}
-{{-- STEP 2: WAKTU & LOKASI                                      --}}
-{{-- ═══════════════════════════════════════════════════════════ --}}
-<div class="dashboard-card mb-4" id="section-waktu" style="display:none">
+{{-- ══════════════════════════════════════════════════════ --}}
+{{-- BAGIAN 2: WAKTU & LOKASI                               --}}
+{{-- ══════════════════════════════════════════════════════ --}}
+<div class="dashboard-card mb-4">
     <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
         <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#0ea5e9,#0369a1);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
             <i class="bi bi-clock"></i>
         </div>
         <div>
-            <div class="fw-bold" style="font-size:15px">2. Tentukan Waktu & Lokasi <span class="text-danger">*</span></div>
+            <div class="fw-bold" style="font-size:15px">Waktu & Lokasi</div>
             <div class="text-muted" style="font-size:12px">Tanggal, jam, metode kelas, dan lokasi pertemuan</div>
         </div>
     </div>
 
-    {{-- METODE KELAS — 3 card pilihan --}}
+    {{-- METODE KELAS --}}
     <div class="mb-4">
         <label class="form-label fw-semibold">Metode Kelas <span class="text-danger">*</span></label>
         <div class="row g-3" id="metodePicker">
@@ -192,33 +156,30 @@ $packageStudentsBaseUrl = '/admin/schedules/package';
     <div class="row g-3 mb-4">
         <div class="col-md-4">
             <label class="form-label fw-semibold">Tanggal <span class="text-danger">*</span></label>
-            <input type="date" name="tanggal" id="tanggal" class="form-control" value="{{ old('tanggal', date('Y-m-d')) }}" required onchange="onWaktuChange()">
+            <input type="date" name="tanggal" id="tanggal" class="form-control" value="{{ old('tanggal', date('Y-m-d')) }}" required>
         </div>
         <div class="col-md-4">
             <label class="form-label fw-semibold">Jam Mulai <span class="text-danger">*</span></label>
-            <input type="time" name="jam_mulai" id="jam_mulai" class="form-control" value="{{ old('jam_mulai') }}" required onchange="onWaktuChange()">
+            <input type="time" name="jam_mulai" id="jam_mulai" class="form-control" value="{{ old('jam_mulai') }}" required>
         </div>
         <div class="col-md-4">
             <label class="form-label fw-semibold">Jam Selesai <span class="text-danger">*</span></label>
-            <input type="time" name="jam_selesai" id="jam_selesai" class="form-control" value="{{ old('jam_selesai') }}" required onchange="onWaktuChange()">
+            <input type="time" name="jam_selesai" id="jam_selesai" class="form-control" value="{{ old('jam_selesai') }}" required>
         </div>
     </div>
 
-    {{-- LOKASI — dinamis sesuai metode --}}
+    {{-- LOKASI --}}
     <div class="mb-4 p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
         <div class="fw-semibold mb-3" style="font-size:13px" id="lokasiTitle"><i class="bi bi-geo-alt me-2"></i>Lokasi Kelas</div>
 
-        {{-- Offline: Ruangan --}}
         <div id="lokasiOffline">
             <label class="form-label fw-semibold">Nama Ruangan <span class="text-muted fw-normal">(opsional)</span></label>
             <div class="input-group" style="max-width:400px">
                 <span class="input-group-text" style="background:var(--input-bg);border-color:var(--card-border)"><i class="bi bi-door-open text-muted"></i></span>
-                <input type="text" name="ruangan" id="ruangan" class="form-control" value="{{ old('ruangan') }}" placeholder="cth: Ruang A1, Ruang B2..." onchange="onWaktuChange()">
+                <input type="text" name="ruangan" id="ruangan" class="form-control" value="{{ old('ruangan') }}" placeholder="cth: Ruang A1, Ruang B2...">
             </div>
-            <div class="form-text">Mengunci ruangan ini dari kelas lain di jam yang sama (dideteksi saat Cek Konflik).</div>
         </div>
 
-        {{-- Online: Link Meeting --}}
         <div id="lokasiOnline" style="display:none">
             <label class="form-label fw-semibold">Link Zoom / Google Meet <span class="text-danger">*</span></label>
             <div class="input-group" style="max-width:500px">
@@ -227,7 +188,6 @@ $packageStudentsBaseUrl = '/admin/schedules/package';
             </div>
         </div>
 
-        {{-- Home Visit: Alamat --}}
         <div id="lokasiHomeVisit" style="display:none">
             <label class="form-label fw-semibold">Alamat Kunjungan <span class="text-danger">*</span></label>
             <textarea name="alamat_kunjungan" id="alamat_kunjungan" class="form-control" rows="2" style="max-width:500px" placeholder="Masukkan alamat lengkap rumah siswa...">{{ old('alamat_kunjungan') }}</textarea>
@@ -235,7 +195,7 @@ $packageStudentsBaseUrl = '/admin/schedules/package';
     </div>
 
     {{-- TOPIK & OPSIONAL --}}
-    <div class="row g-3 mb-3">
+    <div class="row g-3">
         <div class="col-lg-6">
             <label class="form-label fw-semibold">Topik / Materi <span class="text-muted fw-normal">(opsional)</span></label>
             <input type="text" name="topik" class="form-control" value="{{ old('topik') }}" placeholder="cth: Persamaan Kuadrat, Present Tense...">
@@ -253,7 +213,7 @@ $packageStudentsBaseUrl = '/admin/schedules/package';
         </div>
         <div class="col-lg-6">
             <label class="form-label fw-semibold">Modul Belajar <span class="text-muted fw-normal">(opsional)</span></label>
-            <select name="module_id" id="module_id" class="form-select" onchange="onModuleChange(this.value)">
+            <select name="module_id" id="module_id" class="form-select">
                 <option value="">— Tidak ada modul —</option>
                 @foreach($modules as $m)
                 <option value="{{ $m->id }}" {{ old('module_id') == $m->id ? 'selected' : '' }}>
@@ -268,63 +228,49 @@ $packageStudentsBaseUrl = '/admin/schedules/package';
             <input type="text" name="catatan" class="form-control" value="{{ old('catatan') }}" placeholder="Catatan tambahan untuk sesi ini">
         </div>
     </div>
-
-    {{-- CTA CEK KONFLIK --}}
-    <div class="pt-3 border-top" id="cekKonflikCTA" style="display:none">
-        <button type="button" class="btn btn-primary px-4" onclick="runConflictCheck()" id="btnCekKonflik">
-            <i class="bi bi-shield-check me-2"></i>Cek Konflik & Lanjut Penugasan Guru
-        </button>
-        <div class="text-muted mt-1" style="font-size:11px">Sistem akan memeriksa ketersediaan ruangan dan guru di waktu yang dipilih.</div>
-    </div>
 </div>
 
-{{-- ═══════════════════════════════════════════════════════════ --}}
-{{-- STEP 3: HASIL CEK KONFLIK                                   --}}
-{{-- ═══════════════════════════════════════════════════════════ --}}
-<div class="dashboard-card mb-4" id="section-konflik" style="display:none">
-    <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
+{{-- ══════════════════════════════════════════════════════ --}}
+{{-- BAGIAN 3: CEK KONFLIK (opsional, inline)               --}}
+{{-- ══════════════════════════════════════════════════════ --}}
+<div class="dashboard-card mb-4">
+    <div class="d-flex align-items-center gap-2 mb-3 pb-3 border-bottom">
         <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
             <i class="bi bi-shield-check"></i>
         </div>
         <div>
-            <div class="fw-bold" style="font-size:15px">3. Hasil Pemeriksaan Konflik</div>
-            <div class="text-muted" style="font-size:12px">Ketersediaan ruangan dan guru di waktu yang dipilih</div>
+            <div class="fw-bold" style="font-size:15px">Cek Konflik <span class="text-muted fw-normal" style="font-size:12px">(opsional)</span></div>
+            <div class="text-muted" style="font-size:12px">Periksa ketersediaan ruangan dan guru di waktu yang dipilih</div>
         </div>
     </div>
 
-    <div id="konflikResults"></div>
-
-    <div class="mt-3 d-flex gap-2" id="konflikActions" style="display:none!important">
-        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="backToStep2()">
-            <i class="bi bi-arrow-left me-1"></i>Ubah Waktu
-        </button>
-        <button type="button" class="btn btn-primary px-4" id="btnLanjutGuru" onclick="goToStep4()">
-            Lanjut: Tugaskan Guru & Kunci Honor <i class="bi bi-arrow-right ms-2"></i>
-        </button>
-    </div>
+    <button type="button" class="btn btn-outline-primary btn-sm px-4" onclick="runConflictCheck()" id="btnCekKonflik">
+        <i class="bi bi-shield-check me-2"></i>Cek Konflik Sekarang
+    </button>
+    <div id="konflikResults" class="mt-3"></div>
 </div>
 
-{{-- ═══════════════════════════════════════════════════════════ --}}
-{{-- STEP 4: GURU & HONOR                                        --}}
-{{-- ═══════════════════════════════════════════════════════════ --}}
-<div class="dashboard-card mb-4" id="section-guru" style="display:none">
+{{-- ══════════════════════════════════════════════════════ --}}
+{{-- BAGIAN 4: GURU & HONOR                                 --}}
+{{-- ══════════════════════════════════════════════════════ --}}
+<div class="dashboard-card mb-4">
     <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
         <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#10b981,#047857);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
             <i class="bi bi-person-badge"></i>
         </div>
         <div>
-            <div class="fw-bold" style="font-size:15px">4. Tugaskan Guru & Kunci Honor</div>
-            <div class="text-muted" style="font-size:12px">Pilih guru pengajar dan kunci nominal honor per sesi untuk jadwal ini</div>
+            <div class="fw-bold" style="font-size:15px">Guru & Honor</div>
+            <div class="text-muted" style="font-size:12px">Pilih guru pengajar dan kunci nominal honor per sesi</div>
         </div>
     </div>
 
-    {{-- MATA PELAJARAN (summary info) --}}
-    <div class="mb-4 p-3 rounded-3" style="background:var(--soft-primary-bg);border:1.5px solid var(--soft-primary-border)">
+    {{-- MATA PELAJARAN summary --}}
+    <div class="mb-3 p-3 rounded-3" style="background:var(--soft-primary-bg);border:1.5px solid var(--soft-primary-border)">
         <div class="d-flex align-items-center gap-2" style="font-size:13px">
             <i class="bi bi-book text-primary"></i>
             <span class="fw-semibold">Mata Pelajaran:</span>
             <span id="mapelSummaryLabel" class="badge" style="background:var(--soft-primary);color:#461256;font-size:12px">—</span>
-            <span class="text-muted" style="font-size:11px">| Guru tersedia untuk mata pelajaran ini ditampilkan terlebih dahulu.</span>
+            <span class="text-muted" style="font-size:11px">| Guru sesuai mata pelajaran ditampilkan terlebih dahulu.</span>
         </div>
     </div>
 
@@ -332,17 +278,17 @@ $packageStudentsBaseUrl = '/admin/schedules/package';
     <div class="mb-4">
         <label class="form-label fw-semibold">Pilih Guru Pengajar <span class="text-danger">*</span></label>
         <div id="guruList" class="row g-2">
-            <div class="col-12 text-muted" style="font-size:13px"><i class="bi bi-hourglass-split me-1"></i>Memuat daftar guru...</div>
+            <div class="col-12 text-muted" style="font-size:13px"><i class="bi bi-info-circle me-1"></i>Pilih paket terlebih dahulu untuk melihat daftar guru.</div>
         </div>
         <input type="hidden" name="guru_id" id="guru_id" required>
         <div id="guruNote" class="form-text mt-2"></div>
     </div>
 
     {{-- HONOR PER SESI --}}
-    <div class="p-3 rounded-3 mb-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
+    <div class="p-3 rounded-3 mb-4" style="background:var(--input-bg);border:1px solid var(--card-border)">
         <div class="fw-semibold mb-2" style="font-size:13px">
             <i class="bi bi-cash-coin me-2" style="color:#f6af23"></i>Honor Guru per Sesi
-            <span class="text-muted fw-normal" style="font-size:11px">(opsional — dikunci saat jadwal dibuat)</span>
+            <span class="text-muted fw-normal" style="font-size:11px">(opsional)</span>
         </div>
         <div class="row g-3 align-items-end">
             <div class="col-md-5">
@@ -364,14 +310,9 @@ $packageStudentsBaseUrl = '/admin/schedules/package';
     {{-- SUBMIT --}}
     <div class="pt-3 border-top d-flex justify-content-between align-items-center">
         <div class="text-muted" style="font-size:12px"><i class="bi bi-info-circle me-1"></i>Menyimpan jadwal akan otomatis: booking ruangan, booking waktu guru, menyiapkan draft absensi.</div>
-        <div class="d-flex gap-2">
-            <button type="button" class="btn btn-outline-secondary" onclick="backToStep3()">
-                <i class="bi bi-arrow-left me-1"></i>Kembali
-            </button>
-            <button type="submit" id="submitBtn" class="btn btn-primary px-5 fw-semibold" disabled>
-                <i class="bi bi-calendar-check me-2"></i>Simpan Jadwal
-            </button>
-        </div>
+        <button type="submit" id="submitBtn" class="btn btn-primary px-5 fw-semibold" disabled>
+            <i class="bi bi-calendar-check me-2"></i>Simpan Jadwal
+        </button>
     </div>
 </div>
 
@@ -429,55 +370,31 @@ const csrf     = document.querySelector('meta[name="csrf-token"]').content;
 const conflictCheckUrl       = @json($conflictCheckUrl);
 const packageStudentsBaseUrl = @json($packageStudentsBaseUrl);
 
-let currentPaket    = null;
-let currentMapelId  = null;
-let busyTeacherIds  = [];
-let selectedGuruId  = null;
+let currentPaket   = null;
+let currentMapelId = null;
+let busyTeacherIds = [];
+let selectedGuruId = null;
 
-// ─── Helpers ───────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────
 
-function activateStep(n) {
-    for (let i = 1; i <= 4; i++) {
-        const circle = document.getElementById('step-circle-' + i);
-        const label  = document.getElementById('step-label-' + i);
-        const line   = document.getElementById('step-line-' + i);
-        if (!circle) continue;
-        if (i < n) {
-            circle.style.cssText = 'width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#10b981,#047857);color:white;border:2px solid #10b981;display:flex;align-items:center;justify-content:center;font-size:16px;transition:.3s';
-            circle.innerHTML = '<i class="bi bi-check-lg"></i>';
-            label.style.color = '#10b981';
-        } else if (i === n) {
-            circle.style.cssText = 'width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#c84ddf,#461256);color:white;border:2px solid #c84ddf;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;transition:.3s';
-            circle.innerHTML = i;
-            label.style.color = '#c84ddf';
-        } else {
-            circle.style.cssText = 'width:36px;height:36px;border-radius:50%;background:var(--input-bg);color:var(--text-muted);border:2px solid var(--card-border);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;transition:.3s';
-            circle.innerHTML = i;
-            label.style.color = 'var(--text-muted)';
-        }
-        if (line) line.style.background = i < n ? '#10b981' : 'var(--card-border)';
-    }
-}
+function showEl(id) { const el = document.getElementById(id); if (el) el.style.display = ''; }
+function hideEl(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
 
-function showSection(id) { const el = document.getElementById(id); if (el) el.style.display = ''; }
-function hideSection(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
-function scrollTo(id)    { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-
-// ─── STEP 1: Paket ────────────────────────────────────────────────────────
+// ─── Paket change ─────────────────────────────────────────────────────────
 
 function onPaketChange(paketId) {
     currentPaket   = null;
     currentMapelId = null;
+    selectedGuruId = null;
     busyTeacherIds = [];
 
-    // Reset downstream
-    hideSection('section-waktu');
-    hideSection('section-konflik');
-    hideSection('section-guru');
-    hideSection('mapelBox');
-    hideSection('siswaPaketBox');
-    hideSection('step1NextBtn');
-    activateStep(1);
+    hideEl('mapelBox');
+    hideEl('siswaPaketBox');
+    document.getElementById('mapelSummaryLabel').textContent = '—';
+    document.getElementById('guruList').innerHTML = '<div class="col-12 text-muted" style="font-size:13px"><i class="bi bi-info-circle me-1"></i>Pilih paket terlebih dahulu untuk melihat daftar guru.</div>';
+    document.getElementById('guru_id').value = '';
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('konflikResults').innerHTML = '';
 
     if (!paketId) return;
 
@@ -485,16 +402,16 @@ function onPaketChange(paketId) {
     if (!pkg) return;
     currentPaket = pkg;
 
-    // Mata pelajaran: single lock vs multi pick
-    showSection('mapelBox');
+    // Mata pelajaran
+    showEl('mapelBox');
     if (pkg.mata_pelajaran.length === 1) {
         const mp = pkg.mata_pelajaran[0];
         document.getElementById('mapelSingleBadge').textContent = mp.nama;
         document.getElementById('mata_pelajaran_id_hidden').value = mp.id;
         currentMapelId = mp.id;
-        showSection('mapelSingleLock');
-        hideSection('mapelMultiPick');
-    } else {
+        showEl('mapelSingleLock');
+        hideEl('mapelMultiPick');
+    } else if (pkg.mata_pelajaran.length > 1) {
         let opts = '<option value="">— Pilih mata pelajaran —</option>';
         pkg.mata_pelajaran.forEach(m => {
             opts += `<option value="${m.id}">${m.nama}${m.kategori ? ' ('+m.kategori+')' : ''}</option>`;
@@ -502,91 +419,52 @@ function onPaketChange(paketId) {
         document.getElementById('mata_pelajaran_id').innerHTML = opts;
         document.getElementById('mata_pelajaran_id').onchange = function() {
             currentMapelId = this.value ? parseInt(this.value) : null;
-            checkStep1Complete();
+            updateMapelSummary();
+            renderGuruList();
         };
-        hideSection('mapelSingleLock');
-        showSection('mapelMultiPick');
+        hideEl('mapelSingleLock');
+        showEl('mapelMultiPick');
     }
+
+    updateMapelSummary();
 
     // Students
-    showSection('siswaPaketBox');
+    showEl('siswaPaketBox');
     loadStudentsByPackage(paketId);
 
-    // Auto-detect metode from package
+    // Auto-detect metode
     const validJenis = ['online', 'offline', 'private'];
-    const autoJenis  = validJenis.includes(pkg.tipe_kelas) ? pkg.tipe_kelas : 'offline';
-    selectMetode(autoJenis);
+    selectMetode(validJenis.includes(pkg.tipe_kelas) ? pkg.tipe_kelas : 'offline');
 
-    checkStep1Complete();
+    // Load guru list
+    renderGuruList();
 }
 
-function checkStep1Complete() {
-    const paketId = document.getElementById('paket_id').value;
-    const mapelOk = currentPaket && (currentPaket.mata_pelajaran.length === 1 ? true : !!currentMapelId);
-
-    if (paketId && mapelOk) {
-        showSection('step1NextBtn');
-    } else {
-        hideSection('step1NextBtn');
-    }
+function updateMapelSummary() {
+    if (!currentPaket) return;
+    const mp = currentPaket.mata_pelajaran.find(m => m.id == currentMapelId) || currentPaket.mata_pelajaran[0];
+    document.getElementById('mapelSummaryLabel').textContent = mp ? mp.nama : '—';
 }
 
-function goToStep2() {
-    showSection('section-waktu');
-    activateStep(2);
-    scrollTo('section-waktu');
-    onWaktuChange();
-}
-
-// ─── STEP 2: Waktu & Lokasi ───────────────────────────────────────────────
+// ─── Metode Kelas ─────────────────────────────────────────────────────────
 
 function selectMetode(val) {
     document.getElementById('jenis').value = val;
     document.querySelectorAll('.metode-card').forEach(card => {
         const isActive = card.dataset.value === val;
-        card.style.border         = isActive ? '2px solid #c84ddf' : '2px solid var(--card-border)';
-        card.style.background     = isActive ? 'var(--soft-primary-bg)' : 'var(--input-bg)';
-        card.style.color          = isActive ? '#461256' : 'inherit';
+        card.style.border     = isActive ? '2px solid #c84ddf' : '2px solid var(--card-border)';
+        card.style.background = isActive ? 'var(--soft-primary-bg)' : 'var(--input-bg)';
+        card.style.color      = isActive ? '#461256' : 'inherit';
         card.querySelector('.fw-semibold').style.color = isActive ? '#461256' : 'inherit';
     });
-
-    // Show/hide location fields
-    const isOffline   = val === 'offline';
-    const isOnline    = val === 'online';
-    const isHomeVisit = val === 'private';
-    document.getElementById('lokasiOffline').style.display   = isOffline   ? '' : 'none';
-    document.getElementById('lokasiOnline').style.display    = isOnline    ? '' : 'none';
-    document.getElementById('lokasiHomeVisit').style.display = isHomeVisit ? '' : 'none';
-
+    document.getElementById('lokasiOffline').style.display   = val === 'offline'  ? '' : 'none';
+    document.getElementById('lokasiOnline').style.display    = val === 'online'   ? '' : 'none';
+    document.getElementById('lokasiHomeVisit').style.display = val === 'private'  ? '' : 'none';
     const titles = { offline: '🏫 Lokasi Kelas — Ruang Fisik', online: '💻 Lokasi Kelas — Online', private: '🏠 Lokasi Kelas — Kunjungan Rumah' };
     document.getElementById('lokasiTitle').textContent = titles[val] || 'Lokasi Kelas';
 }
 
-function onWaktuChange() {
-    const tanggal   = document.getElementById('tanggal').value;
-    const jamMulai  = document.getElementById('jam_mulai').value;
-    const jamSelesai= document.getElementById('jam_selesai').value;
-
-    if (tanggal && jamMulai && jamSelesai) {
-        showSection('cekKonflikCTA');
-    } else {
-        hideSection('cekKonflikCTA');
-    }
-
-    // Reset downstream steps if time changed
-    hideSection('section-konflik');
-    hideSection('section-guru');
-    activateStep(2);
-}
-
-function backToStep2() {
-    hideSection('section-konflik');
-    hideSection('section-guru');
-    activateStep(2);
-    scrollTo('section-waktu');
-}
-
-// ─── STEP 3: Cek Konflik ─────────────────────────────────────────────────
+// ─── Cek Konflik ──────────────────────────────────────────────────────────
 
 async function runConflictCheck() {
     const btn = document.getElementById('btnCekKonflik');
@@ -599,11 +477,11 @@ async function runConflictCheck() {
 
     const payload = new FormData();
     payload.append('_token', csrf);
-    payload.append('tanggal',    document.getElementById('tanggal').value);
-    payload.append('jam_mulai',  document.getElementById('jam_mulai').value);
-    payload.append('jam_selesai',document.getElementById('jam_selesai').value);
-    payload.append('ruangan',    ruangan);
-    payload.append('cabang_id',  cabangId);
+    payload.append('tanggal',     document.getElementById('tanggal').value);
+    payload.append('jam_mulai',   document.getElementById('jam_mulai').value);
+    payload.append('jam_selesai', document.getElementById('jam_selesai').value);
+    payload.append('ruangan',     ruangan);
+    payload.append('cabang_id',   cabangId);
 
     try {
         const res  = await fetch(conflictCheckUrl, { method: 'POST', body: payload });
@@ -613,77 +491,58 @@ async function runConflictCheck() {
 
         busyTeacherIds = data.busy_teacher_ids || [];
         renderKonflikResults(data, jenis, ruangan);
-
-        showSection('section-konflik');
-        const konflikActions = document.getElementById('konflikActions');
-        konflikActions.style.removeProperty('display');
-        activateStep(3);
-        scrollTo('section-konflik');
+        // Re-render guru list to reflect busy status
+        if (currentPaket) renderGuruList();
     } catch (err) {
         showToast('Gagal menghubungi server. Coba lagi.', 'error');
     } finally {
         btn.disabled = false;
-        btn.innerHTML = '<i class="bi bi-shield-check me-2"></i>Cek Konflik & Lanjut Penugasan Guru';
+        btn.innerHTML = '<i class="bi bi-shield-check me-2"></i>Cek Konflik Sekarang';
     }
 }
 
 function renderKonflikResults(data, jenis, ruangan) {
     let html = '<div class="row g-3">';
 
-    // Room result
     if (jenis === 'offline' && ruangan) {
         const r = data.room;
         if (r) {
             const ok = !r.conflict;
-            html += `
-            <div class="col-md-6">
+            html += `<div class="col-md-6">
                 <div class="p-3 rounded-3 d-flex align-items-start gap-3" style="background:${ok ? 'var(--soft-success-bg,#d1fae5)' : '#fef2f2'};border:1.5px solid ${ok ? '#10b981' : '#ef4444'}">
                     <div style="font-size:22px;line-height:1">${ok ? '✅' : '❌'}</div>
                     <div>
-                        <div class="fw-semibold" style="font-size:13px;color:${ok ? '#047857' : '#b91c1c'}">
-                            ${ok ? 'Ruangan Tersedia' : 'Ruangan Bentrok!'}
-                        </div>
+                        <div class="fw-semibold" style="font-size:13px;color:${ok ? '#047857' : '#b91c1c'}">${ok ? 'Ruangan Tersedia' : 'Ruangan Bentrok!'}</div>
                         <div style="font-size:12px;color:var(--text-muted)">${r.detail}</div>
                     </div>
                 </div>
             </div>`;
         }
     } else if (jenis === 'online') {
-        html += `
-        <div class="col-md-6">
+        html += `<div class="col-md-6">
             <div class="p-3 rounded-3 d-flex align-items-start gap-3" style="background:var(--soft-info-bg,#eff6ff);border:1.5px solid #3b82f6">
                 <div style="font-size:22px;line-height:1">💻</div>
-                <div>
-                    <div class="fw-semibold" style="font-size:13px;color:#1d4ed8">Kelas Online</div>
-                    <div style="font-size:12px;color:var(--text-muted)">Tidak ada pengecekan ruang fisik untuk kelas online.</div>
-                </div>
+                <div><div class="fw-semibold" style="font-size:13px;color:#1d4ed8">Kelas Online</div>
+                <div style="font-size:12px;color:var(--text-muted)">Tidak ada pengecekan ruang fisik untuk kelas online.</div></div>
             </div>
         </div>`;
     } else {
-        html += `
-        <div class="col-md-6">
+        html += `<div class="col-md-6">
             <div class="p-3 rounded-3 d-flex align-items-start gap-3" style="background:#fffbeb;border:1.5px solid #f59e0b">
                 <div style="font-size:22px;line-height:1">🏠</div>
-                <div>
-                    <div class="fw-semibold" style="font-size:13px;color:#92400e">Home Visit</div>
-                    <div style="font-size:12px;color:var(--text-muted)">Kunjungan ke alamat siswa — tidak ada pengecekan ruang.</div>
-                </div>
+                <div><div class="fw-semibold" style="font-size:13px;color:#92400e">Home Visit</div>
+                <div style="font-size:12px;color:var(--text-muted)">Kunjungan ke alamat siswa — tidak ada pengecekan ruang.</div></div>
             </div>
         </div>`;
     }
 
-    // Teacher availability summary
     const busyCount  = busyTeacherIds.length;
-    const totalCount = teachers.length;
-    const freeCount  = totalCount - busyCount;
-    html += `
-    <div class="col-md-6">
+    const freeCount  = teachers.length - busyCount;
+    html += `<div class="col-md-6">
         <div class="p-3 rounded-3 d-flex align-items-start gap-3" style="background:${freeCount > 0 ? 'var(--soft-success-bg,#d1fae5)' : '#fef2f2'};border:1.5px solid ${freeCount > 0 ? '#10b981' : '#ef4444'}">
             <div style="font-size:22px;line-height:1">${freeCount > 0 ? '👨‍🏫' : '⚠️'}</div>
             <div>
-                <div class="fw-semibold" style="font-size:13px;color:${freeCount > 0 ? '#047857' : '#b91c1c'}">
-                    ${freeCount} Guru Tersedia di Waktu Ini
-                </div>
+                <div class="fw-semibold" style="font-size:13px;color:${freeCount > 0 ? '#047857' : '#b91c1c'}">${freeCount} Guru Tersedia di Waktu Ini</div>
                 <div style="font-size:12px;color:var(--text-muted)">${busyCount} guru sedang mengajar kelas lain di jam ini.</div>
             </div>
         </div>
@@ -691,53 +550,28 @@ function renderKonflikResults(data, jenis, ruangan) {
 
     html += '</div>';
 
-    // Room conflict hard-block warning
     if (data.room?.conflict) {
-        html += `
-        <div class="alert alert-warning mt-3 mb-0">
+        html += `<div class="alert alert-warning mt-3 mb-0">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            <strong>Ruangan sudah terpakai.</strong> Silakan ganti ruangan atau ubah waktu sebelum melanjutkan.
+            <strong>Ruangan sudah terpakai.</strong> Silakan ganti ruangan atau ubah waktu.
         </div>`;
-        document.getElementById('btnLanjutGuru').disabled = true;
-    } else {
-        document.getElementById('btnLanjutGuru').disabled = false;
     }
 
     document.getElementById('konflikResults').innerHTML = html;
 }
 
-function goToStep4() {
-    showSection('section-guru');
-    activateStep(4);
-    renderGuruList();
-    scrollTo('section-guru');
-    // Update mata pelajaran summary label
-    if (currentPaket) {
-        const mp = currentPaket.mata_pelajaran.find(m => m.id == currentMapelId) || currentPaket.mata_pelajaran[0];
-        document.getElementById('mapelSummaryLabel').textContent = mp ? mp.nama : '—';
-    }
-}
-
-function backToStep3() {
-    hideSection('section-guru');
-    activateStep(3);
-    scrollTo('section-konflik');
-}
-
-// ─── STEP 4: Guru & Honor ────────────────────────────────────────────────
+// ─── Guru list ────────────────────────────────────────────────────────────
 
 function renderGuruList() {
     if (!currentPaket) return;
     const mapelId = currentMapelId ? parseInt(currentMapelId) : null;
 
-    // Determine preferred teachers (from package-course-teacher assignments)
     let pkgTeacherIds = [];
     if (mapelId && currentPaket.course_teachers) {
         const ct = currentPaket.course_teachers[mapelId];
         if (ct && ct.length > 0) pkgTeacherIds = ct.map(Number);
     }
 
-    // Categorize: preferred + available / preferred + busy / other available / other busy
     let preferred = [], others = [];
     teachers.forEach(t => {
         const isPref = pkgTeacherIds.length > 0
@@ -752,7 +586,7 @@ function renderGuruList() {
         preferred.forEach(t => { html += renderGuruCard(t, true); });
     }
     if (others.length > 0) {
-        html += `<div class="col-12 mt-2 mb-1"><div class="text-muted fw-semibold" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px">— Guru lainnya (${others.length})</div></div>`;
+        if (preferred.length > 0) html += `<div class="col-12 mt-2 mb-1"><div class="text-muted fw-semibold" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px">— Guru lainnya (${others.length})</div></div>`;
         others.forEach(t => { html += renderGuruCard(t, false); });
     }
     if (!html) html = '<div class="col-12 text-muted" style="font-size:13px">Belum ada guru aktif.</div>';
@@ -762,20 +596,18 @@ function renderGuruList() {
         ? `${preferred.length} guru ditugaskan untuk mapel ini dalam paket — tampil di atas.`
         : (preferred.length > 0 ? `${preferred.length} guru terdaftar mengajar mapel ini.` : 'Belum ada guru yang ditetapkan untuk mapel ini.');
 
-    // Re-select if previously chosen
     if (selectedGuruId) selectGuru(selectedGuruId);
 }
 
 function renderGuruCard(t, isPreferred) {
-    const isBusy = busyTeacherIds.includes(t.id);
-    const badgeBg    = isBusy ? '#fef2f2'    : (isPreferred ? 'var(--soft-success-bg,#d1fae5)' : 'var(--input-bg)');
-    const badgeBorder= isBusy ? '#ef4444'    : (isPreferred ? '#10b981' : 'var(--card-border)');
-    const statusBadge= isBusy
+    const isBusy      = busyTeacherIds.includes(t.id);
+    const badgeBg     = isBusy ? '#fef2f2'  : (isPreferred ? 'var(--soft-success-bg,#d1fae5)' : 'var(--input-bg)');
+    const badgeBorder = isBusy ? '#ef4444'  : (isPreferred ? '#10b981' : 'var(--card-border)');
+    const statusBadge = isBusy
         ? `<span style="background:#fee2e2;color:#b91c1c;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600">⚠️ Konflik Jadwal</span>`
         : `<span style="background:#d1fae5;color:#047857;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600">✅ Tersedia</span>`;
 
-    return `
-    <div class="col-md-4 col-sm-6">
+    return `<div class="col-md-4 col-sm-6">
         <div class="guru-card p-3 rounded-3" data-id="${t.id}" data-name="${t.name}"
              style="border:2px solid ${badgeBorder};background:${badgeBg};cursor:${isBusy ? 'not-allowed' : 'pointer'};transition:.2s;opacity:${isBusy ? '.6' : '1'}"
              ${isBusy ? '' : `onclick="selectGuru(${t.id})"`}>
@@ -804,32 +636,21 @@ function selectGuru(guruId) {
         const isSelected = parseInt(card.dataset.id) === guruId;
         const isBusy     = busyTeacherIds.includes(parseInt(card.dataset.id));
         if (!isBusy) {
-            card.style.border = isSelected ? '2px solid #c84ddf' : '2px solid var(--card-border)';
-            card.style.boxShadow = isSelected ? '0 0 0 3px rgba(200,77,223,.15)' : '';
+            card.style.border     = isSelected ? '2px solid #c84ddf' : '2px solid var(--card-border)';
+            card.style.boxShadow  = isSelected ? '0 0 0 3px rgba(200,77,223,.15)' : '';
         }
     });
 
     const t = teachers.find(x => x.id == guruId);
     if (t) {
-        const honorInfo = document.getElementById('honorInfo');
-        honorInfo.innerHTML = `<i class="bi bi-person-check me-1 text-success"></i><strong>${t.name}</strong> dipilih sebagai guru pengajar. Masukkan honor per sesi jika ada kesepakatan.`;
+        document.getElementById('honorInfo').innerHTML =
+            `<i class="bi bi-person-check me-1 text-success"></i><strong>${t.name}</strong> dipilih sebagai guru pengajar. Masukkan honor per sesi jika ada kesepakatan.`;
     }
 
     document.getElementById('submitBtn').disabled = false;
 }
 
-// ─── Sessions / progress bar ─────────────────────────────────────────────
-
-function buildSesiOptions(paketId, pkg) {
-    // kept as stub for legacy references; no-op now
-}
-
-function loadUsedSessions(paketId, pkg) {
-    return Promise.resolve();
-}
-
-
-// ─── Students box ────────────────────────────────────────────────────────
+// ─── Students ─────────────────────────────────────────────────────────────
 
 function loadStudentsByPackage(paketId) {
     const content = document.getElementById('siswaPaketContent');
@@ -852,14 +673,8 @@ function loadStudentsByPackage(paketId) {
     });
 }
 
-// ─── Module info ─────────────────────────────────────────────────────────
+// ─── Init ─────────────────────────────────────────────────────────────────
 
-function onModuleChange(moduleId) { /* no visual display needed */ }
-
-// ─── Init ────────────────────────────────────────────────────────────────
-
-activateStep(1);
-// Pre-select metode card
 selectMetode(document.getElementById('jenis').value || 'offline');
 
 const initPaket = document.getElementById('paket_id').value;
