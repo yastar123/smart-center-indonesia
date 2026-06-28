@@ -13,19 +13,20 @@ class StudentRegistration extends Model
         'no_reg', 'name', 'phone', 'gender', 'education_level',
         'birth_place', 'birth_date', 'address', 'parent_name', 'parent_phone',
         'job', 'program', 'system', 'learning_place', 'pickup_mode', 'branch',
-        'interests', 'day_preferences', 'schedule_time', 'start_date', 'notes',
+        'interests', 'interest_sessions', 'day_preferences', 'schedule_time', 'start_date', 'notes',
         'status', 'payment_status', 'academic_status',
         'assigned_teacher_id', 'biaya_per_sesi', 'total_sessions',
         'total_biaya', 'invoice_id', 'student_id',
     ];
 
     protected $casts = [
-        'birth_date'      => 'date',
-        'start_date'      => 'date',
-        'interests'       => 'array',
-        'day_preferences' => 'array',
-        'biaya_per_sesi'  => 'decimal:2',
-        'total_biaya'     => 'decimal:2',
+        'birth_date'        => 'date',
+        'start_date'        => 'date',
+        'interests'         => 'array',
+        'interest_sessions' => 'array',
+        'day_preferences'   => 'array',
+        'biaya_per_sesi'    => 'decimal:2',
+        'total_biaya'       => 'decimal:2',
     ];
 
     public function assignedTeacher()

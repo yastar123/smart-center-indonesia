@@ -30,6 +30,64 @@
     </div>
 </div>
 
+{{-- PROGRAM TERDAFTAR dari Registrasi --}}
+@if(isset($registration) && $registration && !empty($registration->interest_sessions))
+<div class="dashboard-card mb-4 fade-up">
+    <div class="d-flex align-items-center gap-2 mb-3">
+        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#260632,#c84ddf);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <i class="bi bi-bookmark-star-fill text-white" style="font-size:.9rem"></i>
+        </div>
+        <div>
+            <h6 class="fw-bold mb-0" style="font-size:.95rem">Program Terdaftar</h6>
+            <div class="text-muted" style="font-size:.75rem">Mata pelajaran &amp; jumlah sesi yang ditetapkan admin</div>
+        </div>
+    </div>
+    <div class="row g-3">
+        @php
+            $interestSessions = $registration->interest_sessions ?? [];
+            $totalSesiAll = array_sum($interestSessions);
+            $colors = [
+                'linear-gradient(135deg,#6366f1,#8b5cf6)',
+                'linear-gradient(135deg,#0284c7,#38bdf8)',
+                'linear-gradient(135deg,#10b981,#34d399)',
+                'linear-gradient(135deg,#f59e0b,#fcd34d)',
+                'linear-gradient(135deg,#ec4899,#f9a8d4)',
+                'linear-gradient(135deg,#c84ddf,#a855f7)',
+                'linear-gradient(135deg,#14b8a6,#2dd4bf)',
+                'linear-gradient(135deg,#ef4444,#f87171)',
+            ];
+            $i = 0;
+        @endphp
+        @foreach($interestSessions as $subject => $sessions)
+        @php $grad = $colors[$i % count($colors)]; $i++; @endphp
+        <div class="col-sm-6 col-lg-4">
+            <div class="d-flex align-items-center gap-3 p-3 rounded-3 h-100"
+                 style="background:var(--input-bg);border:1px solid var(--card-border)">
+                <div style="width:42px;height:42px;border-radius:12px;background:{{ $grad }};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <i class="bi bi-book-fill text-white" style="font-size:.9rem"></i>
+                </div>
+                <div style="min-width:0">
+                    <div class="fw-semibold text-truncate" style="font-size:.85rem;color:var(--text-primary)" title="{{ $subject }}">{{ $subject }}</div>
+                    <div class="mt-1 d-flex align-items-center gap-1">
+                        <span class="fw-bold" style="font-size:1rem;color:var(--primary)">{{ $sessions }}</span>
+                        <span class="text-muted" style="font-size:.75rem">sesi</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+    @if($totalSesiAll > 0)
+    <div class="mt-3 pt-3 d-flex align-items-center justify-content-between" style="border-top:1px solid var(--card-border)">
+        <span class="text-muted" style="font-size:.78rem"><i class="bi bi-info-circle me-1"></i>Ditetapkan oleh admin cabang</span>
+        <span class="fw-bold" style="font-size:.82rem;color:var(--primary)">
+            Total {{ $totalSesiAll }} sesi
+        </span>
+    </div>
+    @endif
+</div>
+@endif
+
 {{-- TABLE --}}
 <div class="dashboard-card fade-up">
     <div class="table-responsive">

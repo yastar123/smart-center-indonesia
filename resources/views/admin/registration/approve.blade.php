@@ -167,27 +167,49 @@
                 </div>
             </div>
 
-            {{-- Program Diminati (read-only, nama saja) --}}
+            {{-- Program Diminati + Sesi per Mata Pelajaran --}}
             @php
                 $allInterests = $registration->interests ?? [];
                 if (empty($allInterests) && $registration->program) {
                     $allInterests = [$registration->program];
                 }
+                $savedSessions = $registration->interest_sessions ?? [];
             @endphp
             @if(!empty($allInterests))
             <div class="mb-4 p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
-                <div class="fw-semibold mb-2" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">
-                    <i class="bi bi-bookmark-star me-1" style="color:var(--primary)"></i>Program Diminati Siswa
+                <div class="fw-semibold mb-3" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">
+                    <i class="bi bi-bookmark-star me-1" style="color:var(--primary)"></i>Mata Pelajaran & Jumlah Sesi
                 </div>
-                <div class="d-flex flex-wrap gap-2">
-                    @foreach($allInterests as $prog)
-                    <span class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill fw-semibold"
-                          style="background:linear-gradient(135deg,rgba(38,6,50,.08),rgba(200,77,223,.12));color:var(--primary);border:1px solid rgba(200,77,223,.25);font-size:.8rem">
-                        <i class="bi bi-check2-circle"></i> {{ $prog }}
-                    </span>
+                <div class="d-flex flex-column gap-2">
+                    @foreach($allInterests as $idx => $prog)
+                    @php $defaultSesi = $savedSessions[$prog] ?? 8; @endphp
+                    <div class="d-flex align-items-center gap-3 p-2 rounded-2" style="background:var(--card-bg);border:1px solid var(--card-border)">
+                        <div class="d-flex align-items-center gap-2 flex-grow-1" style="min-width:0">
+                            <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#260632,#c84ddf);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;color:white;font-weight:700">
+                                {{ $idx + 1 }}
+                            </div>
+                            <span class="fw-semibold text-truncate" style="font-size:.83rem;color:var(--text-primary)">{{ $prog }}</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                            <label class="text-muted mb-0" style="font-size:.72rem;white-space:nowrap">Sesi:</label>
+                            <input type="number"
+                                   class="form-control form-control-sm sesi-input"
+                                   data-subject="{{ $prog }}"
+                                   data-idx="{{ $idx }}"
+                                   value="{{ $defaultSesi }}"
+                                   min="1" max="999"
+                                   oninput="recalcTotal()"
+                                   style="width:75px;font-size:.85rem;font-weight:600;text-align:center">
+                        </div>
+                    </div>
                     @endforeach
                 </div>
-                <div class="text-muted mt-2" style="font-size:.72rem"><i class="bi bi-info-circle me-1"></i>Program yang dipilih siswa saat mendaftar</div>
+                <div class="d-flex align-items-center justify-content-between mt-3 pt-2" style="border-top:1px solid var(--card-border)">
+                    <span class="text-muted" style="font-size:.72rem"><i class="bi bi-info-circle me-1"></i>Total sesi dihitung otomatis dari semua mata pelajaran</span>
+                    <span class="fw-bold" style="font-size:.82rem;color:var(--primary)">
+                        Total: <span id="totalSesiSum">{{ array_sum(array_values(array_intersect_key(array_merge(array_fill_keys($allInterests, 8), $savedSessions), array_fill_keys($allInterests, true)))) ?: count($allInterests) * 8 }}</span> sesi
+                    </span>
+                </div>
             </div>
             @endif
 
@@ -226,13 +248,8 @@
                             </div>
                         </div>
 
-                        {{-- Freelance: inputs for biaya per sesi --}}
+                        {{-- Freelance: biaya per sesi (uses total from subject inputs above) --}}
                         <div id="infoFreelance" class="d-none">
-                            <div class="mb-2">
-                                <label class="form-label fw-semibold" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Jumlah Sesi</label>
-                                <input type="number" id="totalSessions" name="total_sessions" class="form-control form-control-sm"
-                                       placeholder="0" min="1" value="8" oninput="recalcTotal()" style="max-width:120px">
-                            </div>
                             <div class="row g-3 align-items-end">
                                 <div class="col-6">
                                     <label class="form-label fw-semibold" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">
@@ -249,7 +266,7 @@
                                     <label class="form-label fw-semibold" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Total Biaya (Otomatis)</label>
                                     <div class="p-2 rounded-2 d-flex align-items-center justify-content-between"
                                          style="background:var(--card-bg);border:1px solid var(--card-border);min-height:38px">
-                                        <span id="totalSesiLabel" class="text-muted" style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em">TOTAL (8 SESI)</span>
+                                        <span id="totalSesiLabel" class="text-muted" style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em">TOTAL</span>
                                         <span id="totalSesiDisplay" class="fw-bold text-primary" style="font-size:.92rem">Rp 0</span>
                                     </div>
                                 </div>
@@ -334,6 +351,7 @@
     <input type="hidden" name="total_biaya"     id="fs_total_biaya">
     <input type="hidden" name="biaya_per_sesi"  id="fs_biaya_per_sesi">
     <input type="hidden" name="total_sessions"  id="fs_total_sessions">
+    <div id="fs_interest_sessions_container"></div>
 </form>
 
 <form method="POST" action="{{ route('admin.registration-list.mark-lunas', $registration->id) }}" id="formLunas" style="display:none">
@@ -342,18 +360,48 @@
     <input type="hidden" name="total_biaya"     id="fl_total_biaya">
     <input type="hidden" name="biaya_per_sesi"  id="fl_biaya_per_sesi">
     <input type="hidden" name="total_sessions"  id="fl_total_sessions">
+    <div id="fl_interest_sessions_container"></div>
 </form>
 
 <script>
+function getTotalSesiFromInputs() {
+    let total = 0;
+    document.querySelectorAll('.sesi-input').forEach(inp => {
+        total += parseInt(inp.value || 0);
+    });
+    return total;
+}
+
+function getInterestSessions() {
+    const result = {};
+    document.querySelectorAll('.sesi-input').forEach(inp => {
+        const subj = inp.dataset.subject;
+        if (subj) result[subj] = parseInt(inp.value || 0);
+    });
+    return result;
+}
+
+function injectInterestSessionsIntoForm(containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    const sessions = getInterestSessions();
+    Object.entries(sessions).forEach(([subj, cnt]) => {
+        const inp = document.createElement('input');
+        inp.type  = 'hidden';
+        inp.name  = 'interest_sessions[' + subj + ']';
+        inp.value = cnt;
+        container.appendChild(inp);
+    });
+}
+
 function onTeacherChange(sel) {
     const opt = sel.options[sel.selectedIndex];
-    const infoCard   = document.getElementById('teacherInfoCard');
-    const infoFree   = document.getElementById('infoFreelance');
+    const infoCard = document.getElementById('teacherInfoCard');
+    const infoFree = document.getElementById('infoFreelance');
 
     if (!opt.value) { infoCard.classList.add('d-none'); return; }
 
     const jenis    = opt.dataset.jenis || 'kontrak';
-    const salary   = parseFloat(opt.dataset.salary || 0);
     const name     = opt.dataset.name || '';
     const subjects = opt.dataset.subjects || '';
 
@@ -372,19 +420,21 @@ function onTeacherChange(sel) {
 }
 
 function recalcTotal() {
-    const bps   = parseFloat(document.getElementById('biayaPerSesi').value || 0);
-    const sesi  = parseInt(document.getElementById('totalSessions').value || 0);
+    const bps   = parseFloat(document.getElementById('biayaPerSesi')?.value || 0);
+    const sesi  = getTotalSesiFromInputs();
     const total = bps * sesi;
-    document.getElementById('totalSesiLabel').textContent   = 'TOTAL (' + (sesi || 0) + ' SESI)';
+    const sumEl = document.getElementById('totalSesiSum');
+    if (sumEl) sumEl.textContent = sesi;
+    document.getElementById('totalSesiLabel').textContent   = 'TOTAL (' + sesi + ' SESI)';
     document.getElementById('totalSesiDisplay').textContent = 'Rp ' + total.toLocaleString('id-ID');
-    document.getElementById('totalBiaya').value = total > 0 ? total : '';
+    if (bps > 0) document.getElementById('totalBiaya').value = total > 0 ? total : '';
 }
 
 function collectForm() {
-    const teacherId   = document.getElementById('teacherSelect').value;
-    const totalBiaya  = document.getElementById('totalBiaya').value;
-    const biayaSesi   = document.getElementById('biayaPerSesi')?.value || '';
-    const totalSesi   = document.getElementById('totalSessions')?.value || '';
+    const teacherId  = document.getElementById('teacherSelect').value;
+    const totalBiaya = document.getElementById('totalBiaya').value;
+    const biayaSesi  = document.getElementById('biayaPerSesi')?.value || '';
+    const totalSesi  = getTotalSesiFromInputs();
 
     if (!teacherId) { showToast('Pilih guru terlebih dahulu.', 'error'); return null; }
     if (!totalBiaya || parseFloat(totalBiaya) < 0) { showToast('Masukkan total biaya program.', 'error'); return null; }
@@ -405,6 +455,7 @@ function submitAction(action) {
         document.getElementById(prefix + '_total_biaya').value   = data.totalBiaya;
         document.getElementById(prefix + '_biaya_per_sesi').value = data.biayaSesi;
         document.getElementById(prefix + '_total_sessions').value = data.totalSesi;
+        injectInterestSessionsIntoForm(prefix + '_interest_sessions_container');
 
         document.getElementById(formId).submit();
     }, null, {
@@ -420,5 +471,11 @@ function confirmReject() {
         document.getElementById('rejectForm').submit();
     }, null, { title: 'Tolak Pendaftaran', okText: '<i class="bi bi-x-circle me-1"></i>Tolak', btnClass: 'btn-danger' });
 }
+
+// Init: update total sesi display on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const sumEl = document.getElementById('totalSesiSum');
+    if (sumEl) sumEl.textContent = getTotalSesiFromInputs();
+});
 </script>
 @endsection

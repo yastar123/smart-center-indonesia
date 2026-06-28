@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Siswa;
 use App\Http\Controllers\Controller;
 use App\Models\ScheduleProposal;
 use App\Models\Student;
+use App\Models\StudentRegistration;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -121,6 +122,12 @@ class KelasController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        return view('siswa.kelas.index', compact('paginator', 'student'));
+        // Get registration with interest_sessions for display
+        $registration = StudentRegistration::where('student_id', $student->id)
+            ->whereNotNull('interest_sessions')
+            ->latest()
+            ->first();
+
+        return view('siswa.kelas.index', compact('paginator', 'student', 'registration'));
     }
 }
