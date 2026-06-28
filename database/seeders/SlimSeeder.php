@@ -21,6 +21,7 @@ use App\Models\Salary;
 use App\Models\Announcement;
 use App\Models\Tryout;
 use App\Models\Certificate;
+use App\Models\StudentRegistration;
 
 class SlimSeeder extends Seeder
 {
@@ -340,6 +341,37 @@ class SlimSeeder extends Seeder
             'branch_id' => $cabangA->id, 'subjects' => ['Matematika'],
             'status' => 'aktif', 'salary_base' => 4500000, 'jenis_guru' => 'tetap',
         ]);
+
+        // ── 2 PENDAFTARAN SISWA BARU (untuk dashboard Siswa Terbaru Mendaftar) ── //
+        try { DB::table('student_registrations')->truncate(); } catch (\Exception $e) {}
+
+        StudentRegistration::create([
+            'no_reg'           => 'REG-2025-0001',
+            'name'             => 'Rizal Maulana',
+            'phone'            => '081298765401',
+            'gender'           => 'L',
+            'education_level'  => 'SMA',
+            'status'           => 'pending',
+            'branch'           => $cabangA->name,
+            'interests'        => ['Matematika', 'Fisika'],
+            'interest_sessions' => ['Matematika' => 8, 'Fisika' => 8],
+            'notes'            => 'Ingin mempersiapkan SNBT tahun depan.',
+        ]);
+
+        StudentRegistration::create([
+            'no_reg'           => 'REG-2025-0002',
+            'name'             => 'Nadia Putri Utami',
+            'phone'            => '082198765402',
+            'gender'           => 'P',
+            'education_level'  => 'SMP',
+            'status'           => 'verified',
+            'branch'           => $cabangA->name,
+            'interests'        => ['Bahasa Inggris'],
+            'interest_sessions' => ['Bahasa Inggris' => 8],
+            'notes'            => 'Perlu persiapan ujian sekolah.',
+        ]);
+
+        $this->command->info('  ✅ 2 Pendaftaran siswa baru');
 
         $this->command->info('✅ SlimSeeder selesai! ' . PHP_EOL .
             '   Owner: adminpusatsci@akademi.com / password' . PHP_EOL .

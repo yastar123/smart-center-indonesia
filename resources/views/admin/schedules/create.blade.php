@@ -73,8 +73,8 @@ $teacherStatsBase      = '/admin/schedules/teacher';
         <select name="mata_pelajaran_id" id="mata_pelajaran_id" class="form-select" required onchange="onCourseChange(this.value)">
             <option value="">— Pilih Mata Pelajaran —</option>
             @foreach($courses as $c)
-            <option value="{{ $c->id }}" data-kategori="{{ $c->kategori ?? '' }}" {{ old('mata_pelajaran_id') == $c->id ? 'selected' : '' }}>
-                {{ $c->nama }}{{ $c->kategori ? ' ('.$c->kategori.')' : '' }}
+            <option value="{{ $c->id }}" {{ old('mata_pelajaran_id') == $c->id ? 'selected' : '' }}>
+                {{ $c->nama }}
             </option>
             @endforeach
         </select>

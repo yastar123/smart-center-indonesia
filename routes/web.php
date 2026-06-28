@@ -286,16 +286,34 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
 
         // AJAX: students by subject/course with remaining session count per subject
         Route::get('/schedules/subject/{course}/students', function(\App\Models\Course $course) {
-            // Get all package IDs that include this course
-            $packageIds = \DB::table('package_course')
-                ->where('course_id', $course->id)
-                ->pluck('package_id');
+            // Find students via class enrollment: school_classes (mata_pelajaran_id) → class_students → students
+            $classIds = \App\Models\SchoolClass::where('mata_pelajaran_id', $course->id)
+                ->where('cabang_id', $course->cabang_id)
+                ->pluck('id');
 
-            // Get active students enrolled in those packages
-            $students = \App\Models\Student::whereIn('package_id', $packageIds)
-                ->where('status', 'aktif')
-                ->orderBy('name')
-                ->get(['id', 'name', 'nis', 'total_sesi', 'package_id']);
+            $studentIdsViaClass = \DB::table('class_students')
+                ->whereIn('class_id', $classIds)
+                ->pluck('student_id');
+
+            // Also check student_course_payments (direct course enrollment)
+            $studentIdsViaCourse = \DB::table('student_course_payments')
+                ->where('course_id', $course->id)
+                ->pluck('student_id');
+
+            $allStudentIds = $studentIdsViaClass->merge($studentIdsViaCourse)->unique()->values();
+
+            if ($allStudentIds->isEmpty()) {
+                // Fallback: all active students in the same branch
+                $students = \App\Models\Student::where('cabang_id', $course->cabang_id)
+                    ->where('status', 'aktif')
+                    ->orderBy('name')
+                    ->get(['id', 'name', 'nis', 'total_sesi', 'package_id', 'cabang_id']);
+            } else {
+                $students = \App\Models\Student::whereIn('id', $allStudentIds)
+                    ->where('status', 'aktif')
+                    ->orderBy('name')
+                    ->get(['id', 'name', 'nis', 'total_sesi', 'package_id', 'cabang_id']);
+            }
 
             $result = $students->map(function ($s) use ($course) {
                 // Sessions used for this specific subject
