@@ -789,26 +789,6 @@ function pickProgram(val, el) {
         document.getElementById('tempat_belajar').value = 'kantor';
     }
 
-    filterProgramDiminati(val);
-}
-
-function filterProgramDiminati(val) {
-    const kursusOnly = ['komputer', 'bahasa'];
-    kursusOnly.forEach(jenis => {
-        const section = document.getElementById('section-' + jenis);
-        if (!section) return;
-        if (val === 'kelas') {
-            section.style.display = 'none';
-            section.querySelectorAll('input[type=checkbox]').forEach(cb => { cb.checked = false; });
-            section.querySelectorAll('.check-pill').forEach(p => p.classList.remove('selected'));
-            const accBody = section.querySelector('.accordion-body');
-            const accHead = section.querySelector('.accordion-cat');
-            if (accBody) accBody.classList.remove('open');
-            if (accHead) accHead.classList.remove('open');
-        } else {
-            section.style.display = '';
-        }
-    });
 }
 
 (function initProgramState() {
@@ -818,7 +798,6 @@ function filterProgramDiminati(val) {
         const rumahBtn = document.getElementById('tempatRumahBtn');
         if (rumahBtn) rumahBtn.classList.remove('d-none');
     }
-    filterProgramDiminati(prog.value);
 })();
 
 function togglePill(el) {
