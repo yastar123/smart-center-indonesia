@@ -300,29 +300,35 @@
 {{-- Hidden forms for POST actions --}}
 <form method="POST" action="{{ route('admin.registration-list.send-invoice', $registration->id) }}" id="formSend" style="display:none">
     @csrf
-    <input type="hidden" name="teacher_id"     id="fs_teacher_id">
     <input type="hidden" name="total_biaya"     id="fs_total_biaya">
     <input type="hidden" name="biaya_per_sesi"  id="fs_biaya_per_sesi">
     <input type="hidden" name="total_sessions"  id="fs_total_sessions">
     <div id="fs_interest_sessions_container"></div>
+    <div id="fs_interest_teachers_container"></div>
 </form>
 
 <form method="POST" action="{{ route('admin.registration-list.mark-lunas', $registration->id) }}" id="formLunas" style="display:none">
     @csrf
-    <input type="hidden" name="teacher_id"     id="fl_teacher_id">
     <input type="hidden" name="total_biaya"     id="fl_total_biaya">
     <input type="hidden" name="biaya_per_sesi"  id="fl_biaya_per_sesi">
     <input type="hidden" name="total_sessions"  id="fl_total_sessions">
     <div id="fl_interest_sessions_container"></div>
+    <div id="fl_interest_teachers_container"></div>
 </form>
 
 <script>
+/* ── helpers ─────────────────────────────────────────── */
 function getTotalSesiFromInputs() {
     let total = 0;
     document.querySelectorAll('.sesi-input').forEach(inp => {
         total += parseInt(inp.value || 0);
     });
     return total;
+}
+
+function recalcSesiTotal() {
+    const sumEl = document.getElementById('totalSesiSum');
+    if (sumEl) sumEl.textContent = getTotalSesiFromInputs();
 }
 
 function getInterestSessions() {
@@ -334,11 +340,20 @@ function getInterestSessions() {
     return result;
 }
 
+/* Collect per-subject teacher selections: { subject: teacher_id } */
+function getInterestTeachers() {
+    const result = {};
+    document.querySelectorAll('.guru-select').forEach(sel => {
+        const subj = sel.dataset.subject;
+        if (subj && sel.value) result[subj] = parseInt(sel.value);
+    });
+    return result;
+}
+
 function injectInterestSessionsIntoForm(containerId) {
     const container = document.getElementById(containerId);
     container.innerHTML = '';
-    const sessions = getInterestSessions();
-    Object.entries(sessions).forEach(([subj, cnt]) => {
+    Object.entries(getInterestSessions()).forEach(([subj, cnt]) => {
         const inp = document.createElement('input');
         inp.type  = 'hidden';
         inp.name  = 'interest_sessions[' + subj + ']';
@@ -347,74 +362,63 @@ function injectInterestSessionsIntoForm(containerId) {
     });
 }
 
-function onTeacherChange(sel) {
-    const opt = sel.options[sel.selectedIndex];
-    const infoCard = document.getElementById('teacherInfoCard');
-    const infoFree = document.getElementById('infoFreelance');
-
-    if (!opt.value) { infoCard.classList.add('d-none'); return; }
-
-    const jenis    = opt.dataset.jenis || 'kontrak';
-    const name     = opt.dataset.name || '';
-    const subjects = opt.dataset.subjects || '';
-
-    infoCard.classList.remove('d-none');
-    document.getElementById('teacherName').textContent     = name;
-    document.getElementById('teacherJenis').textContent    = jenis.charAt(0).toUpperCase() + jenis.slice(1);
-    document.getElementById('teacherSubjects').textContent = subjects || 'Semua Mapel';
-    document.getElementById('teacherAvatar').textContent   = name.charAt(0).toUpperCase();
-
-    if (jenis.toLowerCase() === 'freelance') {
-        infoFree.classList.remove('d-none');
-        recalcTotal();
-    } else {
-        infoFree.classList.add('d-none');
-    }
+function injectInterestTeachersIntoForm(containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    Object.entries(getInterestTeachers()).forEach(([subj, tid]) => {
+        const inp = document.createElement('input');
+        inp.type  = 'hidden';
+        inp.name  = 'interest_teachers[' + subj + ']';
+        inp.value = tid;
+        container.appendChild(inp);
+    });
 }
 
-function recalcTotal() {
-    const bps   = parseFloat(document.getElementById('biayaPerSesi')?.value || 0);
-    const sesi  = getTotalSesiFromInputs();
-    const total = bps * sesi;
-    const sumEl = document.getElementById('totalSesiSum');
-    if (sumEl) sumEl.textContent = sesi;
-    document.getElementById('totalSesiLabel').textContent   = 'TOTAL (' + sesi + ' SESI)';
-    document.getElementById('totalSesiDisplay').textContent = 'Rp ' + total.toLocaleString('id-ID');
-    if (bps > 0) document.getElementById('totalBiaya').value = total > 0 ? total : '';
-}
-
+/* ── validation & submit ─────────────────────────────── */
 function collectForm() {
-    const teacherId  = document.getElementById('teacherSelect').value;
-    const totalBiaya = document.getElementById('totalBiaya').value;
-    const biayaSesi  = document.getElementById('biayaPerSesi')?.value || '';
-    const totalSesi  = getTotalSesiFromInputs();
+    const totalBiaya  = document.getElementById('totalBiaya').value;
+    const totalSesi   = getTotalSesiFromInputs();
 
-    if (!teacherId) { showToast('Pilih guru terlebih dahulu.', 'error'); return null; }
-    if (!totalBiaya || parseFloat(totalBiaya) < 0) { showToast('Masukkan total biaya program.', 'error'); return null; }
+    if (!totalBiaya || parseFloat(totalBiaya) < 0) {
+        showToast('Masukkan total biaya program.', 'error');
+        return null;
+    }
 
-    return { teacherId, totalBiaya, biayaSesi, totalSesi };
+    /* Warn (not block) if any subject has no guru assigned */
+    const selects  = document.querySelectorAll('.guru-select');
+    const noGuru   = [...selects].filter(s => !s.value);
+    if (selects.length > 0 && noGuru.length === selects.length) {
+        showToast('Pilih minimal satu guru untuk mata pelajaran.', 'error');
+        return null;
+    }
+
+    return { totalBiaya, totalSesi };
 }
 
 function submitAction(action) {
     const data = collectForm();
     if (!data) return;
 
-    const label = action === 'send' ? 'Kirim invoice ke siswa' : 'Tandai pembayaran sebagai <strong>Lunas</strong>';
-    confirmAction(label + '?', function() {
-        const formId = action === 'send' ? 'formSend' : 'formLunas';
-        const prefix = action === 'send' ? 'fs' : 'fl';
+    const label = action === 'send'
+        ? 'Kirim invoice ke siswa'
+        : 'Tandai pembayaran sebagai <strong>Lunas</strong>';
 
-        document.getElementById(prefix + '_teacher_id').value    = data.teacherId;
-        document.getElementById(prefix + '_total_biaya').value   = data.totalBiaya;
-        document.getElementById(prefix + '_biaya_per_sesi').value = data.biayaSesi;
+    confirmAction(label + '?', function() {
+        const formId = action === 'send' ? 'formSend'  : 'formLunas';
+        const prefix = action === 'send' ? 'fs'        : 'fl';
+
+        document.getElementById(prefix + '_total_biaya').value    = data.totalBiaya;
+        document.getElementById(prefix + '_biaya_per_sesi').value = '';
         document.getElementById(prefix + '_total_sessions').value = data.totalSesi;
+
         injectInterestSessionsIntoForm(prefix + '_interest_sessions_container');
+        injectInterestTeachersIntoForm(prefix + '_interest_teachers_container');
 
         document.getElementById(formId).submit();
     }, null, {
-        title: action === 'send' ? 'Kirim Invoice' : 'Tandai Lunas',
-        okText: action === 'send' ? '<i class="bi bi-send me-1"></i>Kirim Invoice' : '<i class="bi bi-check-circle me-1"></i>Lunas',
-        btnClass: action === 'send' ? 'btn-primary' : 'btn-success',
+        title:    action === 'send' ? 'Kirim Invoice'                       : 'Tandai Lunas',
+        okText:   action === 'send' ? '<i class="bi bi-send me-1"></i>Kirim Invoice' : '<i class="bi bi-check-circle me-1"></i>Lunas',
+        btnClass: action === 'send' ? 'btn-primary'                         : 'btn-success',
         type: 'warning'
     });
 }
@@ -425,10 +429,9 @@ function confirmReject() {
     }, null, { title: 'Tolak Pendaftaran', okText: '<i class="bi bi-x-circle me-1"></i>Tolak', btnClass: 'btn-danger' });
 }
 
-// Init: update total sesi display on page load
+/* ── init ────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
-    const sumEl = document.getElementById('totalSesiSum');
-    if (sumEl) sumEl.textContent = getTotalSesiFromInputs();
+    recalcSesiTotal();
 });
 </script>
 @endsection
