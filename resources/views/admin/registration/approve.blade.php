@@ -167,132 +167,85 @@
                 </div>
             </div>
 
-            {{-- Program Diminati + Sesi per Mata Pelajaran --}}
+            {{-- Mata Pelajaran: Guru & Sesi per Mapel --}}
             @php
-                $allInterests = $registration->interests ?? [];
+                $allInterests   = $registration->interests ?? [];
                 if (empty($allInterests) && $registration->program) {
                     $allInterests = [$registration->program];
                 }
-                $savedSessions = $registration->interest_sessions ?? [];
+                $savedSessions  = $registration->interest_sessions ?? [];
+                $savedTeachers  = $registration->interest_teachers ?? [];
+                $teachersById   = $teachers->keyBy('id');
             @endphp
             @if(!empty($allInterests))
             <div class="mb-4 p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
                 <div class="fw-semibold mb-3" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">
-                    <i class="bi bi-bookmark-star me-1" style="color:var(--primary)"></i>Mata Pelajaran & Jumlah Sesi
+                    <i class="bi bi-bookmark-star me-1" style="color:var(--primary)"></i>Mata Pelajaran — Guru &amp; Jumlah Sesi
                 </div>
                 <div class="d-flex flex-column gap-2">
                     @foreach($allInterests as $idx => $prog)
-                    @php $defaultSesi = $savedSessions[$prog] ?? 8; @endphp
-                    <div class="d-flex align-items-center gap-3 p-2 rounded-2" style="background:var(--card-bg);border:1px solid var(--card-border)">
-                        <div class="d-flex align-items-center gap-2 flex-grow-1" style="min-width:0">
-                            <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#260632,#c84ddf);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;color:white;font-weight:700">
+                    @php
+                        $defaultSesi    = $savedSessions[$prog] ?? 8;
+                        $defaultTeacher = $savedTeachers[$prog] ?? null;
+                    @endphp
+                    <div class="p-2 rounded-2" style="background:var(--card-bg);border:1px solid var(--card-border)">
+                        {{-- Subject label --}}
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div style="width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#260632,#c84ddf);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.68rem;color:white;font-weight:700">
                                 {{ $idx + 1 }}
                             </div>
-                            <span class="fw-semibold text-truncate" style="font-size:.83rem;color:var(--text-primary)">{{ $prog }}</span>
+                            <span class="fw-semibold" style="font-size:.85rem;color:var(--text-primary)">{{ $prog }}</span>
                         </div>
-                        <div class="d-flex align-items-center gap-2 flex-shrink-0">
-                            <label class="text-muted mb-0" style="font-size:.72rem;white-space:nowrap">Sesi:</label>
-                            <input type="number"
-                                   class="form-control form-control-sm sesi-input"
-                                   data-subject="{{ $prog }}"
-                                   data-idx="{{ $idx }}"
-                                   value="{{ $defaultSesi }}"
-                                   min="1" max="999"
-                                   oninput="recalcTotal()"
-                                   style="width:75px;font-size:.85rem;font-weight:600;text-align:center">
+                        {{-- Guru + Sesi row --}}
+                        <div class="d-flex gap-2 align-items-center">
+                            <div class="flex-grow-1">
+                                <select class="form-select form-select-sm guru-select"
+                                        data-subject="{{ $prog }}"
+                                        style="font-size:.82rem">
+                                    <option value="">— Pilih Guru —</option>
+                                    @foreach($teachers as $teacher)
+                                    <option value="{{ $teacher->id }}"
+                                            {{ $defaultTeacher == $teacher->id ? 'selected' : '' }}>
+                                        {{ $teacher->name }}@if($teacher->jenis_guru) ({{ ucfirst($teacher->jenis_guru) }})@endif
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div style="flex-shrink:0">
+                                <div class="input-group input-group-sm" style="width:100px">
+                                    <span class="input-group-text" style="font-size:.72rem;padding:4px 7px;background:var(--input-bg);border-color:var(--card-border);color:var(--text-muted)">Sesi</span>
+                                    <input type="number"
+                                           class="form-control form-control-sm sesi-input"
+                                           data-subject="{{ $prog }}"
+                                           value="{{ $defaultSesi }}"
+                                           min="1" max="999"
+                                           oninput="recalcSesiTotal()"
+                                           style="font-size:.85rem;font-weight:600;text-align:center;background:var(--input-bg);color:var(--text-primary);border-color:var(--card-border)">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     @endforeach
                 </div>
                 <div class="d-flex align-items-center justify-content-between mt-3 pt-2" style="border-top:1px solid var(--card-border)">
-                    <span class="text-muted" style="font-size:.72rem"><i class="bi bi-info-circle me-1"></i>Total sesi dihitung otomatis dari semua mata pelajaran</span>
+                    <span class="text-muted" style="font-size:.72rem"><i class="bi bi-info-circle me-1"></i>Setiap mata pelajaran bisa memiliki guru berbeda</span>
                     <span class="fw-bold" style="font-size:.82rem;color:var(--primary)">
-                        Total: <span id="totalSesiSum">{{ array_sum(array_values(array_intersect_key(array_merge(array_fill_keys($allInterests, 8), $savedSessions), array_fill_keys($allInterests, true)))) ?: count($allInterests) * 8 }}</span> sesi
+                        Total: <span id="totalSesiSum">0</span> sesi
                     </span>
                 </div>
             </div>
             @endif
 
-            <form id="approveForm">
-                @csrf
-
-                {{-- Pilih Guru --}}
-                <div class="mb-4">
-                    <label class="form-label fw-semibold" style="font-size:.85rem">Pilih Guru <span class="text-danger">*</span></label>
-                    <select id="teacherSelect" name="teacher_id" class="form-select" onchange="onTeacherChange(this)" required>
-                        <option value="">— Pilih Guru —</option>
-                        @foreach($teachers as $teacher)
-                        <option value="{{ $teacher->id }}"
-                                data-jenis="{{ $teacher->jenis_guru ?? 'kontrak' }}"
-                                data-salary="{{ $teacher->salary_base ?? 0 }}"
-                                data-name="{{ $teacher->name }}"
-                                data-subjects="{{ implode(', ', $teacher->subjects ?? []) }}">
-                            {{ $teacher->name }}
-                            @if($teacher->jenis_guru) — <span style="text-transform:capitalize">{{ $teacher->jenis_guru }}</span>@endif
-                        </option>
-                        @endforeach
-                    </select>
+            {{-- Total Biaya Program --}}
+            <div class="mb-2">
+                <label class="form-label fw-semibold" style="font-size:.85rem">Total Biaya Program (Rp) <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text fw-semibold" style="font-size:.85rem">Rp</span>
+                    <input type="number" id="totalBiaya" class="form-control fw-semibold"
+                           placeholder="0" min="0" style="font-size:.95rem">
                 </div>
-
-                {{-- Teacher Info Card (dynamic) --}}
-                <div id="teacherInfoCard" class="d-none mb-4">
-                    <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
-                        <div class="d-flex align-items-center gap-3 mb-3">
-                            <div id="teacherAvatar" class="rounded-circle d-flex align-items-center justify-content-center fw-bold"
-                                 style="width:44px;height:44px;background:linear-gradient(135deg,#260632,#c84ddf);color:white;font-size:.9rem;flex-shrink:0">
-                            </div>
-                            <div>
-                                <div id="teacherName" class="fw-semibold" style="font-size:.9rem"></div>
-                                <div id="teacherJenis" class="text-muted" style="font-size:.75rem"></div>
-                                <div id="teacherSubjects" class="text-muted" style="font-size:.72rem"></div>
-                            </div>
-                        </div>
-
-                        {{-- Freelance: biaya per sesi (uses total from subject inputs above) --}}
-                        <div id="infoFreelance" class="d-none">
-                            <div class="row g-3 align-items-end">
-                                <div class="col-6">
-                                    <label class="form-label fw-semibold" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">
-                                        Biaya Per Sesi (Rp) <span class="text-danger">*</span>
-                                    </label>
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text" style="font-size:.82rem;color:var(--text-muted);background:var(--input-bg);border-color:var(--card-border)">Rp</span>
-                                        <input type="number" id="biayaPerSesi" name="biaya_per_sesi" class="form-control"
-                                               placeholder="0" min="0" oninput="recalcTotal()"
-                                               style="font-size:.88rem;background:var(--input-bg);color:var(--text-primary);border-color:var(--card-border)">
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-label fw-semibold" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Total Biaya (Otomatis)</label>
-                                    <div class="p-2 rounded-2 d-flex align-items-center justify-content-between"
-                                         style="background:var(--card-bg);border:1px solid var(--card-border);min-height:38px">
-                                        <span id="totalSesiLabel" class="text-muted" style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em">TOTAL</span>
-                                        <span id="totalSesiDisplay" class="fw-bold text-primary" style="font-size:.92rem">Rp 0</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Total Biaya Program --}}
-                <div class="mb-4">
-                    <label class="form-label fw-semibold" style="font-size:.85rem">Total Biaya Program (Rp) <span class="text-danger">*</span></label>
-                    <div class="input-group">
-                        <span class="input-group-text fw-semibold" style="font-size:.85rem">Rp</span>
-                        <input type="number" id="totalBiaya" name="total_biaya" class="form-control fw-semibold"
-                               placeholder="0" min="0" required style="font-size:.95rem">
-                    </div>
-                    <div class="form-text">Nominal yang akan ditagihkan kepada siswa.</div>
-                </div>
-
-                {{-- HIDDEN fields for form submission --}}
-                <input type="hidden" id="h_teacher_id" name="teacher_id">
-                <input type="hidden" id="h_biaya_per_sesi" name="biaya_per_sesi">
-                <input type="hidden" id="h_total_sessions" name="total_sessions">
-                <input type="hidden" id="h_total_biaya" name="total_biaya">
-
-            </form>
+                <div class="form-text">Nominal yang akan ditagihkan kepada siswa.</div>
+            </div>
         </div>
 
         {{-- ACTION BUTTONS --}}

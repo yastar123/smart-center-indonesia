@@ -76,12 +76,14 @@ class RegistrationListController extends Controller
     public function sendInvoice(Request $request, StudentRegistration $registration)
     {
         $request->validate([
-            'teacher_id'         => 'required|exists:teachers,id',
-            'total_biaya'        => 'required|numeric|min:0',
-            'total_sessions'     => 'nullable|integer|min:1',
-            'biaya_per_sesi'     => 'nullable|numeric|min:0',
-            'interest_sessions'  => 'nullable|array',
-            'interest_sessions.*'=> 'nullable|integer|min:0',
+            'teacher_id'          => 'nullable|exists:teachers,id',
+            'total_biaya'         => 'required|numeric|min:0',
+            'total_sessions'      => 'nullable|integer|min:1',
+            'biaya_per_sesi'      => 'nullable|numeric|min:0',
+            'interest_sessions'   => 'nullable|array',
+            'interest_sessions.*' => 'nullable|integer|min:0',
+            'interest_teachers'   => 'nullable|array',
+            'interest_teachers.*' => 'nullable|exists:teachers,id',
         ]);
 
         if (!$registration->student_id) {
@@ -90,7 +92,14 @@ class RegistrationListController extends Controller
 
         DB::beginTransaction();
         try {
-            $teacher   = Teacher::find($request->teacher_id);
+            $interestTeachers = null;
+            if ($request->filled('interest_teachers') && is_array($request->interest_teachers)) {
+                $interestTeachers = array_map('intval', array_filter($request->interest_teachers, fn($v) => $v !== null && $v !== ''));
+            }
+            $primaryTeacherId = $request->teacher_id
+                ?? ($interestTeachers ? array_values($interestTeachers)[0] : null);
+
+            $teacher   = Teacher::find($primaryTeacherId);
             $totalBiaya = (float) $request->total_biaya;
 
             // Generate invoice number
@@ -125,10 +134,11 @@ class RegistrationListController extends Controller
             $totalSessions = $interestSessions ? array_sum($interestSessions) : ($request->total_sessions ?? null);
 
             $registration->update([
-                'assigned_teacher_id' => $request->teacher_id,
+                'assigned_teacher_id' => $primaryTeacherId,
                 'biaya_per_sesi'      => $request->biaya_per_sesi ?? null,
                 'total_sessions'      => $totalSessions,
                 'interest_sessions'   => $interestSessions,
+                'interest_teachers'   => $interestTeachers,
                 'total_biaya'         => $totalBiaya,
                 'invoice_id'          => $invoice->id,
                 'payment_status'      => 'belum_bayar',
@@ -147,12 +157,14 @@ class RegistrationListController extends Controller
     public function markLunas(Request $request, StudentRegistration $registration)
     {
         $request->validate([
-            'teacher_id'         => 'required|exists:teachers,id',
-            'total_biaya'        => 'required|numeric|min:0',
-            'total_sessions'     => 'nullable|integer|min:1',
-            'biaya_per_sesi'     => 'nullable|numeric|min:0',
-            'interest_sessions'  => 'nullable|array',
-            'interest_sessions.*'=> 'nullable|integer|min:0',
+            'teacher_id'          => 'nullable|exists:teachers,id',
+            'total_biaya'         => 'required|numeric|min:0',
+            'total_sessions'      => 'nullable|integer|min:1',
+            'biaya_per_sesi'      => 'nullable|numeric|min:0',
+            'interest_sessions'   => 'nullable|array',
+            'interest_sessions.*' => 'nullable|integer|min:0',
+            'interest_teachers'   => 'nullable|array',
+            'interest_teachers.*' => 'nullable|exists:teachers,id',
         ]);
 
         if (!$registration->student_id) {
@@ -161,6 +173,13 @@ class RegistrationListController extends Controller
 
         DB::beginTransaction();
         try {
+            $interestTeachersLunas = null;
+            if ($request->filled('interest_teachers') && is_array($request->interest_teachers)) {
+                $interestTeachersLunas = array_map('intval', array_filter($request->interest_teachers, fn($v) => $v !== null && $v !== ''));
+            }
+            $primaryTeacherIdLunas = $request->teacher_id
+                ?? ($interestTeachersLunas ? array_values($interestTeachersLunas)[0] : null);
+
             $totalBiaya = (float) $request->total_biaya;
 
             $year  = date('Y');
@@ -194,10 +213,11 @@ class RegistrationListController extends Controller
             $totalSessions = $interestSessions ? array_sum($interestSessions) : ($request->total_sessions ?? null);
 
             $registration->update([
-                'assigned_teacher_id' => $request->teacher_id,
+                'assigned_teacher_id' => $primaryTeacherIdLunas,
                 'biaya_per_sesi'      => $request->biaya_per_sesi ?? null,
                 'total_sessions'      => $totalSessions,
                 'interest_sessions'   => $interestSessions,
+                'interest_teachers'   => $interestTeachersLunas,
                 'total_biaya'         => $totalBiaya,
                 'invoice_id'          => $invoice->id,
                 'payment_status'      => 'lunas',
