@@ -508,7 +508,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Kategori Peserta Didik</label>
-                            <select name="education_level" id="education_level" class="form-select" onchange="handleEducationLevel(this.value)">
+                            <select name="education_level" id="education_level" class="form-select">
                                 <option value="">-- Pilih Kategori --</option>
                                 <option value="Pra Sekolah (PAUD/TK)" {{ old('education_level')=='Pra Sekolah (PAUD/TK)'?'selected':'' }}>Pra Sekolah (PAUD/TK)</option>
                                 <option value="Sekolah Dasar (SD)" {{ old('education_level')=='Sekolah Dasar (SD)'?'selected':'' }}>Sekolah Dasar (SD)</option>
@@ -519,25 +519,6 @@
                             </select>
                         </div>
 
-                        {{-- Parent fields shown inline when Pra Sekolah is selected --}}
-                        <div id="praSekolahFields" class="col-12 {{ old('education_level')=='Pra Sekolah (PAUD/TK)' ? '' : 'd-none' }}">
-                            <div class="row g-3 p-3 rounded-3" style="background:#fdf4ff;border:1.5px solid #e9d5ff;">
-                                <div class="col-12" style="font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#461256">
-                                    <i class="bi bi-people-fill me-1"></i> Data Orang Tua / Wali
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Nama Orang Tua / Wali <span class="text-danger">*</span></label>
-                                    <input type="text" name="parent_name" id="parent_name_step1" class="form-control" value="{{ old('parent_name') }}" placeholder="Nama lengkap orang tua/wali">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">HP Orang Tua / Wali <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">+62</span>
-                                        <input type="text" name="parent_phone" id="parent_phone_step1" class="form-control" value="{{ old('parent_phone') }}" placeholder="8xxxxxxxxxx">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div class="step-actions">
@@ -967,16 +948,6 @@ document.getElementById('regForm').addEventListener('submit', function() {
     document.getElementById('regBtn').disabled = true;
 });
 
-function handleEducationLevel(val) {
-    const praFields = document.getElementById('praSekolahFields');
-    if (val === 'Pra Sekolah (PAUD/TK)') {
-        praFields.classList.remove('d-none');
-    } else {
-        praFields.classList.add('d-none');
-    }
-}
-// Run on load in case of old() repopulation
-handleEducationLevel(document.getElementById('education_level').value);
 </script>
 </body>
 </html>
