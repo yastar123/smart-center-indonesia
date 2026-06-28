@@ -789,6 +789,20 @@ function pickProgram(val, el) {
         document.getElementById('tempat_belajar').value = 'kantor';
     }
 
+    // Sembunyikan Mata Pelajaran (mapel) saat program belajar = kelas
+    const mapelSection = document.getElementById('section-mapel');
+    if (mapelSection) {
+        if (val === 'kelas') {
+            mapelSection.style.display = 'none';
+            // Uncheck semua checkbox di dalam mapel agar tidak ikut terkirim
+            mapelSection.querySelectorAll('input[type=checkbox]').forEach(cb => {
+                cb.checked = false;
+                cb.closest('label') && cb.closest('label').classList.remove('selected');
+            });
+        } else {
+            mapelSection.style.display = '';
+        }
+    }
 }
 
 (function initProgramState() {
@@ -797,6 +811,11 @@ function pickProgram(val, el) {
     if (prog.value === 'privat') {
         const rumahBtn = document.getElementById('tempatRumahBtn');
         if (rumahBtn) rumahBtn.classList.remove('d-none');
+    }
+    // Terapkan hide mapel sesuai nilai awal
+    const mapelSection = document.getElementById('section-mapel');
+    if (mapelSection && prog.value === 'kelas') {
+        mapelSection.style.display = 'none';
     }
 })();
 
