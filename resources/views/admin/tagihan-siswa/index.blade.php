@@ -38,11 +38,11 @@
     <div class="alert alert-danger alert-dismissible fade show mb-3"><i class="bi bi-x-circle me-2"></i>{{ session('error') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
 @endif
 
-{{-- MAIN TAB NAV --}}
-<ul class="nav nav-pills mb-4 gap-2 fade-up" id="mainTabNav">
+{{-- MAIN 4-TAB NAV --}}
+<ul class="nav nav-pills mb-4 gap-2 flex-wrap fade-up" id="mainTabNav">
     <li class="nav-item">
-        <button class="nav-link {{ request('main_tab') !== 'verifikasi' ? 'active' : '' }}"
-                onclick="switchMainTab('tagihan')" id="btn-main-tagihan"
+        <button class="nav-link {{ !in_array(request('tab'), ['kelas','registrasi','verifikasi']) ? 'active' : '' }}"
+                onclick="switchTab('siswa')" id="btn-tab-siswa"
                 style="border-radius:10px;font-size:14px;padding:8px 18px">
             <i class="bi bi-wallet2 me-2"></i>Tagihan Siswa
             @if($stats['menunggu'] > 0)
@@ -51,8 +51,28 @@
         </button>
     </li>
     <li class="nav-item">
-        <button class="nav-link {{ request('main_tab') === 'verifikasi' ? 'active' : '' }}"
-                onclick="switchMainTab('verifikasi')" id="btn-main-verifikasi"
+        <button class="nav-link {{ request('tab') === 'kelas' ? 'active' : '' }}"
+                onclick="switchTab('kelas')" id="btn-tab-kelas"
+                style="border-radius:10px;font-size:14px;padding:8px 18px">
+            <i class="bi bi-diagram-3 me-2"></i>Tagihan Kelas
+            @if($stats['total'] > 0)
+            <span class="badge ms-1" style="background:rgba(200,77,223,.2);color:#c84ddf">{{ $stats['total'] }}</span>
+            @endif
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link {{ request('tab') === 'registrasi' ? 'active' : '' }}"
+                onclick="switchTab('registrasi')" id="btn-tab-registrasi"
+                style="border-radius:10px;font-size:14px;padding:8px 18px">
+            <i class="bi bi-file-earmark-text me-2"></i>Tagihan Registrasi
+            @if($stats['reg_belum'] > 0)
+            <span class="badge bg-danger ms-1">{{ $stats['reg_belum'] }}</span>
+            @endif
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link {{ request('tab') === 'verifikasi' ? 'active' : '' }}"
+                onclick="switchTab('verifikasi')" id="btn-tab-verifikasi"
                 style="border-radius:10px;font-size:14px;padding:8px 18px">
             <i class="bi bi-shield-check me-2"></i>Verifikasi Pembayaran
             @if(($counts['pending'] ?? 0) + ($pkgCounts['pending'] ?? 0) > 0)
@@ -62,10 +82,8 @@
     </li>
 </ul>
 
-{{-- ══════════════════ PANE 1: TAGIHAN SISWA ══════════════════ --}}
-<div id="pane-main-tagihan" class="{{ request('main_tab') === 'verifikasi' ? 'd-none' : '' }}">
-
-    {{-- STATS --}}
+{{-- ══════════════════ PANE: TAGIHAN SISWA (overview stats) ══════════════════ --}}
+<div id="pane-tab-siswa" class="{{ in_array(request('tab'), ['kelas','registrasi','verifikasi']) ? 'd-none' : '' }}">
     <div class="row g-3 mb-4">
         <div class="col-6 col-lg-2 fade-up">
             <div class="stat-card" style="border-top:3px solid #c84ddf">
@@ -125,36 +143,13 @@
         </div>
     </div>
 
-    {{-- SUB TAB NAV --}}
-    <ul class="nav nav-pills mb-3 gap-2" id="subTagihanTab">
-        <li class="nav-item">
-            <button class="nav-link {{ request('sub_tab') !== 'registrasi' ? 'active' : '' }}"
-                    onclick="switchSubTab('kelas')" id="btn-sub-kelas"
-                    style="border-radius:10px;font-size:13px">
-                <i class="bi bi-diagram-3 me-1"></i>Tagihan Kelas
-                @if($stats['total'] > 0)
-                <span class="badge ms-1" style="background:rgba(200,77,223,.2);color:#c84ddf">{{ $stats['total'] }}</span>
-                @endif
-            </button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link {{ request('sub_tab') === 'registrasi' ? 'active' : '' }}"
-                    onclick="switchSubTab('registrasi')" id="btn-sub-registrasi"
-                    style="border-radius:10px;font-size:13px">
-                <i class="bi bi-file-earmark-text me-1"></i>Invoice Registrasi
-                @if($stats['reg_belum'] > 0)
-                <span class="badge bg-danger ms-1">{{ $stats['reg_belum'] }}</span>
-                @endif
-            </button>
-        </li>
-    </ul>
+</div>{{-- /pane-tab-siswa --}}
 
-    {{-- SUB PANE: TAGIHAN KELAS --}}
-    <div id="pane-sub-kelas" class="{{ request('sub_tab') === 'registrasi' ? 'd-none' : '' }}">
+{{-- ══════════════════ PANE: TAGIHAN KELAS ══════════════════ --}}
+<div id="pane-tab-kelas" class="{{ request('tab') !== 'kelas' ? 'd-none' : '' }}">
         <div class="dashboard-card mb-4">
             <form method="GET" action="{{ route('admin.tagihan-siswa.index') }}">
-                <input type="hidden" name="main_tab" value="tagihan">
-                <input type="hidden" name="sub_tab" value="kelas">
+                <input type="hidden" name="tab" value="kelas">
                 <div class="row g-2 align-items-end">
                     <div class="col-md-4">
                         <label class="form-label fw-semibold" style="font-size:12px">Cari (Nama Siswa / Kelas)</label>
@@ -279,12 +274,11 @@
         </div>
     </div>
 
-    {{-- SUB PANE: INVOICE REGISTRASI --}}
-    <div id="pane-sub-registrasi" class="{{ request('sub_tab') === 'registrasi' ? '' : 'd-none' }}">
+{{-- ══════════════════ PANE: TAGIHAN REGISTRASI ══════════════════ --}}
+<div id="pane-tab-registrasi" class="{{ request('tab') !== 'registrasi' ? 'd-none' : '' }}">
         <div class="dashboard-card mb-4">
             <form method="GET" action="{{ route('admin.tagihan-siswa.index') }}">
-                <input type="hidden" name="main_tab" value="tagihan">
-                <input type="hidden" name="sub_tab" value="registrasi">
+                <input type="hidden" name="tab" value="registrasi">
                 <div class="row g-2 align-items-end">
                     <div class="col-md-4">
                         <label class="form-label fw-semibold" style="font-size:12px">Cari (Nama Siswa / No Invoice)</label>
@@ -305,7 +299,7 @@
                     </div>
                     <div class="col-md-2 d-flex gap-2">
                         <button type="submit" class="btn btn-primary flex-fill fw-semibold">Filter</button>
-                        <a href="{{ route('admin.tagihan-siswa.index', ['main_tab'=>'tagihan','sub_tab'=>'registrasi']) }}"
+                        <a href="{{ route('admin.tagihan-siswa.index', ['tab'=>'registrasi']) }}"
                            class="btn btn-outline-secondary px-3">Reset</a>
                     </div>
                 </div>
@@ -370,10 +364,10 @@
         </div>
     </div>
 
-</div>{{-- /pane-main-tagihan --}}
+</div>{{-- /pane-tab-registrasi --}}
 
-{{-- ══════════════════ PANE 2: VERIFIKASI PEMBAYARAN ══════════════════ --}}
-<div id="pane-main-verifikasi" class="{{ request('main_tab') === 'verifikasi' ? '' : 'd-none' }}">
+{{-- ══════════════════ PANE: VERIFIKASI PEMBAYARAN ══════════════════ --}}
+<div id="pane-tab-verifikasi" class="{{ request('tab') !== 'verifikasi' ? 'd-none' : '' }}">
 
     {{-- Summary pills --}}
     <div class="d-flex gap-2 flex-wrap mb-3">
@@ -419,7 +413,7 @@
     <div id="ver-pane-invoice">
         <div class="dashboard-card mb-4">
             <form method="GET" class="row g-2 align-items-end">
-                <input type="hidden" name="main_tab" value="verifikasi">
+                <input type="hidden" name="tab" value="verifikasi">
                 <input type="hidden" name="pkg_status" value="{{ request('pkg_status','pending') }}">
                 <div class="col-12 col-md-4">
                     <label class="form-label fw-semibold" style="font-size:12px">Cari Siswa / No Pembayaran</label>
@@ -437,7 +431,7 @@
                 </div>
                 <div class="col-auto">
                     <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-search me-1"></i>Filter</button>
-                    <a href="{{ route('admin.tagihan-siswa.index', ['main_tab'=>'verifikasi']) }}"
+                    <a href="{{ route('admin.tagihan-siswa.index', ['tab'=>'verifikasi']) }}"
                        class="btn btn-outline-secondary btn-sm ms-1">Reset</a>
                 </div>
             </form>
@@ -532,7 +526,7 @@
     <div id="ver-pane-package" style="display:none">
         <div class="dashboard-card mb-4">
             <form method="GET" class="row g-2 align-items-end">
-                <input type="hidden" name="main_tab" value="verifikasi">
+                <input type="hidden" name="tab" value="verifikasi">
                 <input type="hidden" name="ver_status" value="{{ request('ver_status','pending') }}">
                 <div class="col-12 col-md-4">
                     <label class="form-label fw-semibold" style="font-size:12px">Cari Siswa</label>
@@ -550,7 +544,7 @@
                 </div>
                 <div class="col-auto">
                     <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-search me-1"></i>Filter</button>
-                    <a href="{{ route('admin.tagihan-siswa.index', ['main_tab'=>'verifikasi']) }}"
+                    <a href="{{ route('admin.tagihan-siswa.index', ['tab'=>'verifikasi']) }}"
                        class="btn btn-outline-secondary btn-sm ms-1">Reset</a>
                 </div>
             </form>
@@ -635,7 +629,7 @@
         </div>
     </div>
 
-</div>{{-- /pane-main-verifikasi --}}
+</div>{{-- /pane-tab-verifikasi --}}
 
 </div>
 
@@ -735,18 +729,11 @@
 
 @push('scripts')
 <script>
-function switchMainTab(tab) {
-    document.getElementById('pane-main-tagihan').classList.toggle('d-none', tab !== 'tagihan');
-    document.getElementById('pane-main-verifikasi').classList.toggle('d-none', tab !== 'verifikasi');
-    document.getElementById('btn-main-tagihan').classList.toggle('active', tab === 'tagihan');
-    document.getElementById('btn-main-verifikasi').classList.toggle('active', tab === 'verifikasi');
-}
-
-function switchSubTab(sub) {
-    document.getElementById('pane-sub-kelas').classList.toggle('d-none', sub !== 'kelas');
-    document.getElementById('pane-sub-registrasi').classList.toggle('d-none', sub !== 'registrasi');
-    document.getElementById('btn-sub-kelas').classList.toggle('active', sub === 'kelas');
-    document.getElementById('btn-sub-registrasi').classList.toggle('active', sub === 'registrasi');
+function switchTab(tab) {
+    ['siswa','kelas','registrasi','verifikasi'].forEach(function(t) {
+        document.getElementById('pane-tab-'+t).classList.toggle('d-none', t !== tab);
+        document.getElementById('btn-tab-'+t).classList.toggle('active', t === tab);
+    });
 }
 
 function showVerTab(tab) {
@@ -773,13 +760,15 @@ function showPkgRejectModal(id) {
     new bootstrap.Modal(document.getElementById('pkgRejectModal')).show();
 }
 
-// Auto-open verifikasi tab if pkg_status/ver_status set
-const urlP = new URLSearchParams(window.location.search);
-if (urlP.get('main_tab') === 'verifikasi') {
-    switchMainTab('verifikasi');
-    if (urlP.has('pkg_status') || urlP.has('pkg_page')) showVerTab('package');
-}
-if (urlP.get('sub_tab') === 'registrasi') switchSubTab('registrasi');
+// Auto-open correct tab from URL
+(function() {
+    const urlP = new URLSearchParams(window.location.search);
+    const tab = urlP.get('tab') || 'siswa';
+    switchTab(tab);
+    if (tab === 'verifikasi' && (urlP.has('pkg_status') || urlP.has('pkg_page'))) {
+        showVerTab('package');
+    }
+})();
 </script>
 @endpush
 

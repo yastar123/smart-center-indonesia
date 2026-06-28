@@ -251,13 +251,6 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
 
         // RIWAYAT SESI — removed
 
-        // VERIFIKASI PEMBAYARAN
-        Route::get('/verifikasi-pembayaran', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'index'])->name('verifikasi-pembayaran.index');
-        Route::get('/verifikasi-pembayaran/{payment}', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'show'])->name('verifikasi-pembayaran.show');
-        Route::post('/verifikasi-pembayaran/{payment}/approve', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'approve'])->name('verifikasi-pembayaran.approve');
-        Route::post('/verifikasi-pembayaran/{payment}/reject', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'reject'])->name('verifikasi-pembayaran.reject');
-        Route::post('/verifikasi-pembayaran/package/{packagePayment}/approve', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'approvePackage'])->name('verifikasi-pembayaran.package.approve');
-        Route::post('/verifikasi-pembayaran/package/{packagePayment}/reject', [\App\Http\Controllers\Admin\VerifikasiPembayaranController::class, 'rejectPackage'])->name('verifikasi-pembayaran.package.reject');
 
         // AJAX: used sessions per package
         Route::get('/schedules/package/{package}/used-sessions', function(\App\Models\Package $package) {

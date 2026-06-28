@@ -3359,16 +3359,6 @@
                 <span>Billing Lunas</span>
             </a>
         </div>
-        <div class="nav-item">
-            <a href="{{ route('admin.verifikasi-pembayaran.index') }}" class="nav-link {{ request()->routeIs('admin.verifikasi-pembayaran.*') ? 'active' : '' }}" data-label="Verifikasi Pembayaran">
-                <i class="bi bi-shield-check"></i>
-                <span>Verifikasi Pembayaran</span>
-                @php $pendingPayments = \App\Models\Payment::where('status','pending')->count(); @endphp
-                @if($pendingPayments > 0)
-                    <span class="menu-badge">{{ $pendingPayments > 99 ? '99+' : $pendingPayments }}</span>
-                @endif
-            </a>
-        </div>
         @if(auth()->check() && auth()->user()->hasAnyRole(['admin','owner']))
         <div class="nav-item">
             <a href="{{ route('admin.salaries.index') }}" class="nav-link {{ request()->routeIs('admin.salaries.*') ? 'active' : '' }}" data-label="Gaji Guru">
