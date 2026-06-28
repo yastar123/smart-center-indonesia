@@ -14,24 +14,30 @@ class ScheduleController extends Controller
 {
     public function create()
     {
-        $pakets = Package::with(['guru', 'mataPelajaran', 'cabang', 'courseTeachers'])
-            ->where('status', 'aktif')
+        $user     = auth()->user();
+        $branchId = $user->hasRole('admin') ? optional($user->admin)->branch_id : null;
+
+        $courses = \App\Models\Course::where('status', 'aktif')
+            ->when($branchId, fn($q) => $q->where('cabang_id', $branchId))
             ->orderBy('nama')
             ->get();
-        $branches = Branch::all();
-        $modules  = Module::with('mataPelajaran')
+
+        $teachers = \App\Models\Teacher::with(['branch', 'courses'])
+            ->where('status', 'aktif')
+            ->when($branchId, fn($q) => $q->where('branch_id', $branchId))
+            ->orderBy('name')
+            ->get();
+
+        $modules = Module::with('mataPelajaran')
             ->where('status', 'aktif')
             ->orderBy('judul')
             ->get();
-        $teachers = \App\Models\Teacher::with(['branch', 'courses'])
-            ->where('status', 'aktif')
-            ->orderBy('name')
-            ->get();
-        $classes = \App\Models\SchoolClass::with(['mataPelajaran', 'cabang', 'guru'])
-            ->where('status', 'aktif')
-            ->orderBy('nama_kelas')
-            ->get();
-        return view('admin.schedules.create', compact('pakets', 'branches', 'modules', 'teachers', 'classes'));
+
+        $branches = $branchId
+            ? \App\Models\Branch::where('id', $branchId)->get()
+            : \App\Models\Branch::all();
+
+        return view('admin.schedules.create', compact('courses', 'teachers', 'modules', 'branches'));
     }
 
     public function index(Request $request)
@@ -162,11 +168,12 @@ class ScheduleController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'paket_id'          => 'required|exists:packages,id',
             'mata_pelajaran_id' => 'required|exists:courses,id',
+            'paket_id'          => 'nullable|exists:packages,id',
             'kelas_id'          => 'nullable|exists:school_classes,id',
             'module_id'         => 'nullable|exists:modules,id',
             'guru_id'           => 'required|exists:teachers,id',
+            'program_belajar'   => 'required|in:private,kelas',
             'jenis'             => 'required|in:online,offline,private',
             'tanggal'           => 'required|date',
             'tanggal_selesai'   => 'nullable|date|after_or_equal:tanggal',
@@ -178,15 +185,33 @@ class ScheduleController extends Controller
             'alamat_kunjungan'  => 'nullable|string|max:500',
             'honor_per_sesi'    => 'nullable|numeric|min:0',
             'catatan'           => 'nullable|string',
+            'siswa_ids'         => 'nullable|array',
+            'siswa_ids.*'       => 'exists:students,id',
         ]);
 
-        $paket = Package::with('cabang')->findOrFail($data['paket_id']);
-        $data['cabang_id'] = $paket->cabang_id;
-        // $data['jenis'] comes from the form (online/offline/private)
-        $data['status']    = 'dijadwalkan';
+        // Derive cabang_id from course or branch of admin
+        $course = \App\Models\Course::findOrFail($data['mata_pelajaran_id']);
+        $user   = auth()->user();
+        $data['cabang_id'] = $course->cabang_id
+            ?? ($user->hasRole('admin') ? optional($user->admin)->branch_id : null);
+
+        $data['status'] = 'dijadwalkan';
+        $siswaIds = $data['siswa_ids'] ?? [];
+        unset($data['siswa_ids']);
 
         $schedule = Schedule::create($data);
-        $schedule->load(['paket.guru', 'paket.mataPelajaran']);
+
+        // Pre-create attendance records for selected students
+        if (!empty($siswaIds)) {
+            foreach ($siswaIds as $siswaId) {
+                \App\Models\AbsensiSiswa::firstOrCreate(
+                    ['jadwal_id' => $schedule->id, 'siswa_id' => $siswaId],
+                    ['status' => 'menunggu_konfirmasi']
+                );
+            }
+        }
+
+        $schedule->load(['mataPelajaran', 'guru']);
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Jadwal sesi berhasil ditambahkan.', 'data' => $schedule]);

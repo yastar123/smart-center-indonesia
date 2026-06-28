@@ -25,6 +25,7 @@ class Schedule extends Model
         'jam_selesai',
         'topik',
         'jenis',
+        'program_belajar',
         'ruangan',
         'link_meeting',
         'status',

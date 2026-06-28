@@ -284,6 +284,83 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
             ]);
         })->name('schedules.package-students');
 
+        // AJAX: students by subject/course with remaining session count per subject
+        Route::get('/schedules/subject/{course}/students', function(\App\Models\Course $course) {
+            // Get all package IDs that include this course
+            $packageIds = \DB::table('package_course')
+                ->where('course_id', $course->id)
+                ->pluck('package_id');
+
+            // Get active students enrolled in those packages
+            $students = \App\Models\Student::whereIn('package_id', $packageIds)
+                ->where('status', 'aktif')
+                ->orderBy('name')
+                ->get(['id', 'name', 'nis', 'total_sesi', 'package_id']);
+
+            $result = $students->map(function ($s) use ($course) {
+                // Sessions used for this specific subject
+                $used = \App\Models\AbsensiSiswa::where('siswa_id', $s->id)
+                    ->whereHas('jadwal', fn($q) => $q->where('mata_pelajaran_id', $course->id))
+                    ->whereIn('status', ['hadir'])
+                    ->count();
+
+                // Get session quota from their package for this course
+                $packageSesi = \App\Models\Package::where('id', $s->package_id)
+                    ->value('jumlah_pertemuan') ?? $s->total_sesi ?? 0;
+
+                $sisa = max(0, $packageSesi - $used);
+
+                return [
+                    'id'          => $s->id,
+                    'name'        => $s->name,
+                    'nis'         => $s->nis,
+                    'sesi_paket'  => $packageSesi,
+                    'sesi_terpakai' => $used,
+                    'sisa_sesi'   => $sisa,
+                    'package_id'  => $s->package_id,
+                ];
+            });
+
+            return response()->json(['success' => true, 'students' => $result, 'count' => $result->count()]);
+        })->name('schedules.subject-students');
+
+        // AJAX: teacher stats (sessions taught, subjects, earnings for freelance)
+        Route::get('/schedules/teacher/{teacher}/stats', function(\App\Models\Teacher $teacher) {
+            $schedulesDone = \App\Models\Schedule::where('guru_id', $teacher->id)
+                ->whereIn('status', ['selesai', 'berlangsung'])
+                ->count();
+
+            $schedulesAll = \App\Models\Schedule::where('guru_id', $teacher->id)
+                ->whereNull('deleted_at')
+                ->count();
+
+            $subjectIds = \App\Models\Schedule::where('guru_id', $teacher->id)
+                ->whereNotNull('mata_pelajaran_id')
+                ->distinct()
+                ->pluck('mata_pelajaran_id');
+
+            $subjects = \App\Models\Course::whereIn('id', $subjectIds)->pluck('nama')->toArray();
+
+            $earnings = null;
+            if ($teacher->jenis_guru === 'freelance') {
+                $earnings = \App\Models\Schedule::where('guru_id', $teacher->id)
+                    ->where('status', 'selesai')
+                    ->whereNotNull('honor_per_sesi')
+                    ->sum('honor_per_sesi');
+            }
+
+            return response()->json([
+                'success'          => true,
+                'jenis_guru'       => $teacher->jenis_guru,
+                'salary_base'      => $teacher->salary_base,
+                'sesi_selesai'     => $schedulesDone,
+                'sesi_total'       => $schedulesAll,
+                'subjects'         => $subjects,
+                'subjects_count'   => count($subjects),
+                'earnings'         => $earnings,
+            ]);
+        })->name('schedules.teacher-stats');
+
         // AJAX: students by teacher (fallback / legacy)
         Route::get('/schedules/teacher/{teacher}/students', function(\App\Models\Teacher $teacher, \Illuminate\Http\Request $request) {
             $packageId = $request->query('package_id');
