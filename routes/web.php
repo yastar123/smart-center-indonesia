@@ -285,10 +285,15 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         })->name('schedules.package-students');
 
         // AJAX: students by subject/course with remaining session count per subject
-        Route::get('/schedules/subject/{course}/students', function(\App\Models\Course $course) {
+        Route::get('/schedules/subject/{course}/students', function(\App\Models\Course $course, \Illuminate\Http\Request $request) {
+            // Determine effective branch: use course's cabang_id if set, else fall back to the
+            // authenticated user's branch_id so global (cabang_id = null) courses still filter correctly.
+            $userBranchId    = auth()->user()->branch_id;
+            $effectiveBranch = $course->cabang_id ?? $userBranchId;
+
             // Find students via class enrollment: school_classes (mata_pelajaran_id) → class_students → students
             $classIds = \App\Models\SchoolClass::where('mata_pelajaran_id', $course->id)
-                ->where('cabang_id', $course->cabang_id)
+                ->when($effectiveBranch, fn($q) => $q->where('cabang_id', $effectiveBranch))
                 ->pluck('id');
 
             $studentIdsViaClass = \DB::table('class_students')
@@ -302,17 +307,20 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
 
             $allStudentIds = $studentIdsViaClass->merge($studentIdsViaCourse)->unique()->values();
 
+            // Students table uses branch_id (not cabang_id). Apply branch scope in both paths
+            // to prevent cross-branch data leaks in multi-tenant setups.
             if ($allStudentIds->isEmpty()) {
                 // Fallback: all active students in the same branch
-                $students = \App\Models\Student::where('cabang_id', $course->cabang_id)
+                $students = \App\Models\Student::when($effectiveBranch, fn($q) => $q->where('branch_id', $effectiveBranch))
                     ->where('status', 'aktif')
                     ->orderBy('name')
-                    ->get(['id', 'name', 'nis', 'total_sesi', 'package_id', 'cabang_id']);
+                    ->get(['id', 'name', 'nis', 'total_sesi', 'package_id', 'branch_id']);
             } else {
                 $students = \App\Models\Student::whereIn('id', $allStudentIds)
+                    ->when($effectiveBranch, fn($q) => $q->where('branch_id', $effectiveBranch))
                     ->where('status', 'aktif')
                     ->orderBy('name')
-                    ->get(['id', 'name', 'nis', 'total_sesi', 'package_id', 'cabang_id']);
+                    ->get(['id', 'name', 'nis', 'total_sesi', 'package_id', 'branch_id']);
             }
 
             $result = $students->map(function ($s) use ($course) {

@@ -26,6 +26,7 @@ use App\Models\Salary;
 use App\Models\Announcement;
 use App\Models\Certificate;
 use App\Models\Schedule;
+use App\Models\StudentRegistration;
 
 class DemoDataSeeder extends Seeder
 {
@@ -867,6 +868,41 @@ class DemoDataSeeder extends Seeder
         $this->command->info('');
         $this->command->info('📊 Ringkasan data yang di-seed:');
         $this->command->info('   • Tahun Akademik : 2 (2023/2024, 2024/2025)');
+        // ------------------------------------------------------------------ //
+        // PENDAFTARAN SISWA BARU (untuk dashboard Siswa Terbaru Mendaftar)    //
+        // ------------------------------------------------------------------ //
+        StudentRegistration::firstOrCreate(
+            ['no_reg' => 'DEMO-2025-0001'],
+            [
+                'name'              => 'Bimo Prasetyo',
+                'phone'             => '081234500011',
+                'gender'            => 'L',
+                'education_level'   => 'SMA',
+                'status'            => 'pending',
+                'branch'            => $cabangPusat->name,
+                'interests'         => ['Matematika', 'Fisika'],
+                'interest_sessions' => ['Matematika' => 8, 'Fisika' => 8],
+                'notes'             => 'Ingin persiapan SNBT tahun ini.',
+            ]
+        );
+
+        StudentRegistration::firstOrCreate(
+            ['no_reg' => 'DEMO-2025-0002'],
+            [
+                'name'              => 'Tiara Anggraeni',
+                'phone'             => '082234500012',
+                'gender'            => 'P',
+                'education_level'   => 'SMP',
+                'status'            => 'pending',
+                'branch'            => $cabangBandung->name,
+                'interests'         => ['Bahasa Inggris', 'Matematika'],
+                'interest_sessions' => ['Bahasa Inggris' => 8, 'Matematika' => 8],
+                'notes'             => 'Butuh bimbingan untuk ujian akhir semester.',
+            ]
+        );
+
+        $this->command->info('  ✅ Pendaftaran siswa (2 data demo)');
+
         $this->command->info('   • Cabang         : 3 (Jakarta, Bandung, Surabaya)');
         $this->command->info('   • Mata Pelajaran : ' . Course::count());
         $this->command->info('   • Paket Belajar  : ' . Package::count());

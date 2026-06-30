@@ -2,6 +2,15 @@
 @section('title', 'Approve & Biaya — ' . $registration->name)
 @section('page-title', 'Approve & Biaya Pendaftaran')
 
+@php
+$teachersJson = $teachers->map(fn($t) => [
+    'id'          => $t->id,
+    'name'        => $t->name,
+    'jenis_guru'  => $t->jenis_guru,
+    'salary_base' => $t->salary_base,
+]);
+@endphp
+
 @section('content')
 <div class="fade-up">
 
@@ -169,26 +178,33 @@
 
             {{-- Mata Pelajaran: Guru & Sesi per Mapel --}}
             @php
-                $allInterests   = $registration->interests ?? [];
+                $allInterests        = $registration->interests ?? [];
                 if (empty($allInterests) && $registration->program) {
                     $allInterests = [$registration->program];
                 }
-                $savedSessions  = $registration->interest_sessions ?? [];
-                $savedTeachers  = $registration->interest_teachers ?? [];
-                $teachersById   = $teachers->keyBy('id');
+                $savedSessions       = $registration->interest_sessions       ?? [];
+                $savedTeachers       = $registration->interest_teachers       ?? [];
+                $savedTeacherHonor   = $registration->interest_teacher_honor  ?? [];
+                $savedTeacherSesi    = $registration->interest_teacher_sesi   ?? [];
+                $teachersById        = $teachers->keyBy('id');
             @endphp
             @if(!empty($allInterests))
             <div class="mb-4 p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
                 <div class="fw-semibold mb-3" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">
-                    <i class="bi bi-bookmark-star me-1" style="color:var(--primary)"></i>Mata Pelajaran — Guru &amp; Jumlah Sesi
+                    <i class="bi bi-bookmark-star me-1" style="color:var(--primary)"></i>Mata Pelajaran — Guru &amp; Sesi
                 </div>
-                <div class="d-flex flex-column gap-2">
+                <div class="d-flex flex-column gap-3" id="subjectRows">
                     @foreach($allInterests as $idx => $prog)
                     @php
-                        $defaultSesi    = $savedSessions[$prog] ?? 8;
-                        $defaultTeacher = $savedTeachers[$prog] ?? null;
+                        $defaultSesi        = $savedSessions[$prog]     ?? 8;
+                        $defaultTeacher     = $savedTeachers[$prog]     ?? null;
+                        $defaultHonor       = $savedTeacherHonor[$prog] ?? '';
+                        $defaultTeacherSesi = $savedTeacherSesi[$prog]  ?? 8;
+                        $savedTeacherObj    = $defaultTeacher ? ($teachersById[$defaultTeacher] ?? null) : null;
+                        $isFreelance        = $savedTeacherObj && $savedTeacherObj->jenis_guru === 'freelance';
                     @endphp
-                    <div class="p-2 rounded-2" style="background:var(--card-bg);border:1px solid var(--card-border)">
+                    <div class="subject-row p-2 rounded-2" style="background:var(--card-bg);border:1px solid var(--card-border)">
+
                         {{-- Subject label --}}
                         <div class="d-flex align-items-center gap-2 mb-2">
                             <div style="width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#260632,#c84ddf);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.68rem;color:white;font-weight:700">
@@ -196,23 +212,29 @@
                             </div>
                             <span class="fw-semibold" style="font-size:.85rem;color:var(--text-primary)">{{ $prog }}</span>
                         </div>
-                        {{-- Guru + Sesi row --}}
+
+                        {{-- Guru + Sesi Siswa row --}}
                         <div class="d-flex gap-2 align-items-center">
                             <div class="flex-grow-1">
+                                <div class="text-muted mb-1" style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em">Guru Pengajar</div>
                                 <select class="form-select form-select-sm guru-select"
                                         data-subject="{{ $prog }}"
+                                        onchange="onGuruChange(this)"
                                         style="font-size:.82rem">
                                     <option value="">— Pilih Guru —</option>
                                     @foreach($teachers as $teacher)
                                     <option value="{{ $teacher->id }}"
+                                            data-jenis="{{ $teacher->jenis_guru }}"
+                                            data-salary="{{ $teacher->salary_base ?? 0 }}"
                                             {{ $defaultTeacher == $teacher->id ? 'selected' : '' }}>
-                                        {{ $teacher->name }}@if($teacher->jenis_guru) ({{ ucfirst($teacher->jenis_guru) }})@endif
+                                        {{ $teacher->name }}@if($teacher->jenis_guru === 'freelance') <span style="font-size:.7rem">(Freelance)</span>@elseif($teacher->jenis_guru) ({{ ucfirst($teacher->jenis_guru) }})@endif
                                     </option>
                                     @endforeach
                                 </select>
                             </div>
                             <div style="flex-shrink:0">
-                                <div class="input-group input-group-sm" style="width:100px">
+                                <div class="text-muted mb-1" style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em">Sesi Siswa</div>
+                                <div class="input-group input-group-sm" style="width:105px">
                                     <span class="input-group-text" style="font-size:.72rem;padding:4px 7px;background:var(--input-bg);border-color:var(--card-border);color:var(--text-muted)">Sesi</span>
                                     <input type="number"
                                            class="form-control form-control-sm sesi-input"
@@ -224,13 +246,67 @@
                                 </div>
                             </div>
                         </div>
+
+                        {{-- Freelance fields: honor per sesi + total sesi guru (hanya muncul untuk guru freelance) --}}
+                        <div class="freelance-fields mt-2 p-2 rounded-2"
+                             data-subject="{{ $prog }}"
+                             style="display:{{ $isFreelance ? '' : 'none' }};background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25)">
+                            <div class="d-flex align-items-center gap-1 mb-2">
+                                <i class="bi bi-coin" style="color:#d97706;font-size:.8rem"></i>
+                                <span class="fw-semibold" style="font-size:.72rem;color:#92400e;text-transform:uppercase;letter-spacing:.04em">Ketentuan Guru Freelance</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                {{-- Honor per sesi --}}
+                                <div class="flex-grow-1">
+                                    <label class="text-muted mb-1 d-block" style="font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em">
+                                        <i class="bi bi-cash-coin me-1"></i>Honor / Sesi Guru (Rp)
+                                    </label>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text" style="font-size:.72rem;background:var(--input-bg);border-color:rgba(245,158,11,.4);color:#92400e;padding:4px 7px">Rp</span>
+                                        <input type="number"
+                                               class="form-control form-control-sm honor-sesi-input"
+                                               data-subject="{{ $prog }}"
+                                               value="{{ $defaultHonor }}"
+                                               min="0"
+                                               placeholder="Contoh: 150000"
+                                               style="font-size:.83rem;background:var(--input-bg);color:var(--text-primary);border-color:rgba(245,158,11,.4)">
+                                    </div>
+                                    <div class="text-muted mt-1" style="font-size:.68rem">Nominal yang dibayar ke guru per sesi mengajar</div>
+                                </div>
+                                {{-- Total sesi guru mengajar --}}
+                                <div style="flex-shrink:0;min-width:110px">
+                                    <label class="text-muted mb-1 d-block" style="font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em">
+                                        <i class="bi bi-calendar-check me-1"></i>Total Sesi Guru
+                                    </label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number"
+                                               class="form-control form-control-sm sesi-guru-input"
+                                               data-subject="{{ $prog }}"
+                                               value="{{ $defaultTeacherSesi }}"
+                                               min="1" max="999"
+                                               placeholder="8"
+                                               style="font-size:.83rem;font-weight:600;text-align:center;background:var(--input-bg);color:var(--text-primary);border-color:rgba(245,158,11,.4)">
+                                        <span class="input-group-text" style="font-size:.72rem;background:var(--input-bg);border-color:rgba(245,158,11,.4);color:#92400e;padding:4px 7px">sesi</span>
+                                    </div>
+                                    <div class="text-muted mt-1" style="font-size:.68rem">Total sesi mengajar guru ini</div>
+                                </div>
+                            </div>
+                            {{-- Estimasi honor total --}}
+                            <div class="mt-2 pt-2" style="border-top:1px solid rgba(245,158,11,.2)">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="text-muted" style="font-size:.72rem">Estimasi total honor guru:</span>
+                                    <span class="fw-bold honor-total-label" data-subject="{{ $prog }}" style="font-size:.8rem;color:#92400e">Rp —</span>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                     @endforeach
                 </div>
                 <div class="d-flex align-items-center justify-content-between mt-3 pt-2" style="border-top:1px solid var(--card-border)">
                     <span class="text-muted" style="font-size:.72rem"><i class="bi bi-info-circle me-1"></i>Setiap mata pelajaran bisa memiliki guru berbeda</span>
                     <span class="fw-bold" style="font-size:.82rem;color:var(--primary)">
-                        Total: <span id="totalSesiSum">0</span> sesi
+                        Total: <span id="totalSesiSum">0</span> sesi siswa
                     </span>
                 </div>
             </div>
@@ -300,24 +376,70 @@
 {{-- Hidden forms for POST actions --}}
 <form method="POST" action="{{ route('admin.registration-list.send-invoice', $registration->id) }}" id="formSend" style="display:none">
     @csrf
-    <input type="hidden" name="total_biaya"     id="fs_total_biaya">
-    <input type="hidden" name="biaya_per_sesi"  id="fs_biaya_per_sesi">
-    <input type="hidden" name="total_sessions"  id="fs_total_sessions">
+    <input type="hidden" name="total_biaya"    id="fs_total_biaya">
+    <input type="hidden" name="total_sessions" id="fs_total_sessions">
     <div id="fs_interest_sessions_container"></div>
     <div id="fs_interest_teachers_container"></div>
+    <div id="fs_interest_teacher_honor_container"></div>
+    <div id="fs_interest_teacher_sesi_container"></div>
 </form>
 
 <form method="POST" action="{{ route('admin.registration-list.mark-lunas', $registration->id) }}" id="formLunas" style="display:none">
     @csrf
-    <input type="hidden" name="total_biaya"     id="fl_total_biaya">
-    <input type="hidden" name="biaya_per_sesi"  id="fl_biaya_per_sesi">
-    <input type="hidden" name="total_sessions"  id="fl_total_sessions">
+    <input type="hidden" name="total_biaya"    id="fl_total_biaya">
+    <input type="hidden" name="total_sessions" id="fl_total_sessions">
     <div id="fl_interest_sessions_container"></div>
     <div id="fl_interest_teachers_container"></div>
+    <div id="fl_interest_teacher_honor_container"></div>
+    <div id="fl_interest_teacher_sesi_container"></div>
 </form>
 
 <script>
-/* ── helpers ─────────────────────────────────────────── */
+/* ── Teacher data from server ─────────────────────────────────────────── */
+const teachersData = @json($teachersJson);
+
+function getTeacherById(id) {
+    return teachersData.find(t => t.id === parseInt(id)) || null;
+}
+
+/* ── Freelance toggle ─────────────────────────────────────────────────── */
+function onGuruChange(selectEl) {
+    const subj       = selectEl.dataset.subject;
+    const teacherId  = selectEl.value;
+    const teacher    = teacherId ? getTeacherById(teacherId) : null;
+    const isFreelance = teacher && teacher.jenis_guru === 'freelance';
+
+    const freelanceBox = document.querySelector(`.freelance-fields[data-subject="${CSS.escape(subj)}"]`);
+    if (freelanceBox) {
+        freelanceBox.style.display = isFreelance ? '' : 'none';
+        // If freelance and honor is empty, pre-fill with teacher's salary_base if available
+        if (isFreelance && teacher.salary_base) {
+            const honorInput = freelanceBox.querySelector('.honor-sesi-input');
+            if (honorInput && !honorInput.value) {
+                honorInput.value = teacher.salary_base;
+            }
+        }
+        updateHonorTotal(subj);
+    }
+}
+
+function updateHonorTotal(subj) {
+    const freelanceBox = document.querySelector(`.freelance-fields[data-subject="${CSS.escape(subj)}"]`);
+    if (!freelanceBox || freelanceBox.style.display === 'none') return;
+
+    const honor = parseFloat(freelanceBox.querySelector('.honor-sesi-input')?.value || 0);
+    const sesi  = parseInt(freelanceBox.querySelector('.sesi-guru-input')?.value || 0);
+    const total = honor * sesi;
+
+    const label = freelanceBox.querySelector('.honor-total-label');
+    if (label) {
+        label.textContent = total > 0
+            ? 'Rp ' + new Intl.NumberFormat('id-ID').format(total)
+            : 'Rp —';
+    }
+}
+
+/* ── Session helpers ──────────────────────────────────────────────────── */
 function getTotalSesiFromInputs() {
     let total = 0;
     document.querySelectorAll('.sesi-input').forEach(inp => {
@@ -340,7 +462,7 @@ function getInterestSessions() {
     return result;
 }
 
-/* Collect per-subject teacher selections: { subject: teacher_id } */
+/* ── Teacher helpers ──────────────────────────────────────────────────── */
 function getInterestTeachers() {
     const result = {};
     document.querySelectorAll('.guru-select').forEach(sel => {
@@ -350,45 +472,90 @@ function getInterestTeachers() {
     return result;
 }
 
-function injectInterestSessionsIntoForm(containerId) {
+/* ── Freelance helpers ────────────────────────────────────────────────── */
+function getInterestTeacherHonor() {
+    const result = {};
+    document.querySelectorAll('.honor-sesi-input').forEach(inp => {
+        const subj       = inp.dataset.subject;
+        const parentBox  = document.querySelector(`.freelance-fields[data-subject="${CSS.escape(subj)}"]`);
+        if (subj && parentBox && parentBox.style.display !== 'none' && inp.value !== '') {
+            result[subj] = parseFloat(inp.value);
+        }
+    });
+    return result;
+}
+
+function getInterestTeacherSesi() {
+    const result = {};
+    document.querySelectorAll('.sesi-guru-input').forEach(inp => {
+        const subj       = inp.dataset.subject;
+        const parentBox  = document.querySelector(`.freelance-fields[data-subject="${CSS.escape(subj)}"]`);
+        if (subj && parentBox && parentBox.style.display !== 'none' && inp.value !== '') {
+            result[subj] = parseInt(inp.value);
+        }
+    });
+    return result;
+}
+
+/* ── Form injection helpers ───────────────────────────────────────────── */
+function injectHidden(containerId, name, map) {
     const container = document.getElementById(containerId);
+    if (!container) return;
     container.innerHTML = '';
-    Object.entries(getInterestSessions()).forEach(([subj, cnt]) => {
-        const inp = document.createElement('input');
-        inp.type  = 'hidden';
-        inp.name  = 'interest_sessions[' + subj + ']';
-        inp.value = cnt;
+    Object.entries(map).forEach(([key, val]) => {
+        const inp  = document.createElement('input');
+        inp.type   = 'hidden';
+        inp.name   = name + '[' + key + ']';
+        inp.value  = val;
         container.appendChild(inp);
     });
 }
 
-function injectInterestTeachersIntoForm(containerId) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = '';
-    Object.entries(getInterestTeachers()).forEach(([subj, tid]) => {
-        const inp = document.createElement('input');
-        inp.type  = 'hidden';
-        inp.name  = 'interest_teachers[' + subj + ']';
-        inp.value = tid;
-        container.appendChild(inp);
-    });
+function injectInterestSessionsIntoForm(prefix) {
+    injectHidden(prefix + '_interest_sessions_container', 'interest_sessions', getInterestSessions());
 }
 
-/* ── validation & submit ─────────────────────────────── */
+function injectInterestTeachersIntoForm(prefix) {
+    injectHidden(prefix + '_interest_teachers_container', 'interest_teachers', getInterestTeachers());
+}
+
+function injectFreelanceFieldsIntoForm(prefix) {
+    injectHidden(prefix + '_interest_teacher_honor_container', 'interest_teacher_honor', getInterestTeacherHonor());
+    injectHidden(prefix + '_interest_teacher_sesi_container',  'interest_teacher_sesi',  getInterestTeacherSesi());
+}
+
+/* ── Validation & submit ──────────────────────────────────────────────── */
 function collectForm() {
-    const totalBiaya  = document.getElementById('totalBiaya').value;
-    const totalSesi   = getTotalSesiFromInputs();
+    const totalBiaya = document.getElementById('totalBiaya').value;
+    const totalSesi  = getTotalSesiFromInputs();
 
     if (!totalBiaya || parseFloat(totalBiaya) < 0) {
         showToast('Masukkan total biaya program.', 'error');
         return null;
     }
 
-    /* Warn (not block) if any subject has no guru assigned */
-    const selects  = document.querySelectorAll('.guru-select');
-    const noGuru   = [...selects].filter(s => !s.value);
+    const selects = document.querySelectorAll('.guru-select');
+    const noGuru  = [...selects].filter(s => !s.value);
     if (selects.length > 0 && noGuru.length === selects.length) {
         showToast('Pilih minimal satu guru untuk mata pelajaran.', 'error');
+        return null;
+    }
+
+    // Validate freelance fields: if freelance guru selected, honor per sesi is required
+    let freelanceError = null;
+    document.querySelectorAll('.freelance-fields').forEach(box => {
+        if (box.style.display === 'none') return;
+        const honorInput = box.querySelector('.honor-sesi-input');
+        const sesiInput  = box.querySelector('.sesi-guru-input');
+        if (!honorInput.value || parseFloat(honorInput.value) <= 0) {
+            freelanceError = 'Masukkan honor per sesi untuk semua guru freelance.';
+        }
+        if (!sesiInput.value || parseInt(sesiInput.value) < 1) {
+            freelanceError = 'Masukkan total sesi mengajar untuk semua guru freelance.';
+        }
+    });
+    if (freelanceError) {
+        showToast(freelanceError, 'error');
         return null;
     }
 
@@ -408,17 +575,17 @@ function submitAction(action) {
         const prefix = action === 'send' ? 'fs'        : 'fl';
 
         document.getElementById(prefix + '_total_biaya').value    = data.totalBiaya;
-        document.getElementById(prefix + '_biaya_per_sesi').value = '';
         document.getElementById(prefix + '_total_sessions').value = data.totalSesi;
 
-        injectInterestSessionsIntoForm(prefix + '_interest_sessions_container');
-        injectInterestTeachersIntoForm(prefix + '_interest_teachers_container');
+        injectInterestSessionsIntoForm(prefix);
+        injectInterestTeachersIntoForm(prefix);
+        injectFreelanceFieldsIntoForm(prefix);
 
         document.getElementById(formId).submit();
     }, null, {
-        title:    action === 'send' ? 'Kirim Invoice'                       : 'Tandai Lunas',
+        title:    action === 'send' ? 'Kirim Invoice'                        : 'Tandai Lunas',
         okText:   action === 'send' ? '<i class="bi bi-send me-1"></i>Kirim Invoice' : '<i class="bi bi-check-circle me-1"></i>Lunas',
-        btnClass: action === 'send' ? 'btn-primary'                         : 'btn-success',
+        btnClass: action === 'send' ? 'btn-primary'                          : 'btn-success',
         type: 'warning'
     });
 }
@@ -429,9 +596,19 @@ function confirmReject() {
     }, null, { title: 'Tolak Pendaftaran', okText: '<i class="bi bi-x-circle me-1"></i>Tolak', btnClass: 'btn-danger' });
 }
 
-/* ── init ────────────────────────────────────────────── */
+/* ── Init ─────────────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
     recalcSesiTotal();
+
+    // Trigger onGuruChange for pre-selected teachers on page load
+    document.querySelectorAll('.guru-select').forEach(sel => {
+        if (sel.value) onGuruChange(sel);
+    });
+
+    // Live recalc honor total on input
+    document.querySelectorAll('.honor-sesi-input, .sesi-guru-input').forEach(inp => {
+        inp.addEventListener('input', () => updateHonorTotal(inp.dataset.subject));
+    });
 });
 </script>
 @endsection

@@ -48,7 +48,8 @@ class RegistrationListController extends Controller
 
     public function approve(StudentRegistration $registration)
     {
-        $teachers = Teacher::where('status', 'aktif')->orderBy('name')->get();
+        $teachers = Teacher::where('status', 'aktif')->orderBy('name')
+            ->get(['id', 'name', 'jenis_guru', 'salary_base', 'branch_id']);
 
         // Look up prices for each interest by matching course name
         $interests   = $registration->interests ?? [];
@@ -76,14 +77,18 @@ class RegistrationListController extends Controller
     public function sendInvoice(Request $request, StudentRegistration $registration)
     {
         $request->validate([
-            'teacher_id'          => 'nullable|exists:teachers,id',
-            'total_biaya'         => 'required|numeric|min:0',
-            'total_sessions'      => 'nullable|integer|min:1',
-            'biaya_per_sesi'      => 'nullable|numeric|min:0',
-            'interest_sessions'   => 'nullable|array',
-            'interest_sessions.*' => 'nullable|integer|min:0',
-            'interest_teachers'   => 'nullable|array',
-            'interest_teachers.*' => 'nullable|exists:teachers,id',
+            'teacher_id'               => 'nullable|exists:teachers,id',
+            'total_biaya'              => 'required|numeric|min:0',
+            'total_sessions'           => 'nullable|integer|min:1',
+            'biaya_per_sesi'           => 'nullable|numeric|min:0',
+            'interest_sessions'        => 'nullable|array',
+            'interest_sessions.*'      => 'nullable|integer|min:0',
+            'interest_teachers'        => 'nullable|array',
+            'interest_teachers.*'      => 'nullable|exists:teachers,id',
+            'interest_teacher_honor'   => 'nullable|array',
+            'interest_teacher_honor.*' => 'nullable|numeric|min:0',
+            'interest_teacher_sesi'    => 'nullable|array',
+            'interest_teacher_sesi.*'  => 'nullable|integer|min:0',
         ]);
 
         if (!$registration->student_id) {
@@ -99,7 +104,6 @@ class RegistrationListController extends Controller
             $primaryTeacherId = $request->teacher_id
                 ?? ($interestTeachers ? array_values($interestTeachers)[0] : null);
 
-            $teacher   = Teacher::find($primaryTeacherId);
             $totalBiaya = (float) $request->total_biaya;
 
             // Generate invoice number
@@ -109,7 +113,7 @@ class RegistrationListController extends Controller
             $nomor = 'INV-REG-' . $year . $month . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
 
             // Resolve branch
-            $student = \App\Models\Student::find($registration->student_id);
+            $student  = \App\Models\Student::find($registration->student_id);
             $branchId = $student?->branch_id;
 
             $invoice = Invoice::create([
@@ -133,16 +137,28 @@ class RegistrationListController extends Controller
             }
             $totalSessions = $interestSessions ? array_sum($interestSessions) : ($request->total_sessions ?? null);
 
+            $interestTeacherHonor = null;
+            if ($request->filled('interest_teacher_honor') && is_array($request->interest_teacher_honor)) {
+                $interestTeacherHonor = array_map('floatval', array_filter($request->interest_teacher_honor, fn($v) => $v !== null && $v !== ''));
+            }
+
+            $interestTeacherSesi = null;
+            if ($request->filled('interest_teacher_sesi') && is_array($request->interest_teacher_sesi)) {
+                $interestTeacherSesi = array_map('intval', array_filter($request->interest_teacher_sesi, fn($v) => $v !== null && $v !== ''));
+            }
+
             $registration->update([
-                'assigned_teacher_id' => $primaryTeacherId,
-                'biaya_per_sesi'      => $request->biaya_per_sesi ?? null,
-                'total_sessions'      => $totalSessions,
-                'interest_sessions'   => $interestSessions,
-                'interest_teachers'   => $interestTeachers,
-                'total_biaya'         => $totalBiaya,
-                'invoice_id'          => $invoice->id,
-                'payment_status'      => 'belum_bayar',
-                'academic_status'     => 'menunggu_kelas',
+                'assigned_teacher_id'    => $primaryTeacherId,
+                'biaya_per_sesi'         => $request->biaya_per_sesi ?? null,
+                'total_sessions'         => $totalSessions,
+                'interest_sessions'      => $interestSessions,
+                'interest_teachers'      => $interestTeachers,
+                'interest_teacher_honor' => $interestTeacherHonor,
+                'interest_teacher_sesi'  => $interestTeacherSesi,
+                'total_biaya'            => $totalBiaya,
+                'invoice_id'             => $invoice->id,
+                'payment_status'         => 'belum_bayar',
+                'academic_status'        => 'menunggu_kelas',
             ]);
 
             DB::commit();
@@ -157,14 +173,18 @@ class RegistrationListController extends Controller
     public function markLunas(Request $request, StudentRegistration $registration)
     {
         $request->validate([
-            'teacher_id'          => 'nullable|exists:teachers,id',
-            'total_biaya'         => 'required|numeric|min:0',
-            'total_sessions'      => 'nullable|integer|min:1',
-            'biaya_per_sesi'      => 'nullable|numeric|min:0',
-            'interest_sessions'   => 'nullable|array',
-            'interest_sessions.*' => 'nullable|integer|min:0',
-            'interest_teachers'   => 'nullable|array',
-            'interest_teachers.*' => 'nullable|exists:teachers,id',
+            'teacher_id'               => 'nullable|exists:teachers,id',
+            'total_biaya'              => 'required|numeric|min:0',
+            'total_sessions'           => 'nullable|integer|min:1',
+            'biaya_per_sesi'           => 'nullable|numeric|min:0',
+            'interest_sessions'        => 'nullable|array',
+            'interest_sessions.*'      => 'nullable|integer|min:0',
+            'interest_teachers'        => 'nullable|array',
+            'interest_teachers.*'      => 'nullable|exists:teachers,id',
+            'interest_teacher_honor'   => 'nullable|array',
+            'interest_teacher_honor.*' => 'nullable|numeric|min:0',
+            'interest_teacher_sesi'    => 'nullable|array',
+            'interest_teacher_sesi.*'  => 'nullable|integer|min:0',
         ]);
 
         if (!$registration->student_id) {
@@ -212,16 +232,28 @@ class RegistrationListController extends Controller
             }
             $totalSessions = $interestSessions ? array_sum($interestSessions) : ($request->total_sessions ?? null);
 
+            $interestTeacherHonorLunas = null;
+            if ($request->filled('interest_teacher_honor') && is_array($request->interest_teacher_honor)) {
+                $interestTeacherHonorLunas = array_map('floatval', array_filter($request->interest_teacher_honor, fn($v) => $v !== null && $v !== ''));
+            }
+
+            $interestTeacherSesiLunas = null;
+            if ($request->filled('interest_teacher_sesi') && is_array($request->interest_teacher_sesi)) {
+                $interestTeacherSesiLunas = array_map('intval', array_filter($request->interest_teacher_sesi, fn($v) => $v !== null && $v !== ''));
+            }
+
             $registration->update([
-                'assigned_teacher_id' => $primaryTeacherIdLunas,
-                'biaya_per_sesi'      => $request->biaya_per_sesi ?? null,
-                'total_sessions'      => $totalSessions,
-                'interest_sessions'   => $interestSessions,
-                'interest_teachers'   => $interestTeachersLunas,
-                'total_biaya'         => $totalBiaya,
-                'invoice_id'          => $invoice->id,
-                'payment_status'      => 'lunas',
-                'academic_status'     => 'terjadwal',
+                'assigned_teacher_id'    => $primaryTeacherIdLunas,
+                'biaya_per_sesi'         => $request->biaya_per_sesi ?? null,
+                'total_sessions'         => $totalSessions,
+                'interest_sessions'      => $interestSessions,
+                'interest_teachers'      => $interestTeachersLunas,
+                'interest_teacher_honor' => $interestTeacherHonorLunas,
+                'interest_teacher_sesi'  => $interestTeacherSesiLunas,
+                'total_biaya'            => $totalBiaya,
+                'invoice_id'             => $invoice->id,
+                'payment_status'         => 'lunas',
+                'academic_status'        => 'terjadwal',
             ]);
 
             DB::commit();
