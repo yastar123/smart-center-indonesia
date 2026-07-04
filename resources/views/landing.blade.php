@@ -1357,8 +1357,8 @@
 <section class="section-pad" id="galeri">
     <div class="container-lp">
         <div class="text-center reveal">
-            <h2 class="section-title">Galeri <em class="section-title-accent">Kegiatan</em></h2>
-            <p class="section-subtitle mx-auto">Momen belajar menyenangkan bersama siswa dan tutor terbaik SCI di seluruh Indonesia.</p>
+            <h2 class="section-title">{{ $ls('galeri.title_line1','Galeri') }} <em class="section-title-accent">{{ $ls('galeri.title_accent','Kegiatan') }}</em></h2>
+            <p class="section-subtitle mx-auto">{{ $ls('galeri.subtitle','Momen belajar menyenangkan bersama siswa dan tutor terbaik SCI di seluruh Indonesia.') }}</p>
         </div>
 
         @php
@@ -1388,9 +1388,9 @@
 <section class="tutor-grid-section" id="tutor">
     <div class="container-lp">
         <div class="text-center reveal">
-            <div class="program-photo-eyebrow">Tim Pengajar</div>
-            <h2 class="section-title">Tutor <em class="section-title-accent">Terbaik</em> Kami</h2>
-            <p class="section-subtitle mx-auto">Dilatih secara profesional dan berpengalaman di bidangnya masing-masing untuk memberikan hasil terbaik bagi setiap siswa.</p>
+            <div class="program-photo-eyebrow">{{ $ls('tutor.eyebrow','Tim Pengajar') }}</div>
+            <h2 class="section-title">{{ $ls('tutor.title_line1','Tutor') }} <em class="section-title-accent">{{ $ls('tutor.title_accent','Terbaik') }}</em> {{ $ls('tutor.title_line2','Kami') }}</h2>
+            <p class="section-subtitle mx-auto">{{ $ls('tutor.subtitle','Dilatih secara profesional dan berpengalaman di bidangnya masing-masing untuk memberikan hasil terbaik bagi setiap siswa.') }}</p>
         </div>
 
         @php
@@ -1469,9 +1469,9 @@
 <section class="bantuan-section" id="bantuan">
     <div class="container-lp">
         <div class="text-center reveal">
-            <div class="program-photo-eyebrow">Bantuan &amp; Kontak</div>
-            <h2 class="section-title">Pertanyaan &amp; <em class="section-title-accent">Hubungi Kami</em></h2>
-            <p class="section-subtitle mx-auto">Punya pertanyaan atau ingin bergabung? Kami siap membantu Anda kapan saja.</p>
+            <div class="program-photo-eyebrow">{{ $ls('bantuan.eyebrow','Bantuan & Kontak') }}</div>
+            <h2 class="section-title">{{ $ls('bantuan.title_line1','Pertanyaan &') }} <em class="section-title-accent">{{ $ls('bantuan.title_accent','Hubungi Kami') }}</em></h2>
+            <p class="section-subtitle mx-auto">{{ $ls('bantuan.subtitle','Punya pertanyaan atau ingin bergabung? Kami siap membantu Anda kapan saja.') }}</p>
         </div>
 
         <div class="bantuan-inner">
@@ -1533,19 +1533,20 @@
 <section class="cabang-photo-section" id="cabang">
     <div class="container-lp">
         <div class="text-center reveal">
-            <div class="program-photo-eyebrow">Hadir di Seluruh Indonesia</div>
+            <div class="program-photo-eyebrow">{{ $ls('cabang.eyebrow','Hadir di Seluruh Indonesia') }}</div>
             <h2 class="section-title">Cabang SCI <em class="section-title-accent">Indonesia</em></h2>
-            <p class="section-subtitle mx-auto">Dengan 150+ cabang di berbagai kota, SCI selalu dekat dengan Anda dan keluarga.</p>
+            <p class="section-subtitle mx-auto">{{ $ls('cabang.subtitle','Dengan 150+ cabang di berbagai kota, SCI selalu dekat dengan Anda dan keluarga.') }}</p>
         </div>
 
         @php
-        $branches3 = \App\Models\Branch::take(3)->get();
-        $cityPhotos = [
+        $allBranches = \App\Models\Branch::orderBy('name')->get();
+        $branches3   = $allBranches->take(3);
+        $cityPhotos  = [
             'https://images.unsplash.com/photo-1555899434-94d1368aa7af?w=800&q=80',
             'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80',
             'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80',
         ];
-        $cabangDisplay = $branches3->count() >= 3 ? $branches3 : collect([
+        $cabangDisplay = $branches3->count() >= 3 ? $branches3->values() : collect([
             (object)['nama'=>'Riau',           'alamat'=>null, 'photo'=>null],
             (object)['nama'=>'Sumatera Barat', 'alamat'=>null, 'photo'=>null],
             (object)['nama'=>'Sumatera Utara', 'alamat'=>null, 'photo'=>null],
@@ -1553,40 +1554,77 @@
         $cbPhoto = fn($cb, $fallback) => !empty($cb->photo) ? (str_starts_with($cb->photo,'http') ? $cb->photo : asset($cb->photo)) : $fallback;
         @endphp
 
+        {{-- ── Featured 3-photo grid ── --}}
         <div class="cabang-photo-grid reveal">
             {{-- Left: 2 stacked cards --}}
             <div class="cabang-photo-left">
                 @foreach([$cabangDisplay[0], $cabangDisplay[2]] as $ci => $cb)
                 @php $bName = $cb->nama ?? $cb->name ?? 'Cabang SCI'; @endphp
+                @if(isset($cb->id))
+                <a href="{{ route('cabang.show', $cb->id) }}" class="cpc" style="display:block;text-decoration:none">
+                @else
                 <div class="cpc">
+                @endif
                     <img src="{{ $cbPhoto($cb, $cityPhotos[$ci === 0 ? 0 : 2]) }}" alt="{{ $bName }}" loading="lazy">
                     <div class="cpc-overlay">
                         <div class="cpc-name">{{ $bName }}</div>
                         <div class="cpc-sub">Jasa Les Privat {{ $bName }}</div>
-                        @if(isset($cb->id))
-                        <a href="{{ route('cabang.show', $cb->id) }}" class="btn-cpc">Lihat Detail</a>
-                        @else
-                        <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI, saya ingin tanya tentang les privat di '.$bName) }}" target="_blank" class="btn-cpc">Lihat Detail</a>
-                        @endif
+                        <span class="btn-cpc">Lihat Detail <i class="bi bi-arrow-right"></i></span>
                     </div>
+                @if(isset($cb->id))
+                </a>
+                @else
                 </div>
+                @endif
                 @endforeach
             </div>
             {{-- Right: 1 tall card --}}
             @php $cb2 = $cabangDisplay[1]; $bName2 = $cb2->nama ?? $cb2->name ?? 'Cabang SCI'; @endphp
+            @if(isset($cb2->id))
+            <a href="{{ route('cabang.show', $cb2->id) }}" class="cpc cpc-tall" style="display:block;text-decoration:none">
+            @else
             <div class="cpc cpc-tall">
+            @endif
                 <img src="{{ $cbPhoto($cb2, $cityPhotos[1]) }}" alt="{{ $bName2 }}" loading="lazy" style="height:100%;min-height:410px">
                 <div class="cpc-overlay">
                     <div class="cpc-name">{{ $bName2 }}</div>
                     <div class="cpc-sub">Jasa Les Privat {{ $bName2 }}</div>
-                    @if(isset($cb2->id))
-                    <a href="{{ route('cabang.show', $cb2->id) }}" class="btn-cpc">Lihat Detail</a>
-                    @else
-                    <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI, saya ingin tanya tentang les privat di '.$bName2) }}" target="_blank" class="btn-cpc">Lihat Detail</a>
-                    @endif
+                    <span class="btn-cpc">Lihat Detail <i class="bi bi-arrow-right"></i></span>
                 </div>
+            @if(isset($cb2->id))
+            </a>
+            @else
             </div>
+            @endif
         </div>
+
+        {{-- ── All branches grid ── --}}
+        @if($allBranches->count() > 0)
+        <div class="cabang-grid reveal" style="margin-top:2.5rem">
+            @foreach($allBranches as $br)
+            @php
+                $brName    = $br->name ?? $br->nama ?? 'Cabang SCI';
+                $brCity    = $br->city ?: $brName;
+                $brAddress = $br->address ?? '';
+                $brPhone   = $br->phone ?? '';
+            @endphp
+            <a href="{{ route('cabang.show', $br->id) }}" class="cabang-card" style="text-decoration:none;display:block">
+                <div class="cabang-icon"><i class="bi bi-geo-alt-fill"></i></div>
+                <div class="cabang-name">{{ $brName }}</div>
+                @if($brCity && $brCity !== $brName)
+                    <div class="cabang-address" style="font-size:.75rem;font-weight:600;color:var(--primary-dark);margin-bottom:.3rem">{{ $brCity }}</div>
+                @endif
+                @if($brAddress)
+                    <div class="cabang-address">{{ Str::limit($brAddress, 80) }}</div>
+                @endif
+                @if($brPhone)
+                    <div class="cabang-phone"><i class="bi bi-telephone-fill"></i> {{ $brPhone }}</div>
+                @endif
+                <div class="cabang-tag" style="margin-top:.85rem"><i class="bi bi-circle-fill" style="font-size:.4rem"></i> Aktif &middot; Klik untuk detail</div>
+            </a>
+            @endforeach
+        </div>
+        @endif
     </div>
 </section>
 

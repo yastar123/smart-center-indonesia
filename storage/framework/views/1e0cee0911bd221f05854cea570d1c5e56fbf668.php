@@ -22,6 +22,13 @@
     $dbPrograms  = \App\Models\LandingProgram::active()->orderBy('sort_order')->get();
     $waMain      = \App\Models\LandingWaNumber::primaryNumber($ls('footer.wa_number','628001234567'));
     $waNumbers   = \App\Models\LandingWaNumber::active()->orderBy('sort_order')->get();
+    $dbTickers   = \App\Models\LandingTicker::active()->orderBy('sort_order')->get();
+    $dbFeatures  = \App\Models\LandingFeature::active()->orderBy('sort_order')->get();
+    $dbJenjangs  = \App\Models\LandingJenjang::active()->orderBy('sort_order')->get();
+    $dbTrusts    = \App\Models\LandingTrust::active()->orderBy('sort_order')->get();
+    $dbHighlights= \App\Models\LandingHighlight::active()->orderBy('sort_order')->get();
+    $dbGalleries = \App\Models\LandingGallery::active()->orderBy('sort_order')->get();
+    $dbFaqs      = \App\Models\LandingFaq::active()->orderBy('sort_order')->get();
     $tutorGrads = [
         'linear-gradient(160deg,#260632,#c84ddf)',
         'linear-gradient(160deg,#1a3a6b,#2563eb)',
@@ -1051,13 +1058,9 @@
 <div class="hero-ticker" aria-hidden="true">
     <div class="ticker-track">
         <?php
-            $tickerItems = [
+            $tickerItems = $dbTickers->isNotEmpty() ? $dbTickers->map(fn($t) => [$t->emoji, e($t->text)])->all() : [
                 ['🎉', 'Diskon Spesial! Gratis biaya pendaftaran bulan ini'],
                 ['📚', 'Daftar sekarang &amp; dapatkan sesi konsultasi GRATIS!'],
-                ['🎁', 'Promo Paket Hemat: Beli 10 sesi gratis 2 sesi ekstra'],
-                ['⭐', 'Lebih dari 1.000+ siswa sudah bergabung bersama kami'],
-                ['🏆', 'Tutor berpengalaman &amp; bersertifikat nasional'],
-                ['📞', 'Hubungi kami sekarang &mdash; konsultasi gratis!'],
             ];
         ?>
         
@@ -1082,42 +1085,25 @@
                 <span class="tentang-pill neutral">ISO Certified</span>
             </div>
             <h2 class="tentang-title">
-                Tentang <span class="tentang-title-accent">Smart Center Indonesia</span>
+                <?php echo e($ls('tentang.title_line1','Tentang')); ?> <span class="tentang-title-accent"><?php echo e($ls('tentang.title_accent','Smart Center Indonesia')); ?></span>
             </h2>
             <p class="tentang-desc">
-                Smart Center Indonesia (SCI) adalah lembaga pendidikan yang bergerak di bidang bimbingan belajar, kursus, dan les privat (1 guru 1 siswa) berbasis offline dan online yang berkomitmen menjadi lembaga terbaik nomor 1 di Indonesia.
+                <?php echo e($ls('tentang.desc1','Smart Center Indonesia (SCI) adalah lembaga pendidikan yang bergerak di bidang bimbingan belajar, kursus, dan les privat (1 guru 1 siswa) berbasis offline dan online yang berkomitmen menjadi lembaga terbaik nomor 1 di Indonesia.')); ?>
+
             </p>
             <p class="tentang-desc">
-                Dengan metode pembelajaran efektif, pengajar berpengalaman, serta pendekatan personal, SCI hadir sebagai solusi pendidikan terpercaya. <span class="tentang-desc-quote">"Wujudkan mimpi, raih prestasi!"</span>
+                <?php echo e($ls('tentang.desc2','Dengan metode pembelajaran efektif, pengajar berpengalaman, serta pendekatan personal, SCI hadir sebagai solusi pendidikan terpercaya.')); ?> <span class="tentang-desc-quote">"<?php echo e($ls('tentang.quote','Wujudkan mimpi, raih prestasi!')); ?>"</span>
             </p>
         </div>
 
         
         <div class="tentang-features">
+            <?php $__currentLoopData = $dbFeatures; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $feat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="tentang-feat">
-                <div class="tentang-feat-icon"><i class="bi bi-patch-check-fill"></i></div>
-                <div class="tentang-feat-label">Tutor Bersertifikat</div>
+                <div class="tentang-feat-icon"><i class="bi <?php echo e($feat->icon); ?>"></i></div>
+                <div class="tentang-feat-label"><?php echo e($feat->label); ?></div>
             </div>
-            <div class="tentang-feat">
-                <div class="tentang-feat-icon"><i class="bi bi-house-heart-fill"></i></div>
-                <div class="tentang-feat-label">Bisa Home Visit</div>
-            </div>
-            <div class="tentang-feat">
-                <div class="tentang-feat-icon"><i class="bi bi-camera-video-fill"></i></div>
-                <div class="tentang-feat-label">Kelas Online &amp; Offline</div>
-            </div>
-            <div class="tentang-feat">
-                <div class="tentang-feat-icon"><i class="bi bi-bar-chart-fill"></i></div>
-                <div class="tentang-feat-label">Evaluasi Rutin Bulanan</div>
-            </div>
-            <div class="tentang-feat">
-                <div class="tentang-feat-icon"><i class="bi bi-headset"></i></div>
-                <div class="tentang-feat-label">Konsultasi 24/7</div>
-            </div>
-            <div class="tentang-feat">
-                <div class="tentang-feat-icon"><i class="bi bi-bullseye"></i></div>
-                <div class="tentang-feat-label">Target &amp; Hasil Terukur</div>
-            </div>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
 </section>
@@ -1132,78 +1118,23 @@
         </div>
 
         <div class="program-photo-grid">
-            
-            <a href="<?php echo e(route('register')); ?>" class="ppc reveal reveal-delay-1">
+            <?php $__currentLoopData = $dbPrograms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pi => $prog): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <a href="<?php echo e(route('register')); ?>" class="ppc reveal reveal-delay-<?php echo e(($pi % 3) + 1); ?>">
                 <div class="ppc-img-wrap">
-                    <img src="https://images.unsplash.com/photo-1509228468518-180dd4864904?w=600&q=80" alt="Bimbel Mata Pelajaran" loading="lazy">
+                    <?php if($prog->image): ?>
+                        <img src="<?php echo e(str_starts_with($prog->image,'http') ? $prog->image : asset($prog->image)); ?>" alt="<?php echo e($prog->title); ?>" loading="lazy">
+                    <?php else: ?>
+                        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;background:var(--off-white,#fdf8ff)"><?php echo e($prog->icon_emoji ?? '📖'); ?></div>
+                    <?php endif; ?>
                 </div>
                 <div class="ppc-body">
-                    <span class="ppc-badge" style="background:#e8f5e9;color:#2e7d32">SEMUA JENJANG</span>
-                    <div class="ppc-title">Bimbel Mata Pelajaran</div>
-                    <div class="ppc-desc">Bimbingan semua mata pelajaran sekolah dengan metode efektif dan menyenangkan.</div>
+                    <span class="ppc-badge" style="background:<?php echo e($prog->badge_bg ?? '#e8f5e9'); ?>;color:<?php echo e($prog->badge_color ?? '#2e7d32'); ?>"><?php echo e($prog->badge_label); ?></span>
+                    <div class="ppc-title"><?php echo e($prog->title); ?></div>
+                    <div class="ppc-desc"><?php echo e($prog->description); ?></div>
                     <div class="ppc-link">Lihat Detail <i class="bi bi-arrow-down"></i></div>
                 </div>
             </a>
-            
-            <a href="<?php echo e(route('register')); ?>" class="ppc reveal reveal-delay-2">
-                <div class="ppc-img-wrap">
-                    <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=600&q=80" alt="Persiapan Ujian" loading="lazy">
-                </div>
-                <div class="ppc-body">
-                    <span class="ppc-badge" style="background:#f3e8ff;color:#7e22ce">SMP · SMA</span>
-                    <div class="ppc-title">Persiapan Ujian</div>
-                    <div class="ppc-desc">Persiapan UTS, UAS & Ujian Sekolah agar nilai meningkat pesat dan lulus terbaik.</div>
-                    <div class="ppc-link">Lihat Detail <i class="bi bi-arrow-down"></i></div>
-                </div>
-            </a>
-            
-            <a href="<?php echo e(route('register')); ?>" class="ppc reveal reveal-delay-3">
-                <div class="ppc-img-wrap">
-                    <img src="https://images.unsplash.com/photo-1503676382389-4809596d5290?w=600&q=80" alt="Persiapan Tes & SBMPTN" loading="lazy">
-                </div>
-                <div class="ppc-body">
-                    <span class="ppc-badge" style="background:#fff7ed;color:#c2410c">INTENSIF</span>
-                    <div class="ppc-title">Persiapan Tes & SBMPTN</div>
-                    <div class="ppc-desc">Persiapan masuk sekolah favorit, PTN, CPNS & tes lainnya secara intensif.</div>
-                    <div class="ppc-link">Lihat Detail <i class="bi bi-arrow-down"></i></div>
-                </div>
-            </a>
-            
-            <a href="<?php echo e(route('register')); ?>" class="ppc reveal reveal-delay-1">
-                <div class="ppc-img-wrap">
-                    <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&q=80" alt="Kursus Bahasa" loading="lazy">
-                </div>
-                <div class="ppc-body">
-                    <span class="ppc-badge" style="background:#e0f2fe;color:#0369a1">SEMUA LEVEL</span>
-                    <div class="ppc-title">Kursus Bahasa</div>
-                    <div class="ppc-desc">Inggris, Jepang, Mandarin, Arab — tingkatkan kemampuan bahasa Anda bersama kami.</div>
-                    <div class="ppc-link">Lihat Detail <i class="bi bi-arrow-down"></i></div>
-                </div>
-            </a>
-            
-            <a href="<?php echo e(route('register')); ?>" class="ppc reveal reveal-delay-2">
-                <div class="ppc-img-wrap">
-                    <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&q=80" alt="Kursus Komputer" loading="lazy">
-                </div>
-                <div class="ppc-body">
-                    <span class="ppc-badge" style="background:#fef2f2;color:#b91c1c">POPULER 🔥</span>
-                    <div class="ppc-title">Kursus Komputer</div>
-                    <div class="ppc-desc">Microsoft Office, Desain Grafis, Programming — teknologi terkini untuk karir masa depan.</div>
-                    <div class="ppc-link">Lihat Detail <i class="bi bi-arrow-down"></i></div>
-                </div>
-            </a>
-            
-            <a href="<?php echo e(route('register')); ?>" class="ppc reveal reveal-delay-3">
-                <div class="ppc-img-wrap">
-                    <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&q=80" alt="Kursus Akuntansi" loading="lazy">
-                </div>
-                <div class="ppc-body">
-                    <span class="ppc-badge" style="background:#f5f3ff;color:#6d28d9">TERBARU ✨</span>
-                    <div class="ppc-title">Kursus Akuntansi</div>
-                    <div class="ppc-desc">Akuntansi dasar hingga profesional: perpajakan & keuangan untuk mahasiswa dan karyawan.</div>
-                    <div class="ppc-link">Lihat Detail <i class="bi bi-arrow-down"></i></div>
-                </div>
-            </a>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
 </section>
@@ -1240,49 +1171,20 @@
         </div>
 
         <div class="jenjang-grid" id="jenjangGrid">
+            <?php $__currentLoopData = $dbJenjangs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $jj): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <a href="<?php echo e(route('register')); ?>" class="jenjang-card">
                 <div class="jc-photo-wrap">
-                    <img src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=200&q=80&auto=format&fit=crop" alt="TK" loading="lazy"
+                    <?php if($jj->image): ?>
+                    <img src="<?php echo e(str_starts_with($jj->image,'http') ? $jj->image : asset($jj->image)); ?>" alt="<?php echo e($jj->name); ?>" loading="lazy"
                          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                    <div class="jc-photo-fallback" style="display:none">🌱</div>
+                    <?php endif; ?>
+                    <div class="jc-photo-fallback" style="display:<?php echo e($jj->image ? 'none' : 'flex'); ?>"><?php echo e($jj->emoji); ?></div>
                 </div>
-                <div class="jc-name">TK</div>
-                <div class="jc-label">Taman Kanak-Kanak</div>
+                <div class="jc-name"><?php echo e($jj->name); ?></div>
+                <div class="jc-label"><?php echo e($jj->label); ?></div>
                 <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
             </a>
-
-            <a href="<?php echo e(route('register')); ?>" class="jenjang-card">
-                <div class="jc-photo-wrap">
-                    <img src="https://images.unsplash.com/photo-1588072432836-e10032774350?w=200&q=80&auto=format&fit=crop" alt="SD" loading="lazy"
-                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                    <div class="jc-photo-fallback" style="display:none">📚</div>
-                </div>
-                <div class="jc-name">SD</div>
-                <div class="jc-label">Sekolah Dasar</div>
-                <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
-            </a>
-
-            <a href="<?php echo e(route('register')); ?>" class="jenjang-card">
-                <div class="jc-photo-wrap">
-                    <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=200&q=80&auto=format&fit=crop" alt="SMP" loading="lazy"
-                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                    <div class="jc-photo-fallback" style="display:none">🔬</div>
-                </div>
-                <div class="jc-name">SMP</div>
-                <div class="jc-label">Sekolah Menengah Pertama</div>
-                <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
-            </a>
-
-            <a href="<?php echo e(route('register')); ?>" class="jenjang-card">
-                <div class="jc-photo-wrap">
-                    <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=200&q=80&auto=format&fit=crop" alt="SMA" loading="lazy"
-                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                    <div class="jc-photo-fallback" style="display:none">🎓</div>
-                </div>
-                <div class="jc-name">SMA / Umum</div>
-                <div class="jc-label">SMA &amp; Karyawan</div>
-                <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
-            </a>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
         <div class="mobile-carousel-dots" id="jenjang-dots"></div>
     </div>
@@ -1291,9 +1193,9 @@
 
 <section class="cari-guru-section" id="cari-guru">
     <div class="cari-guru-inner reveal">
-        <div class="cg-eyebrow">TEMUKAN PENGAJAR TERBAIK</div>
-        <h2 class="cg-title">Cari Guru <span class="cg-title-accent">Terbaik</span>, Secepat Klik</h2>
-        <p class="cg-subtitle">Temukan tutor privat terbaik di kotamu — pilih berdasarkan mata pelajaran, lokasi, dan metode belajar yang kamu inginkan.</p>
+        <div class="cg-eyebrow"><?php echo e($ls('cariguru.eyebrow','TEMUKAN PENGAJAR TERBAIK')); ?></div>
+        <h2 class="cg-title"><?php echo e($ls('cariguru.title_line1','Cari Guru')); ?> <span class="cg-title-accent"><?php echo e($ls('cariguru.title_accent','Terbaik')); ?></span><?php echo e($ls('cariguru.title_line2',', Secepat Klik')); ?></h2>
+        <p class="cg-subtitle"><?php echo e($ls('cariguru.subtitle','Temukan tutor privat terbaik di kotamu — pilih berdasarkan mata pelajaran, lokasi, dan metode belajar yang kamu inginkan.')); ?></p>
 
         <div class="cg-form">
             <div class="cg-fields">
@@ -1335,10 +1237,9 @@
                 </a>
             </div>
             <div class="cg-trust">
-                <div class="cg-trust-item"><i class="bi bi-patch-check-fill"></i> 500+ Tutor Bersertifikat</div>
-                <div class="cg-trust-item"><i class="bi bi-lightning-fill"></i> Respon dalam 1 Jam</div>
-                <div class="cg-trust-item"><i class="bi bi-shield-fill-check"></i> Aman &amp; Terpercaya</div>
-                <div class="cg-trust-item"><i class="bi bi-award-fill"></i> Garansi Hasil Belajar</div>
+                <?php $__currentLoopData = $dbTrusts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $trust): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div class="cg-trust-item"><i class="bi <?php echo e($trust->icon); ?>"></i> <?php echo e($trust->text); ?></div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
         </div>
     </div>
@@ -1351,25 +1252,24 @@
             <div class="section-eyebrow" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.9)">
                 <i class="bi bi-shield-fill-check"></i> Keunggulan
             </div>
-            <h2 class="section-title" style="color:white">Keunggulan <em class="section-title-accent">SCI</em></h2>
-            <p class="section-subtitle mx-auto" style="color:rgba(255,255,255,.7)">Lima pilar yang membuat SCI menjadi pilihan terpercaya jutaan keluarga Indonesia selama 14+ tahun.</p>
+            <h2 class="section-title" style="color:white">Keunggulan <em class="section-title-accent"><?php echo e($ls('keunggulan.title_accent','SCI')); ?></em></h2>
+            <p class="section-subtitle mx-auto" style="color:rgba(255,255,255,.7)"><?php echo e($ls('keunggulan.subtitle','Lima pilar yang membuat SCI menjadi pilihan terpercaya jutaan keluarga Indonesia selama 14+ tahun.')); ?></p>
         </div>
 
+        <?php
+        $kdCards = $dbHighlights->map(fn($h) => [
+            'img'   => $h->image ? (str_starts_with($h->image,'http') ? $h->image : asset($h->image)) : null,
+            'alt'   => $h->title,
+            'title' => $h->title,
+            'desc'  => e($h->description),
+        ]);
+        ?>
         <div class="keunggulan-inf-vp">
             <div class="keunggulan-inf-track">
-                <?php
-                $kdCards = [
-                    ['img'=>'https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=200&q=80','alt'=>'Tutor Profesional','title'=>'Tutor Profesional','desc'=>'Pengajar ahli bersertifikat resmi dengan pengalaman bertahun-tahun dan rekam jejak hasil nyata.'],
-                    ['img'=>'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&q=80','alt'=>'Bisa Home Visit','title'=>'Bisa Home Visit','desc'=>'Tutor kami siap datang ke rumah Anda kapan saja. Jadwal fleksibel, nyaman, dan tanpa perlu repot.'],
-                    ['img'=>'https://images.unsplash.com/photo-1581092334651-ddf26d9a09d0?w=200&q=80','alt'=>'Metode Modern','title'=>'Metode Modern','desc'=>'Sistem belajar interaktif yang disesuaikan dengan gaya belajar masing-masing siswa. Belajar itu menyenangkan!'],
-                    ['img'=>'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=200&q=80','alt'=>'Hasil Terukur','title'=>'Hasil Terukur','desc'=>'Evaluasi rutin, progress terpantau, laporan bulanan. Nilai meningkat signifikan — dijamin atau kami ulang!'],
-                    ['img'=>'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80','alt'=>'Support Penuh','title'=>'Support Penuh','desc'=>'Bantuan belajar &amp; konsultasi 24/7 via WhatsApp. Kami selalu ada untuk mendukung perjalanan belajar Anda.'],
-                ];
-                ?>
                 
                 <?php $__currentLoopData = $kdCards; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kd): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div class="kd-card">
-                    <div class="kd-photo"><img src="<?php echo e($kd['img']); ?>" alt="<?php echo e($kd['alt']); ?>" loading="lazy"></div>
+                    <div class="kd-photo"><?php if($kd['img']): ?><img src="<?php echo e($kd['img']); ?>" alt="<?php echo e($kd['alt']); ?>" loading="lazy"><?php endif; ?></div>
                     <div class="kd-title"><?php echo e($kd['title']); ?></div>
                     <div class="kd-desc"><?php echo $kd['desc']; ?></div>
                 </div>
@@ -1377,7 +1277,7 @@
                 
                 <?php $__currentLoopData = $kdCards; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kd): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div class="kd-card" aria-hidden="true">
-                    <div class="kd-photo"><img src="<?php echo e($kd['img']); ?>" alt="" loading="lazy"></div>
+                    <div class="kd-photo"><?php if($kd['img']): ?><img src="<?php echo e($kd['img']); ?>" alt="" loading="lazy"><?php endif; ?></div>
                     <div class="kd-title"><?php echo e($kd['title']); ?></div>
                     <div class="kd-desc"><?php echo $kd['desc']; ?></div>
                 </div>
@@ -1398,10 +1298,7 @@
 
         <?php
         $testiCards = $dbTestis->isNotEmpty() ? $dbTestis->take(4) : collect([
-            (object)['text'=>'Belajar di SCI sangat menyenangkan! Tutor menjelaskan dengan cara yang mudah dipahami dan nilai saya meningkat pesat. Sangat merekomendasikan untuk semua!','name'=>'Aisyah Rahma','role'=>'Siswa SMA · Matematika','initial'=>'A','gradient'=>'linear-gradient(135deg,#c84ddf,#68117e)'],
-            (object)['text'=>'Program persiapan ujian di SCI sangat membantu. Akhirnya lolos ke kampus impian! Materinya lengkap banget dan tutornya super sabar dan profesional.','name'=>'Ricky Pratama','role'=>'Mahasiswa · Persiapan SBMPTN','initial'=>'R','gradient'=>'linear-gradient(135deg,#10b981,#059669)'],
-            (object)['text'=>'Kursus akuntansi di SCI sangat bermanfaat untuk tugas kuliah dan persiapan kerja. Tutornya sabar, materi lengkap, dan nilai kuliah saya jadi meningkat!','name'=>'Dinda Lestari','role'=>'Mahasiswi · Akuntansi','initial'=>'D','gradient'=>'linear-gradient(135deg,#6366f1,#4338ca)'],
-            (object)['text'=>'Anakku yang awalnya kesulitan di pelajaran IPA sekarang jadi juara kelas! Metode belajar di SCI sangat efektif dan tutornya sangat sabar dan perhatian.','name'=>'Bunda Sari','role'=>'Orang Tua Siswa · Jakarta','initial'=>'B','gradient'=>'linear-gradient(135deg,#f97316,#ea580c)'],
+            (object)['text'=>'Belajar di SCI sangat menyenangkan! Tutor menjelaskan dengan cara yang mudah dipahami dan nilai saya meningkat pesat. Sangat merekomendasikan untuk semua!','name'=>'Aisyah Rahma','role'=>'Siswa SMA · Matematika','initial'=>'A','gradient'=>'linear-gradient(135deg,#c84ddf,#68117e)','photo'=>null],
         ]);
         ?>
         <div class="testi-inf-vp">
@@ -1416,7 +1313,11 @@
                     <div class="tlc-quote">"</div>
                     <p class="tlc-text"><?php echo e($t->text); ?></p>
                     <div class="tlc-author">
+                        <?php if(!empty($t->photo)): ?>
+                        <div class="tlc-avatar-fb" style="padding:0;overflow:hidden"><img src="<?php echo e(str_starts_with($t->photo,'http') ? $t->photo : asset($t->photo)); ?>" alt="<?php echo e($t->name); ?>" style="width:100%;height:100%;object-fit:cover"></div>
+                        <?php else: ?>
                         <div class="tlc-avatar-fb" style="background:<?php echo e($t->gradient); ?>"><?php echo e($t->initial); ?></div>
+                        <?php endif; ?>
                         <div>
                             <div class="tlc-name"><?php echo e($t->name); ?></div>
                             <div class="tlc-role"><?php echo e($t->role); ?></div>
@@ -1435,7 +1336,11 @@
                     <div class="tlc-quote">"</div>
                     <p class="tlc-text"><?php echo e($t->text); ?></p>
                     <div class="tlc-author">
+                        <?php if(!empty($t->photo)): ?>
+                        <div class="tlc-avatar-fb" style="padding:0;overflow:hidden"><img src="<?php echo e(str_starts_with($t->photo,'http') ? $t->photo : asset($t->photo)); ?>" alt="" style="width:100%;height:100%;object-fit:cover"></div>
+                        <?php else: ?>
                         <div class="tlc-avatar-fb" style="background:<?php echo e($t->gradient); ?>"><?php echo e($t->initial); ?></div>
+                        <?php endif; ?>
                         <div>
                             <div class="tlc-name"><?php echo e($t->name); ?></div>
                             <div class="tlc-role"><?php echo e($t->role); ?></div>
@@ -1453,21 +1358,15 @@
 <section class="section-pad" id="galeri">
     <div class="container-lp">
         <div class="text-center reveal">
-            <h2 class="section-title">Galeri <em class="section-title-accent">Kegiatan</em></h2>
-            <p class="section-subtitle mx-auto">Momen belajar menyenangkan bersama siswa dan tutor terbaik SCI di seluruh Indonesia.</p>
+            <h2 class="section-title"><?php echo e($ls('galeri.title_line1','Galeri')); ?> <em class="section-title-accent"><?php echo e($ls('galeri.title_accent','Kegiatan')); ?></em></h2>
+            <p class="section-subtitle mx-auto"><?php echo e($ls('galeri.subtitle','Momen belajar menyenangkan bersama siswa dan tutor terbaik SCI di seluruh Indonesia.')); ?></p>
         </div>
 
         <?php
-        $galeriPhotos = [
-            ['url'=>'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=700&q=80','alt'=>'Kelas Belajar'],
-            ['url'=>'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=700&q=80','alt'=>'Diskusi Kelompok'],
-            ['url'=>'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=700&q=80','alt'=>'Les Online'],
-            ['url'=>'https://images.unsplash.com/photo-1544717305-2782549b5136?w=700&q=80','alt'=>'Tutor Mengajar'],
-            ['url'=>'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=700&q=80','alt'=>'Les Privat'],
-            ['url'=>'https://images.unsplash.com/photo-1509869175650-a1d97972541a?w=700&q=80','alt'=>'Kursus Komputer'],
-            ['url'=>'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=700&q=80','alt'=>'Persiapan Ujian'],
-            ['url'=>'https://images.unsplash.com/photo-1543269865-cbf427effbad?w=700&q=80','alt'=>'Belajar Bersama'],
-        ];
+        $galeriPhotos = $dbGalleries->map(fn($g) => [
+            'url' => $g->image ? (str_starts_with($g->image,'http') ? $g->image : asset($g->image)) : '',
+            'alt' => $g->alt,
+        ])->filter(fn($g) => $g['url'] !== '');
         ?>
 
         <div class="galeri-row-wrap">
@@ -1490,9 +1389,9 @@
 <section class="tutor-grid-section" id="tutor">
     <div class="container-lp">
         <div class="text-center reveal">
-            <div class="program-photo-eyebrow">Tim Pengajar</div>
-            <h2 class="section-title">Tutor <em class="section-title-accent">Terbaik</em> Kami</h2>
-            <p class="section-subtitle mx-auto">Dilatih secara profesional dan berpengalaman di bidangnya masing-masing untuk memberikan hasil terbaik bagi setiap siswa.</p>
+            <div class="program-photo-eyebrow"><?php echo e($ls('tutor.eyebrow','Tim Pengajar')); ?></div>
+            <h2 class="section-title"><?php echo e($ls('tutor.title_line1','Tutor')); ?> <em class="section-title-accent"><?php echo e($ls('tutor.title_accent','Terbaik')); ?></em> <?php echo e($ls('tutor.title_line2','Kami')); ?></h2>
+            <p class="section-subtitle mx-auto"><?php echo e($ls('tutor.subtitle','Dilatih secara profesional dan berpengalaman di bidangnya masing-masing untuk memberikan hasil terbaik bagi setiap siswa.')); ?></p>
         </div>
 
         <?php
@@ -1571,32 +1470,22 @@
 <section class="bantuan-section" id="bantuan">
     <div class="container-lp">
         <div class="text-center reveal">
-            <div class="program-photo-eyebrow">Bantuan &amp; Kontak</div>
-            <h2 class="section-title">Pertanyaan &amp; <em class="section-title-accent">Hubungi Kami</em></h2>
-            <p class="section-subtitle mx-auto">Punya pertanyaan atau ingin bergabung? Kami siap membantu Anda kapan saja.</p>
+            <div class="program-photo-eyebrow"><?php echo e($ls('bantuan.eyebrow','Bantuan & Kontak')); ?></div>
+            <h2 class="section-title"><?php echo e($ls('bantuan.title_line1','Pertanyaan &')); ?> <em class="section-title-accent"><?php echo e($ls('bantuan.title_accent','Hubungi Kami')); ?></em></h2>
+            <p class="section-subtitle mx-auto"><?php echo e($ls('bantuan.subtitle','Punya pertanyaan atau ingin bergabung? Kami siap membantu Anda kapan saja.')); ?></p>
         </div>
 
         <div class="bantuan-inner">
             
             <div class="faq-list reveal">
-                <?php
-                $faqs = [
-                    ['q'=>'Bagaimana cara mendaftar di SCI?',           'a'=>'Anda bisa mendaftar melalui website ini, menghubungi kami via WhatsApp, atau langsung datang ke cabang SCI terdekat. Tim kami akan membantu proses pendaftaran dengan mudah dan cepat.'],
-                    ['q'=>'Apakah bisa datang ke rumah?',               'a'=>'Ya! Kami menyediakan layanan home visit di mana tutor kami akan datang langsung ke rumah Anda. Jadwal fleksibel dan nyaman tanpa perlu keluar rumah.'],
-                    ['q'=>'Jenjang apa saja yang dilayani?',            'a'=>'SCI melayani semua jenjang mulai dari TK, SD, SMP, SMA, hingga mahasiswa dan umum. Tersedia juga kursus bahasa, komputer, dan akuntansi untuk semua usia.'],
-                    ['q'=>'Berapa biaya les privat di SCI?',            'a'=>'Biaya bervariasi tergantung jenjang, mata pelajaran, dan metode belajar (online/offline/home visit). Hubungi kami untuk mendapatkan penawaran terbaik sesuai kebutuhan Anda.'],
-                    ['q'=>'Apakah ada garansi hasil belajar?',          'a'=>'Ya! SCI memberikan garansi hasil belajar. Jika nilai tidak meningkat sesuai target yang disepakati, kami siap memberikan sesi tambahan tanpa biaya ekstra.'],
-                    ['q'=>'Bagaimana sistem pembayaran di SCI?',        'a'=>'Pembayaran bisa dilakukan bulanan atau per paket belajar. Tersedia berbagai metode pembayaran termasuk transfer bank, dompet digital, dan tunai di cabang.'],
-                ];
-                ?>
-                <?php $__currentLoopData = $faqs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $fi => $faq): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php $__currentLoopData = $dbFaqs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $fi => $faq): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div class="faq-item <?php echo e($fi === 0 ? 'open' : ''); ?>">
                     <div class="faq-trigger" onclick="toggleFaq(this)">
-                        <span><?php echo e($faq['q']); ?></span>
+                        <span><?php echo e($faq->question); ?></span>
                         <span class="faq-icon"><i class="bi bi-plus"></i></span>
                     </div>
                     <div class="faq-body">
-                        <div class="faq-body-inner"><?php echo e($faq['a']); ?></div>
+                        <div class="faq-body-inner"><?php echo e($faq->answer); ?></div>
                     </div>
                 </div>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -1645,59 +1534,98 @@
 <section class="cabang-photo-section" id="cabang">
     <div class="container-lp">
         <div class="text-center reveal">
-            <div class="program-photo-eyebrow">Hadir di Seluruh Indonesia</div>
+            <div class="program-photo-eyebrow"><?php echo e($ls('cabang.eyebrow','Hadir di Seluruh Indonesia')); ?></div>
             <h2 class="section-title">Cabang SCI <em class="section-title-accent">Indonesia</em></h2>
-            <p class="section-subtitle mx-auto">Dengan 150+ cabang di berbagai kota, SCI selalu dekat dengan Anda dan keluarga.</p>
+            <p class="section-subtitle mx-auto"><?php echo e($ls('cabang.subtitle','Dengan 150+ cabang di berbagai kota, SCI selalu dekat dengan Anda dan keluarga.')); ?></p>
         </div>
 
         <?php
-        $branches3 = \App\Models\Branch::take(3)->get();
-        $cityPhotos = [
+        $allBranches = \App\Models\Branch::orderBy('name')->get();
+        $branches3   = $allBranches->take(3);
+        $cityPhotos  = [
             'https://images.unsplash.com/photo-1555899434-94d1368aa7af?w=800&q=80',
             'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80',
             'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80',
         ];
-        $cabangDisplay = $branches3->count() >= 3 ? $branches3 : collect([
-            (object)['nama'=>'Riau',           'alamat'=>null],
-            (object)['nama'=>'Sumatera Barat', 'alamat'=>null],
-            (object)['nama'=>'Sumatera Utara', 'alamat'=>null],
+        $cabangDisplay = $branches3->count() >= 3 ? $branches3->values() : collect([
+            (object)['nama'=>'Riau',           'alamat'=>null, 'photo'=>null],
+            (object)['nama'=>'Sumatera Barat', 'alamat'=>null, 'photo'=>null],
+            (object)['nama'=>'Sumatera Utara', 'alamat'=>null, 'photo'=>null],
         ]);
+        $cbPhoto = fn($cb, $fallback) => !empty($cb->photo) ? (str_starts_with($cb->photo,'http') ? $cb->photo : asset($cb->photo)) : $fallback;
         ?>
 
+        
         <div class="cabang-photo-grid reveal">
             
             <div class="cabang-photo-left">
                 <?php $__currentLoopData = [$cabangDisplay[0], $cabangDisplay[2]]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ci => $cb): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <?php $bName = $cb->nama ?? $cb->name ?? 'Cabang SCI'; ?>
+                <?php if(isset($cb->id)): ?>
+                <a href="<?php echo e(route('cabang.show', $cb->id)); ?>" class="cpc" style="display:block;text-decoration:none">
+                <?php else: ?>
                 <div class="cpc">
-                    <img src="<?php echo e($cityPhotos[$ci === 0 ? 0 : 2]); ?>" alt="<?php echo e($bName); ?>" loading="lazy">
+                <?php endif; ?>
+                    <img src="<?php echo e($cbPhoto($cb, $cityPhotos[$ci === 0 ? 0 : 2])); ?>" alt="<?php echo e($bName); ?>" loading="lazy">
                     <div class="cpc-overlay">
                         <div class="cpc-name"><?php echo e($bName); ?></div>
                         <div class="cpc-sub">Jasa Les Privat <?php echo e($bName); ?></div>
-                        <?php if(isset($cb->id)): ?>
-                        <a href="<?php echo e(route('cabang.show', $cb->id)); ?>" class="btn-cpc">Lihat Detail</a>
-                        <?php else: ?>
-                        <a href="https://wa.me/<?php echo e($waMain); ?>?text=<?php echo e(urlencode('Halo SCI, saya ingin tanya tentang les privat di '.$bName)); ?>" target="_blank" class="btn-cpc">Lihat Detail</a>
-                        <?php endif; ?>
+                        <span class="btn-cpc">Lihat Detail <i class="bi bi-arrow-right"></i></span>
                     </div>
+                <?php if(isset($cb->id)): ?>
+                </a>
+                <?php else: ?>
                 </div>
+                <?php endif; ?>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
             
             <?php $cb2 = $cabangDisplay[1]; $bName2 = $cb2->nama ?? $cb2->name ?? 'Cabang SCI'; ?>
+            <?php if(isset($cb2->id)): ?>
+            <a href="<?php echo e(route('cabang.show', $cb2->id)); ?>" class="cpc cpc-tall" style="display:block;text-decoration:none">
+            <?php else: ?>
             <div class="cpc cpc-tall">
-                <img src="<?php echo e($cityPhotos[1]); ?>" alt="<?php echo e($bName2); ?>" loading="lazy" style="height:100%;min-height:410px">
+            <?php endif; ?>
+                <img src="<?php echo e($cbPhoto($cb2, $cityPhotos[1])); ?>" alt="<?php echo e($bName2); ?>" loading="lazy" style="height:100%;min-height:410px">
                 <div class="cpc-overlay">
                     <div class="cpc-name"><?php echo e($bName2); ?></div>
                     <div class="cpc-sub">Jasa Les Privat <?php echo e($bName2); ?></div>
-                    <?php if(isset($cb2->id)): ?>
-                    <a href="<?php echo e(route('cabang.show', $cb2->id)); ?>" class="btn-cpc">Lihat Detail</a>
-                    <?php else: ?>
-                    <a href="https://wa.me/<?php echo e($waMain); ?>?text=<?php echo e(urlencode('Halo SCI, saya ingin tanya tentang les privat di '.$bName2)); ?>" target="_blank" class="btn-cpc">Lihat Detail</a>
-                    <?php endif; ?>
+                    <span class="btn-cpc">Lihat Detail <i class="bi bi-arrow-right"></i></span>
                 </div>
+            <?php if(isset($cb2->id)): ?>
+            </a>
+            <?php else: ?>
             </div>
+            <?php endif; ?>
         </div>
+
+        
+        <?php if($allBranches->count() > 0): ?>
+        <div class="cabang-grid reveal" style="margin-top:2.5rem">
+            <?php $__currentLoopData = $allBranches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $br): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php
+                $brName    = $br->name ?? $br->nama ?? 'Cabang SCI';
+                $brCity    = $br->city ?: $brName;
+                $brAddress = $br->address ?? '';
+                $brPhone   = $br->phone ?? '';
+            ?>
+            <a href="<?php echo e(route('cabang.show', $br->id)); ?>" class="cabang-card" style="text-decoration:none;display:block">
+                <div class="cabang-icon"><i class="bi bi-geo-alt-fill"></i></div>
+                <div class="cabang-name"><?php echo e($brName); ?></div>
+                <?php if($brCity && $brCity !== $brName): ?>
+                    <div class="cabang-address" style="font-size:.75rem;font-weight:600;color:var(--primary-dark);margin-bottom:.3rem"><?php echo e($brCity); ?></div>
+                <?php endif; ?>
+                <?php if($brAddress): ?>
+                    <div class="cabang-address"><?php echo e(Str::limit($brAddress, 80)); ?></div>
+                <?php endif; ?>
+                <?php if($brPhone): ?>
+                    <div class="cabang-phone"><i class="bi bi-telephone-fill"></i> <?php echo e($brPhone); ?></div>
+                <?php endif; ?>
+                <div class="cabang-tag" style="margin-top:.85rem"><i class="bi bi-circle-fill" style="font-size:.4rem"></i> Aktif &middot; Klik untuk detail</div>
+            </a>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </div>
+        <?php endif; ?>
     </div>
 </section>
 

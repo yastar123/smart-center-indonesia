@@ -1,37 +1,14 @@
 @php
     $cityName = $city; // passed from controller
 
-    /* ── Subjects grid ── */
-    $subjects = [
-        ['icon'=>'🔢','name'=>'Matematika',     'desc'=>'SD, SMP, SMA, Kuliah. Dari aritmatika hingga kalkulus.',           'badge'=>'Terpopuler','badge_type'=>'popular'],
-        ['icon'=>'⚡','name'=>'Fisika',          'desc'=>'Mekanika, gelombang, listrik magnetik, termodinamika.',             'badge'=>'SMP–SMA',   'badge_type'=>'level'],
-        ['icon'=>'🧪','name'=>'Kimia',           'desc'=>'Kimia organik, anorganik, stoikiometri, kimia analitik.',           'badge'=>'SMP–SMA',   'badge_type'=>'level'],
-        ['icon'=>'🌿','name'=>'Biologi',         'desc'=>'Sel, genetika, ekosistem, anatomi, fisiologi manusia.',             'badge'=>'SMP–SMA',   'badge_type'=>'level'],
-        ['icon'=>'🇬🇧','name'=>'Bahasa Inggris', 'desc'=>'Speaking, grammar, reading, TOEFL/IELTS preparation.',             'badge'=>'Terpopuler','badge_type'=>'popular'],
-        ['icon'=>'💻','name'=>'Komputer',        'desc'=>'MS Office, Photoshop, Canva, Programming, Web Design.',            'badge'=>'Populer',   'badge_type'=>'hot'],
-        ['icon'=>'📊','name'=>'Akuntansi',       'desc'=>'Akuntansi dasar–profesional, perpajakan, MYOB.',                   'badge'=>'Umum',      'badge_type'=>'general'],
-        ['icon'=>'🇯🇵','name'=>'Bahasa Jepang',  'desc'=>'Hiragana, katakana, kanji, JLPT N5–N1 preparation.',              'badge'=>'Semua Level','badge_type'=>'general'],
-        ['icon'=>'📐','name'=>'Bahasa Indonesia','desc'=>'Tata bahasa, menulis, membaca, persiapan UN/UTBK.',               'badge'=>'SD–SMA',    'badge_type'=>'level'],
-        ['icon'=>'🎨','name'=>'Seni & Desain',   'desc'=>'Menggambar, desain grafis, fotografi dasar, digital art.',         'badge'=>'Umum',      'badge_type'=>'general'],
-        ['icon'=>'🗣️','name'=>'Public Speaking',  'desc'=>'Kepercayaan diri berbicara, debat, presentasi profesional.',      'badge'=>'Semua Level','badge_type'=>'general'],
-        ['icon'=>'📚','name'=>'Persiapan SBMPTN','desc'=>'Latihan soal UTBK, strategi menjawab, simulasi ujian lengkap.',   'badge'=>'SMA',       'badge_type'=>'level'],
-    ];
+    /* ── features, subjects, metodeImages, heroBg, ctaEyebrow, ctaTitle, ctaDesc ──
+       All passed from BranchLandingController; fallbacks already computed there.    */
 
-    /* ── Features list ── */
-    $features = [
-        ['num'=>'01','icon'=>'👩‍🏫','title'=>'Tutor Bersertifikat',    'desc'=>'Semua tutor SCI '.$cityName.' telah melalui seleksi ketat, pelatihan intensif, dan memiliki sertifikat mengajar resmi.'],
-        ['num'=>'02','icon'=>'🏠','title'=>'Home Visit',               'desc'=>'Tutor datang ke rumah Anda di seluruh wilayah '.$cityName.'. Nyaman, privat, dan efisien.'],
-        ['num'=>'03','icon'=>'📈','title'=>'Prestasi Siswa Meningkat', 'desc'=>'Berdasarkan evaluasi internal, mayoritas siswa SCI '.$cityName.' mengalami peningkatan nilai dalam beberapa bulan pertama.'],
-        ['num'=>'04','icon'=>'⏰','title'=>'Jadwal Fleksibel',         'desc'=>'Belajar bisa pagi, siang, sore, ataupun malam hari sesuai kebutuhan siswa.'],
-        ['num'=>'05','icon'=>'💰','title'=>'Harga Transparan',         'desc'=>'Tidak ada biaya tersembunyi. Tersedia paket hemat, pembayaran bulanan, maupun per sesi belajar.'],
-        ['num'=>'06','icon'=>'🛡️','title'=>'Garansi Kepuasan',         'desc'=>'Tutor dapat diganti apabila kurang cocok tanpa biaya tambahan.'],
-    ];
-
-    /* ── Metode belajar — prices from controller ($prices) ── */
+    /* ── Metode belajar — combine controller data ── */
     $metodes = [
-        ['type'=>'HOME VISIT','icon'=>'🏠','title'=>'Les Privat ke Rumah',      'desc'=>'Tutor kami datang langsung ke rumah Anda di seluruh area '.$cityName.' dan sekitarnya. Nyaman, privat, dan efisien.','price'=>$prices['homevisi'],'img'=>'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&q=80'],
-        ['type'=>'ONLINE',    'icon'=>'🖥️','title'=>'Les Online via Zoom/Meet', 'desc'=>'Belajar dari rumah via Zoom, Google Meet, atau platform pilihan Anda. Rekaman sesi tersedia untuk review ulang.','price'=>$prices['online'],'img'=>'https://images.unsplash.com/photo-1588702547923-7093a6c3ba33?w=600&q=80'],
-        ['type'=>'OFFLINE',   'icon'=>'🏫','title'=>'Belajar di Kantor SCI',    'desc'=>'Datang ke kantor SCI '.$cityName.' dan nikmati fasilitas belajar modern, AC, WiFi cepat, dan perpustakaan materi eksklusif.','price'=>$prices['offline'],'img'=>'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600&q=80'],
+        ['type'=>'HOME VISIT','icon'=>'🏠','title'=>'Les Privat ke Rumah',      'desc'=>'Tutor kami datang langsung ke rumah Anda di seluruh area '.$cityName.' dan sekitarnya. Nyaman, privat, dan efisien.','price'=>$prices['homevisi'],'img'=>$metodeImages['homevisi']],
+        ['type'=>'ONLINE',    'icon'=>'🖥️','title'=>'Les Online via Zoom/Meet', 'desc'=>'Belajar dari rumah via Zoom, Google Meet, atau platform pilihan Anda. Rekaman sesi tersedia untuk review ulang.','price'=>$prices['online'],'img'=>$metodeImages['online']],
+        ['type'=>'OFFLINE',   'icon'=>'🏫','title'=>'Belajar di Kantor SCI',    'desc'=>'Datang ke kantor SCI '.$cityName.' dan nikmati fasilitas belajar modern, AC, WiFi cepat, dan perpustakaan materi eksklusif.','price'=>$prices['offline'],'img'=>$metodeImages['offline']],
     ];
 
     /* ── Testimonials ── */
@@ -153,7 +130,7 @@
         }
         .bl-hero::before {
             content:''; position:absolute; inset:0;
-            background-image:url('https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1400&q=60');
+            background-image:url('{{ $heroBg }}');
             background-size:cover; background-position:center;
             opacity:.15; pointer-events:none;
         }
@@ -973,11 +950,10 @@
     <div class="container-bl">
         <div class="bl-cta-box reveal">
             <div class="bl-cta-inner">
-                <div class="bl-cta-eyebrow">🎉 Bergabung Sekarang</div>
-                <h2 class="bl-cta-title">Siap Mulai Belajar<br><em>{{ $cityName }}?</em></h2>
+                <div class="bl-cta-eyebrow">{{ $ctaEyebrow }}</div>
+                <h2 class="bl-cta-title">{{ $ctaTitle }}<br><em>{{ $cityName }}?</em></h2>
                 <p class="bl-cta-desc">
-                    Bergabung dengan {{ number_format($studentCount) }}+ siswa SCI {{ $cityName }} yang telah merasakan manfaatnya.
-                    Konsultasi gratis — tanpa kewajiban daftar.
+                    {{ $ctaDesc ?: 'Bergabung dengan '.number_format($studentCount).'+  siswa SCI '.$cityName.' yang telah merasakan manfaatnya. Konsultasi gratis — tanpa kewajiban daftar.' }}
                 </p>
                 <div class="bl-cta-btns">
                     <a href="https://wa.me/{{ $branchWa }}?text={{ urlencode('Halo SCI '.$cityName.'! Saya ingin konsultasi gratis tentang les privat di '.$cityName.'.') }}"

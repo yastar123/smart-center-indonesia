@@ -49,7 +49,8 @@
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-keunggulan"><i class="bi bi-shield-fill-check me-1"></i>Keunggulan</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-testimonials"><i class="bi bi-chat-heart me-1"></i>Testimoni</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-galeri"><i class="bi bi-images me-1"></i>Galeri</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-faq"><i class="bi bi-question-circle me-1"></i>FAQ</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-faq"><i class="bi bi-question-circle me-1"></i>FAQ &amp; Kontak</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-tutor"><i class="bi bi-person-badge me-1"></i>Tutor</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-wa"><i class="bi bi-whatsapp me-1 text-success"></i>WhatsApp <span class="badge bg-success ms-1" style="font-size:.65rem">{{ $waNumbers->count() }}</span></button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-cta"><i class="bi bi-megaphone me-1"></i>CTA</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-footer"><i class="bi bi-layout-sidebar-inset-reverse me-1"></i>Footer</button></li>
@@ -914,6 +915,226 @@
             </div>
         </div>
 
+        {{-- ────── GALERI TAB ────── --}}
+        <div class="tab-pane fade" id="tab-galeri">
+            <div class="card lp-card mb-4">
+                <div class="card-header lp-card-header"><i class="bi bi-card-text me-2"></i>Teks Bagian "Galeri Kegiatan"</div>
+                <div class="card-body">
+                    <form action="{{ route('admin.landing.settings.update') }}" method="POST">
+                        @csrf @method('PUT')
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Judul Baris 1</label>
+                                <input type="text" name="settings[galeri.title_line1]" class="form-control" value="{{ $settings['galeri.title_line1']->value ?? 'Galeri' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Judul Aksen <small class="text-primary">(tampil gradien)</small></label>
+                                <input type="text" name="settings[galeri.title_accent]" class="form-control" value="{{ $settings['galeri.title_accent']->value ?? 'Kegiatan' }}">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Subjudul</label>
+                                <textarea name="settings[galeri.subtitle]" class="form-control" rows="2">{{ $settings['galeri.subtitle']->value ?? 'Momen belajar menyenangkan bersama siswa dan tutor terbaik SCI di seluruh Indonesia.' }}</textarea>
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-save me-1"></i>Simpan Heading</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card lp-card mb-4">
+                <div class="card-header lp-card-header"><i class="bi bi-plus-circle me-2"></i>Upload Foto Galeri</div>
+                <div class="card-body">
+                    <form action="{{ route('admin.landing.galleries.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Foto <span class="text-danger">*</span></label>
+                                <input type="file" name="image" class="form-control" accept="image/*" required>
+                                <small class="text-muted"><i class="bi bi-laptop me-1"></i>Upload langsung dari laptop/komputer. Format: JPG, PNG, WebP. Maks 4MB.</small>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label fw-semibold">Keterangan / Alt Teks (opsional)</label>
+                                <input type="text" name="alt" class="form-control" placeholder="Sesi belajar matematika kelas SMA">
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="is_active" id="galAddActive" value="1" checked>
+                                    <label class="form-check-label" for="galAddActive">Tampilkan di landing</label>
+                                </div>
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-upload me-1"></i>Upload & Tambah</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card lp-card">
+                <div class="card-header lp-card-header"><i class="bi bi-images me-2"></i>Foto Galeri ({{ $galleries->count() }})</div>
+                <div class="card-body {{ $galleries->isEmpty() ? '' : 'p-0' }}">
+                    @forelse($galleries as $gal)
+                    <div class="lp-list-item">
+                        @if($gal->image)
+                        <img src="{{ str_starts_with($gal->image,'http') ? $gal->image : asset($gal->image) }}" style="width:90px;height:65px;object-fit:cover;border-radius:10px;flex-shrink:0">
+                        @else
+                        <div class="lp-emoji-icon"><i class="bi bi-image"></i></div>
+                        @endif
+                        <div class="flex-grow-1">
+                            <div class="text-muted small">{{ $gal->alt ?: '(tanpa keterangan)' }}</div>
+                            <div class="d-flex gap-2 mt-1 flex-wrap">
+                                @if(!$gal->is_active)<span class="badge bg-secondary">Non-aktif</span>@endif
+                                <span class="badge" style="background:rgba(200,77,223,.1);color:#68117e">Urutan: {{ $gal->sort_order }}</span>
+                            </div>
+                        </div>
+                        <div class="lp-item-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="openEditGallery({{ $gal->id }})"><i class="bi bi-pencil"></i></button>
+                            <form action="{{ route('admin.landing.galleries.destroy', $gal) }}" method="POST" class="d-inline">
+                                @csrf @method('DELETE')
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmAction('Hapus foto galeri ini?', () => this.closest(\'form\').submit(), null, {title:'Hapus Foto', okText:'Ya, Hapus'})"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="text-center py-5 text-muted"><i class="bi bi-images" style="font-size:2.5rem;opacity:.4"></i><p class="mt-2">Belum ada foto galeri. Upload di atas.</p></div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        {{-- ────── FAQ & KONTAK TAB ────── --}}
+        <div class="tab-pane fade" id="tab-faq">
+            <div class="card lp-card mb-4">
+                <div class="card-header lp-card-header"><i class="bi bi-card-text me-2"></i>Teks Bagian "Pertanyaan &amp; Hubungi Kami"</div>
+                <div class="card-body">
+                    <form action="{{ route('admin.landing.settings.update') }}" method="POST">
+                        @csrf @method('PUT')
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Eyebrow <small class="text-muted">(teks kecil atas)</small></label>
+                                <input type="text" name="settings[bantuan.eyebrow]" class="form-control" value="{{ $settings['bantuan.eyebrow']->value ?? 'Bantuan & Kontak' }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Judul Baris 1</label>
+                                <input type="text" name="settings[bantuan.title_line1]" class="form-control" value="{{ $settings['bantuan.title_line1']->value ?? 'Pertanyaan &' }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Judul Aksen <small class="text-primary">(tampil gradien)</small></label>
+                                <input type="text" name="settings[bantuan.title_accent]" class="form-control" value="{{ $settings['bantuan.title_accent']->value ?? 'Hubungi Kami' }}">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Subjudul</label>
+                                <textarea name="settings[bantuan.subtitle]" class="form-control" rows="2">{{ $settings['bantuan.subtitle']->value ?? 'Punya pertanyaan atau ingin bergabung? Kami siap membantu Anda kapan saja.' }}</textarea>
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-save me-1"></i>Simpan Heading</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card lp-card mb-4">
+                <div class="card-header lp-card-header"><i class="bi bi-plus-circle me-2"></i>Tambah Pertanyaan (FAQ)</div>
+                <div class="card-body">
+                    <form action="{{ route('admin.landing.faqs.store') }}" method="POST">
+                        @csrf
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Pertanyaan <span class="text-danger">*</span></label>
+                                <input type="text" name="question" class="form-control" required placeholder="Berapa biaya pendaftaran di SCI?">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Jawaban <span class="text-danger">*</span></label>
+                                <textarea name="answer" class="form-control" rows="3" required placeholder="Isi jawaban lengkap di sini..."></textarea>
+                            </div>
+                            <div class="col-12 d-flex justify-content-between align-items-center">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="is_active" id="faqAddActive" value="1" checked>
+                                    <label class="form-check-label" for="faqAddActive">Tampilkan di landing</label>
+                                </div>
+                                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-plus me-1"></i>Tambah FAQ</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card lp-card">
+                <div class="card-header lp-card-header"><i class="bi bi-question-circle me-2"></i>Daftar FAQ ({{ $faqs->count() }})</div>
+                <div class="card-body p-0">
+                    @forelse($faqs as $faq)
+                    <div class="lp-list-item" style="align-items:flex-start">
+                        <div class="lp-emoji-icon" style="margin-top:4px"><i class="bi bi-question-circle-fill" style="color:#c84ddf;font-size:1.3rem"></i></div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <strong>{{ $faq->question }}</strong>
+                                @if(!$faq->is_active)<span class="badge bg-secondary">Non-aktif</span>@endif
+                            </div>
+                            <div class="text-muted small">{{ Str::limit($faq->answer, 120) }}</div>
+                        </div>
+                        <div class="lp-item-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="openEditFaq({{ $faq->id }})"><i class="bi bi-pencil"></i></button>
+                            <form action="{{ route('admin.landing.faqs.destroy', $faq) }}" method="POST" class="d-inline">
+                                @csrf @method('DELETE')
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmAction('Hapus FAQ ini?', () => this.closest(\'form\').submit(), null, {title:'Hapus FAQ', okText:'Ya, Hapus'})"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="text-center py-5 text-muted"><i class="bi bi-inbox" style="font-size:2.5rem;opacity:.4"></i><p class="mt-2">Belum ada FAQ. Tambahkan di atas.</p></div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        {{-- ────── TUTOR TAB ────── --}}
+        <div class="tab-pane fade" id="tab-tutor">
+            <div class="alert border-0 mb-4 d-flex align-items-start gap-3" style="background:rgba(200,77,223,.07);border-left:4px solid #c84ddf !important;border-radius:12px">
+                <i class="bi bi-info-circle mt-1" style="color:#c84ddf;font-size:1.3rem;flex-shrink:0"></i>
+                <div>
+                    <div class="fw-bold mb-1">Tentang Bagian "Tutor Terbaik Kami"</div>
+                    <div class="small text-muted">Data tutor (nama, foto, mata pelajaran) diambil otomatis dari <strong>Guru Aktif</strong> di sistem. Kelola data guru di menu <a href="{{ route('admin.teachers.index') }}" class="text-primary fw-semibold">Data Guru <i class="bi bi-arrow-up-right" style="font-size:.7rem"></i></a>. Di sini Anda bisa mengubah teks heading seksi ini saja.</div>
+                </div>
+            </div>
+
+            <div class="card lp-card">
+                <div class="card-header lp-card-header"><i class="bi bi-person-badge me-2"></i>Teks Bagian "Tutor Terbaik Kami"</div>
+                <div class="card-body">
+                    <form action="{{ route('admin.landing.settings.update') }}" method="POST">
+                        @csrf @method('PUT')
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Eyebrow <small class="text-muted">(teks kecil atas)</small></label>
+                                <input type="text" name="settings[tutor.eyebrow]" class="form-control" value="{{ $settings['tutor.eyebrow']->value ?? 'Tim Pengajar' }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Judul Baris 1</label>
+                                <input type="text" name="settings[tutor.title_line1]" class="form-control" value="{{ $settings['tutor.title_line1']->value ?? 'Tutor' }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Judul Aksen <small class="text-primary">(gradien)</small></label>
+                                <input type="text" name="settings[tutor.title_accent]" class="form-control" value="{{ $settings['tutor.title_accent']->value ?? 'Terbaik' }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Judul Baris 2</label>
+                                <input type="text" name="settings[tutor.title_line2]" class="form-control" value="{{ $settings['tutor.title_line2']->value ?? 'Kami' }}">
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label fw-semibold">Subjudul</label>
+                                <textarea name="settings[tutor.subtitle]" class="form-control" rows="2">{{ $settings['tutor.subtitle']->value ?? 'Dilatih secara profesional dan berpengalaman di bidangnya masing-masing untuk memberikan hasil terbaik bagi setiap siswa.' }}</textarea>
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-save me-1"></i>Simpan</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -1026,6 +1247,171 @@
     </div>
 </div>
 
+{{-- Edit Ticker Modal --}}
+<div class="modal fade" id="editTickerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit Teks Promo</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <form id="editTickerForm" method="POST">
+                @csrf @method('PUT')
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-3"><label class="form-label fw-semibold">Emoji</label><input type="text" name="emoji" class="form-control" maxlength="10"></div>
+                        <div class="col-md-9"><label class="form-label fw-semibold">Teks *</label><input type="text" name="text" class="form-control" required></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Urutan</label><input type="number" name="sort_order" class="form-control" min="0"></div>
+                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="etTickerActive" value="1"><label class="form-check-label" for="etTickerActive">Aktif</label></div></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Simpan</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- Edit Feature Modal --}}
+<div class="modal fade" id="editFeatureModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit Fitur Tentang</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <form id="editFeatureForm" method="POST">
+                @csrf @method('PUT')
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-4"><label class="form-label fw-semibold">Ikon (bootstrap-icons)</label><input type="text" name="icon" class="form-control" placeholder="bi-patch-check-fill"></div>
+                        <div class="col-md-8"><label class="form-label fw-semibold">Label *</label><input type="text" name="label" class="form-control" required></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Urutan</label><input type="number" name="sort_order" class="form-control" min="0"></div>
+                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="etFtActive" value="1"><label class="form-check-label" for="etFtActive">Aktif</label></div></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Simpan</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- Edit Jenjang Modal --}}
+<div class="modal fade" id="editJenjangModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit Jenjang Pendidikan</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <form id="editJenjangForm" method="POST" enctype="multipart/form-data">
+                @csrf @method('PUT')
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-3"><label class="form-label fw-semibold">Kode *</label><input type="text" name="name" class="form-control" required placeholder="sd"></div>
+                        <div class="col-md-5"><label class="form-label fw-semibold">Label *</label><input type="text" name="label" class="form-control" required placeholder="Sekolah Dasar"></div>
+                        <div class="col-md-4"><label class="form-label fw-semibold">Emoji</label><input type="text" name="emoji" class="form-control" maxlength="10"></div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Ganti Gambar (opsional)</label>
+                            <input type="file" name="image" class="form-control" accept="image/*">
+                            <small class="text-muted"><i class="bi bi-laptop me-1"></i>Upload dari laptop. Kosongkan jika tidak ingin mengubah gambar.</small>
+                            <div id="jenjangCurrentImg" class="mt-2"></div>
+                        </div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Urutan</label><input type="number" name="sort_order" class="form-control" min="0"></div>
+                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="etJjActive" value="1"><label class="form-check-label" for="etJjActive">Aktif</label></div></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Simpan</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- Edit Trust Modal --}}
+<div class="modal fade" id="editTrustModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit Badge Kepercayaan</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <form id="editTrustForm" method="POST">
+                @csrf @method('PUT')
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-4"><label class="form-label fw-semibold">Ikon (bootstrap-icons)</label><input type="text" name="icon" class="form-control" placeholder="bi-shield-check"></div>
+                        <div class="col-md-8"><label class="form-label fw-semibold">Teks *</label><input type="text" name="text" class="form-control" required></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Urutan</label><input type="number" name="sort_order" class="form-control" min="0"></div>
+                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="etTrActive" value="1"><label class="form-check-label" for="etTrActive">Aktif</label></div></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Simpan</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- Edit Highlight Modal --}}
+<div class="modal fade" id="editHighlightModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit Keunggulan SCI</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <form id="editHighlightForm" method="POST" enctype="multipart/form-data">
+                @csrf @method('PUT')
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12"><label class="form-label fw-semibold">Judul *</label><input type="text" name="title" class="form-control" required></div>
+                        <div class="col-12"><label class="form-label fw-semibold">Deskripsi *</label><textarea name="description" class="form-control" rows="3" required></textarea></div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Ganti Gambar (opsional)</label>
+                            <input type="file" name="image" class="form-control" accept="image/*">
+                            <small class="text-muted"><i class="bi bi-laptop me-1"></i>Upload dari laptop. Kosongkan jika tidak ingin mengubah gambar.</small>
+                            <div id="highlightCurrentImg" class="mt-2"></div>
+                        </div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Urutan</label><input type="number" name="sort_order" class="form-control" min="0"></div>
+                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="etHlActive" value="1"><label class="form-check-label" for="etHlActive">Aktif</label></div></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Simpan</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- Edit Gallery Modal --}}
+<div class="modal fade" id="editGalleryModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit Foto Galeri</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <form id="editGalleryForm" method="POST" enctype="multipart/form-data">
+                @csrf @method('PUT')
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div id="galleryCurrentImg" class="col-12"></div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Ganti Foto (opsional)</label>
+                            <input type="file" name="image" class="form-control" accept="image/*">
+                            <small class="text-muted"><i class="bi bi-laptop me-1"></i>Upload dari laptop/komputer. Kosongkan jika tidak ingin mengganti foto.</small>
+                        </div>
+                        <div class="col-12"><label class="form-label fw-semibold">Keterangan / Alt Teks</label><input type="text" name="alt" class="form-control" placeholder="Keterangan foto (opsional)"></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Urutan</label><input type="number" name="sort_order" class="form-control" min="0"></div>
+                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="etGalActive" value="1"><label class="form-check-label" for="etGalActive">Tampilkan</label></div></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Simpan</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- Edit FAQ Modal --}}
+<div class="modal fade" id="editFaqModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit FAQ</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <form id="editFaqForm" method="POST">
+                @csrf @method('PUT')
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12"><label class="form-label fw-semibold">Pertanyaan *</label><input type="text" name="question" class="form-control" required></div>
+                        <div class="col-12"><label class="form-label fw-semibold">Jawaban *</label><textarea name="answer" class="form-control" rows="4" required></textarea></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Urutan</label><input type="number" name="sort_order" class="form-control" min="0"></div>
+                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="etFaqActive" value="1"><label class="form-check-label" for="etFaqActive">Tampilkan</label></div></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Simpan</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @php
 $programsJson      = $programs->keyBy('id')->toJson();
 $testimonialsJson  = $testimonials->keyBy('id')->toJson();
@@ -1054,6 +1440,13 @@ $waNumbersJson     = $waNumbers->keyBy('id')->toJson();
 const programsData     = @json($programs->keyBy('id'));
 const testimonialsData = @json($testimonials->keyBy('id'));
 const waNumbersData    = @json($waNumbers->keyBy('id'));
+const tickersData      = @json($tickers->keyBy('id'));
+const featuresData     = @json($features->keyBy('id'));
+const jenjangsData     = @json($jenjangs->keyBy('id'));
+const trustsData       = @json($trusts->keyBy('id'));
+const highlightsData   = @json($highlights->keyBy('id'));
+const galleriesData    = @json($galleries->keyBy('id'));
+const faqsData         = @json($faqs->keyBy('id'));
 
 function openEditProgram(id) {
     const p  = programsData[id];
@@ -1096,6 +1489,96 @@ function openEditTesti(id) {
     fm.querySelector('[name=sort_order]').value = t.sort_order;
     document.getElementById('etActive').checked = !!t.is_active;
     new bootstrap.Modal(document.getElementById('editTestiModal')).show();
+}
+
+function openEditTicker(id) {
+    const t  = tickersData[id];
+    const fm = document.getElementById('editTickerForm');
+    fm.action = '/admin/landing/tickers/' + id;
+    fm.querySelector('[name=emoji]').value      = t.emoji || '';
+    fm.querySelector('[name=text]').value       = t.text;
+    fm.querySelector('[name=sort_order]').value = t.sort_order;
+    document.getElementById('etTickerActive').checked = !!t.is_active;
+    new bootstrap.Modal(document.getElementById('editTickerModal')).show();
+}
+
+function openEditFeature(id) {
+    const f  = featuresData[id];
+    const fm = document.getElementById('editFeatureForm');
+    fm.action = '/admin/landing/features/' + id;
+    fm.querySelector('[name=icon]').value       = f.icon || '';
+    fm.querySelector('[name=label]').value      = f.label;
+    fm.querySelector('[name=sort_order]').value = f.sort_order;
+    document.getElementById('etFtActive').checked = !!f.is_active;
+    new bootstrap.Modal(document.getElementById('editFeatureModal')).show();
+}
+
+function openEditJenjang(id) {
+    const j  = jenjangsData[id];
+    const fm = document.getElementById('editJenjangForm');
+    fm.action = '/admin/landing/jenjangs/' + id;
+    fm.querySelector('[name=name]').value       = j.name;
+    fm.querySelector('[name=label]').value      = j.label;
+    fm.querySelector('[name=emoji]').value      = j.emoji || '';
+    fm.querySelector('[name=sort_order]').value = j.sort_order;
+    document.getElementById('etJjActive').checked = !!j.is_active;
+    // Show current image if exists
+    const imgWrap = document.getElementById('jenjangCurrentImg');
+    imgWrap.innerHTML = j.image
+        ? `<p class="text-muted small mb-1">Gambar saat ini:</p><img src="${j.image.startsWith('http') ? j.image : '/'+j.image.replace(/^\//,'')}" style="height:60px;border-radius:8px;object-fit:cover">`
+        : '<p class="text-muted small mb-0">Belum ada gambar.</p>';
+    new bootstrap.Modal(document.getElementById('editJenjangModal')).show();
+}
+
+function openEditTrust(id) {
+    const t  = trustsData[id];
+    const fm = document.getElementById('editTrustForm');
+    fm.action = '/admin/landing/trusts/' + id;
+    fm.querySelector('[name=icon]').value       = t.icon || '';
+    fm.querySelector('[name=text]').value       = t.text;
+    fm.querySelector('[name=sort_order]').value = t.sort_order;
+    document.getElementById('etTrActive').checked = !!t.is_active;
+    new bootstrap.Modal(document.getElementById('editTrustModal')).show();
+}
+
+function openEditHighlight(id) {
+    const h  = highlightsData[id];
+    const fm = document.getElementById('editHighlightForm');
+    fm.action = '/admin/landing/highlights/' + id;
+    fm.querySelector('[name=title]').value       = h.title;
+    fm.querySelector('[name=description]').value = h.description;
+    fm.querySelector('[name=sort_order]').value  = h.sort_order;
+    document.getElementById('etHlActive').checked = !!h.is_active;
+    const imgWrap = document.getElementById('highlightCurrentImg');
+    imgWrap.innerHTML = h.image
+        ? `<p class="text-muted small mb-1">Gambar saat ini:</p><img src="${h.image.startsWith('http') ? h.image : '/'+h.image.replace(/^\//,'')}" style="height:60px;border-radius:8px;object-fit:cover">`
+        : '<p class="text-muted small mb-0">Belum ada gambar.</p>';
+    new bootstrap.Modal(document.getElementById('editHighlightModal')).show();
+}
+
+function openEditGallery(id) {
+    const g  = galleriesData[id];
+    const fm = document.getElementById('editGalleryForm');
+    fm.action = '/admin/landing/galleries/' + id;
+    fm.querySelector('[name=alt]').value        = g.alt || '';
+    fm.querySelector('[name=sort_order]').value = g.sort_order;
+    document.getElementById('etGalActive').checked = !!g.is_active;
+    const imgWrap = document.getElementById('galleryCurrentImg');
+    imgWrap.innerHTML = g.image
+        ? `<p class="text-muted small mb-1">Foto saat ini:</p><img src="${g.image.startsWith('http') ? g.image : '/'+g.image.replace(/^\//,'')}" style="height:80px;border-radius:8px;object-fit:cover">`
+        : '';
+    new bootstrap.Modal(document.getElementById('editGalleryModal')).show();
+}
+
+function openEditFaq(id) {
+    const f  = faqsData[id];
+    const fm = document.getElementById('editFaqForm');
+    fm.action = '/admin/landing/faqs/' + id;
+    fm.querySelector('[name=question]').value   = f.question;
+    fm.querySelector('[name=answer]').value     = f.answer;
+    fm.querySelector('[name=sort_order]').value = f.sort_order;
+    document.getElementById('etFaqActive').checked = !!f.is_active;
+    new bootstrap.Modal(document.getElementById('editFaqModal')).show();
 }
 </script>
 @endpush

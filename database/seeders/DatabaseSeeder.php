@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             SlimSeeder::class,
             SubjectSeeder::class,
+            LandingContentSeeder::class,
         ]);
     }
 }
