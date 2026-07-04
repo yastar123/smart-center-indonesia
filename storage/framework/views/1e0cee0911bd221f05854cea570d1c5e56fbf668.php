@@ -772,11 +772,26 @@
                         radial-gradient(circle at 85% 15%,rgba(246,175,35,.08) 0%,transparent 50%);
             pointer-events:none;
         }
-        .keunggulan-dark-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:1.25rem; margin-top:3rem; }
+        /* ─── KEUNGGULAN INFINITY CAROUSEL ──────────────────────── */
+        .keunggulan-inf-vp {
+            overflow:hidden; position:relative; margin-top:3rem;
+        }
+        .keunggulan-inf-vp::before,
+        .keunggulan-inf-vp::after {
+            content:''; position:absolute; top:0; bottom:0; width:120px; z-index:2; pointer-events:none;
+        }
+        .keunggulan-inf-vp::before { left:0;  background:linear-gradient(to right,rgba(38,6,50,1) 0%,transparent 100%); }
+        .keunggulan-inf-vp::after  { right:0; background:linear-gradient(to left, rgba(38,6,50,1) 0%,transparent 100%); }
+        .keunggulan-inf-track {
+            display:flex; gap:1.25rem; width:max-content;
+            animation: marquee-scroll 32s linear infinite;
+        }
+        .keunggulan-inf-track:hover { animation-play-state:paused; }
         .kd-card {
             background:rgba(255,255,255,.07); backdrop-filter:blur(16px);
             border:1px solid rgba(255,255,255,.1); border-radius:22px;
             padding:2rem 1.5rem; text-align:center;
+            width:260px; flex-shrink:0;
             transition:transform .35s var(--ease-out), background .3s;
         }
         .kd-card:hover { transform:translateY(-8px); background:rgba(255,255,255,.12); }
@@ -788,13 +803,27 @@
         .kd-title { font-size:1rem; font-weight:800; color:white; font-family:var(--font-display); margin-bottom:.65rem; }
         .kd-desc { font-size:.82rem; color:rgba(255,255,255,.7); line-height:1.65; }
 
-        /* ─── TESTIMONI LIGHT CARDS ─────────────────────────────── */
+        /* ─── TESTIMONI INFINITY CAROUSEL ───────────────────────── */
         .testi-light-section { background:#f5eeff; padding:6rem 0; }
-        .testi-light-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.25rem; margin-top:3rem; }
+        .testi-inf-vp {
+            overflow:hidden; position:relative; margin-top:3rem;
+        }
+        .testi-inf-vp::before,
+        .testi-inf-vp::after {
+            content:''; position:absolute; top:0; bottom:0; width:120px; z-index:2; pointer-events:none;
+        }
+        .testi-inf-vp::before { left:0;  background:linear-gradient(to right,#f5eeff 0%,transparent 100%); }
+        .testi-inf-vp::after  { right:0; background:linear-gradient(to left, #f5eeff 0%,transparent 100%); }
+        .testi-inf-track {
+            display:flex; gap:1.25rem; width:max-content;
+            animation: marquee-scroll 40s linear infinite;
+        }
+        .testi-inf-track:hover { animation-play-state:paused; }
         .tlc {
             background:white; border-radius:20px; padding:1.75rem 1.5rem;
             border:1px solid rgba(200,77,223,.1); box-shadow:0 4px 18px rgba(38,6,50,.05);
             display:flex; flex-direction:column;
+            width:340px; flex-shrink:0;
         }
         .tlc-stars { display:flex; gap:3px; margin-bottom:.75rem; color:var(--gold); font-size:.85rem; }
         .tlc-quote { font-size:2.8rem; line-height:.9; color:rgba(200,77,223,.15); font-family:Georgia,serif; margin-bottom:.35rem; }
@@ -817,13 +846,27 @@
         .galeri-nav-btn { width:42px; height:42px; border-radius:50%; border:1.5px solid rgba(200,77,223,.3); background:white; color:var(--deep); display:flex; align-items:center; justify-content:center; font-size:.95rem; cursor:pointer; transition:background .2s, border-color .2s, color .2s, transform .2s; }
         .galeri-nav-btn:hover { background:var(--primary); border-color:var(--primary); color:white; transform:scale(1.08); }
 
-        /* ─── TUTOR GRID CARDS ───────────────────────────────────── */
+        /* ─── TUTOR INFINITY CAROUSEL ────────────────────────────── */
         .tutor-grid-section { background:#f9f4ff; padding:6rem 0; }
-        .tutor-grid-cards { display:grid; grid-template-columns:repeat(6,1fr); gap:1.25rem; margin-top:3rem; }
+        .tutor-inf-vp {
+            overflow:hidden; position:relative; margin-top:3rem;
+        }
+        .tutor-inf-vp::before,
+        .tutor-inf-vp::after {
+            content:''; position:absolute; top:0; bottom:0; width:120px; z-index:2; pointer-events:none;
+        }
+        .tutor-inf-vp::before { left:0;  background:linear-gradient(to right,#f9f4ff 0%,transparent 100%); }
+        .tutor-inf-vp::after  { right:0; background:linear-gradient(to left, #f9f4ff 0%,transparent 100%); }
+        .tutor-inf-track {
+            display:flex; gap:1.25rem; width:max-content;
+            animation: marquee-scroll 28s linear infinite;
+        }
+        .tutor-inf-track:hover { animation-play-state:paused; }
         .tgc {
             background:white; border-radius:20px; padding:1.75rem 1rem;
             text-align:center; border:1px solid rgba(200,77,223,.1);
             box-shadow:0 4px 18px rgba(38,6,50,.05);
+            width:210px; flex-shrink:0;
             transition:transform .3s var(--ease-out), box-shadow .3s;
         }
         .tgc:hover { transform:translateY(-6px); box-shadow:0 18px 50px rgba(38,6,50,.12); }
@@ -879,26 +922,23 @@
         .btn-cpc:hover { background:var(--gold); }
 
         /* ─── RESPONSIVE OVERRIDES (new sections) ────────────────── */
-        @media (max-width:1100px) {
-            .keunggulan-dark-grid { grid-template-columns:repeat(3,1fr); }
-            .tutor-grid-cards { grid-template-columns:repeat(4,1fr); }
-            .testi-light-grid { grid-template-columns:repeat(2,1fr); }
-        }
         @media (max-width:768px) {
-            .keunggulan-dark-grid { grid-template-columns:repeat(2,1fr); }
-            .tutor-grid-cards { grid-template-columns:repeat(3,1fr); }
             .bantuan-inner { grid-template-columns:1fr; gap:2.5rem; }
             .cabang-photo-grid { grid-template-columns:1fr; }
             .galeri-row { grid-template-columns:repeat(2,1fr); }
             .galeri-row-item { height:180px; }
             .testi-light-section,.tutor-grid-section,.bantuan-section,.cabang-photo-section,.keunggulan-dark-section { padding:4.5rem 0; }
+            /* Narrower cards on mobile for better visibility */
+            .kd-card  { width:220px; }
+            .tlc      { width:290px; }
+            .tgc      { width:175px; }
         }
         @media (max-width:560px) {
-            .keunggulan-dark-grid { grid-template-columns:1fr 1fr; }
-            .tutor-grid-cards { grid-template-columns:repeat(2,1fr); }
-            .testi-light-grid { grid-template-columns:1fr; }
             .contact-form-row { grid-template-columns:1fr; }
             .galeri-row { grid-template-columns:1fr 1fr; }
+            .kd-card  { width:200px; }
+            .tlc      { width:270px; }
+            .tgc      { width:160px; }
         }
     </style>
 </head>
@@ -1315,41 +1355,33 @@
             <p class="section-subtitle mx-auto" style="color:rgba(255,255,255,.7)">Lima pilar yang membuat SCI menjadi pilihan terpercaya jutaan keluarga Indonesia selama 14+ tahun.</p>
         </div>
 
-        <div class="keunggulan-dark-grid">
-            <div class="kd-card reveal reveal-delay-1">
-                <div class="kd-photo">
-                    <img src="https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=200&q=80" alt="Tutor Profesional" loading="lazy">
+        <div class="keunggulan-inf-vp">
+            <div class="keunggulan-inf-track">
+                <?php
+                $kdCards = [
+                    ['img'=>'https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=200&q=80','alt'=>'Tutor Profesional','title'=>'Tutor Profesional','desc'=>'Pengajar ahli bersertifikat resmi dengan pengalaman bertahun-tahun dan rekam jejak hasil nyata.'],
+                    ['img'=>'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&q=80','alt'=>'Bisa Home Visit','title'=>'Bisa Home Visit','desc'=>'Tutor kami siap datang ke rumah Anda kapan saja. Jadwal fleksibel, nyaman, dan tanpa perlu repot.'],
+                    ['img'=>'https://images.unsplash.com/photo-1581092334651-ddf26d9a09d0?w=200&q=80','alt'=>'Metode Modern','title'=>'Metode Modern','desc'=>'Sistem belajar interaktif yang disesuaikan dengan gaya belajar masing-masing siswa. Belajar itu menyenangkan!'],
+                    ['img'=>'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=200&q=80','alt'=>'Hasil Terukur','title'=>'Hasil Terukur','desc'=>'Evaluasi rutin, progress terpantau, laporan bulanan. Nilai meningkat signifikan — dijamin atau kami ulang!'],
+                    ['img'=>'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80','alt'=>'Support Penuh','title'=>'Support Penuh','desc'=>'Bantuan belajar &amp; konsultasi 24/7 via WhatsApp. Kami selalu ada untuk mendukung perjalanan belajar Anda.'],
+                ];
+                ?>
+                
+                <?php $__currentLoopData = $kdCards; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kd): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div class="kd-card">
+                    <div class="kd-photo"><img src="<?php echo e($kd['img']); ?>" alt="<?php echo e($kd['alt']); ?>" loading="lazy"></div>
+                    <div class="kd-title"><?php echo e($kd['title']); ?></div>
+                    <div class="kd-desc"><?php echo $kd['desc']; ?></div>
                 </div>
-                <div class="kd-title">Tutor Profesional</div>
-                <div class="kd-desc">Pengajar ahli bersertifikat resmi dengan pengalaman bertahun-tahun dan rekam jejak hasil nyata.</div>
-            </div>
-            <div class="kd-card reveal reveal-delay-2">
-                <div class="kd-photo">
-                    <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&q=80" alt="Bisa Home Visit" loading="lazy">
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                
+                <?php $__currentLoopData = $kdCards; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kd): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div class="kd-card" aria-hidden="true">
+                    <div class="kd-photo"><img src="<?php echo e($kd['img']); ?>" alt="" loading="lazy"></div>
+                    <div class="kd-title"><?php echo e($kd['title']); ?></div>
+                    <div class="kd-desc"><?php echo $kd['desc']; ?></div>
                 </div>
-                <div class="kd-title">Bisa Home Visit</div>
-                <div class="kd-desc">Tutor kami siap datang ke rumah Anda kapan saja. Jadwal fleksibel, nyaman, dan tanpa perlu repot.</div>
-            </div>
-            <div class="kd-card reveal reveal-delay-3">
-                <div class="kd-photo">
-                    <img src="https://images.unsplash.com/photo-1581092334651-ddf26d9a09d0?w=200&q=80" alt="Metode Modern" loading="lazy">
-                </div>
-                <div class="kd-title">Metode Modern</div>
-                <div class="kd-desc">Sistem belajar interaktif yang disesuaikan dengan gaya belajar masing-masing siswa. Belajar itu menyenangkan!</div>
-            </div>
-            <div class="kd-card reveal reveal-delay-1">
-                <div class="kd-photo">
-                    <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=200&q=80" alt="Hasil Terukur" loading="lazy">
-                </div>
-                <div class="kd-title">Hasil Terukur</div>
-                <div class="kd-desc">Evaluasi rutin, progress terpantau, laporan bulanan. Nilai meningkat signifikan — dijamin atau kami ulang!</div>
-            </div>
-            <div class="kd-card reveal reveal-delay-2">
-                <div class="kd-photo">
-                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80" alt="Support Penuh" loading="lazy">
-                </div>
-                <div class="kd-title">Support Penuh</div>
-                <div class="kd-desc">Bantuan belajar & konsultasi 24/7 via WhatsApp. Kami selalu ada untuk mendukung perjalanan belajar Anda.</div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
         </div>
     </div>
@@ -1372,25 +1404,47 @@
             (object)['text'=>'Anakku yang awalnya kesulitan di pelajaran IPA sekarang jadi juara kelas! Metode belajar di SCI sangat efektif dan tutornya sangat sabar dan perhatian.','name'=>'Bunda Sari','role'=>'Orang Tua Siswa · Jakarta','initial'=>'B','gradient'=>'linear-gradient(135deg,#f97316,#ea580c)'],
         ]);
         ?>
-        <div class="testi-light-grid">
-            <?php $__currentLoopData = $testiCards; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <div class="tlc reveal reveal-delay-<?php echo e(($i % 4) + 1); ?>">
-                <div class="tlc-stars">
-                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                </div>
-                <div class="tlc-quote">"</div>
-                <p class="tlc-text"><?php echo e($t->text); ?></p>
-                <div class="tlc-author">
-                    <div class="tlc-avatar-fb" style="background:<?php echo e($t->gradient); ?>"><?php echo e($t->initial); ?></div>
-                    <div>
-                        <div class="tlc-name"><?php echo e($t->name); ?></div>
-                        <div class="tlc-role"><?php echo e($t->role); ?></div>
-                        <div class="tlc-badge"><i class="bi bi-patch-check-fill"></i> Siswa Terverifikasi</div>
+        <div class="testi-inf-vp">
+            <div class="testi-inf-track">
+                
+                <?php $__currentLoopData = $testiCards; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div class="tlc">
+                    <div class="tlc-stars">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                    </div>
+                    <div class="tlc-quote">"</div>
+                    <p class="tlc-text"><?php echo e($t->text); ?></p>
+                    <div class="tlc-author">
+                        <div class="tlc-avatar-fb" style="background:<?php echo e($t->gradient); ?>"><?php echo e($t->initial); ?></div>
+                        <div>
+                            <div class="tlc-name"><?php echo e($t->name); ?></div>
+                            <div class="tlc-role"><?php echo e($t->role); ?></div>
+                            <div class="tlc-badge"><i class="bi bi-patch-check-fill"></i> Siswa Terverifikasi</div>
+                        </div>
                     </div>
                 </div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                
+                <?php $__currentLoopData = $testiCards; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div class="tlc" aria-hidden="true">
+                    <div class="tlc-stars">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                    </div>
+                    <div class="tlc-quote">"</div>
+                    <p class="tlc-text"><?php echo e($t->text); ?></p>
+                    <div class="tlc-author">
+                        <div class="tlc-avatar-fb" style="background:<?php echo e($t->gradient); ?>"><?php echo e($t->initial); ?></div>
+                        <div>
+                            <div class="tlc-name"><?php echo e($t->name); ?></div>
+                            <div class="tlc-role"><?php echo e($t->role); ?></div>
+                            <div class="tlc-badge"><i class="bi bi-patch-check-fill"></i> Siswa Terverifikasi</div>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
 </section>
@@ -1453,33 +1507,62 @@
         $ratingPool = [4.9, 4.8, 4.7, 4.8, 4.9, 4.7];
         $expPool    = [7, 9, 6, 8, 6, 5];
         ?>
-        <div class="tutor-grid-cards">
-            <?php $__currentLoopData = $tutorGridItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ti => $tutor): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <?php
-                $subj    = is_array($tutor->subjects) ? ($tutor->subjects[0] ?? 'Tutor') : ($tutor->subjects ?? 'Tutor');
-                $init    = strtoupper(substr($tutor->name ?? 'T', 0, 1));
-                $grad    = $tutorGrads[$ti % count($tutorGrads)];
-                $hasPhoto= !empty($tutor->photo) && file_exists(public_path('storage/'.$tutor->photo));
-                $rating  = $ratingPool[$ti % count($ratingPool)];
-                $exp     = $expPool[$ti % count($expPool)];
-            ?>
-            <div class="tgc reveal reveal-delay-<?php echo e(($ti % 3) + 1); ?>">
-                <div class="tgc-photo-wrap">
-                    <div class="tgc-photo" style="background:<?php echo e($grad); ?>">
-                        <?php if($hasPhoto): ?>
-                            <img src="<?php echo e(asset('storage/'.$tutor->photo)); ?>" alt="<?php echo e($tutor->name); ?>" loading="lazy">
-                        <?php else: ?>
-                            <div class="tgc-photo-fb" style="background:<?php echo e($grad); ?>"><?php echo e($init); ?></div>
-                        <?php endif; ?>
+        <?php
+        $tutorCardData = [];
+        foreach($tutorGridItems as $ti => $tutor) {
+            $tutorCardData[] = [
+                'subj'     => is_array($tutor->subjects) ? ($tutor->subjects[0] ?? 'Tutor') : ($tutor->subjects ?? 'Tutor'),
+                'init'     => strtoupper(substr($tutor->name ?? 'T', 0, 1)),
+                'grad'     => $tutorGrads[$ti % count($tutorGrads)],
+                'hasPhoto' => !empty($tutor->photo) && file_exists(public_path('storage/'.$tutor->photo)),
+                'photo'    => $tutor->photo ?? null,
+                'name'     => $tutor->name ?? 'Tutor',
+                'rating'   => $ratingPool[$ti % count($ratingPool)],
+                'exp'      => $expPool[$ti % count($expPool)],
+            ];
+        }
+        ?>
+        <div class="tutor-inf-vp">
+            <div class="tutor-inf-track">
+                
+                <?php $__currentLoopData = $tutorCardData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div class="tgc">
+                    <div class="tgc-photo-wrap">
+                        <div class="tgc-photo" style="background:<?php echo e($tc['grad']); ?>">
+                            <?php if($tc['hasPhoto']): ?>
+                                <img src="<?php echo e(asset('storage/'.$tc['photo'])); ?>" alt="<?php echo e($tc['name']); ?>" loading="lazy">
+                            <?php else: ?>
+                                <div class="tgc-photo-fb" style="background:<?php echo e($tc['grad']); ?>"><?php echo e($tc['init']); ?></div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="tgc-star-badge">⭐</div>
                     </div>
-                    <div class="tgc-star-badge">⭐</div>
+                    <div class="tgc-name"><?php echo e($tc['name']); ?></div>
+                    <div class="tgc-subject"><?php echo e($tc['subj']); ?></div>
+                    <div class="tgc-rating"><i class="bi bi-star-fill"></i> <b><?php echo e($tc['rating']); ?></b></div>
+                    <div class="tgc-exp"><?php echo e($tc['exp']); ?> Tahun Pengalaman</div>
                 </div>
-                <div class="tgc-name"><?php echo e($tutor->name); ?></div>
-                <div class="tgc-subject"><?php echo e($subj); ?></div>
-                <div class="tgc-rating"><i class="bi bi-star-fill"></i> <b><?php echo e($rating); ?></b></div>
-                <div class="tgc-exp"><?php echo e($exp); ?> Tahun Pengalaman</div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                
+                <?php $__currentLoopData = $tutorCardData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div class="tgc" aria-hidden="true">
+                    <div class="tgc-photo-wrap">
+                        <div class="tgc-photo" style="background:<?php echo e($tc['grad']); ?>">
+                            <?php if($tc['hasPhoto']): ?>
+                                <img src="<?php echo e(asset('storage/'.$tc['photo'])); ?>" alt="" loading="lazy">
+                            <?php else: ?>
+                                <div class="tgc-photo-fb" style="background:<?php echo e($tc['grad']); ?>"><?php echo e($tc['init']); ?></div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="tgc-star-badge">⭐</div>
+                    </div>
+                    <div class="tgc-name"><?php echo e($tc['name']); ?></div>
+                    <div class="tgc-subject"><?php echo e($tc['subj']); ?></div>
+                    <div class="tgc-rating"><i class="bi bi-star-fill"></i> <b><?php echo e($tc['rating']); ?></b></div>
+                    <div class="tgc-exp"><?php echo e($tc['exp']); ?> Tahun Pengalaman</div>
+                </div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
 </section>
@@ -1886,7 +1969,7 @@ function submitContact(e) {
 
 /* ── Respect reduced-motion ── */
 if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    document.querySelectorAll('.carousel-track, .tutor-carousel-track').forEach(el => {
+    document.querySelectorAll('.carousel-track, .tutor-carousel-track, .keunggulan-inf-track, .testi-inf-track, .tutor-inf-track').forEach(el => {
         el.style.animationDuration = '0s';
         el.style.animationPlayState = 'paused';
     });
