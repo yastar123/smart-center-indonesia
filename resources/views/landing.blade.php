@@ -301,6 +301,32 @@
         @media (max-width:900px) { .tentang-inner { grid-template-columns:1fr; gap:2.5rem; } }
         @media (max-width:480px) { .tentang-features { grid-template-columns:1fr; } .tentang-section { padding:3.5rem 0; } }
 
+        /* ─── PROGRAM UNGGULAN PHOTO CARDS ───────────────────────── */
+        .program-photo-section { background:#fff; padding:6rem 0; }
+        .program-photo-eyebrow { display:inline-flex; align-items:center; gap:8px; color:var(--primary); font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin-bottom:1rem; }
+        .program-photo-eyebrow::before { content:''; display:inline-block; width:28px; height:2px; background:var(--primary); border-radius:2px; }
+        .section-title-accent { font-style:italic; color:var(--primary); font-family:var(--font-display); }
+        .program-photo-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:3rem; }
+        .ppc {
+            background:white; border-radius:20px; overflow:hidden;
+            border:1px solid rgba(200,77,223,.1);
+            box-shadow:0 4px 20px rgba(38,6,50,.06);
+            cursor:pointer; transition:transform .3s var(--ease-out), box-shadow .3s;
+            text-decoration:none; color:inherit; display:flex; flex-direction:column;
+        }
+        .ppc:hover { transform:translateY(-6px); box-shadow:0 20px 52px rgba(38,6,50,.14); }
+        .ppc-img-wrap { width:100%; height:200px; overflow:hidden; }
+        .ppc-img-wrap img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .5s var(--ease-out); }
+        .ppc:hover .ppc-img-wrap img { transform:scale(1.07); }
+        .ppc-body { padding:1.5rem 1.75rem 1.75rem; flex:1; display:flex; flex-direction:column; }
+        .ppc-badge { display:inline-flex; align-items:center; gap:5px; font-size:.65rem; font-weight:700; padding:4px 12px; border-radius:50px; text-transform:uppercase; letter-spacing:.05em; margin-bottom:.875rem; width:fit-content; }
+        .ppc-title { font-size:1.08rem; font-weight:800; color:var(--deep); margin-bottom:.45rem; font-family:var(--font-display); line-height:1.3; }
+        .ppc-desc { font-size:.875rem; color:var(--text-muted); line-height:1.65; margin-bottom:1.25rem; flex:1; }
+        .ppc-link { font-size:.82rem; font-weight:700; color:var(--primary); display:inline-flex; align-items:center; gap:5px; transition:gap .2s; }
+        .ppc:hover .ppc-link { gap:9px; }
+        @media (max-width:900px) { .program-photo-grid { grid-template-columns:1fr 1fr; } .program-photo-section { padding:4.5rem 0; } }
+        @media (max-width:600px) { .program-photo-grid { grid-template-columns:1fr; } .program-photo-section { padding:3.5rem 0; } }
+
         /* ─── STATS STRIP ─────────────────────────────────────────── */
         .stats-strip { background:var(--off-white); border-top:1px solid rgba(200,77,223,.08); border-bottom:1px solid rgba(200,77,223,.08); padding:2.5rem 0; }
         .stats-strip-inner { max-width:1100px; margin:0 auto; padding:0 1.5rem; display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
@@ -912,6 +938,92 @@
                 <div class="tentang-feat-icon"><i class="bi bi-bullseye"></i></div>
                 <div class="tentang-feat-label">Target &amp; Hasil Terukur</div>
             </div>
+        </div>
+    </div>
+</section>
+
+{{-- ─────────────────── PROGRAM UNGGULAN (PHOTO CARDS) ───────────────────── --}}
+<section class="program-photo-section" id="program-unggulan">
+    <div class="container-lp">
+        <div class="text-center reveal">
+            <div class="program-photo-eyebrow">Program SCI</div>
+            <h2 class="section-title">Program <em class="section-title-accent">Unggulan</em></h2>
+            <p class="section-subtitle mx-auto">Pilih program yang sesuai kebutuhan Anda bersama para tutor terbaik kami —<br>klik kartu untuk melihat detail lengkap.</p>
+        </div>
+
+        <div class="program-photo-grid">
+            {{-- Card 1: Bimbel Mata Pelajaran --}}
+            <a href="{{ route('register') }}" class="ppc reveal reveal-delay-1">
+                <div class="ppc-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1509228468518-180dd4864904?w=600&q=80" alt="Bimbel Mata Pelajaran" loading="lazy">
+                </div>
+                <div class="ppc-body">
+                    <span class="ppc-badge" style="background:#e8f5e9;color:#2e7d32">SEMUA JENJANG</span>
+                    <div class="ppc-title">Bimbel Mata Pelajaran</div>
+                    <div class="ppc-desc">Bimbingan semua mata pelajaran sekolah dengan metode efektif dan menyenangkan.</div>
+                    <div class="ppc-link">Lihat Detail <i class="bi bi-arrow-down"></i></div>
+                </div>
+            </a>
+            {{-- Card 2: Persiapan Ujian --}}
+            <a href="{{ route('register') }}" class="ppc reveal reveal-delay-2">
+                <div class="ppc-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=600&q=80" alt="Persiapan Ujian" loading="lazy">
+                </div>
+                <div class="ppc-body">
+                    <span class="ppc-badge" style="background:#f3e8ff;color:#7e22ce">SMP · SMA</span>
+                    <div class="ppc-title">Persiapan Ujian</div>
+                    <div class="ppc-desc">Persiapan UTS, UAS & Ujian Sekolah agar nilai meningkat pesat dan lulus terbaik.</div>
+                    <div class="ppc-link">Lihat Detail <i class="bi bi-arrow-down"></i></div>
+                </div>
+            </a>
+            {{-- Card 3: Persiapan Tes & SBMPTN --}}
+            <a href="{{ route('register') }}" class="ppc reveal reveal-delay-3">
+                <div class="ppc-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1503676382389-4809596d5290?w=600&q=80" alt="Persiapan Tes & SBMPTN" loading="lazy">
+                </div>
+                <div class="ppc-body">
+                    <span class="ppc-badge" style="background:#fff7ed;color:#c2410c">INTENSIF</span>
+                    <div class="ppc-title">Persiapan Tes & SBMPTN</div>
+                    <div class="ppc-desc">Persiapan masuk sekolah favorit, PTN, CPNS & tes lainnya secara intensif.</div>
+                    <div class="ppc-link">Lihat Detail <i class="bi bi-arrow-down"></i></div>
+                </div>
+            </a>
+            {{-- Card 4: Kursus Bahasa --}}
+            <a href="{{ route('register') }}" class="ppc reveal reveal-delay-1">
+                <div class="ppc-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&q=80" alt="Kursus Bahasa" loading="lazy">
+                </div>
+                <div class="ppc-body">
+                    <span class="ppc-badge" style="background:#e0f2fe;color:#0369a1">SEMUA LEVEL</span>
+                    <div class="ppc-title">Kursus Bahasa</div>
+                    <div class="ppc-desc">Inggris, Jepang, Mandarin, Arab — tingkatkan kemampuan bahasa Anda bersama kami.</div>
+                    <div class="ppc-link">Lihat Detail <i class="bi bi-arrow-down"></i></div>
+                </div>
+            </a>
+            {{-- Card 5: Kursus Komputer --}}
+            <a href="{{ route('register') }}" class="ppc reveal reveal-delay-2">
+                <div class="ppc-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&q=80" alt="Kursus Komputer" loading="lazy">
+                </div>
+                <div class="ppc-body">
+                    <span class="ppc-badge" style="background:#fef2f2;color:#b91c1c">POPULER 🔥</span>
+                    <div class="ppc-title">Kursus Komputer</div>
+                    <div class="ppc-desc">Microsoft Office, Desain Grafis, Programming — teknologi terkini untuk karir masa depan.</div>
+                    <div class="ppc-link">Lihat Detail <i class="bi bi-arrow-down"></i></div>
+                </div>
+            </a>
+            {{-- Card 6: Kursus Akuntansi --}}
+            <a href="{{ route('register') }}" class="ppc reveal reveal-delay-3">
+                <div class="ppc-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&q=80" alt="Kursus Akuntansi" loading="lazy">
+                </div>
+                <div class="ppc-body">
+                    <span class="ppc-badge" style="background:#f5f3ff;color:#6d28d9">TERBARU ✨</span>
+                    <div class="ppc-title">Kursus Akuntansi</div>
+                    <div class="ppc-desc">Akuntansi dasar hingga profesional: perpajakan & keuangan untuk mahasiswa dan karyawan.</div>
+                    <div class="ppc-link">Lihat Detail <i class="bi bi-arrow-down"></i></div>
+                </div>
+            </a>
         </div>
     </div>
 </section>
