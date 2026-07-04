@@ -36,6 +36,9 @@ Route::get('/', function () {
     return view('landing');
 })->name('landing');
 
+Route::get('/cabang/{branch}', [\App\Http\Controllers\Public\BranchLandingController::class, 'show'])
+    ->name('cabang.show');
+
 Route::post('/public/student-registrations', [StudentRegistrationPublicController::class, 'store'])
     ->name('public.student-registrations.store');
 

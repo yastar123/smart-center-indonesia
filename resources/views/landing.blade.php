@@ -1674,7 +1674,11 @@
                     <div class="cpc-overlay">
                         <div class="cpc-name">{{ $bName }}</div>
                         <div class="cpc-sub">Jasa Les Privat {{ $bName }}</div>
+                        @if(isset($cb->id))
+                        <a href="{{ route('cabang.show', $cb->id) }}" class="btn-cpc">Lihat Detail</a>
+                        @else
                         <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI, saya ingin tanya tentang les privat di '.$bName) }}" target="_blank" class="btn-cpc">Lihat Detail</a>
+                        @endif
                     </div>
                 </div>
                 @endforeach
@@ -1686,7 +1690,11 @@
                 <div class="cpc-overlay">
                     <div class="cpc-name">{{ $bName2 }}</div>
                     <div class="cpc-sub">Jasa Les Privat {{ $bName2 }}</div>
+                    @if(isset($cb2->id))
+                    <a href="{{ route('cabang.show', $cb2->id) }}" class="btn-cpc">Lihat Detail</a>
+                    @else
                     <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI, saya ingin tanya tentang les privat di '.$bName2) }}" target="_blank" class="btn-cpc">Lihat Detail</a>
+                    @endif
                 </div>
             </div>
         </div>
