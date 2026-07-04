@@ -266,6 +266,41 @@
         /* close button always visible */
         .mobile-menu .mobile-close { opacity:1 !important; transform:none !important; }
 
+        /* ─── TENTANG SECTION ────────────────────────────────────── */
+        .tentang-section { background:#fdf5ff; padding:5rem 0; }
+        .tentang-inner { max-width:1160px; margin:0 auto; padding:0 1.5rem; display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:center; }
+        .tentang-pills { display:flex; flex-wrap:wrap; gap:.5rem; margin-bottom:1.25rem; }
+        .tentang-pill {
+            display:inline-flex; align-items:center; gap:5px;
+            border:1.5px solid rgba(200,77,223,.25); background:rgba(200,77,223,.06);
+            border-radius:50px; padding:4px 14px; font-size:.76rem; font-weight:600; color:var(--primary-dark);
+        }
+        .tentang-pill.neutral { border-color:rgba(0,0,0,.13); background:transparent; color:#555; }
+        .tentang-title { font-size:clamp(1.6rem,2.5vw,2.5rem); font-weight:900; color:var(--deep); line-height:1.2; margin-bottom:1.25rem; }
+        .tentang-title-accent { font-style:italic; color:var(--primary); font-family:var(--font-display); }
+        .tentang-desc { font-size:.95rem; color:#444; line-height:1.8; margin-bottom:.85rem; }
+        .tentang-desc-quote { font-style:italic; color:var(--primary); font-weight:600; }
+
+        .tentang-features { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; }
+        .tentang-feat {
+            background:white; border-radius:14px; padding:.9rem 1.1rem;
+            border:1.5px solid rgba(200,77,223,.1);
+            display:flex; align-items:center; gap:.75rem;
+            box-shadow:0 2px 10px rgba(38,6,50,.05);
+            transition:transform .25s, box-shadow .25s, border-color .25s;
+        }
+        .tentang-feat:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(38,6,50,.1); border-color:rgba(200,77,223,.25); }
+        .tentang-feat-icon {
+            width:38px; height:38px; border-radius:10px; flex-shrink:0;
+            background:linear-gradient(135deg,var(--primary-dark),var(--primary));
+            display:flex; align-items:center; justify-content:center;
+            font-size:.95rem; color:white;
+        }
+        .tentang-feat-label { font-size:.86rem; font-weight:700; color:var(--deep); line-height:1.3; }
+
+        @media (max-width:900px) { .tentang-inner { grid-template-columns:1fr; gap:2.5rem; } }
+        @media (max-width:480px) { .tentang-features { grid-template-columns:1fr; } .tentang-section { padding:3.5rem 0; } }
+
         /* ─── STATS STRIP ─────────────────────────────────────────── */
         .stats-strip { background:var(--off-white); border-top:1px solid rgba(200,77,223,.08); border-bottom:1px solid rgba(200,77,223,.08); padding:2.5rem 0; }
         .stats-strip-inner { max-width:1100px; margin:0 auto; padding:0 1.5rem; display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
@@ -664,11 +699,11 @@
         </a>
 
         <ul class="nav-links">
+            <li><a href="#tentang"      class="nav-link-item">Tentang</a></li>
             <li><a href="#program"      class="nav-link-item">Program</a></li>
-            <li><a href="#jenjang"      class="nav-link-item">Jenjang</a></li>
-            <li><a href="#mengapa-sci"  class="nav-link-item">Mengapa SCI</a></li>
-            <li><a href="#tutor"        class="nav-link-item">Tutor</a></li>
+            <li><a href="#mengapa-sci"  class="nav-link-item">Keunggulan</a></li>
             <li><a href="#testimonials" class="nav-link-item">Testimoni</a></li>
+            <li><a href="#tutor"        class="nav-link-item">Tutor</a></li>
             <li><a href="#cabang"       class="nav-link-item">Cabang</a></li>
         </ul>
 
@@ -688,11 +723,11 @@
     <button class="mobile-close" onclick="closeMobile()" aria-label="Tutup menu">
         <i class="bi bi-x-lg"></i>
     </button>
+    <a href="#tentang"      onclick="closeMobile()">Tentang</a>
     <a href="#program"      onclick="closeMobile()">Program</a>
-    <a href="#jenjang"      onclick="closeMobile()">Jenjang</a>
-    <a href="#mengapa-sci"  onclick="closeMobile()">Mengapa SCI</a>
-    <a href="#tutor"        onclick="closeMobile()">Tutor</a>
+    <a href="#mengapa-sci"  onclick="closeMobile()">Keunggulan</a>
     <a href="#testimonials" onclick="closeMobile()">Testimoni</a>
+    <a href="#tutor"        onclick="closeMobile()">Tutor</a>
     <a href="#cabang"       onclick="closeMobile()">Cabang</a>
     <div class="mobile-divider"></div>
     <a href="<?php echo e(route('login')); ?>"    onclick="closeMobile()" style="color:rgba(255,255,255,.65);font-size:1.05rem;font-weight:600"><i class="bi bi-box-arrow-in-right" style="font-size:.9rem"></i> Masuk</a>
@@ -777,6 +812,57 @@
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
 </div>
+
+
+<section class="tentang-section" id="tentang">
+    <div class="tentang-inner">
+        
+        <div class="reveal">
+            <div class="tentang-pills">
+                <span class="tentang-pill"><i class="bi bi-building"></i> Tentang Kami</span>
+                <span class="tentang-pill neutral">Sejak 2010</span>
+                <span class="tentang-pill neutral">ISO Certified</span>
+            </div>
+            <h2 class="tentang-title">
+                Tentang <span class="tentang-title-accent">Smart Center Indonesia</span>
+            </h2>
+            <p class="tentang-desc">
+                Smart Center Indonesia (SCI) adalah lembaga pendidikan yang bergerak di bidang bimbingan belajar, kursus, dan les privat (1 guru 1 siswa) berbasis offline dan online yang berkomitmen menjadi lembaga terbaik nomor 1 di Indonesia.
+            </p>
+            <p class="tentang-desc">
+                Dengan metode pembelajaran efektif, pengajar berpengalaman, serta pendekatan personal, SCI hadir sebagai solusi pendidikan terpercaya. <span class="tentang-desc-quote">"Wujudkan mimpi, raih prestasi!"</span>
+            </p>
+        </div>
+
+        
+        <div class="tentang-features">
+            <div class="tentang-feat">
+                <div class="tentang-feat-icon"><i class="bi bi-patch-check-fill"></i></div>
+                <div class="tentang-feat-label">Tutor Bersertifikat</div>
+            </div>
+            <div class="tentang-feat">
+                <div class="tentang-feat-icon"><i class="bi bi-house-heart-fill"></i></div>
+                <div class="tentang-feat-label">Bisa Home Visit</div>
+            </div>
+            <div class="tentang-feat">
+                <div class="tentang-feat-icon"><i class="bi bi-camera-video-fill"></i></div>
+                <div class="tentang-feat-label">Kelas Online &amp; Offline</div>
+            </div>
+            <div class="tentang-feat">
+                <div class="tentang-feat-icon"><i class="bi bi-bar-chart-fill"></i></div>
+                <div class="tentang-feat-label">Evaluasi Rutin Bulanan</div>
+            </div>
+            <div class="tentang-feat">
+                <div class="tentang-feat-icon"><i class="bi bi-headset"></i></div>
+                <div class="tentang-feat-label">Konsultasi 24/7</div>
+            </div>
+            <div class="tentang-feat">
+                <div class="tentang-feat-icon"><i class="bi bi-bullseye"></i></div>
+                <div class="tentang-feat-label">Target &amp; Hasil Terukur</div>
+            </div>
+        </div>
+    </div>
+</section>
 
 
 <section class="stats-strip">
