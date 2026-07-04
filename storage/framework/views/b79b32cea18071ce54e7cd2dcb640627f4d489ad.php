@@ -45,6 +45,7 @@
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-wa"><i class="bi bi-whatsapp me-1 text-success"></i>WhatsApp <span class="badge bg-success ms-1" style="font-size:.65rem"><?php echo e($waNumbers->count()); ?></span></button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-cta"><i class="bi bi-megaphone me-1"></i>CTA</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-footer"><i class="bi bi-layout-sidebar-inset-reverse me-1"></i>Footer</button></li>
+        <li class="nav-item ms-auto"><a class="nav-link d-flex align-items-center gap-1 fw-bold" href="<?php echo e(route('admin.landing.cabang.index')); ?>" style="color:var(--bs-primary)"><i class="bi bi-geo-alt-fill me-1"></i>Halaman Cabang <i class="bi bi-arrow-right" style="font-size:.75rem"></i></a></li>
     </ul>
 
     <div class="tab-content">
