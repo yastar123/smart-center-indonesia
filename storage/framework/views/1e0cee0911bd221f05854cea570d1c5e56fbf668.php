@@ -318,33 +318,85 @@
         .container-lp { max-width:1160px; margin:0 auto; padding:0 1.5rem; }
 
         /* ─── JENJANG PENDIDIKAN ──────────────────────────────────── */
-        .jenjang-bg { background:var(--off-white); }
-        .jenjang-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.5rem; margin-top:3rem; }
+        .jenjang-bg { background:#f3e8ff; }
+        .jenjang-eyebrow { display:flex; align-items:center; gap:.6rem; justify-content:center; margin-bottom:.75rem; color:var(--primary); font-size:.72rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+        .jenjang-eyebrow::before { content:''; width:28px; height:1.5px; background:var(--primary); border-radius:2px; }
+        .jenjang-title-wrap { font-size:clamp(2rem,3.5vw,3rem); font-weight:900; color:var(--deep); line-height:1.15; }
+        .jenjang-title-accent { font-style:italic; color:var(--primary); }
+        .jenjang-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.25rem; margin-top:2.75rem; }
         .jenjang-card {
-            background:white; border-radius:24px; padding:2.25rem 1.75rem;
-            border:1px solid rgba(200,77,223,.1);
-            box-shadow:0 4px 20px rgba(38,6,50,.06);
-            text-align:center; position:relative; overflow:hidden;
-            transition:transform .35s var(--ease-out), box-shadow .35s;
+            background:white; border-radius:20px; padding:2rem 1.5rem 1.5rem;
+            border:1.5px solid rgba(200,77,223,.1);
+            box-shadow:0 4px 18px rgba(38,6,50,.06);
+            text-align:center; position:relative;
+            transition:transform .3s var(--ease-out), box-shadow .3s, border-color .3s;
             cursor:pointer; text-decoration:none; display:block; color:inherit;
         }
-        .jenjang-card::before { content:''; position:absolute; inset:0; background:linear-gradient(160deg,var(--deep),var(--primary)); opacity:0; transition:opacity .35s; }
-        .jenjang-card:hover { transform:translateY(-8px); box-shadow:0 20px 60px rgba(38,6,50,.18); }
-        .jenjang-card:hover::before { opacity:1; }
-        .jenjang-card:hover .jc-num,
-        .jenjang-card:hover .jc-icon,
-        .jenjang-card:hover .jc-name,
-        .jenjang-card:hover .jc-label,
-        .jenjang-card:hover .jc-link { color:rgba(255,255,255,.9); }
-        .jenjang-card:hover .jc-icon-wrap { background:rgba(255,255,255,.15); }
-        .jenjang-card:hover .jc-link { color:white; }
-        .jc-num { font-size:3.5rem; font-weight:900; font-family:var(--font-display); color:rgba(200,77,223,.12); position:absolute; top:.75rem; right:1.25rem; line-height:1; letter-spacing:-.04em; transition:color .35s; z-index:1; }
-        .jc-content { position:relative; z-index:2; }
-        .jc-icon-wrap { width:64px; height:64px; border-radius:18px; background:rgba(200,77,223,.08); display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem; transition:background .35s; }
-        .jc-icon { font-size:1.8rem; transition:color .35s; }
-        .jc-name { font-size:1.5rem; font-weight:900; font-family:var(--font-display); color:var(--deep); line-height:1; margin-bottom:.35rem; transition:color .35s; }
-        .jc-label { font-size:.85rem; font-weight:500; color:var(--text-muted); margin-bottom:1.5rem; transition:color .35s; }
-        .jc-link { font-size:.8rem; font-weight:700; color:var(--primary); display:inline-flex; align-items:center; gap:5px; transition:color .35s; }
+        .jenjang-card:hover { transform:translateY(-6px); box-shadow:0 16px 48px rgba(38,6,50,.14); border-color:rgba(200,77,223,.3); }
+        .jc-photo-wrap { width:90px; height:90px; border-radius:50%; overflow:hidden; margin:0 auto 1.1rem; border:3px solid rgba(200,77,223,.18); box-shadow:0 4px 14px rgba(104,17,126,.15); }
+        .jc-photo-wrap img { width:100%; height:100%; object-fit:cover; object-position:center top; }
+        .jc-photo-fallback { width:100%; height:100%; background:linear-gradient(135deg,var(--primary-dark),var(--primary)); display:flex; align-items:center; justify-content:center; font-size:1.8rem; }
+        .jc-name { font-size:1.3rem; font-weight:900; font-family:var(--font-display); color:var(--deep); line-height:1; margin-bottom:.3rem; }
+        .jc-label { font-size:.8rem; font-weight:500; color:var(--text-muted); margin-bottom:1rem; }
+        .jc-link { font-size:.8rem; font-weight:700; color:var(--primary); display:inline-flex; align-items:center; gap:4px; transition:gap .2s; }
+        .jenjang-card:hover .jc-link { gap:8px; }
+
+        /* ─── CARI GURU SECTION ───────────────────────────────────── */
+        .cari-guru-section {
+            background:linear-gradient(135deg,#1a0228 0%,#260632 40%,#461256 80%,#68117e 100%);
+            padding:5rem 0 4rem;
+            position:relative; overflow:hidden;
+        }
+        .cari-guru-section::before {
+            content:''; position:absolute; inset:0;
+            background-image:radial-gradient(circle at 80% 20%,rgba(200,77,223,.18) 0%,transparent 55%),
+                             radial-gradient(circle at 20% 80%,rgba(246,175,35,.08) 0%,transparent 50%);
+            pointer-events:none;
+        }
+        .cari-guru-inner { position:relative; z-index:1; max-width:860px; margin:0 auto; padding:0 1.5rem; text-align:center; }
+        .cg-eyebrow { display:flex; align-items:center; gap:.6rem; justify-content:center; margin-bottom:.85rem; color:var(--gold); font-size:.72rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+        .cg-eyebrow::before { content:''; width:28px; height:1.5px; background:var(--gold); border-radius:2px; }
+        .cg-title { font-size:clamp(2rem,3.8vw,3.2rem); font-weight:900; color:white; line-height:1.15; margin-bottom:.85rem; }
+        .cg-title-accent { font-style:italic; color:var(--gold); }
+        .cg-subtitle { font-size:.97rem; color:rgba(255,255,255,.65); line-height:1.75; max-width:520px; margin:0 auto 2.5rem; }
+        .cg-form {
+            background:rgba(255,255,255,.07); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+            border:1px solid rgba(255,255,255,.12); border-radius:20px;
+            padding:1.75rem 2rem;
+        }
+        .cg-fields { display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:1rem; align-items:end; margin-bottom:1.1rem; }
+        .cg-field label { display:block; font-size:.67rem; font-weight:700; color:rgba(255,255,255,.55); text-transform:uppercase; letter-spacing:.1em; margin-bottom:.5rem; display:flex; align-items:center; gap:5px; }
+        .cg-select {
+            width:100%; padding:.7rem 1rem; border-radius:12px;
+            background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.15);
+            color:white; font-size:.9rem; font-family:var(--font-sans); font-weight:500;
+            appearance:none; -webkit-appearance:none;
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,.5)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat:no-repeat; background-position:right .85rem center;
+            padding-right:2.25rem;
+            transition:border-color .2s, background .2s;
+        }
+        .cg-select:focus { outline:none; border-color:rgba(200,77,223,.6); background-color:rgba(255,255,255,.15); }
+        .cg-select option { background:#260632; color:white; }
+        .btn-cg-search {
+            display:inline-flex; align-items:center; gap:.5rem;
+            padding:.72rem 1.5rem; border-radius:12px; border:none; cursor:pointer;
+            background:linear-gradient(135deg,var(--gold-dark),var(--gold));
+            color:#1a0a00; font-size:.92rem; font-weight:800; font-family:var(--font-display);
+            white-space:nowrap;
+            transition:transform .2s, box-shadow .2s;
+            box-shadow:0 6px 20px rgba(246,175,35,.4);
+        }
+        .btn-cg-search:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(246,175,35,.6); }
+        .cg-trust { display:flex; align-items:center; justify-content:center; gap:1.75rem; flex-wrap:wrap; margin-top:.1rem; }
+        .cg-trust-item { display:flex; align-items:center; gap:.4rem; font-size:.76rem; color:rgba(255,255,255,.55); font-weight:500; }
+        .cg-trust-item i { color:var(--gold); font-size:.8rem; }
+
+        @media (max-width:768px) {
+            .cg-fields { grid-template-columns:1fr; }
+            .btn-cg-search { width:100%; justify-content:center; }
+            .cg-trust { gap:1rem; }
+        }
 
         /* ─── PROGRAM UNGGULAN ────────────────────────────────────── */
         .program-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; margin-top:3rem; }
@@ -890,61 +942,113 @@
 <section class="section-pad jenjang-bg" id="jenjang">
     <div class="container-lp">
         <div class="text-center reveal">
-            <div class="section-eyebrow"><i class="bi bi-layers-fill"></i> Jenjang Pendidikan</div>
-            <h2 class="section-title">Kami Melayani Semua Jenjang</h2>
-            <p class="section-subtitle mx-auto">Dari TK hingga umum dengan pendekatan personal yang tepat untuk setiap tahap perkembangan.</p>
+            <div class="jenjang-eyebrow">LAYANAN KAMI</div>
+            <h2 class="jenjang-title-wrap">Jenjang <span class="jenjang-title-accent">Pendidikan</span></h2>
+            <p class="section-subtitle mx-auto" style="margin-top:.75rem">Kami melayani semua jenjang dari TK hingga umum dengan pendekatan personal yang tepat untuk setiap tahap perkembangan.</p>
         </div>
 
         <div class="jenjang-grid" id="jenjangGrid">
-            <a href="<?php echo e(route('register')); ?>" class="jenjang-card reveal reveal-delay-1">
-                <div class="jc-num">1</div>
-                <div class="jc-content">
-                    <div class="jc-icon-wrap">
-                        <span class="jc-icon">🌱</span>
-                    </div>
-                    <div class="jc-name">TK</div>
-                    <div class="jc-label">Taman Kanak-Kanak</div>
-                    <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
+            <a href="<?php echo e(route('register')); ?>" class="jenjang-card">
+                <div class="jc-photo-wrap">
+                    <img src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=200&q=80&auto=format&fit=crop" alt="TK" loading="lazy"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                    <div class="jc-photo-fallback" style="display:none">🌱</div>
                 </div>
+                <div class="jc-name">TK</div>
+                <div class="jc-label">Taman Kanak-Kanak</div>
+                <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
             </a>
 
-            <a href="<?php echo e(route('register')); ?>" class="jenjang-card reveal reveal-delay-2">
-                <div class="jc-num">2</div>
-                <div class="jc-content">
-                    <div class="jc-icon-wrap">
-                        <span class="jc-icon">📚</span>
-                    </div>
-                    <div class="jc-name">SD</div>
-                    <div class="jc-label">Sekolah Dasar</div>
-                    <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
+            <a href="<?php echo e(route('register')); ?>" class="jenjang-card">
+                <div class="jc-photo-wrap">
+                    <img src="https://images.unsplash.com/photo-1588072432836-e10032774350?w=200&q=80&auto=format&fit=crop" alt="SD" loading="lazy"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                    <div class="jc-photo-fallback" style="display:none">📚</div>
                 </div>
+                <div class="jc-name">SD</div>
+                <div class="jc-label">Sekolah Dasar</div>
+                <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
             </a>
 
-            <a href="<?php echo e(route('register')); ?>" class="jenjang-card reveal reveal-delay-3">
-                <div class="jc-num">3</div>
-                <div class="jc-content">
-                    <div class="jc-icon-wrap">
-                        <span class="jc-icon">🔬</span>
-                    </div>
-                    <div class="jc-name">SMP</div>
-                    <div class="jc-label">Sekolah Menengah Pertama</div>
-                    <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
+            <a href="<?php echo e(route('register')); ?>" class="jenjang-card">
+                <div class="jc-photo-wrap">
+                    <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=200&q=80&auto=format&fit=crop" alt="SMP" loading="lazy"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                    <div class="jc-photo-fallback" style="display:none">🔬</div>
                 </div>
+                <div class="jc-name">SMP</div>
+                <div class="jc-label">Sekolah Menengah Pertama</div>
+                <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
             </a>
 
-            <a href="<?php echo e(route('register')); ?>" class="jenjang-card reveal reveal-delay-4">
-                <div class="jc-num">4</div>
-                <div class="jc-content">
-                    <div class="jc-icon-wrap">
-                        <span class="jc-icon">🎓</span>
-                    </div>
-                    <div class="jc-name">SMA</div>
-                    <div class="jc-label">SMA & Karyawan / Umum</div>
-                    <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
+            <a href="<?php echo e(route('register')); ?>" class="jenjang-card">
+                <div class="jc-photo-wrap">
+                    <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=200&q=80&auto=format&fit=crop" alt="SMA" loading="lazy"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                    <div class="jc-photo-fallback" style="display:none">🎓</div>
                 </div>
+                <div class="jc-name">SMA / Umum</div>
+                <div class="jc-label">SMA &amp; Karyawan</div>
+                <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
             </a>
         </div>
         <div class="mobile-carousel-dots" id="jenjang-dots"></div>
+    </div>
+</section>
+
+
+<section class="cari-guru-section" id="cari-guru">
+    <div class="cari-guru-inner reveal">
+        <div class="cg-eyebrow">TEMUKAN PENGAJAR TERBAIK</div>
+        <h2 class="cg-title">Cari Guru <span class="cg-title-accent">Terbaik</span>, Secepat Klik</h2>
+        <p class="cg-subtitle">Temukan tutor privat terbaik di kotamu — pilih berdasarkan mata pelajaran, lokasi, dan metode belajar yang kamu inginkan.</p>
+
+        <div class="cg-form">
+            <div class="cg-fields">
+                <div class="cg-field">
+                    <label><i class="bi bi-geo-alt-fill"></i> KOTA / LOKASI</label>
+                    <select class="cg-select">
+                        <option>Semua Kota</option>
+                        <option>Jakarta</option>
+                        <option>Surabaya</option>
+                        <option>Bandung</option>
+                        <option>Medan</option>
+                        <option>Yogyakarta</option>
+                        <option>Makassar</option>
+                    </select>
+                </div>
+                <div class="cg-field">
+                    <label><i class="bi bi-book-fill"></i> MATA PELAJARAN</label>
+                    <select class="cg-select">
+                        <option>Semua Mata Pelajaran</option>
+                        <option>Matematika</option>
+                        <option>Bahasa Inggris</option>
+                        <option>IPA / Fisika</option>
+                        <option>Kimia</option>
+                        <option>Bahasa Indonesia</option>
+                        <option>Akuntansi</option>
+                    </select>
+                </div>
+                <div class="cg-field">
+                    <label><i class="bi bi-laptop-fill"></i> METODE BELAJAR</label>
+                    <select class="cg-select">
+                        <option>Semua Metode</option>
+                        <option>Online</option>
+                        <option>Offline / Tatap Muka</option>
+                        <option>Home Visit</option>
+                    </select>
+                </div>
+                <a href="<?php echo e(route('register')); ?>" class="btn-cg-search">
+                    <i class="bi bi-search"></i> Cari Guru
+                </a>
+            </div>
+            <div class="cg-trust">
+                <div class="cg-trust-item"><i class="bi bi-patch-check-fill"></i> 500+ Tutor Bersertifikat</div>
+                <div class="cg-trust-item"><i class="bi bi-lightning-fill"></i> Respon dalam 1 Jam</div>
+                <div class="cg-trust-item"><i class="bi bi-shield-fill-check"></i> Aman &amp; Terpercaya</div>
+                <div class="cg-trust-item"><i class="bi bi-award-fill"></i> Garansi Hasil Belajar</div>
+            </div>
+        </div>
     </div>
 </section>
 
