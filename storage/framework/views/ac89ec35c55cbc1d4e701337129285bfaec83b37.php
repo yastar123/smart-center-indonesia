@@ -1,8 +1,5 @@
 <?php
-    $cityName   = $branch->city ?: $branch->name;
-    $branchName = $branch->name;
-    $tutorCount = $teachers->count() ?: 85;
-    $studentCount = \App\Models\Student::where('branch_id', $branch->id)->count() ?: 1400;
+    $cityName = $city; // passed from controller
 
     /* ── Subjects grid ── */
     $subjects = [
@@ -30,34 +27,15 @@
         ['num'=>'06','icon'=>'🛡️','title'=>'Garansi Kepuasan',         'desc'=>'Tutor dapat diganti apabila kurang cocok tanpa biaya tambahan.'],
     ];
 
-    /* ── Metode belajar ── */
+    /* ── Metode belajar — prices from controller ($prices) ── */
     $metodes = [
-        ['type'=>'HOME VISIT','icon'=>'🏠','title'=>'Les Privat ke Rumah',       'desc'=>'Tutor kami datang langsung ke rumah Anda di seluruh area '.$cityName.' dan sekitarnya. Nyaman, privat, dan efisien.','price'=>'Rp 65.000','img'=>'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&q=80'],
-        ['type'=>'ONLINE',    'icon'=>'🖥️','title'=>'Les Online via Zoom/Meet',  'desc'=>'Belajar dari rumah via Zoom, Google Meet, atau platform pilihan Anda. Rekaman sesi tersedia untuk review ulang.','price'=>'Rp 50.000','img'=>'https://images.unsplash.com/photo-1588702547923-7093a6c3ba33?w=600&q=80'],
-        ['type'=>'OFFLINE',   'icon'=>'🏫','title'=>'Belajar di Kantor SCI',     'desc'=>'Datang ke kantor SCI '.$cityName.' dan nikmati fasilitas belajar modern, AC, WiFi cepat, dan perpustakaan materi eksklusif.','price'=>'Rp 55.000','img'=>'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600&q=80'],
-    ];
-
-    /* ── FAQ ── */
-    $faqs = [
-        ['q'=>'Berapa harga les privat SCI '.$cityName.'?',              'a'=>'Harga les privat SCI '.$cityName.' mulai dari Rp 50.000/sesi untuk online hingga Rp 65.000/sesi untuk home visit. Tersedia paket bulanan dan per-sesi yang lebih hemat.'],
-        ['q'=>'Apakah bisa les privat home visit di '.$cityName.'?',    'a'=>'Ya! SCI '.$cityName.' melayani home visit ke seluruh kota dan kabupaten di '.$cityName.'. Tutor profesional kami siap datang ke rumah Anda sesuai jadwal yang disepakati.'],
-        ['q'=>'Bagaimana cara mendaftar les privat di SCI '.$cityName.'?','a'=>'Isi formulir konsultasi gratis di halaman ini, atau hubungi kami via WhatsApp. Tim kami akan menghubungi Anda dalam 1 jam untuk mencocokkan tutor yang sesuai.'],
-        ['q'=>'Apakah ada garansi nilai naik?',                          'a'=>'Ya! SCI memberikan garansi nilai naik atau sesi gratis. Jika nilai siswa tidak meningkat sesuai target yang disepakati, kami akan memberikan sesi tambahan tanpa biaya.'],
-        ['q'=>'Berapa lama satu sesi les privat berlangsung?',           'a'=>'Satu sesi les privat berlangsung selama 90 menit (1,5 jam). Durasi dapat disesuaikan sesuai kebutuhan dan kesepakatan antara siswa dan tutor.'],
-        ['q'=>'Apakah bisa berganti tutor jika tidak cocok?',           'a'=>'Tentu! Penggantian tutor dapat dilakukan kapan saja dan sepenuhnya gratis. Kepuasan siswa adalah prioritas utama kami.'],
-        ['q'=>'Metode pembayaran apa saja yang tersedia?',              'a'=>'Tersedia berbagai metode pembayaran: transfer bank (semua bank utama), dompet digital (GoPay, OVO, Dana, ShopeePay), QRIS, dan tunai di kantor.'],
-        ['q'=>'Apakah SCI juga melayani kursus untuk orang dewasa?',    'a'=>'Ya! SCI melayani semua usia dari TK hingga profesional dewasa. Tersedia kursus Bahasa Inggris, komputer, akuntansi, dan banyak lagi untuk kebutuhan karir.'],
+        ['type'=>'HOME VISIT','icon'=>'🏠','title'=>'Les Privat ke Rumah',      'desc'=>'Tutor kami datang langsung ke rumah Anda di seluruh area '.$cityName.' dan sekitarnya. Nyaman, privat, dan efisien.','price'=>$prices['homevisi'],'img'=>'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&q=80'],
+        ['type'=>'ONLINE',    'icon'=>'🖥️','title'=>'Les Online via Zoom/Meet', 'desc'=>'Belajar dari rumah via Zoom, Google Meet, atau platform pilihan Anda. Rekaman sesi tersedia untuk review ulang.','price'=>$prices['online'],'img'=>'https://images.unsplash.com/photo-1588702547923-7093a6c3ba33?w=600&q=80'],
+        ['type'=>'OFFLINE',   'icon'=>'🏫','title'=>'Belajar di Kantor SCI',    'desc'=>'Datang ke kantor SCI '.$cityName.' dan nikmati fasilitas belajar modern, AC, WiFi cepat, dan perpustakaan materi eksklusif.','price'=>$prices['offline'],'img'=>'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600&q=80'],
     ];
 
     /* ── Testimonials ── */
-    $testiData = $testimonials->isNotEmpty() ? $testimonials->take(6) : collect([
-        (object)['text'=>'Anakku yang awalnya kesulitan Matematika sekarang jadi juara kelas! Metode SCI sangat efektif.','name'=>'Bunda Sari','role'=>'Orang Tua Siswa · '.$cityName,'initial'=>'B','gradient'=>'linear-gradient(135deg,#f97316,#ea580c)'],
-        (object)['text'=>'Belajar di SCI sangat menyenangkan! Tutor menjelaskan dengan cara mudah dipahami dan nilai saya meningkat pesat.','name'=>'Aisyah R.','role'=>'Siswa SMA · Matematika','initial'=>'A','gradient'=>'linear-gradient(135deg,#c84ddf,#68117e)'],
-        (object)['text'=>'Program persiapan SBMPTN SCI sangat membantu. Akhirnya lolos ke kampus impian! Materinya lengkap banget.','name'=>'Ricky P.','role'=>'Mahasiswa · SBMPTN '.$cityName,'initial'=>'R','gradient'=>'linear-gradient(135deg,#10b981,#059669)'],
-        (object)['text'=>'Home visit-nya sangat nyaman. Tutornya datang tepat waktu dan sabar mengajar. Nilai raport anak saya naik signifikan.','name'=>'Pak Hendra','role'=>'Orang Tua Siswa · Home Visit','initial'=>'H','gradient'=>'linear-gradient(135deg,#6366f1,#4338ca)'],
-        (object)['text'=>'Kursus Bahasa Inggris di SCI sangat bermanfaat. Sekarang saya lebih percaya diri berbicara dan sudah lulus TOEFL.','name'=>'Dinda L.','role'=>'Mahasiswi · Bahasa Inggris','initial'=>'D','gradient'=>'linear-gradient(135deg,#0ea5e9,#0284c7)'],
-        (object)['text'=>'Saya kursus komputer di SCI dan langsung bisa kerja freelance. Tutornya sabar dan materi up-to-date sekali!','name'=>'Fajar W.','role'=>'Karyawan · Kursus Komputer','initial'=>'F','gradient'=>'linear-gradient(135deg,#f59e0b,#d97706)'],
-    ]);
+    $testiData = $testimonials->take(6);
 
     /* ── Packages / Pricing ── */
     $hasDbPackages = $packages->isNotEmpty();
@@ -506,20 +484,8 @@
 
 <div class="promo-ticker" aria-label="Promo">
     <div class="ticker-track">
-        <?php
-        $tickers = [
-            ['icon'=>'📚','text'=>'Mulai belajar dari Rp 50.000/sesi'],
-            ['icon'=>'🌟','text'=>'Garansi nilai naik atau sesi gratis!'],
-            ['icon'=>'💻','text'=>'Tersedia Home Visit, Online &amp; Offline'],
-            ['icon'=>'🎉','text'=>'Gratis Konsultasi Pertama'],
-            ['icon'=>'🏆','text'=>'#1 Les Privat Terbaik di '.$cityName],
-        ];
-        ?>
-        <?php $__currentLoopData = array_merge($tickers,$tickers); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tk): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-        <span class="ticker-item">
-            <?php echo e($tk['icon']); ?> <?php echo $tk['text']; ?>
-
-        </span>
+        <?php $__currentLoopData = array_merge($promoItems, $promoItems); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tk): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <span class="ticker-item">📢 <?php echo htmlspecialchars($tk); ?></span>
         <span class="ticker-sep">|</span>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
@@ -581,15 +547,16 @@
                         <span style="color:rgba(255,255,255,.75)"><?php echo e($cityName); ?></span>
                     </div>
                     <div class="bl-hero-badge">
-                        🏆 #1 Jasa Les Privat <?php echo e(strtoupper($cityName)); ?> Terpercaya
+                        🏆 <?php echo e($heroBadge); ?>
+
                     </div>
                     <h1 class="bl-hero-title">
                         Les Privat <em>Terbaik</em><br>di <?php echo e($cityName); ?>
 
                     </h1>
                     <p class="bl-hero-desc">
-                        Smart Center Indonesia hadir di <?php echo e($cityName); ?> dengan tutor bersertifikat.
-                        Layanan home visit, online, dan offline untuk semua jenjang dari TK hingga umum.
+                        <?php echo e($heroDesc); ?>
+
                     </p>
                     <div class="bl-hero-stats">
                         <div class="bl-stat-chip">
@@ -794,8 +761,9 @@
                         <div>
                             <div class="bl-contact-label">Jam Operasional</div>
                             <div class="bl-contact-val">
-                                Senin – Sabtu: 08.00 – 20.00 WIB<br>
-                                Minggu: 09.00 – 16.00 WIB
+                                Senin – Sabtu: <?php echo e($hoursWeekday); ?><br>
+                                Minggu: <?php echo e($hoursWeekend); ?>
+
                             </div>
                         </div>
                     </div>
@@ -820,11 +788,9 @@
                 <div style="margin-top:2rem" class="reveal">
                     <div class="bl-area-title">Area Layanan Home Visit</div>
                     <div class="bl-area-chips">
-                        <span class="bl-area-chip">📍 Kota <?php echo e($cityName); ?></span>
-                        <?php if($branch->regency && $branch->regency !== $branch->city): ?>
-                        <span class="bl-area-chip">📍 Kab. <?php echo e($branch->regency); ?></span>
-                        <?php endif; ?>
-                        <span class="bl-area-chip">📍 Sekitarnya</span>
+                        <?php $__currentLoopData = $areaChips; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $area): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <span class="bl-area-chip">📍 <?php echo e($area); ?></span>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
             </div>
@@ -994,7 +960,7 @@
             </p>
         </div>
         <div class="bl-faq-list">
-            <?php $__currentLoopData = $faqs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $fi => $faq): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php $__currentLoopData = $faqItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $fi => $faq): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="bl-faq-item">
                 <button class="bl-faq-trigger" onclick="toggleBLFaq(this)" type="button">
                     <?php echo e($faq['q']); ?>

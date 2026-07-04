@@ -245,6 +245,11 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::put('/landing/wa/{wa}',                                  [\App\Http\Controllers\Admin\LandingContentController::class, 'updateWa'])             ->name('landing.wa.update');
         Route::delete('/landing/wa/{wa}',                               [\App\Http\Controllers\Admin\LandingContentController::class, 'destroyWa'])            ->name('landing.wa.destroy');
 
+        // BRANCH LANDING CONTENT
+        Route::get('/landing/cabang',                                   [\App\Http\Controllers\Admin\BranchLandingContentController::class, 'index'])           ->name('landing.cabang.index');
+        Route::get('/landing/cabang/{branch}',                          [\App\Http\Controllers\Admin\BranchLandingContentController::class, 'show'])             ->name('landing.cabang.show');
+        Route::put('/landing/cabang/{branch}',                          [\App\Http\Controllers\Admin\BranchLandingContentController::class, 'update'])           ->name('landing.cabang.update');
+
         // TAGIHAN SISWA (cicilan & pascabayar)
         Route::get('/tagihan-siswa', [\App\Http\Controllers\Admin\TagihanSiswaController::class, 'index'])->name('tagihan-siswa.index');
         Route::get('/tagihan-siswa/{kelas}', [\App\Http\Controllers\Admin\TagihanSiswaController::class, 'show'])->name('tagihan-siswa.show');
