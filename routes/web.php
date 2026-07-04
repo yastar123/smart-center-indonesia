@@ -244,6 +244,27 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::post('/landing/wa',                                      [\App\Http\Controllers\Admin\LandingContentController::class, 'storeWa'])              ->name('landing.wa.store');
         Route::put('/landing/wa/{wa}',                                  [\App\Http\Controllers\Admin\LandingContentController::class, 'updateWa'])             ->name('landing.wa.update');
         Route::delete('/landing/wa/{wa}',                               [\App\Http\Controllers\Admin\LandingContentController::class, 'destroyWa'])            ->name('landing.wa.destroy');
+        Route::post('/landing/tickers',                                 [\App\Http\Controllers\Admin\LandingContentController::class, 'storeTicker'])          ->name('landing.tickers.store');
+        Route::put('/landing/tickers/{ticker}',                         [\App\Http\Controllers\Admin\LandingContentController::class, 'updateTicker'])         ->name('landing.tickers.update');
+        Route::delete('/landing/tickers/{ticker}',                      [\App\Http\Controllers\Admin\LandingContentController::class, 'destroyTicker'])        ->name('landing.tickers.destroy');
+        Route::post('/landing/features',                                [\App\Http\Controllers\Admin\LandingContentController::class, 'storeFeature'])         ->name('landing.features.store');
+        Route::put('/landing/features/{feature}',                       [\App\Http\Controllers\Admin\LandingContentController::class, 'updateFeature'])        ->name('landing.features.update');
+        Route::delete('/landing/features/{feature}',                    [\App\Http\Controllers\Admin\LandingContentController::class, 'destroyFeature'])       ->name('landing.features.destroy');
+        Route::post('/landing/jenjangs',                                [\App\Http\Controllers\Admin\LandingContentController::class, 'storeJenjang'])         ->name('landing.jenjangs.store');
+        Route::put('/landing/jenjangs/{jenjang}',                       [\App\Http\Controllers\Admin\LandingContentController::class, 'updateJenjang'])        ->name('landing.jenjangs.update');
+        Route::delete('/landing/jenjangs/{jenjang}',                    [\App\Http\Controllers\Admin\LandingContentController::class, 'destroyJenjang'])       ->name('landing.jenjangs.destroy');
+        Route::post('/landing/trusts',                                  [\App\Http\Controllers\Admin\LandingContentController::class, 'storeTrust'])           ->name('landing.trusts.store');
+        Route::put('/landing/trusts/{trust}',                           [\App\Http\Controllers\Admin\LandingContentController::class, 'updateTrust'])          ->name('landing.trusts.update');
+        Route::delete('/landing/trusts/{trust}',                        [\App\Http\Controllers\Admin\LandingContentController::class, 'destroyTrust'])         ->name('landing.trusts.destroy');
+        Route::post('/landing/highlights',                              [\App\Http\Controllers\Admin\LandingContentController::class, 'storeHighlight'])       ->name('landing.highlights.store');
+        Route::put('/landing/highlights/{highlight}',                   [\App\Http\Controllers\Admin\LandingContentController::class, 'updateHighlight'])      ->name('landing.highlights.update');
+        Route::delete('/landing/highlights/{highlight}',                [\App\Http\Controllers\Admin\LandingContentController::class, 'destroyHighlight'])     ->name('landing.highlights.destroy');
+        Route::post('/landing/galleries',                               [\App\Http\Controllers\Admin\LandingContentController::class, 'storeGallery'])        ->name('landing.galleries.store');
+        Route::put('/landing/galleries/{gallery}',                      [\App\Http\Controllers\Admin\LandingContentController::class, 'updateGallery'])       ->name('landing.galleries.update');
+        Route::delete('/landing/galleries/{gallery}',                   [\App\Http\Controllers\Admin\LandingContentController::class, 'destroyGallery'])      ->name('landing.galleries.destroy');
+        Route::post('/landing/faqs',                                    [\App\Http\Controllers\Admin\LandingContentController::class, 'storeFaq'])            ->name('landing.faqs.store');
+        Route::put('/landing/faqs/{faq}',                               [\App\Http\Controllers\Admin\LandingContentController::class, 'updateFaq'])           ->name('landing.faqs.update');
+        Route::delete('/landing/faqs/{faq}',                            [\App\Http\Controllers\Admin\LandingContentController::class, 'destroyFaq'])          ->name('landing.faqs.destroy');
 
         // BRANCH LANDING CONTENT
         Route::get('/landing/cabang',                                   [\App\Http\Controllers\Admin\BranchLandingContentController::class, 'index'])           ->name('landing.cabang.index');

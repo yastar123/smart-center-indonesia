@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class LandingTestimonial extends Model
+class LandingHighlight extends Model
 {
-    protected $fillable = ['name','role','text','gradient','initial','photo','is_active','sort_order'];
+    protected $fillable = ['image', 'title', 'description', 'is_active', 'sort_order'];
 
     protected $casts = ['is_active' => 'boolean'];
 

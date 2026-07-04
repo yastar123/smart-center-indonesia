@@ -37,15 +37,22 @@
     <?php endif; ?>
 
     
-    <ul class="nav nav-tabs lp-tabs mb-4" id="lpTabs">
+    <ul class="nav nav-tabs lp-tabs mb-4 flex-nowrap overflow-auto" id="lpTabs" style="flex-wrap:nowrap">
         <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-hero"><i class="bi bi-house-door me-1"></i>Hero</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-ticker"><i class="bi bi-megaphone-fill me-1"></i>Promo Ticker</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-tentang"><i class="bi bi-building me-1"></i>Tentang</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-stats"><i class="bi bi-bar-chart me-1"></i>Statistik</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-programs"><i class="bi bi-award me-1"></i>Program</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-jenjang"><i class="bi bi-mortarboard me-1"></i>Jenjang</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-cariguru"><i class="bi bi-search me-1"></i>Cari Guru</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-keunggulan"><i class="bi bi-shield-fill-check me-1"></i>Keunggulan</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-testimonials"><i class="bi bi-chat-heart me-1"></i>Testimoni</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-galeri"><i class="bi bi-images me-1"></i>Galeri</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-faq"><i class="bi bi-question-circle me-1"></i>FAQ</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-wa"><i class="bi bi-whatsapp me-1 text-success"></i>WhatsApp <span class="badge bg-success ms-1" style="font-size:.65rem"><?php echo e($waNumbers->count()); ?></span></button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-cta"><i class="bi bi-megaphone me-1"></i>CTA</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-footer"><i class="bi bi-layout-sidebar-inset-reverse me-1"></i>Footer</button></li>
-        <li class="nav-item ms-auto"><a class="nav-link d-flex align-items-center gap-1 fw-bold" href="<?php echo e(route('admin.landing.cabang.index')); ?>" style="color:var(--bs-primary)"><i class="bi bi-geo-alt-fill me-1"></i>Halaman Cabang <i class="bi bi-arrow-right" style="font-size:.75rem"></i></a></li>
+        <li class="nav-item"><a class="nav-link d-flex align-items-center gap-1 fw-bold" href="<?php echo e(route('admin.landing.cabang.index')); ?>" style="color:var(--bs-primary)"><i class="bi bi-geo-alt-fill me-1"></i>Halaman Cabang <i class="bi bi-arrow-right" style="font-size:.75rem"></i></a></li>
     </ul>
 
     <div class="tab-content">
@@ -55,7 +62,7 @@
             <div class="card lp-card">
                 <div class="card-header lp-card-header"><i class="bi bi-house-door me-2"></i>Konten Hero Section</div>
                 <div class="card-body">
-                    <form action="<?php echo e(route('admin.landing.settings.update')); ?>" method="POST">
+                    <form action="<?php echo e(route('admin.landing.settings.update')); ?>" method="POST" enctype="multipart/form-data">
                         <?php echo csrf_field(); ?> <?php echo method_field('PUT'); ?>
                         <div class="row g-3">
                             <div class="col-12">
@@ -74,19 +81,23 @@
                                 <label class="form-label fw-semibold">Deskripsi Hero</label>
                                 <textarea name="settings[hero.description]" class="form-control" rows="3"><?php echo e($settings['hero.description']->value ?? ''); ?></textarea>
                             </div>
-                            <div class="col-12"><hr class="my-1"><p class="fw-semibold text-muted mb-2"><i class="bi bi-images me-1"></i>URL Gambar Slide (gunakan link gambar langsung)</p></div>
+                            <div class="col-12"><hr class="my-1"><p class="fw-semibold text-muted mb-2"><i class="bi bi-images me-1"></i>Gambar Slide Hero (upload dari komputer atau isi URL)</p></div>
+                            <?php $__currentLoopData = [1,2,3]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sn): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="col-12">
-                                <label class="form-label">Slide 1 URL</label>
-                                <input type="url" name="settings[hero.slide_1_url]" class="form-control" value="<?php echo e($settings['hero.slide_1_url']->value ?? ''); ?>">
+                                <label class="form-label">Slide <?php echo e($sn); ?></label>
+                                <div class="row g-2 align-items-center">
+                                    <div class="col-md-7">
+                                        <input type="url" name="settings[hero.slide_<?php echo e($sn); ?>_url]" class="form-control" value="<?php echo e($settings['hero.slide_'.$sn.'_url']->value ?? ''); ?>" placeholder="URL gambar (opsional jika upload file)">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <input type="file" name="setting_files[hero.slide_<?php echo e($sn); ?>_url]" class="form-control" accept="image/*">
+                                    </div>
+                                </div>
+                                <?php if(!empty($settings['hero.slide_'.$sn.'_url']->value)): ?>
+                                <img src="<?php echo e(str_starts_with($settings['hero.slide_'.$sn.'_url']->value,'http') ? $settings['hero.slide_'.$sn.'_url']->value : asset($settings['hero.slide_'.$sn.'_url']->value)); ?>" class="mt-2 rounded" style="height:60px;width:100px;object-fit:cover">
+                                <?php endif; ?>
                             </div>
-                            <div class="col-12">
-                                <label class="form-label">Slide 2 URL</label>
-                                <input type="url" name="settings[hero.slide_2_url]" class="form-control" value="<?php echo e($settings['hero.slide_2_url']->value ?? ''); ?>">
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Slide 3 URL</label>
-                                <input type="url" name="settings[hero.slide_3_url]" class="form-control" value="<?php echo e($settings['hero.slide_3_url']->value ?? ''); ?>">
-                            </div>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             <div class="col-12"><hr class="my-1"><p class="fw-semibold text-muted mb-2"><i class="bi bi-card-text me-1"></i>Float Card Animasi</p></div>
                             <div class="col-md-6">
                                 <label class="form-label">Float Card 1 — Judul</label>
@@ -114,6 +125,150 @@
         </div>
 
         
+        <div class="tab-pane fade" id="tab-ticker">
+            <div class="card lp-card mb-4">
+                <div class="card-header lp-card-header"><i class="bi bi-plus-circle me-2"></i>Tambah Teks Promo</div>
+                <div class="card-body">
+                    <form action="<?php echo e(route('admin.landing.tickers.store')); ?>" method="POST">
+                        <?php echo csrf_field(); ?>
+                        <div class="row g-3">
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">Emoji</label>
+                                <input type="text" name="emoji" class="form-control" placeholder="🎉" maxlength="10">
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label fw-semibold">Teks <span class="text-danger">*</span></label>
+                                <input type="text" name="text" class="form-control" required placeholder="Diskon Spesial! Gratis biaya pendaftaran bulan ini">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="is_active" id="tkAddActive" value="1" checked>
+                                    <label class="form-check-label" for="tkAddActive">Aktif</label>
+                                </div>
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-plus me-1"></i>Tambah</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card lp-card">
+                <div class="card-header lp-card-header"><i class="bi bi-list-ul me-2"></i>Daftar Teks Promo (<?php echo e($tickers->count()); ?>)</div>
+                <div class="card-body p-0">
+                    <?php $__empty_1 = true; $__currentLoopData = $tickers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tk): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <div class="lp-list-item">
+                        <div class="lp-emoji-icon"><?php echo e($tk->emoji ?: '📢'); ?></div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center gap-2">
+                                <span><?php echo $tk->text; ?></span>
+                                <?php if(!$tk->is_active): ?><span class="badge bg-secondary">Non-aktif</span><?php endif; ?>
+                            </div>
+                        </div>
+                        <div class="lp-item-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="openEditTicker(<?php echo e($tk->id); ?>)"><i class="bi bi-pencil"></i></button>
+                            <form action="<?php echo e(route('admin.landing.tickers.destroy', $tk)); ?>" method="POST" class="d-inline">
+                                <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmAction('Hapus teks promo ini?', () => this.closest(\'form\').submit(), null, {title:'Hapus Promo', okText:'Ya, Hapus'})"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <div class="text-center py-5 text-muted"><i class="bi bi-inbox" style="font-size:2.5rem;opacity:.4"></i><p class="mt-2">Belum ada teks promo.</p></div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="tab-pane fade" id="tab-tentang">
+            <div class="card lp-card mb-4">
+                <div class="card-header lp-card-header"><i class="bi bi-building me-2"></i>Teks Bagian "Tentang SCI"</div>
+                <div class="card-body">
+                    <form action="<?php echo e(route('admin.landing.settings.update')); ?>" method="POST">
+                        <?php echo csrf_field(); ?> <?php echo method_field('PUT'); ?>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Judul Baris 1</label>
+                                <input type="text" name="settings[tentang.title_line1]" class="form-control" value="<?php echo e($settings['tentang.title_line1']->value ?? 'Tentang'); ?>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Judul Aksen</label>
+                                <input type="text" name="settings[tentang.title_accent]" class="form-control" value="<?php echo e($settings['tentang.title_accent']->value ?? 'Smart Center Indonesia'); ?>">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Deskripsi 1</label>
+                                <textarea name="settings[tentang.desc1]" class="form-control" rows="2"><?php echo e($settings['tentang.desc1']->value ?? ''); ?></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Deskripsi 2</label>
+                                <textarea name="settings[tentang.desc2]" class="form-control" rows="2"><?php echo e($settings['tentang.desc2']->value ?? ''); ?></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Kutipan</label>
+                                <input type="text" name="settings[tentang.quote]" class="form-control" value="<?php echo e($settings['tentang.quote']->value ?? ''); ?>">
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-save me-1"></i>Simpan</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card lp-card mb-4">
+                <div class="card-header lp-card-header"><i class="bi bi-plus-circle me-2"></i>Tambah Fitur Tentang</div>
+                <div class="card-body">
+                    <form action="<?php echo e(route('admin.landing.features.store')); ?>" method="POST">
+                        <?php echo csrf_field(); ?>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Ikon (nama class bootstrap-icons)</label>
+                                <input type="text" name="icon" class="form-control" placeholder="bi-patch-check-fill">
+                                <small class="text-muted">Lihat di <a href="https://icons.getbootstrap.com" target="_blank">icons.getbootstrap.com</a>, salin nama class (mis. patch-check-fill)</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Label <span class="text-danger">*</span></label>
+                                <input type="text" name="label" class="form-control" required placeholder="Tutor Bersertifikat">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="is_active" id="ftAddActive" value="1" checked>
+                                    <label class="form-check-label" for="ftAddActive">Aktif</label>
+                                </div>
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-plus me-1"></i>Tambah</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card lp-card">
+                <div class="card-header lp-card-header"><i class="bi bi-list-ul me-2"></i>Daftar Fitur (<?php echo e($features->count()); ?>)</div>
+                <div class="card-body p-0">
+                    <?php $__empty_1 = true; $__currentLoopData = $features; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ft): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <div class="lp-list-item">
+                        <div class="lp-emoji-icon"><i class="bi <?php echo e($ft->icon); ?>"></i></div>
+                        <div class="flex-grow-1">
+                            <strong><?php echo e($ft->label); ?></strong>
+                            <?php if(!$ft->is_active): ?><span class="badge bg-secondary ms-2">Non-aktif</span><?php endif; ?>
+                        </div>
+                        <div class="lp-item-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="openEditFeature(<?php echo e($ft->id); ?>)"><i class="bi bi-pencil"></i></button>
+                            <form action="<?php echo e(route('admin.landing.features.destroy', $ft)); ?>" method="POST" class="d-inline">
+                                <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmAction('Hapus fitur ini?', () => this.closest(\'form\').submit(), null, {title:'Hapus Fitur', okText:'Ya, Hapus'})"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <div class="text-center py-5 text-muted"><i class="bi bi-inbox" style="font-size:2.5rem;opacity:.4"></i><p class="mt-2">Belum ada fitur.</p></div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
         <div class="tab-pane fade" id="tab-stats">
             <div class="card lp-card">
                 <div class="card-header lp-card-header"><i class="bi bi-bar-chart me-2"></i>Statistik Strip</div>
@@ -243,13 +398,252 @@
         </div>
 
         
+        <div class="tab-pane fade" id="tab-jenjang">
+            <div class="card lp-card mb-4">
+                <div class="card-header lp-card-header"><i class="bi bi-plus-circle me-2"></i>Tambah Jenjang Pendidikan</div>
+                <div class="card-body">
+                    <form action="<?php echo e(route('admin.landing.jenjangs.store')); ?>" method="POST" enctype="multipart/form-data">
+                        <?php echo csrf_field(); ?>
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">Kode <span class="text-danger">*</span></label>
+                                <input type="text" name="name" class="form-control" required placeholder="sd">
+                                <small class="text-muted">Kode unik, mis. sd, smp, sma</small>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label fw-semibold">Label <span class="text-danger">*</span></label>
+                                <input type="text" name="label" class="form-control" required placeholder="Sekolah Dasar">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">Emoji</label>
+                                <input type="text" name="emoji" class="form-control" placeholder="🎒" maxlength="10">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="is_active" id="jjAddActive" value="1" checked>
+                                    <label class="form-check-label" for="jjAddActive">Aktif</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Gambar</label>
+                                <input type="file" name="image" class="form-control" accept="image/*">
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-plus me-1"></i>Tambah</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card lp-card">
+                <div class="card-header lp-card-header"><i class="bi bi-list-ul me-2"></i>Daftar Jenjang (<?php echo e($jenjangs->count()); ?>)</div>
+                <div class="card-body p-0">
+                    <?php $__empty_1 = true; $__currentLoopData = $jenjangs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $jj): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <div class="lp-list-item">
+                        <?php if($jj->image): ?>
+                        <img src="<?php echo e(str_starts_with($jj->image,'http') ? $jj->image : asset($jj->image)); ?>" style="width:48px;height:48px;object-fit:cover;border-radius:12px" class="flex-shrink-0">
+                        <?php else: ?>
+                        <div class="lp-emoji-icon"><?php echo e($jj->emoji ?: '🎒'); ?></div>
+                        <?php endif; ?>
+                        <div class="flex-grow-1">
+                            <strong><?php echo e($jj->label); ?></strong> <span class="text-muted small">(<?php echo e($jj->name); ?>)</span>
+                            <?php if(!$jj->is_active): ?><span class="badge bg-secondary ms-2">Non-aktif</span><?php endif; ?>
+                        </div>
+                        <div class="lp-item-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="openEditJenjang(<?php echo e($jj->id); ?>)"><i class="bi bi-pencil"></i></button>
+                            <form action="<?php echo e(route('admin.landing.jenjangs.destroy', $jj)); ?>" method="POST" class="d-inline">
+                                <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmAction('Hapus jenjang ini?', () => this.closest(\'form\').submit(), null, {title:'Hapus Jenjang', okText:'Ya, Hapus'})"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <div class="text-center py-5 text-muted"><i class="bi bi-inbox" style="font-size:2.5rem;opacity:.4"></i><p class="mt-2">Belum ada jenjang.</p></div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="tab-pane fade" id="tab-cariguru">
+            <div class="card lp-card mb-4">
+                <div class="card-header lp-card-header"><i class="bi bi-search me-2"></i>Teks Bagian "Cari Guru Terbaik"</div>
+                <div class="card-body">
+                    <form action="<?php echo e(route('admin.landing.settings.update')); ?>" method="POST">
+                        <?php echo csrf_field(); ?> <?php echo method_field('PUT'); ?>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Eyebrow</label>
+                                <input type="text" name="settings[cariguru.eyebrow]" class="form-control" value="<?php echo e($settings['cariguru.eyebrow']->value ?? ''); ?>">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Judul Baris 1</label>
+                                <input type="text" name="settings[cariguru.title_line1]" class="form-control" value="<?php echo e($settings['cariguru.title_line1']->value ?? ''); ?>">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Judul Aksen</label>
+                                <input type="text" name="settings[cariguru.title_accent]" class="form-control" value="<?php echo e($settings['cariguru.title_accent']->value ?? ''); ?>">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Judul Baris 2</label>
+                                <input type="text" name="settings[cariguru.title_line2]" class="form-control" value="<?php echo e($settings['cariguru.title_line2']->value ?? ''); ?>">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Subjudul</label>
+                                <textarea name="settings[cariguru.subtitle]" class="form-control" rows="2"><?php echo e($settings['cariguru.subtitle']->value ?? ''); ?></textarea>
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-save me-1"></i>Simpan</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card lp-card mb-4">
+                <div class="card-header lp-card-header"><i class="bi bi-plus-circle me-2"></i>Tambah Badge Kepercayaan</div>
+                <div class="card-body">
+                    <form action="<?php echo e(route('admin.landing.trusts.store')); ?>" method="POST">
+                        <?php echo csrf_field(); ?>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Ikon (bootstrap-icons)</label>
+                                <input type="text" name="icon" class="form-control" placeholder="bi-shield-check">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Teks <span class="text-danger">*</span></label>
+                                <input type="text" name="text" class="form-control" required placeholder="Tutor Terverifikasi">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="is_active" id="trAddActive" value="1" checked>
+                                    <label class="form-check-label" for="trAddActive">Aktif</label>
+                                </div>
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-plus me-1"></i>Tambah</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card lp-card">
+                <div class="card-header lp-card-header"><i class="bi bi-list-ul me-2"></i>Daftar Badge (<?php echo e($trusts->count()); ?>)</div>
+                <div class="card-body p-0">
+                    <?php $__empty_1 = true; $__currentLoopData = $trusts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <div class="lp-list-item">
+                        <div class="lp-emoji-icon"><i class="bi <?php echo e($tr->icon); ?>"></i></div>
+                        <div class="flex-grow-1">
+                            <strong><?php echo e($tr->text); ?></strong>
+                            <?php if(!$tr->is_active): ?><span class="badge bg-secondary ms-2">Non-aktif</span><?php endif; ?>
+                        </div>
+                        <div class="lp-item-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="openEditTrust(<?php echo e($tr->id); ?>)"><i class="bi bi-pencil"></i></button>
+                            <form action="<?php echo e(route('admin.landing.trusts.destroy', $tr)); ?>" method="POST" class="d-inline">
+                                <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmAction('Hapus badge ini?', () => this.closest(\'form\').submit(), null, {title:'Hapus Badge', okText:'Ya, Hapus'})"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <div class="text-center py-5 text-muted"><i class="bi bi-inbox" style="font-size:2.5rem;opacity:.4"></i><p class="mt-2">Belum ada badge.</p></div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="tab-pane fade" id="tab-keunggulan">
+            <div class="card lp-card mb-4">
+                <div class="card-header lp-card-header"><i class="bi bi-shield-fill-check me-2"></i>Teks Bagian "Keunggulan SCI"</div>
+                <div class="card-body">
+                    <form action="<?php echo e(route('admin.landing.settings.update')); ?>" method="POST">
+                        <?php echo csrf_field(); ?> <?php echo method_field('PUT'); ?>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Judul Aksen</label>
+                                <input type="text" name="settings[keunggulan.title_accent]" class="form-control" value="<?php echo e($settings['keunggulan.title_accent']->value ?? ''); ?>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Subjudul</label>
+                                <input type="text" name="settings[keunggulan.subtitle]" class="form-control" value="<?php echo e($settings['keunggulan.subtitle']->value ?? ''); ?>">
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-save me-1"></i>Simpan</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card lp-card mb-4">
+                <div class="card-header lp-card-header"><i class="bi bi-plus-circle me-2"></i>Tambah Keunggulan</div>
+                <div class="card-body">
+                    <form action="<?php echo e(route('admin.landing.highlights.store')); ?>" method="POST" enctype="multipart/form-data">
+                        <?php echo csrf_field(); ?>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Judul <span class="text-danger">*</span></label>
+                                <input type="text" name="title" class="form-control" required placeholder="Kurikulum Terpersonalisasi">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Deskripsi <span class="text-danger">*</span></label>
+                                <textarea name="description" class="form-control" rows="2" required></textarea>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label fw-semibold">Gambar</label>
+                                <input type="file" name="image" class="form-control" accept="image/*">
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="is_active" id="hlAddActive" value="1" checked>
+                                    <label class="form-check-label" for="hlAddActive">Aktif</label>
+                                </div>
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-plus me-1"></i>Tambah</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card lp-card">
+                <div class="card-header lp-card-header"><i class="bi bi-list-ul me-2"></i>Daftar Keunggulan (<?php echo e($highlights->count()); ?>)</div>
+                <div class="card-body p-0">
+                    <?php $__empty_1 = true; $__currentLoopData = $highlights; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $hl): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <div class="lp-list-item">
+                        <?php if($hl->image): ?>
+                        <img src="<?php echo e(str_starts_with($hl->image,'http') ? $hl->image : asset($hl->image)); ?>" style="width:48px;height:48px;object-fit:cover;border-radius:12px" class="flex-shrink-0">
+                        <?php else: ?>
+                        <div class="lp-emoji-icon"><i class="bi bi-star-fill"></i></div>
+                        <?php endif; ?>
+                        <div class="flex-grow-1">
+                            <strong><?php echo e($hl->title); ?></strong>
+                            <?php if(!$hl->is_active): ?><span class="badge bg-secondary ms-2">Non-aktif</span><?php endif; ?>
+                            <div class="text-muted small"><?php echo e(Str::limit($hl->description, 100)); ?></div>
+                        </div>
+                        <div class="lp-item-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="openEditHighlight(<?php echo e($hl->id); ?>)"><i class="bi bi-pencil"></i></button>
+                            <form action="<?php echo e(route('admin.landing.highlights.destroy', $hl)); ?>" method="POST" class="d-inline">
+                                <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmAction('Hapus keunggulan ini?', () => this.closest(\'form\').submit(), null, {title:'Hapus Keunggulan', okText:'Ya, Hapus'})"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <div class="text-center py-5 text-muted"><i class="bi bi-inbox" style="font-size:2.5rem;opacity:.4"></i><p class="mt-2">Belum ada keunggulan.</p></div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
         <div class="tab-pane fade" id="tab-testimonials">
 
             
             <div class="card lp-card mb-4">
                 <div class="card-header lp-card-header"><i class="bi bi-plus-circle me-2"></i>Tambah Testimoni Baru</div>
                 <div class="card-body">
-                    <form action="<?php echo e(route('admin.landing.testimonials.store')); ?>" method="POST">
+                    <form action="<?php echo e(route('admin.landing.testimonials.store')); ?>" method="POST" enctype="multipart/form-data">
                         <?php echo csrf_field(); ?>
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -265,6 +659,10 @@
                                 <textarea name="text" class="form-control" rows="3" required placeholder='"Testimoni dari siswa..."'></textarea>
                             </div>
                             <div class="col-md-8">
+                                <label class="form-label">Foto (opsional, jika kosong pakai inisial nama)</label>
+                                <input type="file" name="photo" class="form-control" accept="image/*">
+                            </div>
+                            <div class="col-md-4">
                                 <label class="form-label">Warna Avatar (CSS gradient)</label>
                                 <input type="text" name="gradient" class="form-control" placeholder="linear-gradient(135deg,#c84ddf,#68117e)">
                             </div>
@@ -289,7 +687,11 @@
                     <?php $__empty_1 = true; $__currentLoopData = $testimonials; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $testi): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <div class="lp-list-item">
                         <div class="d-flex align-items-start gap-3 flex-grow-1">
+                            <?php if($testi->photo): ?>
+                            <img src="<?php echo e(str_starts_with($testi->photo,'http') ? $testi->photo : asset($testi->photo)); ?>" class="testi-mini-avatar" style="object-fit:cover">
+                            <?php else: ?>
                             <div class="testi-mini-avatar" style="background:<?php echo e($testi->gradient); ?>"><?php echo e($testi->initial); ?></div>
+                            <?php endif; ?>
                             <div class="flex-grow-1">
                                 <div class="d-flex align-items-center gap-2 mb-1">
                                     <strong><?php echo e($testi->name); ?></strong>

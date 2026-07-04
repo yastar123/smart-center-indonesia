@@ -22,6 +22,13 @@
     $dbPrograms  = \App\Models\LandingProgram::active()->orderBy('sort_order')->get();
     $waMain      = \App\Models\LandingWaNumber::primaryNumber($ls('footer.wa_number','628001234567'));
     $waNumbers   = \App\Models\LandingWaNumber::active()->orderBy('sort_order')->get();
+    $dbTickers   = \App\Models\LandingTicker::active()->orderBy('sort_order')->get();
+    $dbFeatures  = \App\Models\LandingFeature::active()->orderBy('sort_order')->get();
+    $dbJenjangs  = \App\Models\LandingJenjang::active()->orderBy('sort_order')->get();
+    $dbTrusts    = \App\Models\LandingTrust::active()->orderBy('sort_order')->get();
+    $dbHighlights= \App\Models\LandingHighlight::active()->orderBy('sort_order')->get();
+    $dbGalleries = \App\Models\LandingGallery::active()->orderBy('sort_order')->get();
+    $dbFaqs      = \App\Models\LandingFaq::active()->orderBy('sort_order')->get();
     $tutorGrads = [
         'linear-gradient(160deg,#260632,#c84ddf)',
         'linear-gradient(160deg,#1a3a6b,#2563eb)',
@@ -1051,13 +1058,9 @@
 <div class="hero-ticker" aria-hidden="true">
     <div class="ticker-track">
         @php
-            $tickerItems = [
+            $tickerItems = $dbTickers->isNotEmpty() ? $dbTickers->map(fn($t) => [$t->emoji, e($t->text)])->all() : [
                 ['🎉', 'Diskon Spesial! Gratis biaya pendaftaran bulan ini'],
                 ['📚', 'Daftar sekarang &amp; dapatkan sesi konsultasi GRATIS!'],
-                ['🎁', 'Promo Paket Hemat: Beli 10 sesi gratis 2 sesi ekstra'],
-                ['⭐', 'Lebih dari 1.000+ siswa sudah bergabung bersama kami'],
-                ['🏆', 'Tutor berpengalaman &amp; bersertifikat nasional'],
-                ['📞', 'Hubungi kami sekarang &mdash; konsultasi gratis!'],
             ];
         @endphp
         {{-- Set 1 --}}
@@ -1082,42 +1085,24 @@
                 <span class="tentang-pill neutral">ISO Certified</span>
             </div>
             <h2 class="tentang-title">
-                Tentang <span class="tentang-title-accent">Smart Center Indonesia</span>
+                {{ $ls('tentang.title_line1','Tentang') }} <span class="tentang-title-accent">{{ $ls('tentang.title_accent','Smart Center Indonesia') }}</span>
             </h2>
             <p class="tentang-desc">
-                Smart Center Indonesia (SCI) adalah lembaga pendidikan yang bergerak di bidang bimbingan belajar, kursus, dan les privat (1 guru 1 siswa) berbasis offline dan online yang berkomitmen menjadi lembaga terbaik nomor 1 di Indonesia.
+                {{ $ls('tentang.desc1','Smart Center Indonesia (SCI) adalah lembaga pendidikan yang bergerak di bidang bimbingan belajar, kursus, dan les privat (1 guru 1 siswa) berbasis offline dan online yang berkomitmen menjadi lembaga terbaik nomor 1 di Indonesia.') }}
             </p>
             <p class="tentang-desc">
-                Dengan metode pembelajaran efektif, pengajar berpengalaman, serta pendekatan personal, SCI hadir sebagai solusi pendidikan terpercaya. <span class="tentang-desc-quote">"Wujudkan mimpi, raih prestasi!"</span>
+                {{ $ls('tentang.desc2','Dengan metode pembelajaran efektif, pengajar berpengalaman, serta pendekatan personal, SCI hadir sebagai solusi pendidikan terpercaya.') }} <span class="tentang-desc-quote">"{{ $ls('tentang.quote','Wujudkan mimpi, raih prestasi!') }}"</span>
             </p>
         </div>
 
         {{-- Right: feature boxes --}}
         <div class="tentang-features">
+            @foreach($dbFeatures as $feat)
             <div class="tentang-feat">
-                <div class="tentang-feat-icon"><i class="bi bi-patch-check-fill"></i></div>
-                <div class="tentang-feat-label">Tutor Bersertifikat</div>
+                <div class="tentang-feat-icon"><i class="bi {{ $feat->icon }}"></i></div>
+                <div class="tentang-feat-label">{{ $feat->label }}</div>
             </div>
-            <div class="tentang-feat">
-                <div class="tentang-feat-icon"><i class="bi bi-house-heart-fill"></i></div>
-                <div class="tentang-feat-label">Bisa Home Visit</div>
-            </div>
-            <div class="tentang-feat">
-                <div class="tentang-feat-icon"><i class="bi bi-camera-video-fill"></i></div>
-                <div class="tentang-feat-label">Kelas Online &amp; Offline</div>
-            </div>
-            <div class="tentang-feat">
-                <div class="tentang-feat-icon"><i class="bi bi-bar-chart-fill"></i></div>
-                <div class="tentang-feat-label">Evaluasi Rutin Bulanan</div>
-            </div>
-            <div class="tentang-feat">
-                <div class="tentang-feat-icon"><i class="bi bi-headset"></i></div>
-                <div class="tentang-feat-label">Konsultasi 24/7</div>
-            </div>
-            <div class="tentang-feat">
-                <div class="tentang-feat-icon"><i class="bi bi-bullseye"></i></div>
-                <div class="tentang-feat-label">Target &amp; Hasil Terukur</div>
-            </div>
+            @endforeach
         </div>
     </div>
 </section>
@@ -1132,78 +1117,23 @@
         </div>
 
         <div class="program-photo-grid">
-            {{-- Card 1: Bimbel Mata Pelajaran --}}
-            <a href="{{ route('register') }}" class="ppc reveal reveal-delay-1">
+            @foreach($dbPrograms as $pi => $prog)
+            <a href="{{ route('register') }}" class="ppc reveal reveal-delay-{{ ($pi % 3) + 1 }}">
                 <div class="ppc-img-wrap">
-                    <img src="https://images.unsplash.com/photo-1509228468518-180dd4864904?w=600&q=80" alt="Bimbel Mata Pelajaran" loading="lazy">
+                    @if($prog->image)
+                        <img src="{{ str_starts_with($prog->image,'http') ? $prog->image : asset($prog->image) }}" alt="{{ $prog->title }}" loading="lazy">
+                    @else
+                        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;background:var(--off-white,#fdf8ff)">{{ $prog->icon_emoji ?? '📖' }}</div>
+                    @endif
                 </div>
                 <div class="ppc-body">
-                    <span class="ppc-badge" style="background:#e8f5e9;color:#2e7d32">SEMUA JENJANG</span>
-                    <div class="ppc-title">Bimbel Mata Pelajaran</div>
-                    <div class="ppc-desc">Bimbingan semua mata pelajaran sekolah dengan metode efektif dan menyenangkan.</div>
+                    <span class="ppc-badge" style="background:{{ $prog->badge_bg ?? '#e8f5e9' }};color:{{ $prog->badge_color ?? '#2e7d32' }}">{{ $prog->badge_label }}</span>
+                    <div class="ppc-title">{{ $prog->title }}</div>
+                    <div class="ppc-desc">{{ $prog->description }}</div>
                     <div class="ppc-link">Lihat Detail <i class="bi bi-arrow-down"></i></div>
                 </div>
             </a>
-            {{-- Card 2: Persiapan Ujian --}}
-            <a href="{{ route('register') }}" class="ppc reveal reveal-delay-2">
-                <div class="ppc-img-wrap">
-                    <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=600&q=80" alt="Persiapan Ujian" loading="lazy">
-                </div>
-                <div class="ppc-body">
-                    <span class="ppc-badge" style="background:#f3e8ff;color:#7e22ce">SMP · SMA</span>
-                    <div class="ppc-title">Persiapan Ujian</div>
-                    <div class="ppc-desc">Persiapan UTS, UAS & Ujian Sekolah agar nilai meningkat pesat dan lulus terbaik.</div>
-                    <div class="ppc-link">Lihat Detail <i class="bi bi-arrow-down"></i></div>
-                </div>
-            </a>
-            {{-- Card 3: Persiapan Tes & SBMPTN --}}
-            <a href="{{ route('register') }}" class="ppc reveal reveal-delay-3">
-                <div class="ppc-img-wrap">
-                    <img src="https://images.unsplash.com/photo-1503676382389-4809596d5290?w=600&q=80" alt="Persiapan Tes & SBMPTN" loading="lazy">
-                </div>
-                <div class="ppc-body">
-                    <span class="ppc-badge" style="background:#fff7ed;color:#c2410c">INTENSIF</span>
-                    <div class="ppc-title">Persiapan Tes & SBMPTN</div>
-                    <div class="ppc-desc">Persiapan masuk sekolah favorit, PTN, CPNS & tes lainnya secara intensif.</div>
-                    <div class="ppc-link">Lihat Detail <i class="bi bi-arrow-down"></i></div>
-                </div>
-            </a>
-            {{-- Card 4: Kursus Bahasa --}}
-            <a href="{{ route('register') }}" class="ppc reveal reveal-delay-1">
-                <div class="ppc-img-wrap">
-                    <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&q=80" alt="Kursus Bahasa" loading="lazy">
-                </div>
-                <div class="ppc-body">
-                    <span class="ppc-badge" style="background:#e0f2fe;color:#0369a1">SEMUA LEVEL</span>
-                    <div class="ppc-title">Kursus Bahasa</div>
-                    <div class="ppc-desc">Inggris, Jepang, Mandarin, Arab — tingkatkan kemampuan bahasa Anda bersama kami.</div>
-                    <div class="ppc-link">Lihat Detail <i class="bi bi-arrow-down"></i></div>
-                </div>
-            </a>
-            {{-- Card 5: Kursus Komputer --}}
-            <a href="{{ route('register') }}" class="ppc reveal reveal-delay-2">
-                <div class="ppc-img-wrap">
-                    <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&q=80" alt="Kursus Komputer" loading="lazy">
-                </div>
-                <div class="ppc-body">
-                    <span class="ppc-badge" style="background:#fef2f2;color:#b91c1c">POPULER 🔥</span>
-                    <div class="ppc-title">Kursus Komputer</div>
-                    <div class="ppc-desc">Microsoft Office, Desain Grafis, Programming — teknologi terkini untuk karir masa depan.</div>
-                    <div class="ppc-link">Lihat Detail <i class="bi bi-arrow-down"></i></div>
-                </div>
-            </a>
-            {{-- Card 6: Kursus Akuntansi --}}
-            <a href="{{ route('register') }}" class="ppc reveal reveal-delay-3">
-                <div class="ppc-img-wrap">
-                    <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&q=80" alt="Kursus Akuntansi" loading="lazy">
-                </div>
-                <div class="ppc-body">
-                    <span class="ppc-badge" style="background:#f5f3ff;color:#6d28d9">TERBARU ✨</span>
-                    <div class="ppc-title">Kursus Akuntansi</div>
-                    <div class="ppc-desc">Akuntansi dasar hingga profesional: perpajakan & keuangan untuk mahasiswa dan karyawan.</div>
-                    <div class="ppc-link">Lihat Detail <i class="bi bi-arrow-down"></i></div>
-                </div>
-            </a>
+            @endforeach
         </div>
     </div>
 </section>
@@ -1240,49 +1170,20 @@
         </div>
 
         <div class="jenjang-grid" id="jenjangGrid">
+            @foreach($dbJenjangs as $jj)
             <a href="{{ route('register') }}" class="jenjang-card">
                 <div class="jc-photo-wrap">
-                    <img src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=200&q=80&auto=format&fit=crop" alt="TK" loading="lazy"
+                    @if($jj->image)
+                    <img src="{{ str_starts_with($jj->image,'http') ? $jj->image : asset($jj->image) }}" alt="{{ $jj->name }}" loading="lazy"
                          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                    <div class="jc-photo-fallback" style="display:none">🌱</div>
+                    @endif
+                    <div class="jc-photo-fallback" style="display:{{ $jj->image ? 'none' : 'flex' }}">{{ $jj->emoji }}</div>
                 </div>
-                <div class="jc-name">TK</div>
-                <div class="jc-label">Taman Kanak-Kanak</div>
+                <div class="jc-name">{{ $jj->name }}</div>
+                <div class="jc-label">{{ $jj->label }}</div>
                 <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
             </a>
-
-            <a href="{{ route('register') }}" class="jenjang-card">
-                <div class="jc-photo-wrap">
-                    <img src="https://images.unsplash.com/photo-1588072432836-e10032774350?w=200&q=80&auto=format&fit=crop" alt="SD" loading="lazy"
-                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                    <div class="jc-photo-fallback" style="display:none">📚</div>
-                </div>
-                <div class="jc-name">SD</div>
-                <div class="jc-label">Sekolah Dasar</div>
-                <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
-            </a>
-
-            <a href="{{ route('register') }}" class="jenjang-card">
-                <div class="jc-photo-wrap">
-                    <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=200&q=80&auto=format&fit=crop" alt="SMP" loading="lazy"
-                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                    <div class="jc-photo-fallback" style="display:none">🔬</div>
-                </div>
-                <div class="jc-name">SMP</div>
-                <div class="jc-label">Sekolah Menengah Pertama</div>
-                <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
-            </a>
-
-            <a href="{{ route('register') }}" class="jenjang-card">
-                <div class="jc-photo-wrap">
-                    <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=200&q=80&auto=format&fit=crop" alt="SMA" loading="lazy"
-                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                    <div class="jc-photo-fallback" style="display:none">🎓</div>
-                </div>
-                <div class="jc-name">SMA / Umum</div>
-                <div class="jc-label">SMA &amp; Karyawan</div>
-                <div class="jc-link">Lihat Detail <i class="bi bi-arrow-right"></i></div>
-            </a>
+            @endforeach
         </div>
         <div class="mobile-carousel-dots" id="jenjang-dots"></div>
     </div>
@@ -1291,9 +1192,9 @@
 {{-- ──────────────────────────── CARI GURU ─────────────────────────────────── --}}
 <section class="cari-guru-section" id="cari-guru">
     <div class="cari-guru-inner reveal">
-        <div class="cg-eyebrow">TEMUKAN PENGAJAR TERBAIK</div>
-        <h2 class="cg-title">Cari Guru <span class="cg-title-accent">Terbaik</span>, Secepat Klik</h2>
-        <p class="cg-subtitle">Temukan tutor privat terbaik di kotamu — pilih berdasarkan mata pelajaran, lokasi, dan metode belajar yang kamu inginkan.</p>
+        <div class="cg-eyebrow">{{ $ls('cariguru.eyebrow','TEMUKAN PENGAJAR TERBAIK') }}</div>
+        <h2 class="cg-title">{{ $ls('cariguru.title_line1','Cari Guru') }} <span class="cg-title-accent">{{ $ls('cariguru.title_accent','Terbaik') }}</span>{{ $ls('cariguru.title_line2',', Secepat Klik') }}</h2>
+        <p class="cg-subtitle">{{ $ls('cariguru.subtitle','Temukan tutor privat terbaik di kotamu — pilih berdasarkan mata pelajaran, lokasi, dan metode belajar yang kamu inginkan.') }}</p>
 
         <div class="cg-form">
             <div class="cg-fields">
@@ -1335,10 +1236,9 @@
                 </a>
             </div>
             <div class="cg-trust">
-                <div class="cg-trust-item"><i class="bi bi-patch-check-fill"></i> 500+ Tutor Bersertifikat</div>
-                <div class="cg-trust-item"><i class="bi bi-lightning-fill"></i> Respon dalam 1 Jam</div>
-                <div class="cg-trust-item"><i class="bi bi-shield-fill-check"></i> Aman &amp; Terpercaya</div>
-                <div class="cg-trust-item"><i class="bi bi-award-fill"></i> Garansi Hasil Belajar</div>
+                @foreach($dbTrusts as $trust)
+                <div class="cg-trust-item"><i class="bi {{ $trust->icon }}"></i> {{ $trust->text }}</div>
+                @endforeach
             </div>
         </div>
     </div>
@@ -1351,25 +1251,24 @@
             <div class="section-eyebrow" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.9)">
                 <i class="bi bi-shield-fill-check"></i> Keunggulan
             </div>
-            <h2 class="section-title" style="color:white">Keunggulan <em class="section-title-accent">SCI</em></h2>
-            <p class="section-subtitle mx-auto" style="color:rgba(255,255,255,.7)">Lima pilar yang membuat SCI menjadi pilihan terpercaya jutaan keluarga Indonesia selama 14+ tahun.</p>
+            <h2 class="section-title" style="color:white">Keunggulan <em class="section-title-accent">{{ $ls('keunggulan.title_accent','SCI') }}</em></h2>
+            <p class="section-subtitle mx-auto" style="color:rgba(255,255,255,.7)">{{ $ls('keunggulan.subtitle','Lima pilar yang membuat SCI menjadi pilihan terpercaya jutaan keluarga Indonesia selama 14+ tahun.') }}</p>
         </div>
 
+        @php
+        $kdCards = $dbHighlights->map(fn($h) => [
+            'img'   => $h->image ? (str_starts_with($h->image,'http') ? $h->image : asset($h->image)) : null,
+            'alt'   => $h->title,
+            'title' => $h->title,
+            'desc'  => e($h->description),
+        ]);
+        @endphp
         <div class="keunggulan-inf-vp">
             <div class="keunggulan-inf-track">
-                @php
-                $kdCards = [
-                    ['img'=>'https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=200&q=80','alt'=>'Tutor Profesional','title'=>'Tutor Profesional','desc'=>'Pengajar ahli bersertifikat resmi dengan pengalaman bertahun-tahun dan rekam jejak hasil nyata.'],
-                    ['img'=>'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&q=80','alt'=>'Bisa Home Visit','title'=>'Bisa Home Visit','desc'=>'Tutor kami siap datang ke rumah Anda kapan saja. Jadwal fleksibel, nyaman, dan tanpa perlu repot.'],
-                    ['img'=>'https://images.unsplash.com/photo-1581092334651-ddf26d9a09d0?w=200&q=80','alt'=>'Metode Modern','title'=>'Metode Modern','desc'=>'Sistem belajar interaktif yang disesuaikan dengan gaya belajar masing-masing siswa. Belajar itu menyenangkan!'],
-                    ['img'=>'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=200&q=80','alt'=>'Hasil Terukur','title'=>'Hasil Terukur','desc'=>'Evaluasi rutin, progress terpantau, laporan bulanan. Nilai meningkat signifikan — dijamin atau kami ulang!'],
-                    ['img'=>'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80','alt'=>'Support Penuh','title'=>'Support Penuh','desc'=>'Bantuan belajar &amp; konsultasi 24/7 via WhatsApp. Kami selalu ada untuk mendukung perjalanan belajar Anda.'],
-                ];
-                @endphp
                 {{-- Set 1 --}}
                 @foreach($kdCards as $kd)
                 <div class="kd-card">
-                    <div class="kd-photo"><img src="{{ $kd['img'] }}" alt="{{ $kd['alt'] }}" loading="lazy"></div>
+                    <div class="kd-photo">@if($kd['img'])<img src="{{ $kd['img'] }}" alt="{{ $kd['alt'] }}" loading="lazy">@endif</div>
                     <div class="kd-title">{{ $kd['title'] }}</div>
                     <div class="kd-desc">{!! $kd['desc'] !!}</div>
                 </div>
@@ -1377,7 +1276,7 @@
                 {{-- Set 2 (duplicate for seamless loop) --}}
                 @foreach($kdCards as $kd)
                 <div class="kd-card" aria-hidden="true">
-                    <div class="kd-photo"><img src="{{ $kd['img'] }}" alt="" loading="lazy"></div>
+                    <div class="kd-photo">@if($kd['img'])<img src="{{ $kd['img'] }}" alt="" loading="lazy">@endif</div>
                     <div class="kd-title">{{ $kd['title'] }}</div>
                     <div class="kd-desc">{!! $kd['desc'] !!}</div>
                 </div>
@@ -1398,10 +1297,7 @@
 
         @php
         $testiCards = $dbTestis->isNotEmpty() ? $dbTestis->take(4) : collect([
-            (object)['text'=>'Belajar di SCI sangat menyenangkan! Tutor menjelaskan dengan cara yang mudah dipahami dan nilai saya meningkat pesat. Sangat merekomendasikan untuk semua!','name'=>'Aisyah Rahma','role'=>'Siswa SMA · Matematika','initial'=>'A','gradient'=>'linear-gradient(135deg,#c84ddf,#68117e)'],
-            (object)['text'=>'Program persiapan ujian di SCI sangat membantu. Akhirnya lolos ke kampus impian! Materinya lengkap banget dan tutornya super sabar dan profesional.','name'=>'Ricky Pratama','role'=>'Mahasiswa · Persiapan SBMPTN','initial'=>'R','gradient'=>'linear-gradient(135deg,#10b981,#059669)'],
-            (object)['text'=>'Kursus akuntansi di SCI sangat bermanfaat untuk tugas kuliah dan persiapan kerja. Tutornya sabar, materi lengkap, dan nilai kuliah saya jadi meningkat!','name'=>'Dinda Lestari','role'=>'Mahasiswi · Akuntansi','initial'=>'D','gradient'=>'linear-gradient(135deg,#6366f1,#4338ca)'],
-            (object)['text'=>'Anakku yang awalnya kesulitan di pelajaran IPA sekarang jadi juara kelas! Metode belajar di SCI sangat efektif dan tutornya sangat sabar dan perhatian.','name'=>'Bunda Sari','role'=>'Orang Tua Siswa · Jakarta','initial'=>'B','gradient'=>'linear-gradient(135deg,#f97316,#ea580c)'],
+            (object)['text'=>'Belajar di SCI sangat menyenangkan! Tutor menjelaskan dengan cara yang mudah dipahami dan nilai saya meningkat pesat. Sangat merekomendasikan untuk semua!','name'=>'Aisyah Rahma','role'=>'Siswa SMA · Matematika','initial'=>'A','gradient'=>'linear-gradient(135deg,#c84ddf,#68117e)','photo'=>null],
         ]);
         @endphp
         <div class="testi-inf-vp">
@@ -1416,7 +1312,11 @@
                     <div class="tlc-quote">"</div>
                     <p class="tlc-text">{{ $t->text }}</p>
                     <div class="tlc-author">
+                        @if(!empty($t->photo))
+                        <div class="tlc-avatar-fb" style="padding:0;overflow:hidden"><img src="{{ str_starts_with($t->photo,'http') ? $t->photo : asset($t->photo) }}" alt="{{ $t->name }}" style="width:100%;height:100%;object-fit:cover"></div>
+                        @else
                         <div class="tlc-avatar-fb" style="background:{{ $t->gradient }}">{{ $t->initial }}</div>
+                        @endif
                         <div>
                             <div class="tlc-name">{{ $t->name }}</div>
                             <div class="tlc-role">{{ $t->role }}</div>
@@ -1435,7 +1335,11 @@
                     <div class="tlc-quote">"</div>
                     <p class="tlc-text">{{ $t->text }}</p>
                     <div class="tlc-author">
+                        @if(!empty($t->photo))
+                        <div class="tlc-avatar-fb" style="padding:0;overflow:hidden"><img src="{{ str_starts_with($t->photo,'http') ? $t->photo : asset($t->photo) }}" alt="" style="width:100%;height:100%;object-fit:cover"></div>
+                        @else
                         <div class="tlc-avatar-fb" style="background:{{ $t->gradient }}">{{ $t->initial }}</div>
+                        @endif
                         <div>
                             <div class="tlc-name">{{ $t->name }}</div>
                             <div class="tlc-role">{{ $t->role }}</div>
@@ -1458,16 +1362,10 @@
         </div>
 
         @php
-        $galeriPhotos = [
-            ['url'=>'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=700&q=80','alt'=>'Kelas Belajar'],
-            ['url'=>'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=700&q=80','alt'=>'Diskusi Kelompok'],
-            ['url'=>'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=700&q=80','alt'=>'Les Online'],
-            ['url'=>'https://images.unsplash.com/photo-1544717305-2782549b5136?w=700&q=80','alt'=>'Tutor Mengajar'],
-            ['url'=>'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=700&q=80','alt'=>'Les Privat'],
-            ['url'=>'https://images.unsplash.com/photo-1509869175650-a1d97972541a?w=700&q=80','alt'=>'Kursus Komputer'],
-            ['url'=>'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=700&q=80','alt'=>'Persiapan Ujian'],
-            ['url'=>'https://images.unsplash.com/photo-1543269865-cbf427effbad?w=700&q=80','alt'=>'Belajar Bersama'],
-        ];
+        $galeriPhotos = $dbGalleries->map(fn($g) => [
+            'url' => $g->image ? (str_starts_with($g->image,'http') ? $g->image : asset($g->image)) : '',
+            'alt' => $g->alt,
+        ])->filter(fn($g) => $g['url'] !== '');
         @endphp
 
         <div class="galeri-row-wrap">
@@ -1579,24 +1477,14 @@
         <div class="bantuan-inner">
             {{-- Left: FAQ Accordion --}}
             <div class="faq-list reveal">
-                @php
-                $faqs = [
-                    ['q'=>'Bagaimana cara mendaftar di SCI?',           'a'=>'Anda bisa mendaftar melalui website ini, menghubungi kami via WhatsApp, atau langsung datang ke cabang SCI terdekat. Tim kami akan membantu proses pendaftaran dengan mudah dan cepat.'],
-                    ['q'=>'Apakah bisa datang ke rumah?',               'a'=>'Ya! Kami menyediakan layanan home visit di mana tutor kami akan datang langsung ke rumah Anda. Jadwal fleksibel dan nyaman tanpa perlu keluar rumah.'],
-                    ['q'=>'Jenjang apa saja yang dilayani?',            'a'=>'SCI melayani semua jenjang mulai dari TK, SD, SMP, SMA, hingga mahasiswa dan umum. Tersedia juga kursus bahasa, komputer, dan akuntansi untuk semua usia.'],
-                    ['q'=>'Berapa biaya les privat di SCI?',            'a'=>'Biaya bervariasi tergantung jenjang, mata pelajaran, dan metode belajar (online/offline/home visit). Hubungi kami untuk mendapatkan penawaran terbaik sesuai kebutuhan Anda.'],
-                    ['q'=>'Apakah ada garansi hasil belajar?',          'a'=>'Ya! SCI memberikan garansi hasil belajar. Jika nilai tidak meningkat sesuai target yang disepakati, kami siap memberikan sesi tambahan tanpa biaya ekstra.'],
-                    ['q'=>'Bagaimana sistem pembayaran di SCI?',        'a'=>'Pembayaran bisa dilakukan bulanan atau per paket belajar. Tersedia berbagai metode pembayaran termasuk transfer bank, dompet digital, dan tunai di cabang.'],
-                ];
-                @endphp
-                @foreach($faqs as $fi => $faq)
+                @foreach($dbFaqs as $fi => $faq)
                 <div class="faq-item {{ $fi === 0 ? 'open' : '' }}">
                     <div class="faq-trigger" onclick="toggleFaq(this)">
-                        <span>{{ $faq['q'] }}</span>
+                        <span>{{ $faq->question }}</span>
                         <span class="faq-icon"><i class="bi bi-plus"></i></span>
                     </div>
                     <div class="faq-body">
-                        <div class="faq-body-inner">{{ $faq['a'] }}</div>
+                        <div class="faq-body-inner">{{ $faq->answer }}</div>
                     </div>
                 </div>
                 @endforeach
@@ -1658,10 +1546,11 @@
             'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80',
         ];
         $cabangDisplay = $branches3->count() >= 3 ? $branches3 : collect([
-            (object)['nama'=>'Riau',           'alamat'=>null],
-            (object)['nama'=>'Sumatera Barat', 'alamat'=>null],
-            (object)['nama'=>'Sumatera Utara', 'alamat'=>null],
+            (object)['nama'=>'Riau',           'alamat'=>null, 'photo'=>null],
+            (object)['nama'=>'Sumatera Barat', 'alamat'=>null, 'photo'=>null],
+            (object)['nama'=>'Sumatera Utara', 'alamat'=>null, 'photo'=>null],
         ]);
+        $cbPhoto = fn($cb, $fallback) => !empty($cb->photo) ? (str_starts_with($cb->photo,'http') ? $cb->photo : asset($cb->photo)) : $fallback;
         @endphp
 
         <div class="cabang-photo-grid reveal">
@@ -1670,7 +1559,7 @@
                 @foreach([$cabangDisplay[0], $cabangDisplay[2]] as $ci => $cb)
                 @php $bName = $cb->nama ?? $cb->name ?? 'Cabang SCI'; @endphp
                 <div class="cpc">
-                    <img src="{{ $cityPhotos[$ci === 0 ? 0 : 2] }}" alt="{{ $bName }}" loading="lazy">
+                    <img src="{{ $cbPhoto($cb, $cityPhotos[$ci === 0 ? 0 : 2]) }}" alt="{{ $bName }}" loading="lazy">
                     <div class="cpc-overlay">
                         <div class="cpc-name">{{ $bName }}</div>
                         <div class="cpc-sub">Jasa Les Privat {{ $bName }}</div>
@@ -1686,7 +1575,7 @@
             {{-- Right: 1 tall card --}}
             @php $cb2 = $cabangDisplay[1]; $bName2 = $cb2->nama ?? $cb2->name ?? 'Cabang SCI'; @endphp
             <div class="cpc cpc-tall">
-                <img src="{{ $cityPhotos[1] }}" alt="{{ $bName2 }}" loading="lazy" style="height:100%;min-height:410px">
+                <img src="{{ $cbPhoto($cb2, $cityPhotos[1]) }}" alt="{{ $bName2 }}" loading="lazy" style="height:100%;min-height:410px">
                 <div class="cpc-overlay">
                     <div class="cpc-name">{{ $bName2 }}</div>
                     <div class="cpc-sub">Jasa Les Privat {{ $bName2 }}</div>
