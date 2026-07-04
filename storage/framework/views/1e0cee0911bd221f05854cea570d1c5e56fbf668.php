@@ -1,4 +1,4 @@
-@php
+<?php
     $stats = [
         'students' => \App\Models\Student::where('status','aktif')->count(),
         'teachers' => \App\Models\Teacher::where('status','aktif')->count(),
@@ -32,7 +32,7 @@
         'linear-gradient(160deg,#134e4a,#14b8a6)',
         'linear-gradient(160deg,#422006,#f59e0b)',
     ];
-@endphp
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -652,10 +652,10 @@
 <body>
 <div id="scroll-progress" role="progressbar" aria-hidden="true"></div>
 
-{{-- ─────────────────────────────── NAVBAR ────────────────────────────────── --}}
+
 <nav class="lp-nav" id="navbar">
     <div class="nav-inner">
-        <a href="{{ url('/') }}" class="nav-brand">
+        <a href="<?php echo e(url('/')); ?>" class="nav-brand">
             <div class="nav-brand-icon"><i class="bi bi-mortarboard-fill"></i></div>
             <div class="nav-brand-text">
                 Smart Center
@@ -673,8 +673,8 @@
         </ul>
 
         <div class="nav-cta">
-            <a href="{{ route('login') }}"    class="btn-nav-login">Masuk</a>
-            <a href="{{ route('register') }}" class="btn-nav-register">Daftar Sekarang</a>
+            <a href="<?php echo e(route('login')); ?>"    class="btn-nav-login">Masuk</a>
+            <a href="<?php echo e(route('register')); ?>" class="btn-nav-register">Daftar Sekarang</a>
         </div>
 
         <button class="nav-toggle" id="navToggle" aria-label="Menu">
@@ -683,7 +683,7 @@
     </div>
 </nav>
 
-{{-- Mobile Menu --}}
+
 <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
     <button class="mobile-close" onclick="closeMobile()" aria-label="Tutup menu">
         <i class="bi bi-x-lg"></i>
@@ -695,38 +695,38 @@
     <a href="#testimonials" onclick="closeMobile()">Testimoni</a>
     <a href="#cabang"       onclick="closeMobile()">Cabang</a>
     <div class="mobile-divider"></div>
-    <a href="{{ route('login') }}"    onclick="closeMobile()" style="color:rgba(255,255,255,.65);font-size:1.05rem;font-weight:600"><i class="bi bi-box-arrow-in-right" style="font-size:.9rem"></i> Masuk</a>
-    <a href="{{ route('register') }}" onclick="closeMobile()" style="background:linear-gradient(135deg,var(--primary-dark),var(--primary));padding:.8rem 2.5rem;border-radius:14px;font-size:1rem;color:white">Daftar Sekarang</a>
+    <a href="<?php echo e(route('login')); ?>"    onclick="closeMobile()" style="color:rgba(255,255,255,.65);font-size:1.05rem;font-weight:600"><i class="bi bi-box-arrow-in-right" style="font-size:.9rem"></i> Masuk</a>
+    <a href="<?php echo e(route('register')); ?>" onclick="closeMobile()" style="background:linear-gradient(135deg,var(--primary-dark),var(--primary));padding:.8rem 2.5rem;border-radius:14px;font-size:1rem;color:white">Daftar Sekarang</a>
 </div>
 
-{{-- ─────────────────────────────── HERO ──────────────────────────────────── --}}
+
 <section class="hero" id="home">
     <div class="hero-slides" id="heroSlides">
-        @php
+        <?php
             $heroSlides = array_values(array_filter([
                 $ls('hero.slide_1_url','https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1920&q=80'),
                 $ls('hero.slide_2_url','https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1920&q=80'),
                 $ls('hero.slide_3_url','https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&w=1920&q=80'),
             ]));
-        @endphp
-        @foreach($heroSlides as $i => $slideUrl)
-        <div class="hero-slide {{ $i === 0 ? 'active' : '' }}" style="background-image:url('{{ $slideUrl }}')">
+        ?>
+        <?php $__currentLoopData = $heroSlides; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $slideUrl): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <div class="hero-slide <?php echo e($i === 0 ? 'active' : ''); ?>" style="background-image:url('<?php echo e($slideUrl); ?>')">
             <div class="hero-slide-overlay"></div>
         </div>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
 
-    {{-- Left arrow --}}
+    
     <button class="hero-arrow hero-arrow-left" id="heroArrowLeft" aria-label="Slide sebelumnya">
         <i class="bi bi-chevron-left"></i>
     </button>
 
-    {{-- Right arrow --}}
+    
     <button class="hero-arrow hero-arrow-right" id="heroArrowRight" aria-label="Slide berikutnya">
         <i class="bi bi-chevron-right"></i>
     </button>
 
-    {{-- Notification popup --}}
+    
     <div class="hero-notify" id="heroNotify">
         <div class="notify-avatar">
             W
@@ -742,22 +742,22 @@
         </button>
     </div>
 
-    {{-- SCROLL indicator + dots --}}
+    
     <div class="hero-scroll-hint">
         <div class="hero-scroll-text">Scroll</div>
         <div class="hero-scroll-chevron"><i class="bi bi-chevron-down"></i></div>
         <div class="hero-dots" id="heroDots">
-            @foreach($heroSlides as $i => $slideUrl)
-            <button class="hero-dot {{ $i === 0 ? 'active' : '' }}" data-slide="{{ $i }}" aria-label="Slide {{ $i + 1 }}"></button>
-            @endforeach
+            <?php $__currentLoopData = $heroSlides; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $slideUrl): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <button class="hero-dot <?php echo e($i === 0 ? 'active' : ''); ?>" data-slide="<?php echo e($i); ?>" aria-label="Slide <?php echo e($i + 1); ?>"></button>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
 </section>
 
-{{-- ─────────────────────────────── TICKER BAR ─────────────────────────────── --}}
+
 <div class="hero-ticker" aria-hidden="true">
     <div class="ticker-track">
-        @php
+        <?php
             $tickerItems = [
                 ['🎉', 'Diskon Spesial! Gratis biaya pendaftaran bulan ini'],
                 ['📚', 'Daftar sekarang &amp; dapatkan sesi konsultasi GRATIS!'],
@@ -766,41 +766,41 @@
                 ['🏆', 'Tutor berpengalaman &amp; bersertifikat nasional'],
                 ['📞', 'Hubungi kami sekarang &mdash; konsultasi gratis!'],
             ];
-        @endphp
-        {{-- Set 1 --}}
-        @foreach($tickerItems as $ti)
-        <span class="ticker-item">{{ $ti[0] }} {!! $ti[1] !!} <span class="ticker-sep">|</span></span>
-        @endforeach
-        {{-- Set 2 (duplicate for seamless loop) --}}
-        @foreach($tickerItems as $ti)
-        <span class="ticker-item">{{ $ti[0] }} {!! $ti[1] !!} <span class="ticker-sep">|</span></span>
-        @endforeach
+        ?>
+        
+        <?php $__currentLoopData = $tickerItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ti): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <span class="ticker-item"><?php echo e($ti[0]); ?> <?php echo $ti[1]; ?> <span class="ticker-sep">|</span></span>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        
+        <?php $__currentLoopData = $tickerItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ti): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <span class="ticker-item"><?php echo e($ti[0]); ?> <?php echo $ti[1]; ?> <span class="ticker-sep">|</span></span>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
 </div>
 
-{{-- ──────────────────────────── STATS STRIP ───────────────────────────────── --}}
+
 <section class="stats-strip">
     <div class="stats-strip-inner">
         <div class="stat-item reveal">
-            <div class="si-num count-up" data-target="{{ max($stats['students'], 500) }}">0</div>
+            <div class="si-num count-up" data-target="<?php echo e(max($stats['students'], 500)); ?>">0</div>
             <div class="si-label">Siswa Aktif</div>
         </div>
         <div class="stat-item reveal reveal-delay-1">
-            <div class="si-num count-up" data-target="{{ max($stats['teachers'], 50) }}">0</div>
+            <div class="si-num count-up" data-target="<?php echo e(max($stats['teachers'], 50)); ?>">0</div>
             <div class="si-label">Tutor Profesional</div>
         </div>
         <div class="stat-item reveal reveal-delay-2">
-            <div class="si-num">{{ $ls('stats.years_exp','14+') }}</div>
+            <div class="si-num"><?php echo e($ls('stats.years_exp','14+')); ?></div>
             <div class="si-label">Tahun Pengalaman</div>
         </div>
         <div class="stat-item reveal reveal-delay-3">
-            <div class="si-num">{{ $ls('stats.satisfaction','98%') }}</div>
+            <div class="si-num"><?php echo e($ls('stats.satisfaction','98%')); ?></div>
             <div class="si-label">Kepuasan Pelanggan</div>
         </div>
     </div>
 </section>
 
-{{-- ──────────────────────────── JENJANG PENDIDIKAN ───────────────────────── --}}
+
 <section class="section-pad jenjang-bg" id="jenjang">
     <div class="container-lp">
         <div class="text-center reveal">
@@ -810,7 +810,7 @@
         </div>
 
         <div class="jenjang-grid" id="jenjangGrid">
-            <a href="{{ route('register') }}" class="jenjang-card reveal reveal-delay-1">
+            <a href="<?php echo e(route('register')); ?>" class="jenjang-card reveal reveal-delay-1">
                 <div class="jc-num">1</div>
                 <div class="jc-content">
                     <div class="jc-icon-wrap">
@@ -822,7 +822,7 @@
                 </div>
             </a>
 
-            <a href="{{ route('register') }}" class="jenjang-card reveal reveal-delay-2">
+            <a href="<?php echo e(route('register')); ?>" class="jenjang-card reveal reveal-delay-2">
                 <div class="jc-num">2</div>
                 <div class="jc-content">
                     <div class="jc-icon-wrap">
@@ -834,7 +834,7 @@
                 </div>
             </a>
 
-            <a href="{{ route('register') }}" class="jenjang-card reveal reveal-delay-3">
+            <a href="<?php echo e(route('register')); ?>" class="jenjang-card reveal reveal-delay-3">
                 <div class="jc-num">3</div>
                 <div class="jc-content">
                     <div class="jc-icon-wrap">
@@ -846,7 +846,7 @@
                 </div>
             </a>
 
-            <a href="{{ route('register') }}" class="jenjang-card reveal reveal-delay-4">
+            <a href="<?php echo e(route('register')); ?>" class="jenjang-card reveal reveal-delay-4">
                 <div class="jc-num">4</div>
                 <div class="jc-content">
                     <div class="jc-icon-wrap">
@@ -862,7 +862,7 @@
     </div>
 </section>
 
-{{-- ──────────────────────────── PROGRAM UNGGULAN ─────────────────────────── --}}
+
 <section class="section-pad" id="program">
     <div class="container-lp">
         <div class="text-center reveal">
@@ -872,26 +872,26 @@
         </div>
 
         <div class="program-grid" id="programGrid">
-            @php $delays = ['reveal-delay-1','reveal-delay-2','reveal-delay-3']; @endphp
-            @forelse($dbPrograms as $pi => $prog)
-            <a href="{{ route('register') }}" class="program-card reveal {{ $delays[$pi % 3] }}" style="text-decoration:none;color:inherit{{ $prog->is_popular ? ';border-color:rgba(246,175,35,.3)' : ($prog->is_new ? ';border-color:rgba(16,185,129,.25)' : '') }}">
-                <div class="pc-badge" style="background:{{ $prog->badge_bg }};color:{{ $prog->badge_color }};">{{ $prog->badge_label }}</div>
-                <div class="pc-icon-wrap" style="background:{{ $prog->badge_bg }};">
-                    <span style="font-size:1.5rem">{{ $prog->icon_emoji }}</span>
+            <?php $delays = ['reveal-delay-1','reveal-delay-2','reveal-delay-3']; ?>
+            <?php $__empty_1 = true; $__currentLoopData = $dbPrograms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pi => $prog): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+            <a href="<?php echo e(route('register')); ?>" class="program-card reveal <?php echo e($delays[$pi % 3]); ?>" style="text-decoration:none;color:inherit<?php echo e($prog->is_popular ? ';border-color:rgba(246,175,35,.3)' : ($prog->is_new ? ';border-color:rgba(16,185,129,.25)' : '')); ?>">
+                <div class="pc-badge" style="background:<?php echo e($prog->badge_bg); ?>;color:<?php echo e($prog->badge_color); ?>;"><?php echo e($prog->badge_label); ?></div>
+                <div class="pc-icon-wrap" style="background:<?php echo e($prog->badge_bg); ?>;">
+                    <span style="font-size:1.5rem"><?php echo e($prog->icon_emoji); ?></span>
                 </div>
-                <div class="pc-title">{{ $prog->title }}</div>
-                <div class="pc-desc">{{ $prog->description }}</div>
+                <div class="pc-title"><?php echo e($prog->title); ?></div>
+                <div class="pc-desc"><?php echo e($prog->description); ?></div>
                 <div class="pc-link">Daftar Sekarang <i class="bi bi-arrow-right"></i></div>
             </a>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <div class="col-12 text-center py-5 text-muted">Program segera hadir.</div>
-            @endforelse
+            <?php endif; ?>
         </div>
         <div class="mobile-carousel-dots" id="program-dots"></div>
     </div>
 </section>
 
-{{-- ──────────────────────────── CARA BERGABUNG ───────────────────────────── --}}
+
 <section class="section-pad" id="cara-bergabung" style="background:var(--off-white)">
     <div class="container-lp">
         <div class="how-inner">
@@ -950,7 +950,7 @@
     </div>
 </section>
 
-{{-- ──────────────────────────── MENGAPA SCI ───────────────────────────────── --}}
+
 <section class="section-pad" id="mengapa-sci">
     <div class="container-lp">
         <div class="text-center reveal">
@@ -999,7 +999,7 @@
     </div>
 </section>
 
-{{-- ──────────────────────────── TESTIMONIALS ──────────────────────────────── --}}
+
 <section class="section-pad testimonials-bg" id="testimonials">
     <div class="testimonials-inner">
         <div class="container-lp">
@@ -1012,56 +1012,56 @@
             </div>
         </div>
 
-        {{-- Infinite carousel — items duplicated for seamless loop --}}
+        
         <div class="carousel-viewport">
             <div class="carousel-track">
-                @php
+                <?php
                     $testiSource = $dbTestis->isNotEmpty() ? $dbTestis : collect([
                         (object)['text'=>'"Nilai matematika saya naik dari 60 ke 90 setelah 3 bulan bimbel di SCI! Tutornya sabar dan cara jelasinnya mudah dipahami."','name'=>'Rini Kusumawati','role'=>'Siswa SMA · Surabaya','initial'=>'R','gradient'=>'linear-gradient(135deg,#c84ddf,#68117e)'],
                         (object)['text'=>'"Berkat program intensif SBMPTN di SCI, saya berhasil masuk ITB! Materinya lengkap, soal-soal latihannya mirip ujian asli."','name'=>'Siti Nuraini','role'=>'Mahasiswa ITB · Bandung','initial'=>'S','gradient'=>'linear-gradient(135deg,#10b981,#059669)'],
                         (object)['text'=>'"Kursus komputer di SCI luar biasa! Dalam 3 bulan saya sudah bisa desain grafis dan sekarang sudah dapat klien freelance."','name'=>'Andika Putra','role'=>'Alumni Kursus Komputer · Yogyakarta','initial'=>'A','gradient'=>'linear-gradient(135deg,#6366f1,#4338ca)'],
                     ]);
-                @endphp
-                {{-- Set 1 --}}
-                @foreach($testiSource as $t)
+                ?>
+                
+                <?php $__currentLoopData = $testiSource; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div class="testi-card">
                     <div class="testi-stars">
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                     </div>
-                    <p class="testi-text">{{ $t->text }}</p>
+                    <p class="testi-text"><?php echo e($t->text); ?></p>
                     <div class="testi-author">
-                        <div class="testi-avatar" style="background:{{ $t->gradient }}">{{ $t->initial }}</div>
+                        <div class="testi-avatar" style="background:<?php echo e($t->gradient); ?>"><?php echo e($t->initial); ?></div>
                         <div>
-                            <div class="testi-name">{{ $t->name }}</div>
-                            <div class="testi-role">{{ $t->role }}</div>
+                            <div class="testi-name"><?php echo e($t->name); ?></div>
+                            <div class="testi-role"><?php echo e($t->role); ?></div>
                         </div>
                     </div>
                 </div>
-                @endforeach
-                {{-- Set 2 (duplicate for seamless loop) --}}
-                @foreach($testiSource as $t)
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                
+                <?php $__currentLoopData = $testiSource; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div class="testi-card">
                     <div class="testi-stars">
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                     </div>
-                    <p class="testi-text">{{ $t->text }}</p>
+                    <p class="testi-text"><?php echo e($t->text); ?></p>
                     <div class="testi-author">
-                        <div class="testi-avatar" style="background:{{ $t->gradient }}">{{ $t->initial }}</div>
+                        <div class="testi-avatar" style="background:<?php echo e($t->gradient); ?>"><?php echo e($t->initial); ?></div>
                         <div>
-                            <div class="testi-name">{{ $t->name }}</div>
-                            <div class="testi-role">{{ $t->role }}</div>
+                            <div class="testi-name"><?php echo e($t->name); ?></div>
+                            <div class="testi-role"><?php echo e($t->role); ?></div>
                         </div>
                     </div>
                 </div>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
         </div>
     </div>
 </section>
 
-{{-- ──────────────────────────── GALERI KEGIATAN ──────────────────────────── --}}
+
 <section class="section-pad" id="galeri">
     <div class="container-lp">
         <div class="text-center reveal">
@@ -1095,7 +1095,7 @@
     </div>
 </section>
 
-{{-- ──────────────────────────── TUTOR TERBAIK ─────────────────────────────── --}}
+
 <section class="section-pad tutor-bg" id="tutor">
     <div class="container-lp">
         <div class="text-center reveal">
@@ -1105,8 +1105,8 @@
         </div>
     </div>
 
-    {{-- Pre-compute tutor data once to avoid duplicate file_exists I/O --}}
-    @php
+    
+    <?php
         $tutorItems = $tutors->values()->map(function($tutor, $i) use ($tutorGrads) {
             return [
                 'tutor'    => $tutor,
@@ -1116,24 +1116,24 @@
                 'hasPhoto' => !empty($tutor->photo) && file_exists(public_path('storage/'.$tutor->photo)),
             ];
         });
-    @endphp
-    {{-- Infinite tutor carousel — full width, edge-faded --}}
+    ?>
+    
     <div class="carousel-viewport tutor-carousel-viewport" style="margin-top:3rem;">
         <div class="tutor-carousel-track">
-            {{-- Set 1 --}}
-            @foreach($tutorItems as $td)
-            @php extract($td); @endphp
+            
+            <?php $__currentLoopData = $tutorItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $td): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php extract($td); ?>
             <div class="tutor-card">
-                <div class="tutor-avatar-wrap" style="background:{{ $grad }}">
-                    @if($hasPhoto)
-                        <img src="{{ asset('storage/'.$tutor->photo) }}" alt="{{ $tutor->name }}" loading="lazy">
-                    @else
-                        <div class="tutor-avatar-fallback">{{ $init }}</div>
-                    @endif
-                    <div class="tutor-badge-subject">{{ $subj }}</div>
+                <div class="tutor-avatar-wrap" style="background:<?php echo e($grad); ?>">
+                    <?php if($hasPhoto): ?>
+                        <img src="<?php echo e(asset('storage/'.$tutor->photo)); ?>" alt="<?php echo e($tutor->name); ?>" loading="lazy">
+                    <?php else: ?>
+                        <div class="tutor-avatar-fallback"><?php echo e($init); ?></div>
+                    <?php endif; ?>
+                    <div class="tutor-badge-subject"><?php echo e($subj); ?></div>
                 </div>
                 <div class="tutor-info">
-                    <div class="tutor-name">{{ $tutor->name }}</div>
+                    <div class="tutor-name"><?php echo e($tutor->name); ?></div>
                     <div class="tutor-meta">Tutor Profesional SCI</div>
                     <div class="tutor-stars">
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
@@ -1141,21 +1141,21 @@
                     </div>
                 </div>
             </div>
-            @endforeach
-            {{-- Set 2 (duplicate for seamless loop) --}}
-            @foreach($tutorItems as $td)
-            @php extract($td); @endphp
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            
+            <?php $__currentLoopData = $tutorItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $td): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php extract($td); ?>
             <div class="tutor-card">
-                <div class="tutor-avatar-wrap" style="background:{{ $grad }}">
-                    @if($hasPhoto)
-                        <img src="{{ asset('storage/'.$tutor->photo) }}" alt="{{ $tutor->name }}">
-                    @else
-                        <div class="tutor-avatar-fallback">{{ $init }}</div>
-                    @endif
-                    <div class="tutor-badge-subject">{{ $subj }}</div>
+                <div class="tutor-avatar-wrap" style="background:<?php echo e($grad); ?>">
+                    <?php if($hasPhoto): ?>
+                        <img src="<?php echo e(asset('storage/'.$tutor->photo)); ?>" alt="<?php echo e($tutor->name); ?>">
+                    <?php else: ?>
+                        <div class="tutor-avatar-fallback"><?php echo e($init); ?></div>
+                    <?php endif; ?>
+                    <div class="tutor-badge-subject"><?php echo e($subj); ?></div>
                 </div>
                 <div class="tutor-info">
-                    <div class="tutor-name">{{ $tutor->name }}</div>
+                    <div class="tutor-name"><?php echo e($tutor->name); ?></div>
                     <div class="tutor-meta">Tutor Profesional SCI</div>
                     <div class="tutor-stars">
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
@@ -1163,12 +1163,12 @@
                     </div>
                 </div>
             </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
 </section>
 
-{{-- ──────────────────────────── CABANG SCI ─────────────────────────────────── --}}
+
 <section class="section-pad" id="cabang">
     <div class="container-lp">
         <div class="text-center reveal">
@@ -1177,88 +1177,88 @@
             <p class="section-subtitle mx-auto">Temukan cabang SCI terdekat di kota Anda dan mulai perjalanan belajar bersama kami.</p>
         </div>
 
-        @php
+        <?php
             $branches = \App\Models\Branch::take(6)->get();
-        @endphp
+        ?>
 
-        @if($branches->count() > 0)
+        <?php if($branches->count() > 0): ?>
         <div class="cabang-grid">
-            @foreach($branches as $i => $branch)
-            @php $branchName = $branch->nama ?? $branch->name ?? 'Cabang SCI'; @endphp
-            <div class="cabang-card reveal reveal-delay-{{ ($i % 3) + 1 }}">
+            <?php $__currentLoopData = $branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $branch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php $branchName = $branch->nama ?? $branch->name ?? 'Cabang SCI'; ?>
+            <div class="cabang-card reveal reveal-delay-<?php echo e(($i % 3) + 1); ?>">
                 <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
-                <div class="cabang-name">{{ $branchName }}</div>
-                <div class="cabang-address">{{ $branch->alamat ?? $branch->address ?? 'Indonesia' }}</div>
+                <div class="cabang-name"><?php echo e($branchName); ?></div>
+                <div class="cabang-address"><?php echo e($branch->alamat ?? $branch->address ?? 'Indonesia'); ?></div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI, saya ingin tanya tentang program di cabang '.$branchName) }}" target="_blank" rel="noopener" class="btn-cabang-wa">
+                <a href="https://wa.me/<?php echo e($waMain); ?>?text=<?php echo e(urlencode('Halo SCI, saya ingin tanya tentang program di cabang '.$branchName)); ?>" target="_blank" rel="noopener" class="btn-cabang-wa">
                     <i class="bi bi-whatsapp"></i> Hubungi Cabang
                 </a>
             </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
-        @else
+        <?php else: ?>
         <div class="cabang-grid">
             <div class="cabang-card reveal reveal-delay-1">
                 <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
                 <div class="cabang-name">SCI Pusat — Jakarta</div>
                 <div class="cabang-address">Jl. Pendidikan No. 1, Jakarta Selatan</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI Jakarta, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
+                <a href="https://wa.me/<?php echo e($waMain); ?>?text=<?php echo e(urlencode('Halo SCI Jakarta, saya ingin tanya tentang program bimbel.')); ?>" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
             </div>
             <div class="cabang-card reveal reveal-delay-2">
                 <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
                 <div class="cabang-name">SCI Surabaya</div>
                 <div class="cabang-address">Jl. Raya Darmo No. 45, Surabaya</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI Surabaya, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
+                <a href="https://wa.me/<?php echo e($waMain); ?>?text=<?php echo e(urlencode('Halo SCI Surabaya, saya ingin tanya tentang program bimbel.')); ?>" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
             </div>
             <div class="cabang-card reveal reveal-delay-3">
                 <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
                 <div class="cabang-name">SCI Bandung</div>
                 <div class="cabang-address">Jl. Asia Afrika No. 22, Bandung</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI Bandung, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
+                <a href="https://wa.me/<?php echo e($waMain); ?>?text=<?php echo e(urlencode('Halo SCI Bandung, saya ingin tanya tentang program bimbel.')); ?>" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
             </div>
             <div class="cabang-card reveal reveal-delay-1">
                 <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
                 <div class="cabang-name">SCI Yogyakarta</div>
                 <div class="cabang-address">Jl. Malioboro No. 88, Yogyakarta</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI Yogyakarta, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
+                <a href="https://wa.me/<?php echo e($waMain); ?>?text=<?php echo e(urlencode('Halo SCI Yogyakarta, saya ingin tanya tentang program bimbel.')); ?>" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
             </div>
             <div class="cabang-card reveal reveal-delay-2">
                 <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
                 <div class="cabang-name">SCI Medan</div>
                 <div class="cabang-address">Jl. Gatot Subroto No. 12, Medan</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI Medan, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
+                <a href="https://wa.me/<?php echo e($waMain); ?>?text=<?php echo e(urlencode('Halo SCI Medan, saya ingin tanya tentang program bimbel.')); ?>" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
             </div>
             <div class="cabang-card reveal reveal-delay-3">
                 <div class="cabang-icon"><i class="bi bi-building-fill"></i></div>
                 <div class="cabang-name">SCI Makassar</div>
                 <div class="cabang-address">Jl. Penghibur No. 5, Makassar</div>
                 <div class="cabang-tag"><i class="bi bi-circle-fill" style="font-size:.45rem"></i> Aktif</div>
-                <a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo SCI Makassar, saya ingin tanya tentang program bimbel.') }}" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
+                <a href="https://wa.me/<?php echo e($waMain); ?>?text=<?php echo e(urlencode('Halo SCI Makassar, saya ingin tanya tentang program bimbel.')); ?>" target="_blank" rel="noopener" class="btn-cabang-wa"><i class="bi bi-whatsapp"></i> Hubungi Cabang</a>
             </div>
         </div>
-        @endif
+        <?php endif; ?>
     </div>
 </section>
 
-{{-- ──────────────────────────── CTA ───────────────────────────────────────── --}}
+
 <section class="cta-section">
     <div class="container-lp">
         <div class="cta-box reveal">
             <div class="cta-content">
-                <div class="cta-eyebrow"><i class="bi bi-mortarboard-fill"></i> {{ $ls('cta.eyebrow','Mulai Sekarang') }}</div>
-                <h2 class="cta-title">{{ $ls('cta.title','Wujudkan Mimpi Bersama SCI!') }}</h2>
-                <p class="cta-desc">{{ $ls('cta.description','Bergabunglah bersama ribuan siswa yang telah meraih prestasi bersama Smart Center Indonesia. Konsultasi gratis, daftar mudah!') }}</p>
+                <div class="cta-eyebrow"><i class="bi bi-mortarboard-fill"></i> <?php echo e($ls('cta.eyebrow','Mulai Sekarang')); ?></div>
+                <h2 class="cta-title"><?php echo e($ls('cta.title','Wujudkan Mimpi Bersama SCI!')); ?></h2>
+                <p class="cta-desc"><?php echo e($ls('cta.description','Bergabunglah bersama ribuan siswa yang telah meraih prestasi bersama Smart Center Indonesia. Konsultasi gratis, daftar mudah!')); ?></p>
                 <div class="cta-btns">
-                    <a href="{{ route('register') }}" class="btn-cta-primary">
+                    <a href="<?php echo e(route('register')); ?>" class="btn-cta-primary">
                         <i class="bi bi-person-plus-fill"></i>
                         Daftar Sekarang
                     </a>
-                    <a href="{{ route('login') }}" class="btn-cta-secondary">
+                    <a href="<?php echo e(route('login')); ?>" class="btn-cta-secondary">
                         <i class="bi bi-box-arrow-in-right"></i>
                         Masuk ke Portal
                     </a>
@@ -1268,8 +1268,8 @@
     </div>
 </section>
 
-{{-- ──────────────────────────── FLOATING BUTTONS ──────────────────────────── --}}
-<a href="https://wa.me/{{ $waMain }}?text={{ urlencode('Halo Smart Center Indonesia! Saya ingin konsultasi tentang program bimbel/kursus. Bisa bantu?') }}"
+
+<a href="https://wa.me/<?php echo e($waMain); ?>?text=<?php echo e(urlencode('Halo Smart Center Indonesia! Saya ingin konsultasi tentang program bimbel/kursus. Bisa bantu?')); ?>"
    class="wa-float" target="_blank" rel="noopener" aria-label="Hubungi via WhatsApp">
     <i class="bi bi-whatsapp"></i>
     <span class="wa-float-label">Konsultasi Gratis 💬</span>
@@ -1279,23 +1279,23 @@
     <i class="bi bi-arrow-up"></i>
 </button>
 
-{{-- ──────────────────────────── FOOTER ────────────────────────────────────── --}}
+
 <footer class="footer">
     <div class="container-lp">
         <div class="footer-grid">
             <div>
-                <a href="{{ url('/') }}" class="nav-brand" style="text-decoration:none">
+                <a href="<?php echo e(url('/')); ?>" class="nav-brand" style="text-decoration:none">
                     <div class="nav-brand-icon"><i class="bi bi-mortarboard-fill"></i></div>
                     <div class="nav-brand-text" style="color:white">
                         Smart Center<small style="color:rgba(255,255,255,.5)">Indonesia</small>
                     </div>
                 </a>
-                <p class="footer-brand-desc">{{ $ls('footer.brand_desc','Lembaga bimbingan belajar, kursus, dan les privat terbaik di Indonesia. Berkomitmen menjadi lembaga pendidikan nomor 1 di Indonesia. "Wujudkan mimpi, raih prestasi!"') }}</p>
+                <p class="footer-brand-desc"><?php echo e($ls('footer.brand_desc','Lembaga bimbingan belajar, kursus, dan les privat terbaik di Indonesia. Berkomitmen menjadi lembaga pendidikan nomor 1 di Indonesia. "Wujudkan mimpi, raih prestasi!"')); ?></p>
                 <div class="footer-social">
-                    <a href="{{ $ls('footer.instagram','#') }}"><i class="bi bi-instagram"></i></a>
-                    <a href="{{ $ls('footer.facebook','#') }}"><i class="bi bi-facebook"></i></a>
-                    <a href="{{ $ls('footer.youtube','#') }}"><i class="bi bi-youtube"></i></a>
-                    <a href="https://wa.me/{{ $waMain }}"><i class="bi bi-whatsapp"></i></a>
+                    <a href="<?php echo e($ls('footer.instagram','#')); ?>"><i class="bi bi-instagram"></i></a>
+                    <a href="<?php echo e($ls('footer.facebook','#')); ?>"><i class="bi bi-facebook"></i></a>
+                    <a href="<?php echo e($ls('footer.youtube','#')); ?>"><i class="bi bi-youtube"></i></a>
+                    <a href="https://wa.me/<?php echo e($waMain); ?>"><i class="bi bi-whatsapp"></i></a>
                 </div>
             </div>
 
@@ -1327,17 +1327,17 @@
                     <li><a href="#cabang">Lokasi Cabang</a></li>
                     <li><a href="#tutor">Tim Tutor</a></li>
                     <li><a href="#cta">Kontak Kami</a></li>
-                    <li><a href="{{ route('login') }}">Portal Siswa</a></li>
+                    <li><a href="<?php echo e(route('login')); ?>">Portal Siswa</a></li>
                 </ul>
             </div>
         </div>
 
         <div class="footer-bottom">
-            <p>&copy; {{ date('Y') }} Smart Center Indonesia. All rights reserved.</p>
+            <p>&copy; <?php echo e(date('Y')); ?> Smart Center Indonesia. All rights reserved.</p>
             <div class="footer-bottom-links">
-                <a href="{{ route('login') }}">Kebijakan Privasi</a>
-                <a href="{{ route('login') }}">Syarat & Ketentuan</a>
-                <a href="{{ route('login') }}">Bantuan</a>
+                <a href="<?php echo e(route('login')); ?>">Kebijakan Privasi</a>
+                <a href="<?php echo e(route('login')); ?>">Syarat & Ketentuan</a>
+                <a href="<?php echo e(route('login')); ?>">Bantuan</a>
             </div>
         </div>
     </div>
@@ -1544,3 +1544,4 @@ if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 </script>
 </body>
 </html>
+<?php /**PATH /home/runner/workspace/resources/views/landing.blade.php ENDPATH**/ ?>
