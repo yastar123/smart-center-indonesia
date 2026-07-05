@@ -1,4 +1,4 @@
-@php
+<?php
     $cityName = $city; // passed from controller
 
     /* ── features, subjects, metodeImages, heroBg, ctaEyebrow, ctaTitle, ctaDesc ──
@@ -22,16 +22,16 @@
         ['name'=>'Paket Intensif','desc'=>'Cocok untuk persiapan ujian dan akselerasi nilai.','price'=>'Rp 45.000','unit'=>'/sesi','sessions'=>'2–3× per minggu (8–12 sesi/bln)','fitur'=>['Durasi 90 menit/sesi','Materi soal ujian eksklusif','Laporan perkembangan mingguan','Try-out bulanan gratis','Konsultasi guru kapan saja'],'unggulan'=>true],
         ['name'=>'Paket Premium', 'desc'=>'Solusi lengkap untuk target nilai terbaik.','price'=>'Hubungi Kami','unit'=>'','sessions'=>'Jadwal & sesi fleksibel','fitur'=>['Sesi tak terbatas per bulan','Tutor spesialis bidang studi','Monitoring nilai real-time','Garansi nilai naik tertulis','Materi custom sesuai kurikulum'],'unggulan'=>false],
     ];
-@endphp
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Les Privat Terbaik di {{ $cityName }} — Smart Center Indonesia. Tutor bersertifikat, home visit, online & offline. Garansi nilai naik!">
-    <title>Les Privat Terbaik di {{ $cityName }} | Smart Center Indonesia</title>
-    <meta property="og:title" content="Les Privat Terbaik di {{ $cityName }} | SCI">
-    <meta property="og:description" content="SCI hadir di {{ $cityName }} dengan {{ $tutorCount }}+ tutor bersertifikat. Home visit, online & offline untuk semua jenjang.">
+    <meta name="description" content="Les Privat Terbaik di <?php echo e($cityName); ?> — Smart Center Indonesia. Tutor bersertifikat, home visit, online & offline. Garansi nilai naik!">
+    <title>Les Privat Terbaik di <?php echo e($cityName); ?> | Smart Center Indonesia</title>
+    <meta property="og:title" content="Les Privat Terbaik di <?php echo e($cityName); ?> | SCI">
+    <meta property="og:description" content="SCI hadir di <?php echo e($cityName); ?> dengan <?php echo e($tutorCount); ?>+ tutor bersertifikat. Home visit, online & offline untuk semua jenjang.">
     <meta property="og:type" content="website">
     <meta name="theme-color" content="#260632">
 
@@ -131,7 +131,7 @@
         }
         .bl-hero::before {
             content:''; position:absolute; inset:0;
-            background-image:url('{{ $heroBg }}');
+            background-image:url('<?php echo e($heroBg); ?>');
             background-size:cover; background-position:center;
             opacity:.15; pointer-events:none;
         }
@@ -476,24 +476,24 @@
 </head>
 <body>
 
-{{-- ──────────────── PROMO TICKER ──────────────────────────────────── --}}
+
 <div class="promo-ticker" aria-label="Promo">
     <div class="ticker-track">
-        @foreach(array_merge($promoItems, $promoItems) as $tk)
-        <span class="ticker-item">📢 {!! htmlspecialchars($tk) !!}</span>
+        <?php $__currentLoopData = array_merge($promoItems, $promoItems); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tk): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <span class="ticker-item">📢 <?php echo htmlspecialchars($tk); ?></span>
         <span class="ticker-sep">|</span>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
 </div>
 
-{{-- ──────────────── NAVBAR ─────────────────────────────────────────── --}}
+
 <nav class="bl-nav" id="blNav">
     <div class="bl-nav-inner">
-        <a href="{{ url('/') }}" class="bl-brand">
+        <a href="<?php echo e(url('/')); ?>" class="bl-brand">
             <div class="bl-brand-icon">SCI</div>
             <div class="bl-brand-text">
                 Smart Center Indonesia
-                <small>Les Privat {{ $cityName }}</small>
+                <small>Les Privat <?php echo e($cityName); ?></small>
             </div>
         </a>
         <ul class="bl-nav-links">
@@ -504,7 +504,7 @@
             <li><a href="#testimoni">Testimoni</a></li>
             <li><a href="#faq">FAQ</a></li>
         </ul>
-        <a href="https://wa.me/{{ $branchWa }}?text={{ urlencode('Halo SCI '.$cityName.'! Saya ingin konsultasi gratis tentang les privat.') }}"
+        <a href="https://wa.me/<?php echo e($branchWa); ?>?text=<?php echo e(urlencode('Halo SCI '.$cityName.'! Saya ingin konsultasi gratis tentang les privat.')); ?>"
            target="_blank" class="btn-bl-cta">
             <i class="bi bi-whatsapp"></i> Daftar Sekarang
         </a>
@@ -514,7 +514,7 @@
     </div>
 </nav>
 
-{{-- Mobile Menu --}}
+
 <div class="bl-mobile-menu" id="blMobileMenu" aria-hidden="true">
     <button class="bl-mobile-close" onclick="closeBLMenu()" aria-label="Tutup">
         <i class="bi bi-x-lg"></i>
@@ -527,41 +527,44 @@
     <a href="#faq"        onclick="closeBLMenu()">FAQ</a>
 </div>
 
-{{-- ──────────────── HERO ───────────────────────────────────────────── --}}
+
 <section class="bl-hero" id="home">
     <div class="bl-hero-inner">
         <div class="container-bl">
             <div class="bl-hero-grid">
-                {{-- Left: Text --}}
+                
                 <div>
                     <div class="bl-breadcrumb">
-                        <a href="{{ url('/') }}">Beranda</a>
+                        <a href="<?php echo e(url('/')); ?>">Beranda</a>
                         <span>›</span>
-                        <a href="{{ url('/') }}#cabang">Cabang</a>
+                        <a href="<?php echo e(url('/')); ?>#cabang">Cabang</a>
                         <span>›</span>
-                        <span style="color:rgba(255,255,255,.75)">{{ $cityName }}</span>
+                        <span style="color:rgba(255,255,255,.75)"><?php echo e($cityName); ?></span>
                     </div>
                     <div class="bl-hero-badge">
-                        🏆 {{ $heroBadge }}
+                        🏆 <?php echo e($heroBadge); ?>
+
                     </div>
                     <h1 class="bl-hero-title">
-                        Les Privat <em>Terbaik</em><br>di {{ $cityName }}
+                        Les Privat <em>Terbaik</em><br>di <?php echo e($cityName); ?>
+
                     </h1>
                     <p class="bl-hero-desc">
-                        {{ $heroDesc }}
+                        <?php echo e($heroDesc); ?>
+
                     </p>
                     <div class="bl-hero-stats">
                         <div class="bl-stat-chip">
                             <span class="bl-stat-chip-icon">⭐</span>
                             <div>
                                 <div class="bl-stat-chip-val">Rating 4.8/5.0</div>
-                                <span class="bl-stat-chip-lab">{{ number_format($studentCount) }}+ ulasan siswa</span>
+                                <span class="bl-stat-chip-lab"><?php echo e(number_format($studentCount)); ?>+ ulasan siswa</span>
                             </div>
                         </div>
                         <div class="bl-stat-chip">
                             <span class="bl-stat-chip-icon">🎓</span>
                             <div>
-                                <div class="bl-stat-chip-val">{{ $tutorCount }}+ Tutor</div>
+                                <div class="bl-stat-chip-val"><?php echo e($tutorCount); ?>+ Tutor</div>
                                 <span class="bl-stat-chip-lab">Bersertifikat resmi</span>
                             </div>
                         </div>
@@ -569,13 +572,13 @@
                             <span class="bl-stat-chip-icon">🏠</span>
                             <div>
                                 <div class="bl-stat-chip-val">Home Visit</div>
-                                <span class="bl-stat-chip-lab">Ke seluruh {{ $cityName }}</span>
+                                <span class="bl-stat-chip-lab">Ke seluruh <?php echo e($cityName); ?></span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- Right: Consultation Form --}}
+                
                 <div class="bl-form-card">
                     <div class="bl-form-title">📋 Daftar Konsultasi Gratis</div>
                     <div class="bl-form-sub">Isi form &amp; tim kami hubungi dalam 1 jam</div>
@@ -645,88 +648,88 @@
     </div>
 </section>
 
-{{-- ──────────────── DIPERCAYA RIBUAN KELUARGA ─────────────────────── --}}
+
 <section class="bl-section bl-features-section" id="keunggulan">
     <div class="container-bl">
         <div class="text-center reveal">
-            <div class="bl-section-eyebrow">Mengapa SCI {{ $cityName }}?</div>
-            <h2 class="bl-section-title">Dipercaya Ribuan Keluarga<br><em>di {{ $cityName }}</em></h2>
+            <div class="bl-section-eyebrow">Mengapa SCI <?php echo e($cityName); ?>?</div>
+            <h2 class="bl-section-title">Dipercaya Ribuan Keluarga<br><em>di <?php echo e($cityName); ?></em></h2>
             <p class="bl-section-sub mx-auto" style="text-align:center">
-                SCI hadir di {{ $cityName }} sejak 2012 dengan rekam jejak nyata dalam meningkatkan prestasi siswa dari berbagai jenjang.
+                SCI hadir di <?php echo e($cityName); ?> sejak 2012 dengan rekam jejak nyata dalam meningkatkan prestasi siswa dari berbagai jenjang.
             </p>
         </div>
         <div class="bl-features-grid">
-            @foreach($features as $fi => $f)
-            <div class="bl-feat-card reveal reveal-d{{ ($fi % 3) + 1 }}">
-                <div class="bl-feat-num">{{ $f['num'] }}</div>
-                <span class="bl-feat-icon">{{ $f['icon'] }}</span>
-                <div class="bl-feat-title">{{ $f['title'] }}</div>
-                <div class="bl-feat-desc">{{ $f['desc'] }}</div>
+            <?php $__currentLoopData = $features; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $fi => $f): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <div class="bl-feat-card reveal reveal-d<?php echo e(($fi % 3) + 1); ?>">
+                <div class="bl-feat-num"><?php echo e($f['num']); ?></div>
+                <span class="bl-feat-icon"><?php echo e($f['icon']); ?></span>
+                <div class="bl-feat-title"><?php echo e($f['title']); ?></div>
+                <div class="bl-feat-desc"><?php echo e($f['desc']); ?></div>
             </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
 </section>
 
-{{-- ──────────────── MATA PELAJARAN ────────────────────────────────── --}}
+
 <section class="bl-section bl-subjects-section" id="program">
     <div class="container-bl">
         <div class="text-center reveal">
             <div class="bl-section-eyebrow">Mata Pelajaran</div>
-            <h2 class="bl-section-title">Program Les &amp; Kursus<br><em>di {{ $cityName }}</em></h2>
+            <h2 class="bl-section-title">Program Les &amp; Kursus<br><em>di <?php echo e($cityName); ?></em></h2>
             <p class="bl-section-sub mx-auto" style="text-align:center">
                 Semua mata pelajaran dan kursus tersedia dengan tutor spesialis di bidangnya masing-masing.
             </p>
         </div>
         <div class="bl-subjects-grid">
-            @foreach($subjects as $si => $subj)
-            <div class="bl-subj-card reveal reveal-d{{ ($si % 3) + 1 }}">
-                <span class="bl-subj-icon">{{ $subj['icon'] }}</span>
-                <div class="bl-subj-name">{{ $subj['name'] }}</div>
-                <div class="bl-subj-desc">{{ $subj['desc'] }}</div>
-                <span class="bl-badge {{ $subj['badge_type'] }}">{{ $subj['badge'] }}</span>
+            <?php $__currentLoopData = $subjects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $si => $subj): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <div class="bl-subj-card reveal reveal-d<?php echo e(($si % 3) + 1); ?>">
+                <span class="bl-subj-icon"><?php echo e($subj['icon']); ?></span>
+                <div class="bl-subj-name"><?php echo e($subj['name']); ?></div>
+                <div class="bl-subj-desc"><?php echo e($subj['desc']); ?></div>
+                <span class="bl-badge <?php echo e($subj['badge_type']); ?>"><?php echo e($subj['badge']); ?></span>
             </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
 </section>
 
-{{-- ──────────────── METODE BELAJAR ────────────────────────────────── --}}
+
 <section class="bl-section bl-metode-section">
     <div class="container-bl">
         <div class="text-center reveal">
             <div class="bl-section-eyebrow">Metode Belajar</div>
             <h2 class="bl-section-title">Pilih Cara Belajar <em>Terbaik</em></h2>
             <p class="bl-section-sub mx-auto" style="text-align:center">
-                Tiga metode layanan SCI {{ $cityName }} — pilih yang paling nyaman dan sesuai kebutuhan Anda.
+                Tiga metode layanan SCI <?php echo e($cityName); ?> — pilih yang paling nyaman dan sesuai kebutuhan Anda.
             </p>
         </div>
         <div class="bl-metode-grid">
-            @foreach($metodes as $mi => $m)
-            <div class="bl-metode-card reveal reveal-d{{ $mi + 1 }}">
+            <?php $__currentLoopData = $metodes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $mi => $m): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <div class="bl-metode-card reveal reveal-d<?php echo e($mi + 1); ?>">
                 <div class="bl-metode-img">
-                    <img src="{{ $m['img'] }}" alt="{{ $m['title'] }}" loading="lazy">
-                    <div class="bl-metode-type-badge">{{ $m['icon'] }} {{ $m['type'] }}</div>
+                    <img src="<?php echo e($m['img']); ?>" alt="<?php echo e($m['title']); ?>" loading="lazy">
+                    <div class="bl-metode-type-badge"><?php echo e($m['icon']); ?> <?php echo e($m['type']); ?></div>
                 </div>
                 <div class="bl-metode-body">
-                    <div class="bl-metode-title">{{ $m['title'] }}</div>
-                    <div class="bl-metode-desc">{{ $m['desc'] }}</div>
+                    <div class="bl-metode-title"><?php echo e($m['title']); ?></div>
+                    <div class="bl-metode-desc"><?php echo e($m['desc']); ?></div>
                     <div class="bl-metode-price">
-                        Mulai <strong>{{ $m['price'] }}</strong><span> /sesi</span>
+                        Mulai <strong><?php echo e($m['price']); ?></strong><span> /sesi</span>
                     </div>
                 </div>
             </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
 </section>
 
-{{-- ──────────────── LOKASI ─────────────────────────────────────────── --}}
+
 <section class="bl-section bl-lokasi-section" id="lokasi">
     <div class="container-bl">
         <div class="reveal">
             <div class="bl-section-eyebrow">Lokasi Kami</div>
-            <h2 class="bl-section-title">Kantor SCI <em>{{ $cityName }}</em></h2>
+            <h2 class="bl-section-title">Kantor SCI <em><?php echo e($cityName); ?></em></h2>
         </div>
         <div class="bl-lokasi-grid">
             <div>
@@ -739,11 +742,12 @@
                         <div>
                             <div class="bl-contact-label">Nomor Telepon &amp; WhatsApp</div>
                             <div class="bl-contact-val">
-                                @if($branch->phone)
-                                    {{ $branch->phone }}
-                                @else
+                                <?php if($branch->phone): ?>
+                                    <?php echo e($branch->phone); ?>
+
+                                <?php else: ?>
                                     Hubungi kami via WhatsApp
-                                @endif
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -752,8 +756,9 @@
                         <div>
                             <div class="bl-contact-label">Jam Operasional</div>
                             <div class="bl-contact-val">
-                                Senin – Sabtu: {{ $hoursWeekday }}<br>
-                                Minggu: {{ $hoursWeekend }}
+                                Senin – Sabtu: <?php echo e($hoursWeekday); ?><br>
+                                Minggu: <?php echo e($hoursWeekend); ?>
+
                             </div>
                         </div>
                     </div>
@@ -761,26 +766,26 @@
                         <div class="bl-contact-icon"><i class="bi bi-envelope-fill"></i></div>
                         <div>
                             <div class="bl-contact-label">Email</div>
-                            <div class="bl-contact-val">{{ $branch->email ?: 'smartcenterindonesia@gmail.com' }}</div>
+                            <div class="bl-contact-val"><?php echo e($branch->email ?: 'smartcenterindonesia@gmail.com'); ?></div>
                         </div>
                     </div>
-                    @if($branch->address)
+                    <?php if($branch->address): ?>
                     <div class="bl-contact-item reveal reveal-d1">
                         <div class="bl-contact-icon"><i class="bi bi-geo-alt-fill"></i></div>
                         <div>
                             <div class="bl-contact-label">Alamat</div>
-                            <div class="bl-contact-val">{{ $branch->address }}</div>
+                            <div class="bl-contact-val"><?php echo e($branch->address); ?></div>
                         </div>
                     </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
 
                 <div style="margin-top:2rem" class="reveal">
                     <div class="bl-area-title">Area Layanan Home Visit</div>
                     <div class="bl-area-chips">
-                        @foreach($areaChips as $area)
-                        <span class="bl-area-chip">📍 {{ $area }}</span>
-                        @endforeach
+                        <?php $__currentLoopData = $areaChips; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $area): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <span class="bl-area-chip">📍 <?php echo e($area); ?></span>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
             </div>
@@ -789,9 +794,9 @@
                 <div class="bl-map-placeholder">
                     <div class="bl-map-icon">📍</div>
                     <div class="bl-map-text">
-                        <strong style="color:var(--deep)">Kantor SCI {{ $cityName }}</strong><br>
-                        {{ $branch->address ?: 'Hubungi kami untuk alamat lengkap' }}<br><br>
-                        <a href="https://wa.me/{{ $branchWa }}?text={{ urlencode('Halo SCI '.$cityName.'! Saya ingin tahu lokasi kantor SCI '.$cityName.'.') }}"
+                        <strong style="color:var(--deep)">Kantor SCI <?php echo e($cityName); ?></strong><br>
+                        <?php echo e($branch->address ?: 'Hubungi kami untuk alamat lengkap'); ?><br><br>
+                        <a href="https://wa.me/<?php echo e($branchWa); ?>?text=<?php echo e(urlencode('Halo SCI '.$cityName.'! Saya ingin tahu lokasi kantor SCI '.$cityName.'.')); ?>"
                            target="_blank"
                            style="display:inline-flex;align-items:center;gap:6px;padding:.5rem 1.25rem;border-radius:10px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;font-size:.82rem;font-weight:700;text-decoration:none;margin-top:.5rem">
                             <i class="bi bi-whatsapp"></i> Tanya Lokasi via WA
@@ -803,123 +808,126 @@
     </div>
 </section>
 
-{{-- ──────────────── HARGA & PAKET ─────────────────────────────────── --}}
+
 <section class="bl-section bl-harga-section" id="harga">
     <div class="container-bl">
         <div class="text-center reveal">
             <div class="bl-section-eyebrow">Biaya &amp; Paket</div>
-            <h2 class="bl-section-title">Harga Les Privat <em>{{ $cityName }}</em></h2>
+            <h2 class="bl-section-title">Harga Les Privat <em><?php echo e($cityName); ?></em></h2>
             <p class="bl-section-sub mx-auto" style="text-align:center">
                 Harga transparan tanpa biaya tersembunyi. Pilih paket yang sesuai kebutuhan dan budget Anda.
             </p>
         </div>
 
-        @if($hasBranchPricingCards)
-        {{-- Branch-specific custom pricing cards (highest priority) --}}
+        <?php if($hasBranchPricingCards): ?>
+        
         <div class="bl-harga-grid">
-            @foreach($branchPricingCards as $pkg)
-            @php $ung = $pkg['unggulan'] ?? false; @endphp
-            <div class="bl-pkg-card {{ $ung ? 'unggulan' : '' }}"
-                 style="{{ $ung ? 'background:linear-gradient(135deg,#260632,#461256);padding-top:2.75rem' : 'background:white' }}">
-                @if($ung)
+            <?php $__currentLoopData = $branchPricingCards; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pkg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php $ung = $pkg['unggulan'] ?? false; ?>
+            <div class="bl-pkg-card <?php echo e($ung ? 'unggulan' : ''); ?>"
+                 style="<?php echo e($ung ? 'background:linear-gradient(135deg,#260632,#461256);padding-top:2.75rem' : 'background:white'); ?>">
+                <?php if($ung): ?>
                     <div class="bl-pkg-badge-best">⭐ PALING POPULER</div>
-                @endif
-                <div class="bl-pkg-name" style="{{ $ung ? 'color:white' : '' }}">{{ $pkg['name'] }}</div>
-                <div class="bl-pkg-desc" style="{{ $ung ? 'color:rgba(255,255,255,.6)' : '' }}">{{ $pkg['desc'] ?? '' }}</div>
-                <div class="bl-pkg-price" style="{{ $ung ? 'color:var(--gold)' : '' }}">
-                    {{ $pkg['price'] ?? '' }}<span>{{ $pkg['unit'] ?? '' }}</span>
+                <?php endif; ?>
+                <div class="bl-pkg-name" style="<?php echo e($ung ? 'color:white' : ''); ?>"><?php echo e($pkg['name']); ?></div>
+                <div class="bl-pkg-desc" style="<?php echo e($ung ? 'color:rgba(255,255,255,.6)' : ''); ?>"><?php echo e($pkg['desc'] ?? ''); ?></div>
+                <div class="bl-pkg-price" style="<?php echo e($ung ? 'color:var(--gold)' : ''); ?>">
+                    <?php echo e($pkg['price'] ?? ''); ?><span><?php echo e($pkg['unit'] ?? ''); ?></span>
                 </div>
-                <div class="bl-pkg-sessions" style="{{ $ung ? 'color:rgba(255,255,255,.5)' : '' }}">
-                    {{ $pkg['sessions'] ?? '' }}
+                <div class="bl-pkg-sessions" style="<?php echo e($ung ? 'color:rgba(255,255,255,.5)' : ''); ?>">
+                    <?php echo e($pkg['sessions'] ?? ''); ?>
+
                 </div>
-                @if(!empty($pkg['fitur']))
+                <?php if(!empty($pkg['fitur'])): ?>
                 <ul class="bl-pkg-fitur">
-                    @foreach($pkg['fitur'] as $f)
-                    <li style="{{ $ung ? 'color:rgba(255,255,255,.8)' : '' }}">{{ $f }}</li>
-                    @endforeach
+                    <?php $__currentLoopData = $pkg['fitur']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $f): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <li style="<?php echo e($ung ? 'color:rgba(255,255,255,.8)' : ''); ?>"><?php echo e($f); ?></li>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </ul>
-                @endif
-                <a href="https://wa.me/{{ $branchWa }}?text={{ urlencode('Halo SCI '.$cityName.'! Saya tertarik dengan '.($pkg['name'] ?? 'paket les').'. Bisa info lebih lanjut?') }}"
+                <?php endif; ?>
+                <a href="https://wa.me/<?php echo e($branchWa); ?>?text=<?php echo e(urlencode('Halo SCI '.$cityName.'! Saya tertarik dengan '.($pkg['name'] ?? 'paket les').'. Bisa info lebih lanjut?')); ?>"
                    target="_blank"
-                   class="btn-bl-pkg {{ $ung ? 'primary' : 'default' }}">
+                   class="btn-bl-pkg <?php echo e($ung ? 'primary' : 'default'); ?>">
                     <i class="bi bi-whatsapp"></i> Pilih Paket Ini
                 </a>
             </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
-        @elseif($hasDbPackages)
-        {{-- DB Packages --}}
+        <?php elseif($hasDbPackages): ?>
+        
         <div class="bl-harga-grid">
-            @foreach($packages->take(3) as $pkg)
-            @php
+            <?php $__currentLoopData = $packages->take(3); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pkg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php
                 $fiturList = is_array($pkg->fitur) ? $pkg->fitur : [];
                 $harga     = $pkg->harga ? 'Rp '.number_format($pkg->harga,0,',','.') : 'Hubungi Kami';
                 $ung       = (bool)$pkg->is_unggulan;
-            @endphp
-            <div class="bl-pkg-card {{ $ung ? 'unggulan' : '' }}"
-                 style="{{ $ung ? 'background:linear-gradient(135deg,#260632,#461256);padding-top:2.75rem' : 'background:white' }}">
-                @if($ung)
+            ?>
+            <div class="bl-pkg-card <?php echo e($ung ? 'unggulan' : ''); ?>"
+                 style="<?php echo e($ung ? 'background:linear-gradient(135deg,#260632,#461256);padding-top:2.75rem' : 'background:white'); ?>">
+                <?php if($ung): ?>
                     <div class="bl-pkg-badge-best">⭐ PALING POPULER</div>
-                @endif
-                <div class="bl-pkg-name" style="{{ $ung ? 'color:white' : '' }}">{{ $pkg->nama }}</div>
-                <div class="bl-pkg-desc" style="{{ $ung ? 'color:rgba(255,255,255,.6)' : '' }}">{{ $pkg->deskripsi }}</div>
-                <div class="bl-pkg-price" style="{{ $ung ? 'color:var(--gold)' : '' }}">
-                    {{ $harga }}<span>{{ $pkg->harga ? '/sesi' : '' }}</span>
+                <?php endif; ?>
+                <div class="bl-pkg-name" style="<?php echo e($ung ? 'color:white' : ''); ?>"><?php echo e($pkg->nama); ?></div>
+                <div class="bl-pkg-desc" style="<?php echo e($ung ? 'color:rgba(255,255,255,.6)' : ''); ?>"><?php echo e($pkg->deskripsi); ?></div>
+                <div class="bl-pkg-price" style="<?php echo e($ung ? 'color:var(--gold)' : ''); ?>">
+                    <?php echo e($harga); ?><span><?php echo e($pkg->harga ? '/sesi' : ''); ?></span>
                 </div>
-                <div class="bl-pkg-sessions" style="{{ $ung ? 'color:rgba(255,255,255,.5)' : '' }}">
-                    {{ $pkg->jumlah_pertemuan ? $pkg->jumlah_pertemuan.'× pertemuan' : 'Jadwal fleksibel' }}
+                <div class="bl-pkg-sessions" style="<?php echo e($ung ? 'color:rgba(255,255,255,.5)' : ''); ?>">
+                    <?php echo e($pkg->jumlah_pertemuan ? $pkg->jumlah_pertemuan.'× pertemuan' : 'Jadwal fleksibel'); ?>
+
                 </div>
-                @if($fiturList)
+                <?php if($fiturList): ?>
                 <ul class="bl-pkg-fitur">
-                    @foreach($fiturList as $f)
-                    <li style="{{ $ung ? 'color:rgba(255,255,255,.8)' : '' }}">{{ $f }}</li>
-                    @endforeach
+                    <?php $__currentLoopData = $fiturList; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $f): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <li style="<?php echo e($ung ? 'color:rgba(255,255,255,.8)' : ''); ?>"><?php echo e($f); ?></li>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </ul>
-                @endif
-                <a href="https://wa.me/{{ $branchWa }}?text={{ urlencode('Halo SCI '.$cityName.'! Saya tertarik dengan '.$pkg->nama.'. Bisa info lebih lanjut?') }}"
+                <?php endif; ?>
+                <a href="https://wa.me/<?php echo e($branchWa); ?>?text=<?php echo e(urlencode('Halo SCI '.$cityName.'! Saya tertarik dengan '.$pkg->nama.'. Bisa info lebih lanjut?')); ?>"
                    target="_blank"
-                   class="btn-bl-pkg {{ $ung ? 'primary' : 'default' }}">
+                   class="btn-bl-pkg <?php echo e($ung ? 'primary' : 'default'); ?>">
                     <i class="bi bi-whatsapp"></i> Pilih Paket Ini
                 </a>
             </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
-        @else
-        {{-- Default Packages --}}
+        <?php else: ?>
+        
         <div class="bl-harga-grid">
-            @foreach($defaultPricing as $pkg)
-            @php $ung = $pkg['unggulan'] ?? false; @endphp
-            <div class="bl-pkg-card {{ $ung ? 'unggulan' : '' }}"
-                 style="{{ $ung ? 'background:linear-gradient(135deg,#260632,#461256);padding-top:2.75rem' : 'background:white' }}">
-                @if($ung)
+            <?php $__currentLoopData = $defaultPricing; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pkg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php $ung = $pkg['unggulan'] ?? false; ?>
+            <div class="bl-pkg-card <?php echo e($ung ? 'unggulan' : ''); ?>"
+                 style="<?php echo e($ung ? 'background:linear-gradient(135deg,#260632,#461256);padding-top:2.75rem' : 'background:white'); ?>">
+                <?php if($ung): ?>
                     <div class="bl-pkg-badge-best">⭐ PALING POPULER</div>
-                @endif
-                <div class="bl-pkg-name" style="{{ $ung ? 'color:white' : '' }}">{{ $pkg['name'] }}</div>
-                <div class="bl-pkg-desc" style="{{ $ung ? 'color:rgba(255,255,255,.6)' : '' }}">{{ $pkg['desc'] }}</div>
-                <div class="bl-pkg-price" style="{{ $ung ? 'color:var(--gold)' : '' }}">
-                    {{ $pkg['price'] }}<span>{{ $pkg['unit'] }}</span>
+                <?php endif; ?>
+                <div class="bl-pkg-name" style="<?php echo e($ung ? 'color:white' : ''); ?>"><?php echo e($pkg['name']); ?></div>
+                <div class="bl-pkg-desc" style="<?php echo e($ung ? 'color:rgba(255,255,255,.6)' : ''); ?>"><?php echo e($pkg['desc']); ?></div>
+                <div class="bl-pkg-price" style="<?php echo e($ung ? 'color:var(--gold)' : ''); ?>">
+                    <?php echo e($pkg['price']); ?><span><?php echo e($pkg['unit']); ?></span>
                 </div>
-                <div class="bl-pkg-sessions" style="{{ $ung ? 'color:rgba(255,255,255,.5)' : '' }}">
-                    {{ $pkg['sessions'] }}
+                <div class="bl-pkg-sessions" style="<?php echo e($ung ? 'color:rgba(255,255,255,.5)' : ''); ?>">
+                    <?php echo e($pkg['sessions']); ?>
+
                 </div>
                 <ul class="bl-pkg-fitur">
-                    @foreach($pkg['fitur'] as $f)
-                    <li style="{{ $ung ? 'color:rgba(255,255,255,.8)' : '' }}">{{ $f }}</li>
-                    @endforeach
+                    <?php $__currentLoopData = $pkg['fitur']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $f): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <li style="<?php echo e($ung ? 'color:rgba(255,255,255,.8)' : ''); ?>"><?php echo e($f); ?></li>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </ul>
-                <a href="https://wa.me/{{ $branchWa }}?text={{ urlencode('Halo SCI '.$cityName.'! Saya tertarik dengan '.$pkg['name'].'. Bisa info lebih lanjut?') }}"
+                <a href="https://wa.me/<?php echo e($branchWa); ?>?text=<?php echo e(urlencode('Halo SCI '.$cityName.'! Saya tertarik dengan '.$pkg['name'].'. Bisa info lebih lanjut?')); ?>"
                    target="_blank"
-                   class="btn-bl-pkg {{ $ung ? 'primary' : 'default' }}">
+                   class="btn-bl-pkg <?php echo e($ung ? 'primary' : 'default'); ?>">
                     <i class="bi bi-whatsapp"></i> Pilih Paket Ini
                 </a>
             </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
-        @endif
+        <?php endif; ?>
     </div>
 </section>
 
-{{-- ──────────────── TESTIMONI ─────────────────────────────────────── --}}
+
 <section class="bl-section bl-testi-section" id="testimoni">
     <div class="container-bl">
         <div class="text-center reveal">
@@ -932,77 +940,77 @@
     </div>
     <div class="bl-testi-vp">
         <div class="bl-testi-track">
-            {{-- Set 1 --}}
-            @foreach($testiData as $t)
+            
+            <?php $__currentLoopData = $testiData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="bl-testi-card">
                 <div class="bl-testi-stars">
-                    @for($s=0;$s<5;$s++)<i class="bi bi-star-fill"></i>@endfor
+                    <?php for($s=0;$s<5;$s++): ?><i class="bi bi-star-fill"></i><?php endfor; ?>
                 </div>
                 <div class="bl-testi-quote">"</div>
-                <p class="bl-testi-text">{{ $t->text }}</p>
+                <p class="bl-testi-text"><?php echo e($t->text); ?></p>
                 <div class="bl-testi-author">
-                    <div class="bl-testi-avatar" style="background:{{ $t->gradient }}">{{ $t->initial }}</div>
+                    <div class="bl-testi-avatar" style="background:<?php echo e($t->gradient); ?>"><?php echo e($t->initial); ?></div>
                     <div>
-                        <div class="bl-testi-name">{{ $t->name }}</div>
-                        <div class="bl-testi-role">{{ $t->role }}</div>
+                        <div class="bl-testi-name"><?php echo e($t->name); ?></div>
+                        <div class="bl-testi-role"><?php echo e($t->role); ?></div>
                         <div class="bl-testi-badge"><i class="bi bi-patch-check-fill"></i> Siswa Terverifikasi</div>
                     </div>
                 </div>
             </div>
-            @endforeach
-            {{-- Set 2 (duplicate for seamless loop) --}}
-            @foreach($testiData as $t)
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            
+            <?php $__currentLoopData = $testiData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="bl-testi-card" aria-hidden="true">
                 <div class="bl-testi-stars">
-                    @for($s=0;$s<5;$s++)<i class="bi bi-star-fill"></i>@endfor
+                    <?php for($s=0;$s<5;$s++): ?><i class="bi bi-star-fill"></i><?php endfor; ?>
                 </div>
                 <div class="bl-testi-quote">"</div>
-                <p class="bl-testi-text">{{ $t->text }}</p>
+                <p class="bl-testi-text"><?php echo e($t->text); ?></p>
                 <div class="bl-testi-author">
-                    <div class="bl-testi-avatar" style="background:{{ $t->gradient }}">{{ $t->initial }}</div>
+                    <div class="bl-testi-avatar" style="background:<?php echo e($t->gradient); ?>"><?php echo e($t->initial); ?></div>
                     <div>
-                        <div class="bl-testi-name">{{ $t->name }}</div>
-                        <div class="bl-testi-role">{{ $t->role }}</div>
+                        <div class="bl-testi-name"><?php echo e($t->name); ?></div>
+                        <div class="bl-testi-role"><?php echo e($t->role); ?></div>
                         <div class="bl-testi-badge"><i class="bi bi-patch-check-fill"></i> Siswa Terverifikasi</div>
                     </div>
                 </div>
             </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
 </section>
 
-{{-- ──────────────── FAQ & KONTAK ──────────────────────────────────── --}}
+
 <section class="bl-section bl-faq-section" id="faq">
     <div class="container-bl">
         <div class="text-center reveal">
             <div class="bl-section-eyebrow">Bantuan &amp; Kontak</div>
             <h2 class="bl-section-title">Pertanyaan &amp; <em>Hubungi Kami</em></h2>
             <p class="bl-section-sub mx-auto" style="text-align:center">
-                Temukan jawaban atas pertanyaan yang sering diajukan, atau kirim pesan langsung ke tim SCI {{ $cityName }}.
+                Temukan jawaban atas pertanyaan yang sering diajukan, atau kirim pesan langsung ke tim SCI <?php echo e($cityName); ?>.
             </p>
         </div>
 
         <div class="bl-bantuan-inner">
-            {{-- Kiri: FAQ Accordion --}}
+            
             <div class="bl-faq-list reveal">
-                @foreach($faqItems as $fi => $faq)
-                <div class="bl-faq-item {{ $fi === 0 ? 'open' : '' }}">
+                <?php $__currentLoopData = $faqItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $fi => $faq): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div class="bl-faq-item <?php echo e($fi === 0 ? 'open' : ''); ?>">
                     <button class="bl-faq-trigger" onclick="toggleBLFaq(this)" type="button">
-                        <span>{{ $faq['q'] }}</span>
+                        <span><?php echo e($faq['q']); ?></span>
                         <span class="bl-faq-icon"><i class="bi bi-plus"></i></span>
                     </button>
                     <div class="bl-faq-body">
-                        <div class="bl-faq-body-inner">{{ $faq['a'] }}</div>
+                        <div class="bl-faq-body-inner"><?php echo e($faq['a']); ?></div>
                     </div>
                 </div>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
 
-            {{-- Kanan: Form Kontak --}}
+            
             <div class="bl-contact-dark-card reveal">
                 <div class="bl-contact-dark-title">Kirim Pesan 📩</div>
-                <div class="bl-contact-dark-sub">Isi form di bawah ini, tim SCI {{ $cityName }} akan segera menghubungi Anda.</div>
+                <div class="bl-contact-dark-sub">Isi form di bawah ini, tim SCI <?php echo e($cityName); ?> akan segera menghubungi Anda.</div>
                 <form id="blContactForm" onsubmit="return submitBLContact(event)">
                     <div class="bl-contact-form-row">
                         <div class="bl-contact-field">
@@ -1025,18 +1033,19 @@
     </div>
 </section>
 
-{{-- ──────────────── CTA ────────────────────────────────────────────── --}}
+
 <section class="bl-cta-section">
     <div class="container-bl">
         <div class="bl-cta-box reveal">
             <div class="bl-cta-inner">
-                <div class="bl-cta-eyebrow">{{ $ctaEyebrow }}</div>
-                <h2 class="bl-cta-title">{{ $ctaTitle }}<br><em>{{ $cityName }}?</em></h2>
+                <div class="bl-cta-eyebrow"><?php echo e($ctaEyebrow); ?></div>
+                <h2 class="bl-cta-title"><?php echo e($ctaTitle); ?><br><em><?php echo e($cityName); ?>?</em></h2>
                 <p class="bl-cta-desc">
-                    {{ $ctaDesc ?: 'Bergabung dengan '.number_format($studentCount).'+  siswa SCI '.$cityName.' yang telah merasakan manfaatnya. Konsultasi gratis — tanpa kewajiban daftar.' }}
+                    <?php echo e($ctaDesc ?: 'Bergabung dengan '.number_format($studentCount).'+  siswa SCI '.$cityName.' yang telah merasakan manfaatnya. Konsultasi gratis — tanpa kewajiban daftar.'); ?>
+
                 </p>
                 <div class="bl-cta-btns">
-                    <a href="https://wa.me/{{ $branchWa }}?text={{ urlencode('Halo SCI '.$cityName.'! Saya ingin konsultasi gratis tentang les privat di '.$cityName.'.') }}"
+                    <a href="https://wa.me/<?php echo e($branchWa); ?>?text=<?php echo e(urlencode('Halo SCI '.$cityName.'! Saya ingin konsultasi gratis tentang les privat di '.$cityName.'.')); ?>"
                        target="_blank" class="btn-cta-wa">
                         <i class="bi bi-whatsapp"></i> Konsultasi Gratis via WA
                     </a>
@@ -1049,7 +1058,7 @@
     </div>
 </section>
 
-{{-- ──────────────── FOOTER ─────────────────────────────────────────── --}}
+
 <footer class="bl-footer">
     <div class="container-bl">
         <div class="bl-footer-grid">
@@ -1057,18 +1066,18 @@
                 <div style="display:flex;align-items:center;gap:10px;text-decoration:none">
                     <div class="bl-brand-icon" style="width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#68117e,#c84ddf);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:900;color:white;font-family:var(--font-display)">SCI</div>
                     <div style="font-family:var(--font-display);font-weight:800;font-size:.95rem;color:white;line-height:1.2">
-                        Smart Center Indonesia<br><small style="font-size:.62rem;font-weight:500;color:rgba(255,255,255,.5)">Les Privat {{ $cityName }}</small>
+                        Smart Center Indonesia<br><small style="font-size:.62rem;font-weight:500;color:rgba(255,255,255,.5)">Les Privat <?php echo e($cityName); ?></small>
                     </div>
                 </div>
                 <p class="bl-footer-brand-desc">
-                    Jasa les privat &amp; bimbel terbaik di {{ $cityName }}. Hadir dengan {{ $tutorCount }}+ tutor bersertifikat, melayani seluruh area {{ $cityName }} dan sekitarnya.
+                    Jasa les privat &amp; bimbel terbaik di <?php echo e($cityName); ?>. Hadir dengan <?php echo e($tutorCount); ?>+ tutor bersertifikat, melayani seluruh area <?php echo e($cityName); ?> dan sekitarnya.
                 </p>
             </div>
             <div>
                 <div class="bl-footer-col-title">Navigasi</div>
                 <ul class="bl-footer-links">
-                    <li><a href="{{ url('/') }}">Beranda Utama</a></li>
-                    <li><a href="{{ url('/') }}#cabang">Semua Cabang</a></li>
+                    <li><a href="<?php echo e(url('/')); ?>">Beranda Utama</a></li>
+                    <li><a href="<?php echo e(url('/')); ?>#cabang">Semua Cabang</a></li>
                     <li><a href="#keunggulan">Keunggulan</a></li>
                     <li><a href="#harga">Harga &amp; Paket</a></li>
                     <li><a href="#testimoni">Testimoni</a></li>
@@ -1077,34 +1086,34 @@
             <div>
                 <div class="bl-footer-col-title">Layanan</div>
                 <ul class="bl-footer-links">
-                    <li><a href="#program">Les Privat SD {{ $cityName }}</a></li>
-                    <li><a href="#program">Les Privat SMP {{ $cityName }}</a></li>
-                    <li><a href="#program">Les Privat SMA {{ $cityName }}</a></li>
-                    <li><a href="#program">Kursus Bahasa {{ $cityName }}</a></li>
-                    <li><a href="#program">Kursus Komputer {{ $cityName }}</a></li>
+                    <li><a href="#program">Les Privat SD <?php echo e($cityName); ?></a></li>
+                    <li><a href="#program">Les Privat SMP <?php echo e($cityName); ?></a></li>
+                    <li><a href="#program">Les Privat SMA <?php echo e($cityName); ?></a></li>
+                    <li><a href="#program">Kursus Bahasa <?php echo e($cityName); ?></a></li>
+                    <li><a href="#program">Kursus Komputer <?php echo e($cityName); ?></a></li>
                 </ul>
             </div>
             <div>
                 <div class="bl-footer-col-title">Kontak</div>
                 <ul class="bl-footer-links">
-                    @if($branch->phone)
-                    <li><a href="tel:{{ $branchWa }}"><i class="bi bi-telephone-fill" style="color:var(--primary);margin-right:5px"></i>{{ $branch->phone }}</a></li>
-                    @endif
-                    <li><a href="https://wa.me/{{ $branchWa }}" target="_blank"><i class="bi bi-whatsapp" style="color:var(--primary);margin-right:5px"></i>WhatsApp Kami</a></li>
-                    <li><a href="mailto:{{ $branch->email ?: 'smartcenterindonesia@gmail.com' }}"><i class="bi bi-envelope-fill" style="color:var(--primary);margin-right:5px"></i>{{ $branch->email ?: 'Email' }}</a></li>
+                    <?php if($branch->phone): ?>
+                    <li><a href="tel:<?php echo e($branchWa); ?>"><i class="bi bi-telephone-fill" style="color:var(--primary);margin-right:5px"></i><?php echo e($branch->phone); ?></a></li>
+                    <?php endif; ?>
+                    <li><a href="https://wa.me/<?php echo e($branchWa); ?>" target="_blank"><i class="bi bi-whatsapp" style="color:var(--primary);margin-right:5px"></i>WhatsApp Kami</a></li>
+                    <li><a href="mailto:<?php echo e($branch->email ?: 'smartcenterindonesia@gmail.com'); ?>"><i class="bi bi-envelope-fill" style="color:var(--primary);margin-right:5px"></i><?php echo e($branch->email ?: 'Email'); ?></a></li>
                     <li><i class="bi bi-clock-fill" style="color:var(--primary);margin-right:5px"></i>Senin–Sabtu (08.00–20.00)</li>
                 </ul>
             </div>
         </div>
         <div class="bl-footer-bottom">
-            <span>&copy; {{ date('Y') }} Smart Center Indonesia — Cabang {{ $cityName }}. All Rights Reserved.</span>
-            <span style="color:rgba(255,255,255,.35)">Made with ❤️ for {{ $cityName }} Education</span>
+            <span>&copy; <?php echo e(date('Y')); ?> Smart Center Indonesia — Cabang <?php echo e($cityName); ?>. All Rights Reserved.</span>
+            <span style="color:rgba(255,255,255,.35)">Made with ❤️ for <?php echo e($cityName); ?> Education</span>
         </div>
     </div>
 </footer>
 
-{{-- Floating Buttons --}}
-<a href="https://wa.me/{{ $branchWa }}?text={{ urlencode('Halo SCI '.$cityName.'! Saya ingin konsultasi gratis.') }}"
+
+<a href="https://wa.me/<?php echo e($branchWa); ?>?text=<?php echo e(urlencode('Halo SCI '.$cityName.'! Saya ingin konsultasi gratis.')); ?>"
    target="_blank" class="bl-wa-float" rel="noopener" aria-label="Hubungi via WhatsApp">
     <i class="bi bi-whatsapp"></i>
 </a>
@@ -1181,8 +1190,8 @@ function submitBLContact(e) {
     const name  = document.getElementById('blCfName')?.value  || '';
     const phone = document.getElementById('blCfPhone')?.value || '';
     const msg   = document.getElementById('blCfMsg')?.value   || '';
-    const text  = `Halo SCI {{ $cityName }}!\nNama: ${name}\nNo. WA: ${phone}\nPesan: ${msg}`;
-    window.open('https://wa.me/{{ $branchWa }}?text=' + encodeURIComponent(text), '_blank');
+    const text  = `Halo SCI <?php echo e($cityName); ?>!\nNama: ${name}\nNo. WA: ${phone}\nPesan: ${msg}`;
+    window.open('https://wa.me/<?php echo e($branchWa); ?>?text=' + encodeURIComponent(text), '_blank');
     return false;
 }
 
@@ -1194,8 +1203,8 @@ function submitConsult(e) {
     const jenjang = document.getElementById('cfJenjang').value || '';
     const mapel   = document.getElementById('cfMapel').value   || '';
     const metode  = document.getElementById('cfMetode').value  || '';
-    const msg = `Halo SCI {{ $cityName }}! Saya ingin konsultasi les privat.\n\nNama   : ${name}\nNo. WA : ${wa}\nJenjang: ${jenjang}\nMapel  : ${mapel}\nMetode : ${metode}\n\nMohon info lebih lanjut. Terima kasih!`;
-    window.open('https://wa.me/{{ $branchWa }}?text=' + encodeURIComponent(msg), '_blank');
+    const msg = `Halo SCI <?php echo e($cityName); ?>! Saya ingin konsultasi les privat.\n\nNama   : ${name}\nNo. WA : ${wa}\nJenjang: ${jenjang}\nMapel  : ${mapel}\nMetode : ${metode}\n\nMohon info lebih lanjut. Terima kasih!`;
+    window.open('https://wa.me/<?php echo e($branchWa); ?>?text=' + encodeURIComponent(msg), '_blank');
 }
 
 /* ── Reduced motion ── */
@@ -1208,3 +1217,4 @@ if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 </script>
 </body>
 </html>
+<?php /**PATH /home/runner/workspace/resources/views/branch-landing.blade.php ENDPATH**/ ?>
