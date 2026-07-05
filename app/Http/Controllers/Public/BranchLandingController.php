@@ -22,8 +22,8 @@ class BranchLandingController extends Controller
         $teachers = Teacher::where('branch_id', $bid)->where('status', 'aktif')->get();
         $packages = Package::where('cabang_id', $bid)->where('status', 'aktif')->get();
 
-        /* ── Global testimonials ── */
-        $testimonials = LandingTestimonial::active()->orderBy('sort_order')->get();
+        /* ── Global testimonials (fallback if no branch-specific ones) ── */
+        $globalTestimonials = LandingTestimonial::active()->orderBy('sort_order')->get();
 
         /* ── Main WA fallback ── */
         $lsAll  = LandingSetting::all()->keyBy('key');
@@ -139,8 +139,13 @@ class BranchLandingController extends Controller
         $studentCount = \App\Models\Student::where('branch_id', $bid)->count() ?: 1400;
         $tutorCount   = $teachers->count() ?: 85;
 
-        /* ── Testimonials fallback ── */
-        if ($testimonials->isEmpty()) {
+        /* ── Branch-specific testimonials (override global if set) ── */
+        $branchTestiRaw = $getJson('branch_testimonials');
+        if (!empty($branchTestiRaw)) {
+            $testimonials = collect(array_map(fn($t) => (object)$t, $branchTestiRaw));
+        } elseif ($globalTestimonials->isNotEmpty()) {
+            $testimonials = $globalTestimonials;
+        } else {
             $testimonials = collect([
                 (object)['text'=>'Anakku yang awalnya kesulitan Matematika sekarang jadi juara kelas!','name'=>'Bunda Sari','role'=>'Orang Tua Siswa · '.$city,'initial'=>'B','gradient'=>'linear-gradient(135deg,#f97316,#ea580c)'],
                 (object)['text'=>'Belajar di SCI sangat menyenangkan! Nilai saya meningkat pesat.','name'=>'Aisyah R.','role'=>'Siswa SMA · Matematika','initial'=>'A','gradient'=>'linear-gradient(135deg,#c84ddf,#68117e)'],
@@ -149,6 +154,9 @@ class BranchLandingController extends Controller
             ]);
         }
 
+        /* ── Branch-specific pricing cards (override DB packages & defaults if set) ── */
+        $branchPricingCards = $getJson('pricing_cards');
+
         return view('branch-landing', compact(
             'branch', 'city', 'teachers', 'packages', 'testimonials',
             'waMain', 'branchWa',
@@ -156,7 +164,8 @@ class BranchLandingController extends Controller
             'hoursWeekday', 'hoursWeekend', 'areaChips', 'prices', 'metodeImages',
             'features', 'subjects',
             'ctaEyebrow', 'ctaTitle', 'ctaDesc',
-            'faqItems', 'studentCount', 'tutorCount'
+            'faqItems', 'studentCount', 'tutorCount',
+            'branchPricingCards'
         ));
     }
 }

@@ -77,14 +77,33 @@
         $metodeImgHv   = $s['metode_img_homevisi'] ?? '';
         $metodeImgOn   = $s['metode_img_online'] ?? '';
         $metodeImgOf   = $s['metode_img_offline'] ?? '';
+
+        /* ── Harga / Pricing cards ── */
+        $defaultPricingCards = [
+            ['name'=>'Paket Reguler', 'desc'=>'Cocok untuk pemula dan maintenance nilai.','price'=>'Rp 50.000','unit'=>'/sesi','sessions'=>'1× per minggu (4 sesi/bln)','fitur'=>['Durasi 90 menit/sesi','Pilihan tutor sesuai kebutuhan','Laporan perkembangan bulanan','Bisa home visit/online/offline'],'unggulan'=>false],
+            ['name'=>'Paket Intensif','desc'=>'Cocok untuk persiapan ujian dan akselerasi nilai.','price'=>'Rp 45.000','unit'=>'/sesi','sessions'=>'2–3× per minggu (8–12 sesi/bln)','fitur'=>['Durasi 90 menit/sesi','Materi soal ujian eksklusif','Laporan perkembangan mingguan','Try-out bulanan gratis','Konsultasi guru kapan saja'],'unggulan'=>true],
+            ['name'=>'Paket Premium', 'desc'=>'Solusi lengkap untuk target nilai terbaik.','price'=>'Hubungi Kami','unit'=>'','sessions'=>'Jadwal & sesi fleksibel','fitur'=>['Sesi tak terbatas per bulan','Tutor spesialis bidang studi','Monitoring nilai real-time','Garansi nilai naik tertulis','Materi custom sesuai kurikulum'],'unggulan'=>false],
+        ];
+        $savedPricingCards = json_decode($s['pricing_cards'] ?? '[]', true) ?: [];
+        $editPricingCards  = !empty($savedPricingCards) ? $savedPricingCards : $defaultPricingCards;
+
+        /* ── Branch testimonials ── */
+        $defaultTestimonials = [
+            ['text'=>'Anakku yang awalnya kesulitan Matematika sekarang jadi juara kelas!','name'=>'Bunda Sari','role'=>'Orang Tua Siswa · '.$city,'initial'=>'B','gradient'=>'linear-gradient(135deg,#f97316,#ea580c)'],
+            ['text'=>'Belajar di SCI sangat menyenangkan! Nilai saya meningkat pesat.','name'=>'Aisyah R.','role'=>'Siswa SMA · Matematika','initial'=>'A','gradient'=>'linear-gradient(135deg,#c84ddf,#68117e)'],
+            ['text'=>'Program persiapan SBMPTN SCI sangat membantu. Akhirnya lolos kampus impian!','name'=>'Ricky P.','role'=>'Mahasiswa · SBMPTN','initial'=>'R','gradient'=>'linear-gradient(135deg,#10b981,#059669)'],
+            ['text'=>'Home visit-nya sangat nyaman. Tutornya datang tepat waktu dan sabar.','name'=>'Pak Hendra','role'=>'Orang Tua Siswa · Home Visit','initial'=>'H','gradient'=>'linear-gradient(135deg,#6366f1,#4338ca)'],
+        ];
+        $savedTestimonials = json_decode($s['branch_testimonials'] ?? '[]', true) ?: [];
+        $editTestimonials  = !empty($savedTestimonials) ? $savedTestimonials : $defaultTestimonials;
     @endphp
 
     {{-- Info box --}}
     <div class="alert border-0 mb-4 small" style="background:rgba(200,77,223,.06);border-left:4px solid #c84ddf !important;border-radius:12px">
         <i class="bi bi-info-circle me-1" style="color:var(--bs-primary)"></i>
         <strong>Kontak, alamat &amp; email</strong> dikelola di menu <a href="{{ route('owner.branches.edit', $branch) }}">Kelola Cabang</a>.
-        <strong>Paket &amp; harga</strong> dikelola di menu <a href="{{ route('admin.packages.index') }}">Paket</a>.
-        <strong>Testimoni</strong> menggunakan testimoni global — kelola di <a href="{{ route('admin.landing.index') }}#tab-testimonials">Landing Utama → Testimoni</a>.
+        Tab <strong>Harga</strong> mengatur kartu paket khusus cabang ini (menimpa paket global).
+        Tab <strong>Testimoni</strong> mengatur testimoni khusus cabang ini (menimpa testimoni global).
     </div>
 
     {{-- NOTE: enctype required for image uploads --}}
@@ -99,6 +118,8 @@
             <li class="nav-item"><button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#bl-dipercaya"><i class="bi bi-star me-1"></i>Dipercaya</button></li>
             <li class="nav-item"><button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#bl-program"><i class="bi bi-book me-1"></i>Program</button></li>
             <li class="nav-item"><button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#bl-metode"><i class="bi bi-grid-3x3 me-1"></i>Metode</button></li>
+            <li class="nav-item"><button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#bl-harga"><i class="bi bi-tag me-1"></i>Harga</button></li>
+            <li class="nav-item"><button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#bl-testi"><i class="bi bi-chat-quote me-1"></i>Testimoni</button></li>
             <li class="nav-item"><button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#bl-jam"><i class="bi bi-clock me-1"></i>Lokasi &amp; Area</button></li>
             <li class="nav-item"><button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#bl-faq"><i class="bi bi-question-circle me-1"></i>FAQ</button></li>
             <li class="nav-item"><button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#bl-cta"><i class="bi bi-rocket me-1"></i>CTA</button></li>
@@ -346,6 +367,138 @@
                 </div>
             </div>
 
+            {{-- ────────────────────── HARGA & PAKET ──────────────────── --}}
+            <div class="tab-pane fade" id="bl-harga">
+                <div class="card lp-card">
+                    <div class="card-header lp-card-header d-flex align-items-center justify-content-between">
+                        <span><i class="bi bi-tag me-2"></i>Harga Les Privat {{ $city }}</span>
+                        <small class="fw-normal opacity-75">Kartu paket pada section Harga di halaman cabang</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert border-0 mb-4" style="background:rgba(200,77,223,.06);border-left:3px solid #c84ddf !important;border-radius:10px;font-size:.83rem">
+                            <i class="bi bi-info-circle me-1" style="color:var(--bs-primary)"></i>
+                            Maksimal <strong>3 kartu paket</strong> yang tampil di halaman cabang. Centang <strong>Unggulan</strong> pada satu kartu untuk tampilan menonjol (warna gelap).
+                        </div>
+                        <div id="hargaList" class="row g-4 mb-4">
+                            @foreach($editPricingCards as $pi => $pkg)
+                            <div class="col-md-4 harga-card-col" data-idx="{{ $pi }}">
+                                <div class="p-3 rounded-3 h-100" style="background:#f9f4ff;border:1.5px solid rgba(200,77,223,.15)">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <span class="badge fw-bold harga-num" style="background:rgba(200,77,223,.1);color:#68117e;min-width:28px">{{ $pi+1 }}</span>
+                                        <div class="form-check form-switch mb-0">
+                                            <input class="form-check-input" type="checkbox" name="pkg_unggulan[]" value="{{ $pi }}" id="pkgUng{{ $pi }}" {{ ($pkg['unggulan'] ?? false) ? 'checked' : '' }}>
+                                            <label class="form-check-label small fw-semibold" for="pkgUng{{ $pi }}">Unggulan</label>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-danger harga-remove py-0 px-2"><i class="bi bi-trash"></i></button>
+                                    </div>
+                                    <div class="row g-2">
+                                        <div class="col-12">
+                                            <label class="form-label small fw-semibold mb-1">Nama Paket *</label>
+                                            <input type="text" name="pkg_name[]" value="{{ $pkg['name'] ?? '' }}" class="form-control form-control-sm" maxlength="80" placeholder="Paket Reguler" required>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-semibold mb-1">Deskripsi Singkat</label>
+                                            <input type="text" name="pkg_desc[]" value="{{ $pkg['desc'] ?? '' }}" class="form-control form-control-sm" maxlength="150" placeholder="Cocok untuk pemula...">
+                                        </div>
+                                        <div class="col-7">
+                                            <label class="form-label small fw-semibold mb-1">Harga</label>
+                                            <input type="text" name="pkg_price[]" value="{{ $pkg['price'] ?? '' }}" class="form-control form-control-sm" maxlength="40" placeholder="Rp 50.000">
+                                        </div>
+                                        <div class="col-5">
+                                            <label class="form-label small fw-semibold mb-1">Satuan</label>
+                                            <input type="text" name="pkg_unit[]" value="{{ $pkg['unit'] ?? '/sesi' }}" class="form-control form-control-sm" maxlength="20" placeholder="/sesi">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-semibold mb-1">Info Sesi</label>
+                                            <input type="text" name="pkg_sessions[]" value="{{ $pkg['sessions'] ?? '' }}" class="form-control form-control-sm" maxlength="80" placeholder="1× per minggu (4 sesi/bln)">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-semibold mb-1">Fitur <small class="text-muted fw-normal">(1 fitur per baris)</small></label>
+                                            <textarea name="pkg_fitur[]" class="form-control form-control-sm" rows="4" placeholder="Durasi 90 menit/sesi&#10;Laporan bulanan&#10;...">{{ implode("\n", $pkg['fitur'] ?? []) }}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <button type="button" id="hargaAdd" class="btn btn-sm btn-outline-primary"><i class="bi bi-plus me-1"></i>Tambah Kartu Paket</button>
+                            <small class="text-muted">Rekomendasi: 3 kartu</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- ────────────────────── TESTIMONI SISWA ─────────────────── --}}
+            <div class="tab-pane fade" id="bl-testi">
+                <div class="card lp-card">
+                    <div class="card-header lp-card-header d-flex align-items-center justify-content-between">
+                        <span><i class="bi bi-chat-quote me-2"></i>Testimoni Siswa {{ $city }}</span>
+                        <small class="fw-normal opacity-75">Carousel testimoni pada halaman cabang</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert border-0 mb-4" style="background:rgba(200,77,223,.06);border-left:3px solid #c84ddf !important;border-radius:10px;font-size:.83rem">
+                            <i class="bi bi-info-circle me-1" style="color:var(--bs-primary)"></i>
+                            Testimoni ini <strong>khusus untuk cabang {{ $city }}</strong> dan akan menimpa testimoni global. Rekomendasi: 4–8 testimoni. Carousel berulang otomatis.
+                        </div>
+                        <div id="testiList" class="d-flex flex-column gap-3 mb-4">
+                            @foreach($editTestimonials as $ti => $testi)
+                            <div class="testi-row border rounded-3 p-3" style="border-color:rgba(200,77,223,.15) !important;background:#fdf8ff">
+                                <div class="d-flex align-items-start gap-2">
+                                    <span class="badge fw-bold mt-1 testi-num" style="background:rgba(200,77,223,.1);color:#68117e;min-width:24px">{{ $ti+1 }}</span>
+                                    <div class="flex-grow-1">
+                                        <div class="row g-2">
+                                            <div class="col-12">
+                                                <label class="form-label small fw-semibold mb-1">Teks Testimoni *</label>
+                                                <textarea name="testi_text[]" class="form-control form-control-sm" rows="3" maxlength="400" placeholder="Cerita sukses siswa...">{{ $testi['text'] ?? '' }}</textarea>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small fw-semibold mb-1">Nama</label>
+                                                <input type="text" name="testi_name[]" value="{{ $testi['name'] ?? '' }}" class="form-control form-control-sm" maxlength="60" placeholder="Bunda Sari">
+                                            </div>
+                                            <div class="col-md-5">
+                                                <label class="form-label small fw-semibold mb-1">Peran / Keterangan</label>
+                                                <input type="text" name="testi_role[]" value="{{ $testi['role'] ?? '' }}" class="form-control form-control-sm" maxlength="80" placeholder="Orang Tua Siswa · {{ $city }}">
+                                            </div>
+                                            <div class="col-md-1">
+                                                <label class="form-label small fw-semibold mb-1">Inisial</label>
+                                                <input type="text" name="testi_initial[]" value="{{ $testi['initial'] ?? '' }}" class="form-control form-control-sm" maxlength="3" placeholder="B">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label small fw-semibold mb-1">Warna Avatar</label>
+                                                <select name="testi_color[]" class="form-select form-select-sm">
+                                                    @php
+                                                        $colorOpts = [
+                                                            'linear-gradient(135deg,#c84ddf,#68117e)' => 'Ungu (default)',
+                                                            'linear-gradient(135deg,#f97316,#ea580c)' => 'Oranye',
+                                                            'linear-gradient(135deg,#10b981,#059669)' => 'Hijau',
+                                                            'linear-gradient(135deg,#6366f1,#4338ca)' => 'Biru',
+                                                            'linear-gradient(135deg,#f43f5e,#be123c)' => 'Merah',
+                                                            'linear-gradient(135deg,#f59e0b,#d97706)' => 'Kuning',
+                                                            'linear-gradient(135deg,#06b6d4,#0891b2)' => 'Teal',
+                                                        ];
+                                                        $curGrad = $testi['gradient'] ?? 'linear-gradient(135deg,#c84ddf,#68117e)';
+                                                    @endphp
+                                                    @foreach($colorOpts as $val => $label)
+                                                    <option value="{{ $val }}" {{ $curGrad === $val ? 'selected' : '' }}>{{ $label }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-danger testi-remove flex-shrink-0 mt-1"><i class="bi bi-trash"></i></button>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <button type="button" id="testiAdd" class="btn btn-sm btn-outline-primary"><i class="bi bi-plus me-1"></i>Tambah Testimoni</button>
+                            <small class="text-muted">Rekomendasi: 4–8 testimoni</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {{-- ────────────────────── LOKASI & AREA ──────────────────── --}}
             <div class="tab-pane fade" id="bl-jam">
                 <div class="row g-4">
@@ -487,6 +640,90 @@
 
     </form>
 </div>
+
+{{-- Harga Card Template --}}
+<template id="hargaCardTpl">
+    <div class="col-md-4 harga-card-col">
+        <div class="p-3 rounded-3 h-100" style="background:#f9f4ff;border:1.5px solid rgba(200,77,223,.15)">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="badge fw-bold harga-num" style="background:rgba(200,77,223,.1);color:#68117e;min-width:28px">?</span>
+                <div class="form-check form-switch mb-0">
+                    <input class="form-check-input" type="checkbox" name="pkg_unggulan[]" value="0">
+                    <label class="form-check-label small fw-semibold">Unggulan</label>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger harga-remove py-0 px-2"><i class="bi bi-trash"></i></button>
+            </div>
+            <div class="row g-2">
+                <div class="col-12">
+                    <label class="form-label small fw-semibold mb-1">Nama Paket *</label>
+                    <input type="text" name="pkg_name[]" class="form-control form-control-sm" maxlength="80" placeholder="Nama paket...">
+                </div>
+                <div class="col-12">
+                    <label class="form-label small fw-semibold mb-1">Deskripsi Singkat</label>
+                    <input type="text" name="pkg_desc[]" class="form-control form-control-sm" maxlength="150" placeholder="Cocok untuk...">
+                </div>
+                <div class="col-7">
+                    <label class="form-label small fw-semibold mb-1">Harga</label>
+                    <input type="text" name="pkg_price[]" class="form-control form-control-sm" maxlength="40" placeholder="Rp 50.000">
+                </div>
+                <div class="col-5">
+                    <label class="form-label small fw-semibold mb-1">Satuan</label>
+                    <input type="text" name="pkg_unit[]" value="/sesi" class="form-control form-control-sm" maxlength="20" placeholder="/sesi">
+                </div>
+                <div class="col-12">
+                    <label class="form-label small fw-semibold mb-1">Info Sesi</label>
+                    <input type="text" name="pkg_sessions[]" class="form-control form-control-sm" maxlength="80" placeholder="1× per minggu">
+                </div>
+                <div class="col-12">
+                    <label class="form-label small fw-semibold mb-1">Fitur <small class="text-muted fw-normal">(1 fitur per baris)</small></label>
+                    <textarea name="pkg_fitur[]" class="form-control form-control-sm" rows="4" placeholder="Durasi 90 menit/sesi&#10;Laporan bulanan&#10;..."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+{{-- Testimoni Row Template --}}
+<template id="testiRowTpl">
+    <div class="testi-row border rounded-3 p-3" style="border-color:rgba(200,77,223,.15) !important;background:#fdf8ff">
+        <div class="d-flex align-items-start gap-2">
+            <span class="badge fw-bold mt-1 testi-num" style="background:rgba(200,77,223,.1);color:#68117e;min-width:24px">?</span>
+            <div class="flex-grow-1">
+                <div class="row g-2">
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold mb-1">Teks Testimoni *</label>
+                        <textarea name="testi_text[]" class="form-control form-control-sm" rows="3" maxlength="400" placeholder="Cerita sukses siswa..."></textarea>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold mb-1">Nama</label>
+                        <input type="text" name="testi_name[]" class="form-control form-control-sm" maxlength="60" placeholder="Bunda Sari">
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label small fw-semibold mb-1">Peran / Keterangan</label>
+                        <input type="text" name="testi_role[]" class="form-control form-control-sm" maxlength="80" placeholder="Orang Tua Siswa">
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label small fw-semibold mb-1">Inisial</label>
+                        <input type="text" name="testi_initial[]" class="form-control form-control-sm" maxlength="3" placeholder="B">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold mb-1">Warna Avatar</label>
+                        <select name="testi_color[]" class="form-select form-select-sm">
+                            <option value="linear-gradient(135deg,#c84ddf,#68117e)">Ungu (default)</option>
+                            <option value="linear-gradient(135deg,#f97316,#ea580c)">Oranye</option>
+                            <option value="linear-gradient(135deg,#10b981,#059669)">Hijau</option>
+                            <option value="linear-gradient(135deg,#6366f1,#4338ca)">Biru</option>
+                            <option value="linear-gradient(135deg,#f43f5e,#be123c)">Merah</option>
+                            <option value="linear-gradient(135deg,#f59e0b,#d97706)">Kuning</option>
+                            <option value="linear-gradient(135deg,#06b6d4,#0891b2)">Teal</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-danger testi-remove flex-shrink-0 mt-1"><i class="bi bi-trash"></i></button>
+        </div>
+    </div>
+</template>
 
 {{-- FAQ Row Template --}}
 <template id="faqRowTpl">
@@ -633,6 +870,50 @@ document.getElementById('subjAdd').addEventListener('click', () => {
 });
 subjList.addEventListener('click', e => {
     if (e.target.closest('.subj-remove')) { e.target.closest('.subj-row').remove(); updateSubjNumbers(); }
+});
+
+/* ── Harga / Pricing card dynamic rows ── */
+const hargaList = document.getElementById('hargaList');
+const hargaTpl  = document.getElementById('hargaCardTpl');
+function updateHargaNumbers() {
+    let idx = 0;
+    hargaList.querySelectorAll('.harga-card-col').forEach((col) => {
+        const n = col.querySelector('.harga-num'); if (n) n.textContent = idx + 1;
+        const cb = col.querySelector('input[name="pkg_unggulan[]"]'); if (cb) cb.value = idx;
+        idx++;
+    });
+}
+document.getElementById('hargaAdd').addEventListener('click', () => {
+    if (hargaList.querySelectorAll('.harga-card-col').length >= 3) {
+        return alert('Maksimal 3 kartu paket.');
+    }
+    hargaList.appendChild(hargaTpl.content.cloneNode(true));
+    updateHargaNumbers();
+});
+hargaList.addEventListener('click', e => {
+    if (e.target.closest('.harga-remove')) {
+        e.target.closest('.harga-card-col').remove();
+        updateHargaNumbers();
+    }
+});
+
+/* ── Testimoni dynamic rows ── */
+const testiList = document.getElementById('testiList');
+const testiTpl  = document.getElementById('testiRowTpl');
+function updateTestiNumbers() {
+    testiList.querySelectorAll('.testi-row').forEach((row, i) => {
+        const n = row.querySelector('.testi-num'); if (n) n.textContent = i + 1;
+    });
+}
+document.getElementById('testiAdd').addEventListener('click', () => {
+    testiList.appendChild(testiTpl.content.cloneNode(true));
+    updateTestiNumbers();
+});
+testiList.addEventListener('click', e => {
+    if (e.target.closest('.testi-remove')) {
+        e.target.closest('.testi-row').remove();
+        updateTestiNumbers();
+    }
 });
 </script>
 @endpush

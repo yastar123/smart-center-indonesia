@@ -14,12 +14,13 @@
     /* ── Testimonials ── */
     $testiData = $testimonials->take(6);
 
-    /* ── Packages / Pricing ── */
-    $hasDbPackages = $packages->isNotEmpty();
+    /* ── Packages / Pricing (priority: branch custom cards > DB packages > defaults) ── */
+    $hasBranchPricingCards = !empty($branchPricingCards);
+    $hasDbPackages = !$hasBranchPricingCards && $packages->isNotEmpty();
     $defaultPricing = [
-        ['name'=>'Paket Reguler', 'desc'=>'Cocok untuk pemula dan maintenance nilai.','price'=>'Rp 50.000','unit'=>'/sesi','sessions'=>'1× per minggu (4 sesi/bln)','fitur'=>['Durasi 90 menit/sesi','Pilihan tutor sesuai kebutuhan','Laporan perkembangan bulanan','Bisa home visit/online/offline'],'unggulan'=>false,'color'=>'linear-gradient(135deg,#f9f4ff,#f0e6ff)'],
-        ['name'=>'Paket Intensif','desc'=>'Cocok untuk persiapan ujian dan akselerasi nilai.','price'=>'Rp 45.000','unit'=>'/sesi','sessions'=>'2–3× per minggu (8–12 sesi/bln)','fitur'=>['Durasi 90 menit/sesi','Materi soal ujian eksklusif','Laporan perkembangan mingguan','Try-out bulanan gratis','Konsultasi guru kapan saja'],'unggulan'=>true,'color'=>'linear-gradient(135deg,#260632,#461256)'],
-        ['name'=>'Paket Premium', 'desc'=>'Solusi lengkap untuk target nilai terbaik.','price'=>'Hubungi Kami','unit'=>'','sessions'=>'Jadwal & sesi fleksibel','fitur'=>['Sesi tak terbatas per bulan','Tutor spesialis bidang studi','Monitoring nilai real-time','Garansi nilai naik tertulis','Materi custom sesuai kurikulum'],'unggulan'=>false,'color'=>'linear-gradient(135deg,#f9f4ff,#f0e6ff)'],
+        ['name'=>'Paket Reguler', 'desc'=>'Cocok untuk pemula dan maintenance nilai.','price'=>'Rp 50.000','unit'=>'/sesi','sessions'=>'1× per minggu (4 sesi/bln)','fitur'=>['Durasi 90 menit/sesi','Pilihan tutor sesuai kebutuhan','Laporan perkembangan bulanan','Bisa home visit/online/offline'],'unggulan'=>false],
+        ['name'=>'Paket Intensif','desc'=>'Cocok untuk persiapan ujian dan akselerasi nilai.','price'=>'Rp 45.000','unit'=>'/sesi','sessions'=>'2–3× per minggu (8–12 sesi/bln)','fitur'=>['Durasi 90 menit/sesi','Materi soal ujian eksklusif','Laporan perkembangan mingguan','Try-out bulanan gratis','Konsultasi guru kapan saja'],'unggulan'=>true],
+        ['name'=>'Paket Premium', 'desc'=>'Solusi lengkap untuk target nilai terbaik.','price'=>'Hubungi Kami','unit'=>'','sessions'=>'Jadwal & sesi fleksibel','fitur'=>['Sesi tak terbatas per bulan','Tutor spesialis bidang studi','Monitoring nilai real-time','Garansi nilai naik tertulis','Materi custom sesuai kurikulum'],'unggulan'=>false],
     ];
 @endphp
 <!DOCTYPE html>
@@ -796,37 +797,71 @@
             </p>
         </div>
 
-        @if($hasDbPackages)
+        @if($hasBranchPricingCards)
+        {{-- Branch-specific custom pricing cards (highest priority) --}}
+        <div class="bl-harga-grid">
+            @foreach($branchPricingCards as $pkg)
+            @php $ung = $pkg['unggulan'] ?? false; @endphp
+            <div class="bl-pkg-card {{ $ung ? 'unggulan' : '' }}"
+                 style="{{ $ung ? 'background:linear-gradient(135deg,#260632,#461256);padding-top:2.75rem' : 'background:white' }}">
+                @if($ung)
+                    <div class="bl-pkg-badge-best">⭐ PALING POPULER</div>
+                @endif
+                <div class="bl-pkg-name" style="{{ $ung ? 'color:white' : '' }}">{{ $pkg['name'] }}</div>
+                <div class="bl-pkg-desc" style="{{ $ung ? 'color:rgba(255,255,255,.6)' : '' }}">{{ $pkg['desc'] ?? '' }}</div>
+                <div class="bl-pkg-price" style="{{ $ung ? 'color:var(--gold)' : '' }}">
+                    {{ $pkg['price'] ?? '' }}<span>{{ $pkg['unit'] ?? '' }}</span>
+                </div>
+                <div class="bl-pkg-sessions" style="{{ $ung ? 'color:rgba(255,255,255,.5)' : '' }}">
+                    {{ $pkg['sessions'] ?? '' }}
+                </div>
+                @if(!empty($pkg['fitur']))
+                <ul class="bl-pkg-fitur">
+                    @foreach($pkg['fitur'] as $f)
+                    <li style="{{ $ung ? 'color:rgba(255,255,255,.8)' : '' }}">{{ $f }}</li>
+                    @endforeach
+                </ul>
+                @endif
+                <a href="https://wa.me/{{ $branchWa }}?text={{ urlencode('Halo SCI '.$cityName.'! Saya tertarik dengan '.($pkg['name'] ?? 'paket les').'. Bisa info lebih lanjut?') }}"
+                   target="_blank"
+                   class="btn-bl-pkg {{ $ung ? 'primary' : 'default' }}">
+                    <i class="bi bi-whatsapp"></i> Pilih Paket Ini
+                </a>
+            </div>
+            @endforeach
+        </div>
+        @elseif($hasDbPackages)
         {{-- DB Packages --}}
         <div class="bl-harga-grid">
-            @foreach($packages->take(3) as $pi => $pkg)
+            @foreach($packages->take(3) as $pkg)
             @php
                 $fiturList = is_array($pkg->fitur) ? $pkg->fitur : [];
                 $harga     = $pkg->harga ? 'Rp '.number_format($pkg->harga,0,',','.') : 'Hubungi Kami';
+                $ung       = (bool)$pkg->is_unggulan;
             @endphp
-            <div class="bl-pkg-card {{ $pkg->is_unggulan ? 'unggulan' : '' }}"
-                 style="{{ $pkg->is_unggulan ? 'background:linear-gradient(135deg,#260632,#461256);padding-top:2.75rem' : 'background:white' }}">
-                @if($pkg->is_unggulan)
+            <div class="bl-pkg-card {{ $ung ? 'unggulan' : '' }}"
+                 style="{{ $ung ? 'background:linear-gradient(135deg,#260632,#461256);padding-top:2.75rem' : 'background:white' }}">
+                @if($ung)
                     <div class="bl-pkg-badge-best">⭐ PALING POPULER</div>
                 @endif
-                <div class="bl-pkg-name" style="{{ $pkg->is_unggulan ? 'color:white' : '' }}">{{ $pkg->nama }}</div>
-                <div class="bl-pkg-desc" style="{{ $pkg->is_unggulan ? 'color:rgba(255,255,255,.6)' : '' }}">{{ $pkg->deskripsi }}</div>
-                <div class="bl-pkg-price" style="{{ $pkg->is_unggulan ? 'color:var(--gold)' : '' }}">
+                <div class="bl-pkg-name" style="{{ $ung ? 'color:white' : '' }}">{{ $pkg->nama }}</div>
+                <div class="bl-pkg-desc" style="{{ $ung ? 'color:rgba(255,255,255,.6)' : '' }}">{{ $pkg->deskripsi }}</div>
+                <div class="bl-pkg-price" style="{{ $ung ? 'color:var(--gold)' : '' }}">
                     {{ $harga }}<span>{{ $pkg->harga ? '/sesi' : '' }}</span>
                 </div>
-                <div class="bl-pkg-sessions" style="{{ $pkg->is_unggulan ? 'color:rgba(255,255,255,.5)' : '' }}">
+                <div class="bl-pkg-sessions" style="{{ $ung ? 'color:rgba(255,255,255,.5)' : '' }}">
                     {{ $pkg->jumlah_pertemuan ? $pkg->jumlah_pertemuan.'× pertemuan' : 'Jadwal fleksibel' }}
                 </div>
                 @if($fiturList)
                 <ul class="bl-pkg-fitur">
                     @foreach($fiturList as $f)
-                    <li style="{{ $pkg->is_unggulan ? 'color:rgba(255,255,255,.8)' : '' }}">{{ $f }}</li>
+                    <li style="{{ $ung ? 'color:rgba(255,255,255,.8)' : '' }}">{{ $f }}</li>
                     @endforeach
                 </ul>
                 @endif
                 <a href="https://wa.me/{{ $branchWa }}?text={{ urlencode('Halo SCI '.$cityName.'! Saya tertarik dengan '.$pkg->nama.'. Bisa info lebih lanjut?') }}"
                    target="_blank"
-                   class="btn-bl-pkg {{ $pkg->is_unggulan ? 'primary' : 'default' }}">
+                   class="btn-bl-pkg {{ $ung ? 'primary' : 'default' }}">
                     <i class="bi bi-whatsapp"></i> Pilih Paket Ini
                 </a>
             </div>
@@ -835,28 +870,29 @@
         @else
         {{-- Default Packages --}}
         <div class="bl-harga-grid">
-            @foreach($defaultPricing as $pi => $pkg)
-            <div class="bl-pkg-card {{ $pkg['unggulan'] ? 'unggulan' : '' }}"
-                 style="{{ $pkg['unggulan'] ? 'background:linear-gradient(135deg,#260632,#461256);padding-top:2.75rem' : 'background:white' }}">
-                @if($pkg['unggulan'])
+            @foreach($defaultPricing as $pkg)
+            @php $ung = $pkg['unggulan'] ?? false; @endphp
+            <div class="bl-pkg-card {{ $ung ? 'unggulan' : '' }}"
+                 style="{{ $ung ? 'background:linear-gradient(135deg,#260632,#461256);padding-top:2.75rem' : 'background:white' }}">
+                @if($ung)
                     <div class="bl-pkg-badge-best">⭐ PALING POPULER</div>
                 @endif
-                <div class="bl-pkg-name" style="{{ $pkg['unggulan'] ? 'color:white' : '' }}">{{ $pkg['name'] }}</div>
-                <div class="bl-pkg-desc" style="{{ $pkg['unggulan'] ? 'color:rgba(255,255,255,.6)' : '' }}">{{ $pkg['desc'] }}</div>
-                <div class="bl-pkg-price" style="{{ $pkg['unggulan'] ? 'color:var(--gold)' : '' }}">
+                <div class="bl-pkg-name" style="{{ $ung ? 'color:white' : '' }}">{{ $pkg['name'] }}</div>
+                <div class="bl-pkg-desc" style="{{ $ung ? 'color:rgba(255,255,255,.6)' : '' }}">{{ $pkg['desc'] }}</div>
+                <div class="bl-pkg-price" style="{{ $ung ? 'color:var(--gold)' : '' }}">
                     {{ $pkg['price'] }}<span>{{ $pkg['unit'] }}</span>
                 </div>
-                <div class="bl-pkg-sessions" style="{{ $pkg['unggulan'] ? 'color:rgba(255,255,255,.5)' : '' }}">
+                <div class="bl-pkg-sessions" style="{{ $ung ? 'color:rgba(255,255,255,.5)' : '' }}">
                     {{ $pkg['sessions'] }}
                 </div>
                 <ul class="bl-pkg-fitur">
                     @foreach($pkg['fitur'] as $f)
-                    <li style="{{ $pkg['unggulan'] ? 'color:rgba(255,255,255,.8)' : '' }}">{{ $f }}</li>
+                    <li style="{{ $ung ? 'color:rgba(255,255,255,.8)' : '' }}">{{ $f }}</li>
                     @endforeach
                 </ul>
                 <a href="https://wa.me/{{ $branchWa }}?text={{ urlencode('Halo SCI '.$cityName.'! Saya tertarik dengan '.$pkg['name'].'. Bisa info lebih lanjut?') }}"
                    target="_blank"
-                   class="btn-bl-pkg {{ $pkg['unggulan'] ? 'primary' : 'default' }}">
+                   class="btn-bl-pkg {{ $ung ? 'primary' : 'default' }}">
                     <i class="bi bi-whatsapp"></i> Pilih Paket Ini
                 </a>
             </div>

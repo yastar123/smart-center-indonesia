@@ -159,6 +159,47 @@ class BranchLandingContentController extends Controller
         }
         BranchLandingSetting::setVal($bid, 'subjects', json_encode($subjects));
 
+        /* ── Pricing cards — Harga Les Privat ── */
+        $pkgNames    = $request->input('pkg_name', []);
+        $pkgUnggulan = $request->input('pkg_unggulan', []); // array of checked indices
+        $pricingCards = [];
+        foreach ($pkgNames as $i => $name) {
+            $name = trim($name);
+            if ($name) {
+                $fiturRaw = $request->input('pkg_fitur')[$i] ?? '';
+                $fitur = array_values(array_filter(array_map('trim', explode("\n", str_replace("\r", '', $fiturRaw)))));
+                $pricingCards[] = [
+                    'name'     => $name,
+                    'desc'     => trim($request->input('pkg_desc')[$i] ?? ''),
+                    'price'    => trim($request->input('pkg_price')[$i] ?? ''),
+                    'unit'     => trim($request->input('pkg_unit')[$i] ?? '/sesi'),
+                    'sessions' => trim($request->input('pkg_sessions')[$i] ?? ''),
+                    'fitur'    => $fitur,
+                    'unggulan' => in_array((string)$i, array_map('strval', $pkgUnggulan)),
+                ];
+            }
+        }
+        BranchLandingSetting::setVal($bid, 'pricing_cards', json_encode($pricingCards));
+
+        /* ── Branch testimonials ── */
+        $testiTexts = $request->input('testi_text', []);
+        $testimonials = [];
+        foreach ($testiTexts as $i => $text) {
+            $text = trim($text);
+            if ($text) {
+                $name    = trim($request->input('testi_name')[$i] ?? '');
+                $initial = strtoupper(trim($request->input('testi_initial')[$i] ?? ($name ? mb_substr($name, 0, 1) : 'S')));
+                $testimonials[] = [
+                    'text'     => $text,
+                    'name'     => $name,
+                    'role'     => trim($request->input('testi_role')[$i] ?? ''),
+                    'initial'  => $initial ?: 'S',
+                    'gradient' => trim($request->input('testi_color')[$i] ?? 'linear-gradient(135deg,#c84ddf,#68117e)'),
+                ];
+            }
+        }
+        BranchLandingSetting::setVal($bid, 'branch_testimonials', json_encode($testimonials));
+
         return back()->with('success', 'Konten landing page cabang '.$branch->name.' berhasil disimpan.');
     }
 }
