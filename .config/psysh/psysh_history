@@ -1,52 +1,9 @@
-echo "=== VERIFY COURSE MODEL FIX ===\n";
-try {
-    $c = \App\Models\Course::withCount('kelas')->first();
-    echo "Course kelas_count: ".$c->kelas_count."\n";
-} catch(\Exception $e) { echo "Course->kelas FAIL: ".$e->getMessage()."\n"; }
-try {
-    $c = \App\Models\Course::withCount(['school_classes','packages'])->first();
-    echo "Course school_classes=".$c->school_classes_count." packages=".$c->packages_count."\n";
-} catch(\Exception $e) { echo "Course withCount FAIL: ".$e->getMessage()."\n"; }
-echo "\n=== BATCH REMAINING TESTS ===\n";
-// Check if CourseController show method uses kelas relation
-try {
-    $course = \App\Models\Course::with(['cabang','kelas.guru','modul','guru'])->first();
-    echo "CourseController show: OK ({$course->nama}, kelas=".$course->kelas->count().")\n";
-} catch(\Exception $e) { echo "CourseController show FAIL: ".$e->getMessage()."\n"; }
-// Check ScheduleController join (needed for admin schedules table)
-try {
-    $schedules = \App\Models\Schedule::with([
-        'kelas.mataPelajaran',
-        'kelas.guru',
-        'absensi'
-    ])->orderBy('tanggal','desc')->paginate(20);
-    echo "Admin Schedules: OK (".$schedules->count()." of ".$schedules->total().")\n";
-} catch(\Exception $e) { echo "Admin Schedules FAIL: ".$e->getMessage()."\n"; }
-// GradeController (Guru) index
-try {
-    $teacher = \App\Models\Teacher::where('user_id',9)->first();
-    $q = \App\Models\Grade::with('siswa','mataPelajaran')
-        ->where('guru_id', $teacher->id);
-    $grades = $q->orderByDesc('tanggal')->paginate(20);
-    echo "Guru GradeController: OK (".$grades->count()." of ".$grades->total().")\n";
-} catch(\Exception $e) { echo "Guru GradeController FAIL: ".$e->getMessage()."\n"; }
-// Admin Riwayat Sesi (session history per teacher)
-try {
-    $t = \App\Models\Teacher::with('branch')->first();
-    $sessions = \App\Models\Schedule::with(['kelas.mataPelajaran','absensi'])
-        ->where('guru_id', $t->id)
-        ->orderByDesc('tanggal')->paginate(20);
-    echo "RiwayatSesi (teacher): OK (".$sessions->count()." sessions)\n";
-} catch(\Exception $e) { echo "RiwayatSesi FAIL: ".$e->getMessage()."\n"; }
-// Admin Invoice/Tagihan show
-try {
-    $invoice = \App\Models\Invoice::with(['siswa.user','siswa.branch','cabang'])->first();
-    $payments = \App\Models\Payment::where('invoice_id', $invoice->id)->get();
-    echo "Admin Invoice show: OK (id={$invoice->id}, payments={$payments->count()})\n";
-} catch(\Exception $e) { echo "Admin Invoice show FAIL: ".$e->getMessage()."\n"; }
-// Certificate model
-try {
-    $cert = \App\Models\Certificate::with(['siswa','cabang'])->get();
-    echo "Certificates: OK (".$cert->count().")\n";
-} catch(\Exception $e) { echo "Certificate FAIL: ".$e->getMessage()."\n"; }
-echo "=== DONE ===\n";
+// Clean up test data from branch 1 so editor shows defaults
+\App\Models\BranchLandingSetting::where('branch_id', 1)
+    ->whereIn('key', ['pricing_cards', 'branch_testimonials'])
+    ->delete();
+echo "Cleaned test data from branch 1\n";
+// Verify clean
+$s = \App\Models\BranchLandingSetting::forBranch(1);
+echo "pricing_cards: " . ($s['pricing_cards'] ?? 'EMPTY (correct)') . "\n";
+echo "branch_testimonials: " . ($s['branch_testimonials'] ?? 'EMPTY (correct)') . "\n";

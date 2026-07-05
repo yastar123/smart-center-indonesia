@@ -14,12 +14,13 @@
     /* ── Testimonials ── */
     $testiData = $testimonials->take(6);
 
-    /* ── Packages / Pricing ── */
-    $hasDbPackages = $packages->isNotEmpty();
+    /* ── Packages / Pricing (priority: branch custom cards > DB packages > defaults) ── */
+    $hasBranchPricingCards = !empty($branchPricingCards);
+    $hasDbPackages = !$hasBranchPricingCards && $packages->isNotEmpty();
     $defaultPricing = [
-        ['name'=>'Paket Reguler', 'desc'=>'Cocok untuk pemula dan maintenance nilai.','price'=>'Rp 50.000','unit'=>'/sesi','sessions'=>'1× per minggu (4 sesi/bln)','fitur'=>['Durasi 90 menit/sesi','Pilihan tutor sesuai kebutuhan','Laporan perkembangan bulanan','Bisa home visit/online/offline'],'unggulan'=>false,'color'=>'linear-gradient(135deg,#f9f4ff,#f0e6ff)'],
-        ['name'=>'Paket Intensif','desc'=>'Cocok untuk persiapan ujian dan akselerasi nilai.','price'=>'Rp 45.000','unit'=>'/sesi','sessions'=>'2–3× per minggu (8–12 sesi/bln)','fitur'=>['Durasi 90 menit/sesi','Materi soal ujian eksklusif','Laporan perkembangan mingguan','Try-out bulanan gratis','Konsultasi guru kapan saja'],'unggulan'=>true,'color'=>'linear-gradient(135deg,#260632,#461256)'],
-        ['name'=>'Paket Premium', 'desc'=>'Solusi lengkap untuk target nilai terbaik.','price'=>'Hubungi Kami','unit'=>'','sessions'=>'Jadwal & sesi fleksibel','fitur'=>['Sesi tak terbatas per bulan','Tutor spesialis bidang studi','Monitoring nilai real-time','Garansi nilai naik tertulis','Materi custom sesuai kurikulum'],'unggulan'=>false,'color'=>'linear-gradient(135deg,#f9f4ff,#f0e6ff)'],
+        ['name'=>'Paket Reguler', 'desc'=>'Cocok untuk pemula dan maintenance nilai.','price'=>'Rp 50.000','unit'=>'/sesi','sessions'=>'1× per minggu (4 sesi/bln)','fitur'=>['Durasi 90 menit/sesi','Pilihan tutor sesuai kebutuhan','Laporan perkembangan bulanan','Bisa home visit/online/offline'],'unggulan'=>false],
+        ['name'=>'Paket Intensif','desc'=>'Cocok untuk persiapan ujian dan akselerasi nilai.','price'=>'Rp 45.000','unit'=>'/sesi','sessions'=>'2–3× per minggu (8–12 sesi/bln)','fitur'=>['Durasi 90 menit/sesi','Materi soal ujian eksklusif','Laporan perkembangan mingguan','Try-out bulanan gratis','Konsultasi guru kapan saja'],'unggulan'=>true],
+        ['name'=>'Paket Premium', 'desc'=>'Solusi lengkap untuk target nilai terbaik.','price'=>'Hubungi Kami','unit'=>'','sessions'=>'Jadwal & sesi fleksibel','fitur'=>['Sesi tak terbatas per bulan','Tutor spesialis bidang studi','Monitoring nilai real-time','Garansi nilai naik tertulis','Materi custom sesuai kurikulum'],'unggulan'=>false],
     ];
 ?>
 <!DOCTYPE html>
@@ -801,38 +802,73 @@
             </p>
         </div>
 
-        <?php if($hasDbPackages): ?>
+        <?php if($hasBranchPricingCards): ?>
         
         <div class="bl-harga-grid">
-            <?php $__currentLoopData = $packages->take(3); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pi => $pkg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php $__currentLoopData = $branchPricingCards; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pkg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php $ung = $pkg['unggulan'] ?? false; ?>
+            <div class="bl-pkg-card <?php echo e($ung ? 'unggulan' : ''); ?>"
+                 style="<?php echo e($ung ? 'background:linear-gradient(135deg,#260632,#461256);padding-top:2.75rem' : 'background:white'); ?>">
+                <?php if($ung): ?>
+                    <div class="bl-pkg-badge-best">⭐ PALING POPULER</div>
+                <?php endif; ?>
+                <div class="bl-pkg-name" style="<?php echo e($ung ? 'color:white' : ''); ?>"><?php echo e($pkg['name']); ?></div>
+                <div class="bl-pkg-desc" style="<?php echo e($ung ? 'color:rgba(255,255,255,.6)' : ''); ?>"><?php echo e($pkg['desc'] ?? ''); ?></div>
+                <div class="bl-pkg-price" style="<?php echo e($ung ? 'color:var(--gold)' : ''); ?>">
+                    <?php echo e($pkg['price'] ?? ''); ?><span><?php echo e($pkg['unit'] ?? ''); ?></span>
+                </div>
+                <div class="bl-pkg-sessions" style="<?php echo e($ung ? 'color:rgba(255,255,255,.5)' : ''); ?>">
+                    <?php echo e($pkg['sessions'] ?? ''); ?>
+
+                </div>
+                <?php if(!empty($pkg['fitur'])): ?>
+                <ul class="bl-pkg-fitur">
+                    <?php $__currentLoopData = $pkg['fitur']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $f): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <li style="<?php echo e($ung ? 'color:rgba(255,255,255,.8)' : ''); ?>"><?php echo e($f); ?></li>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </ul>
+                <?php endif; ?>
+                <a href="https://wa.me/<?php echo e($branchWa); ?>?text=<?php echo e(urlencode('Halo SCI '.$cityName.'! Saya tertarik dengan '.($pkg['name'] ?? 'paket les').'. Bisa info lebih lanjut?')); ?>"
+                   target="_blank"
+                   class="btn-bl-pkg <?php echo e($ung ? 'primary' : 'default'); ?>">
+                    <i class="bi bi-whatsapp"></i> Pilih Paket Ini
+                </a>
+            </div>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </div>
+        <?php elseif($hasDbPackages): ?>
+        
+        <div class="bl-harga-grid">
+            <?php $__currentLoopData = $packages->take(3); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pkg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <?php
                 $fiturList = is_array($pkg->fitur) ? $pkg->fitur : [];
                 $harga     = $pkg->harga ? 'Rp '.number_format($pkg->harga,0,',','.') : 'Hubungi Kami';
+                $ung       = (bool)$pkg->is_unggulan;
             ?>
-            <div class="bl-pkg-card <?php echo e($pkg->is_unggulan ? 'unggulan' : ''); ?>"
-                 style="<?php echo e($pkg->is_unggulan ? 'background:linear-gradient(135deg,#260632,#461256);padding-top:2.75rem' : 'background:white'); ?>">
-                <?php if($pkg->is_unggulan): ?>
+            <div class="bl-pkg-card <?php echo e($ung ? 'unggulan' : ''); ?>"
+                 style="<?php echo e($ung ? 'background:linear-gradient(135deg,#260632,#461256);padding-top:2.75rem' : 'background:white'); ?>">
+                <?php if($ung): ?>
                     <div class="bl-pkg-badge-best">⭐ PALING POPULER</div>
                 <?php endif; ?>
-                <div class="bl-pkg-name" style="<?php echo e($pkg->is_unggulan ? 'color:white' : ''); ?>"><?php echo e($pkg->nama); ?></div>
-                <div class="bl-pkg-desc" style="<?php echo e($pkg->is_unggulan ? 'color:rgba(255,255,255,.6)' : ''); ?>"><?php echo e($pkg->deskripsi); ?></div>
-                <div class="bl-pkg-price" style="<?php echo e($pkg->is_unggulan ? 'color:var(--gold)' : ''); ?>">
+                <div class="bl-pkg-name" style="<?php echo e($ung ? 'color:white' : ''); ?>"><?php echo e($pkg->nama); ?></div>
+                <div class="bl-pkg-desc" style="<?php echo e($ung ? 'color:rgba(255,255,255,.6)' : ''); ?>"><?php echo e($pkg->deskripsi); ?></div>
+                <div class="bl-pkg-price" style="<?php echo e($ung ? 'color:var(--gold)' : ''); ?>">
                     <?php echo e($harga); ?><span><?php echo e($pkg->harga ? '/sesi' : ''); ?></span>
                 </div>
-                <div class="bl-pkg-sessions" style="<?php echo e($pkg->is_unggulan ? 'color:rgba(255,255,255,.5)' : ''); ?>">
+                <div class="bl-pkg-sessions" style="<?php echo e($ung ? 'color:rgba(255,255,255,.5)' : ''); ?>">
                     <?php echo e($pkg->jumlah_pertemuan ? $pkg->jumlah_pertemuan.'× pertemuan' : 'Jadwal fleksibel'); ?>
 
                 </div>
                 <?php if($fiturList): ?>
                 <ul class="bl-pkg-fitur">
                     <?php $__currentLoopData = $fiturList; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $f): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <li style="<?php echo e($pkg->is_unggulan ? 'color:rgba(255,255,255,.8)' : ''); ?>"><?php echo e($f); ?></li>
+                    <li style="<?php echo e($ung ? 'color:rgba(255,255,255,.8)' : ''); ?>"><?php echo e($f); ?></li>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </ul>
                 <?php endif; ?>
                 <a href="https://wa.me/<?php echo e($branchWa); ?>?text=<?php echo e(urlencode('Halo SCI '.$cityName.'! Saya tertarik dengan '.$pkg->nama.'. Bisa info lebih lanjut?')); ?>"
                    target="_blank"
-                   class="btn-bl-pkg <?php echo e($pkg->is_unggulan ? 'primary' : 'default'); ?>">
+                   class="btn-bl-pkg <?php echo e($ung ? 'primary' : 'default'); ?>">
                     <i class="bi bi-whatsapp"></i> Pilih Paket Ini
                 </a>
             </div>
@@ -841,29 +877,30 @@
         <?php else: ?>
         
         <div class="bl-harga-grid">
-            <?php $__currentLoopData = $defaultPricing; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pi => $pkg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <div class="bl-pkg-card <?php echo e($pkg['unggulan'] ? 'unggulan' : ''); ?>"
-                 style="<?php echo e($pkg['unggulan'] ? 'background:linear-gradient(135deg,#260632,#461256);padding-top:2.75rem' : 'background:white'); ?>">
-                <?php if($pkg['unggulan']): ?>
+            <?php $__currentLoopData = $defaultPricing; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pkg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php $ung = $pkg['unggulan'] ?? false; ?>
+            <div class="bl-pkg-card <?php echo e($ung ? 'unggulan' : ''); ?>"
+                 style="<?php echo e($ung ? 'background:linear-gradient(135deg,#260632,#461256);padding-top:2.75rem' : 'background:white'); ?>">
+                <?php if($ung): ?>
                     <div class="bl-pkg-badge-best">⭐ PALING POPULER</div>
                 <?php endif; ?>
-                <div class="bl-pkg-name" style="<?php echo e($pkg['unggulan'] ? 'color:white' : ''); ?>"><?php echo e($pkg['name']); ?></div>
-                <div class="bl-pkg-desc" style="<?php echo e($pkg['unggulan'] ? 'color:rgba(255,255,255,.6)' : ''); ?>"><?php echo e($pkg['desc']); ?></div>
-                <div class="bl-pkg-price" style="<?php echo e($pkg['unggulan'] ? 'color:var(--gold)' : ''); ?>">
+                <div class="bl-pkg-name" style="<?php echo e($ung ? 'color:white' : ''); ?>"><?php echo e($pkg['name']); ?></div>
+                <div class="bl-pkg-desc" style="<?php echo e($ung ? 'color:rgba(255,255,255,.6)' : ''); ?>"><?php echo e($pkg['desc']); ?></div>
+                <div class="bl-pkg-price" style="<?php echo e($ung ? 'color:var(--gold)' : ''); ?>">
                     <?php echo e($pkg['price']); ?><span><?php echo e($pkg['unit']); ?></span>
                 </div>
-                <div class="bl-pkg-sessions" style="<?php echo e($pkg['unggulan'] ? 'color:rgba(255,255,255,.5)' : ''); ?>">
+                <div class="bl-pkg-sessions" style="<?php echo e($ung ? 'color:rgba(255,255,255,.5)' : ''); ?>">
                     <?php echo e($pkg['sessions']); ?>
 
                 </div>
                 <ul class="bl-pkg-fitur">
                     <?php $__currentLoopData = $pkg['fitur']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $f): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <li style="<?php echo e($pkg['unggulan'] ? 'color:rgba(255,255,255,.8)' : ''); ?>"><?php echo e($f); ?></li>
+                    <li style="<?php echo e($ung ? 'color:rgba(255,255,255,.8)' : ''); ?>"><?php echo e($f); ?></li>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </ul>
                 <a href="https://wa.me/<?php echo e($branchWa); ?>?text=<?php echo e(urlencode('Halo SCI '.$cityName.'! Saya tertarik dengan '.$pkg['name'].'. Bisa info lebih lanjut?')); ?>"
                    target="_blank"
-                   class="btn-bl-pkg <?php echo e($pkg['unggulan'] ? 'primary' : 'default'); ?>">
+                   class="btn-bl-pkg <?php echo e($ung ? 'primary' : 'default'); ?>">
                     <i class="bi bi-whatsapp"></i> Pilih Paket Ini
                 </a>
             </div>
