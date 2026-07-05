@@ -31,7 +31,12 @@ class SlimSeeder extends Seeder
 
         $this->command->info('🌱 SlimSeeder: 2 data per entitas...');
 
-        DB::statement('SET session_replication_role = replica');
+        $driver = DB::connection()->getDriverName();
+        if ($driver === 'pgsql') {
+            DB::statement('SET session_replication_role = replica');
+        } elseif ($driver === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        }
 
         $tables = [
             'absensi_siswas', 'absensi_gurus', 'grades', 'tryout_attempts', 'questions',
@@ -48,9 +53,15 @@ class SlimSeeder extends Seeder
         }
 
         $keepEmails = ['adminpusatsci@akademi.com', 'admincabangasci@akademi.com'];
-        User::whereNotIn('email', $keepEmails)->delete();
+        User::withTrashed()->whereNotIn('email', $keepEmails)->get()->each(function ($user) {
+            try { $user->forceDelete(); } catch (\Exception $e) { }
+        });
 
-        DB::statement('SET session_replication_role = DEFAULT');
+        if ($driver === 'pgsql') {
+            DB::statement('SET session_replication_role = DEFAULT');
+        } elseif ($driver === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        }
 
         $this->command->info('  ✅ Tabel dikosongkan');
 
