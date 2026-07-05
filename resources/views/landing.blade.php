@@ -1539,71 +1539,56 @@
         </div>
 
         @php
-        $allBranches = \App\Models\Branch::orderBy('name')->get();
-        $branches3   = $allBranches->take(3);
-        $cityPhotos  = [
+        $allBranches  = \App\Models\Branch::orderBy('name')->get();
+        $featBranches = $allBranches->take(3)->values();
+        $fallbackPhotos = [
             'https://images.unsplash.com/photo-1555899434-94d1368aa7af?w=800&q=80',
             'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80',
             'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80',
         ];
-        $cabangDisplay = $branches3->count() >= 3 ? $branches3->values() : collect([
-            (object)['nama'=>'Riau',           'alamat'=>null, 'photo'=>null],
-            (object)['nama'=>'Sumatera Barat', 'alamat'=>null, 'photo'=>null],
-            (object)['nama'=>'Sumatera Utara', 'alamat'=>null, 'photo'=>null],
-        ]);
-        $cbPhoto = fn($cb, $fallback) => !empty($cb->photo) ? (str_starts_with($cb->photo,'http') ? $cb->photo : asset($cb->photo)) : $fallback;
+        $cbPhoto = fn($br, $idx) => !empty($br->photo)
+            ? (str_starts_with($br->photo,'http') ? $br->photo : asset($br->photo))
+            : ($fallbackPhotos[$idx] ?? $fallbackPhotos[0]);
         @endphp
 
-        {{-- ── Featured 3-photo grid ── --}}
+        @if($featBranches->count() >= 2)
+        {{-- ── Featured photo grid (2–3 branches) ── --}}
         <div class="cabang-photo-grid reveal">
-            {{-- Left: 2 stacked cards --}}
+            {{-- Left: up to 2 stacked cards --}}
             <div class="cabang-photo-left">
-                @foreach([$cabangDisplay[0], $cabangDisplay[2]] as $ci => $cb)
-                @php $bName = $cb->nama ?? $cb->name ?? 'Cabang SCI'; @endphp
-                @if(isset($cb->id))
+                @foreach([$featBranches[0], $featBranches->get(2)] as $ci => $cb)
+                @if($cb)
+                @php $bName = $cb->name ?? 'Cabang SCI'; @endphp
                 <a href="{{ route('cabang.show', $cb->id) }}" class="cpc" style="display:block;text-decoration:none">
-                @else
-                <div class="cpc">
-                @endif
-                    <img src="{{ $cbPhoto($cb, $cityPhotos[$ci === 0 ? 0 : 2]) }}" alt="{{ $bName }}" loading="lazy">
+                    <img src="{{ $cbPhoto($cb, $ci === 0 ? 0 : 2) }}" alt="{{ $bName }}" loading="lazy">
                     <div class="cpc-overlay">
                         <div class="cpc-name">{{ $bName }}</div>
                         <div class="cpc-sub">Jasa Les Privat {{ $bName }}</div>
                         <span class="btn-cpc">Lihat Detail <i class="bi bi-arrow-right"></i></span>
                     </div>
-                @if(isset($cb->id))
                 </a>
-                @else
-                </div>
                 @endif
                 @endforeach
             </div>
             {{-- Right: 1 tall card --}}
-            @php $cb2 = $cabangDisplay[1]; $bName2 = $cb2->nama ?? $cb2->name ?? 'Cabang SCI'; @endphp
-            @if(isset($cb2->id))
+            @php $cb2 = $featBranches[1]; $bName2 = $cb2->name ?? 'Cabang SCI'; @endphp
             <a href="{{ route('cabang.show', $cb2->id) }}" class="cpc cpc-tall" style="display:block;text-decoration:none">
-            @else
-            <div class="cpc cpc-tall">
-            @endif
-                <img src="{{ $cbPhoto($cb2, $cityPhotos[1]) }}" alt="{{ $bName2 }}" loading="lazy" style="height:100%;min-height:410px">
+                <img src="{{ $cbPhoto($cb2, 1) }}" alt="{{ $bName2 }}" loading="lazy" style="height:100%;min-height:410px">
                 <div class="cpc-overlay">
                     <div class="cpc-name">{{ $bName2 }}</div>
                     <div class="cpc-sub">Jasa Les Privat {{ $bName2 }}</div>
                     <span class="btn-cpc">Lihat Detail <i class="bi bi-arrow-right"></i></span>
                 </div>
-            @if(isset($cb2->id))
             </a>
-            @else
-            </div>
-            @endif
         </div>
+        @endif
 
         {{-- ── All branches grid ── --}}
         @if($allBranches->count() > 0)
         <div class="cabang-grid reveal" style="margin-top:2.5rem">
             @foreach($allBranches as $br)
             @php
-                $brName    = $br->name ?? $br->nama ?? 'Cabang SCI';
+                $brName    = $br->name ?? 'Cabang SCI';
                 $brCity    = $br->city ?: $brName;
                 $brAddress = $br->address ?? '';
                 $brPhone   = $br->phone ?? '';
@@ -1623,6 +1608,11 @@
                 <div class="cabang-tag" style="margin-top:.85rem"><i class="bi bi-circle-fill" style="font-size:.4rem"></i> Aktif &middot; Klik untuk detail</div>
             </a>
             @endforeach
+        </div>
+        @else
+        <div class="text-center py-4 text-muted reveal">
+            <i class="bi bi-geo-alt" style="font-size:2.5rem;opacity:.3"></i>
+            <p class="mt-2 small">Cabang belum tersedia. Silakan hubungi kami untuk informasi lebih lanjut.</p>
         </div>
         @endif
     </div>

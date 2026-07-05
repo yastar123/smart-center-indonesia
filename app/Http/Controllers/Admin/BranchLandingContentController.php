@@ -16,6 +16,67 @@ class BranchLandingContentController extends Controller
         return view('admin.landing.cabang-index', compact('branches'));
     }
 
+    /* ── Branch CRUD ─────────────────────────────────────────────── */
+
+    public function storeBranch(Request $request)
+    {
+        $request->validate([
+            'name'   => 'required|string|max:255',
+            'city'   => 'nullable|string|max:255',
+            'address'=> 'nullable|string',
+            'phone'  => 'nullable|string|max:50',
+            'email'  => 'nullable|email|max:255',
+            'status' => 'nullable|in:aktif,nonaktif',
+            'photo'  => 'nullable|image|max:4096',
+        ]);
+
+        $data = $request->only(['name','city','address','phone','email']);
+        $data['status'] = $request->input('status', 'aktif');
+
+        if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
+            $path = $request->file('photo')->store('landing/cabang/photos', 'public');
+            $data['photo'] = Storage::url($path);
+        }
+
+        Branch::create($data);
+
+        return back()->with('success', 'Cabang berhasil ditambahkan.');
+    }
+
+    public function updateBranch(Request $request, Branch $branch)
+    {
+        $request->validate([
+            'name'   => 'required|string|max:255',
+            'city'   => 'nullable|string|max:255',
+            'address'=> 'nullable|string',
+            'phone'  => 'nullable|string|max:50',
+            'email'  => 'nullable|email|max:255',
+            'status' => 'nullable|in:aktif,nonaktif',
+            'photo'  => 'nullable|image|max:4096',
+        ]);
+
+        $data = $request->only(['name','city','address','phone','email']);
+        $data['status'] = $request->input('status', $branch->status);
+
+        if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
+            $path = $request->file('photo')->store('landing/cabang/photos', 'public');
+            $data['photo'] = Storage::url($path);
+        }
+
+        $branch->update($data);
+
+        return back()->with('success', 'Cabang ' . $branch->name . ' berhasil diupdate.');
+    }
+
+    public function destroyBranch(Branch $branch)
+    {
+        $name = $branch->name;
+        $branch->delete();
+        return back()->with('success', 'Cabang ' . $name . ' berhasil dihapus.');
+    }
+
+    /* ── Branch Landing Content ──────────────────────────────────── */
+
     public function show(Branch $branch)
     {
         $s = BranchLandingSetting::forBranch($branch->id);

@@ -29,6 +29,7 @@ class Branch extends Model
         'email',
         'password',
         'status',
+        'photo',
 
         'can_students',
         'can_teachers',
