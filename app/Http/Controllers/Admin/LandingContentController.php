@@ -100,7 +100,7 @@ class LandingContentController extends Controller
             'is_active'  => 'boolean',
             'sort_order' => 'integer|min:0',
         ]);
-        $data['is_active'] = $request->boolean('is_active', true);
+        $data['is_active'] = $request->boolean('is_active');
         $data['initial']   = strtoupper(substr($data['name'], 0, 1));
         if (array_key_exists('gradient', $data) && $data['gradient'] === null) unset($data['gradient']);
         if ($photo = $this->storeImage($request, 'photo', 'landing/testimonials')) {
@@ -161,7 +161,7 @@ class LandingContentController extends Controller
             'is_new'      => 'boolean',
             'sort_order'  => 'integer|min:0',
         ]);
-        $data['is_active']  = $request->boolean('is_active', true);
+        $data['is_active']  = $request->boolean('is_active');
         $data['is_popular'] = $request->boolean('is_popular');
         $data['is_new']     = $request->boolean('is_new');
         foreach (['badge_bg','badge_color','icon_emoji'] as $f) {
@@ -216,7 +216,7 @@ class LandingContentController extends Controller
             'sort_order'  => 'integer|min:0',
         ]);
         $data['is_primary'] = $request->boolean('is_primary');
-        $data['is_active']  = $request->boolean('is_active', true);
+        $data['is_active']  = $request->boolean('is_active');
 
         if ($data['is_primary']) {
             LandingWaNumber::where('is_primary', true)->where('id', '!=', $wa->id)->update(['is_primary' => false]);
@@ -256,7 +256,7 @@ class LandingContentController extends Controller
             'is_active'  => 'boolean',
             'sort_order' => 'integer|min:0',
         ]);
-        $data['is_active'] = $request->boolean('is_active', true);
+        $data['is_active'] = $request->boolean('is_active');
         if (array_key_exists('emoji', $data) && $data['emoji'] === null) unset($data['emoji']);
         $ticker->update($data);
         return back()->with('success', 'Teks promo berhasil diperbarui.');
@@ -292,7 +292,7 @@ class LandingContentController extends Controller
             'is_active'  => 'boolean',
             'sort_order' => 'integer|min:0',
         ]);
-        $data['is_active'] = $request->boolean('is_active', true);
+        $data['is_active'] = $request->boolean('is_active');
         if (array_key_exists('icon', $data) && $data['icon'] === null) unset($data['icon']);
         $feature->update($data);
         return back()->with('success', 'Fitur berhasil diperbarui.');
@@ -333,7 +333,7 @@ class LandingContentController extends Controller
             'is_active'  => 'boolean',
             'sort_order' => 'integer|min:0',
         ]);
-        $data['is_active'] = $request->boolean('is_active', true);
+        $data['is_active'] = $request->boolean('is_active');
         if (array_key_exists('emoji', $data) && $data['emoji'] === null) unset($data['emoji']);
         if ($image = $this->storeImage($request, 'image', 'landing/jenjang')) {
             $data['image'] = $image;
@@ -374,7 +374,7 @@ class LandingContentController extends Controller
             'is_active'  => 'boolean',
             'sort_order' => 'integer|min:0',
         ]);
-        $data['is_active'] = $request->boolean('is_active', true);
+        $data['is_active'] = $request->boolean('is_active');
         if (array_key_exists('icon', $data) && $data['icon'] === null) unset($data['icon']);
         $trust->update($data);
         return back()->with('success', 'Badge berhasil diperbarui.');
@@ -412,7 +412,7 @@ class LandingContentController extends Controller
             'is_active'   => 'boolean',
             'sort_order'  => 'integer|min:0',
         ]);
-        $data['is_active'] = $request->boolean('is_active', true);
+        $data['is_active'] = $request->boolean('is_active');
         if ($image = $this->storeImage($request, 'image', 'landing/highlights')) {
             $data['image'] = $image;
         } else {
@@ -452,7 +452,7 @@ class LandingContentController extends Controller
             'is_active'  => 'boolean',
             'sort_order' => 'integer|min:0',
         ]);
-        $data['is_active'] = $request->boolean('is_active', true);
+        $data['is_active'] = $request->boolean('is_active');
         if ($image = $this->storeImage($request, 'image', 'landing/gallery')) {
             $data['image'] = $image;
         } else {
@@ -491,7 +491,7 @@ class LandingContentController extends Controller
             'is_active'  => 'boolean',
             'sort_order' => 'integer|min:0',
         ]);
-        $data['is_active'] = $request->boolean('is_active', true);
+        $data['is_active'] = $request->boolean('is_active');
         $faq->update($data);
         return back()->with('success', 'FAQ berhasil diperbarui.');
     }

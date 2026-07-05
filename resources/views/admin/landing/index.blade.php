@@ -1154,9 +1154,9 @@
                         <div class="col-md-4"><label class="form-label">BG Badge</label><input type="text" name="badge_bg" class="form-control"></div>
                         <div class="col-md-4"><label class="form-label">Warna Teks Badge</label><input type="text" name="badge_color" class="form-control"></div>
                         <div class="col-md-4 d-flex align-items-end gap-3">
-                            <div class="form-check"><input class="form-check-input" type="checkbox" name="is_popular" id="epPopular" value="1"><label class="form-check-label" for="epPopular">Populer</label></div>
-                            <div class="form-check"><input class="form-check-input" type="checkbox" name="is_new" id="epNew" value="1"><label class="form-check-label" for="epNew">Baru</label></div>
-                            <div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="epActive" value="1"><label class="form-check-label" for="epActive">Aktif</label></div>
+                            <div class="form-check"><input type="hidden" name="is_popular" value="0"><input class="form-check-input" type="checkbox" name="is_popular" id="epPopular" value="1"><label class="form-check-label" for="epPopular">Populer</label></div>
+                            <div class="form-check"><input type="hidden" name="is_new" value="0"><input class="form-check-input" type="checkbox" name="is_new" id="epNew" value="1"><label class="form-check-label" for="epNew">Baru</label></div>
+                            <div class="form-check"><input type="hidden" name="is_active" value="0"><input class="form-check-input" type="checkbox" name="is_active" id="epActive" value="1"><label class="form-check-label" for="epActive">Aktif</label></div>
                         </div>
                         <div class="col-md-4"><label class="form-label">Urutan</label><input type="number" name="sort_order" class="form-control" min="0"></div>
                     </div>
@@ -1181,7 +1181,7 @@
                         <div class="col-12"><label class="form-label fw-semibold">Teks Testimoni *</label><textarea name="text" class="form-control" rows="4" required></textarea></div>
                         <div class="col-md-8"><label class="form-label">Gradient Avatar</label><input type="text" name="gradient" class="form-control"></div>
                         <div class="col-md-4 d-flex align-items-end">
-                            <div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="etActive" value="1"><label class="form-check-label" for="etActive">Tampilkan</label></div>
+                            <div class="form-check"><input type="hidden" name="is_active" value="0"><input class="form-check-input" type="checkbox" name="is_active" id="etActive" value="1"><label class="form-check-label" for="etActive">Tampilkan</label></div>
                         </div>
                         <div class="col-md-4"><label class="form-label">Urutan</label><input type="number" name="sort_order" class="form-control" min="0"></div>
                     </div>
@@ -1226,11 +1226,11 @@
                         </div>
                         <div class="col-6 d-flex flex-column justify-content-end gap-2">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" name="is_primary" id="ewPrimary" value="1">
+                                <input type="hidden" name="is_primary" value="0"><input class="form-check-input" type="checkbox" name="is_primary" id="ewPrimary" value="1">
                                 <label class="form-check-label fw-semibold" for="ewPrimary"><i class="bi bi-star-fill text-warning me-1"></i>Utama</label>
                             </div>
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" name="is_active" id="ewActive" value="1">
+                                <input type="hidden" name="is_active" value="0"><input class="form-check-input" type="checkbox" name="is_active" id="ewActive" value="1">
                                 <label class="form-check-label" for="ewActive">Aktif</label>
                             </div>
                         </div>
@@ -1259,7 +1259,7 @@
                         <div class="col-md-3"><label class="form-label fw-semibold">Emoji</label><input type="text" name="emoji" class="form-control" maxlength="10"></div>
                         <div class="col-md-9"><label class="form-label fw-semibold">Teks *</label><input type="text" name="text" class="form-control" required></div>
                         <div class="col-md-6"><label class="form-label fw-semibold">Urutan</label><input type="number" name="sort_order" class="form-control" min="0"></div>
-                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="etTickerActive" value="1"><label class="form-check-label" for="etTickerActive">Aktif</label></div></div>
+                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input type="hidden" name="is_active" value="0"><input class="form-check-input" type="checkbox" name="is_active" id="etTickerActive" value="1"><label class="form-check-label" for="etTickerActive">Aktif</label></div></div>
                     </div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Simpan</button></div>
@@ -1280,7 +1280,7 @@
                         <div class="col-md-4"><label class="form-label fw-semibold">Ikon (bootstrap-icons)</label><input type="text" name="icon" class="form-control" placeholder="bi-patch-check-fill"></div>
                         <div class="col-md-8"><label class="form-label fw-semibold">Label *</label><input type="text" name="label" class="form-control" required></div>
                         <div class="col-md-6"><label class="form-label fw-semibold">Urutan</label><input type="number" name="sort_order" class="form-control" min="0"></div>
-                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="etFtActive" value="1"><label class="form-check-label" for="etFtActive">Aktif</label></div></div>
+                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input type="hidden" name="is_active" value="0"><input class="form-check-input" type="checkbox" name="is_active" id="etFtActive" value="1"><label class="form-check-label" for="etFtActive">Aktif</label></div></div>
                     </div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Simpan</button></div>
@@ -1308,7 +1308,7 @@
                             <div id="jenjangCurrentImg" class="mt-2"></div>
                         </div>
                         <div class="col-md-6"><label class="form-label fw-semibold">Urutan</label><input type="number" name="sort_order" class="form-control" min="0"></div>
-                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="etJjActive" value="1"><label class="form-check-label" for="etJjActive">Aktif</label></div></div>
+                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input type="hidden" name="is_active" value="0"><input class="form-check-input" type="checkbox" name="is_active" id="etJjActive" value="1"><label class="form-check-label" for="etJjActive">Aktif</label></div></div>
                     </div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Simpan</button></div>
@@ -1329,7 +1329,7 @@
                         <div class="col-md-4"><label class="form-label fw-semibold">Ikon (bootstrap-icons)</label><input type="text" name="icon" class="form-control" placeholder="bi-shield-check"></div>
                         <div class="col-md-8"><label class="form-label fw-semibold">Teks *</label><input type="text" name="text" class="form-control" required></div>
                         <div class="col-md-6"><label class="form-label fw-semibold">Urutan</label><input type="number" name="sort_order" class="form-control" min="0"></div>
-                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="etTrActive" value="1"><label class="form-check-label" for="etTrActive">Aktif</label></div></div>
+                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input type="hidden" name="is_active" value="0"><input class="form-check-input" type="checkbox" name="is_active" id="etTrActive" value="1"><label class="form-check-label" for="etTrActive">Aktif</label></div></div>
                     </div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Simpan</button></div>
@@ -1356,7 +1356,7 @@
                             <div id="highlightCurrentImg" class="mt-2"></div>
                         </div>
                         <div class="col-md-6"><label class="form-label fw-semibold">Urutan</label><input type="number" name="sort_order" class="form-control" min="0"></div>
-                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="etHlActive" value="1"><label class="form-check-label" for="etHlActive">Aktif</label></div></div>
+                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input type="hidden" name="is_active" value="0"><input class="form-check-input" type="checkbox" name="is_active" id="etHlActive" value="1"><label class="form-check-label" for="etHlActive">Aktif</label></div></div>
                     </div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Simpan</button></div>
@@ -1382,7 +1382,7 @@
                         </div>
                         <div class="col-12"><label class="form-label fw-semibold">Keterangan / Alt Teks</label><input type="text" name="alt" class="form-control" placeholder="Keterangan foto (opsional)"></div>
                         <div class="col-md-6"><label class="form-label fw-semibold">Urutan</label><input type="number" name="sort_order" class="form-control" min="0"></div>
-                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="etGalActive" value="1"><label class="form-check-label" for="etGalActive">Tampilkan</label></div></div>
+                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input type="hidden" name="is_active" value="0"><input class="form-check-input" type="checkbox" name="is_active" id="etGalActive" value="1"><label class="form-check-label" for="etGalActive">Tampilkan</label></div></div>
                     </div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Simpan</button></div>
@@ -1403,7 +1403,7 @@
                         <div class="col-12"><label class="form-label fw-semibold">Pertanyaan *</label><input type="text" name="question" class="form-control" required></div>
                         <div class="col-12"><label class="form-label fw-semibold">Jawaban *</label><textarea name="answer" class="form-control" rows="4" required></textarea></div>
                         <div class="col-md-6"><label class="form-label fw-semibold">Urutan</label><input type="number" name="sort_order" class="form-control" min="0"></div>
-                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="etFaqActive" value="1"><label class="form-check-label" for="etFaqActive">Tampilkan</label></div></div>
+                        <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input type="hidden" name="is_active" value="0"><input class="form-check-input" type="checkbox" name="is_active" id="etFaqActive" value="1"><label class="form-check-label" for="etFaqActive">Tampilkan</label></div></div>
                     </div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Simpan</button></div>
