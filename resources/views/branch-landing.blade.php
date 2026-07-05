@@ -658,10 +658,10 @@
         <div class="bl-features-grid">
             @foreach($features as $fi => $f)
             <div class="bl-feat-card reveal reveal-d{{ ($fi % 3) + 1 }}">
-                <div class="bl-feat-num">{{ $f['num'] }}</div>
-                <span class="bl-feat-icon">{{ $f['icon'] }}</span>
-                <div class="bl-feat-title">{{ $f['title'] }}</div>
-                <div class="bl-feat-desc">{{ $f['desc'] }}</div>
+                <div class="bl-feat-num">{{ $f['num'] ?? sprintf('%02d', $loop->index + 1) }}</div>
+                <span class="bl-feat-icon">{{ $f['icon'] ?? '⭐' }}</span>
+                <div class="bl-feat-title">{{ $f['title'] ?? '' }}</div>
+                <div class="bl-feat-desc">{{ $f['desc'] ?? '' }}</div>
             </div>
             @endforeach
         </div>
@@ -681,10 +681,10 @@
         <div class="bl-subjects-grid">
             @foreach($subjects as $si => $subj)
             <div class="bl-subj-card reveal reveal-d{{ ($si % 3) + 1 }}">
-                <span class="bl-subj-icon">{{ $subj['icon'] }}</span>
-                <div class="bl-subj-name">{{ $subj['name'] }}</div>
-                <div class="bl-subj-desc">{{ $subj['desc'] }}</div>
-                <span class="bl-badge {{ $subj['badge_type'] }}">{{ $subj['badge'] }}</span>
+                <span class="bl-subj-icon">{{ $subj['icon'] ?? '📚' }}</span>
+                <div class="bl-subj-name">{{ $subj['name'] ?? '' }}</div>
+                <div class="bl-subj-desc">{{ $subj['desc'] ?? '' }}</div>
+                <span class="bl-badge {{ $subj['badge_type'] ?? 'general' }}">{{ $subj['badge'] ?? '' }}</span>
             </div>
             @endforeach
         </div>

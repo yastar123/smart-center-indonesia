@@ -50,18 +50,39 @@ class LandingContentController extends Controller
 
     /* ─── Settings ─────────────────────────────────────────────────── */
 
+    /** Safely upsert a setting — derives section & label from the key if creating new. */
+    private function upsertSetting(string $key, string $value): void
+    {
+        $existing = LandingSetting::where('key', $key)->first();
+        if ($existing) {
+            $existing->update(['value' => $value]);
+        } else {
+            $parts   = explode('.', $key);
+            $section = $parts[0];
+            $label   = ucwords(str_replace('_', ' ', $parts[1] ?? $key));
+            LandingSetting::create([
+                'section'    => $section,
+                'key'        => $key,
+                'value'      => $value,
+                'label'      => $label,
+                'type'       => 'text',
+                'sort_order' => 0,
+            ]);
+        }
+    }
+
     public function updateSettings(Request $request)
     {
         $data = $request->validate(['settings' => 'required|array', 'settings.*' => 'nullable|string|max:5000']);
 
         foreach ($data['settings'] as $key => $value) {
-            LandingSetting::updateOrCreate(['key' => $key], ['value' => $value ?? '']);
+            $this->upsertSetting($key, $value ?? '');
         }
 
         foreach ($request->file('setting_files', []) as $key => $file) {
             if ($file) {
                 $path = $file->store('landing/settings', 'public');
-                LandingSetting::updateOrCreate(['key' => $key], ['value' => Storage::url($path)]);
+                $this->upsertSetting($key, Storage::url($path));
             }
         }
 

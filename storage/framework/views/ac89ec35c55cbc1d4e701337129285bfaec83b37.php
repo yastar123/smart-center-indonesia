@@ -661,10 +661,10 @@
         <div class="bl-features-grid">
             <?php $__currentLoopData = $features; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $fi => $f): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="bl-feat-card reveal reveal-d<?php echo e(($fi % 3) + 1); ?>">
-                <div class="bl-feat-num"><?php echo e($f['num']); ?></div>
-                <span class="bl-feat-icon"><?php echo e($f['icon']); ?></span>
-                <div class="bl-feat-title"><?php echo e($f['title']); ?></div>
-                <div class="bl-feat-desc"><?php echo e($f['desc']); ?></div>
+                <div class="bl-feat-num"><?php echo e($f['num'] ?? sprintf('%02d', $loop->index + 1)); ?></div>
+                <span class="bl-feat-icon"><?php echo e($f['icon'] ?? '⭐'); ?></span>
+                <div class="bl-feat-title"><?php echo e($f['title'] ?? ''); ?></div>
+                <div class="bl-feat-desc"><?php echo e($f['desc'] ?? ''); ?></div>
             </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
@@ -684,10 +684,10 @@
         <div class="bl-subjects-grid">
             <?php $__currentLoopData = $subjects; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $si => $subj): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="bl-subj-card reveal reveal-d<?php echo e(($si % 3) + 1); ?>">
-                <span class="bl-subj-icon"><?php echo e($subj['icon']); ?></span>
-                <div class="bl-subj-name"><?php echo e($subj['name']); ?></div>
-                <div class="bl-subj-desc"><?php echo e($subj['desc']); ?></div>
-                <span class="bl-badge <?php echo e($subj['badge_type']); ?>"><?php echo e($subj['badge']); ?></span>
+                <span class="bl-subj-icon"><?php echo e($subj['icon'] ?? '📚'); ?></span>
+                <div class="bl-subj-name"><?php echo e($subj['name'] ?? ''); ?></div>
+                <div class="bl-subj-desc"><?php echo e($subj['desc'] ?? ''); ?></div>
+                <span class="bl-badge <?php echo e($subj['badge_type'] ?? 'general'); ?>"><?php echo e($subj['badge'] ?? ''); ?></span>
             </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
