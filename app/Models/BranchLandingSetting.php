@@ -24,11 +24,11 @@ class BranchLandingSetting extends Model
         return is_array($decoded) ? $decoded : $default;
     }
 
-    public static function setVal(int $branchId, string $key, string $value): void
+    public static function setVal(int $branchId, string $key, string|null $value): void
     {
         static::updateOrCreate(
             ['branch_id' => $branchId, 'key' => $key],
-            ['value' => $value]
+            ['value' => (string) ($value ?? '')]
         );
     }
 

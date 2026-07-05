@@ -111,7 +111,7 @@ class BranchLandingContentController extends Controller
         }
 
         /* ── Areas (comma-separated → JSON) ── */
-        $areas = array_values(array_filter(array_map('trim', explode(',', $request->input('areas', '')))));
+        $areas = array_values(array_filter(array_map('trim', explode(',', (string) ($request->input('areas') ?? '')))));
         BranchLandingSetting::setVal($bid, 'areas', json_encode($areas));
 
         /* ── Promo items ── */

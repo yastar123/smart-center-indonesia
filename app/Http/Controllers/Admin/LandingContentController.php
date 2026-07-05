@@ -83,6 +83,7 @@ class LandingContentController extends Controller
         $data['is_active']  = $request->boolean('is_active', true);
         $data['initial']    = strtoupper(substr($data['name'], 0, 1));
         $data['sort_order'] = LandingTestimonial::max('sort_order') + 1;
+        $data['gradient']   = $data['gradient'] ?? 'linear-gradient(135deg,#c84ddf,#68117e)';
         $data['photo']      = $this->storeImage($request, 'photo', 'landing/testimonials');
         LandingTestimonial::create($data);
         return back()->with('success', 'Testimoni berhasil ditambahkan.');
@@ -101,6 +102,7 @@ class LandingContentController extends Controller
         ]);
         $data['is_active'] = $request->boolean('is_active', true);
         $data['initial']   = strtoupper(substr($data['name'], 0, 1));
+        if (array_key_exists('gradient', $data) && $data['gradient'] === null) unset($data['gradient']);
         if ($photo = $this->storeImage($request, 'photo', 'landing/testimonials')) {
             $data['photo'] = $photo;
         } else {
@@ -136,6 +138,9 @@ class LandingContentController extends Controller
         $data['is_popular'] = $request->boolean('is_popular');
         $data['is_new']     = $request->boolean('is_new');
         $data['sort_order'] = LandingProgram::max('sort_order') + 1;
+        $data['badge_bg']   = $data['badge_bg']    ?? 'rgba(200,77,223,.1)';
+        $data['badge_color']= $data['badge_color'] ?? '#68117e';
+        $data['icon_emoji'] = $data['icon_emoji']  ?? '📖';
         $data['image']      = $this->storeImage($request, 'image', 'landing/programs');
         LandingProgram::create($data);
         return back()->with('success', 'Program berhasil ditambahkan.');
@@ -159,6 +164,9 @@ class LandingContentController extends Controller
         $data['is_active']  = $request->boolean('is_active', true);
         $data['is_popular'] = $request->boolean('is_popular');
         $data['is_new']     = $request->boolean('is_new');
+        foreach (['badge_bg','badge_color','icon_emoji'] as $f) {
+            if (array_key_exists($f, $data) && $data[$f] === null) unset($data[$f]);
+        }
         if ($image = $this->storeImage($request, 'image', 'landing/programs')) {
             $data['image'] = $image;
         } else {
@@ -235,6 +243,7 @@ class LandingContentController extends Controller
         ]);
         $data['is_active']  = $request->boolean('is_active', true);
         $data['sort_order'] = LandingTicker::max('sort_order') + 1;
+        $data['emoji']      = $data['emoji'] ?? '🎉';
         LandingTicker::create($data);
         return back()->with('success', 'Teks promo berhasil ditambahkan.');
     }
@@ -248,6 +257,7 @@ class LandingContentController extends Controller
             'sort_order' => 'integer|min:0',
         ]);
         $data['is_active'] = $request->boolean('is_active', true);
+        if (array_key_exists('emoji', $data) && $data['emoji'] === null) unset($data['emoji']);
         $ticker->update($data);
         return back()->with('success', 'Teks promo berhasil diperbarui.');
     }
@@ -269,6 +279,7 @@ class LandingContentController extends Controller
         ]);
         $data['is_active']  = $request->boolean('is_active', true);
         $data['sort_order'] = LandingFeature::max('sort_order') + 1;
+        $data['icon']       = $data['icon'] ?? 'bi-check-circle-fill';
         LandingFeature::create($data);
         return back()->with('success', 'Fitur berhasil ditambahkan.');
     }
@@ -282,6 +293,7 @@ class LandingContentController extends Controller
             'sort_order' => 'integer|min:0',
         ]);
         $data['is_active'] = $request->boolean('is_active', true);
+        if (array_key_exists('icon', $data) && $data['icon'] === null) unset($data['icon']);
         $feature->update($data);
         return back()->with('success', 'Fitur berhasil diperbarui.');
     }
@@ -305,6 +317,7 @@ class LandingContentController extends Controller
         ]);
         $data['is_active']  = $request->boolean('is_active', true);
         $data['sort_order'] = LandingJenjang::max('sort_order') + 1;
+        $data['emoji']      = $data['emoji'] ?? '📚';
         $data['image']      = $this->storeImage($request, 'image', 'landing/jenjang');
         LandingJenjang::create($data);
         return back()->with('success', 'Jenjang berhasil ditambahkan.');
@@ -321,6 +334,7 @@ class LandingContentController extends Controller
             'sort_order' => 'integer|min:0',
         ]);
         $data['is_active'] = $request->boolean('is_active', true);
+        if (array_key_exists('emoji', $data) && $data['emoji'] === null) unset($data['emoji']);
         if ($image = $this->storeImage($request, 'image', 'landing/jenjang')) {
             $data['image'] = $image;
         } else {
@@ -347,6 +361,7 @@ class LandingContentController extends Controller
         ]);
         $data['is_active']  = $request->boolean('is_active', true);
         $data['sort_order'] = LandingTrust::max('sort_order') + 1;
+        $data['icon']       = $data['icon'] ?? 'bi-patch-check-fill';
         LandingTrust::create($data);
         return back()->with('success', 'Badge berhasil ditambahkan.');
     }
@@ -360,6 +375,7 @@ class LandingContentController extends Controller
             'sort_order' => 'integer|min:0',
         ]);
         $data['is_active'] = $request->boolean('is_active', true);
+        if (array_key_exists('icon', $data) && $data['icon'] === null) unset($data['icon']);
         $trust->update($data);
         return back()->with('success', 'Badge berhasil diperbarui.');
     }
