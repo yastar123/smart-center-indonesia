@@ -1,9 +1,13 @@
-// Clean up test data from branch 1 so editor shows defaults
-\App\Models\BranchLandingSetting::where('branch_id', 1)
-    ->whereIn('key', ['pricing_cards', 'branch_testimonials'])
-    ->delete();
-echo "Cleaned test data from branch 1\n";
-// Verify clean
-$s = \App\Models\BranchLandingSetting::forBranch(1);
-echo "pricing_cards: " . ($s['pricing_cards'] ?? 'EMPTY (correct)') . "\n";
-echo "branch_testimonials: " . ($s['branch_testimonials'] ?? 'EMPTY (correct)') . "\n";
+$photos = [
+    1 => 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1200&q=80',
+    2 => 'https://images.unsplash.com/photo-1555899434-94d1368aa7af?w=1200&q=80',
+];
+foreach ($photos as $id => $url) {
+    $b = \App\Models\Branch::find($id);
+    if ($b) {
+        $b->photo = $url;
+        $b->save();
+        echo "Updated branch {$id}: {$b->name}\n";
+    }
+}
+echo "Done\n";
