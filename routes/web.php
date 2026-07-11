@@ -217,7 +217,6 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
 
         // STUDENT REGISTRATIONS (pendaftar dari form publik)
         Route::get('/student-registrations/{studentRegistration}',        [StudentRegistrationController::class, 'show'])    ->name('student-registrations.show');
-        Route::post('/student-registrations/{studentRegistration}/verify', [StudentRegistrationController::class, 'verify'])  ->name('student-registrations.verify');
         Route::delete('/student-registrations/{studentRegistration}',      [StudentRegistrationController::class, 'destroy']) ->name('student-registrations.destroy');
 
 

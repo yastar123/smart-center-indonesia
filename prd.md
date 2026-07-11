@@ -60,10 +60,13 @@ Setiap pengguna (`User`) terhubung ke satu `branch_id` (cabang), kecuali Owner y
 Dua jalur yang saling melengkapi:
 
 **A. Jalur Lead → Verifikasi (untuk calon siswa yang mendaftar sendiri)**
-1. Calon siswa mengisi form publik → tersimpan sebagai lead `pending`.
-2. Admin membuka **Registration List**, meninjau lead.
-3. Admin memproses lead melalui **wizard 5 langkah** (data terkunci karena berasal dari lead): Informasi Siswa (read-only) → Paket Kelas → Mapel & Guru → Pembayaran → Preview.
-4. Sistem membuat akun `User` + `Student`, invoice, dan penugasan guru.
+1. Calon siswa mengisi form publik (`/register`) → tersimpan sebagai lead `pending` di `student_registrations`.
+2. Admin melihat lead ini di dashboard pada komponen **"Siswa Terbaru Mendaftar"** (juga bisa ditinjau lengkap di **Registration List**).
+3. Admin klik tombol **"Verifikasi"** → **diarahkan ke halaman wizard 5 langkah** (bukan langsung membuat akun): Informasi Siswa (terisi otomatis dari data lead) → Paket Kelas → Mapel & Guru → Pembayaran → Preview.
+4. Setelah admin melengkapi paket/mapel/guru/pembayaran dan submit di langkah Preview, sistem baru membuat akun `User` + `Student`, invoice, dan penugasan guru.
+5. Halaman sukses menampilkan kredensial (email & password) dan tombol **"Kirim ke WhatsApp Siswa"** — admin klik tombol ini untuk membuka WhatsApp dengan pesan kredensial sudah terisi (memakai nomor HP yang didaftarkan calon siswa saat mengisi form publik), lalu admin menekan kirim secara manual di WhatsApp. Proses ini **tidak otomatis penuh** — tidak ada pengiriman via API WhatsApp tanpa interaksi admin (lihat §8).
+
+> Perubahan produk (11 Jul 2026): sebelumnya tombol "Verifikasi" langsung membuat akun & mengirim WA tanpa melalui wizard. Sekarang proses verifikasi lead **wajib melalui wizard 5 langkah yang sama** dengan jalur pendaftaran manual (§3.2.B), supaya admin selalu menentukan paket/mapel/guru/pembayaran sebelum akun dibuat.
 
 **B. Jalur Wizard Langsung (untuk admin mendaftarkan siswa baru secara manual)**
 1. Admin membuka **Registrasi Siswa Baru** (`/admin/registrasi-baru`) — wizard 5 langkah dengan Langkah 1 (Informasi Siswa) **dapat diedit langsung**, tanpa perlu lead sebelumnya.

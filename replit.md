@@ -28,6 +28,9 @@ The app starts via `bash start.sh` which:
 ## Admin: Registrasi Siswa Baru (5-step wizard)
 `admin/registrasi-baru` (route `admin.registration.wizard`) is a 5-step wizard for admins to register a brand-new student directly: Informasi Siswa → Paket Kelas → Mapel & Guru → Pembayaran → Preview. On submit it creates the User/Student account and invoice, then shows a "Kirim ke WhatsApp Siswa" button that opens a pre-filled `wa.me` link with the login credentials — mirroring the pattern already used in the lead-verification wizard (`admin/registration-list/{id}/process`). Controller: `RegistrationController@wizardCreate`/`wizardStore`. View: `resources/views/admin/registration/wizard.blade.php`.
 
+## Admin: Verifikasi pendaftaran lead → wizard (not instant account creation)
+The "Verifikasi" button on the dashboard's "Siswa Terbaru Mendaftar" widget (for public leads in `student_registrations`) now **redirects** to the same 5-step wizard (`admin.registration-list.process`, view `resources/views/admin/registration/process.blade.php`) instead of instantly creating an account. Admin fills Paket Kelas → Mapel & Guru → Pembayaran → Preview, then submits; only then is the User/Student/Invoice created. WhatsApp send after success is manual-click (`sendToWA()` opens a pre-filled `wa.me` link using the phone number from the original registration) — deliberately not fully automated (no WhatsApp Business API is integrated). The old instant-verify endpoint (`StudentRegistrationController@verify`, route `admin.student-registrations.verify`) was removed as dead code.
+
 ## Key routes
 - `/` — Landing page
 - `/login` — Login
