@@ -794,6 +794,29 @@ unset($__errorArgs, $__bag); ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+// ── Per-day schedule (declared first: used by pickProgram/initProgramState below) ──
+const DAY_ORDER = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+let jadwalLocked = true;
+
+function setJadwalLocked(locked) {
+    jadwalLocked = locked;
+    const section = document.getElementById('jadwalSection');
+    const note = document.getElementById('jadwalLockedNote');
+    if (section) section.classList.toggle('jadwal-locked', locked);
+    if (note) note.classList.toggle('show', locked);
+
+    if (locked) {
+        // Kosongkan pilihan jadwal saat dikunci agar tidak ikut terkirim
+        document.querySelectorAll('.day-pill.selected').forEach(pill => {
+            const cb = pill.querySelector('input[type=checkbox]');
+            if (cb) cb.checked = false;
+            pill.classList.remove('selected');
+        });
+        document.getElementById('dayScheduleContainer').innerHTML = '';
+        updateScheduleWrapper();
+    }
+}
+
 function pickOption(group, val, el) {
     const groupMap = { 'sistem': 'sistem_belajar', 'tempat': 'tempat_belajar' };
     el.closest('.option-btn-group').querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
@@ -892,29 +915,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-
-// ── Per-day schedule ──────────────────────────────────────────────
-const DAY_ORDER = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
-let jadwalLocked = true;
-
-function setJadwalLocked(locked) {
-    jadwalLocked = locked;
-    const section = document.getElementById('jadwalSection');
-    const note = document.getElementById('jadwalLockedNote');
-    if (section) section.classList.toggle('jadwal-locked', locked);
-    if (note) note.classList.toggle('show', locked);
-
-    if (locked) {
-        // Kosongkan pilihan jadwal saat dikunci agar tidak ikut terkirim
-        document.querySelectorAll('.day-pill.selected').forEach(pill => {
-            const cb = pill.querySelector('input[type=checkbox]');
-            if (cb) cb.checked = false;
-            pill.classList.remove('selected');
-        });
-        document.getElementById('dayScheduleContainer').innerHTML = '';
-        updateScheduleWrapper();
-    }
-}
 
 function toggleDay(el, dayName) {
     if (jadwalLocked) return;
