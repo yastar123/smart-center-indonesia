@@ -606,7 +606,7 @@ unset($__errorArgs, $__bag); ?>
                             </div>
                             <input type="hidden" name="program_belajar" id="program_belajar" value="<?php echo e(old('program_belajar','kelas')); ?>">
                         </div>
-                        <div class="col-12 <?php echo e($oldProgram ? '' : 'd-none'); ?>" id="tempatBelajarSection">
+                        <div class="col-12 <?php echo e(($oldProgram && $oldSistem == 'offline') ? '' : 'd-none'); ?>" id="tempatBelajarSection">
                             <label class="form-label">Tempat Belajar</label>
                             <div class="option-btn-group" id="tempatGroup">
                                 <div class="option-btn active" data-val="kantor" onclick="pickOption('tempat','kantor',this)">Belajar di Kantor</div>
@@ -790,6 +790,14 @@ function pickOption(group, val, el) {
 
     if (group === 'sistem') {
         document.getElementById('programBelajarSection').classList.remove('d-none');
+
+        const tempatSection = document.getElementById('tempatBelajarSection');
+        const programVal = document.getElementById('program_belajar').value;
+        if (val === 'online') {
+            tempatSection.classList.add('d-none');
+        } else if (programVal) {
+            tempatSection.classList.remove('d-none');
+        }
     }
 }
 
@@ -798,7 +806,12 @@ function pickProgram(val, el) {
     el.classList.add('active');
     document.getElementById('program_belajar').value = val;
 
-    document.getElementById('tempatBelajarSection').classList.remove('d-none');
+    const tempatSection = document.getElementById('tempatBelajarSection');
+    if (document.getElementById('sistem_belajar').value === 'offline') {
+        tempatSection.classList.remove('d-none');
+    } else {
+        tempatSection.classList.add('d-none');
+    }
 
     const rumahBtn  = document.getElementById('tempatRumahBtn');
     const kantorBtn = document.querySelector('#tempatGroup .option-btn[data-val="kantor"]');
