@@ -206,6 +206,10 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::get('/registration-create',       [RegistrationController::class, 'create']) ->name('registration.create');
         Route::post('/registration-create',      [RegistrationController::class, 'store'])  ->name('registration.store');
 
+        // REGISTRATION WIZARD (Registrasi Siswa Baru — 5 langkah + kirim akun ke WA)
+        Route::get('/registrasi-baru',           [RegistrationController::class, 'wizardCreate']) ->name('registration.wizard');
+        Route::post('/registrasi-baru',          [RegistrationController::class, 'wizardStore'])  ->name('registration.wizard.store');
+
         // REGISTRATION LIST (Daftar Registrasi dari Form Publik)
         Route::get('/registration-list',                                [RegistrationListController::class, 'index'])       ->name('registration-list.index');
         Route::get('/registration-list/{registration}/process',         [RegistrationListController::class, 'process'])     ->name('registration-list.process');

@@ -25,6 +25,9 @@ The app starts via `bash start.sh` which:
 | Admin | admincabangasci@akademi.com | password |
 | Guru  | gurusci@gmail.com | password123 |
 
+## Admin: Registrasi Siswa Baru (5-step wizard)
+`admin/registrasi-baru` (route `admin.registration.wizard`) is a 5-step wizard for admins to register a brand-new student directly: Informasi Siswa → Paket Kelas → Mapel & Guru → Pembayaran → Preview. On submit it creates the User/Student account and invoice, then shows a "Kirim ke WhatsApp Siswa" button that opens a pre-filled `wa.me` link with the login credentials — mirroring the pattern already used in the lead-verification wizard (`admin/registration-list/{id}/process`). Controller: `RegistrationController@wizardCreate`/`wizardStore`. View: `resources/views/admin/registration/wizard.blade.php`.
+
 ## Key routes
 - `/` — Landing page
 - `/login` — Login

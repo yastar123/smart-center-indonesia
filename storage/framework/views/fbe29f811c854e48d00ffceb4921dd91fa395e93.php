@@ -4368,7 +4368,7 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         <?php endif; ?>
         { label:'Dashboard Jadwal', desc:'Pantau jadwal kelas harian', href:'<?php echo e(route("admin.schedule-dashboard.index")); ?>', icon:'bi-calendar3', color:'#461256', group:'Akademik' },
         { label:'Reschedule Kelas', desc:'Kelola permohonan reschedule', href:'<?php echo e(route("admin.reschedule.index")); ?>', icon:'bi-arrow-repeat', color:'#68117e', group:'Akademik' },
-        { label:'Registrasi Siswa Baru', desc:'Daftarkan siswa & buat paket', href:'<?php echo e(route("admin.registration.create")); ?>', icon:'bi-person-plus', color:'#c84ddf', group:'Akademik' },
+        { label:'Registrasi Siswa Baru', desc:'Daftarkan siswa & buat paket', href:'<?php echo e(route("admin.registration.wizard")); ?>', icon:'bi-person-plus', color:'#c84ddf', group:'Akademik' },
         { label:'E-Billing & Invoice', desc:'Manajemen invoice & tagihan siswa', href:'<?php echo e(route("admin.billing.index")); ?>', icon:'bi-receipt', color:'#059669', group:'Keuangan' },
         <?php endif; ?>
         <?php if (\Illuminate\Support\Facades\Blade::check('role', 'guru')): ?>

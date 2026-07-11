@@ -4367,7 +4367,7 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         @endrole
         { label:'Dashboard Jadwal', desc:'Pantau jadwal kelas harian', href:'{{ route("admin.schedule-dashboard.index") }}', icon:'bi-calendar3', color:'#461256', group:'Akademik' },
         { label:'Reschedule Kelas', desc:'Kelola permohonan reschedule', href:'{{ route("admin.reschedule.index") }}', icon:'bi-arrow-repeat', color:'#68117e', group:'Akademik' },
-        { label:'Registrasi Siswa Baru', desc:'Daftarkan siswa & buat paket', href:'{{ route("admin.registration.create") }}', icon:'bi-person-plus', color:'#c84ddf', group:'Akademik' },
+        { label:'Registrasi Siswa Baru', desc:'Daftarkan siswa & buat paket', href:'{{ route("admin.registration.wizard") }}', icon:'bi-person-plus', color:'#c84ddf', group:'Akademik' },
         { label:'E-Billing & Invoice', desc:'Manajemen invoice & tagihan siswa', href:'{{ route("admin.billing.index") }}', icon:'bi-receipt', color:'#059669', group:'Keuangan' },
         @endrole
         @role('guru')
