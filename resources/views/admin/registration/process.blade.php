@@ -129,27 +129,98 @@
         {{-- STEP 2: PAKET KELAS --}}
         <div class="pw-panel" data-step="2">
             <h6 class="fw-bold mb-3"><i class="bi bi-box-seam me-2 text-primary"></i>Paket Kelas</h6>
-            <p class="text-muted" style="font-size:.83rem">Pilih paket belajar untuk siswa ini (opsional — bisa dilewati jika belum ada paket yang cocok).</p>
-            <div class="row g-3" id="packageOptions">
-                <div class="col-12">
-                    <div class="form-check p-3 border rounded-3" style="border-color:var(--card-border)!important">
-                        <input class="form-check-input" type="radio" name="package_id" id="pkgNone" value="" checked>
-                        <label class="form-check-label fw-semibold" for="pkgNone">Tanpa Paket (susun manual per mata pelajaran)</label>
-                    </div>
-                </div>
-                @foreach($packages as $pkg)
-                <div class="col-md-6">
-                    <div class="form-check p-3 border rounded-3 h-100" style="border-color:var(--card-border)!important">
-                        <input class="form-check-input" type="radio" name="package_id" id="pkg{{ $pkg->id }}" value="{{ $pkg->id }}" data-cabang="{{ $pkg->cabang_id }}" data-harga="{{ $pkg->harga }}">
-                        <label class="form-check-label w-100" for="pkg{{ $pkg->id }}">
-                            <div class="fw-semibold">{{ $pkg->nama }}</div>
-                            <div class="text-muted" style="font-size:.75rem">{{ $pkg->tipe_kelas ?? 'Reguler' }} &middot; {{ $pkg->jumlah_pertemuan ?? '–' }} pertemuan</div>
-                            <div class="fw-bold text-primary mt-1">Rp{{ number_format($pkg->harga ?? 0,0,',','.') }}</div>
-                        </label>
-                    </div>
-                </div>
-                @endforeach
+
+            {{-- TOGGLE PAKET STANDAR / CUSTOM --}}
+            <input type="hidden" name="is_custom_package" id="isCustomPackage" value="0">
+            <div class="d-flex gap-2 mb-3">
+                <button type="button" id="btnStandard" onclick="switchPackage('standard')" class="btn btn-sm btn-primary flex-fill">
+                    <i class="bi bi-box-seam me-1"></i>Paket Standar
+                </button>
+                <button type="button" id="btnCustom" onclick="switchPackage('custom')" class="btn btn-sm btn-outline-secondary flex-fill">
+                    <i class="bi bi-pencil-square me-1"></i>Paket Custom
+                </button>
             </div>
+
+            {{-- PAKET STANDAR --}}
+            <div id="standardPackage">
+                <p class="text-muted" style="font-size:.83rem">Pilih paket belajar untuk siswa ini (opsional — bisa dilewati jika belum ada paket yang cocok).</p>
+                <div class="row g-3" id="packageOptions">
+                    <div class="col-12">
+                        <div class="form-check p-3 border rounded-3" style="border-color:var(--card-border)!important">
+                            <input class="form-check-input" type="radio" name="package_id" id="pkgNone" value="" checked>
+                            <label class="form-check-label fw-semibold" for="pkgNone">Tanpa Paket (susun manual per mata pelajaran)</label>
+                        </div>
+                    </div>
+                    @foreach($packages as $pkg)
+                    <div class="col-md-6">
+                        <div class="form-check p-3 border rounded-3 h-100" style="border-color:var(--card-border)!important">
+                            <input class="form-check-input" type="radio" name="package_id" id="pkg{{ $pkg->id }}" value="{{ $pkg->id }}" data-cabang="{{ $pkg->cabang_id }}" data-harga="{{ $pkg->harga }}">
+                            <label class="form-check-label w-100" for="pkg{{ $pkg->id }}">
+                                <div class="fw-semibold">{{ $pkg->nama }}</div>
+                                <div class="text-muted" style="font-size:.75rem">{{ $pkg->tipe_kelas ?? 'Reguler' }} &middot; {{ $pkg->jumlah_pertemuan ?? '–' }} pertemuan</div>
+                                <div class="fw-bold text-primary mt-1">Rp{{ number_format($pkg->harga ?? 0,0,',','.') }}</div>
+                            </label>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- PAKET CUSTOM --}}
+            <div id="customPackage" style="display:none">
+                <p class="text-muted" style="font-size:.83rem">Susun paket belajar khusus untuk siswa ini. Paket akan dibuat dan tersimpan di data master paket.</p>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label fw-semibold" style="font-size:.78rem">Nama Paket <span class="text-danger">*</span></label>
+                        <input type="text" name="custom_package_name" class="form-control" placeholder="cth. Intensif UTBK 12 SMA" maxlength="150">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:.78rem">Jenis Paket <span class="text-danger">*</span></label>
+                        <select name="custom_jenis" class="form-select">
+                            <option value="">Pilih jenis…</option>
+                            <option value="reguler">Reguler</option>
+                            <option value="intensif">Intensif</option>
+                            <option value="privat" selected>Privat (1 Siswa)</option>
+                            <option value="online">Online</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:.78rem">Jumlah Sesi <span class="text-danger">*</span></label>
+                        <input type="number" name="jumlah_pertemuan" class="form-control" value="8" min="1">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:.78rem">Metode Absensi <span class="text-danger">*</span></label>
+                        <select name="custom_metode_absensi" class="form-select">
+                            <option value="manual" selected>Manual</option>
+                            <option value="otomatis">Otomatis</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:.78rem">Tipe Kelas <span class="text-danger">*</span></label>
+                        <select name="custom_tipe_kelas" class="form-select">
+                            <option value="offline" selected>Offline</option>
+                            <option value="online">Online</option>
+                            <option value="private">Private</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:.78rem">Harga Dasar (Rp) <span class="text-danger">*</span></label>
+                        <input type="number" name="custom_package_price" id="customPackagePrice" class="form-control" placeholder="0" value="0" min="0">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:.78rem">Status</label>
+                        <select name="custom_status" class="form-select">
+                            <option value="aktif" selected>Aktif</option>
+                            <option value="nonaktif">Non Aktif</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Deskripsi</label>
+                        <textarea name="custom_deskripsi" class="form-control" rows="2" placeholder="Deskripsi paket belajar…"></textarea>
+                    </div>
+                </div>
+            </div>
+
             <div class="pw-actions">
                 <button type="button" class="btn btn-outline-secondary" data-action="prev"><i class="bi bi-arrow-left me-1"></i>Kembali</button>
                 <button type="button" class="btn btn-primary" data-action="next">Lanjut<i class="bi bi-arrow-right ms-1"></i></button>
@@ -330,6 +401,29 @@ document.querySelectorAll('input[name="package_id"]').forEach(r => {
     });
 });
 
+let isCustomPkg = false;
+function switchPackage(type) {
+    isCustomPkg = (type === 'custom');
+    document.getElementById('isCustomPackage').value = isCustomPkg ? '1' : '0';
+    document.getElementById('standardPackage').style.display = isCustomPkg ? 'none' : '';
+    document.getElementById('customPackage').style.display = isCustomPkg ? '' : 'none';
+    document.getElementById('btnStandard').className = 'btn btn-sm flex-fill ' + (!isCustomPkg ? 'btn-primary' : 'btn-outline-secondary');
+    document.getElementById('btnCustom').className = 'btn btn-sm flex-fill ' + (isCustomPkg ? 'btn-primary' : 'btn-outline-secondary');
+    if (isCustomPkg) {
+        document.getElementById('totalBiaya').value = document.getElementById('customPackagePrice').value || 0;
+    } else {
+        const checked = document.querySelector('input[name="package_id"]:checked');
+        if (checked && checked.value) {
+            document.getElementById('totalBiaya').value = checked.dataset.harga || 0;
+        } else {
+            recalcTotal();
+        }
+    }
+}
+document.getElementById('customPackagePrice').addEventListener('input', function() {
+    if (isCustomPkg) document.getElementById('totalBiaya').value = this.value || 0;
+});
+
 document.getElementById('branchSelect').addEventListener('change', function() {
     const branchId = this.value;
     document.querySelectorAll('#packageOptions .col-md-6').forEach(col => {
@@ -345,8 +439,14 @@ document.getElementById('branchSelect').addEventListener('change', function() {
 
 function buildPreview() {
     const branchName = document.getElementById('branchSelect').selectedOptions[0]?.text || '–';
-    const pkgRadio = document.querySelector('input[name="package_id"]:checked');
-    const pkgName = pkgRadio && pkgRadio.value ? pkgRadio.closest('label').querySelector('.fw-semibold').textContent : 'Tanpa Paket';
+    let pkgName = 'Tanpa Paket';
+    if (isCustomPkg) {
+        const cpName = document.querySelector('[name="custom_package_name"]')?.value;
+        pkgName = cpName ? (cpName + ' (Custom)') : '— (Custom, belum diisi)';
+    } else {
+        const pkgRadio = document.querySelector('input[name="package_id"]:checked');
+        pkgName = pkgRadio && pkgRadio.value ? pkgRadio.closest('label').querySelector('.fw-semibold').textContent : 'Tanpa Paket';
+    }
     const rows = [];
     document.querySelectorAll('.course-check:checked').forEach(chk => {
         const row = chk.closest('.pw-course-row');
@@ -378,6 +478,15 @@ document.getElementById('processForm').addEventListener('submit', function(e) {
         showToast('Pilih minimal satu mata pelajaran sebelum melanjutkan.', 'error');
         showStep(3);
         return;
+    }
+    if (isCustomPkg) {
+        const cpName = document.querySelector('[name="custom_package_name"]').value.trim();
+        const cpJenis = document.querySelector('[name="custom_jenis"]').value;
+        if (!cpName || !cpJenis) {
+            showToast('Lengkapi Nama Paket & Jenis Paket pada Paket Custom.', 'error');
+            showStep(2);
+            return;
+        }
     }
 
     const submitBtn = document.getElementById('submitBtn');

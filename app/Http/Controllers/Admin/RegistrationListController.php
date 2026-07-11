@@ -98,7 +98,16 @@ class RegistrationListController extends Controller
             'program'              => 'nullable|in:kelas,privat',
             'system'               => 'nullable|in:online,offline',
             'branch_id'            => 'required|exists:branches,id',
+            'is_custom_package'    => 'nullable|in:0,1',
             'package_id'           => 'nullable|exists:packages,id',
+            'custom_package_name'  => 'required_if:is_custom_package,1|nullable|string|max:150',
+            'custom_jenis'         => 'required_if:is_custom_package,1|nullable|in:reguler,intensif,privat,online',
+            'jumlah_pertemuan'     => 'nullable|integer|min:1',
+            'custom_metode_absensi'=> 'nullable|in:manual,otomatis',
+            'custom_tipe_kelas'    => 'nullable|in:offline,online,private',
+            'custom_package_price' => 'nullable|numeric|min:0',
+            'custom_status'        => 'nullable|in:aktif,nonaktif',
+            'custom_deskripsi'     => 'nullable|string',
             'course_ids'           => 'required|array|min:1',
             'course_ids.*'         => 'exists:courses,id',
             'course_teacher'       => 'nullable|array',
@@ -154,6 +163,35 @@ class RegistrationListController extends Controller
             $courseSessions = $data['course_sessions'] ?? [];
             $totalSesi      = array_sum(array_map('intval', $courseSessions));
 
+            // Resolve teacher(s) chosen per mata pelajaran before the package is created,
+            // so a custom package can be linked to the primary teacher.
+            $courseTeachers   = array_filter($data['course_teacher'] ?? []);
+            $primaryTeacherId = $courseTeachers ? array_values($courseTeachers)[0] : null;
+
+            // Paket Custom — create a new Package record in the master data instead of
+            // reusing an existing one, mirroring the "Konfigurasi Kelas & Paket" flow used
+            // in admin/registrasi-baru (RegistrationController@store).
+            $resolvedPackageId = $data['package_id'] ?? null;
+            if (($data['is_custom_package'] ?? '0') == '1' && !empty($data['custom_package_name'])) {
+                $customPkg = Package::create([
+                    'cabang_id'        => $branch->id,
+                    'guru_id'          => $primaryTeacherId,
+                    'nama'             => $data['custom_package_name'],
+                    'deskripsi'        => $data['custom_deskripsi'] ?? null,
+                    'harga'            => (float) ($data['custom_package_price'] ?? 0),
+                    'jumlah_pertemuan' => (int) ($data['jumlah_pertemuan'] ?? 8),
+                    'durasi_bulan'     => 3,
+                    'jenis'            => $data['custom_jenis'] ?? 'privat',
+                    'tipe_kelas'       => $data['custom_tipe_kelas'] ?? 'offline',
+                    'metode_absensi'   => $data['custom_metode_absensi'] ?? 'manual',
+                    'status'           => $data['custom_status'] ?? 'aktif',
+                ]);
+                if (!empty($data['course_ids'])) {
+                    $customPkg->mataPelajaran()->syncWithoutDetaching($data['course_ids']);
+                }
+                $resolvedPackageId = $customPkg->id;
+            }
+
             $student = Student::create([
                 'user_id'                => $user->id,
                 'nis'                    => $nis,
@@ -166,7 +204,7 @@ class RegistrationListController extends Controller
                 'parent_name'            => $registration->parent_name,
                 'parent_phone'           => $registration->parent_phone,
                 'branch_id'              => $branch->id,
-                'package_id'             => $data['package_id'] ?? null,
+                'package_id'             => $resolvedPackageId,
                 'total_sesi'             => $totalSesi ?: null,
                 'status'                 => 'aktif',
                 'join_date'              => now()->toDateString(),
@@ -174,7 +212,6 @@ class RegistrationListController extends Controller
             ]);
 
             // Assign each chosen teacher to the student (one row per course's teacher)
-            $courseTeachers = array_filter($data['course_teacher'] ?? []);
             foreach (array_unique($courseTeachers) as $teacherId) {
                 DB::table('student_teachers')->insertOrIgnore([
                     'student_id' => $student->id,
@@ -183,7 +220,6 @@ class RegistrationListController extends Controller
                     'updated_at' => now(),
                 ]);
             }
-            $primaryTeacherId = $courseTeachers ? array_values($courseTeachers)[0] : null;
 
             $year  = date('Y');
             $month = str_pad(date('m'), 2, '0', STR_PAD_LEFT);
