@@ -392,6 +392,14 @@
         .day-pill:hover { border-color: #c84ddf; background: #fdf4ff; }
         .day-pill.selected { border-color: #c84ddf; background: linear-gradient(135deg,#461256,#c84ddf); color: white; }
 
+        #jadwalSection.jadwal-locked { opacity: .5; pointer-events: none; user-select: none; }
+        .jadwal-locked-note {
+            display: none; align-items: center; gap: 8px; padding: 10px 14px;
+            border: 1.5px dashed #e7e3ff; border-radius: 12px; background: #fcfbff;
+            color: #9ca3af; font-size: .82rem; font-weight: 600; margin-bottom: 1rem;
+        }
+        .jadwal-locked-note.show { display: flex; }
+
         @media(max-width: 992px) {
             .form-layout {
                 grid-template-columns: 1fr;
@@ -695,7 +703,11 @@ unset($__errorArgs, $__bag); ?>
             <div class="step-panel" data-step="5">
                 <div class="section-card">
                     <div class="section-title">Jadwal Belajar</div>
-                    <div class="row g-3">
+                    <div class="jadwal-locked-note" id="jadwalLockedNote">
+                        <i class="bi bi-info-circle"></i>
+                        Jadwal belajar hanya dapat diatur untuk Program Belajar "Privat".
+                    </div>
+                    <div class="row g-3" id="jadwalSection">
                         <div class="col-12">
                             <label class="form-label">Hari Belajar</label>
                             <div class="day-check-group">
@@ -806,6 +818,8 @@ function pickProgram(val, el) {
     el.classList.add('active');
     document.getElementById('program_belajar').value = val;
 
+    setJadwalLocked(val !== 'privat');
+
     const tempatSection = document.getElementById('tempatBelajarSection');
     if (document.getElementById('sistem_belajar').value === 'offline') {
         tempatSection.classList.remove('d-none');
@@ -852,6 +866,7 @@ function pickProgram(val, el) {
     if (mapelSection && prog.value === 'kelas') {
         mapelSection.style.display = 'none';
     }
+    setJadwalLocked(prog.value !== 'privat');
 })();
 
 function togglePill(el) {
@@ -880,8 +895,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ── Per-day schedule ──────────────────────────────────────────────
 const DAY_ORDER = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+let jadwalLocked = true;
+
+function setJadwalLocked(locked) {
+    jadwalLocked = locked;
+    const section = document.getElementById('jadwalSection');
+    const note = document.getElementById('jadwalLockedNote');
+    if (section) section.classList.toggle('jadwal-locked', locked);
+    if (note) note.classList.toggle('show', locked);
+
+    if (locked) {
+        // Kosongkan pilihan jadwal saat dikunci agar tidak ikut terkirim
+        document.querySelectorAll('.day-pill.selected').forEach(pill => {
+            const cb = pill.querySelector('input[type=checkbox]');
+            if (cb) cb.checked = false;
+            pill.classList.remove('selected');
+        });
+        document.getElementById('dayScheduleContainer').innerHTML = '';
+        updateScheduleWrapper();
+    }
+}
 
 function toggleDay(el, dayName) {
+    if (jadwalLocked) return;
     const cb = el.querySelector('input[type=checkbox]');
     setTimeout(() => {
         const checked = cb.checked;
@@ -938,6 +974,7 @@ function updateScheduleWrapper() {
 }
 
 function addSlot(dayName) {
+    if (jadwalLocked) return;
     const slotsDiv = document.getElementById('slots-' + dayName);
     if (!slotsDiv) return;
     const div = document.createElement('div');
@@ -952,6 +989,7 @@ function addSlot(dayName) {
 }
 
 function removeSlot(btn) {
+    if (jadwalLocked) return;
     btn.closest('.time-slot')?.remove();
 }
 
