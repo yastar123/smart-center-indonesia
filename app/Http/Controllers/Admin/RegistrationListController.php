@@ -87,6 +87,16 @@ class RegistrationListController extends Controller
         }
 
         $data = $request->validate([
+            'name'                 => 'required|string|max:255',
+            'phone'                => 'required|string|max:30',
+            'gender'               => 'nullable|in:L,P',
+            'birth_place'          => 'nullable|string|max:255',
+            'birth_date'           => 'nullable|date',
+            'address'              => 'nullable|string',
+            'parent_name'          => 'nullable|string|max:255',
+            'parent_phone'         => 'nullable|string|max:30',
+            'program'              => 'nullable|in:kelas,privat',
+            'system'               => 'nullable|in:online,offline',
             'branch_id'            => 'required|exists:branches,id',
             'package_id'           => 'nullable|exists:packages,id',
             'course_ids'           => 'required|array|min:1',
@@ -105,6 +115,22 @@ class RegistrationListController extends Controller
         DB::beginTransaction();
         try {
             $branch = Branch::find($data['branch_id']);
+
+            // Persist any corrections the admin made to the student's own data
+            // back onto the original registration record before using it.
+            $registration->fill([
+                'name'         => $data['name'],
+                'phone'        => $data['phone'],
+                'gender'       => $data['gender'] ?? $registration->gender,
+                'birth_place'  => $data['birth_place'] ?? null,
+                'birth_date'   => $data['birth_date'] ?? null,
+                'address'      => $data['address'] ?? null,
+                'parent_name'  => $data['parent_name'] ?? null,
+                'parent_phone' => $data['parent_phone'] ?? null,
+                'program'      => $data['program'] ?? $registration->program,
+                'system'       => $data['system'] ?? $registration->system,
+            ]);
+            $registration->save();
 
             $baseName = Str::slug($registration->name, '.');
             $baseName = $baseName ?: 'siswa';

@@ -57,17 +57,59 @@
         
         <div class="pw-panel active" data-step="1">
             <h6 class="fw-bold mb-3"><i class="bi bi-person-vcard me-2 text-primary"></i>Informasi Siswa</h6>
+            <p class="text-muted" style="font-size:.8rem">Data ini awalnya diisi siswa saat mendaftar &mdash; admin dapat mengoreksi/melengkapinya jika perlu.</p>
             <div class="row g-3">
-                <div class="col-md-6"><label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Nama</label><input type="text" class="form-control" value="<?php echo e($registration->name); ?>" disabled></div>
-                <div class="col-md-6"><label class="form-label" style="font-size:.78rem;color:var(--text-muted)">No. HP</label><input type="text" class="form-control" value="<?php echo e($registration->phone); ?>" disabled></div>
-                <div class="col-md-6"><label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Jenis Kelamin</label><input type="text" class="form-control" value="<?php echo e($registration->gender==='L'?'Laki-laki':($registration->gender==='P'?'Perempuan':'–')); ?>" disabled></div>
-                <div class="col-md-6"><label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Tempat, Tgl Lahir</label><input type="text" class="form-control" value="<?php echo e($registration->birth_place); ?><?php echo e($registration->birth_date ? ', '.$registration->birth_date->format('d M Y') : ''); ?>" disabled></div>
-                <div class="col-12"><label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Alamat</label><input type="text" class="form-control" value="<?php echo e($registration->address); ?>" disabled></div>
-                <div class="col-md-6"><label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Nama Orang Tua</label><input type="text" class="form-control" value="<?php echo e($registration->parent_name); ?>" disabled></div>
-                <div class="col-md-6"><label class="form-label" style="font-size:.78rem;color:var(--text-muted)">No. HP Orang Tua</label><input type="text" class="form-control" value="<?php echo e($registration->parent_phone); ?>" disabled></div>
                 <div class="col-md-6">
-                    <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Program &amp; Sistem</label>
-                    <input type="text" class="form-control" value="<?php echo e($registration->program); ?> &middot; <?php echo e($registration->system); ?>" disabled>
+                    <label class="form-label fw-semibold" style="font-size:.78rem">Nama <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="name" value="<?php echo e($registration->name); ?>" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold" style="font-size:.78rem">No. HP <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="phone" value="<?php echo e($registration->phone); ?>" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold" style="font-size:.78rem">Jenis Kelamin</label>
+                    <select class="form-select" name="gender">
+                        <option value="">Pilih…</option>
+                        <option value="L" <?php echo e($registration->gender==='L'?'selected':''); ?>>Laki-laki</option>
+                        <option value="P" <?php echo e($registration->gender==='P'?'selected':''); ?>>Perempuan</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Tempat Lahir</label>
+                    <input type="text" class="form-control" name="birth_place" value="<?php echo e($registration->birth_place); ?>">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Tgl Lahir</label>
+                    <input type="date" class="form-control" name="birth_date" value="<?php echo e($registration->birth_date?->format('Y-m-d')); ?>">
+                </div>
+                <div class="col-12">
+                    <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Alamat</label>
+                    <input type="text" class="form-control" name="address" value="<?php echo e($registration->address); ?>">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Nama Orang Tua</label>
+                    <input type="text" class="form-control" name="parent_name" value="<?php echo e($registration->parent_name); ?>">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">No. HP Orang Tua</label>
+                    <input type="text" class="form-control" name="parent_phone" value="<?php echo e($registration->parent_phone); ?>">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Program</label>
+                    <select class="form-select" name="program">
+                        <option value="">Pilih…</option>
+                        <option value="kelas" <?php echo e($registration->program==='kelas'?'selected':''); ?>>Kelas</option>
+                        <option value="privat" <?php echo e($registration->program==='privat'?'selected':''); ?>>Privat</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Sistem</label>
+                    <select class="form-select" name="system">
+                        <option value="">Pilih…</option>
+                        <option value="online" <?php echo e($registration->system==='online'?'selected':''); ?>>Online</option>
+                        <option value="offline" <?php echo e($registration->system==='offline'?'selected':''); ?>>Offline</option>
+                    </select>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold" style="font-size:.78rem">Cabang <span class="text-danger">*</span></label>
@@ -126,9 +168,11 @@
                 <div class="row g-2 align-items-center">
                     <div class="col-md-3">
                         <div class="form-check">
-                            <input class="form-check-input course-check" type="checkbox" name="course_ids[]" value="<?php echo e($course->id); ?>" id="course<?php echo e($course->id); ?>" checked>
+                            <input class="form-check-input course-check" type="checkbox" id="course<?php echo e($course->id); ?>" checked disabled>
+                            <input type="hidden" name="course_ids[]" value="<?php echo e($course->id); ?>">
                             <label class="form-check-label fw-semibold" for="course<?php echo e($course->id); ?>"><?php echo e($course->nama); ?></label>
                         </div>
+                        <div class="form-text" style="font-size:.68rem">Mapel pilihan siswa &mdash; tidak dapat dihapus</div>
                     </div>
                     <div class="col-md-3">
                         <select class="form-select form-select-sm" name="course_teacher[<?php echo e($course->id); ?>]">
@@ -308,7 +352,8 @@ function buildPreview() {
         const teacher = row.querySelector('select').selectedOptions[0]?.text || '–';
         const sesi = row.querySelector('input[name^="course_sessions"]').value || '–';
         const fee = row.querySelector('.fee-input').value || 0;
-        rows.push(`<tr><td>${chk.nextElementSibling.textContent}</td><td>${teacher}</td><td>${sesi}</td><td>Rp${Number(fee).toLocaleString('id-ID')}</td></tr>`);
+        const courseName = row.querySelector('.form-check-label').textContent;
+        rows.push(`<tr><td>${courseName}</td><td>${teacher}</td><td>${sesi}</td><td>Rp${Number(fee).toLocaleString('id-ID')}</td></tr>`);
     });
     const total = document.getElementById('totalBiaya').value || 0;
     const payStatus = document.querySelector('input[name="payment_status"]:checked').value === 'lunas' ? 'Lunas' : 'Belum Dibayar';
