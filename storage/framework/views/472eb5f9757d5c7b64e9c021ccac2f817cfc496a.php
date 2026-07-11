@@ -232,7 +232,7 @@
             <?php if($courses->isEmpty()): ?>
             <div class="alert alert-warning" style="font-size:.85rem"><i class="bi bi-exclamation-triangle me-2"></i>Tidak ditemukan mata pelajaran yang cocok dengan minat pendaftaran ini di data master. Hubungi bagian akademik untuk melengkapi data mata pelajaran.</div>
             <?php else: ?>
-            <p class="text-muted" style="font-size:.83rem">Centang mata pelajaran yang akan diambil siswa, lalu tentukan guru pengajar dan jumlah sesi. Mapel pilihan siswa tidak dapat dihapus, namun Anda bisa menambah mata pelajaran lain di bawah.</p>
+            <p class="text-muted" style="font-size:.83rem">Centang mata pelajaran yang akan diambil siswa, lalu tentukan guru pengajar dan jumlah sesi. Semua mata pelajaran &mdash; termasuk pilihan siswa &mdash; dapat dihapus atau ditambah admin di sini.</p>
             <?php endif; ?>
 
             <div id="courseRowsContainer">
@@ -242,19 +242,19 @@
                     <div class="row g-2 align-items-center">
                         <div class="col-md-3">
                             <div class="form-check">
-                                <input class="form-check-input course-check" type="checkbox" id="course<?php echo e($course->id); ?>" checked disabled>
-                                <input type="hidden" name="course_ids[]" value="<?php echo e($course->id); ?>">
+                                <input class="form-check-input course-check" type="checkbox" name="course_ids[]" value="<?php echo e($course->id); ?>" id="course<?php echo e($course->id); ?>" checked>
                                 <label class="form-check-label fw-semibold" for="course<?php echo e($course->id); ?>"><?php echo e($course->nama); ?></label>
                             </div>
-                            <div class="form-text" style="font-size:.68rem">Mapel pilihan siswa &mdash; tidak dapat dihapus</div>
+                            <div class="form-text" style="font-size:.68rem">Mapel pilihan siswa</div>
                         </div>
                         <div class="col-md-3">
-                            <select class="form-select form-select-sm" name="course_teacher[<?php echo e($course->id); ?>]">
+                            <select class="form-select form-select-sm guru-select" name="course_teacher[<?php echo e($course->id); ?>]" data-course-id="<?php echo e($course->id); ?>">
                                 <option value="">Pilih guru…</option>
                                 <?php $__currentLoopData = $course->guru; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <option value="<?php echo e($t->id); ?>"><?php echo e($t->name); ?></option>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
+                            <div class="form-text text-danger d-none conflict-warning" style="font-size:.68rem"></div>
                         </div>
                         <div class="col-md-2">
                             <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[<?php echo e($course->id); ?>]" placeholder="Jml sesi" value="<?php echo e($registration->interest_sessions[$course->nama] ?? 8); ?>">
@@ -265,8 +265,8 @@
                                 <input type="number" min="0" class="form-control fee-input" name="course_fee[<?php echo e($course->id); ?>]" value="<?php echo e($fee); ?>">
                             </div>
                         </div>
-                        <div class="col-md-1 text-end text-muted" title="Mapel pilihan siswa, tidak dapat dihapus">
-                            <i class="bi bi-lock-fill"></i>
+                        <div class="col-md-1 text-end">
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCourseRow(this, <?php echo e($course->id); ?>)" title="Hapus mapel ini"><i class="bi bi-trash"></i></button>
                         </div>
                     </div>
                 </div>
@@ -434,67 +434,74 @@ function bindCourseRowEvents(row) {
 document.querySelectorAll('.pw-course-row').forEach(bindCourseRowEvents);
 recalcTotal();
 
-// --- CRUD Mata Pelajaran & Guru tambahan (di luar minat asli siswa) ---
-const extraCoursesData = <?php echo json_encode($extraCoursesData, 15, 512) ?>;
-const usedExtraCourseIds = new Set();
+// --- CRUD Mata Pelajaran & Guru (semua mapel bisa ditambah/dihapus admin) ---
+const courseMetaList = <?php echo json_encode($courseMeta, 15, 512) ?>;
+const courseMetaMap = {};
+courseMetaList.forEach(c => courseMetaMap[c.id] = c);
+const usedCourseIds = new Set(<?php echo json_encode($courses->pluck('id')->values(), 15, 512) ?>);
 
 function refreshExtraCourseSelect() {
     const sel = document.getElementById('extraCourseSelect');
-    const available = extraCoursesData.filter(c => !usedExtraCourseIds.has(c.id));
+    const available = courseMetaList.filter(c => !usedCourseIds.has(c.id));
     sel.innerHTML = '<option value="">— Pilih mata pelajaran —</option>' +
         available.map(c => `<option value="${c.id}">${c.nama}</option>`).join('');
     document.getElementById('extraCourseEmptyMsg').style.display = available.length === 0 ? '' : 'none';
+}
+
+function buildCourseRow(course, isAdmin) {
+    const row = document.createElement('div');
+    row.className = 'pw-course-row';
+    row.dataset.courseRow = course.id;
+    const guruOptions = course.guru.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+    row.innerHTML = `
+        <div class="row g-2 align-items-center">
+            <div class="col-md-3">
+                <div class="form-check">
+                    <input class="form-check-input course-check" type="checkbox" name="course_ids[]" value="${course.id}" id="rowCourse${course.id}" checked>
+                    <label class="form-check-label fw-semibold" for="rowCourse${course.id}">${course.nama}</label>
+                </div>
+                <div class="form-text" style="font-size:.68rem">${isAdmin ? 'Ditambahkan admin' : 'Mapel pilihan siswa'}</div>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select form-select-sm guru-select" name="course_teacher[${course.id}]" data-course-id="${course.id}">
+                    <option value="">Pilih guru…</option>
+                    ${guruOptions}
+                </select>
+                <div class="form-text text-danger d-none conflict-warning" style="font-size:.68rem"></div>
+            </div>
+            <div class="col-md-2">
+                <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[${course.id}]" placeholder="Jml sesi" value="8">
+            </div>
+            <div class="col-md-3">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Rp</span>
+                    <input type="number" min="0" class="form-control fee-input" name="course_fee[${course.id}]" value="${course.fee}">
+                </div>
+            </div>
+            <div class="col-md-1 text-end">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCourseRow(this, ${course.id})" title="Hapus mapel ini"><i class="bi bi-trash"></i></button>
+            </div>
+        </div>`;
+    return row;
 }
 
 function addExtraCourse() {
     const sel = document.getElementById('extraCourseSelect');
     const id = parseInt(sel.value, 10);
     if (!id) return;
-    const course = extraCoursesData.find(c => c.id === id);
+    const course = courseMetaMap[id];
     if (!course) return;
-    usedExtraCourseIds.add(id);
-
-    const row = document.createElement('div');
-    row.className = 'pw-course-row';
-    row.dataset.courseRow = id;
-    const guruOptions = course.guru.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
-    row.innerHTML = `
-        <div class="row g-2 align-items-center">
-            <div class="col-md-3">
-                <div class="form-check">
-                    <input class="form-check-input course-check" type="checkbox" name="course_ids[]" value="${id}" id="extraCourse${id}" checked>
-                    <label class="form-check-label fw-semibold" for="extraCourse${id}">${course.nama}</label>
-                </div>
-                <div class="form-text" style="font-size:.68rem">Ditambahkan admin</div>
-            </div>
-            <div class="col-md-3">
-                <select class="form-select form-select-sm" name="course_teacher[${id}]">
-                    <option value="">Pilih guru…</option>
-                    ${guruOptions}
-                </select>
-            </div>
-            <div class="col-md-2">
-                <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[${id}]" placeholder="Jml sesi" value="8">
-            </div>
-            <div class="col-md-3">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text">Rp</span>
-                    <input type="number" min="0" class="form-control fee-input" name="course_fee[${id}]" value="${course.fee}">
-                </div>
-            </div>
-            <div class="col-md-1 text-end">
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeExtraCourse(this, ${id})" title="Hapus mapel ini"><i class="bi bi-trash"></i></button>
-            </div>
-        </div>`;
+    usedCourseIds.add(id);
+    const row = buildCourseRow(course, true);
     document.getElementById('courseRowsContainer').appendChild(row);
     bindCourseRowEvents(row);
     refreshExtraCourseSelect();
     recalcTotal();
 }
 
-function removeExtraCourse(btn, id) {
+function removeCourseRow(btn, id) {
     btn.closest('.pw-course-row').remove();
-    usedExtraCourseIds.delete(id);
+    usedCourseIds.delete(id);
     refreshExtraCourseSelect();
     recalcTotal();
 }

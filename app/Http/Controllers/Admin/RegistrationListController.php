@@ -70,29 +70,37 @@ class RegistrationListController extends Controller
         }
 
         $interests = $registration->interests ?? [];
-        $courses = Course::whereIn('nama', $interests)->with(['fee', 'guru'])->get();
 
-        // Full course catalog (with fee & guru) so the admin can add extra mata
-        // pelajaran beyond what the student originally showed interest in.
-        $courseIds = $courses->pluck('id')->all();
-        $extraCoursesData = Course::with(['fee', 'guru'])
-            ->whereNotIn('id', $courseIds)
-            ->orderBy('nama')
-            ->get()
-            ->map(function ($c) {
-                return [
-                    'id'   => $c->id,
-                    'nama' => $c->nama,
-                    'fee'  => (float) ($c->fee->amount ?? 0),
-                    'guru' => $c->guru->map(fn ($t) => ['id' => $t->id, 'name' => $t->name])->values(),
-                ];
+        $allCoursesFull = Course::with(['fee', 'guru'])->orderBy('nama')->get();
+
+        // Some course names exist both as a branch-specific record and as a global
+        // (cabang_id = null) master record. Without deduping, whereIn('nama', ...)
+        // would match both and show the same mata pelajaran twice. Prefer the
+        // branch-specific course when one exists, otherwise fall back to global.
+        $courses = $allCoursesFull
+            ->filter(fn ($c) => in_array($c->nama, $interests))
+            ->when($matchedBranch, function ($collection) use ($matchedBranch) {
+                return $collection->sortByDesc(fn ($c) => (int) ($c->cabang_id === $matchedBranch->id));
             })
+            ->unique('nama')
             ->values();
+
+        // Metadata (fee + guru) for the entire course catalog, used both to build the
+        // "tambah mata pelajaran" dropdown and to let the admin re-add a mata pelajaran
+        // after removing it — see admin.registration.process for the CRUD controls.
+        $courseMeta = $allCoursesFull->map(function ($c) {
+            return [
+                'id'   => $c->id,
+                'nama' => $c->nama,
+                'fee'  => (float) ($c->fee->amount ?? 0),
+                'guru' => $c->guru->map(fn ($t) => ['id' => $t->id, 'name' => $t->name])->values(),
+            ];
+        })->values();
 
         $packages = Package::where('status', 'aktif')->orderBy('nama')->get(['id', 'cabang_id', 'nama', 'harga', 'tipe_kelas', 'jumlah_pertemuan']);
 
         return view('admin.registration.process', compact(
-            'registration', 'branches', 'matchedBranch', 'courses', 'extraCoursesData', 'packages'
+            'registration', 'branches', 'matchedBranch', 'courses', 'courseMeta', 'packages'
         ));
     }
 
