@@ -72,10 +72,27 @@ class RegistrationListController extends Controller
         $interests = $registration->interests ?? [];
         $courses = Course::whereIn('nama', $interests)->with(['fee', 'guru'])->get();
 
+        // Full course catalog (with fee & guru) so the admin can add extra mata
+        // pelajaran beyond what the student originally showed interest in.
+        $courseIds = $courses->pluck('id')->all();
+        $extraCoursesData = Course::with(['fee', 'guru'])
+            ->whereNotIn('id', $courseIds)
+            ->orderBy('nama')
+            ->get()
+            ->map(function ($c) {
+                return [
+                    'id'   => $c->id,
+                    'nama' => $c->nama,
+                    'fee'  => (float) ($c->fee->amount ?? 0),
+                    'guru' => $c->guru->map(fn ($t) => ['id' => $t->id, 'name' => $t->name])->values(),
+                ];
+            })
+            ->values();
+
         $packages = Package::where('status', 'aktif')->orderBy('nama')->get(['id', 'cabang_id', 'nama', 'harga', 'tipe_kelas', 'jumlah_pertemuan']);
 
         return view('admin.registration.process', compact(
-            'registration', 'branches', 'matchedBranch', 'courses', 'packages'
+            'registration', 'branches', 'matchedBranch', 'courses', 'extraCoursesData', 'packages'
         ));
     }
 

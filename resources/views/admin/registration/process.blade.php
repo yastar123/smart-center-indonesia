@@ -233,40 +233,75 @@
             @if($courses->isEmpty())
             <div class="alert alert-warning" style="font-size:.85rem"><i class="bi bi-exclamation-triangle me-2"></i>Tidak ditemukan mata pelajaran yang cocok dengan minat pendaftaran ini di data master. Hubungi bagian akademik untuk melengkapi data mata pelajaran.</div>
             @else
-            <p class="text-muted" style="font-size:.83rem">Centang mata pelajaran yang akan diambil siswa, lalu tentukan guru pengajar dan jumlah sesi.</p>
-            @foreach($courses as $course)
-            @php $fee = $course->fee->amount ?? 0; @endphp
-            <div class="pw-course-row" data-course-row="{{ $course->id }}">
-                <div class="row g-2 align-items-center">
-                    <div class="col-md-3">
-                        <div class="form-check">
-                            <input class="form-check-input course-check" type="checkbox" id="course{{ $course->id }}" checked disabled>
-                            <input type="hidden" name="course_ids[]" value="{{ $course->id }}">
-                            <label class="form-check-label fw-semibold" for="course{{ $course->id }}">{{ $course->nama }}</label>
+            <p class="text-muted" style="font-size:.83rem">Centang mata pelajaran yang akan diambil siswa, lalu tentukan guru pengajar dan jumlah sesi. Mapel pilihan siswa tidak dapat dihapus, namun Anda bisa menambah mata pelajaran lain di bawah.</p>
+            @endif
+
+            <div id="courseRowsContainer">
+                @foreach($courses as $course)
+                @php $fee = $course->fee->amount ?? 0; @endphp
+                <div class="pw-course-row" data-course-row="{{ $course->id }}">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input class="form-check-input course-check" type="checkbox" id="course{{ $course->id }}" checked disabled>
+                                <input type="hidden" name="course_ids[]" value="{{ $course->id }}">
+                                <label class="form-check-label fw-semibold" for="course{{ $course->id }}">{{ $course->nama }}</label>
+                            </div>
+                            <div class="form-text" style="font-size:.68rem">Mapel pilihan siswa &mdash; tidak dapat dihapus</div>
                         </div>
-                        <div class="form-text" style="font-size:.68rem">Mapel pilihan siswa &mdash; tidak dapat dihapus</div>
-                    </div>
-                    <div class="col-md-3">
-                        <select class="form-select form-select-sm" name="course_teacher[{{ $course->id }}]">
-                            <option value="">Pilih guru…</option>
-                            @foreach($course->guru as $t)
-                            <option value="{{ $t->id }}">{{ $t->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[{{ $course->id }}]" placeholder="Jml sesi" value="{{ $registration->interest_sessions[$course->nama] ?? 8 }}">
-                    </div>
-                    <div class="col-md-4">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text">Rp</span>
-                            <input type="number" min="0" class="form-control fee-input" name="course_fee[{{ $course->id }}]" value="{{ $fee }}">
+                        <div class="col-md-3">
+                            <select class="form-select form-select-sm" name="course_teacher[{{ $course->id }}]">
+                                <option value="">Pilih guru…</option>
+                                @foreach($course->guru as $t)
+                                <option value="{{ $t->id }}">{{ $t->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[{{ $course->id }}]" placeholder="Jml sesi" value="{{ $registration->interest_sessions[$course->nama] ?? 8 }}">
+                        </div>
+                        <div class="col-md-3">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">Rp</span>
+                                <input type="number" min="0" class="form-control fee-input" name="course_fee[{{ $course->id }}]" value="{{ $fee }}">
+                            </div>
+                        </div>
+                        <div class="col-md-1 text-end text-muted" title="Mapel pilihan siswa, tidak dapat dihapus">
+                            <i class="bi bi-lock-fill"></i>
                         </div>
                     </div>
                 </div>
+                @endforeach
             </div>
-            @endforeach
-            @endif
+
+            {{-- TAMBAH MATA PELAJARAN LAIN (CRUD tambahan oleh admin) --}}
+            <div class="mt-3 p-3 rounded-3" style="background:var(--input-bg);border:1px dashed var(--card-border)">
+                <div class="d-flex gap-2 align-items-end flex-wrap">
+                    <div class="flex-grow-1" style="min-width:220px">
+                        <label class="form-label fw-semibold" style="font-size:.78rem">Tambah Mata Pelajaran Lain</label>
+                        <select id="extraCourseSelect" class="form-select form-select-sm"></select>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="addExtraCourse()"><i class="bi bi-plus-circle me-1"></i>Tambah</button>
+                </div>
+                <div class="text-muted mt-2" id="extraCourseEmptyMsg" style="font-size:.72rem;display:none">Semua mata pelajaran di data master sudah ditambahkan.</div>
+            </div>
+
+            {{-- RINGKASAN TOTAL SESI & ESTIMASI BIAYA GURU --}}
+            <div class="row g-3 mt-3">
+                <div class="col-md-6">
+                    <div class="p-3 rounded-3 text-center" style="background:rgba(200,77,223,.08);border:1.5px solid rgba(200,77,223,.35)">
+                        <div class="text-muted" style="font-size:.72rem;text-transform:uppercase;letter-spacing:.05em">Total Sesi</div>
+                        <div class="fw-bold fs-5 text-primary" id="summaryTotalSesi">0</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 rounded-3 text-center" style="background:rgba(200,77,223,.08);border:1.5px solid rgba(200,77,223,.35)">
+                        <div class="text-muted" style="font-size:.72rem;text-transform:uppercase;letter-spacing:.05em">Total Estimasi Biaya Guru</div>
+                        <div class="fw-bold fs-5 text-primary" id="summaryTotalFee">Rp0</div>
+                    </div>
+                </div>
+            </div>
+
             <div class="pw-actions">
                 <button type="button" class="btn btn-outline-secondary" data-action="prev"><i class="bi bi-arrow-left me-1"></i>Kembali</button>
                 <button type="button" class="btn btn-primary" data-action="next">Lanjut<i class="bi bi-arrow-right ms-1"></i></button>
@@ -375,20 +410,97 @@ document.querySelectorAll('[data-action="prev"]').forEach(btn => {
 
 function recalcTotal() {
     let total = 0;
+    let totalSesi = 0;
     document.querySelectorAll('.course-check').forEach(chk => {
         const row = chk.closest('.pw-course-row');
         row.classList.toggle('disabled', !chk.checked);
         row.querySelectorAll('select, input').forEach(el => { if (el !== chk) el.disabled = !chk.checked; });
         if (chk.checked) {
             const feeInput = row.querySelector('.fee-input');
+            const sesiInput = row.querySelector('input[name^="course_sessions"]');
             total += parseFloat(feeInput?.value || 0);
+            totalSesi += parseInt(sesiInput?.value || 0, 10);
         }
     });
     document.getElementById('totalBiaya').value = total || 0;
+    const sesiEl = document.getElementById('summaryTotalSesi');
+    const feeEl = document.getElementById('summaryTotalFee');
+    if (sesiEl) sesiEl.textContent = totalSesi || 0;
+    if (feeEl) feeEl.textContent = 'Rp' + Number(total || 0).toLocaleString('id-ID');
 }
-document.querySelectorAll('.course-check, .fee-input').forEach(el => el.addEventListener('input', recalcTotal));
-document.querySelectorAll('.course-check').forEach(el => el.addEventListener('change', recalcTotal));
+function bindCourseRowEvents(row) {
+    row.querySelectorAll('.course-check, .fee-input, input[name^="course_sessions"]').forEach(el => el.addEventListener('input', recalcTotal));
+    row.querySelectorAll('.course-check').forEach(el => el.addEventListener('change', recalcTotal));
+}
+document.querySelectorAll('.pw-course-row').forEach(bindCourseRowEvents);
 recalcTotal();
+
+// --- CRUD Mata Pelajaran & Guru tambahan (di luar minat asli siswa) ---
+const extraCoursesData = @json($extraCoursesData);
+const usedExtraCourseIds = new Set();
+
+function refreshExtraCourseSelect() {
+    const sel = document.getElementById('extraCourseSelect');
+    const available = extraCoursesData.filter(c => !usedExtraCourseIds.has(c.id));
+    sel.innerHTML = '<option value="">— Pilih mata pelajaran —</option>' +
+        available.map(c => `<option value="${c.id}">${c.nama}</option>`).join('');
+    document.getElementById('extraCourseEmptyMsg').style.display = available.length === 0 ? '' : 'none';
+}
+
+function addExtraCourse() {
+    const sel = document.getElementById('extraCourseSelect');
+    const id = parseInt(sel.value, 10);
+    if (!id) return;
+    const course = extraCoursesData.find(c => c.id === id);
+    if (!course) return;
+    usedExtraCourseIds.add(id);
+
+    const row = document.createElement('div');
+    row.className = 'pw-course-row';
+    row.dataset.courseRow = id;
+    const guruOptions = course.guru.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+    row.innerHTML = `
+        <div class="row g-2 align-items-center">
+            <div class="col-md-3">
+                <div class="form-check">
+                    <input class="form-check-input course-check" type="checkbox" name="course_ids[]" value="${id}" id="extraCourse${id}" checked>
+                    <label class="form-check-label fw-semibold" for="extraCourse${id}">${course.nama}</label>
+                </div>
+                <div class="form-text" style="font-size:.68rem">Ditambahkan admin</div>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select form-select-sm" name="course_teacher[${id}]">
+                    <option value="">Pilih guru…</option>
+                    ${guruOptions}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[${id}]" placeholder="Jml sesi" value="8">
+            </div>
+            <div class="col-md-3">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Rp</span>
+                    <input type="number" min="0" class="form-control fee-input" name="course_fee[${id}]" value="${course.fee}">
+                </div>
+            </div>
+            <div class="col-md-1 text-end">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeExtraCourse(this, ${id})" title="Hapus mapel ini"><i class="bi bi-trash"></i></button>
+            </div>
+        </div>`;
+    document.getElementById('courseRowsContainer').appendChild(row);
+    bindCourseRowEvents(row);
+    refreshExtraCourseSelect();
+    recalcTotal();
+}
+
+function removeExtraCourse(btn, id) {
+    btn.closest('.pw-course-row').remove();
+    usedExtraCourseIds.delete(id);
+    refreshExtraCourseSelect();
+    recalcTotal();
+}
+
+refreshExtraCourseSelect();
 
 document.querySelectorAll('input[name="package_id"]').forEach(r => {
     r.addEventListener('change', () => {
