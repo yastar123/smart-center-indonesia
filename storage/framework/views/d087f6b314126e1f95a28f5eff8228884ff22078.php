@@ -585,8 +585,20 @@ unset($__errorArgs, $__bag); ?>
                 <div class="section-card">
                     <div class="section-title">Program Belajar</div>
 
+                    <?php
+                        $oldSistem  = old('sistem_belajar');
+                        $oldProgram = old('program_belajar');
+                    ?>
                     <div class="row g-4">
-                        <div class="col-md-6">
+                        <div class="col-12" id="sistemBelajarSection">
+                            <label class="form-label">Sistem Belajar</label>
+                            <div class="option-btn-group" id="sistemGroup">
+                                <div class="option-btn <?php echo e($oldSistem == 'offline' ? '' : 'active'); ?>" data-val="online" onclick="pickOption('sistem','online',this)">Online (Daring)</div>
+                                <div class="option-btn <?php echo e($oldSistem == 'offline' ? 'active' : ''); ?>" data-val="offline" onclick="pickOption('sistem','offline',this)">Offline (Tatap Muka)</div>
+                            </div>
+                            <input type="hidden" name="sistem_belajar" id="sistem_belajar" value="<?php echo e(old('sistem_belajar','online')); ?>">
+                        </div>
+                        <div class="col-12 <?php echo e($oldSistem ? '' : 'd-none'); ?>" id="programBelajarSection">
                             <label class="form-label">Program Belajar</label>
                             <div class="option-btn-group" id="programGroup">
                                 <div class="option-btn <?php echo e(old('program_belajar','kelas') == 'kelas' ? 'active' : ''); ?>" data-val="kelas" onclick="pickProgram('kelas',this)">Kelas</div>
@@ -594,15 +606,7 @@ unset($__errorArgs, $__bag); ?>
                             </div>
                             <input type="hidden" name="program_belajar" id="program_belajar" value="<?php echo e(old('program_belajar','kelas')); ?>">
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Sistem Belajar</label>
-                            <div class="option-btn-group" id="sistemGroup">
-                                <div class="option-btn active" data-val="online" onclick="pickOption('sistem','online',this)">Online (Daring)</div>
-                                <div class="option-btn" data-val="offline" onclick="pickOption('sistem','offline',this)">Offline (Tatap Muka)</div>
-                            </div>
-                            <input type="hidden" name="sistem_belajar" id="sistem_belajar" value="<?php echo e(old('sistem_belajar','online')); ?>">
-                        </div>
-                        <div class="col-12" id="tempatBelajarSection">
+                        <div class="col-12 <?php echo e($oldProgram ? '' : 'd-none'); ?>" id="tempatBelajarSection">
                             <label class="form-label">Tempat Belajar</label>
                             <div class="option-btn-group" id="tempatGroup">
                                 <div class="option-btn active" data-val="kantor" onclick="pickOption('tempat','kantor',this)">Belajar di Kantor</div>
@@ -783,12 +787,18 @@ function pickOption(group, val, el) {
     el.closest('.option-btn-group').querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
     el.classList.add('active');
     document.getElementById(groupMap[group]).value = val;
+
+    if (group === 'sistem') {
+        document.getElementById('programBelajarSection').classList.remove('d-none');
+    }
 }
 
 function pickProgram(val, el) {
     el.closest('.option-btn-group').querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
     el.classList.add('active');
     document.getElementById('program_belajar').value = val;
+
+    document.getElementById('tempatBelajarSection').classList.remove('d-none');
 
     const rumahBtn  = document.getElementById('tempatRumahBtn');
     const kantorBtn = document.querySelector('#tempatGroup .option-btn[data-val="kantor"]');
