@@ -4,12 +4,17 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
+use App\Models\Course;
 use App\Models\Invoice;
+use App\Models\Package;
+use App\Models\Student;
 use App\Models\StudentRegistration;
 use App\Models\Teacher;
-use Carbon\Carbon;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class RegistrationListController extends Controller
 {
@@ -46,79 +51,124 @@ class RegistrationListController extends Controller
         return view('admin.registration.registration-list', compact('registrations', 'stats'));
     }
 
-    public function approve(StudentRegistration $registration)
+    /** GET /admin/registration-list/{registration}/process — multi-step setup wizard */
+    public function process(StudentRegistration $registration)
     {
-        $teachers = Teacher::where('status', 'aktif')->orderBy('name')
-            ->get(['id', 'name', 'jenis_guru', 'salary_base', 'branch_id']);
-
-        // Look up prices for each interest by matching course name
-        $interests   = $registration->interests ?? [];
-        $coursePrices = [];
-        if (!empty($interests)) {
-            $courses = \App\Models\Course::whereIn('nama', $interests)->get()->keyBy('nama');
-            foreach ($interests as $interest) {
-                $course = $courses->get($interest);
-                $price  = null;
-                if ($course) {
-                    $price = \Illuminate\Support\Facades\DB::table('course_fees')
-                        ->where('course_id', $course->id)
-                        ->value('amount');
-                    if ($price === null) {
-                        $price = $course->harga ?? $course->biaya ?? null;
-                    }
-                }
-                $coursePrices[$interest] = $price;
-            }
+        if ($registration->status === 'verified') {
+            return redirect()->route('admin.registration-list.index')
+                ->with('error', 'Pendaftaran ini sudah diverifikasi dan memiliki akun.');
         }
 
-        return view('admin.registration.approve', compact('registration', 'teachers', 'coursePrices'));
+        $branches = Branch::orderBy('name')->get(['id', 'name']);
+
+        $matchedBranch = null;
+        if ($registration->branch) {
+            $matchedBranch = Branch::where('name', 'like', '%' . $registration->branch . '%')->first();
+        }
+        if (!$matchedBranch && auth()->user()->branch_id) {
+            $matchedBranch = Branch::find(auth()->user()->branch_id);
+        }
+
+        $interests = $registration->interests ?? [];
+        $courses = Course::whereIn('nama', $interests)->with(['fee', 'guru'])->get();
+
+        $packages = Package::where('status', 'aktif')->orderBy('nama')->get(['id', 'cabang_id', 'nama', 'harga', 'tipe_kelas', 'jumlah_pertemuan']);
+
+        return view('admin.registration.process', compact(
+            'registration', 'branches', 'matchedBranch', 'courses', 'packages'
+        ));
     }
 
-    public function sendInvoice(Request $request, StudentRegistration $registration)
+    /** POST /admin/registration-list/{registration}/process — finalize setup, create account */
+    public function processStore(Request $request, StudentRegistration $registration)
     {
-        $request->validate([
-            'teacher_id'               => 'nullable|exists:teachers,id',
-            'total_biaya'              => 'required|numeric|min:0',
-            'total_sessions'           => 'nullable|integer|min:1',
-            'biaya_per_sesi'           => 'nullable|numeric|min:0',
-            'interest_sessions'        => 'nullable|array',
-            'interest_sessions.*'      => 'nullable|integer|min:0',
-            'interest_teachers'        => 'nullable|array',
-            'interest_teachers.*'      => 'nullable|exists:teachers,id',
-            'interest_teacher_honor'   => 'nullable|array',
-            'interest_teacher_honor.*' => 'nullable|numeric|min:0',
-            'interest_teacher_sesi'    => 'nullable|array',
-            'interest_teacher_sesi.*'  => 'nullable|integer|min:0',
-        ]);
-
-        if (!$registration->student_id) {
-            return back()->with('error', 'Siswa belum memiliki akun terdaftar. Verifikasi terlebih dahulu dari dashboard.');
+        if ($registration->status === 'verified') {
+            return response()->json(['success' => false, 'message' => 'Pendaftaran ini sudah diverifikasi.'], 422);
         }
+
+        $data = $request->validate([
+            'branch_id'            => 'required|exists:branches,id',
+            'package_id'           => 'nullable|exists:packages,id',
+            'course_ids'           => 'required|array|min:1',
+            'course_ids.*'         => 'exists:courses,id',
+            'course_teacher'       => 'nullable|array',
+            'course_teacher.*'     => 'nullable|exists:teachers,id',
+            'course_sessions'      => 'nullable|array',
+            'course_sessions.*'    => 'nullable|integer|min:0',
+            'course_fee'           => 'nullable|array',
+            'course_fee.*'         => 'nullable|numeric|min:0',
+            'total_biaya'          => 'required|numeric|min:0',
+            'biaya_per_sesi'       => 'nullable|numeric|min:0',
+            'payment_status'       => 'required|in:belum_bayar,lunas',
+        ]);
 
         DB::beginTransaction();
         try {
-            $interestTeachers = null;
-            if ($request->filled('interest_teachers') && is_array($request->interest_teachers)) {
-                $interestTeachers = array_map('intval', array_filter($request->interest_teachers, fn($v) => $v !== null && $v !== ''));
+            $branch = Branch::find($data['branch_id']);
+
+            $baseName = Str::slug($registration->name, '.');
+            $baseName = $baseName ?: 'siswa';
+            $email    = strtolower($baseName) . '.' . now()->format('His') . '@siswa.akademi.com';
+            $password = Str::random(8);
+
+            $user = User::create([
+                'name'      => $registration->name,
+                'email'     => $email,
+                'password'  => Hash::make($password),
+                'phone'     => $registration->phone,
+                'branch_id' => $branch->id,
+                'is_active' => true,
+            ]);
+            $user->assignRole('siswa');
+
+            do {
+                $nis = 'S' . now()->format('YmdHis') . Str::upper(Str::random(3));
+            } while (Student::where('nis', $nis)->exists());
+
+            $courseSessions = $data['course_sessions'] ?? [];
+            $totalSesi      = array_sum(array_map('intval', $courseSessions));
+
+            $student = Student::create([
+                'user_id'                => $user->id,
+                'nis'                    => $nis,
+                'name'                   => $registration->name,
+                'gender'                 => $registration->gender ?? 'L',
+                'phone'                  => $registration->phone,
+                'birth_place'            => $registration->birth_place,
+                'birth_date'             => $registration->birth_date,
+                'address'                => $registration->address,
+                'parent_name'            => $registration->parent_name,
+                'parent_phone'           => $registration->parent_phone,
+                'branch_id'              => $branch->id,
+                'package_id'             => $data['package_id'] ?? null,
+                'total_sesi'             => $totalSesi ?: null,
+                'status'                 => 'aktif',
+                'join_date'              => now()->toDateString(),
+                'kategori_peserta_didik' => $registration->education_level,
+            ]);
+
+            // Assign each chosen teacher to the student (one row per course's teacher)
+            $courseTeachers = array_filter($data['course_teacher'] ?? []);
+            foreach (array_unique($courseTeachers) as $teacherId) {
+                DB::table('student_teachers')->insertOrIgnore([
+                    'student_id' => $student->id,
+                    'teacher_id' => $teacherId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
             }
-            $primaryTeacherId = $request->teacher_id
-                ?? ($interestTeachers ? array_values($interestTeachers)[0] : null);
+            $primaryTeacherId = $courseTeachers ? array_values($courseTeachers)[0] : null;
 
-            $totalBiaya = (float) $request->total_biaya;
-
-            // Generate invoice number
             $year  = date('Y');
             $month = str_pad(date('m'), 2, '0', STR_PAD_LEFT);
             $count = Invoice::whereYear('created_at', $year)->whereMonth('created_at', date('m'))->count() + 1;
             $nomor = 'INV-REG-' . $year . $month . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
 
-            // Resolve branch
-            $student  = \App\Models\Student::find($registration->student_id);
-            $branchId = $student?->branch_id;
+            $totalBiaya = (float) $data['total_biaya'];
 
             $invoice = Invoice::create([
-                'siswa_id'      => $registration->student_id,
-                'cabang_id'     => $branchId,
+                'siswa_id'      => $student->id,
+                'cabang_id'     => $branch->id,
                 'kelas_id'      => null,
                 'nomor_invoice' => $nomor,
                 'deskripsi'     => 'Biaya Pendaftaran Program: ' . implode(', ', $registration->interests ?? [$registration->program ?? 'Umum']),
@@ -126,152 +176,42 @@ class RegistrationListController extends Controller
                 'diskon'        => 0,
                 'pajak'         => 0,
                 'total'         => $totalBiaya,
-                'status'        => 'belum_bayar',
-                'jatuh_tempo'   => Carbon::now()->addDays(7),
+                'status'        => $data['payment_status'],
+                'jatuh_tempo'   => $data['payment_status'] === 'lunas' ? now() : now()->addDays(7),
                 'periode'       => date('Y-m'),
+                'catatan'       => $data['payment_status'] === 'lunas' ? 'Dibayar lunas saat proses registrasi.' : null,
             ]);
 
-            $interestSessions = null;
-            if ($request->filled('interest_sessions') && is_array($request->interest_sessions)) {
-                $interestSessions = array_map('intval', array_filter($request->interest_sessions, fn($v) => $v !== null && $v !== ''));
-            }
-            $totalSessions = $interestSessions ? array_sum($interestSessions) : ($request->total_sessions ?? null);
-
-            $interestTeacherHonor = null;
-            if ($request->filled('interest_teacher_honor') && is_array($request->interest_teacher_honor)) {
-                $interestTeacherHonor = array_map('floatval', array_filter($request->interest_teacher_honor, fn($v) => $v !== null && $v !== ''));
-            }
-
-            $interestTeacherSesi = null;
-            if ($request->filled('interest_teacher_sesi') && is_array($request->interest_teacher_sesi)) {
-                $interestTeacherSesi = array_map('intval', array_filter($request->interest_teacher_sesi, fn($v) => $v !== null && $v !== ''));
-            }
-
             $registration->update([
-                'assigned_teacher_id'    => $primaryTeacherId,
-                'biaya_per_sesi'         => $request->biaya_per_sesi ?? null,
-                'total_sessions'         => $totalSessions,
-                'interest_sessions'      => $interestSessions,
-                'interest_teachers'      => $interestTeachers,
-                'interest_teacher_honor' => $interestTeacherHonor,
-                'interest_teacher_sesi'  => $interestTeacherSesi,
-                'total_biaya'            => $totalBiaya,
-                'invoice_id'             => $invoice->id,
-                'payment_status'         => 'belum_bayar',
-                'academic_status'        => 'menunggu_kelas',
+                'status'               => 'verified',
+                'student_id'           => $student->id,
+                'branch'               => $branch->name,
+                'assigned_teacher_id'  => $primaryTeacherId,
+                'interest_teachers'    => $courseTeachers ?: null,
+                'interest_sessions'    => $courseSessions ?: null,
+                'total_sessions'       => $totalSesi ?: null,
+                'biaya_per_sesi'       => $data['biaya_per_sesi'] ?? null,
+                'total_biaya'          => $totalBiaya,
+                'invoice_id'           => $invoice->id,
+                'payment_status'       => $data['payment_status'],
+                'academic_status'      => $data['payment_status'] === 'lunas' ? 'terjadwal' : 'menunggu_kelas',
             ]);
 
             DB::commit();
-            return redirect()->route('admin.registration-list.index')
-                ->with('success', "Invoice {$nomor} berhasil dikirim ke siswa.");
+
+            return response()->json([
+                'success'  => true,
+                'message'  => 'Pendaftaran berhasil diproses. Akun siswa telah dibuat.',
+                'name'     => $registration->name,
+                'email'    => $email,
+                'password' => $password,
+                'nis'      => $nis,
+                'phone'    => $registration->phone,
+                'no_reg'   => $registration->no_reg,
+            ]);
         } catch (\Throwable $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal membuat invoice: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Gagal memproses: ' . $e->getMessage()], 500);
         }
-    }
-
-    public function markLunas(Request $request, StudentRegistration $registration)
-    {
-        $request->validate([
-            'teacher_id'               => 'nullable|exists:teachers,id',
-            'total_biaya'              => 'required|numeric|min:0',
-            'total_sessions'           => 'nullable|integer|min:1',
-            'biaya_per_sesi'           => 'nullable|numeric|min:0',
-            'interest_sessions'        => 'nullable|array',
-            'interest_sessions.*'      => 'nullable|integer|min:0',
-            'interest_teachers'        => 'nullable|array',
-            'interest_teachers.*'      => 'nullable|exists:teachers,id',
-            'interest_teacher_honor'   => 'nullable|array',
-            'interest_teacher_honor.*' => 'nullable|numeric|min:0',
-            'interest_teacher_sesi'    => 'nullable|array',
-            'interest_teacher_sesi.*'  => 'nullable|integer|min:0',
-        ]);
-
-        if (!$registration->student_id) {
-            return back()->with('error', 'Siswa belum memiliki akun terdaftar. Verifikasi terlebih dahulu dari dashboard.');
-        }
-
-        DB::beginTransaction();
-        try {
-            $interestTeachersLunas = null;
-            if ($request->filled('interest_teachers') && is_array($request->interest_teachers)) {
-                $interestTeachersLunas = array_map('intval', array_filter($request->interest_teachers, fn($v) => $v !== null && $v !== ''));
-            }
-            $primaryTeacherIdLunas = $request->teacher_id
-                ?? ($interestTeachersLunas ? array_values($interestTeachersLunas)[0] : null);
-
-            $totalBiaya = (float) $request->total_biaya;
-
-            $year  = date('Y');
-            $month = str_pad(date('m'), 2, '0', STR_PAD_LEFT);
-            $count = Invoice::whereYear('created_at', $year)->whereMonth('created_at', date('m'))->count() + 1;
-            $nomor = 'INV-REG-' . $year . $month . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
-
-            $student  = \App\Models\Student::find($registration->student_id);
-            $branchId = $student?->branch_id;
-
-            $invoice = Invoice::create([
-                'siswa_id'      => $registration->student_id,
-                'cabang_id'     => $branchId,
-                'kelas_id'      => null,
-                'nomor_invoice' => $nomor,
-                'deskripsi'     => 'Biaya Pendaftaran Program (Lunas): ' . implode(', ', $registration->interests ?? [$registration->program ?? 'Umum']),
-                'subtotal'      => $totalBiaya,
-                'diskon'        => 0,
-                'pajak'         => 0,
-                'total'         => $totalBiaya,
-                'status'        => 'lunas',
-                'jatuh_tempo'   => Carbon::now(),
-                'periode'       => date('Y-m'),
-                'catatan'       => 'Dibayar lunas saat proses registrasi.',
-            ]);
-
-            $interestSessions = null;
-            if ($request->filled('interest_sessions') && is_array($request->interest_sessions)) {
-                $interestSessions = array_map('intval', array_filter($request->interest_sessions, fn($v) => $v !== null && $v !== ''));
-            }
-            $totalSessions = $interestSessions ? array_sum($interestSessions) : ($request->total_sessions ?? null);
-
-            $interestTeacherHonorLunas = null;
-            if ($request->filled('interest_teacher_honor') && is_array($request->interest_teacher_honor)) {
-                $interestTeacherHonorLunas = array_map('floatval', array_filter($request->interest_teacher_honor, fn($v) => $v !== null && $v !== ''));
-            }
-
-            $interestTeacherSesiLunas = null;
-            if ($request->filled('interest_teacher_sesi') && is_array($request->interest_teacher_sesi)) {
-                $interestTeacherSesiLunas = array_map('intval', array_filter($request->interest_teacher_sesi, fn($v) => $v !== null && $v !== ''));
-            }
-
-            $registration->update([
-                'assigned_teacher_id'    => $primaryTeacherIdLunas,
-                'biaya_per_sesi'         => $request->biaya_per_sesi ?? null,
-                'total_sessions'         => $totalSessions,
-                'interest_sessions'      => $interestSessions,
-                'interest_teachers'      => $interestTeachersLunas,
-                'interest_teacher_honor' => $interestTeacherHonorLunas,
-                'interest_teacher_sesi'  => $interestTeacherSesiLunas,
-                'total_biaya'            => $totalBiaya,
-                'invoice_id'             => $invoice->id,
-                'payment_status'         => 'lunas',
-                'academic_status'        => 'terjadwal',
-            ]);
-
-            DB::commit();
-            return redirect()->route('admin.registration-list.index')
-                ->with('success', 'Pembayaran dicatat lunas. Invoice tersimpan di halaman Billing.');
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            return back()->with('error', 'Gagal memproses: ' . $e->getMessage());
-        }
-    }
-
-    public function reject(StudentRegistration $registration)
-    {
-        $registration->update([
-            'status'          => 'rejected',
-            'academic_status' => 'pending',
-        ]);
-        return redirect()->route('admin.registration-list.index')
-            ->with('success', 'Pendaftaran telah ditolak.');
     }
 }

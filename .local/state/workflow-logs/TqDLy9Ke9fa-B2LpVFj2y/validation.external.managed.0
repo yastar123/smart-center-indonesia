@@ -1,0 +1,34 @@
+VERDICT: APPROVED_WITH_COMMENTS
+The core CRUD error fixes for `/admin/landing` and `/admin/landing/cabang/{id}` are correctly implemented and should prevent the reported null-related failures.
+
+Critical findings / analysis:
+- `BranchLandingSetting::setVal()` now accepts `string|null` and normalizes null to `''`, which addresses TypeErrors caused by `ConvertEmptyStringsToNull` when saving branch landing settings.
+- `BranchLandingContentController::update()` now safely handles nullable `areas` by casting the input before `explode`, preventing runtime errors when the field is blank.
+- In `LandingContentController` store methods, nullable fields that map to NOT NULL DB columns now get explicit defaults (`gradient`, `badge_bg`, `badge_color`, `icon_emoji`, `emoji`, `icon`), preventing SQL insert failures when blank inputs become null.
+- In update methods, replacing null handling with `array_key_exists()` + `unset()` is the correct fix; it avoids writing `null` into NOT NULL columns while still allowing valid updates.
+
+Security: none observed (no new authz/injection/secrets exposure in the reviewed source changes).
+
+Next actions:
+1) Exclude generated cache artifacts (`storage/framework/views/*.php`) and local workflow-log churn from this task commit; they are unrelated and create review noise.
+2) Add a small regression test matrix for create/update with blank optional fields on testimonials/programs/tickers/features/jenjang/trust and branch areas.
+3) In a follow-up task, review boolean checkbox handling (`request->boolean(..., true)`) where “unchecked” may still default to true (already reflected by proposed task #2).
+
+VERDICT: APPROVED_WITH_COMMENTS
+VERDICT: APPROVED_WITH_COMMENTS
+The core CRUD error fixes for `/admin/landing` and `/admin/landing/cabang/{id}` are correctly implemented and should prevent the reported null-related failures.
+
+Critical findings / analysis:
+- `BranchLandingSetting::setVal()` now accepts `string|null` and normalizes null to `''`, which addresses TypeErrors caused by `ConvertEmptyStringsToNull` when saving branch landing settings.
+- `BranchLandingContentController::update()` now safely handles nullable `areas` by casting the input before `explode`, preventing runtime errors when the field is blank.
+- In `LandingContentController` store methods, nullable fields that map to NOT NULL DB columns now get explicit defaults (`gradient`, `badge_bg`, `badge_color`, `icon_emoji`, `emoji`, `icon`), preventing SQL insert failures when blank inputs become null.
+- In update methods, replacing null handling with `array_key_exists()` + `unset()` is the correct fix; it avoids writing `null` into NOT NULL columns while still allowing valid updates.
+
+Security: none observed (no new authz/injection/secrets exposure in the reviewed source changes).
+
+Next actions:
+1) Exclude generated cache artifacts (`storage/framework/views/*.php`) and local workflow-log churn from this task commit; they are unrelated and create review noise.
+2) Add a small regression test matrix for create/update with blank optional fields on testimonials/programs/tickers/features/jenjang/trust and branch areas.
+3) In a follow-up task, review boolean checkbox handling (`request->boolean(..., true)`) where “unchecked” may still default to true (already reflected by proposed task #2).
+
+VERDICT: APPROVED_WITH_COMMENTS

@@ -208,10 +208,8 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
 
         // REGISTRATION LIST (Daftar Registrasi dari Form Publik)
         Route::get('/registration-list',                                [RegistrationListController::class, 'index'])       ->name('registration-list.index');
-        Route::get('/registration-list/{registration}/approve',         [RegistrationListController::class, 'approve'])     ->name('registration-list.approve');
-        Route::post('/registration-list/{registration}/send-invoice',   [RegistrationListController::class, 'sendInvoice']) ->name('registration-list.send-invoice');
-        Route::post('/registration-list/{registration}/mark-lunas',     [RegistrationListController::class, 'markLunas'])   ->name('registration-list.mark-lunas');
-        Route::post('/registration-list/{registration}/reject',         [RegistrationListController::class, 'reject'])      ->name('registration-list.reject');
+        Route::get('/registration-list/{registration}/process',         [RegistrationListController::class, 'process'])     ->name('registration-list.process');
+        Route::post('/registration-list/{registration}/process',        [RegistrationListController::class, 'processStore'])->name('registration-list.process.store');
 
         // STUDENT REGISTRATIONS (pendaftar dari form publik)
         Route::get('/student-registrations/{studentRegistration}',        [StudentRegistrationController::class, 'show'])    ->name('student-registrations.show');

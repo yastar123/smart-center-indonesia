@@ -54,7 +54,7 @@ class StudentRegistrationController extends Controller
         // Try to match branch by name
         $branch = null;
         if ($studentRegistration->branch) {
-            $branch = Branch::where('nama', 'like', '%' . $studentRegistration->branch . '%')->first();
+            $branch = Branch::where('name', 'like', '%' . $studentRegistration->branch . '%')->first();
         }
         // Fall back to admin's own branch if available
         if (!$branch && auth()->user()->branch_id) {

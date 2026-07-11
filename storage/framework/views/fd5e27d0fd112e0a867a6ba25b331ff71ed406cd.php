@@ -101,20 +101,11 @@
             </select>
         </div>
         <div class="col-6 col-md-2">
-            <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Pembayaran</label>
-            <select name="payment_status" class="form-select form-select-sm">
-                <option value="">Semua</option>
-                <option value="belum_bayar" <?php echo e(request('payment_status')==='belum_bayar'?'selected':''); ?>>Belum Dibayar</option>
-                <option value="cicilan"     <?php echo e(request('payment_status')==='cicilan'    ?'selected':''); ?>>Cicilan</option>
-                <option value="lunas"       <?php echo e(request('payment_status')==='lunas'      ?'selected':''); ?>>Lunas</option>
-            </select>
-        </div>
-        <div class="col-6 col-md-2">
-            <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Status Akademik</label>
+            <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Status</label>
             <select name="academic_status" class="form-select form-select-sm">
                 <option value="">Semua</option>
                 <option value="pending"        <?php echo e(request('academic_status')==='pending'        ?'selected':''); ?>>Pending</option>
-                <option value="menunggu_kelas" <?php echo e(request('academic_status')==='menunggu_kelas' ?'selected':''); ?>>Menunggu Kelas</option>
+                <option value="menunggu_kelas" <?php echo e(request('academic_status')==='menunggu_kelas' ?'selected':''); ?>>Atur Jadwal</option>
                 <option value="terjadwal"      <?php echo e(request('academic_status')==='terjadwal'      ?'selected':''); ?>>Terjadwal</option>
             </select>
         </div>
@@ -141,24 +132,17 @@
                     <th style="width:40px;color:var(--text-muted);font-size:.72rem;font-weight:600;text-transform:uppercase;padding:10px 12px">#</th>
                     <th style="color:var(--text-muted);font-size:.72rem;font-weight:600;text-transform:uppercase;padding:10px 12px">Siswa &amp; Paket</th>
                     <th style="color:var(--text-muted);font-size:.72rem;font-weight:600;text-transform:uppercase;padding:10px 12px">Total Pendaftar</th>
-                    <th style="color:var(--text-muted);font-size:.72rem;font-weight:600;text-transform:uppercase;padding:10px 12px">Pembayaran</th>
-                    <th style="color:var(--text-muted);font-size:.72rem;font-weight:600;text-transform:uppercase;padding:10px 12px">Status Akademik</th>
+                    <th style="color:var(--text-muted);font-size:.72rem;font-weight:600;text-transform:uppercase;padding:10px 12px">Status</th>
                     <th style="color:var(--text-muted);font-size:.72rem;font-weight:600;text-transform:uppercase;padding:10px 12px;text-align:right">Aksi</th>
                 </tr>
             </thead>
             <tbody>
             <?php $__empty_1 = true; $__currentLoopData = $registrations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $idx => $reg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
             <?php
-                $payBadge = [
-                    'belum_bayar' => ['var(--soft-danger-bg)',  'var(--soft-danger-text)',  'Belum Dibayar', 'bi-exclamation-circle'],
-                    'cicilan'     => ['var(--soft-warning-bg)', 'var(--soft-warning-text)', 'Cicilan',       'bi-receipt-cutoff'],
-                    'lunas'       => ['var(--soft-success-bg)', 'var(--soft-success-text)', 'Lunas',         'bi-check-circle-fill'],
-                ][$reg->payment_status ?? 'belum_bayar'] ?? ['var(--soft-muted-bg)','var(--text-muted)','–','bi-dash'];
-
                 $acadBadge = [
-                    'pending'        => ['var(--soft-warning-bg)', 'var(--soft-warning-text)', 'Pending',        'bi-hourglass-split'],
-                    'menunggu_kelas' => ['var(--soft-info-bg)',    'var(--soft-info-text)',    'Menunggu Kelas', 'bi-calendar-plus'],
-                    'terjadwal'      => ['var(--soft-success-bg)', 'var(--soft-success-text)', 'Terjadwal',      'bi-calendar-check-fill'],
+                    'pending'        => ['var(--soft-warning-bg)', 'var(--soft-warning-text)', 'Pending',     'bi-hourglass-split'],
+                    'menunggu_kelas' => ['var(--soft-info-bg)',    'var(--soft-info-text)',    'Atur Jadwal', 'bi-calendar-plus'],
+                    'terjadwal'      => ['var(--soft-success-bg)', 'var(--soft-success-text)', 'Terjadwal',   'bi-calendar-check-fill'],
                 ][$reg->academic_status ?? 'pending'] ?? ['var(--soft-muted-bg)','var(--text-muted)','–','bi-dash'];
 
                 $regBadge = [
@@ -212,30 +196,19 @@
                 </td>
                 <td style="padding:12px">
                     <span class="badge d-inline-flex align-items-center gap-1"
-                          style="background:<?php echo e($payBadge[0]); ?>;color:<?php echo e($payBadge[1]); ?>;padding:5px 10px;border-radius:20px;font-size:.75rem;font-weight:500">
-                        <i class="bi <?php echo e($payBadge[3]); ?>" style="font-size:.72rem"></i>
-                        <?php echo e($payBadge[2]); ?>
-
-                    </span>
-                    <?php if($reg->total_biaya): ?>
-                    <div class="text-muted mt-1" style="font-size:.72rem">Rp<?php echo e(number_format($reg->total_biaya,0,',','.')); ?></div>
-                    <?php endif; ?>
-                </td>
-                <td style="padding:12px">
-                    <span class="badge d-inline-flex align-items-center gap-1"
                           style="background:<?php echo e($acadBadge[0]); ?>;color:<?php echo e($acadBadge[1]); ?>;padding:5px 10px;border-radius:20px;font-size:.75rem;font-weight:500">
-                        <i class="bi <?php echo e($acadBadge[2]); ?>" style="font-size:.72rem"></i>
-                        <?php echo e($acadBadge[1+1]); ?>
+                        <i class="bi <?php echo e($acadBadge[3]); ?>" style="font-size:.72rem"></i>
+                        <?php echo e($acadBadge[2]); ?>
 
                     </span>
                 </td>
                 <td style="padding:12px;text-align:right">
                     <div class="d-flex justify-content-end gap-2 flex-wrap">
-                        <?php if($reg->status === 'verified' && $reg->status !== 'rejected'): ?>
-                        <a href="<?php echo e(route('admin.registration-list.approve', $reg->id)); ?>"
+                        <?php if($reg->status !== 'verified'): ?>
+                        <a href="<?php echo e(route('admin.registration-list.process', $reg->id)); ?>"
                            class="btn btn-sm btn-primary"
                            style="border-radius:8px;font-size:.75rem;padding:5px 12px">
-                            <i class="bi bi-check2-square me-1"></i>Approve &amp; Biaya
+                            <i class="bi bi-clipboard2-check me-1"></i>Proses Pendaftaran
                         </a>
                         <?php endif; ?>
                         <button type="button" class="btn btn-sm btn-outline-secondary"
@@ -248,7 +221,7 @@
             </tr>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <tr>
-                <td colspan="6" class="text-center py-5">
+                <td colspan="5" class="text-center py-5">
                     <i class="bi bi-inbox d-block mb-3" style="font-size:3rem;opacity:.2"></i>
                     <div class="fw-semibold mb-1">Belum ada data pendaftar</div>
                     <p class="text-muted" style="font-size:.83rem">Data akan muncul ketika calon siswa mengisi form pendaftaran.</p>
