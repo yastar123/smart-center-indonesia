@@ -254,7 +254,6 @@
                                 <option value="<?php echo e($t->id); ?>"><?php echo e($t->name); ?></option>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
-                            <div class="form-text text-danger d-none conflict-warning" style="font-size:.68rem"></div>
                         </div>
                         <div class="col-md-2">
                             <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[<?php echo e($course->id); ?>]" placeholder="Jml sesi" value="<?php echo e($registration->interest_sessions[$course->nama] ?? 8); ?>">
@@ -267,6 +266,29 @@
                         </div>
                         <div class="col-md-1 text-end">
                             <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCourseRow(this, <?php echo e($course->id); ?>)" title="Hapus mapel ini"><i class="bi bi-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="row g-2 align-items-center mt-2 pw-conflict-row">
+                        <div class="col-md-3">
+                            <select class="form-select form-select-sm hari-select" data-course-id="<?php echo e($course->id); ?>">
+                                <option value="">Hari kelas…</option>
+                                <option value="1">Senin</option>
+                                <option value="2">Selasa</option>
+                                <option value="3">Rabu</option>
+                                <option value="4">Kamis</option>
+                                <option value="5">Jum'at</option>
+                                <option value="6">Sabtu</option>
+                                <option value="0">Minggu</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="time" class="form-control form-control-sm jam-mulai-input" data-course-id="<?php echo e($course->id); ?>" placeholder="Jam mulai">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="time" class="form-control form-control-sm jam-selesai-input" data-course-id="<?php echo e($course->id); ?>" placeholder="Jam selesai">
+                        </div>
+                        <div class="col-md-3">
+                            <div class="conflict-warning-box" style="font-size:.72rem"></div>
                         </div>
                     </div>
                 </div>
@@ -430,9 +452,63 @@ function recalcTotal() {
 function bindCourseRowEvents(row) {
     row.querySelectorAll('.course-check, .fee-input, input[name^="course_sessions"]').forEach(el => el.addEventListener('input', recalcTotal));
     row.querySelectorAll('.course-check').forEach(el => el.addEventListener('change', recalcTotal));
+    bindGuruConflictEvents(row);
 }
 document.querySelectorAll('.pw-course-row').forEach(bindCourseRowEvents);
 recalcTotal();
+
+// --- Cek konflik jadwal guru (hari & jam bentrok) ---
+const guruConflictCheckUrl = <?php echo json_encode(route('admin.registration-list.guru-conflict-check'), 15, 512) ?>;
+
+function bindGuruConflictEvents(row) {
+    const guruSelect = row.querySelector('.guru-select');
+    const hariSelect = row.querySelector('.hari-select');
+    const jamMulai = row.querySelector('.jam-mulai-input');
+    const jamSelesai = row.querySelector('.jam-selesai-input');
+    const warningBox = row.querySelector('.conflict-warning-box');
+    if (!guruSelect || !hariSelect || !jamMulai || !jamSelesai || !warningBox) return;
+
+    const runCheck = () => {
+        const guruId = guruSelect.value;
+        const hari = hariSelect.value;
+        const mulai = jamMulai.value;
+        const selesai = jamSelesai.value;
+
+        if (!guruId || hari === '' || !mulai || !selesai) {
+            warningBox.innerHTML = '';
+            return;
+        }
+        if (mulai >= selesai) {
+            warningBox.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>Jam selesai harus setelah jam mulai.</span>';
+            return;
+        }
+
+        warningBox.innerHTML = '<span class="text-muted"><i class="bi bi-hourglass-split me-1"></i>Mengecek jadwal guru…</span>';
+
+        fetch(guruConflictCheckUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({ guru_id: guruId, hari: hari, jam_mulai: mulai, jam_selesai: selesai }),
+        })
+            .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(data => {
+                if (data.conflict) {
+                    warningBox.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>${data.detail}</span>`;
+                } else {
+                    warningBox.innerHTML = '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Guru tersedia di jadwal ini.</span>';
+                }
+            })
+            .catch(() => {
+                warningBox.innerHTML = '<span class="text-muted">Gagal mengecek konflik jadwal.</span>';
+            });
+    };
+
+    [guruSelect, hariSelect, jamMulai, jamSelesai].forEach(el => el.addEventListener('change', runCheck));
+}
 
 // --- CRUD Mata Pelajaran & Guru (semua mapel bisa ditambah/dihapus admin) ---
 const courseMetaList = <?php echo json_encode($courseMeta, 15, 512) ?>;
@@ -467,7 +543,6 @@ function buildCourseRow(course, isAdmin) {
                     <option value="">Pilih guru…</option>
                     ${guruOptions}
                 </select>
-                <div class="form-text text-danger d-none conflict-warning" style="font-size:.68rem"></div>
             </div>
             <div class="col-md-2">
                 <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[${course.id}]" placeholder="Jml sesi" value="8">
@@ -480,6 +555,29 @@ function buildCourseRow(course, isAdmin) {
             </div>
             <div class="col-md-1 text-end">
                 <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCourseRow(this, ${course.id})" title="Hapus mapel ini"><i class="bi bi-trash"></i></button>
+            </div>
+        </div>
+        <div class="row g-2 align-items-center mt-2 pw-conflict-row">
+            <div class="col-md-3">
+                <select class="form-select form-select-sm hari-select" data-course-id="${course.id}">
+                    <option value="">Hari kelas…</option>
+                    <option value="1">Senin</option>
+                    <option value="2">Selasa</option>
+                    <option value="3">Rabu</option>
+                    <option value="4">Kamis</option>
+                    <option value="5">Jum'at</option>
+                    <option value="6">Sabtu</option>
+                    <option value="0">Minggu</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input type="time" class="form-control form-control-sm jam-mulai-input" data-course-id="${course.id}" placeholder="Jam mulai">
+            </div>
+            <div class="col-md-3">
+                <input type="time" class="form-control form-control-sm jam-selesai-input" data-course-id="${course.id}" placeholder="Jam selesai">
+            </div>
+            <div class="col-md-3">
+                <div class="conflict-warning-box" style="font-size:.72rem"></div>
             </div>
         </div>`;
     return row;

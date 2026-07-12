@@ -7,6 +7,7 @@ use App\Models\Branch;
 use App\Models\Course;
 use App\Models\Invoice;
 use App\Models\Package;
+use App\Models\Schedule;
 use App\Models\Student;
 use App\Models\StudentRegistration;
 use App\Models\Teacher;
@@ -102,6 +103,55 @@ class RegistrationListController extends Controller
         return view('admin.registration.process', compact(
             'registration', 'branches', 'matchedBranch', 'courses', 'courseMeta', 'packages'
         ));
+    }
+
+    /**
+     * AJAX: cek apakah seorang guru sudah punya jadwal lain yang bentrok pada
+     * hari & jam yang sama, dipakai di wizard verifikasi pendaftaran (Langkah 3)
+     * sebelum admin menetapkan guru untuk mata pelajaran baru.
+     */
+    public function guruConflictCheck(Request $request)
+    {
+        $data = $request->validate([
+            'guru_id'     => 'required|exists:teachers,id',
+            'hari'        => 'required|integer|min:0|max:6', // 0 = Minggu ... 6 = Sabtu (konvensi PostgreSQL DOW)
+            'jam_mulai'   => 'required',
+            'jam_selesai' => 'required|after:jam_mulai',
+        ]);
+
+        $overlap = Schedule::where('guru_id', $data['guru_id'])
+            ->where('status', '!=', 'dibatalkan')
+            ->whereNotNull('tanggal')
+            ->whereRaw('EXTRACT(DOW FROM tanggal) = ?', [$data['hari']])
+            ->where(function ($q) use ($data) {
+                $q->whereBetween('jam_mulai', [$data['jam_mulai'], $data['jam_selesai']])
+                  ->orWhereBetween('jam_selesai', [$data['jam_mulai'], $data['jam_selesai']])
+                  ->orWhere(function ($i) use ($data) {
+                      $i->where('jam_mulai', '<=', $data['jam_mulai'])
+                        ->where('jam_selesai', '>=', $data['jam_selesai']);
+                  });
+            })
+            ->with(['paket', 'mataPelajaran'])
+            ->first();
+
+        if (!$overlap) {
+            return response()->json(['success' => true, 'conflict' => false]);
+        }
+
+        $hariNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', "Jum'at", 'Sabtu'];
+
+        return response()->json([
+            'success'  => true,
+            'conflict' => true,
+            'detail'   => sprintf(
+                'Guru sudah mengajar %s pada %s %s–%s (%s)',
+                $overlap->mataPelajaran->nama ?? ($overlap->paket->nama ?? 'kelas lain'),
+                $hariNames[$data['hari']],
+                substr($overlap->jam_mulai, 0, 5),
+                substr($overlap->jam_selesai, 0, 5),
+                $overlap->topik ?: 'tanpa topik'
+            ),
+        ]);
     }
 
     /** POST /admin/registration-list/{registration}/process — finalize setup, create account */
