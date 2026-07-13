@@ -1156,7 +1156,7 @@ function buildPreview() {
 
     const totalMarginColor = totalMargin >= 0 ? '#10b981' : '#dc2626';
 
-    // Hoist inline expressions so ${{ }} never appears inside the template literal (Blade parses {{ }} even in JS blocks)
+    // Hoist inline expressions so a dollar-brace-brace pattern never appears inside the template literal (Blade parses double braces even in JS blocks)
     const _previewEduLevel  = document.querySelector('[name="education_level"]')?.value || '–';
     const _tempatMap        = {kantor:'Di Kantor', rumah:'Guru ke Rumah'};
     const _previewTempat    = _tempatMap[document.getElementById('tempatBelajarInput')?.value] || '–';

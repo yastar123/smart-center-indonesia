@@ -1157,14 +1157,28 @@ function buildPreview() {
 
     const totalMarginColor = totalMargin >= 0 ? '#10b981' : '#dc2626';
 
+    // Hoist inline expressions so a dollar-brace-brace pattern never appears inside the template literal (Blade parses double braces even in JS blocks)
+    const _previewEduLevel  = document.querySelector('[name="education_level"]')?.value || '–';
+    const _tempatMap        = {kantor:'Di Kantor', rumah:'Guru ke Rumah'};
+    const _previewTempat    = _tempatMap[document.getElementById('tempatBelajarInput')?.value] || '–';
+    const _previewJadwal    = (() => {
+        const days = Array.from(document.querySelectorAll('input[name="hari_belajar[]"]:checked')).map(c => c.value);
+        if (!days.length) return '–';
+        return days.map(d => {
+            const slots = Array.from(document.querySelectorAll('input[name="jam_detail[' + d + '][]"]'))
+                              .map(i => i.value).filter(Boolean);
+            return d + (slots.length ? ' (' + slots.join(', ') + ')' : '');
+        }).join(' · ');
+    })();
+
     document.getElementById('previewBox').innerHTML = `
         
         <div class="row g-2 mb-3">
             <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Cabang:</span> <strong>${branchName}</strong></div>
             <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Paket:</span> <strong>${pkgName}</strong></div>
-            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Kategori:</span> <strong>${(document.querySelector('[name="education_level"]')?.value)||'–'}</strong></div>
-            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Tempat Belajar:</span> <strong>$<?php echo e(kantor:'Di Kantor',rumah:'Guru ke Rumah'}[document.getElementById('tempatBelajarInput')?.value]||'–'}</strong></div>
-            <div class="col-md-8"><span class="text-muted" style="font-size:.83rem">Jadwal:</span> <strong style="font-size:.82rem">${(()=>{const days=Array.from(document.querySelectorAll('input[name="hari_belajar[]"]:checked')).map(c=>c.value);if(!days.length)return'–';return days.map(d=>{const slots=Array.from(document.querySelectorAll('input[name="jam_detail['+d+'][]"]')).map(i=>i.value).filter(Boolean);return d+(slots.length?' ('+slots.join(', ')+')':'');}).join(' · ');})()}</strong></div>
+            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Kategori:</span> <strong>${_previewEduLevel}</strong></div>
+            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Tempat Belajar:</span> <strong>${_previewTempat}</strong></div>
+            <div class="col-md-8"><span class="text-muted" style="font-size:.83rem">Jadwal:</span> <strong style="font-size:.82rem">${_previewJadwal}</strong></div>
         </div>
 
         
@@ -1479,7 +1493,7 @@ function sendToWA() {
     const phone = (_credData.phone || '').replace(/\D/g, '');
     if (!phone) { showToast('Nomor HP siswa tidak tersedia.', 'error'); return; }
     const wa = phone.startsWith('0') ? '62' + phone.slice(1) : phone;
-    const loginUrl = '{{ url("/login")); ?>';
+    const loginUrl = '<?php echo e(url("/login")); ?>';
     const msg = encodeURIComponent(
         'Halo ' + (_credData.name || 'Siswa') + ',\n\n' +
         'Selamat datang di Smart Center Indonesia!\n\n' +
@@ -1496,4 +1510,4 @@ function sendToWA() {
 </script>
 <?php $__env->stopPush(); ?>
 
-<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?> ?><?php /**PATH /home/runner/workspace/resources/views/admin/registration/process.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/admin/registration/process.blade.php ENDPATH**/ ?>
