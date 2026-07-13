@@ -466,7 +466,7 @@
                             </thead>
                             <tbody id="scheduleRowsContainer">
                                 @foreach($courses as $course)
-                                <tr class="pw-schedule-row" data-schedule-row="{{ $course->id }}">
+                                <tr class="pw-sched-tr" data-schedule-row="{{ $course->id }}">
                                     <td class="text-center text-muted sched-no" style="font-size:.78rem">{{ $loop->iteration }}</td>
                                     <td>
                                         <span class="badge rounded-pill" style="background:rgba(200,77,223,.12);color:#461256;font-size:.75rem;font-weight:600;padding:.3em .75em">{{ $course->nama }}</span>
@@ -755,7 +755,7 @@ document.querySelectorAll('[data-action="prev"]').forEach(btn => {
 
 // ── Sinkronisasi baris jadwal saat mapel dicentang/tidak ──────────────────────
 function updateScheduleEmpty() {
-    const visible = document.querySelectorAll('.pw-schedule-row:not([style*="display:none"]):not([style*="display: none"])');
+    const visible = document.querySelectorAll('.pw-sched-tr:not([style*="display:none"]):not([style*="display: none"])');
     document.getElementById('scheduleEmptyMsg').style.display = visible.length === 0 ? '' : 'none';
 }
 
@@ -766,7 +766,7 @@ function recalcTotal() {
         row.classList.toggle('disabled', !chk.checked);
         row.querySelectorAll('select, input').forEach(el => { if (el !== chk) el.disabled = !chk.checked; });
         // Sync matching schedule row visibility
-        const schedRow = document.querySelector(`.pw-schedule-row[data-schedule-row="${chk.value}"]`);
+        const schedRow = document.querySelector(`.pw-sched-tr[data-schedule-row="${chk.value}"]`);
         if (schedRow) schedRow.style.display = chk.checked ? '' : 'none';
         if (chk.checked) {
             const feeInput   = row.querySelector('.fee-input');
@@ -829,7 +829,7 @@ function syncGuruName(courseId) {
 // ── Renumber visible schedule rows ─────────────────────────────────────────────
 function renumberScheduleRows() {
     let n = 1;
-    document.querySelectorAll('#scheduleRowsContainer .pw-schedule-row').forEach(tr => {
+    document.querySelectorAll('#scheduleRowsContainer .pw-sched-tr').forEach(tr => {
         const noCell = tr.querySelector('.sched-no');
         if (tr.style.display === 'none') return;
         if (noCell) noCell.textContent = n++;
@@ -984,7 +984,7 @@ function buildCourseRow(course, isAdmin) {
 // Builds Card B (jadwal kelas) table row — now a <tr> with 7 cols
 function buildScheduleRow(course) {
     const tr = document.createElement('tr');
-    tr.className = 'pw-schedule-row';
+    tr.className = 'pw-sched-tr';
     tr.dataset.scheduleRow = course.id;
     tr.innerHTML = `
         <td class="text-center text-muted sched-no" style="font-size:.78rem">—</td>
@@ -1035,7 +1035,7 @@ function addExtraCourse() {
 
 function removeCourseRow(btn, id) {
     btn.closest('.pw-course-row').remove();
-    const schedRow = document.querySelector(`#scheduleRowsContainer .pw-schedule-row[data-schedule-row="${id}"]`);
+    const schedRow = document.querySelector(`#scheduleRowsContainer .pw-sched-tr[data-schedule-row="${id}"]`);
     if (schedRow) schedRow.remove();
     const conflictRow = document.getElementById(`conflict-result-${id}`);
     if (conflictRow) conflictRow.remove();
