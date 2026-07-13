@@ -1,0 +1,389 @@
+Stack
+Context
+Debug
+Flare
+Share
+Share with Flare
+Docs
+
+Stack
+
+Context
+
+Debug
+Create Share
+Docs
+
+Ignition Settings
+Docs
+Editor
+
+PhpStorm
+Theme
+auto
+Save settings
+Settings will be saved locally in ~/.ignition.json.
+
+SQLSTATE[42703]: Undefined column: 7 ERROR: column "pertemuan_ke" does not exist LINE 1: ...(3) and "schedules"."deleted_at" is null order by "pertemuan... ^ (SQL: select * from "schedules" where "schedules"."kelas_id" in (3) and "schedules"."deleted_at" is null order by "pertemuan_ke" asc)
+Illuminate
+ \ 
+Database
+ \ 
+QueryException
+PHP 8.2.23
+9.52.21
+SQLSTATE[42703]: Undefined column: 7 ERROR: column "pertemuan_ke" does not exist LINE 1: ...(3) and "schedules"."deleted_at" is null order by "pertemuan... ^
+select * from "schedules" where "schedules"."kelas_id" in (3) and "schedules"."deleted_at" is null order by "pertemuan_ke" asc
+
+
+
+Expand vendor frames
+14 vendor frames
+App
+ \ 
+Http
+ \ 
+Controllers
+ \ 
+Siswa
+ \ 
+AttendanceController
+ 
+: 73
+show
+47 vendor frames
+public
+ / 
+index
+.php
+ 
+: 51
+require_once
+1 vendor frame
+app
+ / 
+Http
+ / 
+Controllers
+ / 
+Siswa
+ / 
+AttendanceController
+.php
+ 
+: 73
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            'courses', 'meetingCounts', 'attendanceSummary', 'student', 'pendingConfirmations'
+
+        ));
+
+    }
+
+
+
+    public function show(Course $course)
+
+    {
+
+        $student = Student::where('user_id', auth()->id())->first();
+
+        if (! $student) {
+
+            return redirect()->route('siswa.attendance');
+
+        }
+
+
+
+        $classes = SchoolClass::with(['jadwal' => fn ($q) => $q->orderBy('pertemuan_ke')])
+
+            ->where('mata_pelajaran_id', $course->id)
+
+            ->whereIn('id', function ($q) use ($student) {
+
+                $q->select('class_id')->from('class_students')->where('student_id', $student->id);
+
+            })->get();
+
+
+
+        $scheduleIds = $classes->flatMap(fn ($c) => $c->jadwal->pluck('id'));
+
+
+
+        // Load absensi records with dual-confirmation fields
+
+        $myAttendance = DB::table('absensi_siswas')
+
+            ->where('siswa_id', $student->id)
+
+            ->whereIn('jadwal_id', $scheduleIds)
+
+            ->get(['jadwal_id', 'guru_hadir', 'siswa_konfirmasi_at', 'status'])
+
+            ->keyBy('jadwal_id');
+
+
+
+        return view('siswa.attendance.show', compact(
+
+            'course', 'classes', 'myAttendance', 'student'
+
+        ));
+
+    }
+arguments
+$columns:array
+[
+    "*"
+]
+
+App
+Routing
+Request
+Browser
+Headers
+Body
+Context
+User
+Git
+Versions
+Exception
+App
+Routing
+Controller
+App\Http\Controllers\Siswa\AttendanceController@show
+
+Route name
+siswa.attendance.show
+
+Middleware
+web
+
+auth
+
+role:siswa
+
+Request
+https://754c86c0-0a27-4822-bf70-dd280819fbae-00-1cnbiss8uciws.pike.replit.dev/siswa/attendance/13
+GET
+curl "https://754c86c0-0a27-4822-bf70-dd280819fbae-00-1cnbiss8uciws.pike.replit.dev/siswa/attendance/13" \
+   -X GET \
+   -H 'host: 754c86c0-0a27-4822-bf70-dd280819fbae-00-1cnbiss8uciws.pike.replit.dev' \
+   -H 'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36' \
+   -H 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' \
+   -H 'accept-encoding: gzip, deflate, br, zstd' \
+   -H 'accept-language: en-US,en;q=0.9' \
+   -H 'cookie: XSRF-TOKEN=eyJpdiI6ImJJbUFRa0N0SjlSZGQwNVU0dnRuQkE9PSIsInZhbHVlIjoiSUNrLzNpb3c1Wk1JOWQ3M1pWU252RUVFelIrcWtQTzBBZ21EYjFVL2oySEFtZ0xyTUJmMWYwVlBrVy9KTzI2ejh4U3AxVTBIZDR1T1dDRkNyQzRaR2VrRE96VzhEKzc3ZjJpYXRHRHF3QjFWUnpBZGlybmE3aVBQdTUrY3J5RGQiLCJtYWMiOiJlNWExZGMyNDFlZjE5YTE2MWQyZTFiNDYxODI2ZTc2N2YzYmUxOWJhN2MwZjJkNGM3ZWFlNDgwYjkxMmJhOWJhIiwidGFnIjoiIn0%3D; akademi_bimbel_session=eyJpdiI6InI3c2VNRjlqNEZ4SXFEZnhhNEhtY2c9PSIsInZhbHVlIjoiSlZ1Rmhxa3Y1U0c1aVExTlVOQzFGUEZFTW9Wc3ZtSHp6cDVDYzExbjhJQ0pYdkJaQ2phYm1iREtTcmZHYTlKMFJLTVRlTk9tNmZyZitlV05Sd1FMbzVkRHI2Vkd4amIvcGdUaUZsVlh6RTJ3WHJiNEJHdjJiRW91SDdPbEp5a1QiLCJtYWMiOiJlNTY3ZmQyN2ZmOWE5NjhiMjQ2MWJjOTkyZjRmZmU2MTFkMWEyMGVkMjY5MDg3NTgzNDBlNTgwOTFhODM5MmRlIiwidGFnIjoiIn0%3D' \
+   -H 'referer: https://754c86c0-0a27-4822-bf70-dd280819fbae-00-1cnbiss8uciws.pike.replit.dev/siswa/attendance' \
+   -H 'sec-ch-ua: "Not;A=Brand";v="8", "Chromium";v="150", "Google Chrome";v="150"' \
+   -H 'sec-ch-ua-mobile: ?0' \
+   -H 'sec-ch-ua-platform: "Windows"' \
+   -H 'sec-fetch-dest: document' \
+   -H 'sec-fetch-mode: navigate' \
+   -H 'sec-fetch-site: same-origin' \
+   -H 'sec-fetch-user: ?1' \
+   -H 'upgrade-insecure-requests: 1' \
+   -H 'x-forwarded-for: 103.111.98.140, 10.60.9.166, 127.0.0.1' \
+   -H 'x-forwarded-proto: https';
+
+
+Browser
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+
+Headers
+host
+754c86c0-0a27-4822-bf70-dd280819fbae-00-1cnbiss8uciws.pike.replit.dev
+
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+
+accept
+text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+
+accept-encoding
+gzip, deflate, br, zstd
+
+accept-language
+en-US,en;q=0.9
+
+cookie
+XSRF-TOKEN=eyJpdiI6ImJJbUFRa0N0SjlSZGQwNVU0dnRuQkE9PSIsInZhbHVlIjoiSUNrLzNpb3c1Wk1JOWQ3M1pWU252RUVFelIrcWtQTzBBZ21EYjFVL2oySEFtZ0xyTUJmMWYwVlBrVy9KTzI2ejh4U3AxVTBIZDR1T1dDRkNyQzRaR2VrRE96VzhEKzc3ZjJpYXRHRHF3QjFWUnpBZGlybmE3aVBQdTUrY3J5RGQiLCJtYWMiOiJlNWExZGMyNDFlZjE5YTE2MWQyZTFiNDYxODI2ZTc2N2YzYmUxOWJhN2MwZjJkNGM3ZWFlNDgwYjkxMmJhOWJhIiwidGFnIjoiIn0%3D; akademi_bimbel_session=eyJpdiI6InI3c2VNRjlqNEZ4SXFEZnhhNEhtY2c9PSIsInZhbHVlIjoiSlZ1Rmhxa3Y1U0c1aVExTlVOQzFGUEZFTW9Wc3ZtSHp6cDVDYzExbjhJQ0pYdkJaQ2phYm1iREtTcmZHYTlKMFJLTVRlTk9tNmZyZitlV05Sd1FMbzVkRHI2Vkd4amIvcGdUaUZsVlh6RTJ3WHJiNEJHdjJiRW91SDdPbEp5a1QiLCJtYWMiOiJlNTY3ZmQyN2ZmOWE5NjhiMjQ2MWJjOTkyZjRmZmU2MTFkMWEyMGVkMjY5MDg3NTgzNDBlNTgwOTFhODM5MmRlIiwidGFnIjoiIn0%3D
+
+referer
+https://754c86c0-0a27-4822-bf70-dd280819fbae-00-1cnbiss8uciws.pike.replit.dev/siswa/attendance
+
+sec-ch-ua
+"Not;A=Brand";v="8", "Chromium";v="150", "Google Chrome";v="150"
+
+sec-ch-ua-mobile
+?0
+
+sec-ch-ua-platform
+"Windows"
+
+sec-fetch-dest
+document
+
+sec-fetch-mode
+navigate
+
+sec-fetch-site
+same-origin
+
+sec-fetch-user
+?1
+
+upgrade-insecure-requests
+1
+
+x-forwarded-for
+103.111.98.140, 10.60.9.166, 127.0.0.1
+
+x-forwarded-proto
+https
+
+Body
+[]
+
+Context
+User
+kelas.050551@siswa.akademi.com
+kelas
+
+kelas.050551@siswa.akademi.com
+
+{
+    "id": 8,
+    "name": "kelas",
+    "email": "kelas.050551@siswa.akademi.com",
+    "email_verified_at": null,
+    "created_at": "2026-07-13T22:05:51.000000Z",
+    "updated_at": "2026-07-13T22:05:51.000000Z",
+    "deleted_at": null,
+    "phone": "1",
+    "avatar": null,
+    "branch_id": 1,
+    "is_active": true,
+    "last_login_at": null,
+    "username": null,
+    "roles": [
+        {
+            "id": 4,
+            "name": "siswa",
+            "guard_name": "web",
+            "created_at": "2026-07-13T21:48:15.000000Z",
+            "updated_at": "2026-07-13T21:48:15.000000Z",
+            "pivot": {
+                "model_id": 8,
+                "role_id": 4,
+                "model_type": "App\\Models\\User"
+            }
+        }
+    ]
+}
+
+
+Git
+Update registration process view and clean up compiled view cache files
+5e8fceeea1c6c64a4db25caffe3254b1c8ae3c62
+
+View commit 5e8fcee
+Last commit is dirty. (Un)staged changes have been made since this commit.
+
+Versions
+Php Version
+8.2.23
+
+Laravel Version
+9.52.21
+
+Laravel Locale
+en
+
+Laravel Config Cached
+false
+App Debug
+true
+App Env
+local
+
+Exception
+Raw Sql
+select * from "schedules" where "schedules"."kelas_id" in (3) and "schedules"."deleted_at" is null order by "pertemuan_ke" asc
+
+
+5
+Queries
+5:09:55 AM
+10.81ms
+pgsql
+select * from "users" where "id" = 8 and "users"."deleted_at" is null limit 1
+
+
+1 query parameter
+5:09:55 AM
+0.81ms
+pgsql
+select * from "courses" where "id" = 13 and "courses"."deleted_at" is null limit 1
+
+
+1 query parameter
+5:09:55 AM
+1.36ms
+pgsql
+select "roles".*, "model_has_roles"."model_id" as "pivot_model_id", "model_has_roles"."role_id" as "pivot_role_id", "model_has_roles"."model_type" as "pivot_model_type" from "roles" inner join "model_has_roles" on "roles"."id" = "model_has_roles"."role_id" where "model_has_roles"."model_id" in (8) and "model_has_roles"."model_type" = App\Models\User
+
+
+1 query parameter
+5:09:55 AM
+1.88ms
+pgsql
+select * from "students" where "user_id" = 8 limit 1
+
+
+1 query parameter
+5:09:55 AM
+0.93ms
+pgsql
+select * from "school_classes" where "mata_pelajaran_id" = 13 and "id" in (select "class_id" from "class_students" where "student_id" = 3) and "school_classes"."deleted_at" is null
+
+
+2 query parameters
+·
+Source
+·
+Docs
+·
+Laravel
+Ignition is built byFlare, the Laravel error reporting service.
