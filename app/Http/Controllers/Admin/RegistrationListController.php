@@ -185,6 +185,11 @@ class RegistrationListController extends Controller
             'parent_phone'         => 'nullable|string|max:30',
             'program'              => 'nullable|in:kelas,privat',
             'system'               => 'nullable|in:online,offline',
+            'education_level'      => 'nullable|string|max:255',
+            'tempat_belajar'       => 'nullable|in:kantor,rumah',
+            'hari_belajar'         => 'nullable|array',
+            'hari_belajar.*'       => 'nullable|string|max:20',
+            'jam_detail'           => 'nullable|array',
             'branch_id'            => 'required|exists:branches,id',
             'is_custom_package'    => 'nullable|in:0,1',
             'package_id'           => 'nullable|exists:packages,id',
@@ -204,6 +209,8 @@ class RegistrationListController extends Controller
             'course_sessions.*'    => 'nullable|integer|min:0',
             'course_fee'           => 'nullable|array',
             'course_fee.*'         => 'nullable|numeric|min:0',
+            'course_honor'         => 'nullable|array',
+            'course_honor.*'       => 'nullable|numeric|min:0',
             'total_biaya'            => 'required|numeric|min:0',
             'biaya_per_sesi'         => 'nullable|numeric|min:0',
             'biaya_admin'            => 'nullable|numeric|min:0',
@@ -224,17 +231,34 @@ class RegistrationListController extends Controller
 
             // Persist any corrections the admin made to the student's own data
             // back onto the original registration record before using it.
+            // Build schedule_time string from jam_detail array
+            $scheduleTime = null;
+            if (!empty($data['jam_detail'])) {
+                $lines = [];
+                foreach ($data['jam_detail'] as $day => $slots) {
+                    $slots = array_filter((array) $slots);
+                    if (!empty($slots)) {
+                        $lines[] = $day . ': ' . implode(' dan ', $slots);
+                    }
+                }
+                $scheduleTime = implode("\n", $lines) ?: null;
+            }
+
             $registration->fill([
-                'name'         => $data['name'],
-                'phone'        => $data['phone'],
-                'gender'       => $data['gender'] ?? $registration->gender,
-                'birth_place'  => $data['birth_place'] ?? null,
-                'birth_date'   => $data['birth_date'] ?? null,
-                'address'      => $data['address'] ?? null,
-                'parent_name'  => $data['parent_name'] ?? null,
-                'parent_phone' => $data['parent_phone'] ?? null,
-                'program'      => $data['program'] ?? $registration->program,
-                'system'       => $data['system'] ?? $registration->system,
+                'name'            => $data['name'],
+                'phone'           => $data['phone'],
+                'gender'          => $data['gender'] ?? $registration->gender,
+                'birth_place'     => $data['birth_place'] ?? null,
+                'birth_date'      => $data['birth_date'] ?? null,
+                'address'         => $data['address'] ?? null,
+                'parent_name'     => $data['parent_name'] ?? null,
+                'parent_phone'    => $data['parent_phone'] ?? null,
+                'program'         => $data['program'] ?? $registration->program,
+                'system'          => $data['system'] ?? $registration->system,
+                'education_level' => $data['education_level'] ?? $registration->education_level,
+                'learning_place'  => $data['tempat_belajar'] ?? $registration->learning_place,
+                'day_preferences' => $data['hari_belajar'] ?? $registration->day_preferences ?? [],
+                'schedule_time'   => $scheduleTime ?? $registration->schedule_time,
             ]);
             $registration->save();
 
@@ -333,24 +357,26 @@ class RegistrationListController extends Controller
                 $cicilanNominals = array_values(array_filter($data['cicilan_nominal'] ?? [], fn($v) => $v !== null && $v !== ''));
                 $cicilanMulai    = array_values($data['cicilan_mulai']          ?? []);
                 $cicilanTempo    = array_values($data['cicilan_jatuh_tempo']    ?? []);
+                $total           = count($cicilanNominals);
                 foreach ($cicilanNominals as $idx => $nominal) {
                     $seqCount  = $baseCount + $idx + 1;
                     $nomor     = 'INV-CIC-' . $year . $month . '-' . str_pad($seqCount, 3, '0', STR_PAD_LEFT) . '-' . ($idx + 1);
                     $tempo     = !empty($cicilanTempo[$idx]) ? $cicilanTempo[$idx] : now()->addDays(30 * ($idx + 1))->toDateString();
+                    $mulai     = !empty($cicilanMulai[$idx])  ? $cicilanMulai[$idx]  : now()->addDays(($idx) * 30)->toDateString();
                     $inv = Invoice::create([
                         'siswa_id'      => $student->id,
                         'cabang_id'     => $branch->id,
                         'kelas_id'      => null,
                         'nomor_invoice' => $nomor,
-                        'deskripsi'     => $deskripsi . ' — Cicilan ' . ($idx + 1) . ' dari ' . count($cicilanNominals),
+                        'deskripsi'     => $deskripsi . ' — Cicilan ' . ($idx + 1) . ' dari ' . $total,
                         'subtotal'      => (float) $nominal,
                         'diskon'        => 0,
                         'pajak'         => 0,
                         'total'         => (float) $nominal,
                         'status'        => 'belum_bayar',
                         'jatuh_tempo'   => $tempo,
-                        'periode'       => date('Y-m'),
-                        'catatan'       => 'Cicilan ' . ($idx + 1) . ' dari ' . count($cicilanNominals),
+                        'periode'       => date('Y-m', strtotime($mulai)),
+                        'catatan'       => 'Cicilan ' . ($idx + 1) . ' dari ' . $total . ' · Mulai tagih: ' . $mulai . ' · Jatuh tempo: ' . $tempo,
                     ]);
                     if ($idx === 0) $invoice = $inv;
                 }

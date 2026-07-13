@@ -36,6 +36,27 @@
         .pw-stepper-item span:last-child { display:none; }
         .pw-stepper-item { justify-content:center; }
     }
+    /* ── Step 1 option buttons ── */
+    .pw-opt-btn { cursor:pointer; padding:.45rem 1rem; border-radius:8px; font-size:.82rem; font-weight:600;
+        border:1.5px solid var(--card-border); color:var(--text-muted); background:var(--input-bg);
+        transition:all .18s; user-select:none; }
+    .pw-opt-btn.active { border-color:#c84ddf; background:rgba(200,77,223,.09); color:#461256; }
+    .pw-opt-btn:hover:not(.active) { border-color:#c84ddf; color:#c84ddf; }
+    /* ── Day pills ── */
+    .pw-day-pill { cursor:pointer; display:inline-flex; align-items:center; justify-content:center;
+        width:44px; height:36px; border-radius:8px; font-size:.78rem; font-weight:700;
+        border:1.5px solid var(--card-border); color:var(--text-muted); background:var(--input-bg);
+        transition:all .15s; user-select:none; }
+    .pw-day-pill.selected { border-color:#c84ddf; background:rgba(200,77,223,.12); color:#461256; }
+    .pw-day-pill:hover:not(.selected) { border-color:#c84ddf; color:#c84ddf; }
+    /* ── Day schedule rows ── */
+    .pw-schedule-row { display:flex; align-items:flex-start; gap:.5rem; padding:.5rem .75rem;
+        border-radius:10px; background:var(--input-bg); border:1px solid var(--card-border); margin-bottom:.5rem; }
+    .pw-day-label { min-width:60px; font-size:.78rem; font-weight:700; color:#461256;
+        padding-top:.38rem; flex-shrink:0; }
+    .pw-time-slot { display:flex; gap:.4rem; align-items:center; margin-bottom:.3rem; }
+    .pw-time-slot:last-child { margin-bottom:0; }
+    .pw-time-slot .btn-remove-slot { flex-shrink:0; }
 </style>
 
 <?php if($registration->status === 'rejected'): ?>
@@ -58,7 +79,14 @@
         <div class="pw-panel active" data-step="1">
             <h6 class="fw-bold mb-3"><i class="bi bi-person-vcard me-2 text-primary"></i>Informasi Siswa</h6>
             <p class="text-muted" style="font-size:.8rem">Data ini awalnya diisi siswa saat mendaftar &mdash; admin dapat mengoreksi/melengkapinya jika perlu.</p>
+
+            
+            <input type="hidden" name="branch_id" id="branchSelect"
+                   value="<?php echo e($matchedBranch?->id ?? ''); ?>"
+                   data-name="<?php echo e($matchedBranch?->name ?? '–'); ?>">
+
             <div class="row g-3">
+                
                 <div class="col-md-6">
                     <label class="form-label fw-semibold" style="font-size:.78rem">Nama <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" name="name" value="<?php echo e($registration->name); ?>" required>
@@ -75,6 +103,15 @@
                         <option value="P" <?php echo e($registration->gender==='P'?'selected':''); ?>>Perempuan</option>
                     </select>
                 </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold" style="font-size:.78rem">Kategori Peserta Didik</label>
+                    <select class="form-select" name="education_level">
+                        <option value="">-- Pilih Kategori --</option>
+                        <?php $__currentLoopData = ['Pra Sekolah (PAUD/TK)','Sekolah Dasar (SD)','Sekolah Menengah Pertama (SMP)','Sekolah Menengah Atas/Kejuruan (SMA/SMK)','Mahasiswa','Umum']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lvl): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($lvl); ?>" <?php echo e($registration->education_level===$lvl?'selected':''); ?>><?php echo e($lvl); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </select>
+                </div>
                 <div class="col-md-3">
                     <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Tempat Lahir</label>
                     <input type="text" class="form-control" name="birth_place" value="<?php echo e($registration->birth_place); ?>">
@@ -82,18 +119,6 @@
                 <div class="col-md-3">
                     <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Tgl Lahir</label>
                     <input type="date" class="form-control" name="birth_date" value="<?php echo e($registration->birth_date?->format('Y-m-d')); ?>">
-                </div>
-                <div class="col-12">
-                    <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Alamat</label>
-                    <input type="text" class="form-control" name="address" value="<?php echo e($registration->address); ?>">
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Nama Orang Tua</label>
-                    <input type="text" class="form-control" name="parent_name" value="<?php echo e($registration->parent_name); ?>">
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">No. HP Orang Tua</label>
-                    <input type="text" class="form-control" name="parent_phone" value="<?php echo e($registration->parent_phone); ?>">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Program</label>
@@ -111,16 +136,87 @@
                         <option value="offline" <?php echo e($registration->system==='offline'?'selected':''); ?>>Offline</option>
                     </select>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold" style="font-size:.78rem">Cabang <span class="text-danger">*</span></label>
-                    <select name="branch_id" id="branchSelect" class="form-select" required>
-                        <option value="">Pilih cabang…</option>
-                        <?php $__currentLoopData = $branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $b): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <option value="<?php echo e($b->id); ?>" <?php echo e($matchedBranch && $matchedBranch->id === $b->id ? 'selected' : ''); ?>><?php echo e($b->name); ?></option>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </select>
-                    <div class="form-text" style="font-size:.72rem">Cabang asal pendaftaran: <strong><?php echo e($registration->branch ?: '–'); ?></strong></div>
+                <div class="col-12">
+                    <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Alamat</label>
+                    <input type="text" class="form-control" name="address" value="<?php echo e($registration->address); ?>">
                 </div>
+                <div class="col-md-6">
+                    <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Nama Orang Tua</label>
+                    <input type="text" class="form-control" name="parent_name" value="<?php echo e($registration->parent_name); ?>">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">No. HP Orang Tua</label>
+                    <input type="text" class="form-control" name="parent_phone" value="<?php echo e($registration->parent_phone); ?>">
+                </div>
+
+                
+                <div class="col-12">
+                    <label class="form-label fw-semibold" style="font-size:.78rem">Tempat Belajar</label>
+                    <?php $curTempat = $registration->learning_place ?? 'kantor'; ?>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <div class="pw-opt-btn <?php echo e($curTempat!=='rumah'?'active':''); ?>" onclick="pickTempat('kantor',this)">
+                            <i class="bi bi-building me-1"></i>Belajar di Kantor
+                        </div>
+                        <div class="pw-opt-btn <?php echo e($curTempat==='rumah'?'active':''); ?>" onclick="pickTempat('rumah',this)">
+                            <i class="bi bi-house-door me-1"></i>Guru ke Rumah
+                        </div>
+                    </div>
+                    <input type="hidden" name="tempat_belajar" id="tempatBelajarInput" value="<?php echo e($curTempat); ?>">
+                </div>
+
+                
+                <div class="col-12">
+                    <label class="form-label fw-semibold" style="font-size:.78rem">Jadwal Belajar
+                        <span class="fw-normal text-muted ms-1" style="font-size:.72rem">— pilih hari lalu isi jam</span>
+                    </label>
+                    
+                    <?php
+                        $dayShorts = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+                        $dayFulls  = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+                        $existDays = $registration->day_preferences ?? [];
+                    ?>
+                    <div class="d-flex flex-wrap gap-2 mb-2">
+                        <?php $__currentLoopData = $dayShorts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $short): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php $dayVal = $dayFulls[$i]; $isChecked = in_array($dayVal, $existDays); ?>
+                        <label class="pw-day-pill <?php echo e($isChecked?'selected':''); ?>" id="dpill-<?php echo e($dayVal); ?>"
+                               onclick="pwToggleDay(this,'<?php echo e($dayVal); ?>')">
+                            <input type="checkbox" name="hari_belajar[]" value="<?php echo e($dayVal); ?>"
+                                   style="display:none" <?php echo e($isChecked?'checked':''); ?>>
+                            <?php echo e($short); ?>
+
+                        </label>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </div>
+                    
+                    <div id="pwDayScheduleWrapper" style="<?php echo e(empty($existDays)?'display:none':''); ?>">
+                        <div id="pwDayScheduleContainer">
+                            <?php $__currentLoopData = $dayFulls; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dayVal): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php if(in_array($dayVal, $existDays)): ?>
+                            <div class="pw-schedule-row" id="pwsrow-<?php echo e($dayVal); ?>">
+                                <div class="pw-day-label"><?php echo e($dayVal); ?></div>
+                                <div class="flex-fill" id="pwslots-<?php echo e($dayVal); ?>">
+                                    <div class="pw-time-slot">
+                                        <input type="text" name="jam_detail[<?php echo e($dayVal); ?>][]"
+                                               class="form-control form-control-sm"
+                                               placeholder="cth. 10:00 - 12:00" autocomplete="off">
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                        onclick="pwAddSlot('<?php echo e($dayVal); ?>')" style="font-size:.72rem;white-space:nowrap">
+                                    <i class="bi bi-plus"></i> Slot
+                                </button>
+                            </div>
+                            <?php endif; ?>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </div>
+                    </div>
+                    <?php if($registration->schedule_time): ?>
+                    <div class="form-text mt-1" style="font-size:.72rem">
+                        <i class="bi bi-clock me-1"></i>Jadwal sebelumnya: <em><?php echo e($registration->schedule_time); ?></em>
+                    </div>
+                    <?php endif; ?>
+                </div>
+
             </div>
             <div class="pw-actions"><span></span><button type="button" class="btn btn-primary" data-action="next">Lanjut<i class="bi bi-arrow-right ms-1"></i></button></div>
         </div>
@@ -245,25 +341,27 @@
                 <div class="p-3">
                     
                     <div class="row g-2 mb-1 d-none d-md-flex px-1">
-                        <div class="col-md-3"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Mata Pelajaran</span></div>
-                        <div class="col-md-3"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Guru Pengajar</span></div>
-                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Jml Sesi</span></div>
-                        <div class="col-md-3"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Biaya (Rp)</span></div>
+                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Mata Pelajaran</span></div>
+                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Guru Pengajar</span></div>
+                        <div class="col-md-1"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Sesi</span></div>
+                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Biaya Siswa (Rp)</span></div>
+                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Honor Guru (Rp)</span></div>
+                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Margin</span></div>
                     </div>
 
                     <div id="courseRowsContainer">
                         <?php $__currentLoopData = $courses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <?php $fee = $course->fee->amount ?? 0; ?>
+                        <?php $fee = $course->fee->amount ?? 0; $honor = round($fee * 0.6); ?>
                         <div class="pw-course-row" data-course-row="<?php echo e($course->id); ?>">
                             <div class="row g-2 align-items-center">
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <div class="form-check">
                                         <input class="form-check-input course-check" type="checkbox" name="course_ids[]" value="<?php echo e($course->id); ?>" id="course<?php echo e($course->id); ?>" checked>
-                                        <label class="form-check-label fw-semibold" for="course<?php echo e($course->id); ?>"><?php echo e($course->nama); ?></label>
+                                        <label class="form-check-label fw-semibold" for="course<?php echo e($course->id); ?>" style="font-size:.82rem"><?php echo e($course->nama); ?></label>
                                     </div>
-                                    <div class="form-text" style="font-size:.68rem">Mapel pilihan siswa</div>
+                                    <div class="form-text" style="font-size:.67rem">Mapel pilihan siswa</div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <select class="form-select form-select-sm guru-select" name="course_teacher[<?php echo e($course->id); ?>]" data-course-id="<?php echo e($course->id); ?>">
                                         <option value="">Pilih guru…</option>
                                         <?php $__currentLoopData = $course->guru; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -271,13 +369,25 @@
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </select>
                                 </div>
-                                <div class="col-md-2">
-                                    <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[<?php echo e($course->id); ?>]" placeholder="Jml sesi" value="<?php echo e($registration->interest_sessions[$course->nama] ?? 8); ?>">
+                                <div class="col-md-1">
+                                    <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[<?php echo e($course->id); ?>]" placeholder="Sesi" value="<?php echo e($registration->interest_sessions[$course->nama] ?? 8); ?>">
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-text">Rp</span>
-                                        <input type="number" min="0" class="form-control fee-input" name="course_fee[<?php echo e($course->id); ?>]" value="<?php echo e($fee); ?>">
+                                        <input type="number" min="0" class="form-control fee-input" name="course_fee[<?php echo e($course->id); ?>]" value="<?php echo e($fee); ?>" oninput="updateRowMargin(this)">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text">Rp</span>
+                                        <input type="number" min="0" class="form-control honor-input" name="course_honor[<?php echo e($course->id); ?>]" value="<?php echo e($honor); ?>" oninput="updateRowMargin(this)">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="margin-display px-2 py-1 rounded-2 text-center" style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);font-size:.78rem">
+                                        <span class="margin-rp fw-semibold" style="color:#10b981">Rp<?php echo e(number_format($fee - $honor, 0, ',', '.')); ?></span>
+                                        <span class="margin-pct text-muted ms-1" style="font-size:.7rem">(<?php echo e($fee > 0 ? round((($fee-$honor)/$fee)*100) : 0); ?>%)</span>
                                     </div>
                                 </div>
                                 <div class="col-md-1 text-end">
@@ -302,16 +412,28 @@
 
                     
                     <div class="row g-3 mt-3">
-                        <div class="col-md-6">
-                            <div class="p-3 rounded-3 text-center" style="background:rgba(200,77,223,.08);border:1.5px solid rgba(200,77,223,.35)">
-                                <div class="text-muted" style="font-size:.72rem;text-transform:uppercase;letter-spacing:.05em">Total Sesi</div>
+                        <div class="col-6 col-md-3">
+                            <div class="p-2 rounded-3 text-center" style="background:rgba(200,77,223,.08);border:1.5px solid rgba(200,77,223,.35)">
+                                <div class="text-muted" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.04em">Total Sesi</div>
                                 <div class="fw-bold fs-5 text-primary" id="summaryTotalSesi">0</div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="p-3 rounded-3 text-center" style="background:rgba(200,77,223,.08);border:1.5px solid rgba(200,77,223,.35)">
-                                <div class="text-muted" style="font-size:.72rem;text-transform:uppercase;letter-spacing:.05em">Total Estimasi Biaya Guru</div>
+                        <div class="col-6 col-md-3">
+                            <div class="p-2 rounded-3 text-center" style="background:rgba(200,77,223,.08);border:1.5px solid rgba(200,77,223,.35)">
+                                <div class="text-muted" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.04em">Total Biaya Siswa</div>
                                 <div class="fw-bold fs-5 text-primary" id="summaryTotalFee">Rp0</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="p-2 rounded-3 text-center" style="background:rgba(14,165,233,.08);border:1.5px solid rgba(14,165,233,.3)">
+                                <div class="text-muted" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.04em">Total Honor Guru</div>
+                                <div class="fw-bold fs-5" id="summaryTotalHonor" style="color:#0ea5e9">Rp0</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="p-2 rounded-3 text-center" style="background:rgba(16,185,129,.08);border:1.5px solid rgba(16,185,129,.3)">
+                                <div class="text-muted" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.04em">Est. Margin Bimbel</div>
+                                <div class="fw-bold fs-5" id="summaryMargin" style="color:#10b981">Rp0 <span id="summaryMarginPct" class="fw-normal" style="font-size:.65rem">(0%)</span></div>
                             </div>
                         </div>
                     </div>
@@ -392,7 +514,7 @@
                         <i class="bi bi-search" style="color:#e09000"></i>
                         <span class="fw-bold" style="font-size:.85rem">Cek Konflik Jadwal Guru</span>
                     </div>
-                    <button type="button" class="btn btn-sm" style="background:rgba(246,175,35,.15);color:#8a5e00;border:1px solid rgba(246,175,35,.5);border-radius:10px" onclick="runAllConflictChecks()">
+                    <button type="button" id="btnCekSemuaGuru" class="btn btn-sm" style="background:rgba(246,175,35,.15);color:#8a5e00;border:1px solid rgba(246,175,35,.5);border-radius:10px">
                         <i class="bi bi-search me-1"></i>Cek Semua Guru
                     </button>
                 </div>
@@ -418,30 +540,144 @@
         
         <div class="pw-panel" data-step="4">
             <h6 class="fw-bold mb-3"><i class="bi bi-cash-coin me-2 text-primary"></i>Pembayaran</h6>
-            <div class="row g-3">
+
+            
+            <div class="mb-4 p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
+                <label class="form-label fw-semibold mb-1" style="font-size:.78rem">Total Biaya Program</label>
+                <div class="input-group">
+                    <span class="input-group-text">Rp</span>
+                    <input type="number" min="0" class="form-control fw-bold" id="totalBiaya" name="total_biaya" required>
+                </div>
+                <div class="form-text" style="font-size:.72rem">Dihitung otomatis dari mapel/paket — bisa disesuaikan.</div>
+            </div>
+
+            
+            <label class="form-label fw-semibold mb-2" style="font-size:.78rem">Metode Pembayaran <span class="text-danger">*</span></label>
+            <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                    <label class="form-label fw-semibold" style="font-size:.78rem">Total Biaya</label>
-                    <div class="input-group"><span class="input-group-text">Rp</span><input type="number" min="0" class="form-control" id="totalBiaya" name="total_biaya" required></div>
-                    <div class="form-text" style="font-size:.72rem">Dihitung otomatis dari mata pelajaran / paket yang dipilih — bisa disesuaikan.</div>
+                    <div class="pm-card rounded-3 p-3" data-method="prabayar" onclick="selectPaymentMethod('prabayar')"
+                         style="border:2px solid var(--card-border);cursor:pointer;transition:border-color .2s,background .2s">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <div style="width:32px;height:32px;border-radius:8px;background:rgba(200,77,223,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                                <i class="bi bi-wallet2" style="color:#461256"></i>
+                            </div>
+                            <span class="fw-semibold" style="font-size:.9rem">Prabayar (Prepaid)</span>
+                        </div>
+                        <p class="text-muted mb-0" style="font-size:.78rem">Siswa membayar sebelum kelas — bisa langsung lunas atau dicicil sesuai kesepakatan.</p>
+                    </div>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Biaya per Sesi (opsional)</label>
-                    <div class="input-group"><span class="input-group-text">Rp</span><input type="number" min="0" class="form-control" name="biaya_per_sesi"></div>
-                </div>
-                <div class="col-12">
-                    <label class="form-label fw-semibold" style="font-size:.78rem">Status Pembayaran</label>
-                    <div class="d-flex gap-3 flex-wrap">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="payment_status" id="payBelum" value="belum_bayar" checked>
-                            <label class="form-check-label" for="payBelum">Belum Dibayar &mdash; kirim invoice, siswa masuk status <em>Atur Jadwal</em></label>
+                    <div class="pm-card rounded-3 p-3" data-method="pascabayar" onclick="selectPaymentMethod('pascabayar')"
+                         style="border:2px solid var(--card-border);cursor:pointer;transition:border-color .2s,background .2s">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <div style="width:32px;height:32px;border-radius:8px;background:rgba(16,185,129,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                                <i class="bi bi-calendar-check" style="color:#10b981"></i>
+                            </div>
+                            <span class="fw-semibold" style="font-size:.9rem">Pascabayar (Per Sesi)</span>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="payment_status" id="payLunas" value="lunas">
-                            <label class="form-check-label" for="payLunas">Lunas &mdash; siswa langsung <em>Terjadwal</em></label>
-                        </div>
+                        <p class="text-muted mb-0" style="font-size:.78rem">Tagihan awal Rp 0. Invoice sesi dibuat otomatis setiap guru submit Jurnal Mengajar.</p>
                     </div>
                 </div>
             </div>
+
+            
+            <div id="prabayarPanel" style="display:none">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold mb-2" style="font-size:.78rem">Jenis Pembayaran</label>
+                    <div class="d-flex gap-4 flex-wrap">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="prabayar_type" id="payLunas" value="lunas" checked onchange="onPrabayarTypeChange()">
+                            <label class="form-check-label fw-semibold" for="payLunas"><i class="bi bi-check-circle-fill text-success me-1"></i>Langsung Lunas</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="prabayar_type" id="payCicilan" value="cicilan" onchange="onPrabayarTypeChange()">
+                            <label class="form-check-label fw-semibold" for="payCicilan"><i class="bi bi-credit-card-2-front text-primary me-1"></i>Cicilan</label>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="lunasPanel" style="display:none">
+                    <div class="p-3 rounded-3 mb-3" style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.25)">
+                        <p class="mb-2" style="font-size:.85rem;color:#10b981"><i class="bi bi-check-circle-fill me-2"></i>Invoice senilai <strong>Rp <span id="lunasTotalDisplay">0</span></strong> akan dibuat.</p>
+                        <div class="d-flex gap-3 flex-wrap">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="prabayar_lunas_status" id="statusBelum" value="belum_bayar" checked onchange="document.getElementById('paymentStatusInput').value=this.value">
+                                <label class="form-check-label" for="statusBelum" style="font-size:.83rem">Kirim invoice — tandai lunas setelah bayar diterima</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="prabayar_lunas_status" id="statusLunas" value="lunas" onchange="document.getElementById('paymentStatusInput').value=this.value">
+                                <label class="form-check-label" for="statusLunas" style="font-size:.83rem">Langsung tandai <strong>Lunas</strong> sekarang</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="cicilanPanel" style="display:none">
+                    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                        <span class="fw-semibold" style="font-size:.85rem">Rincian Cicilan</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <label style="font-size:.8rem;color:var(--text-muted)">Jumlah cicilan:</label>
+                            <input type="number" min="1" max="24" class="form-control form-control-sm" id="jumlahCicilan" value="2" style="width:72px" oninput="rebuildCicilanRows()">
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered align-middle mb-0" style="font-size:.82rem">
+                            <thead>
+                                <tr style="background:var(--input-bg)">
+                                    <th style="width:36px;font-size:.7rem;color:var(--text-muted)">No</th>
+                                    <th style="font-size:.7rem;color:var(--text-muted)">Nominal (Rp)</th>
+                                    <th style="font-size:.7rem;color:var(--text-muted)">Mulai Tagih</th>
+                                    <th style="font-size:.7rem;color:var(--text-muted)">Jatuh Tempo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cicilanRowsContainer"></tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2 p-2 rounded-3" style="background:var(--input-bg)">
+                        <span style="font-size:.83rem">Total semua cicilan:</span>
+                        <span id="cicilanTotalCheck" class="fw-bold" style="font-size:.88rem">Rp 0</span>
+                    </div>
+                    <div id="cicilanMismatchWarning" class="mt-1" style="font-size:.8rem;color:#b45309;display:none">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>Total cicilan belum sesuai total biaya (Rp <span id="cicilanBiayaRef">0</span>). Harap sesuaikan.
+                    </div>
+                </div>
+            </div>
+
+            
+            <div id="pascabayarPanel" style="display:none">
+                <div class="p-3 rounded-3 mb-3" style="background:rgba(14,165,233,.06);border:1px solid rgba(14,165,233,.25)">
+                    <div class="fw-semibold mb-2" style="font-size:.88rem;color:#0ea5e9"><i class="bi bi-info-circle-fill me-2"></i>Skema Pascabayar (Per Sesi)</div>
+                    <ul class="mb-0 ps-3" style="font-size:.84rem;color:var(--text-muted)">
+                        <li class="mb-1">Tagihan awal hari ini adalah <strong>Rp 0</strong> (hanya biaya admin jika ada)</li>
+                        <li class="mb-1">Akun siswa akan <strong>otomatis aktif</strong> setelah proses selesai</li>
+                        <li>Invoice sesi akan di-generate setiap guru submit <strong>Jurnal Mengajar</strong></li>
+                    </ul>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:.78rem">Biaya Admin (opsional)</label>
+                        <div class="input-group input-group-sm"><span class="input-group-text">Rp</span>
+                            <input type="number" min="0" name="biaya_admin" class="form-control" placeholder="0">
+                        </div>
+                        <div class="form-text" style="font-size:.7rem">Ditagihkan di awal, jika ada.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:.78rem">Tarif per Sesi</label>
+                        <div class="input-group input-group-sm"><span class="input-group-text">Rp</span>
+                            <input type="number" min="0" name="biaya_per_sesi" class="form-control" placeholder="0">
+                        </div>
+                        <div class="form-text" style="font-size:.7rem">Dipakai untuk generate invoice per sesi dari jurnal mengajar.</div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <input type="hidden" name="payment_method"  id="paymentMethodInput"  value="prabayar">
+            <input type="hidden" name="payment_status"  id="paymentStatusInput"  value="belum_bayar">
+            <input type="hidden" name="prabayar_type"   id="prabayarTypeInput"   value="lunas">
+
             <div class="pw-actions">
                 <button type="button" class="btn btn-outline-secondary" data-action="prev"><i class="bi bi-arrow-left me-1"></i>Kembali</button>
                 <button type="button" class="btn btn-primary" data-action="next">Lanjut<i class="bi bi-arrow-right ms-1"></i></button>
@@ -486,8 +722,9 @@
 
 <?php $__env->startPush('scripts'); ?>
 <script>
-const _processUrl = "<?php echo e(route('admin.registration-list.process.store', $registration->id)); ?>";
-const _csrf = "<?php echo e(csrf_token()); ?>";
+const _processUrl  = "<?php echo e(route('admin.registration-list.process.store', $registration->id)); ?>";
+const _csrf        = "<?php echo e(csrf_token()); ?>";
+const _branchName  = <?php echo json_encode($matchedBranch ? $matchedBranch->name : '–', 15, 512) ?>;
 let _credData = {};
 
 function showStep(step) {
@@ -522,8 +759,7 @@ function updateScheduleEmpty() {
 }
 
 function recalcTotal() {
-    let total = 0;
-    let totalSesi = 0;
+    let total = 0, totalHonor = 0, totalSesi = 0;
     document.querySelectorAll('.course-check').forEach(chk => {
         const row = chk.closest('.pw-course-row');
         row.classList.toggle('disabled', !chk.checked);
@@ -532,19 +768,45 @@ function recalcTotal() {
         const schedRow = document.querySelector(`.pw-schedule-row[data-schedule-row="${chk.value}"]`);
         if (schedRow) schedRow.style.display = chk.checked ? '' : 'none';
         if (chk.checked) {
-            const feeInput = row.querySelector('.fee-input');
-            const sesiInput = row.querySelector('input[name^="course_sessions"]');
-            total += parseFloat(feeInput?.value || 0);
-            totalSesi += parseInt(sesiInput?.value || 0, 10);
+            const feeInput   = row.querySelector('.fee-input');
+            const honorInput = row.querySelector('.honor-input');
+            const sesiInput  = row.querySelector('input[name^="course_sessions"]');
+            total      += parseFloat(feeInput?.value   || 0);
+            totalHonor += parseFloat(honorInput?.value || 0);
+            totalSesi  += parseInt(sesiInput?.value    || 0, 10);
         }
     });
     document.getElementById('totalBiaya').value = total || 0;
-    const sesiEl = document.getElementById('summaryTotalSesi');
-    const feeEl  = document.getElementById('summaryTotalFee');
-    if (sesiEl) sesiEl.textContent = totalSesi || 0;
-    if (feeEl)  feeEl.textContent  = 'Rp' + Number(total || 0).toLocaleString('id-ID');
+    const margin = total - totalHonor;
+    const pct    = total > 0 ? Math.round((margin / total) * 100) : 0;
+    const fmt    = v => 'Rp' + Number(v).toLocaleString('id-ID');
+    if (document.getElementById('summaryTotalSesi'))  document.getElementById('summaryTotalSesi').textContent  = totalSesi || 0;
+    if (document.getElementById('summaryTotalFee'))   document.getElementById('summaryTotalFee').textContent   = fmt(total);
+    if (document.getElementById('summaryTotalHonor')) document.getElementById('summaryTotalHonor').textContent = fmt(totalHonor);
+    if (document.getElementById('summaryMargin')) {
+        document.getElementById('summaryMargin').childNodes[0].textContent = fmt(margin) + ' ';
+        document.getElementById('summaryMarginPct').textContent = '(' + pct + '%)';
+    }
     updateScheduleEmpty();
     renumberScheduleRows();
+}
+
+// Update a single row's margin display when fee or honor changes
+function updateRowMargin(input) {
+    const row    = input.closest('.pw-course-row');
+    const fee    = parseFloat(row.querySelector('.fee-input')?.value   || 0);
+    const honor  = parseFloat(row.querySelector('.honor-input')?.value || 0);
+    const margin = fee - honor;
+    const pct    = fee > 0 ? Math.round((margin / fee) * 100) : 0;
+    const display = row.querySelector('.margin-display');
+    if (display) {
+        display.querySelector('.margin-rp').textContent  = 'Rp' + margin.toLocaleString('id-ID');
+        display.querySelector('.margin-pct').textContent = '(' + pct + '%)';
+        display.style.background = margin >= 0 ? 'rgba(16,185,129,.07)' : 'rgba(220,38,38,.07)';
+        display.style.borderColor = margin >= 0 ? 'rgba(16,185,129,.2)' : 'rgba(220,38,38,.2)';
+        display.querySelector('.margin-rp').style.color = margin >= 0 ? '#10b981' : '#dc2626';
+    }
+    recalcTotal();
 }
 
 // ── Rooms list (for schedule dropdown) ────────────────────────────────────────
@@ -609,12 +871,22 @@ function runConflictCheck(courseId) {
 }
 
 function runAllConflictChecks() {
-    document.querySelectorAll('#scheduleRowsContainer .pw-schedule-row').forEach(tr => {
-        if (tr.style.display !== 'none') {
-            const cid = tr.dataset.scheduleRow;
-            if (cid) runConflictCheck(cid);
+    // Iterate ALL conflict-warning-boxes that belong to currently checked courses
+    const checkedCourseIds = new Set(
+        Array.from(document.querySelectorAll('.course-check:checked')).map(el => el.value)
+    );
+    const boxes = document.querySelectorAll('.conflict-warning-box[data-course-id]');
+    let ran = 0;
+    boxes.forEach(box => {
+        const cid = box.dataset.courseId;
+        if (checkedCourseIds.has(cid)) {
+            runConflictCheck(cid);
+            ran++;
         }
     });
+    if (ran === 0) {
+        showToast('Pilih setidaknya satu mata pelajaran dan lengkapi jadwal (guru, hari & jam) untuk mengecek konflik.', 'warning');
+    }
 }
 
 function bindGuruConflictEvents(courseId) {
@@ -658,28 +930,44 @@ function buildCourseRow(course, isAdmin) {
     row.className = 'pw-course-row';
     row.dataset.courseRow = course.id;
     const guruOptions = course.guru.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+    const fee   = parseFloat(course.fee) || 0;
+    const honor = Math.round(fee * 0.6);
+    const margin = fee - honor;
+    const pct    = fee > 0 ? Math.round((margin / fee) * 100) : 0;
     row.innerHTML = `
         <div class="row g-2 align-items-center">
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="form-check">
                     <input class="form-check-input course-check" type="checkbox" name="course_ids[]" value="${course.id}" id="rowCourse${course.id}" checked>
-                    <label class="form-check-label fw-semibold" for="rowCourse${course.id}">${course.nama}</label>
+                    <label class="form-check-label fw-semibold" for="rowCourse${course.id}" style="font-size:.82rem">${course.nama}</label>
                 </div>
-                <div class="form-text" style="font-size:.68rem">${isAdmin ? 'Ditambahkan admin' : 'Mapel pilihan siswa'}</div>
+                <div class="form-text" style="font-size:.67rem">${isAdmin ? 'Ditambahkan admin' : 'Mapel pilihan siswa'}</div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <select class="form-select form-select-sm guru-select" name="course_teacher[${course.id}]" data-course-id="${course.id}">
                     <option value="">Pilih guru…</option>
                     ${guruOptions}
                 </select>
             </div>
-            <div class="col-md-2">
-                <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[${course.id}]" placeholder="Jml sesi" value="8">
+            <div class="col-md-1">
+                <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[${course.id}]" placeholder="Sesi" value="8">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="input-group input-group-sm">
                     <span class="input-group-text">Rp</span>
-                    <input type="number" min="0" class="form-control fee-input" name="course_fee[${course.id}]" value="${course.fee}">
+                    <input type="number" min="0" class="form-control fee-input" name="course_fee[${course.id}]" value="${fee}" oninput="updateRowMargin(this)">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Rp</span>
+                    <input type="number" min="0" class="form-control honor-input" name="course_honor[${course.id}]" value="${honor}" oninput="updateRowMargin(this)">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="margin-display px-2 py-1 rounded-2 text-center" style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);font-size:.78rem">
+                    <span class="margin-rp fw-semibold" style="color:#10b981">Rp${margin.toLocaleString('id-ID')}</span>
+                    <span class="margin-pct text-muted ms-1" style="font-size:.7rem">(${pct}%)</span>
                 </div>
             </div>
             <div class="col-md-1 text-end">
@@ -796,22 +1084,19 @@ document.getElementById('customPackagePrice').addEventListener('input', function
     if (isCustomPkg) document.getElementById('totalBiaya').value = this.value || 0;
 });
 
-document.getElementById('branchSelect').addEventListener('change', function() {
-    const branchId = this.value;
+// Branch is now a fixed hidden input — filter packages once on load using its value
+(function filterPackagesByBranch() {
+    const branchId = document.getElementById('branchSelect')?.value;
+    if (!branchId) return;
     Array.from(packageDropdown.options).forEach(opt => {
-        if (!opt.value) return; // keep "Tanpa Paket" always visible
+        if (!opt.value) return;
         const cabang = opt.dataset.cabang || '';
-        const hide = branchId && cabang && cabang !== branchId;
-        opt.hidden = hide;
-        if (hide && packageDropdown.value === opt.value) {
-            packageDropdown.value = '';
-            onPackageDropdownChange();
-        }
+        opt.hidden = cabang && cabang !== branchId;
     });
-});
+})();
 
 function buildPreview() {
-    const branchName = document.getElementById('branchSelect').selectedOptions[0]?.text || '–';
+    const branchName = _branchName;
     let pkgName = 'Tanpa Paket';
     if (isCustomPkg) {
         const cpName = document.querySelector('[name="custom_package_name"]')?.value;
@@ -820,29 +1105,322 @@ function buildPreview() {
         const sel = packageDropdown.selectedOptions[0];
         pkgName = packageDropdown.value ? sel.text.split(' — ')[0] : 'Tanpa Paket';
     }
+
+    // Collect per-course data for both the summary table and quotation
     const rows = [];
+    let totalFee = 0, totalHonor = 0;
     document.querySelectorAll('.course-check:checked').forEach(chk => {
-        const row = chk.closest('.pw-course-row');
+        const row     = chk.closest('.pw-course-row');
         const teacher = row.querySelector('select').selectedOptions[0]?.text || '–';
-        const sesi = row.querySelector('input[name^="course_sessions"]').value || '–';
-        const fee = row.querySelector('.fee-input').value || 0;
-        const courseName = row.querySelector('.form-check-label').textContent;
-        rows.push(`<tr><td>${courseName}</td><td>${teacher}</td><td>${sesi}</td><td>Rp${Number(fee).toLocaleString('id-ID')}</td></tr>`);
+        const sesi    = row.querySelector('input[name^="course_sessions"]').value || '–';
+        const fee     = parseFloat(row.querySelector('.fee-input')?.value   || 0);
+        const honor   = parseFloat(row.querySelector('.honor-input')?.value || 0);
+        const margin  = fee - honor;
+        const pct     = fee > 0 ? Math.round((margin / fee) * 100) : 0;
+        const name    = row.querySelector('.form-check-label').textContent.trim();
+        totalFee   += fee;
+        totalHonor += honor;
+        const marginColor  = margin >= 0 ? '#10b981' : '#dc2626';
+        rows.push({ name, teacher, sesi, fee, honor, margin, pct, marginColor });
     });
-    const total = document.getElementById('totalBiaya').value || 0;
-    const payStatus = document.querySelector('input[name="payment_status"]:checked').value === 'lunas' ? 'Lunas' : 'Belum Dibayar';
+
+    const totalMargin = totalFee - totalHonor;
+    const totalPct    = totalFee > 0 ? Math.round((totalMargin / totalFee) * 100) : 0;
+    const fmt = v => 'Rp' + Number(v).toLocaleString('id-ID');
+
+    const method    = document.getElementById('paymentMethodInput').value;
+    const payStatus = document.getElementById('paymentStatusInput').value;
+    const prabType  = document.getElementById('prabayarTypeInput').value;
+    let metodeTxt = '–';
+    if (method === 'prabayar') {
+        if (prabType === 'cicilan') {
+            const n = document.getElementById('jumlahCicilan')?.value || '?';
+            metodeTxt = `Prabayar — Cicilan (${n}x)`;
+        } else {
+            metodeTxt = 'Prabayar — ' + (payStatus === 'lunas' ? 'Lunas Sekarang' : 'Invoice Dikirim');
+        }
+    } else if (method === 'pascabayar') {
+        metodeTxt = 'Pascabayar (Per Sesi)';
+    }
+
+    const rowsHtml = rows.length
+        ? rows.map(r => `
+            <tr>
+                <td class="fw-semibold" style="font-size:.83rem">${r.name}</td>
+                <td style="font-size:.82rem">${r.teacher}</td>
+                <td class="text-center">${r.sesi}</td>
+                <td class="text-end">${fmt(r.fee)}</td>
+                <td class="text-end">${fmt(r.honor)}</td>
+                <td class="text-end fw-semibold" style="color:${r.marginColor}">${fmt(r.margin)} <span class="text-muted fw-normal" style="font-size:.75rem">(${r.pct}%)</span></td>
+            </tr>`).join('')
+        : '<tr><td colspan="6" class="text-muted text-center">Tidak ada mapel dipilih</td></tr>';
+
+    const totalMarginColor = totalMargin >= 0 ? '#10b981' : '#dc2626';
 
     document.getElementById('previewBox').innerHTML = `
+        
         <div class="row g-2 mb-3">
-            <div class="col-md-6"><span class="text-muted">Cabang:</span> <strong>${branchName}</strong></div>
-            <div class="col-md-6"><span class="text-muted">Paket:</span> <strong>${pkgName}</strong></div>
+            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Cabang:</span> <strong>${branchName}</strong></div>
+            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Paket:</span> <strong>${pkgName}</strong></div>
+            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Kategori:</span> <strong>${(document.querySelector('[name="education_level"]')?.value)||'–'}</strong></div>
+            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Tempat Belajar:</span> <strong>$<?php echo e(kantor:'Di Kantor',rumah:'Guru ke Rumah'}[document.getElementById('tempatBelajarInput')?.value]||'–'}</strong></div>
+            <div class="col-md-8"><span class="text-muted" style="font-size:.83rem">Jadwal:</span> <strong style="font-size:.82rem">${(()=>{const days=Array.from(document.querySelectorAll('input[name="hari_belajar[]"]:checked')).map(c=>c.value);if(!days.length)return'–';return days.map(d=>{const slots=Array.from(document.querySelectorAll('input[name="jam_detail['+d+'][]"]')).map(i=>i.value).filter(Boolean);return d+(slots.length?' ('+slots.join(', ')+')':'');}).join(' · ');})()}</strong></div>
         </div>
-        <table class="table table-sm"><thead><tr><th>Mapel</th><th>Guru</th><th>Sesi</th><th>Biaya</th></tr></thead>
-        <tbody>${rows.join('') || '<tr><td colspan="4" class="text-muted text-center">Tidak ada mapel dipilih</td></tr>'}</tbody></table>
-        <div class="d-flex justify-content-between mt-2"><span class="text-muted">Status Pembayaran:</span><strong>${payStatus}</strong></div>
-        <div class="d-flex justify-content-between"><span class="text-muted">Total Biaya:</span><strong class="text-primary">Rp${Number(total).toLocaleString('id-ID')}</strong></div>
+
+        
+        <div class="fw-bold mb-2" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted)"><i class="bi bi-journal-bookmark me-1"></i>Mata Pelajaran & Guru</div>
+        <div class="table-responsive mb-3">
+            <table class="table table-sm table-bordered align-middle mb-0" style="font-size:.82rem">
+                <thead><tr style="background:var(--input-bg)">
+                    <th>Mapel</th><th>Guru</th><th class="text-center">Sesi</th>
+                    <th class="text-end">Biaya Siswa</th><th class="text-end">Honor Guru</th><th class="text-end">Margin</th>
+                </tr></thead>
+                <tbody>${rowsHtml}</tbody>
+            </table>
+        </div>
+
+        
+        <div class="rounded-3 overflow-hidden mb-3" style="border:1.5px solid rgba(200,77,223,.35)">
+            <div class="px-3 py-2 d-flex align-items-center gap-2" style="background:linear-gradient(90deg,rgba(70,18,86,.1),rgba(200,77,223,.08))">
+                <i class="bi bi-graph-up-arrow" style="color:#c84ddf"></i>
+                <span class="fw-bold" style="font-size:.82rem;color:#461256">📊 Live Quotation</span>
+                <span class="ms-auto badge rounded-pill" style="background:rgba(200,77,223,.15);color:#461256;font-size:.7rem">${rows.length} mapel</span>
+            </div>
+            <div class="p-3" style="background:var(--input-bg)">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-3 text-center h-100" style="background:rgba(200,77,223,.07);border:1.5px solid rgba(200,77,223,.25)">
+                            <div class="text-muted mb-1" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.05em"><i class="bi bi-person me-1"></i>Total Tagihan Siswa</div>
+                            <div class="fw-bold" style="font-size:1.15rem;color:#461256">${fmt(totalFee)}</div>
+                            <div class="text-muted mt-1" style="font-size:.7rem">Tagihan yang diterbitkan ke siswa</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-3 text-center h-100" style="background:rgba(14,165,233,.07);border:1.5px solid rgba(14,165,233,.25)">
+                            <div class="text-muted mb-1" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.05em"><i class="bi bi-person-badge me-1"></i>Total Honor Guru</div>
+                            <div class="fw-bold" style="font-size:1.15rem;color:#0ea5e9">${fmt(totalHonor)}</div>
+                            <div class="text-muted mt-1" style="font-size:.7rem">Biaya yang dibayarkan ke guru</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-3 text-center h-100" style="background:rgba(16,185,129,.07);border:1.5px solid rgba(16,185,129,.25)">
+                            <div class="text-muted mb-1" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.05em"><i class="bi bi-building me-1"></i>Pendapatan Bimbel</div>
+                            <div class="fw-bold" style="font-size:1.15rem;color:${totalMarginColor}">${fmt(totalMargin)}</div>
+                            <div class="mt-1">
+                                <span class="badge rounded-pill" style="background:${totalMargin>=0?'rgba(16,185,129,.15)':'rgba(220,38,38,.12)'};color:${totalMarginColor};font-size:.72rem">Margin ${totalPct}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3 pt-3" style="border-top:1px solid var(--card-border)">
+                    <div class="row g-2" style="font-size:.84rem">
+                        <div class="col-md-6 d-flex justify-content-between py-1" style="border-bottom:1px dashed var(--card-border)">
+                            <span class="text-muted">Metode Pembayaran</span><strong>${metodeTxt}</strong>
+                        </div>
+                        <div class="col-md-6 d-flex justify-content-between py-1" style="border-bottom:1px dashed var(--card-border)">
+                            <span class="text-muted">Total Biaya (Final)</span><strong class="text-primary">${fmt(totalFee)}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     `;
 }
+
+// ═══════════════════════════════════════════
+// STEP 1 — Tempat Belajar & Jadwal JS
+// ═══════════════════════════════════════════
+function pickTempat(val, el) {
+    el.closest('.d-flex').querySelectorAll('.pw-opt-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tempatBelajarInput').value = val;
+}
+
+const PW_DAY_ORDER = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+
+function pwToggleDay(pill, dayName) {
+    const cb = pill.querySelector('input[type=checkbox]');
+    setTimeout(() => {
+        const checked = cb.checked;
+        pill.classList.toggle('selected', checked);
+        if (checked) pwAddDayRow(dayName);
+        else pwRemoveDayRow(dayName);
+        pwUpdateScheduleWrapper();
+    }, 0);
+}
+
+function pwAddDayRow(dayName) {
+    if (document.getElementById('pwsrow-' + dayName)) return;
+    const container = document.getElementById('pwDayScheduleContainer');
+    const row = document.createElement('div');
+    row.className = 'pw-schedule-row';
+    row.id = 'pwsrow-' + dayName;
+    row.innerHTML = `
+        <div class="pw-day-label">${dayName}</div>
+        <div class="flex-fill" id="pwslots-${dayName}">
+            <div class="pw-time-slot">
+                <input type="text" name="jam_detail[${dayName}][]"
+                       class="form-control form-control-sm" placeholder="cth. 10:00 - 12:00" autocomplete="off">
+            </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-primary" onclick="pwAddSlot('${dayName}')" style="font-size:.72rem;white-space:nowrap">
+            <i class="bi bi-plus"></i> Slot
+        </button>`;
+    // Insert in day order
+    let inserted = false;
+    container.querySelectorAll('.pw-schedule-row').forEach(existRow => {
+        if (inserted) return;
+        const existDay = existRow.id.replace('pwsrow-', '');
+        if (PW_DAY_ORDER.indexOf(dayName) < PW_DAY_ORDER.indexOf(existDay)) {
+            container.insertBefore(row, existRow);
+            inserted = true;
+        }
+    });
+    if (!inserted) container.appendChild(row);
+}
+
+function pwRemoveDayRow(dayName) {
+    document.getElementById('pwsrow-' + dayName)?.remove();
+}
+
+function pwUpdateScheduleWrapper() {
+    const wrapper   = document.getElementById('pwDayScheduleWrapper');
+    const container = document.getElementById('pwDayScheduleContainer');
+    if (!wrapper || !container) return;
+    wrapper.style.display = container.querySelectorAll('.pw-schedule-row').length > 0 ? '' : 'none';
+}
+
+function pwAddSlot(dayName) {
+    const slotsDiv = document.getElementById('pwslots-' + dayName);
+    if (!slotsDiv) return;
+    const div = document.createElement('div');
+    div.className = 'pw-time-slot mt-1';
+    div.innerHTML = `
+        <input type="text" name="jam_detail[${dayName}][]"
+               class="form-control form-control-sm" placeholder="cth. 15:00 - 17:00" autocomplete="off">
+        <button type="button" class="btn btn-sm btn-outline-danger" onclick="pwRemoveSlot(this)" title="Hapus">
+            <i class="bi bi-x"></i>
+        </button>`;
+    slotsDiv.appendChild(div);
+}
+
+function pwRemoveSlot(btn) {
+    btn.closest('.pw-time-slot')?.remove();
+}
+
+// ═══════════════════════════════════════════
+// STEP 4 — Payment Method JS
+// ═══════════════════════════════════════════
+function selectPaymentMethod(method) {
+    document.querySelectorAll('.pm-card').forEach(c => {
+        const isActive = c.dataset.method === method;
+        c.style.borderColor   = isActive ? 'var(--bs-primary)' : 'var(--card-border)';
+        c.style.background    = isActive ? 'rgba(200,77,223,.06)' : '';
+    });
+    document.getElementById('paymentMethodInput').value = method;
+    document.getElementById('prabayarPanel').style.display  = method === 'prabayar'  ? '' : 'none';
+    document.getElementById('pascabayarPanel').style.display = method === 'pascabayar' ? '' : 'none';
+    if (method === 'pascabayar') {
+        document.getElementById('paymentStatusInput').value = 'belum_bayar';
+        document.getElementById('prabayarTypeInput').value  = 'lunas';
+    } else {
+        onPrabayarTypeChange();
+    }
+}
+
+function onPrabayarTypeChange() {
+    const type = document.querySelector('input[name="prabayar_type"]:checked')?.value || '';
+    document.getElementById('prabayarTypeInput').value   = type || 'lunas';
+    document.getElementById('lunasPanel').style.display  = type === 'lunas'   ? '' : 'none';
+    document.getElementById('cicilanPanel').style.display = type === 'cicilan' ? '' : 'none';
+    if (type === 'lunas') {
+        const checked = document.querySelector('input[name="prabayar_lunas_status"]:checked');
+        document.getElementById('paymentStatusInput').value = checked ? checked.value : 'belum_bayar';
+        updateLunasDisplay();
+    } else if (type === 'cicilan') {
+        document.getElementById('paymentStatusInput').value = 'belum_bayar';
+        if (!document.querySelector('#cicilanRowsContainer tr')) rebuildCicilanRows();
+    }
+}
+
+function updateLunasDisplay() {
+    const total = parseFloat(document.getElementById('totalBiaya').value) || 0;
+    const el = document.getElementById('lunasTotalDisplay');
+    if (el) el.textContent = total.toLocaleString('id-ID');
+}
+
+function rebuildCicilanRows() {
+    const n         = Math.max(1, parseInt(document.getElementById('jumlahCicilan').value) || 2);
+    const totalBiaya = parseFloat(document.getElementById('totalBiaya').value) || 0;
+    const container  = document.getElementById('cicilanRowsContainer');
+    container.innerHTML = '';
+    const base     = n > 0 ? Math.floor(totalBiaya / n) : 0;
+    const today    = new Date();
+    const pad = v => String(v).padStart(2,'0');
+    const dateStr = (d) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    for (let i = 1; i <= n; i++) {
+        const nominal  = i === n ? (totalBiaya - base * (n - 1)) : base;
+        const mulaiDate = new Date(today); mulaiDate.setDate(today.getDate() + (i-1)*30);
+        const tempoDate = new Date(today); tempoDate.setDate(today.getDate() + i*30);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="text-center"><span class="badge bg-primary-soft text-primary" style="font-size:.75rem">${i}</span></td>
+            <td>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Rp</span>
+                    <input type="number" min="0" class="form-control cicilan-nominal" name="cicilan_nominal[]"
+                           value="${nominal}" oninput="updateCicilanTotal()">
+                </div>
+            </td>
+            <td><input type="date" class="form-control form-control-sm" name="cicilan_mulai[]" value="${dateStr(mulaiDate)}"></td>
+            <td><input type="date" class="form-control form-control-sm" name="cicilan_jatuh_tempo[]" value="${dateStr(tempoDate)}"></td>`;
+        container.appendChild(tr);
+    }
+    updateCicilanTotal();
+}
+
+function updateCicilanTotal() {
+    const nominals = document.querySelectorAll('.cicilan-nominal');
+    const sum      = Array.from(nominals).reduce((s, el) => s + (parseFloat(el.value) || 0), 0);
+    const biaya    = parseFloat(document.getElementById('totalBiaya').value) || 0;
+    document.getElementById('cicilanTotalCheck').textContent = 'Rp ' + sum.toLocaleString('id-ID');
+    const mismatch = Math.abs(sum - biaya) > 1;
+    document.getElementById('cicilanMismatchWarning').style.display = mismatch ? '' : 'none';
+    const refEl = document.getElementById('cicilanBiayaRef');
+    if (refEl) refEl.textContent = biaya.toLocaleString('id-ID');
+}
+
+// Sync totalBiaya changes → lunas display + cicilan total
+document.getElementById('totalBiaya').addEventListener('input', function() {
+    updateLunasDisplay();
+    if (document.getElementById('cicilanPanel').style.display !== 'none') {
+        updateCicilanTotal();
+    }
+});
+
+// Auto-initialise payment method to prabayar on page load
+selectPaymentMethod('prabayar');
+
+// Conflict check button — add loading state + toast summary
+document.getElementById('btnCekSemuaGuru')?.addEventListener('click', function() {
+    const btn = this;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Mengecek…';
+    runAllConflictChecks();
+    setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-shield-check me-1"></i>Cek Semua Guru';
+        const conflicts = document.querySelectorAll('.conflict-warning-box .text-danger').length;
+        if (conflicts > 0) {
+            showToast(`Ditemukan ${conflicts} konflik jadwal guru. Periksa panel di bawah.`, 'error');
+        } else {
+            const checked = document.querySelectorAll('.conflict-warning-box .text-success').length;
+            if (checked > 0) showToast('Semua guru tersedia — tidak ada konflik jadwal.', 'success');
+        }
+    }, 1800);
+});
+
+// ── end STEP 4 JS ──
 
 document.getElementById('processForm').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -901,7 +1479,7 @@ function sendToWA() {
     const phone = (_credData.phone || '').replace(/\D/g, '');
     if (!phone) { showToast('Nomor HP siswa tidak tersedia.', 'error'); return; }
     const wa = phone.startsWith('0') ? '62' + phone.slice(1) : phone;
-    const loginUrl = '<?php echo e(url("/login")); ?>';
+    const loginUrl = '{{ url("/login")); ?>';
     const msg = encodeURIComponent(
         'Halo ' + (_credData.name || 'Siswa') + ',\n\n' +
         'Selamat datang di Smart Center Indonesia!\n\n' +
@@ -918,4 +1496,4 @@ function sendToWA() {
 </script>
 <?php $__env->stopPush(); ?>
 
-<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/admin/registration/process.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?> ?><?php /**PATH /home/runner/workspace/resources/views/admin/registration/process.blade.php ENDPATH**/ ?>
