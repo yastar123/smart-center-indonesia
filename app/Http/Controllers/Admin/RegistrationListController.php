@@ -9,6 +9,7 @@ use App\Models\Invoice;
 use App\Models\Package;
 use App\Models\Room;
 use App\Models\Schedule;
+use App\Models\SchoolClass;
 use App\Models\Student;
 use App\Models\StudentRegistration;
 use App\Models\Teacher;
@@ -337,6 +338,54 @@ class RegistrationListController extends Controller
                 DB::table('student_teachers')->insertOrIgnore([
                     'student_id' => $student->id,
                     'teacher_id' => $teacherId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            // Auto-enroll the student into a class for each chosen course — reuse an
+            // existing active class for the same branch+course+teacher, or create one
+            // (mirroring SchoolClassController@store's auto-naming), then attach the
+            // student via class_students. This is what actually places a newly
+            // verified student "into their class", not just gives them an account.
+            $jenisKelas = ($data['system'] ?? null) === 'online'
+                ? 'online'
+                : ((($data['program'] ?? null) === 'privat') ? 'private' : 'offline');
+
+            foreach ($data['course_ids'] as $courseId) {
+                $teacherId = $courseTeachers[$courseId] ?? $primaryTeacherId ?? null;
+
+                $classQuery = SchoolClass::where('cabang_id', $branch->id)
+                    ->where('mata_pelajaran_id', $courseId)
+                    ->where('status', 'aktif');
+                $teacherId ? $classQuery->where('guru_id', $teacherId) : $classQuery->whereNull('guru_id');
+                $schoolClass = $classQuery->first();
+
+                if (!$schoolClass) {
+                    $course  = Course::find($courseId);
+                    $teacher = $teacherId ? Teacher::find($teacherId) : null;
+                    $parts   = array_filter([
+                        $course->nama ?? null,
+                        $teacher->name ?? null,
+                        $branch->name,
+                        ucfirst($jenisKelas),
+                    ]);
+
+                    $schoolClass = SchoolClass::create([
+                        'cabang_id'         => $branch->id,
+                        'mata_pelajaran_id' => $courseId,
+                        'guru_id'           => $teacherId,
+                        'kapasitas'         => 20,
+                        'jumlah_pertemuan'  => (int) ($courseSessions[$courseId] ?? 8),
+                        'jenis'             => $jenisKelas,
+                        'status'            => 'aktif',
+                        'nama_kelas'        => implode(' - ', $parts) ?: 'Kelas Baru',
+                    ]);
+                }
+
+                DB::table('class_students')->insertOrIgnore([
+                    'class_id'   => $schoolClass->id,
+                    'student_id' => $student->id,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
