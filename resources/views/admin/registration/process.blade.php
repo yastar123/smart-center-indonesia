@@ -323,53 +323,89 @@
                 <div class="px-3 py-2 d-flex align-items-center gap-2" style="background:linear-gradient(90deg,rgba(70,18,86,.07),transparent);border-bottom:1px solid var(--card-border)">
                     <i class="bi bi-calendar-week text-primary"></i>
                     <span class="fw-bold" style="font-size:.85rem">Jadwal Kelas</span>
-                    <span class="ms-1 text-muted" style="font-size:.75rem">&mdash; opsional, untuk cek konflik jadwal guru</span>
+                    <span class="ms-1 text-muted" style="font-size:.75rem">&mdash; opsional</span>
                 </div>
                 <div class="p-3">
-                    <p class="text-muted mb-3" style="font-size:.82rem">Isi hari &amp; jam kelas agar sistem dapat mengecek apakah guru yang dipilih sudah punya jadwal lain yang bentrok. Pengisian ini <strong>tidak wajib</strong> dan tidak memblokir proses submit.</p>
-
-                    {{-- Column headers (md+) --}}
-                    <div class="row g-2 mb-1 d-none d-md-flex px-1">
-                        <div class="col-md-3"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Mata Pelajaran</span></div>
-                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Hari</span></div>
-                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Jam Mulai</span></div>
-                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Jam Selesai</span></div>
-                        <div class="col-md-3"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Status</span></div>
+                    <p class="text-muted mb-3" style="font-size:.82rem">Isi hari, jam, dan ruang/media untuk setiap mata pelajaran. Guru ditampilkan otomatis sesuai pilihan di tabel atas. Pengisian ini <strong>tidak wajib</strong> dan tidak memblokir submit.</p>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered align-middle mb-0" style="font-size:.83rem;min-width:700px">
+                            <thead>
+                                <tr style="background:var(--input-bg)">
+                                    <th style="width:40px;font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">No</th>
+                                    <th style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Mata Pelajaran</th>
+                                    <th style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Guru</th>
+                                    <th style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Hari</th>
+                                    <th style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Jam Mulai</th>
+                                    <th style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Jam Berakhir</th>
+                                    <th style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Ruang / Media</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scheduleRowsContainer">
+                                @foreach($courses as $course)
+                                <tr class="pw-schedule-row" data-schedule-row="{{ $course->id }}">
+                                    <td class="text-center text-muted sched-no" style="font-size:.78rem">{{ $loop->iteration }}</td>
+                                    <td>
+                                        <span class="badge rounded-pill" style="background:rgba(200,77,223,.12);color:#461256;font-size:.75rem;font-weight:600;padding:.3em .75em">{{ $course->nama }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="sched-guru-name text-muted" data-course-id="{{ $course->id }}" style="font-size:.82rem">—</span>
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm hari-select" data-course-id="{{ $course->id }}" style="min-width:88px">
+                                            <option value="">Pilih…</option>
+                                            <option value="1">Senin</option>
+                                            <option value="2">Selasa</option>
+                                            <option value="3">Rabu</option>
+                                            <option value="4">Kamis</option>
+                                            <option value="5">Jum'at</option>
+                                            <option value="6">Sabtu</option>
+                                            <option value="0">Minggu</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="time" class="form-control form-control-sm jam-mulai-input" data-course-id="{{ $course->id }}" style="min-width:100px">
+                                    </td>
+                                    <td>
+                                        <input type="time" class="form-control form-control-sm jam-selesai-input" data-course-id="{{ $course->id }}" style="min-width:100px">
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm room-select" name="schedule_room[{{ $course->id }}]" data-course-id="{{ $course->id }}" style="min-width:140px">
+                                            <option value="">— Pilih ruang —</option>
+                                            @foreach($rooms as $room)
+                                            <option value="{{ $room->id }}">{{ $room->nama_ruangan }}{{ $room->kapasitas ? ' ('.$room->kapasitas.' org)' : '' }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
+                    <div id="scheduleEmptyMsg" class="text-muted mt-2" style="font-size:.8rem;display:none"><i class="bi bi-info-circle me-1"></i>Tidak ada mata pelajaran yang dipilih.</div>
+                </div>
+            </div>
 
-                    <div id="scheduleRowsContainer">
+            {{-- CARD C: CEK KONFLIK JADWAL GURU --}}
+            <div class="mb-3" style="border:1px solid rgba(246,175,35,.4);border-radius:14px;overflow:hidden">
+                <div class="px-3 py-2 d-flex align-items-center justify-content-between gap-2 flex-wrap" style="background:linear-gradient(90deg,rgba(246,175,35,.08),transparent);border-bottom:1px solid rgba(246,175,35,.3)">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-search" style="color:#e09000"></i>
+                        <span class="fw-bold" style="font-size:.85rem">Cek Konflik Jadwal Guru</span>
+                    </div>
+                    <button type="button" class="btn btn-sm" style="background:rgba(246,175,35,.15);color:#8a5e00;border:1px solid rgba(246,175,35,.5);border-radius:10px" onclick="runAllConflictChecks()">
+                        <i class="bi bi-search me-1"></i>Cek Semua Guru
+                    </button>
+                </div>
+                <div class="p-3">
+                    <p class="text-muted mb-3" style="font-size:.82rem">Klik <strong>Cek Semua Guru</strong> untuk memeriksa apakah guru yang dipilih memiliki jadwal lain yang bentrok. Status juga diperbarui otomatis saat guru, hari, atau jam diubah di tabel jadwal.</p>
+                    <div id="conflictResultsPanel">
                         @foreach($courses as $course)
-                        <div class="pw-schedule-row mb-2" data-schedule-row="{{ $course->id }}">
-                            <div class="row g-2 align-items-center">
-                                <div class="col-md-3">
-                                    <span class="badge rounded-pill" style="background:rgba(200,77,223,.12);color:#461256;font-size:.75rem;font-weight:600;padding:.35em .8em">{{ $course->nama }}</span>
-                                </div>
-                                <div class="col-md-2">
-                                    <select class="form-select form-select-sm hari-select" data-course-id="{{ $course->id }}">
-                                        <option value="">Hari…</option>
-                                        <option value="1">Senin</option>
-                                        <option value="2">Selasa</option>
-                                        <option value="3">Rabu</option>
-                                        <option value="4">Kamis</option>
-                                        <option value="5">Jum'at</option>
-                                        <option value="6">Sabtu</option>
-                                        <option value="0">Minggu</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <input type="time" class="form-control form-control-sm jam-mulai-input" data-course-id="{{ $course->id }}">
-                                </div>
-                                <div class="col-md-2">
-                                    <input type="time" class="form-control form-control-sm jam-selesai-input" data-course-id="{{ $course->id }}">
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="conflict-warning-box" data-course-id="{{ $course->id }}" style="font-size:.72rem"></div>
-                                </div>
-                            </div>
+                        <div class="d-flex align-items-center gap-2 mb-2 p-2 rounded-3" id="conflict-result-{{ $course->id }}" style="background:var(--input-bg)">
+                            <span class="badge rounded-pill flex-shrink-0" style="background:rgba(200,77,223,.12);color:#461256;font-size:.74rem;font-weight:600;padding:.3em .7em;min-width:80px;text-align:center">{{ $course->nama }}</span>
+                            <div class="conflict-warning-box text-muted" data-course-id="{{ $course->id }}" style="font-size:.8rem">—</div>
                         </div>
                         @endforeach
                     </div>
-                    <div id="scheduleEmptyMsg" class="text-muted" style="font-size:.8rem;display:none"><i class="bi bi-info-circle me-1"></i>Tidak ada mata pelajaran yang dipilih.</div>
                 </div>
             </div>
 
@@ -508,44 +544,89 @@ function recalcTotal() {
     if (sesiEl) sesiEl.textContent = totalSesi || 0;
     if (feeEl)  feeEl.textContent  = 'Rp' + Number(total || 0).toLocaleString('id-ID');
     updateScheduleEmpty();
+    renumberScheduleRows();
 }
 
-// ── Guru conflict check — reads from both card A (guru) and card B (jadwal) ──
+// ── Rooms list (for schedule dropdown) ────────────────────────────────────────
+const _roomsList = @json($rooms->map(fn($r) => ['id' => $r->id, 'nama' => $r->nama_ruangan, 'kapasitas' => $r->kapasitas]));
+const _roomOptions = '<option value="">— Pilih ruang —</option>' +
+    _roomsList.map(r => `<option value="${r.id}">${r.nama}${r.kapasitas ? ' (' + r.kapasitas + ' org)' : ''}</option>`).join('');
+
+// ── Guru name sync: Card A guru-select → Card B table display ──────────────────
+function syncGuruName(courseId) {
+    const sel = document.querySelector(`.guru-select[data-course-id="${courseId}"]`);
+    const span = document.querySelector(`.sched-guru-name[data-course-id="${courseId}"]`);
+    if (!sel || !span) return;
+    const chosen = sel.selectedOptions[0];
+    span.textContent = chosen && chosen.value ? chosen.text : '—';
+}
+
+// ── Renumber visible schedule rows ─────────────────────────────────────────────
+function renumberScheduleRows() {
+    let n = 1;
+    document.querySelectorAll('#scheduleRowsContainer .pw-schedule-row').forEach(tr => {
+        const noCell = tr.querySelector('.sched-no');
+        if (tr.style.display === 'none') return;
+        if (noCell) noCell.textContent = n++;
+    });
+}
+
+// ── Guru conflict check — conflict panel below Card B ─────────────────────────
 const guruConflictCheckUrl = @json(route('admin.registration-list.guru-conflict-check'));
+
+function runConflictCheck(courseId) {
+    const guruSelect = document.querySelector(`.guru-select[data-course-id="${courseId}"]`);
+    const hariSelect = document.querySelector(`.hari-select[data-course-id="${courseId}"]`);
+    const jamMulai   = document.querySelector(`.jam-mulai-input[data-course-id="${courseId}"]`);
+    const jamSelesai = document.querySelector(`.jam-selesai-input[data-course-id="${courseId}"]`);
+    const warningBox = document.querySelector(`.conflict-warning-box[data-course-id="${courseId}"]`);
+    if (!warningBox) return;
+    const guruId  = guruSelect?.value;
+    const hari    = hariSelect?.value;
+    const mulai   = jamMulai?.value;
+    const selesai = jamSelesai?.value;
+    if (!guruId || hari === '' || !mulai || !selesai) {
+        warningBox.innerHTML = '<span class="text-muted" style="font-size:.78rem">Lengkapi guru, hari &amp; jam terlebih dahulu.</span>';
+        return;
+    }
+    if (mulai >= selesai) {
+        warningBox.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>Jam berakhir harus setelah jam mulai.</span>';
+        return;
+    }
+    warningBox.innerHTML = '<span class="text-muted"><i class="bi bi-hourglass-split me-1"></i>Mengecek…</span>';
+    fetch(guruConflictCheckUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '', 'Accept': 'application/json' },
+        body: JSON.stringify({ guru_id: guruId, hari, jam_mulai: mulai, jam_selesai: selesai }),
+    })
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(data => {
+        warningBox.innerHTML = data.conflict
+            ? `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>${data.detail}</span>`
+            : '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Guru tersedia.</span>';
+    })
+    .catch(() => { warningBox.innerHTML = '<span class="text-muted">Gagal mengecek.</span>'; });
+}
+
+function runAllConflictChecks() {
+    document.querySelectorAll('#scheduleRowsContainer .pw-schedule-row').forEach(tr => {
+        if (tr.style.display !== 'none') {
+            const cid = tr.dataset.scheduleRow;
+            if (cid) runConflictCheck(cid);
+        }
+    });
+}
 
 function bindGuruConflictEvents(courseId) {
     const guruSelect = document.querySelector(`.guru-select[data-course-id="${courseId}"]`);
     const hariSelect = document.querySelector(`.hari-select[data-course-id="${courseId}"]`);
     const jamMulai   = document.querySelector(`.jam-mulai-input[data-course-id="${courseId}"]`);
     const jamSelesai = document.querySelector(`.jam-selesai-input[data-course-id="${courseId}"]`);
-    const warningBox = document.querySelector(`.conflict-warning-box[data-course-id="${courseId}"]`);
-    if (!guruSelect || !hariSelect || !jamMulai || !jamSelesai || !warningBox) return;
-
-    const runCheck = () => {
-        const guruId  = guruSelect.value;
-        const hari    = hariSelect.value;
-        const mulai   = jamMulai.value;
-        const selesai = jamSelesai.value;
-        if (!guruId || hari === '' || !mulai || !selesai) { warningBox.innerHTML = ''; return; }
-        if (mulai >= selesai) {
-            warningBox.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>Jam selesai harus setelah jam mulai.</span>';
-            return;
-        }
-        warningBox.innerHTML = '<span class="text-muted"><i class="bi bi-hourglass-split me-1"></i>Mengecek jadwal guru…</span>';
-        fetch(guruConflictCheckUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '', 'Accept': 'application/json' },
-            body: JSON.stringify({ guru_id: guruId, hari, jam_mulai: mulai, jam_selesai: selesai }),
-        })
-        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(data => {
-            warningBox.innerHTML = data.conflict
-                ? `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>${data.detail}</span>`
-                : '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Guru tersedia di jadwal ini.</span>';
-        })
-        .catch(() => { warningBox.innerHTML = '<span class="text-muted">Gagal mengecek konflik jadwal.</span>'; });
-    };
+    if (!guruSelect || !hariSelect || !jamMulai || !jamSelesai) return;
+    const runCheck = () => runConflictCheck(courseId);
     [guruSelect, hariSelect, jamMulai, jamSelesai].forEach(el => el.addEventListener('change', runCheck));
+    // Sync guru name to Card B on guru change
+    guruSelect.addEventListener('change', () => syncGuruName(courseId));
 }
 
 function bindCourseRowEvents(row) {
@@ -571,7 +652,7 @@ function refreshExtraCourseSelect() {
     document.getElementById('extraCourseEmptyMsg').style.display = available.length === 0 ? '' : 'none';
 }
 
-// Builds only the Card A (mapel + guru) row
+// Builds Card A (mapel + guru) row
 function buildCourseRow(course, isAdmin) {
     const row = document.createElement('div');
     row.className = 'pw-course-row';
@@ -608,39 +689,38 @@ function buildCourseRow(course, isAdmin) {
     return row;
 }
 
-// Builds the Card B (jadwal kelas) row for the same course
+// Builds Card B (jadwal kelas) table row — now a <tr> with 7 cols
 function buildScheduleRow(course) {
-    const row = document.createElement('div');
-    row.className = 'pw-schedule-row mb-2';
-    row.dataset.scheduleRow = course.id;
-    row.innerHTML = `
-        <div class="row g-2 align-items-center">
-            <div class="col-md-3">
-                <span class="badge rounded-pill" style="background:rgba(200,77,223,.12);color:#461256;font-size:.75rem;font-weight:600;padding:.35em .8em">${course.nama}</span>
-            </div>
-            <div class="col-md-2">
-                <select class="form-select form-select-sm hari-select" data-course-id="${course.id}">
-                    <option value="">Hari…</option>
-                    <option value="1">Senin</option>
-                    <option value="2">Selasa</option>
-                    <option value="3">Rabu</option>
-                    <option value="4">Kamis</option>
-                    <option value="5">Jum'at</option>
-                    <option value="6">Sabtu</option>
-                    <option value="0">Minggu</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <input type="time" class="form-control form-control-sm jam-mulai-input" data-course-id="${course.id}">
-            </div>
-            <div class="col-md-2">
-                <input type="time" class="form-control form-control-sm jam-selesai-input" data-course-id="${course.id}">
-            </div>
-            <div class="col-md-3">
-                <div class="conflict-warning-box" data-course-id="${course.id}" style="font-size:.72rem"></div>
-            </div>
-        </div>`;
-    return row;
+    const tr = document.createElement('tr');
+    tr.className = 'pw-schedule-row';
+    tr.dataset.scheduleRow = course.id;
+    tr.innerHTML = `
+        <td class="text-center text-muted sched-no" style="font-size:.78rem">—</td>
+        <td><span class="badge rounded-pill" style="background:rgba(200,77,223,.12);color:#461256;font-size:.75rem;font-weight:600;padding:.3em .75em">${course.nama}</span></td>
+        <td><span class="sched-guru-name text-muted" data-course-id="${course.id}" style="font-size:.82rem">—</span></td>
+        <td>
+            <select class="form-select form-select-sm hari-select" data-course-id="${course.id}" style="min-width:88px">
+                <option value="">Pilih…</option>
+                <option value="1">Senin</option><option value="2">Selasa</option><option value="3">Rabu</option>
+                <option value="4">Kamis</option><option value="5">Jum'at</option><option value="6">Sabtu</option><option value="0">Minggu</option>
+            </select>
+        </td>
+        <td><input type="time" class="form-control form-control-sm jam-mulai-input" data-course-id="${course.id}" style="min-width:100px"></td>
+        <td><input type="time" class="form-control form-control-sm jam-selesai-input" data-course-id="${course.id}" style="min-width:100px"></td>
+        <td><select class="form-select form-select-sm room-select" name="schedule_room[${course.id}]" data-course-id="${course.id}" style="min-width:140px">${_roomOptions}</select></td>`;
+    return tr;
+}
+
+// Builds a conflict result row for Card C panel
+function buildConflictResult(course) {
+    const div = document.createElement('div');
+    div.className = 'd-flex align-items-center gap-2 mb-2 p-2 rounded-3';
+    div.id = `conflict-result-${course.id}`;
+    div.style.background = 'var(--input-bg)';
+    div.innerHTML = `
+        <span class="badge rounded-pill flex-shrink-0" style="background:rgba(200,77,223,.12);color:#461256;font-size:.74rem;font-weight:600;padding:.3em .7em;min-width:80px;text-align:center">${course.nama}</span>
+        <div class="conflict-warning-box text-muted" data-course-id="${course.id}" style="font-size:.8rem">—</div>`;
+    return div;
 }
 
 function addExtraCourse() {
@@ -654,6 +734,8 @@ function addExtraCourse() {
     document.getElementById('courseRowsContainer').appendChild(courseRow);
     const schedRow = buildScheduleRow(course);
     document.getElementById('scheduleRowsContainer').appendChild(schedRow);
+    const conflictRow = buildConflictResult(course);
+    document.getElementById('conflictResultsPanel').appendChild(conflictRow);
     bindCourseRowEvents(courseRow);
     refreshExtraCourseSelect();
     recalcTotal();
@@ -661,8 +743,10 @@ function addExtraCourse() {
 
 function removeCourseRow(btn, id) {
     btn.closest('.pw-course-row').remove();
-    const schedRow = document.querySelector(`.pw-schedule-row[data-schedule-row="${id}"]`);
+    const schedRow = document.querySelector(`#scheduleRowsContainer .pw-schedule-row[data-schedule-row="${id}"]`);
     if (schedRow) schedRow.remove();
+    const conflictRow = document.getElementById(`conflict-result-${id}`);
+    if (conflictRow) conflictRow.remove();
     usedCourseIds.delete(id);
     refreshExtraCourseSelect();
     recalcTotal();
