@@ -191,7 +191,6 @@ class RegistrationListController extends Controller
             'hari_belajar'         => 'nullable|array',
             'hari_belajar.*'       => 'nullable|string|max:20',
             'jam_detail'           => 'nullable|array',
-            'branch_id'            => 'required|exists:branches,id',
             'is_custom_package'    => 'nullable|in:0,1',
             'package_id'           => 'nullable|exists:packages,id',
             'custom_package_name'  => 'required_if:is_custom_package,1|nullable|string|max:150',
@@ -228,7 +227,22 @@ class RegistrationListController extends Controller
 
         DB::beginTransaction();
         try {
-            $branch = Branch::find($data['branch_id']);
+            // Branch is no longer a user-supplied field on this wizard — resolve it
+            // server-side the same way the process() view matches it, with a final
+            // fallback so verification/account creation never fails for missing branch_id.
+            $branch = null;
+            if ($registration->branch) {
+                $branch = Branch::where('name', 'like', '%' . $registration->branch . '%')->first();
+            }
+            if (!$branch && auth()->user()->branch_id) {
+                $branch = Branch::find(auth()->user()->branch_id);
+            }
+            if (!$branch) {
+                $branch = Branch::orderBy('id')->first();
+            }
+            if (!$branch) {
+                throw new \Exception('Tidak ada data cabang di sistem. Tambahkan cabang terlebih dahulu sebelum memproses pendaftaran.');
+            }
 
             // Persist any corrections the admin made to the student's own data
             // back onto the original registration record before using it.

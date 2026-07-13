@@ -81,11 +81,6 @@
             <h6 class="fw-bold mb-3"><i class="bi bi-person-vcard me-2 text-primary"></i>Informasi Siswa</h6>
             <p class="text-muted" style="font-size:.8rem">Data ini awalnya diisi siswa saat mendaftar &mdash; admin dapat mengoreksi/melengkapinya jika perlu.</p>
 
-            {{-- Branch fixed as hidden input (determined by admin's branch) --}}
-            <input type="hidden" name="branch_id" id="branchSelect"
-                   value="{{ $matchedBranch?->id ?? '' }}"
-                   data-name="{{ $matchedBranch?->name ?? '–' }}">
-
             <div class="row g-3">
                 {{-- Data Pribadi --}}
                 <div class="col-md-6">
@@ -723,7 +718,6 @@
 <script>
 const _processUrl  = "{{ route('admin.registration-list.process.store', $registration->id) }}";
 const _csrf        = "{{ csrf_token() }}";
-const _branchName  = @json($matchedBranch ? $matchedBranch->name : '–');
 let _credData = {};
 
 function showStep(step) {
@@ -1083,19 +1077,7 @@ document.getElementById('customPackagePrice').addEventListener('input', function
     if (isCustomPkg) document.getElementById('totalBiaya').value = this.value || 0;
 });
 
-// Branch is now a fixed hidden input — filter packages once on load using its value
-(function filterPackagesByBranch() {
-    const branchId = document.getElementById('branchSelect')?.value;
-    if (!branchId) return;
-    Array.from(packageDropdown.options).forEach(opt => {
-        if (!opt.value) return;
-        const cabang = opt.dataset.cabang || '';
-        opt.hidden = cabang && cabang !== branchId;
-    });
-})();
-
 function buildPreview() {
-    const branchName = _branchName;
     let pkgName = 'Tanpa Paket';
     if (isCustomPkg) {
         const cpName = document.querySelector('[name="custom_package_name"]')?.value;
@@ -1173,7 +1155,6 @@ function buildPreview() {
     document.getElementById('previewBox').innerHTML = `
         {{-- Header info --}}
         <div class="row g-2 mb-3">
-            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Cabang:</span> <strong>${branchName}</strong></div>
             <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Paket:</span> <strong>${pkgName}</strong></div>
             <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Kategori:</span> <strong>${_previewEduLevel}</strong></div>
             <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Tempat Belajar:</span> <strong>${_previewTempat}</strong></div>
