@@ -117,12 +117,20 @@ class RegistrationListController extends Controller
      */
     public function guruConflictCheck(Request $request)
     {
-        $data = $request->validate([
-            'guru_id'     => 'required|exists:teachers,id',
-            'hari'        => 'required|integer|min:0|max:6', // 0 = Minggu ... 6 = Sabtu (konvensi PostgreSQL DOW)
+        $validated = $request->validate([
+            'guru_id'     => 'required|numeric',
+            'hari'        => 'required',
             'jam_mulai'   => 'required',
-            'jam_selesai' => 'required|after:jam_mulai',
+            'jam_selesai' => 'required',
         ]);
+
+        // Manual time comparison — safer than Laravel's after: rule for HH:MM strings
+        if ($validated['jam_mulai'] >= $validated['jam_selesai']) {
+            return response()->json(['success' => true, 'conflict' => false,
+                'detail' => 'Jam berakhir harus setelah jam mulai.']);
+        }
+
+        $data = $validated;
 
         $overlap = Schedule::where('guru_id', $data['guru_id'])
             ->where('status', '!=', 'dibatalkan')
@@ -196,9 +204,18 @@ class RegistrationListController extends Controller
             'course_sessions.*'    => 'nullable|integer|min:0',
             'course_fee'           => 'nullable|array',
             'course_fee.*'         => 'nullable|numeric|min:0',
-            'total_biaya'          => 'required|numeric|min:0',
-            'biaya_per_sesi'       => 'nullable|numeric|min:0',
-            'payment_status'       => 'required|in:belum_bayar,lunas',
+            'total_biaya'            => 'required|numeric|min:0',
+            'biaya_per_sesi'         => 'nullable|numeric|min:0',
+            'biaya_admin'            => 'nullable|numeric|min:0',
+            'payment_status'         => 'required|in:belum_bayar,lunas',
+            'payment_method'         => 'nullable|in:prabayar,pascabayar',
+            'prabayar_type'          => 'nullable|in:lunas,cicilan',
+            'cicilan_nominal'        => 'nullable|array',
+            'cicilan_nominal.*'      => 'nullable|numeric|min:0',
+            'cicilan_mulai'          => 'nullable|array',
+            'cicilan_mulai.*'        => 'nullable|date',
+            'cicilan_jatuh_tempo'    => 'nullable|array',
+            'cicilan_jatuh_tempo.*'  => 'nullable|date',
         ]);
 
         DB::beginTransaction();
@@ -303,26 +320,78 @@ class RegistrationListController extends Controller
 
             $year  = date('Y');
             $month = str_pad(date('m'), 2, '0', STR_PAD_LEFT);
-            $count = Invoice::whereYear('created_at', $year)->whereMonth('created_at', date('m'))->count() + 1;
-            $nomor = 'INV-REG-' . $year . $month . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
+            $baseCount = Invoice::whereYear('created_at', $year)->whereMonth('created_at', date('m'))->count();
+            $totalBiaya    = (float) $data['total_biaya'];
+            $paymentMethod = $data['payment_method'] ?? 'prabayar';
+            $prabayarType  = $data['prabayar_type']  ?? 'lunas';
+            $deskripsi     = 'Biaya Pendaftaran Program: ' . implode(', ', $registration->interests ?? [$registration->program ?? 'Umum']);
 
-            $totalBiaya = (float) $data['total_biaya'];
+            $invoice = null; // will hold the first/primary invoice
 
-            $invoice = Invoice::create([
-                'siswa_id'      => $student->id,
-                'cabang_id'     => $branch->id,
-                'kelas_id'      => null,
-                'nomor_invoice' => $nomor,
-                'deskripsi'     => 'Biaya Pendaftaran Program: ' . implode(', ', $registration->interests ?? [$registration->program ?? 'Umum']),
-                'subtotal'      => $totalBiaya,
-                'diskon'        => 0,
-                'pajak'         => 0,
-                'total'         => $totalBiaya,
-                'status'        => $data['payment_status'],
-                'jatuh_tempo'   => $data['payment_status'] === 'lunas' ? now() : now()->addDays(7),
-                'periode'       => date('Y-m'),
-                'catatan'       => $data['payment_status'] === 'lunas' ? 'Dibayar lunas saat proses registrasi.' : null,
-            ]);
+            if ($paymentMethod === 'prabayar' && $prabayarType === 'cicilan') {
+                // ── Cicilan: create N invoice records, one per installment ──
+                $cicilanNominals = array_values(array_filter($data['cicilan_nominal'] ?? [], fn($v) => $v !== null && $v !== ''));
+                $cicilanMulai    = array_values($data['cicilan_mulai']          ?? []);
+                $cicilanTempo    = array_values($data['cicilan_jatuh_tempo']    ?? []);
+                foreach ($cicilanNominals as $idx => $nominal) {
+                    $seqCount  = $baseCount + $idx + 1;
+                    $nomor     = 'INV-CIC-' . $year . $month . '-' . str_pad($seqCount, 3, '0', STR_PAD_LEFT) . '-' . ($idx + 1);
+                    $tempo     = !empty($cicilanTempo[$idx]) ? $cicilanTempo[$idx] : now()->addDays(30 * ($idx + 1))->toDateString();
+                    $inv = Invoice::create([
+                        'siswa_id'      => $student->id,
+                        'cabang_id'     => $branch->id,
+                        'kelas_id'      => null,
+                        'nomor_invoice' => $nomor,
+                        'deskripsi'     => $deskripsi . ' — Cicilan ' . ($idx + 1) . ' dari ' . count($cicilanNominals),
+                        'subtotal'      => (float) $nominal,
+                        'diskon'        => 0,
+                        'pajak'         => 0,
+                        'total'         => (float) $nominal,
+                        'status'        => 'belum_bayar',
+                        'jatuh_tempo'   => $tempo,
+                        'periode'       => date('Y-m'),
+                        'catatan'       => 'Cicilan ' . ($idx + 1) . ' dari ' . count($cicilanNominals),
+                    ]);
+                    if ($idx === 0) $invoice = $inv;
+                }
+            } elseif ($paymentMethod === 'pascabayar') {
+                // ── Pascabayar: invoice for admin fee (Rp 0 if none), per-session invoicing later ──
+                $biayaAdmin = (float) ($data['biaya_admin'] ?? 0);
+                $nomor      = 'INV-REG-' . $year . $month . '-' . str_pad($baseCount + 1, 3, '0', STR_PAD_LEFT);
+                $invoice    = Invoice::create([
+                    'siswa_id'      => $student->id,
+                    'cabang_id'     => $branch->id,
+                    'kelas_id'      => null,
+                    'nomor_invoice' => $nomor,
+                    'deskripsi'     => $deskripsi . ' (Pascabayar per sesi)',
+                    'subtotal'      => $biayaAdmin,
+                    'diskon'        => 0,
+                    'pajak'         => 0,
+                    'total'         => $biayaAdmin,
+                    'status'        => $biayaAdmin > 0 ? 'belum_bayar' : 'lunas',
+                    'jatuh_tempo'   => now()->addDays(7),
+                    'periode'       => date('Y-m'),
+                    'catatan'       => 'Pascabayar — invoice sesi digenerate otomatis dari jurnal mengajar.',
+                ]);
+            } else {
+                // ── Prabayar Lunas (default) ──
+                $nomor   = 'INV-REG-' . $year . $month . '-' . str_pad($baseCount + 1, 3, '0', STR_PAD_LEFT);
+                $invoice = Invoice::create([
+                    'siswa_id'      => $student->id,
+                    'cabang_id'     => $branch->id,
+                    'kelas_id'      => null,
+                    'nomor_invoice' => $nomor,
+                    'deskripsi'     => $deskripsi,
+                    'subtotal'      => $totalBiaya,
+                    'diskon'        => 0,
+                    'pajak'         => 0,
+                    'total'         => $totalBiaya,
+                    'status'        => $data['payment_status'],
+                    'jatuh_tempo'   => $data['payment_status'] === 'lunas' ? now() : now()->addDays(7),
+                    'periode'       => date('Y-m'),
+                    'catatan'       => $data['payment_status'] === 'lunas' ? 'Dibayar lunas saat proses registrasi.' : null,
+                ]);
+            }
 
             $registration->update([
                 'status'               => 'verified',

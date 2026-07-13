@@ -418,30 +418,144 @@
         {{-- STEP 4: PEMBAYARAN --}}
         <div class="pw-panel" data-step="4">
             <h6 class="fw-bold mb-3"><i class="bi bi-cash-coin me-2 text-primary"></i>Pembayaran</h6>
-            <div class="row g-3">
+
+            {{-- Total biaya (auto from step 3) --}}
+            <div class="mb-4 p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
+                <label class="form-label fw-semibold mb-1" style="font-size:.78rem">Total Biaya Program</label>
+                <div class="input-group">
+                    <span class="input-group-text">Rp</span>
+                    <input type="number" min="0" class="form-control fw-bold" id="totalBiaya" name="total_biaya" required>
+                </div>
+                <div class="form-text" style="font-size:.72rem">Dihitung otomatis dari mapel/paket — bisa disesuaikan.</div>
+            </div>
+
+            {{-- Metode Pembayaran selector --}}
+            <label class="form-label fw-semibold mb-2" style="font-size:.78rem">Metode Pembayaran <span class="text-danger">*</span></label>
+            <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                    <label class="form-label fw-semibold" style="font-size:.78rem">Total Biaya</label>
-                    <div class="input-group"><span class="input-group-text">Rp</span><input type="number" min="0" class="form-control" id="totalBiaya" name="total_biaya" required></div>
-                    <div class="form-text" style="font-size:.72rem">Dihitung otomatis dari mata pelajaran / paket yang dipilih — bisa disesuaikan.</div>
+                    <div class="pm-card rounded-3 p-3" data-method="prabayar" onclick="selectPaymentMethod('prabayar')"
+                         style="border:2px solid var(--card-border);cursor:pointer;transition:border-color .2s,background .2s">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <div style="width:32px;height:32px;border-radius:8px;background:rgba(200,77,223,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                                <i class="bi bi-wallet2" style="color:#461256"></i>
+                            </div>
+                            <span class="fw-semibold" style="font-size:.9rem">Prabayar (Prepaid)</span>
+                        </div>
+                        <p class="text-muted mb-0" style="font-size:.78rem">Siswa membayar sebelum kelas — bisa langsung lunas atau dicicil sesuai kesepakatan.</p>
+                    </div>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Biaya per Sesi (opsional)</label>
-                    <div class="input-group"><span class="input-group-text">Rp</span><input type="number" min="0" class="form-control" name="biaya_per_sesi"></div>
-                </div>
-                <div class="col-12">
-                    <label class="form-label fw-semibold" style="font-size:.78rem">Status Pembayaran</label>
-                    <div class="d-flex gap-3 flex-wrap">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="payment_status" id="payBelum" value="belum_bayar" checked>
-                            <label class="form-check-label" for="payBelum">Belum Dibayar &mdash; kirim invoice, siswa masuk status <em>Atur Jadwal</em></label>
+                    <div class="pm-card rounded-3 p-3" data-method="pascabayar" onclick="selectPaymentMethod('pascabayar')"
+                         style="border:2px solid var(--card-border);cursor:pointer;transition:border-color .2s,background .2s">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <div style="width:32px;height:32px;border-radius:8px;background:rgba(16,185,129,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                                <i class="bi bi-calendar-check" style="color:#10b981"></i>
+                            </div>
+                            <span class="fw-semibold" style="font-size:.9rem">Pascabayar (Per Sesi)</span>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="payment_status" id="payLunas" value="lunas">
-                            <label class="form-check-label" for="payLunas">Lunas &mdash; siswa langsung <em>Terjadwal</em></label>
-                        </div>
+                        <p class="text-muted mb-0" style="font-size:.78rem">Tagihan awal Rp 0. Invoice sesi dibuat otomatis setiap guru submit Jurnal Mengajar.</p>
                     </div>
                 </div>
             </div>
+
+            {{-- ── PRABAYAR PANEL ── --}}
+            <div id="prabayarPanel" style="display:none">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold mb-2" style="font-size:.78rem">Jenis Pembayaran</label>
+                    <div class="d-flex gap-4 flex-wrap">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="prabayar_type" id="payLunas" value="lunas" onchange="onPrabayarTypeChange()">
+                            <label class="form-check-label fw-semibold" for="payLunas"><i class="bi bi-check-circle-fill text-success me-1"></i>Langsung Lunas</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="prabayar_type" id="payCicilan" value="cicilan" onchange="onPrabayarTypeChange()">
+                            <label class="form-check-label fw-semibold" for="payCicilan"><i class="bi bi-credit-card-2-front text-primary me-1"></i>Cicilan</label>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Langsung Lunas --}}
+                <div id="lunasPanel" style="display:none">
+                    <div class="p-3 rounded-3 mb-3" style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.25)">
+                        <p class="mb-2" style="font-size:.85rem;color:#10b981"><i class="bi bi-check-circle-fill me-2"></i>Invoice senilai <strong>Rp <span id="lunasTotalDisplay">0</span></strong> akan dibuat.</p>
+                        <div class="d-flex gap-3 flex-wrap">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="prabayar_lunas_status" id="statusBelum" value="belum_bayar" checked onchange="document.getElementById('paymentStatusInput').value=this.value">
+                                <label class="form-check-label" for="statusBelum" style="font-size:.83rem">Kirim invoice — tandai lunas setelah bayar diterima</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="prabayar_lunas_status" id="statusLunas" value="lunas" onchange="document.getElementById('paymentStatusInput').value=this.value">
+                                <label class="form-check-label" for="statusLunas" style="font-size:.83rem">Langsung tandai <strong>Lunas</strong> sekarang</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Cicilan --}}
+                <div id="cicilanPanel" style="display:none">
+                    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                        <span class="fw-semibold" style="font-size:.85rem">Rincian Cicilan</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <label style="font-size:.8rem;color:var(--text-muted)">Jumlah cicilan:</label>
+                            <input type="number" min="1" max="24" class="form-control form-control-sm" id="jumlahCicilan" value="2" style="width:72px" oninput="rebuildCicilanRows()">
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered align-middle mb-0" style="font-size:.82rem">
+                            <thead>
+                                <tr style="background:var(--input-bg)">
+                                    <th style="width:36px;font-size:.7rem;color:var(--text-muted)">No</th>
+                                    <th style="font-size:.7rem;color:var(--text-muted)">Nominal (Rp)</th>
+                                    <th style="font-size:.7rem;color:var(--text-muted)">Mulai Tagih</th>
+                                    <th style="font-size:.7rem;color:var(--text-muted)">Jatuh Tempo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cicilanRowsContainer"></tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2 p-2 rounded-3" style="background:var(--input-bg)">
+                        <span style="font-size:.83rem">Total semua cicilan:</span>
+                        <span id="cicilanTotalCheck" class="fw-bold" style="font-size:.88rem">Rp 0</span>
+                    </div>
+                    <div id="cicilanMismatchWarning" class="mt-1" style="font-size:.8rem;color:#b45309;display:none">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>Total cicilan belum sesuai total biaya (Rp <span id="cicilanBiayaRef">0</span>). Harap sesuaikan.
+                    </div>
+                </div>
+            </div>
+
+            {{-- ── PASCABAYAR PANEL ── --}}
+            <div id="pascabayarPanel" style="display:none">
+                <div class="p-3 rounded-3 mb-3" style="background:rgba(14,165,233,.06);border:1px solid rgba(14,165,233,.25)">
+                    <div class="fw-semibold mb-2" style="font-size:.88rem;color:#0ea5e9"><i class="bi bi-info-circle-fill me-2"></i>Skema Pascabayar (Per Sesi)</div>
+                    <ul class="mb-0 ps-3" style="font-size:.84rem;color:var(--text-muted)">
+                        <li class="mb-1">Tagihan awal hari ini adalah <strong>Rp 0</strong> (hanya biaya admin jika ada)</li>
+                        <li class="mb-1">Akun siswa akan <strong>otomatis aktif</strong> setelah proses selesai</li>
+                        <li>Invoice sesi akan di-generate setiap guru submit <strong>Jurnal Mengajar</strong></li>
+                    </ul>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:.78rem">Biaya Admin (opsional)</label>
+                        <div class="input-group input-group-sm"><span class="input-group-text">Rp</span>
+                            <input type="number" min="0" name="biaya_admin" class="form-control" placeholder="0">
+                        </div>
+                        <div class="form-text" style="font-size:.7rem">Ditagihkan di awal, jika ada.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="font-size:.78rem">Tarif per Sesi</label>
+                        <div class="input-group input-group-sm"><span class="input-group-text">Rp</span>
+                            <input type="number" min="0" name="biaya_per_sesi" class="form-control" placeholder="0">
+                        </div>
+                        <div class="form-text" style="font-size:.7rem">Dipakai untuk generate invoice per sesi dari jurnal mengajar.</div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Hidden state inputs --}}
+            <input type="hidden" name="payment_method"  id="paymentMethodInput"  value="prabayar">
+            <input type="hidden" name="payment_status"  id="paymentStatusInput"  value="belum_bayar">
+            <input type="hidden" name="prabayar_type"   id="prabayarTypeInput"   value="lunas">
+
             <div class="pw-actions">
                 <button type="button" class="btn btn-outline-secondary" data-action="prev"><i class="bi bi-arrow-left me-1"></i>Kembali</button>
                 <button type="button" class="btn btn-primary" data-action="next">Lanjut<i class="bi bi-arrow-right ms-1"></i></button>
@@ -830,7 +944,20 @@ function buildPreview() {
         rows.push(`<tr><td>${courseName}</td><td>${teacher}</td><td>${sesi}</td><td>Rp${Number(fee).toLocaleString('id-ID')}</td></tr>`);
     });
     const total = document.getElementById('totalBiaya').value || 0;
-    const payStatus = document.querySelector('input[name="payment_status"]:checked').value === 'lunas' ? 'Lunas' : 'Belum Dibayar';
+    const method     = document.getElementById('paymentMethodInput').value;
+    const payStatus  = document.getElementById('paymentStatusInput').value;
+    const prabType   = document.getElementById('prabayarTypeInput').value;
+    let   metodeTxt  = '–';
+    if (method === 'prabayar') {
+        if (prabType === 'cicilan') {
+            const n = document.getElementById('jumlahCicilan')?.value || '?';
+            metodeTxt = `Prabayar — Cicilan (${n}x)`;
+        } else {
+            metodeTxt = 'Prabayar — ' + (payStatus === 'lunas' ? 'Lunas Sekarang' : 'Invoice Dikirim');
+        }
+    } else if (method === 'pascabayar') {
+        metodeTxt = 'Pascabayar (Per Sesi)';
+    }
 
     document.getElementById('previewBox').innerHTML = `
         <div class="row g-2 mb-3">
@@ -839,10 +966,121 @@ function buildPreview() {
         </div>
         <table class="table table-sm"><thead><tr><th>Mapel</th><th>Guru</th><th>Sesi</th><th>Biaya</th></tr></thead>
         <tbody>${rows.join('') || '<tr><td colspan="4" class="text-muted text-center">Tidak ada mapel dipilih</td></tr>'}</tbody></table>
-        <div class="d-flex justify-content-between mt-2"><span class="text-muted">Status Pembayaran:</span><strong>${payStatus}</strong></div>
+        <div class="d-flex justify-content-between mt-2"><span class="text-muted">Metode Pembayaran:</span><strong>${metodeTxt}</strong></div>
         <div class="d-flex justify-content-between"><span class="text-muted">Total Biaya:</span><strong class="text-primary">Rp${Number(total).toLocaleString('id-ID')}</strong></div>
     `;
 }
+
+// ═══════════════════════════════════════════
+// STEP 4 — Payment Method JS
+// ═══════════════════════════════════════════
+function selectPaymentMethod(method) {
+    document.querySelectorAll('.pm-card').forEach(c => {
+        const isActive = c.dataset.method === method;
+        c.style.borderColor   = isActive ? 'var(--bs-primary)' : 'var(--card-border)';
+        c.style.background    = isActive ? 'rgba(200,77,223,.06)' : '';
+    });
+    document.getElementById('paymentMethodInput').value = method;
+    document.getElementById('prabayarPanel').style.display  = method === 'prabayar'  ? '' : 'none';
+    document.getElementById('pascabayarPanel').style.display = method === 'pascabayar' ? '' : 'none';
+    if (method === 'pascabayar') {
+        document.getElementById('paymentStatusInput').value = 'belum_bayar';
+        document.getElementById('prabayarTypeInput').value  = 'lunas';
+    } else {
+        onPrabayarTypeChange();
+    }
+}
+
+function onPrabayarTypeChange() {
+    const type = document.querySelector('input[name="prabayar_type"]:checked')?.value || '';
+    document.getElementById('prabayarTypeInput').value   = type || 'lunas';
+    document.getElementById('lunasPanel').style.display  = type === 'lunas'   ? '' : 'none';
+    document.getElementById('cicilanPanel').style.display = type === 'cicilan' ? '' : 'none';
+    if (type === 'lunas') {
+        const checked = document.querySelector('input[name="prabayar_lunas_status"]:checked');
+        document.getElementById('paymentStatusInput').value = checked ? checked.value : 'belum_bayar';
+        updateLunasDisplay();
+    } else if (type === 'cicilan') {
+        document.getElementById('paymentStatusInput').value = 'belum_bayar';
+        if (!document.querySelector('#cicilanRowsContainer tr')) rebuildCicilanRows();
+    }
+}
+
+function updateLunasDisplay() {
+    const total = parseFloat(document.getElementById('totalBiaya').value) || 0;
+    const el = document.getElementById('lunasTotalDisplay');
+    if (el) el.textContent = total.toLocaleString('id-ID');
+}
+
+function rebuildCicilanRows() {
+    const n         = Math.max(1, parseInt(document.getElementById('jumlahCicilan').value) || 2);
+    const totalBiaya = parseFloat(document.getElementById('totalBiaya').value) || 0;
+    const container  = document.getElementById('cicilanRowsContainer');
+    container.innerHTML = '';
+    const base     = n > 0 ? Math.floor(totalBiaya / n) : 0;
+    const today    = new Date();
+    const pad = v => String(v).padStart(2,'0');
+    const dateStr = (d) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    for (let i = 1; i <= n; i++) {
+        const nominal  = i === n ? (totalBiaya - base * (n - 1)) : base;
+        const mulaiDate = new Date(today); mulaiDate.setDate(today.getDate() + (i-1)*30);
+        const tempoDate = new Date(today); tempoDate.setDate(today.getDate() + i*30);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="text-center"><span class="badge bg-primary-soft text-primary" style="font-size:.75rem">${i}</span></td>
+            <td>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Rp</span>
+                    <input type="number" min="0" class="form-control cicilan-nominal" name="cicilan_nominal[]"
+                           value="${nominal}" oninput="updateCicilanTotal()">
+                </div>
+            </td>
+            <td><input type="date" class="form-control form-control-sm" name="cicilan_mulai[]" value="${dateStr(mulaiDate)}"></td>
+            <td><input type="date" class="form-control form-control-sm" name="cicilan_jatuh_tempo[]" value="${dateStr(tempoDate)}"></td>`;
+        container.appendChild(tr);
+    }
+    updateCicilanTotal();
+}
+
+function updateCicilanTotal() {
+    const nominals = document.querySelectorAll('.cicilan-nominal');
+    const sum      = Array.from(nominals).reduce((s, el) => s + (parseFloat(el.value) || 0), 0);
+    const biaya    = parseFloat(document.getElementById('totalBiaya').value) || 0;
+    document.getElementById('cicilanTotalCheck').textContent = 'Rp ' + sum.toLocaleString('id-ID');
+    const mismatch = Math.abs(sum - biaya) > 1;
+    document.getElementById('cicilanMismatchWarning').style.display = mismatch ? '' : 'none';
+    const refEl = document.getElementById('cicilanBiayaRef');
+    if (refEl) refEl.textContent = biaya.toLocaleString('id-ID');
+}
+
+// Sync totalBiaya changes → lunas display + cicilan total
+document.getElementById('totalBiaya').addEventListener('input', function() {
+    updateLunasDisplay();
+    if (document.getElementById('cicilanPanel').style.display !== 'none') {
+        updateCicilanTotal();
+    }
+});
+
+// Conflict check button — add loading state + toast summary
+document.getElementById('btnCekSemuaGuru')?.addEventListener('click', function() {
+    const btn = this;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Mengecek…';
+    runAllConflictChecks();
+    setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-shield-check me-1"></i>Cek Semua Guru';
+        const conflicts = document.querySelectorAll('.conflict-warning-box .text-danger').length;
+        if (conflicts > 0) {
+            showToast(`Ditemukan ${conflicts} konflik jadwal guru. Periksa panel di bawah.`, 'error');
+        } else {
+            const checked = document.querySelectorAll('.conflict-warning-box .text-success').length;
+            if (checked > 0) showToast('Semua guru tersedia — tidak ada konflik jadwal.', 'success');
+        }
+    }, 1800);
+});
+
+// ── end STEP 4 JS ──
 
 document.getElementById('processForm').addEventListener('submit', function(e) {
     e.preventDefault();
