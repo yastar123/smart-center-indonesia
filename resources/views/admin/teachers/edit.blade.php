@@ -113,8 +113,27 @@
                         </div>
                         <div class="col-12">
                             <label class="form-label small fw-semibold">Mata Pelajaran</label>
-                            <textarea name="subjects" class="form-control form-control-sm" rows="3" placeholder="Contoh: Matematika, Bahasa Indonesia, Fisika">{{ old('subjects', is_array($teacher->subjects) ? implode(', ', $teacher->subjects) : $teacher->subjects) }}</textarea>
-                            <div class="form-text">Pisahkan dengan koma atau enter. Field ini tidak bergantung pada data mata pelajaran dari halaman lain.</div>
+                            <div class="border rounded p-2" style="min-height:52px;background:var(--input-bg,#fff)">
+                                <div id="selectedCourses" class="d-flex flex-wrap gap-1 mb-2">
+                                    <span class="text-muted small" id="emptyNotice">Belum ada mata pelajaran dipilih</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <select id="courseSelect" class="form-select form-select-sm" style="max-width:300px">
+                                        <option value="">-- Pilih mata pelajaran --</option>
+                                        @foreach($courses as $course)
+                                            <option value="{{ $course->id }}" data-nama="{{ $course->nama }}">{{ $course->nama }}</option>
+                                        @endforeach
+                                    </select>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="addCourse()">
+                                        <i class="bi bi-plus-lg"></i> Tambah
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="courseHiddenInputs"></div>
+                            <div class="form-text">
+                                Pilih dari daftar mata pelajaran aktif. Data dikelola di
+                                <a href="{{ route('owner.subject.index') }}" target="_blank" class="text-primary">halaman Mata Pelajaran</a>.
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-semibold">Upload CV</label>
@@ -167,5 +186,79 @@ document.getElementById('photoInput')?.addEventListener('change', function () {
         reader.readAsDataURL(this.files[0]);
     }
 });
+
+// ── Mata Pelajaran tag-picker ──────────────────────────────────────────────
+@php
+    $existingCourses = $teacher->courses->map(fn($c) => ['id' => $c->id, 'nama' => $c->nama])->values();
+@endphp
+const _existingCourses = @json($existingCourses);
+
+let _selected = {};   // { courseId: courseName }
+
+// Seed from saved pivot data
+_existingCourses.forEach(c => { _selected[c.id] = c.nama; });
+
+function _renderCourses() {
+    const chips   = document.getElementById('selectedCourses');
+    const hidden  = document.getElementById('courseHiddenInputs');
+    const notice  = document.getElementById('emptyNotice');
+    const ids     = Object.keys(_selected);
+
+    // clear old chips (keep notice span)
+    Array.from(chips.children).forEach(el => { if (el !== notice) el.remove(); });
+    hidden.innerHTML = '';
+
+    if (ids.length === 0) {
+        notice.style.display = '';
+    } else {
+        notice.style.display = 'none';
+        ids.forEach(id => {
+            const nama = _selected[id];
+
+            // chip badge
+            const chip = document.createElement('span');
+            chip.className = 'badge d-inline-flex align-items-center gap-1 px-2 py-1';
+            chip.style.cssText = 'background:var(--soft-primary,#f3e0fb);color:var(--bs-primary,#c84ddf);font-size:12px;font-weight:500;border:1px solid var(--bs-primary,#c84ddf)40';
+            chip.innerHTML = `${nama}&nbsp;<button type="button" onclick="_removeCourse(${id})" style="background:none;border:none;padding:0;line-height:1;color:inherit;opacity:.7;cursor:pointer" title="Hapus"><i class="bi bi-x-lg" style="font-size:10px"></i></button>`;
+            chips.insertBefore(chip, notice);
+
+            // hidden input for form submission
+            const inp = document.createElement('input');
+            inp.type  = 'hidden';
+            inp.name  = 'course_ids[]';
+            inp.value = id;
+            hidden.appendChild(inp);
+        });
+    }
+
+    // hide already-selected options in the dropdown
+    const sel = document.getElementById('courseSelect');
+    Array.from(sel.options).forEach(opt => {
+        if (opt.value) opt.hidden = !!_selected[opt.value];
+    });
+}
+
+function addCourse() {
+    const sel  = document.getElementById('courseSelect');
+    const id   = sel.value;
+    const nama = sel.options[sel.selectedIndex]?.dataset?.nama;
+    if (!id) return;
+    _selected[id] = nama;
+    sel.value = '';
+    _renderCourses();
+}
+
+function _removeCourse(id) {
+    delete _selected[id];
+    _renderCourses();
+}
+
+// Allow pressing Enter in the select to add
+document.getElementById('courseSelect')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); addCourse(); }
+});
+
+// Initial render
+_renderCourses();
 </script>
 @endpush

@@ -172,24 +172,23 @@ class TeacherController extends Controller
                 Rule::unique('teachers', 'email')->ignore($teacher->id),
                 Rule::unique('users', 'email')->ignore($teacher->user_id),
             ],
-            'password'   => 'nullable|string|min:8',
-            'subjects'   => 'nullable|string',
-            'photo'      => 'nullable|image|max:2048',
-            'cv'         => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+            'password'    => 'nullable|string|min:8',
+            'course_ids'  => 'nullable|array',
+            'course_ids.*'=> 'exists:courses,id',
+            'photo'       => 'nullable|image|max:2048',
+            'cv'          => 'nullable|file|mimes:pdf,doc,docx|max:5120',
         ]);
 
         DB::transaction(function () use ($request, $teacher) {
-            $rawSubjects = is_array($request->input('subjects'))
-                ? $request->input('subjects')
-                : preg_split('/[\n,]+/', (string) $request->input('subjects', ''));
-            $subjects = collect($rawSubjects)
-                ->map(fn ($value) => trim((string) $value))
-                ->filter()
-                ->values()
-                ->all();
+            // Sync mata pelajaran via pivot table
+            $courseIds = array_filter(array_map('intval', $request->input('course_ids', [])));
+            $teacher->courses()->sync($courseIds);
 
-            $data = $request->except(['photo', 'cv', 'password', 'subjects']);
-            $data['subjects'] = $subjects;
+            // Keep subjects JSON in sync (store course names for backward compat)
+            $courseNames = Course::whereIn('id', $courseIds)->pluck('nama')->toArray();
+
+            $data = $request->except(['photo', 'cv', 'password', 'course_ids', 'subjects']);
+            $data['subjects'] = $courseNames;
 
             if ($request->hasFile('photo')) {
                 if ($teacher->photo) Storage::disk('public')->delete($teacher->photo);
