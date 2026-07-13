@@ -102,9 +102,8 @@ class RegistrationListController extends Controller
         $packages = Package::where('status', 'aktif')->orderBy('nama')->get(['id', 'cabang_id', 'nama', 'harga', 'tipe_kelas', 'jumlah_pertemuan']);
 
         $rooms = Room::where('status', 'aktif')
-            ->when($matchedBranch, fn ($q) => $q->where('branch_id', $matchedBranch->id))
             ->orderBy('nama_ruangan')
-            ->get(['id', 'branch_id', 'nama_ruangan', 'kapasitas']);
+            ->get(['id', 'nama_ruangan', 'kapasitas']);
 
         return view('admin.registration.process', compact(
             'registration', 'branches', 'matchedBranch', 'courses', 'courseMeta', 'packages', 'rooms'

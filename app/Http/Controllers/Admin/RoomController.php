@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Room;
-use App\Models\Branch;
 use Illuminate\Http\Request;
 
 class RoomController extends Controller
@@ -22,14 +21,12 @@ class RoomController extends Controller
 
     public function create()
     {
-        $branches = Branch::orderBy('name')->get();
-        return view('admin.rooms.create', compact('branches'));
+        return view('admin.rooms.create');
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'branch_id'    => 'required|exists:branches,id',
             'nama_ruangan' => 'required|string|max:100',
             'kapasitas'    => 'required|integer|min:1',
             'status'       => 'required|in:aktif,maintenance',
@@ -50,14 +47,12 @@ class RoomController extends Controller
 
     public function edit(Room $room)
     {
-        $branches = Branch::orderBy('name')->get();
-        return view('admin.rooms.edit', compact('room', 'branches'));
+        return view('admin.rooms.edit', compact('room'));
     }
 
     public function update(Request $request, Room $room)
     {
         $data = $request->validate([
-            'branch_id'    => 'required|exists:branches,id',
             'nama_ruangan' => 'required|string|max:100',
             'kapasitas'    => 'required|integer|min:1',
             'status'       => 'required|in:aktif,maintenance',

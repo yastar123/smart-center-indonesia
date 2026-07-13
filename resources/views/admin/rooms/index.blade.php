@@ -80,7 +80,6 @@
         <table class="table table-hover table-modern align-middle mb-0">
             <thead class="thead-modern">
                 <tr>
-                    <th>Cabang</th>
                     <th>Nama Ruangan</th>
                     <th>Kapasitas Maksimal</th>
                     <th>Status</th>
@@ -90,14 +89,6 @@
             <tbody>
                 @forelse($rooms as $room)
                 <tr>
-                    <td>
-                        <div class="d-flex align-items-center gap-2">
-                            <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#461256,#c84ddf);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
-                                <i class="bi bi-building"></i>
-                            </div>
-                            <span class="fw-semibold">{{ $room->branch->name ?? '–' }}</span>
-                        </div>
-                    </td>
                     <td>
                         <div class="fw-semibold">{{ $room->nama_ruangan }}</div>
                         @if($room->keterangan)
@@ -140,7 +131,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="text-center py-5 text-muted">
+                    <td colspan="4" class="text-center py-5 text-muted">
                         <i class="bi bi-door-open" style="font-size:2.5rem;display:block;margin-bottom:10px;opacity:.4"></i>
                         Belum ada ruangan. <a href="{{ route('admin.rooms.create') }}">Tambah sekarang</a>
                     </td>

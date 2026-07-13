@@ -35,19 +35,6 @@
                 @csrf @method('PUT')
                 <div class="row g-3">
                     <div class="col-12">
-                        <label class="form-label fw-semibold">Pilih Cabang <span class="text-danger">*</span></label>
-                        <select name="branch_id" class="form-select @error('branch_id') is-invalid @enderror" required>
-                            <option value="">-- Pilih Cabang --</option>
-                            @foreach($branches as $branch)
-                                <option value="{{ $branch->id }}" {{ (old('branch_id', $room->branch_id) == $branch->id) ? 'selected' : '' }}>
-                                    {{ $branch->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('branch_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                    </div>
-
-                    <div class="col-12">
                         <label class="form-label fw-semibold">Nama Ruangan <span class="text-danger">*</span></label>
                         <input type="text" name="nama_ruangan"
                                class="form-control @error('nama_ruangan') is-invalid @enderror"
