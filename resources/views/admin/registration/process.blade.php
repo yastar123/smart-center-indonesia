@@ -342,13 +342,17 @@
                         <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Guru Pengajar</span></div>
                         <div class="col-md-1"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Sesi</span></div>
                         <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Biaya Siswa (Rp)</span></div>
-                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Honor Guru (Rp)</span></div>
+                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Honor Guru (Rp) / Sesi</span></div>
                         <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Margin</span></div>
                     </div>
 
                     <div id="courseRowsContainer">
                         @foreach($courses as $course)
-                        @php $fee = $course->fee->amount ?? 0; $honor = round($fee * 0.6); @endphp
+                        @php
+                            $fee     = $course->fee->amount ?? 0;
+                            $sesiDef = $registration->interest_sessions[$course->nama] ?? 8;
+                            $honor   = round(($fee * 0.6) / max($sesiDef, 1));
+                        @endphp
                         <div class="pw-course-row" data-course-row="{{ $course->id }}">
                             <div class="row g-2 align-items-center">
                                 <div class="col-md-2">
@@ -367,7 +371,7 @@
                                     </select>
                                 </div>
                                 <div class="col-md-1">
-                                    <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[{{ $course->id }}]" placeholder="Sesi" value="{{ $registration->interest_sessions[$course->nama] ?? 8 }}">
+                                    <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[{{ $course->id }}]" placeholder="Sesi" value="{{ $registration->interest_sessions[$course->nama] ?? 8 }}" oninput="updateRowMargin(this)">
                                 </div>
                                 <div class="col-md-2">
                                     <div class="input-group input-group-sm">
@@ -381,10 +385,11 @@
                                         <input type="number" min="0" class="form-control honor-input" name="course_honor[{{ $course->id }}]" value="{{ $honor }}" oninput="updateRowMargin(this)">
                                     </div>
                                 </div>
+                                @php $honorTotal = $honor * $sesiDef; @endphp
                                 <div class="col-md-2">
                                     <div class="margin-display px-2 py-1 rounded-2 text-center" style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);font-size:.78rem">
-                                        <span class="margin-rp fw-semibold" style="color:#10b981">Rp{{ number_format($fee - $honor, 0, ',', '.') }}</span>
-                                        <span class="margin-pct text-muted ms-1" style="font-size:.7rem">({{ $fee > 0 ? round((($fee-$honor)/$fee)*100) : 0 }}%)</span>
+                                        <span class="margin-rp fw-semibold" style="color:#10b981">Rp{{ number_format($fee - $honorTotal, 0, ',', '.') }}</span>
+                                        <span class="margin-pct text-muted ms-1" style="font-size:.7rem">({{ $fee > 0 ? round((($fee-$honorTotal)/$fee)*100) : 0 }}%)</span>
                                     </div>
                                 </div>
                                 <div class="col-md-1 text-end">
@@ -767,9 +772,10 @@ function recalcTotal() {
             const feeInput   = row.querySelector('.fee-input');
             const honorInput = row.querySelector('.honor-input');
             const sesiInput  = row.querySelector('input[name^="course_sessions"]');
+            const sesi       = parseInt(sesiInput?.value || 0, 10);
             total      += parseFloat(feeInput?.value   || 0);
-            totalHonor += parseFloat(honorInput?.value || 0);
-            totalSesi  += parseInt(sesiInput?.value    || 0, 10);
+            totalHonor += parseFloat(honorInput?.value || 0) * sesi; // honor per sesi × jumlah sesi
+            totalSesi  += sesi;
         }
     });
     document.getElementById('totalBiaya').value = total || 0;
@@ -791,8 +797,9 @@ function recalcTotal() {
 function updateRowMargin(input) {
     const row    = input.closest('.pw-course-row');
     const fee    = parseFloat(row.querySelector('.fee-input')?.value   || 0);
-    const honor  = parseFloat(row.querySelector('.honor-input')?.value || 0);
-    const margin = fee - honor;
+    const honor  = parseFloat(row.querySelector('.honor-input')?.value || 0); // honor per sesi
+    const sesi   = parseInt(row.querySelector('input[name^="course_sessions"]')?.value || 0, 10);
+    const margin = fee - (honor * sesi);
     const pct    = fee > 0 ? Math.round((margin / fee) * 100) : 0;
     const display = row.querySelector('.margin-display');
     if (display) {
@@ -926,9 +933,10 @@ function buildCourseRow(course, isAdmin) {
     row.className = 'pw-course-row';
     row.dataset.courseRow = course.id;
     const guruOptions = course.guru.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
-    const fee   = parseFloat(course.fee) || 0;
-    const honor = Math.round(fee * 0.6);
-    const margin = fee - honor;
+    const fee    = parseFloat(course.fee) || 0;
+    const sesiDef = 8;
+    const honor  = Math.round((fee * 0.6) / sesiDef); // honor per sesi
+    const margin = fee - (honor * sesiDef);
     const pct    = fee > 0 ? Math.round((margin / fee) * 100) : 0;
     row.innerHTML = `
         <div class="row g-2 align-items-center">
@@ -1096,16 +1104,18 @@ function buildPreview() {
     document.querySelectorAll('.course-check:checked').forEach(chk => {
         const row     = chk.closest('.pw-course-row');
         const teacher = row.querySelector('select').selectedOptions[0]?.text || '–';
-        const sesi    = row.querySelector('input[name^="course_sessions"]').value || '–';
+        const sesiRaw = parseInt(row.querySelector('input[name^="course_sessions"]').value || 0, 10);
+        const sesi    = sesiRaw || '–';
         const fee     = parseFloat(row.querySelector('.fee-input')?.value   || 0);
-        const honor   = parseFloat(row.querySelector('.honor-input')?.value || 0);
+        const honorPerSesi = parseFloat(row.querySelector('.honor-input')?.value || 0);
+        const honor   = honorPerSesi * sesiRaw; // total honor guru = per sesi × jumlah sesi
         const margin  = fee - honor;
         const pct     = fee > 0 ? Math.round((margin / fee) * 100) : 0;
         const name    = row.querySelector('.form-check-label').textContent.trim();
         totalFee   += fee;
         totalHonor += honor;
         const marginColor  = margin >= 0 ? '#10b981' : '#dc2626';
-        rows.push({ name, teacher, sesi, fee, honor, margin, pct, marginColor });
+        rows.push({ name, teacher, sesi, fee, honorPerSesi, honor, margin, pct, marginColor });
     });
 
     const totalMargin = totalFee - totalHonor;
