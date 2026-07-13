@@ -19,11 +19,14 @@ The app starts via `bash start.sh` which:
 6. Starts `php artisan serve` on port 5000
 
 ## Demo accounts
+Seeded via `SlimSeeder` — there is no dedicated `admin`-role account; pages with `role:admin|owner` middleware are reachable by the `owner` account.
+
 | Role  | Email | Password |
 |-------|-------|----------|
 | Owner | adminpusatsci@akademi.com | password |
-| Admin | admincabangasci@akademi.com | password |
 | Guru  | gurusci@gmail.com | password123 |
+| Guru  | budi.santoso@guru.akademisci.com | password |
+| Siswa | andi.nugroho@siswa.com | password |
 
 ## Admin: Registrasi Siswa Baru (5-step wizard)
 `admin/registrasi-baru` (route `admin.registration.wizard`) is a 5-step wizard for admins to register a brand-new student directly: Informasi Siswa → Paket Kelas → Mapel & Guru → Pembayaran → Preview. On submit it creates the User/Student account and invoice, then shows a "Kirim ke WhatsApp Siswa" button that opens a pre-filled `wa.me` link with the login credentials — mirroring the pattern already used in the lead-verification wizard (`admin/registration-list/{id}/process`). Controller: `RegistrationController@wizardCreate`/`wizardStore`. View: `resources/views/admin/registration/wizard.blade.php`.
