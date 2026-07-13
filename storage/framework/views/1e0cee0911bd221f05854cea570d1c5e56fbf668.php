@@ -1988,4 +1988,4 @@ if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 </script>
 </body>
 </html>
-<?php /**PATH C:\Users\Edu Juanda Pratama\Downloads\smart-center-indonesia-1\smart-center-indonesia-1\resources\views/landing.blade.php ENDPATH**/ ?>
+<?php /**PATH /home/runner/workspace/resources/views/landing.blade.php ENDPATH**/ ?>
