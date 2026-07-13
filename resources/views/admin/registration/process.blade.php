@@ -118,7 +118,7 @@
                 </div>
                 <div class="col-md-3">
                     <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Program</label>
-                    <select class="form-select" name="program">
+                    <select class="form-select" name="program" id="programSelect" onchange="pwToggleLearningLogistics()">
                         <option value="">Pilih…</option>
                         <option value="kelas" {{ $registration->program==='kelas'?'selected':'' }}>Kelas</option>
                         <option value="privat" {{ $registration->program==='privat'?'selected':'' }}>Privat</option>
@@ -145,71 +145,74 @@
                     <input type="text" class="form-control" name="parent_phone" value="{{ $registration->parent_phone }}">
                 </div>
 
-                {{-- TEMPAT BELAJAR --}}
-                <div class="col-12">
-                    <label class="form-label fw-semibold" style="font-size:.78rem">Tempat Belajar</label>
-                    @php $curTempat = $registration->learning_place ?? 'kantor'; @endphp
-                    <div class="d-flex gap-2 flex-wrap">
-                        <div class="pw-opt-btn {{ $curTempat!=='rumah'?'active':'' }}" onclick="pickTempat('kantor',this)">
-                            <i class="bi bi-building me-1"></i>Belajar di Kantor
-                        </div>
-                        <div class="pw-opt-btn {{ $curTempat==='rumah'?'active':'' }}" onclick="pickTempat('rumah',this)">
-                            <i class="bi bi-house-door me-1"></i>Guru ke Rumah
-                        </div>
-                    </div>
-                    <input type="hidden" name="tempat_belajar" id="tempatBelajarInput" value="{{ $curTempat }}">
-                </div>
-
-                {{-- JADWAL BELAJAR --}}
-                <div class="col-12">
-                    <label class="form-label fw-semibold" style="font-size:.78rem">Jadwal Belajar
-                        <span class="fw-normal text-muted ms-1" style="font-size:.72rem">— pilih hari lalu isi jam</span>
-                    </label>
-                    {{-- Day pills --}}
-                    @php
-                        $dayShorts = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
-                        $dayFulls  = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
-                        $existDays = $registration->day_preferences ?? [];
-                    @endphp
-                    <div class="d-flex flex-wrap gap-2 mb-2">
-                        @foreach($dayShorts as $i => $short)
-                        @php $dayVal = $dayFulls[$i]; $isChecked = in_array($dayVal, $existDays); @endphp
-                        <label class="pw-day-pill {{ $isChecked?'selected':'' }}" id="dpill-{{ $dayVal }}"
-                               onclick="pwToggleDay(this,'{{ $dayVal }}')">
-                            <input type="checkbox" name="hari_belajar[]" value="{{ $dayVal }}"
-                                   style="display:none" {{ $isChecked?'checked':'' }}>
-                            {{ $short }}
-                        </label>
-                        @endforeach
-                    </div>
-                    {{-- Per-day time slots --}}
-                    <div id="pwDayScheduleWrapper" style="{{ empty($existDays)?'display:none':'' }}">
-                        <div id="pwDayScheduleContainer">
-                            @foreach($dayFulls as $dayVal)
-                            @if(in_array($dayVal, $existDays))
-                            <div class="pw-schedule-row" id="pwsrow-{{ $dayVal }}">
-                                <div class="pw-day-label">{{ $dayVal }}</div>
-                                <div class="flex-fill" id="pwslots-{{ $dayVal }}">
-                                    <div class="pw-time-slot">
-                                        <input type="text" name="jam_detail[{{ $dayVal }}][]"
-                                               class="form-control form-control-sm"
-                                               placeholder="cth. 10:00 - 12:00" autocomplete="off">
-                                    </div>
-                                </div>
-                                <button type="button" class="btn btn-sm btn-outline-primary"
-                                        onclick="pwAddSlot('{{ $dayVal }}')" style="font-size:.72rem;white-space:nowrap">
-                                    <i class="bi bi-plus"></i> Slot
-                                </button>
+                {{-- TEMPAT BELAJAR & JADWAL BELAJAR — hanya relevan untuk program Privat --}}
+                <div id="learningLogisticsWrapper" class="row g-3">
+                    {{-- TEMPAT BELAJAR --}}
+                    <div class="col-12">
+                        <label class="form-label fw-semibold" style="font-size:.78rem">Tempat Belajar</label>
+                        @php $curTempat = $registration->learning_place ?? 'kantor'; @endphp
+                        <div class="d-flex gap-2 flex-wrap">
+                            <div class="pw-opt-btn {{ $curTempat!=='rumah'?'active':'' }}" onclick="pickTempat('kantor',this)">
+                                <i class="bi bi-building me-1"></i>Belajar di Kantor
                             </div>
-                            @endif
+                            <div class="pw-opt-btn {{ $curTempat==='rumah'?'active':'' }}" onclick="pickTempat('rumah',this)">
+                                <i class="bi bi-house-door me-1"></i>Guru ke Rumah
+                            </div>
+                        </div>
+                        <input type="hidden" name="tempat_belajar" id="tempatBelajarInput" value="{{ $curTempat }}">
+                    </div>
+
+                    {{-- JADWAL BELAJAR --}}
+                    <div class="col-12">
+                        <label class="form-label fw-semibold" style="font-size:.78rem">Jadwal Belajar
+                            <span class="fw-normal text-muted ms-1" style="font-size:.72rem">— pilih hari lalu isi jam</span>
+                        </label>
+                        {{-- Day pills --}}
+                        @php
+                            $dayShorts = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+                            $dayFulls  = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+                            $existDays = $registration->day_preferences ?? [];
+                        @endphp
+                        <div class="d-flex flex-wrap gap-2 mb-2">
+                            @foreach($dayShorts as $i => $short)
+                            @php $dayVal = $dayFulls[$i]; $isChecked = in_array($dayVal, $existDays); @endphp
+                            <label class="pw-day-pill {{ $isChecked?'selected':'' }}" id="dpill-{{ $dayVal }}"
+                                   onclick="pwToggleDay(this,'{{ $dayVal }}')">
+                                <input type="checkbox" name="hari_belajar[]" value="{{ $dayVal }}"
+                                       style="display:none" {{ $isChecked?'checked':'' }}>
+                                {{ $short }}
+                            </label>
                             @endforeach
                         </div>
+                        {{-- Per-day time slots --}}
+                        <div id="pwDayScheduleWrapper" style="{{ empty($existDays)?'display:none':'' }}">
+                            <div id="pwDayScheduleContainer">
+                                @foreach($dayFulls as $dayVal)
+                                @if(in_array($dayVal, $existDays))
+                                <div class="pw-schedule-row" id="pwsrow-{{ $dayVal }}">
+                                    <div class="pw-day-label">{{ $dayVal }}</div>
+                                    <div class="flex-fill" id="pwslots-{{ $dayVal }}">
+                                        <div class="pw-time-slot">
+                                            <input type="text" name="jam_detail[{{ $dayVal }}][]"
+                                                   class="form-control form-control-sm"
+                                                   placeholder="cth. 10:00 - 12:00" autocomplete="off">
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                            onclick="pwAddSlot('{{ $dayVal }}')" style="font-size:.72rem;white-space:nowrap">
+                                        <i class="bi bi-plus"></i> Slot
+                                    </button>
+                                </div>
+                                @endif
+                                @endforeach
+                            </div>
+                        </div>
+                        @if($registration->schedule_time)
+                        <div class="form-text mt-1" style="font-size:.72rem">
+                            <i class="bi bi-clock me-1"></i>Jadwal sebelumnya: <em>{{ $registration->schedule_time }}</em>
+                        </div>
+                        @endif
                     </div>
-                    @if($registration->schedule_time)
-                    <div class="form-text mt-1" style="font-size:.72rem">
-                        <i class="bi bi-clock me-1"></i>Jadwal sebelumnya: <em>{{ $registration->schedule_time }}</em>
-                    </div>
-                    @endif
                 </div>
 
             </div>
@@ -1140,6 +1143,7 @@ function buildPreview() {
 
     // Hoist inline expressions so a dollar-brace-brace pattern never appears inside the template literal (Blade parses double braces even in JS blocks)
     const _previewEduLevel  = document.querySelector('[name="education_level"]')?.value || '–';
+    const _isPrivatProgram  = document.getElementById('programSelect')?.value === 'privat';
     const _tempatMap        = {kantor:'Di Kantor', rumah:'Guru ke Rumah'};
     const _previewTempat    = _tempatMap[document.getElementById('tempatBelajarInput')?.value] || '–';
     const _previewJadwal    = (() => {
@@ -1151,14 +1155,16 @@ function buildPreview() {
             return d + (slots.length ? ' (' + slots.join(', ') + ')' : '');
         }).join(' · ');
     })();
+    const _learningLogisticsHtml = _isPrivatProgram ? `
+            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Tempat Belajar:</span> <strong>${_previewTempat}</strong></div>
+            <div class="col-md-8"><span class="text-muted" style="font-size:.83rem">Jadwal:</span> <strong style="font-size:.82rem">${_previewJadwal}</strong></div>` : '';
 
     document.getElementById('previewBox').innerHTML = `
         {{-- Header info --}}
         <div class="row g-2 mb-3">
             <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Paket:</span> <strong>${pkgName}</strong></div>
             <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Kategori:</span> <strong>${_previewEduLevel}</strong></div>
-            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Tempat Belajar:</span> <strong>${_previewTempat}</strong></div>
-            <div class="col-md-8"><span class="text-muted" style="font-size:.83rem">Jadwal:</span> <strong style="font-size:.82rem">${_previewJadwal}</strong></div>
+            ${_learningLogisticsHtml}
         </div>
 
         {{-- Mapel + Guru table --}}
@@ -1229,6 +1235,18 @@ function pickTempat(val, el) {
     el.classList.add('active');
     document.getElementById('tempatBelajarInput').value = val;
 }
+
+// Tempat Belajar & Jadwal Belajar hanya relevan untuk program Privat —
+// kelas reguler sudah punya jadwal/lokasi sendiri lewat paket/kelas yang dipilih.
+function pwToggleLearningLogistics() {
+    const program = document.getElementById('programSelect')?.value;
+    const wrapper = document.getElementById('learningLogisticsWrapper');
+    if (!wrapper) return;
+    const isPrivat = program === 'privat';
+    wrapper.style.display = isPrivat ? '' : 'none';
+    wrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = !isPrivat);
+}
+document.addEventListener('DOMContentLoaded', pwToggleLearningLogistics);
 
 const PW_DAY_ORDER = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
 

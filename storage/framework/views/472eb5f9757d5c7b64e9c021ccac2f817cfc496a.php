@@ -117,7 +117,7 @@
                 </div>
                 <div class="col-md-3">
                     <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Program</label>
-                    <select class="form-select" name="program">
+                    <select class="form-select" name="program" id="programSelect" onchange="pwToggleLearningLogistics()">
                         <option value="">Pilih…</option>
                         <option value="kelas" <?php echo e($registration->program==='kelas'?'selected':''); ?>>Kelas</option>
                         <option value="privat" <?php echo e($registration->program==='privat'?'selected':''); ?>>Privat</option>
@@ -145,71 +145,74 @@
                 </div>
 
                 
-                <div class="col-12">
-                    <label class="form-label fw-semibold" style="font-size:.78rem">Tempat Belajar</label>
-                    <?php $curTempat = $registration->learning_place ?? 'kantor'; ?>
-                    <div class="d-flex gap-2 flex-wrap">
-                        <div class="pw-opt-btn <?php echo e($curTempat!=='rumah'?'active':''); ?>" onclick="pickTempat('kantor',this)">
-                            <i class="bi bi-building me-1"></i>Belajar di Kantor
-                        </div>
-                        <div class="pw-opt-btn <?php echo e($curTempat==='rumah'?'active':''); ?>" onclick="pickTempat('rumah',this)">
-                            <i class="bi bi-house-door me-1"></i>Guru ke Rumah
-                        </div>
-                    </div>
-                    <input type="hidden" name="tempat_belajar" id="tempatBelajarInput" value="<?php echo e($curTempat); ?>">
-                </div>
-
-                
-                <div class="col-12">
-                    <label class="form-label fw-semibold" style="font-size:.78rem">Jadwal Belajar
-                        <span class="fw-normal text-muted ms-1" style="font-size:.72rem">— pilih hari lalu isi jam</span>
-                    </label>
+                <div id="learningLogisticsWrapper" class="row g-3">
                     
-                    <?php
-                        $dayShorts = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
-                        $dayFulls  = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
-                        $existDays = $registration->day_preferences ?? [];
-                    ?>
-                    <div class="d-flex flex-wrap gap-2 mb-2">
-                        <?php $__currentLoopData = $dayShorts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $short): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <?php $dayVal = $dayFulls[$i]; $isChecked = in_array($dayVal, $existDays); ?>
-                        <label class="pw-day-pill <?php echo e($isChecked?'selected':''); ?>" id="dpill-<?php echo e($dayVal); ?>"
-                               onclick="pwToggleDay(this,'<?php echo e($dayVal); ?>')">
-                            <input type="checkbox" name="hari_belajar[]" value="<?php echo e($dayVal); ?>"
-                                   style="display:none" <?php echo e($isChecked?'checked':''); ?>>
-                            <?php echo e($short); ?>
-
-                        </label>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </div>
-                    
-                    <div id="pwDayScheduleWrapper" style="<?php echo e(empty($existDays)?'display:none':''); ?>">
-                        <div id="pwDayScheduleContainer">
-                            <?php $__currentLoopData = $dayFulls; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dayVal): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <?php if(in_array($dayVal, $existDays)): ?>
-                            <div class="pw-schedule-row" id="pwsrow-<?php echo e($dayVal); ?>">
-                                <div class="pw-day-label"><?php echo e($dayVal); ?></div>
-                                <div class="flex-fill" id="pwslots-<?php echo e($dayVal); ?>">
-                                    <div class="pw-time-slot">
-                                        <input type="text" name="jam_detail[<?php echo e($dayVal); ?>][]"
-                                               class="form-control form-control-sm"
-                                               placeholder="cth. 10:00 - 12:00" autocomplete="off">
-                                    </div>
-                                </div>
-                                <button type="button" class="btn btn-sm btn-outline-primary"
-                                        onclick="pwAddSlot('<?php echo e($dayVal); ?>')" style="font-size:.72rem;white-space:nowrap">
-                                    <i class="bi bi-plus"></i> Slot
-                                </button>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold" style="font-size:.78rem">Tempat Belajar</label>
+                        <?php $curTempat = $registration->learning_place ?? 'kantor'; ?>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <div class="pw-opt-btn <?php echo e($curTempat!=='rumah'?'active':''); ?>" onclick="pickTempat('kantor',this)">
+                                <i class="bi bi-building me-1"></i>Belajar di Kantor
                             </div>
-                            <?php endif; ?>
+                            <div class="pw-opt-btn <?php echo e($curTempat==='rumah'?'active':''); ?>" onclick="pickTempat('rumah',this)">
+                                <i class="bi bi-house-door me-1"></i>Guru ke Rumah
+                            </div>
+                        </div>
+                        <input type="hidden" name="tempat_belajar" id="tempatBelajarInput" value="<?php echo e($curTempat); ?>">
+                    </div>
+
+                    
+                    <div class="col-12">
+                        <label class="form-label fw-semibold" style="font-size:.78rem">Jadwal Belajar
+                            <span class="fw-normal text-muted ms-1" style="font-size:.72rem">— pilih hari lalu isi jam</span>
+                        </label>
+                        
+                        <?php
+                            $dayShorts = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+                            $dayFulls  = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+                            $existDays = $registration->day_preferences ?? [];
+                        ?>
+                        <div class="d-flex flex-wrap gap-2 mb-2">
+                            <?php $__currentLoopData = $dayShorts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $short): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php $dayVal = $dayFulls[$i]; $isChecked = in_array($dayVal, $existDays); ?>
+                            <label class="pw-day-pill <?php echo e($isChecked?'selected':''); ?>" id="dpill-<?php echo e($dayVal); ?>"
+                                   onclick="pwToggleDay(this,'<?php echo e($dayVal); ?>')">
+                                <input type="checkbox" name="hari_belajar[]" value="<?php echo e($dayVal); ?>"
+                                       style="display:none" <?php echo e($isChecked?'checked':''); ?>>
+                                <?php echo e($short); ?>
+
+                            </label>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
+                        
+                        <div id="pwDayScheduleWrapper" style="<?php echo e(empty($existDays)?'display:none':''); ?>">
+                            <div id="pwDayScheduleContainer">
+                                <?php $__currentLoopData = $dayFulls; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dayVal): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php if(in_array($dayVal, $existDays)): ?>
+                                <div class="pw-schedule-row" id="pwsrow-<?php echo e($dayVal); ?>">
+                                    <div class="pw-day-label"><?php echo e($dayVal); ?></div>
+                                    <div class="flex-fill" id="pwslots-<?php echo e($dayVal); ?>">
+                                        <div class="pw-time-slot">
+                                            <input type="text" name="jam_detail[<?php echo e($dayVal); ?>][]"
+                                                   class="form-control form-control-sm"
+                                                   placeholder="cth. 10:00 - 12:00" autocomplete="off">
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                            onclick="pwAddSlot('<?php echo e($dayVal); ?>')" style="font-size:.72rem;white-space:nowrap">
+                                        <i class="bi bi-plus"></i> Slot
+                                    </button>
+                                </div>
+                                <?php endif; ?>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </div>
+                        </div>
+                        <?php if($registration->schedule_time): ?>
+                        <div class="form-text mt-1" style="font-size:.72rem">
+                            <i class="bi bi-clock me-1"></i>Jadwal sebelumnya: <em><?php echo e($registration->schedule_time); ?></em>
+                        </div>
+                        <?php endif; ?>
                     </div>
-                    <?php if($registration->schedule_time): ?>
-                    <div class="form-text mt-1" style="font-size:.72rem">
-                        <i class="bi bi-clock me-1"></i>Jadwal sebelumnya: <em><?php echo e($registration->schedule_time); ?></em>
-                    </div>
-                    <?php endif; ?>
                 </div>
 
             </div>
@@ -1141,6 +1144,7 @@ function buildPreview() {
 
     // Hoist inline expressions so a dollar-brace-brace pattern never appears inside the template literal (Blade parses double braces even in JS blocks)
     const _previewEduLevel  = document.querySelector('[name="education_level"]')?.value || '–';
+    const _isPrivatProgram  = document.getElementById('programSelect')?.value === 'privat';
     const _tempatMap        = {kantor:'Di Kantor', rumah:'Guru ke Rumah'};
     const _previewTempat    = _tempatMap[document.getElementById('tempatBelajarInput')?.value] || '–';
     const _previewJadwal    = (() => {
@@ -1152,14 +1156,16 @@ function buildPreview() {
             return d + (slots.length ? ' (' + slots.join(', ') + ')' : '');
         }).join(' · ');
     })();
+    const _learningLogisticsHtml = _isPrivatProgram ? `
+            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Tempat Belajar:</span> <strong>${_previewTempat}</strong></div>
+            <div class="col-md-8"><span class="text-muted" style="font-size:.83rem">Jadwal:</span> <strong style="font-size:.82rem">${_previewJadwal}</strong></div>` : '';
 
     document.getElementById('previewBox').innerHTML = `
         
         <div class="row g-2 mb-3">
             <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Paket:</span> <strong>${pkgName}</strong></div>
             <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Kategori:</span> <strong>${_previewEduLevel}</strong></div>
-            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Tempat Belajar:</span> <strong>${_previewTempat}</strong></div>
-            <div class="col-md-8"><span class="text-muted" style="font-size:.83rem">Jadwal:</span> <strong style="font-size:.82rem">${_previewJadwal}</strong></div>
+            ${_learningLogisticsHtml}
         </div>
 
         
@@ -1230,6 +1236,18 @@ function pickTempat(val, el) {
     el.classList.add('active');
     document.getElementById('tempatBelajarInput').value = val;
 }
+
+// Tempat Belajar & Jadwal Belajar hanya relevan untuk program Privat —
+// kelas reguler sudah punya jadwal/lokasi sendiri lewat paket/kelas yang dipilih.
+function pwToggleLearningLogistics() {
+    const program = document.getElementById('programSelect')?.value;
+    const wrapper = document.getElementById('learningLogisticsWrapper');
+    if (!wrapper) return;
+    const isPrivat = program === 'privat';
+    wrapper.style.display = isPrivat ? '' : 'none';
+    wrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = !isPrivat);
+}
+document.addEventListener('DOMContentLoaded', pwToggleLearningLogistics);
 
 const PW_DAY_ORDER = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
 
