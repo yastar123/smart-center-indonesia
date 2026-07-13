@@ -535,13 +535,28 @@ class RegistrationListController extends Controller
                 ]);
             }
 
+            // interest_sessions/interest_teachers are shown to the student keyed by
+            // subject NAME (see resources/views/siswa/kelas/index.blade.php), but the
+            // form submits course_sessions/course_teacher keyed by course ID — remap
+            // here so the student portal doesn't display raw course IDs as labels.
+            $courseNamesById = Course::whereIn('id', array_keys($courseSessions + $courseTeachers))
+                ->pluck('nama', 'id');
+            $interestSessionsByName = [];
+            foreach ($courseSessions as $cId => $sesi) {
+                $interestSessionsByName[$courseNamesById[$cId] ?? $cId] = $sesi;
+            }
+            $interestTeachersByName = [];
+            foreach ($courseTeachers as $cId => $tId) {
+                $interestTeachersByName[$courseNamesById[$cId] ?? $cId] = $tId;
+            }
+
             $registration->update([
                 'status'               => 'verified',
                 'student_id'           => $student->id,
                 'branch'               => $branch->name,
                 'assigned_teacher_id'  => $primaryTeacherId,
-                'interest_teachers'    => $courseTeachers ?: null,
-                'interest_sessions'    => $courseSessions ?: null,
+                'interest_teachers'    => $interestTeachersByName ?: null,
+                'interest_sessions'    => $interestSessionsByName ?: null,
                 'total_sessions'       => $totalSesi ?: null,
                 'biaya_per_sesi'       => $data['biaya_per_sesi'] ?? null,
                 'total_biaya'          => $totalBiaya,
