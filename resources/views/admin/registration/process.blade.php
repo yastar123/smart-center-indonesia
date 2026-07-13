@@ -475,7 +475,7 @@
                                         <span class="sched-guru-name text-muted" data-course-id="{{ $course->id }}" style="font-size:.82rem">—</span>
                                     </td>
                                     <td>
-                                        <select class="form-select form-select-sm hari-select" data-course-id="{{ $course->id }}" style="min-width:88px">
+                                        <select class="form-select form-select-sm hari-select" name="schedule_hari[{{ $course->id }}]" data-course-id="{{ $course->id }}" style="min-width:88px">
                                             <option value="">Pilih…</option>
                                             <option value="1">Senin</option>
                                             <option value="2">Selasa</option>
@@ -487,10 +487,10 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <input type="time" class="form-control form-control-sm jam-mulai-input" data-course-id="{{ $course->id }}" style="min-width:100px">
+                                        <input type="time" class="form-control form-control-sm jam-mulai-input" name="schedule_jam_mulai[{{ $course->id }}]" data-course-id="{{ $course->id }}" value="08:00" style="min-width:100px">
                                     </td>
                                     <td>
-                                        <input type="time" class="form-control form-control-sm jam-selesai-input" data-course-id="{{ $course->id }}" style="min-width:100px">
+                                        <input type="time" class="form-control form-control-sm jam-selesai-input" name="schedule_jam_selesai[{{ $course->id }}]" data-course-id="{{ $course->id }}" value="10:00" style="min-width:100px">
                                     </td>
                                     <td>
                                         <select class="form-select form-select-sm room-select" name="schedule_room[{{ $course->id }}]" data-course-id="{{ $course->id }}" style="min-width:140px">
@@ -991,14 +991,14 @@ function buildScheduleRow(course) {
         <td><span class="badge rounded-pill" style="background:rgba(200,77,223,.12);color:#461256;font-size:.75rem;font-weight:600;padding:.3em .75em">${course.nama}</span></td>
         <td><span class="sched-guru-name text-muted" data-course-id="${course.id}" style="font-size:.82rem">—</span></td>
         <td>
-            <select class="form-select form-select-sm hari-select" data-course-id="${course.id}" style="min-width:88px">
+            <select class="form-select form-select-sm hari-select" name="schedule_hari[${course.id}]" data-course-id="${course.id}" style="min-width:88px">
                 <option value="">Pilih…</option>
                 <option value="1">Senin</option><option value="2">Selasa</option><option value="3">Rabu</option>
                 <option value="4">Kamis</option><option value="5">Jum'at</option><option value="6">Sabtu</option><option value="0">Minggu</option>
             </select>
         </td>
-        <td><input type="time" class="form-control form-control-sm jam-mulai-input" data-course-id="${course.id}" style="min-width:100px"></td>
-        <td><input type="time" class="form-control form-control-sm jam-selesai-input" data-course-id="${course.id}" style="min-width:100px"></td>
+        <td><input type="time" class="form-control form-control-sm jam-mulai-input" name="schedule_jam_mulai[${course.id}]" data-course-id="${course.id}" value="08:00" style="min-width:100px"></td>
+        <td><input type="time" class="form-control form-control-sm jam-selesai-input" name="schedule_jam_selesai[${course.id}]" data-course-id="${course.id}" value="10:00" style="min-width:100px"></td>
         <td><select class="form-select form-select-sm room-select" name="schedule_room[${course.id}]" data-course-id="${course.id}" style="min-width:140px">${_roomOptions}</select></td>`;
     return tr;
 }

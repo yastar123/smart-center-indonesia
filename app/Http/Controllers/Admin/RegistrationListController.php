@@ -211,6 +211,14 @@ class RegistrationListController extends Controller
             'course_fee.*'         => 'nullable|numeric|min:0',
             'course_honor'         => 'nullable|array',
             'course_honor.*'       => 'nullable|numeric|min:0',
+            'schedule_hari'        => 'nullable|array',
+            'schedule_hari.*'      => 'nullable|string|max:20',
+            'schedule_jam_mulai'   => 'nullable|array',
+            'schedule_jam_mulai.*' => 'nullable',
+            'schedule_jam_selesai' => 'nullable|array',
+            'schedule_jam_selesai.*' => 'nullable',
+            'schedule_room'        => 'nullable|array',
+            'schedule_room.*'      => 'nullable|exists:rooms,id',
             'total_biaya'            => 'required|numeric|min:0',
             'biaya_per_sesi'         => 'nullable|numeric|min:0',
             'biaya_admin'            => 'nullable|numeric|min:0',
@@ -366,6 +374,13 @@ class RegistrationListController extends Controller
                 ? 'online'
                 : ((($data['program'] ?? null) === 'privat') ? 'private' : 'offline');
 
+            $courseHonor  = $data['course_honor']         ?? [];
+            $scheduleHari = $data['schedule_hari']        ?? [];
+            $scheduleJamMulai   = $data['schedule_jam_mulai']   ?? [];
+            $scheduleJamSelesai = $data['schedule_jam_selesai'] ?? [];
+            $scheduleRoom = $data['schedule_room']        ?? [];
+            $programBelajarSchedule = ($data['program'] ?? null) === 'privat' ? 'private' : 'kelas';
+
             foreach ($data['course_ids'] as $courseId) {
                 $teacherId = $courseTeachers[$courseId] ?? $primaryTeacherId ?? null;
 
@@ -374,8 +389,10 @@ class RegistrationListController extends Controller
                     ->where('status', 'aktif');
                 $teacherId ? $classQuery->where('guru_id', $teacherId) : $classQuery->whereNull('guru_id');
                 $schoolClass = $classQuery->first();
+                $isNewClass  = false;
 
                 if (!$schoolClass) {
+                    $isNewClass = true;
                     $course  = Course::find($courseId);
                     $teacher = $teacherId ? Teacher::find($teacherId) : null;
                     $parts   = array_filter([
@@ -403,6 +420,42 @@ class RegistrationListController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
+
+                // Generate the recurring weekly sessions for this brand-new class from
+                // the "Jadwal Kelas" table on the process form (hari/jam/ruang per mapel).
+                // Only for classes we just created — an existing/reused class already
+                // has its own schedule, so we never duplicate sessions onto it.
+                $hari   = $scheduleHari[$courseId] ?? null;
+                $mulai  = $scheduleJamMulai[$courseId] ?? null;
+                $selesai = $scheduleJamSelesai[$courseId] ?? null;
+                if ($isNewClass && $hari !== null && $hari !== '' && $mulai && $selesai) {
+                    $roomId   = $scheduleRoom[$courseId] ?? null;
+                    $roomName = $roomId ? optional(Room::find($roomId))->nama_ruangan : null;
+                    $honorPerSesi = isset($courseHonor[$courseId]) ? (float) $courseHonor[$courseId] : null;
+                    $jumlahSesi   = (int) ($courseSessions[$courseId] ?? 8);
+
+                    $tanggal = now()->startOfDay();
+                    while ((int) $tanggal->dayOfWeek !== (int) $hari) {
+                        $tanggal = $tanggal->addDay();
+                    }
+
+                    for ($i = 0; $i < $jumlahSesi; $i++) {
+                        Schedule::create([
+                            'kelas_id'          => $schoolClass->id,
+                            'mata_pelajaran_id' => $courseId,
+                            'guru_id'           => $teacherId,
+                            'cabang_id'         => $branch->id,
+                            'tanggal'           => $tanggal->copy()->addWeeks($i)->toDateString(),
+                            'jam_mulai'         => $mulai,
+                            'jam_selesai'       => $selesai,
+                            'program_belajar'   => $programBelajarSchedule,
+                            'jenis'             => $jenisKelas,
+                            'ruangan'           => $roomName,
+                            'honor_per_sesi'    => $honorPerSesi,
+                            'status'            => 'dijadwalkan',
+                        ]);
+                    }
+                }
             }
 
             $year  = date('Y');
