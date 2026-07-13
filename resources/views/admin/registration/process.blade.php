@@ -229,98 +229,147 @@
 
         {{-- STEP 3: MAPEL & GURU --}}
         <div class="pw-panel" data-step="3">
-            <h6 class="fw-bold mb-3"><i class="bi bi-journal-bookmark me-2 text-primary"></i>Mata Pelajaran &amp; Guru</h6>
+            <h6 class="fw-bold mb-3"><i class="bi bi-journal-bookmark me-2 text-primary"></i>Mata Pelajaran, Guru &amp; Jadwal</h6>
             @if($courses->isEmpty())
             <div class="alert alert-warning" style="font-size:.85rem"><i class="bi bi-exclamation-triangle me-2"></i>Tidak ditemukan mata pelajaran yang cocok dengan minat pendaftaran ini di data master. Hubungi bagian akademik untuk melengkapi data mata pelajaran.</div>
             @else
-            <p class="text-muted" style="font-size:.83rem">Centang mata pelajaran yang akan diambil siswa, lalu tentukan guru pengajar dan jumlah sesi. Semua mata pelajaran &mdash; termasuk pilihan siswa &mdash; dapat dihapus atau ditambah admin di sini.</p>
+            <p class="text-muted mb-3" style="font-size:.83rem">Centang mata pelajaran yang akan diambil siswa, tentukan guru &amp; jumlah sesi, lalu isi jadwal kelas untuk pengecekan konflik guru.</p>
             @endif
 
-            <div id="courseRowsContainer">
-                @foreach($courses as $course)
-                @php $fee = $course->fee->amount ?? 0; @endphp
-                <div class="pw-course-row" data-course-row="{{ $course->id }}">
-                    <div class="row g-2 align-items-center">
-                        <div class="col-md-3">
-                            <div class="form-check">
-                                <input class="form-check-input course-check" type="checkbox" name="course_ids[]" value="{{ $course->id }}" id="course{{ $course->id }}" checked>
-                                <label class="form-check-label fw-semibold" for="course{{ $course->id }}">{{ $course->nama }}</label>
-                            </div>
-                            <div class="form-text" style="font-size:.68rem">Mapel pilihan siswa</div>
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-select form-select-sm guru-select" name="course_teacher[{{ $course->id }}]" data-course-id="{{ $course->id }}">
-                                <option value="">Pilih guru…</option>
-                                @foreach($course->guru as $t)
-                                <option value="{{ $t->id }}">{{ $t->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[{{ $course->id }}]" placeholder="Jml sesi" value="{{ $registration->interest_sessions[$course->nama] ?? 8 }}">
-                        </div>
-                        <div class="col-md-3">
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text">Rp</span>
-                                <input type="number" min="0" class="form-control fee-input" name="course_fee[{{ $course->id }}]" value="{{ $fee }}">
-                            </div>
-                        </div>
-                        <div class="col-md-1 text-end">
-                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCourseRow(this, {{ $course->id }})" title="Hapus mapel ini"><i class="bi bi-trash"></i></button>
-                        </div>
+            {{-- CARD A: MATA PELAJARAN & GURU --}}
+            <div class="mb-3" style="border:1px solid var(--card-border);border-radius:14px;overflow:hidden">
+                <div class="px-3 py-2 d-flex align-items-center gap-2" style="background:linear-gradient(90deg,rgba(70,18,86,.07),transparent);border-bottom:1px solid var(--card-border)">
+                    <i class="bi bi-journal-bookmark text-primary"></i>
+                    <span class="fw-bold" style="font-size:.85rem">Mata Pelajaran &amp; Guru</span>
+                </div>
+                <div class="p-3">
+                    {{-- Column headers (md+) --}}
+                    <div class="row g-2 mb-1 d-none d-md-flex px-1">
+                        <div class="col-md-3"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Mata Pelajaran</span></div>
+                        <div class="col-md-3"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Guru Pengajar</span></div>
+                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Jml Sesi</span></div>
+                        <div class="col-md-3"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Biaya (Rp)</span></div>
                     </div>
-                    <div class="row g-2 align-items-center mt-2 pw-conflict-row">
-                        <div class="col-md-3">
-                            <select class="form-select form-select-sm hari-select" data-course-id="{{ $course->id }}">
-                                <option value="">Hari kelas…</option>
-                                <option value="1">Senin</option>
-                                <option value="2">Selasa</option>
-                                <option value="3">Rabu</option>
-                                <option value="4">Kamis</option>
-                                <option value="5">Jum'at</option>
-                                <option value="6">Sabtu</option>
-                                <option value="0">Minggu</option>
-                            </select>
+
+                    <div id="courseRowsContainer">
+                        @foreach($courses as $course)
+                        @php $fee = $course->fee->amount ?? 0; @endphp
+                        <div class="pw-course-row" data-course-row="{{ $course->id }}">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input course-check" type="checkbox" name="course_ids[]" value="{{ $course->id }}" id="course{{ $course->id }}" checked>
+                                        <label class="form-check-label fw-semibold" for="course{{ $course->id }}">{{ $course->nama }}</label>
+                                    </div>
+                                    <div class="form-text" style="font-size:.68rem">Mapel pilihan siswa</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select form-select-sm guru-select" name="course_teacher[{{ $course->id }}]" data-course-id="{{ $course->id }}">
+                                        <option value="">Pilih guru…</option>
+                                        @foreach($course->guru as $t)
+                                        <option value="{{ $t->id }}">{{ $t->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[{{ $course->id }}]" placeholder="Jml sesi" value="{{ $registration->interest_sessions[$course->nama] ?? 8 }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text">Rp</span>
+                                        <input type="number" min="0" class="form-control fee-input" name="course_fee[{{ $course->id }}]" value="{{ $fee }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-1 text-end">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCourseRow(this, {{ $course->id }})" title="Hapus mapel ini"><i class="bi bi-trash"></i></button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <input type="time" class="form-control form-control-sm jam-mulai-input" data-course-id="{{ $course->id }}" placeholder="Jam mulai">
+                        @endforeach
+                    </div>
+
+                    {{-- TAMBAH MATA PELAJARAN LAIN --}}
+                    <div class="mt-3 p-3 rounded-3" style="background:var(--input-bg);border:1px dashed var(--card-border)">
+                        <div class="d-flex gap-2 align-items-end flex-wrap">
+                            <div class="flex-grow-1" style="min-width:220px">
+                                <label class="form-label fw-semibold" style="font-size:.78rem">Tambah Mata Pelajaran Lain</label>
+                                <select id="extraCourseSelect" class="form-select form-select-sm"></select>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addExtraCourse()"><i class="bi bi-plus-circle me-1"></i>Tambah</button>
                         </div>
-                        <div class="col-md-3">
-                            <input type="time" class="form-control form-control-sm jam-selesai-input" data-course-id="{{ $course->id }}" placeholder="Jam selesai">
+                        <div class="text-muted mt-2" id="extraCourseEmptyMsg" style="font-size:.72rem;display:none">Semua mata pelajaran di data master sudah ditambahkan.</div>
+                    </div>
+
+                    {{-- RINGKASAN TOTAL SESI & ESTIMASI BIAYA --}}
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3 text-center" style="background:rgba(200,77,223,.08);border:1.5px solid rgba(200,77,223,.35)">
+                                <div class="text-muted" style="font-size:.72rem;text-transform:uppercase;letter-spacing:.05em">Total Sesi</div>
+                                <div class="fw-bold fs-5 text-primary" id="summaryTotalSesi">0</div>
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="conflict-warning-box" style="font-size:.72rem"></div>
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3 text-center" style="background:rgba(200,77,223,.08);border:1.5px solid rgba(200,77,223,.35)">
+                                <div class="text-muted" style="font-size:.72rem;text-transform:uppercase;letter-spacing:.05em">Total Estimasi Biaya Guru</div>
+                                <div class="fw-bold fs-5 text-primary" id="summaryTotalFee">Rp0</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                @endforeach
             </div>
 
-            {{-- TAMBAH MATA PELAJARAN LAIN (CRUD penuh oleh admin) --}}
-            <div class="mt-3 p-3 rounded-3" style="background:var(--input-bg);border:1px dashed var(--card-border)">
-                <div class="d-flex gap-2 align-items-end flex-wrap">
-                    <div class="flex-grow-1" style="min-width:220px">
-                        <label class="form-label fw-semibold" style="font-size:.78rem">Tambah Mata Pelajaran Lain</label>
-                        <select id="extraCourseSelect" class="form-select form-select-sm"></select>
-                    </div>
-                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="addExtraCourse()"><i class="bi bi-plus-circle me-1"></i>Tambah</button>
+            {{-- CARD B: JADWAL KELAS --}}
+            <div class="mb-3" style="border:1px solid var(--card-border);border-radius:14px;overflow:hidden">
+                <div class="px-3 py-2 d-flex align-items-center gap-2" style="background:linear-gradient(90deg,rgba(70,18,86,.07),transparent);border-bottom:1px solid var(--card-border)">
+                    <i class="bi bi-calendar-week text-primary"></i>
+                    <span class="fw-bold" style="font-size:.85rem">Jadwal Kelas</span>
+                    <span class="ms-1 text-muted" style="font-size:.75rem">&mdash; opsional, untuk cek konflik jadwal guru</span>
                 </div>
-                <div class="text-muted mt-2" id="extraCourseEmptyMsg" style="font-size:.72rem;display:none">Semua mata pelajaran di data master sudah ditambahkan.</div>
-            </div>
+                <div class="p-3">
+                    <p class="text-muted mb-3" style="font-size:.82rem">Isi hari &amp; jam kelas agar sistem dapat mengecek apakah guru yang dipilih sudah punya jadwal lain yang bentrok. Pengisian ini <strong>tidak wajib</strong> dan tidak memblokir proses submit.</p>
 
-            {{-- RINGKASAN TOTAL SESI & ESTIMASI BIAYA GURU --}}
-            <div class="row g-3 mt-3">
-                <div class="col-md-6">
-                    <div class="p-3 rounded-3 text-center" style="background:rgba(200,77,223,.08);border:1.5px solid rgba(200,77,223,.35)">
-                        <div class="text-muted" style="font-size:.72rem;text-transform:uppercase;letter-spacing:.05em">Total Sesi</div>
-                        <div class="fw-bold fs-5 text-primary" id="summaryTotalSesi">0</div>
+                    {{-- Column headers (md+) --}}
+                    <div class="row g-2 mb-1 d-none d-md-flex px-1">
+                        <div class="col-md-3"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Mata Pelajaran</span></div>
+                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Hari</span></div>
+                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Jam Mulai</span></div>
+                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Jam Selesai</span></div>
+                        <div class="col-md-3"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Status</span></div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="p-3 rounded-3 text-center" style="background:rgba(200,77,223,.08);border:1.5px solid rgba(200,77,223,.35)">
-                        <div class="text-muted" style="font-size:.72rem;text-transform:uppercase;letter-spacing:.05em">Total Estimasi Biaya Guru</div>
-                        <div class="fw-bold fs-5 text-primary" id="summaryTotalFee">Rp0</div>
+
+                    <div id="scheduleRowsContainer">
+                        @foreach($courses as $course)
+                        <div class="pw-schedule-row mb-2" data-schedule-row="{{ $course->id }}">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-md-3">
+                                    <span class="badge rounded-pill" style="background:rgba(200,77,223,.12);color:#461256;font-size:.75rem;font-weight:600;padding:.35em .8em">{{ $course->nama }}</span>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select form-select-sm hari-select" data-course-id="{{ $course->id }}">
+                                        <option value="">Hari…</option>
+                                        <option value="1">Senin</option>
+                                        <option value="2">Selasa</option>
+                                        <option value="3">Rabu</option>
+                                        <option value="4">Kamis</option>
+                                        <option value="5">Jum'at</option>
+                                        <option value="6">Sabtu</option>
+                                        <option value="0">Minggu</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="time" class="form-control form-control-sm jam-mulai-input" data-course-id="{{ $course->id }}">
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="time" class="form-control form-control-sm jam-selesai-input" data-course-id="{{ $course->id }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="conflict-warning-box" data-course-id="{{ $course->id }}" style="font-size:.72rem"></div>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
                     </div>
+                    <div id="scheduleEmptyMsg" class="text-muted" style="font-size:.8rem;display:none"><i class="bi bi-info-circle me-1"></i>Tidak ada mata pelajaran yang dipilih.</div>
                 </div>
             </div>
 
@@ -430,6 +479,12 @@ document.querySelectorAll('[data-action="prev"]').forEach(btn => {
     });
 });
 
+// ── Sinkronisasi baris jadwal saat mapel dicentang/tidak ──────────────────────
+function updateScheduleEmpty() {
+    const visible = document.querySelectorAll('.pw-schedule-row:not([style*="display:none"]):not([style*="display: none"])');
+    document.getElementById('scheduleEmptyMsg').style.display = visible.length === 0 ? '' : 'none';
+}
+
 function recalcTotal() {
     let total = 0;
     let totalSesi = 0;
@@ -437,6 +492,9 @@ function recalcTotal() {
         const row = chk.closest('.pw-course-row');
         row.classList.toggle('disabled', !chk.checked);
         row.querySelectorAll('select, input').forEach(el => { if (el !== chk) el.disabled = !chk.checked; });
+        // Sync matching schedule row visibility
+        const schedRow = document.querySelector(`.pw-schedule-row[data-schedule-row="${chk.value}"]`);
+        if (schedRow) schedRow.style.display = chk.checked ? '' : 'none';
         if (chk.checked) {
             const feeInput = row.querySelector('.fee-input');
             const sesiInput = row.querySelector('input[name^="course_sessions"]');
@@ -446,74 +504,62 @@ function recalcTotal() {
     });
     document.getElementById('totalBiaya').value = total || 0;
     const sesiEl = document.getElementById('summaryTotalSesi');
-    const feeEl = document.getElementById('summaryTotalFee');
+    const feeEl  = document.getElementById('summaryTotalFee');
     if (sesiEl) sesiEl.textContent = totalSesi || 0;
-    if (feeEl) feeEl.textContent = 'Rp' + Number(total || 0).toLocaleString('id-ID');
+    if (feeEl)  feeEl.textContent  = 'Rp' + Number(total || 0).toLocaleString('id-ID');
+    updateScheduleEmpty();
 }
-function bindCourseRowEvents(row) {
-    row.querySelectorAll('.course-check, .fee-input, input[name^="course_sessions"]').forEach(el => el.addEventListener('input', recalcTotal));
-    row.querySelectorAll('.course-check').forEach(el => el.addEventListener('change', recalcTotal));
-    bindGuruConflictEvents(row);
-}
-document.querySelectorAll('.pw-course-row').forEach(bindCourseRowEvents);
-recalcTotal();
 
-// --- Cek konflik jadwal guru (hari & jam bentrok) ---
+// ── Guru conflict check — reads from both card A (guru) and card B (jadwal) ──
 const guruConflictCheckUrl = @json(route('admin.registration-list.guru-conflict-check'));
 
-function bindGuruConflictEvents(row) {
-    const guruSelect = row.querySelector('.guru-select');
-    const hariSelect = row.querySelector('.hari-select');
-    const jamMulai = row.querySelector('.jam-mulai-input');
-    const jamSelesai = row.querySelector('.jam-selesai-input');
-    const warningBox = row.querySelector('.conflict-warning-box');
+function bindGuruConflictEvents(courseId) {
+    const guruSelect = document.querySelector(`.guru-select[data-course-id="${courseId}"]`);
+    const hariSelect = document.querySelector(`.hari-select[data-course-id="${courseId}"]`);
+    const jamMulai   = document.querySelector(`.jam-mulai-input[data-course-id="${courseId}"]`);
+    const jamSelesai = document.querySelector(`.jam-selesai-input[data-course-id="${courseId}"]`);
+    const warningBox = document.querySelector(`.conflict-warning-box[data-course-id="${courseId}"]`);
     if (!guruSelect || !hariSelect || !jamMulai || !jamSelesai || !warningBox) return;
 
     const runCheck = () => {
-        const guruId = guruSelect.value;
-        const hari = hariSelect.value;
-        const mulai = jamMulai.value;
+        const guruId  = guruSelect.value;
+        const hari    = hariSelect.value;
+        const mulai   = jamMulai.value;
         const selesai = jamSelesai.value;
-
-        if (!guruId || hari === '' || !mulai || !selesai) {
-            warningBox.innerHTML = '';
-            return;
-        }
+        if (!guruId || hari === '' || !mulai || !selesai) { warningBox.innerHTML = ''; return; }
         if (mulai >= selesai) {
             warningBox.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>Jam selesai harus setelah jam mulai.</span>';
             return;
         }
-
         warningBox.innerHTML = '<span class="text-muted"><i class="bi bi-hourglass-split me-1"></i>Mengecek jadwal guru…</span>';
-
         fetch(guruConflictCheckUrl, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
-                'Accept': 'application/json',
-            },
-            body: JSON.stringify({ guru_id: guruId, hari: hari, jam_mulai: mulai, jam_selesai: selesai }),
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '', 'Accept': 'application/json' },
+            body: JSON.stringify({ guru_id: guruId, hari, jam_mulai: mulai, jam_selesai: selesai }),
         })
-            .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-            .then(data => {
-                if (data.conflict) {
-                    warningBox.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>${data.detail}</span>`;
-                } else {
-                    warningBox.innerHTML = '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Guru tersedia di jadwal ini.</span>';
-                }
-            })
-            .catch(() => {
-                warningBox.innerHTML = '<span class="text-muted">Gagal mengecek konflik jadwal.</span>';
-            });
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(data => {
+            warningBox.innerHTML = data.conflict
+                ? `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>${data.detail}</span>`
+                : '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Guru tersedia di jadwal ini.</span>';
+        })
+        .catch(() => { warningBox.innerHTML = '<span class="text-muted">Gagal mengecek konflik jadwal.</span>'; });
     };
-
     [guruSelect, hariSelect, jamMulai, jamSelesai].forEach(el => el.addEventListener('change', runCheck));
 }
 
-// --- CRUD Mata Pelajaran & Guru (semua mapel bisa ditambah/dihapus admin) ---
+function bindCourseRowEvents(row) {
+    row.querySelectorAll('.course-check, .fee-input, input[name^="course_sessions"]').forEach(el => el.addEventListener('input', recalcTotal));
+    row.querySelectorAll('.course-check').forEach(el => el.addEventListener('change', recalcTotal));
+    const courseId = row.dataset.courseRow;
+    bindGuruConflictEvents(courseId);
+}
+document.querySelectorAll('.pw-course-row').forEach(bindCourseRowEvents);
+recalcTotal();
+
+// ── CRUD Mata Pelajaran (semua mapel bisa ditambah/dihapus admin) ─────────────
 const courseMetaList = @json($courseMeta);
-const courseMetaMap = {};
+const courseMetaMap  = {};
 courseMetaList.forEach(c => courseMetaMap[c.id] = c);
 const usedCourseIds = new Set(@json($courses->pluck('id')->values()));
 
@@ -525,6 +571,7 @@ function refreshExtraCourseSelect() {
     document.getElementById('extraCourseEmptyMsg').style.display = available.length === 0 ? '' : 'none';
 }
 
+// Builds only the Card A (mapel + guru) row
 function buildCourseRow(course, isAdmin) {
     const row = document.createElement('div');
     row.className = 'pw-course-row';
@@ -557,11 +604,23 @@ function buildCourseRow(course, isAdmin) {
             <div class="col-md-1 text-end">
                 <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCourseRow(this, ${course.id})" title="Hapus mapel ini"><i class="bi bi-trash"></i></button>
             </div>
-        </div>
-        <div class="row g-2 align-items-center mt-2 pw-conflict-row">
+        </div>`;
+    return row;
+}
+
+// Builds the Card B (jadwal kelas) row for the same course
+function buildScheduleRow(course) {
+    const row = document.createElement('div');
+    row.className = 'pw-schedule-row mb-2';
+    row.dataset.scheduleRow = course.id;
+    row.innerHTML = `
+        <div class="row g-2 align-items-center">
             <div class="col-md-3">
+                <span class="badge rounded-pill" style="background:rgba(200,77,223,.12);color:#461256;font-size:.75rem;font-weight:600;padding:.35em .8em">${course.nama}</span>
+            </div>
+            <div class="col-md-2">
                 <select class="form-select form-select-sm hari-select" data-course-id="${course.id}">
-                    <option value="">Hari kelas…</option>
+                    <option value="">Hari…</option>
                     <option value="1">Senin</option>
                     <option value="2">Selasa</option>
                     <option value="3">Rabu</option>
@@ -571,14 +630,14 @@ function buildCourseRow(course, isAdmin) {
                     <option value="0">Minggu</option>
                 </select>
             </div>
-            <div class="col-md-3">
-                <input type="time" class="form-control form-control-sm jam-mulai-input" data-course-id="${course.id}" placeholder="Jam mulai">
+            <div class="col-md-2">
+                <input type="time" class="form-control form-control-sm jam-mulai-input" data-course-id="${course.id}">
+            </div>
+            <div class="col-md-2">
+                <input type="time" class="form-control form-control-sm jam-selesai-input" data-course-id="${course.id}">
             </div>
             <div class="col-md-3">
-                <input type="time" class="form-control form-control-sm jam-selesai-input" data-course-id="${course.id}" placeholder="Jam selesai">
-            </div>
-            <div class="col-md-3">
-                <div class="conflict-warning-box" style="font-size:.72rem"></div>
+                <div class="conflict-warning-box" data-course-id="${course.id}" style="font-size:.72rem"></div>
             </div>
         </div>`;
     return row;
@@ -591,15 +650,19 @@ function addExtraCourse() {
     const course = courseMetaMap[id];
     if (!course) return;
     usedCourseIds.add(id);
-    const row = buildCourseRow(course, true);
-    document.getElementById('courseRowsContainer').appendChild(row);
-    bindCourseRowEvents(row);
+    const courseRow = buildCourseRow(course, true);
+    document.getElementById('courseRowsContainer').appendChild(courseRow);
+    const schedRow = buildScheduleRow(course);
+    document.getElementById('scheduleRowsContainer').appendChild(schedRow);
+    bindCourseRowEvents(courseRow);
     refreshExtraCourseSelect();
     recalcTotal();
 }
 
 function removeCourseRow(btn, id) {
     btn.closest('.pw-course-row').remove();
+    const schedRow = document.querySelector(`.pw-schedule-row[data-schedule-row="${id}"]`);
+    if (schedRow) schedRow.remove();
     usedCourseIds.delete(id);
     refreshExtraCourseSelect();
     recalcTotal();

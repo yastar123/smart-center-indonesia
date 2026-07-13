@@ -143,25 +143,26 @@
             
             <div id="standardPackage">
                 <p class="text-muted" style="font-size:.83rem">Pilih paket belajar untuk siswa ini (opsional — bisa dilewati jika belum ada paket yang cocok).</p>
-                <div class="row g-3" id="packageOptions">
-                    <div class="col-12">
-                        <div class="form-check p-3 border rounded-3" style="border-color:var(--card-border)!important">
-                            <input class="form-check-input" type="radio" name="package_id" id="pkgNone" value="" checked>
-                            <label class="form-check-label fw-semibold" for="pkgNone">Tanpa Paket (susun manual per mata pelajaran)</label>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" style="font-size:.78rem">Paket Kelas</label>
+                    <select name="package_id" id="packageDropdown" class="form-select">
+                        <option value="" data-harga="0">— Tanpa Paket (susun manual per mata pelajaran) —</option>
+                        <?php $__currentLoopData = $packages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pkg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($pkg->id); ?>" data-cabang="<?php echo e($pkg->cabang_id); ?>" data-harga="<?php echo e($pkg->harga); ?>">
+                            <?php echo e($pkg->nama); ?> — <?php echo e($pkg->tipe_kelas ?? 'Reguler'); ?> · <?php echo e($pkg->jumlah_pertemuan ?? '–'); ?> pertemuan · Rp<?php echo e(number_format($pkg->harga ?? 0,0,',','.')); ?>
+
+                        </option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </select>
+                </div>
+                <div id="packageInfoBox" class="p-3 rounded-3 d-none" style="background:rgba(200,77,223,.06);border:1.5px solid rgba(200,77,223,.25)">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <div class="fw-semibold" id="pkgInfoNama">–</div>
+                            <div class="text-muted" style="font-size:.75rem" id="pkgInfoDetail">–</div>
                         </div>
+                        <div class="fw-bold text-primary fs-6" id="pkgInfoHarga">–</div>
                     </div>
-                    <?php $__currentLoopData = $packages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pkg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <div class="col-md-6">
-                        <div class="form-check p-3 border rounded-3 h-100" style="border-color:var(--card-border)!important">
-                            <input class="form-check-input" type="radio" name="package_id" id="pkg<?php echo e($pkg->id); ?>" value="<?php echo e($pkg->id); ?>" data-cabang="<?php echo e($pkg->cabang_id); ?>" data-harga="<?php echo e($pkg->harga); ?>">
-                            <label class="form-check-label w-100" for="pkg<?php echo e($pkg->id); ?>">
-                                <div class="fw-semibold"><?php echo e($pkg->nama); ?></div>
-                                <div class="text-muted" style="font-size:.75rem"><?php echo e($pkg->tipe_kelas ?? 'Reguler'); ?> &middot; <?php echo e($pkg->jumlah_pertemuan ?? '–'); ?> pertemuan</div>
-                                <div class="fw-bold text-primary mt-1">Rp<?php echo e(number_format($pkg->harga ?? 0,0,',','.')); ?></div>
-                            </label>
-                        </div>
-                    </div>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </div>
 
@@ -606,16 +607,29 @@ function removeCourseRow(btn, id) {
 
 refreshExtraCourseSelect();
 
-document.querySelectorAll('input[name="package_id"]').forEach(r => {
-    r.addEventListener('change', () => {
-        const checked = document.querySelector('input[name="package_id"]:checked');
-        if (checked && checked.value) {
-            document.getElementById('totalBiaya').value = checked.dataset.harga || 0;
-        } else {
-            recalcTotal();
-        }
-    });
-});
+// --- Package dropdown ---
+const packageDropdown = document.getElementById('packageDropdown');
+const packageInfoBox  = document.getElementById('packageInfoBox');
+
+function onPackageDropdownChange() {
+    const sel = packageDropdown.selectedOptions[0];
+    const val = packageDropdown.value;
+    if (val) {
+        const text = sel.text;
+        const harga = parseFloat(sel.dataset.harga || 0);
+        // Parse detail from option text: "Nama — tipe · N pertemuan · RpXXX"
+        const parts = text.split(' — ');
+        document.getElementById('pkgInfoNama').textContent = parts[0] || text;
+        document.getElementById('pkgInfoDetail').textContent = parts.slice(1).join(' — ').replace(/·\s*Rp[\d.,]+/, '').trim();
+        document.getElementById('pkgInfoHarga').textContent = 'Rp' + Number(harga).toLocaleString('id-ID');
+        packageInfoBox.classList.remove('d-none');
+        document.getElementById('totalBiaya').value = harga;
+    } else {
+        packageInfoBox.classList.add('d-none');
+        recalcTotal();
+    }
+}
+packageDropdown.addEventListener('change', onPackageDropdownChange);
 
 let isCustomPkg = false;
 function switchPackage(type) {
@@ -628,12 +642,7 @@ function switchPackage(type) {
     if (isCustomPkg) {
         document.getElementById('totalBiaya').value = document.getElementById('customPackagePrice').value || 0;
     } else {
-        const checked = document.querySelector('input[name="package_id"]:checked');
-        if (checked && checked.value) {
-            document.getElementById('totalBiaya').value = checked.dataset.harga || 0;
-        } else {
-            recalcTotal();
-        }
+        onPackageDropdownChange();
     }
 }
 document.getElementById('customPackagePrice').addEventListener('input', function() {
@@ -642,13 +651,14 @@ document.getElementById('customPackagePrice').addEventListener('input', function
 
 document.getElementById('branchSelect').addEventListener('change', function() {
     const branchId = this.value;
-    document.querySelectorAll('#packageOptions .col-md-6').forEach(col => {
-        const radio = col.querySelector('input[name="package_id"]');
-        if (!branchId || !radio.dataset.cabang || radio.dataset.cabang === branchId) {
-            col.classList.remove('d-none');
-        } else {
-            col.classList.add('d-none');
-            if (radio.checked) document.getElementById('pkgNone').checked = true;
+    Array.from(packageDropdown.options).forEach(opt => {
+        if (!opt.value) return; // keep "Tanpa Paket" always visible
+        const cabang = opt.dataset.cabang || '';
+        const hide = branchId && cabang && cabang !== branchId;
+        opt.hidden = hide;
+        if (hide && packageDropdown.value === opt.value) {
+            packageDropdown.value = '';
+            onPackageDropdownChange();
         }
     });
 });
@@ -660,8 +670,8 @@ function buildPreview() {
         const cpName = document.querySelector('[name="custom_package_name"]')?.value;
         pkgName = cpName ? (cpName + ' (Custom)') : '— (Custom, belum diisi)';
     } else {
-        const pkgRadio = document.querySelector('input[name="package_id"]:checked');
-        pkgName = pkgRadio && pkgRadio.value ? pkgRadio.closest('label').querySelector('.fw-semibold').textContent : 'Tanpa Paket';
+        const sel = packageDropdown.selectedOptions[0];
+        pkgName = packageDropdown.value ? sel.text.split(' — ')[0] : 'Tanpa Paket';
     }
     const rows = [];
     document.querySelectorAll('.course-check:checked').forEach(chk => {
