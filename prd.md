@@ -3,8 +3,8 @@
 
 | | |
 |---|---|
-| **Versi Dokumen** | 1.2 |
-| **Tanggal** | 13 Juli 2026 |
+| **Versi Dokumen** | 1.3 |
+| **Tanggal** | 15 Juli 2026 |
 | **Status** | Living document — diperbarui setiap ada perubahan fitur besar |
 | **Pemilik Produk** | Tim internal Akademi Bimbel |
 
@@ -86,6 +86,8 @@ Dua jalur yang saling melengkapi:
 > Sinkronisasi antar kartu: hapus mapel di Kartu A → baris di Kartu B & hasil di Kartu C ikut terhapus; uncheck mapel → baris Kartu B tersembunyi & nomor urut diperbarui.
 >
 > Perubahan produk (11 Jul 2026, lanjutan lagi): ditambahkan fitur **cek konflik jadwal guru** di Langkah 3. Setiap baris mata pelajaran kini punya input Hari, Jam Mulai, dan Jam Selesai (opsional, untuk keperluan pengecekan saja). Saat admin memilih guru dan mengisi hari+jam, sistem otomatis memanggil endpoint `admin.registration-list.guru-conflict-check` yang mencocokkan terhadap jadwal (`schedules`) guru tersebut yang sudah ada pada hari & jam yang tumpang-tindih (status bukan "dibatalkan"), lalu menampilkan peringatan berwarna merah beserta detail kelas yang bentrok, atau tanda hijau jika guru tersedia. Sama seperti fitur cek konflik pada halaman Jadwal, ini bersifat peringatan (tidak memblokir submit) — admin tetap bisa melanjutkan meski ada konflik, atas pertimbangan sendiri.
+
+> Perubahan produk (15 Jul 2026): pada Langkah 1 (Informasi Siswa) di wizard verifikasi lead (`/admin/registration-list/{id}/process`), ditambahkan pilihan **Tipe Pendaftaran** dengan dua opsi: **"Daftar Siswa Baru"** (default, perilaku lama — sistem membuat akun `User` + `Student` baru) dan **"Siswa Lama"** — untuk kasus siswa yang sudah punya akun dan hanya mendaftar tambahan program/kelas baru. Saat "Siswa Lama" dipilih, admin mencari siswa yang sudah ada lewat kolom pencarian (nama/no. HP/NIS, endpoint `admin.registration-list.student-search`) dan memilihnya dari hasil. Sistem kemudian **menautkan lead ke `Student` yang sudah ada** (mengisi ulang data siswa yang dikoreksi, paket, dan jumlah sesi) tanpa membuat akun `User` baru, sehingga tidak ada akun/data siswa duplikat. Langkah 2–5 (paket, mapel & guru, pembayaran, preview) berjalan sama seperti jalur siswa baru, hanya saja hasil akhirnya menambahkan penugasan kelas/paket baru ke siswa yang sudah ada. Halaman sukses dan pesan WhatsApp otomatis menyesuaikan: untuk siswa lama, tidak ditampilkan/dikirim email & password baru (akun sudah ada), hanya info program/kelas baru yang telah aktif.
 
 **B. Jalur Wizard Langsung (untuk admin mendaftarkan siswa baru secara manual)**
 1. Admin membuka **Registrasi Siswa Baru** (`/admin/registrasi-baru`) — wizard 5 langkah dengan Langkah 1 (Informasi Siswa) **dapat diedit langsung**, tanpa perlu lead sebelumnya.
@@ -281,3 +283,4 @@ Bagian ini mencatat gap yang **diketahui secara sadar** sebagai keputusan produk
 | Cuti & Freeze | Pengajuan penangguhan sementara sesi belajar siswa |
 | Tryout | Simulasi ujian berbasis komputer (CBT) |
 | Lead | Calon siswa yang mendaftar via form publik, belum berstatus akun aktif |
+| Siswa Lama | Siswa yang sudah memiliki akun aktif dan mendaftar tambahan program/kelas baru, ditautkan ke `Student` yang sudah ada (bukan akun baru) |

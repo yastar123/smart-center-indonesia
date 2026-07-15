@@ -168,6 +168,39 @@ class RegistrationListController extends Controller
         ]);
     }
 
+    /**
+     * AJAX: cari siswa lama (nama/no HP/NIS) untuk step "Siswa Lama" pada wizard
+     * proses pendaftaran — supaya admin bisa mendaftarkan program/kelas baru untuk
+     * siswa yang sudah punya akun tanpa membuat akun & data siswa duplikat.
+     */
+    public function studentSearch(Request $request)
+    {
+        $q = trim((string) $request->query('q', ''));
+        if (strlen($q) < 2) {
+            return response()->json(['students' => []]);
+        }
+
+        $students = Student::with('branch:id,name')
+            ->where(function ($query) use ($q) {
+                $query->where('name', 'ilike', "%{$q}%")
+                    ->orWhere('phone', 'ilike', "%{$q}%")
+                    ->orWhere('nis', 'ilike', "%{$q}%");
+            })
+            ->orderBy('name')
+            ->limit(10)
+            ->get(['id', 'name', 'phone', 'nis', 'branch_id']);
+
+        return response()->json([
+            'students' => $students->map(fn ($s) => [
+                'id'     => $s->id,
+                'name'   => $s->name,
+                'phone'  => $s->phone,
+                'nis'    => $s->nis,
+                'branch' => $s->branch->name ?? null,
+            ])->values(),
+        ]);
+    }
+
     /** POST /admin/registration-list/{registration}/process — finalize setup, create account */
     public function processStore(Request $request, StudentRegistration $registration)
     {
@@ -176,6 +209,8 @@ class RegistrationListController extends Controller
         }
 
         $data = $request->validate([
+            'registration_type'    => 'nullable|in:baru,lama',
+            'existing_student_id'  => 'required_if:registration_type,lama|nullable|exists:students,id',
             'name'                 => 'required|string|max:255',
             'phone'                => 'required|string|max:30',
             'gender'               => 'nullable|in:L,P',
@@ -285,24 +320,49 @@ class RegistrationListController extends Controller
             ]);
             $registration->save();
 
-            $baseName = Str::slug($registration->name, '.');
-            $baseName = $baseName ?: 'siswa';
-            $email    = strtolower($baseName) . '.' . now()->format('His') . '@siswa.akademi.com';
-            $password = Str::random(8);
+            // "Siswa Lama": admin picked an existing student instead of registering a
+            // brand-new one — reuse that Student + User record so a returning student
+            // enrolling in a new program/kelas never ends up with a duplicate account.
+            $isExistingStudent = ($data['registration_type'] ?? 'baru') === 'lama'
+                && !empty($data['existing_student_id']);
 
-            $user = User::create([
-                'name'      => $registration->name,
-                'email'     => $email,
-                'password'  => Hash::make($password),
-                'phone'     => $registration->phone,
-                'branch_id' => $branch->id,
-                'is_active' => true,
-            ]);
-            $user->assignRole('siswa');
+            $existingStudent = null;
+            if ($isExistingStudent) {
+                $existingStudent = Student::with('user')->find($data['existing_student_id']);
+                if (!$existingStudent || !$existingStudent->user) {
+                    throw new \Exception('Siswa lama yang dipilih tidak valid atau tidak memiliki akun.');
+                }
+                // Keep using the existing student's own branch for package/class
+                // creation, so their class stays consistent with their cabang.
+                $branch = Branch::find($existingStudent->branch_id) ?? $branch;
+            }
 
-            do {
-                $nis = 'S' . now()->format('YmdHis') . Str::upper(Str::random(3));
-            } while (Student::where('nis', $nis)->exists());
+            $email    = null;
+            $password = null;
+
+            if ($isExistingStudent) {
+                $user = $existingStudent->user;
+                $nis  = $existingStudent->nis;
+            } else {
+                $baseName = Str::slug($registration->name, '.');
+                $baseName = $baseName ?: 'siswa';
+                $email    = strtolower($baseName) . '.' . now()->format('His') . '@siswa.akademi.com';
+                $password = Str::random(8);
+
+                $user = User::create([
+                    'name'      => $registration->name,
+                    'email'     => $email,
+                    'password'  => Hash::make($password),
+                    'phone'     => $registration->phone,
+                    'branch_id' => $branch->id,
+                    'is_active' => true,
+                ]);
+                $user->assignRole('siswa');
+
+                do {
+                    $nis = 'S' . now()->format('YmdHis') . Str::upper(Str::random(3));
+                } while (Student::where('nis', $nis)->exists());
+            }
 
             $courseSessions = $data['course_sessions'] ?? [];
             $totalSesi      = array_sum(array_map('intval', $courseSessions));
@@ -336,24 +396,45 @@ class RegistrationListController extends Controller
                 $resolvedPackageId = $customPkg->id;
             }
 
-            $student = Student::create([
-                'user_id'                => $user->id,
-                'nis'                    => $nis,
-                'name'                   => $registration->name,
-                'gender'                 => $registration->gender ?? 'L',
-                'phone'                  => $registration->phone,
-                'birth_place'            => $registration->birth_place,
-                'birth_date'             => $registration->birth_date,
-                'address'                => $registration->address,
-                'parent_name'            => $registration->parent_name,
-                'parent_phone'           => $registration->parent_phone,
-                'branch_id'              => $branch->id,
-                'package_id'             => $resolvedPackageId,
-                'total_sesi'             => $totalSesi ?: null,
-                'status'                 => 'aktif',
-                'join_date'              => now()->toDateString(),
-                'kategori_peserta_didik' => $registration->education_level,
-            ]);
+            if ($isExistingStudent) {
+                // Update the existing student's record with any corrections made on
+                // the form and their new package, but never touch join_date/nis —
+                // this is an additional enrollment, not a fresh registration.
+                $existingStudent->fill([
+                    'gender'                 => $registration->gender ?? $existingStudent->gender,
+                    'phone'                  => $registration->phone ?? $existingStudent->phone,
+                    'birth_place'            => $registration->birth_place ?? $existingStudent->birth_place,
+                    'birth_date'             => $registration->birth_date ?? $existingStudent->birth_date,
+                    'address'                => $registration->address ?? $existingStudent->address,
+                    'parent_name'            => $registration->parent_name ?? $existingStudent->parent_name,
+                    'parent_phone'           => $registration->parent_phone ?? $existingStudent->parent_phone,
+                    'package_id'             => $resolvedPackageId ?: $existingStudent->package_id,
+                    'total_sesi'             => $totalSesi ? ($existingStudent->total_sesi ?? 0) + $totalSesi : $existingStudent->total_sesi,
+                    'status'                 => 'aktif',
+                    'kategori_peserta_didik' => $registration->education_level ?? $existingStudent->kategori_peserta_didik,
+                ]);
+                $existingStudent->save();
+                $student = $existingStudent;
+            } else {
+                $student = Student::create([
+                    'user_id'                => $user->id,
+                    'nis'                    => $nis,
+                    'name'                   => $registration->name,
+                    'gender'                 => $registration->gender ?? 'L',
+                    'phone'                  => $registration->phone,
+                    'birth_place'            => $registration->birth_place,
+                    'birth_date'             => $registration->birth_date,
+                    'address'                => $registration->address,
+                    'parent_name'            => $registration->parent_name,
+                    'parent_phone'           => $registration->parent_phone,
+                    'branch_id'              => $branch->id,
+                    'package_id'             => $resolvedPackageId,
+                    'total_sesi'             => $totalSesi ?: null,
+                    'status'                 => 'aktif',
+                    'join_date'              => now()->toDateString(),
+                    'kategori_peserta_didik' => $registration->education_level,
+                ]);
+            }
 
             // Assign each chosen teacher to the student (one row per course's teacher)
             foreach (array_unique($courseTeachers) as $teacherId) {
@@ -568,14 +649,17 @@ class RegistrationListController extends Controller
             DB::commit();
 
             return response()->json([
-                'success'  => true,
-                'message'  => 'Pendaftaran berhasil diproses. Akun siswa telah dibuat.',
-                'name'     => $registration->name,
-                'email'    => $email,
-                'password' => $password,
-                'nis'      => $nis,
-                'phone'    => $registration->phone,
-                'no_reg'   => $registration->no_reg,
+                'success'        => true,
+                'message'        => $isExistingStudent
+                    ? 'Pendaftaran berhasil diproses. Siswa lama telah didaftarkan ke program/kelas baru.'
+                    : 'Pendaftaran berhasil diproses. Akun siswa telah dibuat.',
+                'is_existing'    => $isExistingStudent,
+                'name'           => $registration->name,
+                'email'          => $email ?? ($user->email ?? null),
+                'password'       => $password,
+                'nis'            => $nis,
+                'phone'          => $registration->phone,
+                'no_reg'         => $registration->no_reg,
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();

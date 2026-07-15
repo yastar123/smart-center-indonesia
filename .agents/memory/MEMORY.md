@@ -36,3 +36,5 @@
 - [Invoice numbering vs soft deletes](invoice-numbering-softdelete.md) — nomor_invoice is generated from a non-trashed monthly count; soft-deleted invoices still hold their number and cause unique-constraint collisions on retry.
 - [Registration flow e2e test findings](registration-flow-e2e-test.md) — public signup is `/register` not `/public/student-registrations`; class_students is never written anywhere, only read; stale demo admin creds in replit.md.
 - [Registration "Jadwal Kelas" → real Schedule rows](schedule-generation-from-registration.md) — hari/jam/ruang inputs on the process page now have `name` attrs and generate weekly Schedule records for brand-new classes only.
+- [Postgres LIKE case sensitivity](postgres-like-case-sensitivity.md) — new admin search inputs must use `ilike` not `like`; Postgres LIKE is case-sensitive unlike MySQL.
+- [Siswa Lama linking pattern](siswa-lama-linking.md) — registration process wizard supports linking a lead to an existing Student instead of always creating a new User+Student.

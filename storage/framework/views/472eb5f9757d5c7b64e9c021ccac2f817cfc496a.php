@@ -82,6 +82,32 @@
 
             <div class="row g-3">
                 
+                <div class="col-12">
+                    <label class="form-label fw-semibold" style="font-size:.78rem">Tipe Pendaftaran</label>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <div class="pw-opt-btn active" id="regTypeBaruBtn" onclick="pwSetRegType('baru')">
+                            <i class="bi bi-person-plus me-1"></i>Daftar Siswa Baru
+                        </div>
+                        <div class="pw-opt-btn" id="regTypeLamaBtn" onclick="pwSetRegType('lama')">
+                            <i class="bi bi-person-check me-1"></i>Siswa Lama
+                        </div>
+                    </div>
+                    <input type="hidden" name="registration_type" id="registrationTypeInput" value="baru">
+                    <div class="form-text" style="font-size:.72rem">Pilih "Siswa Lama" jika siswa sudah punya akun dan hanya mendaftar program/kelas tambahan &mdash; ini mencegah akun & data ganda.</div>
+                </div>
+
+                
+                <div class="col-12" id="existingStudentWrapper" style="display:none">
+                    <label class="form-label fw-semibold" style="font-size:.78rem">Cari Siswa Lama <span class="text-danger">*</span></label>
+                    <div class="position-relative">
+                        <input type="text" class="form-control" id="existingStudentSearch" placeholder="Cari nama / no HP / NIS…" autocomplete="off">
+                        <div id="existingStudentResults" class="list-group shadow-sm" style="position:absolute;z-index:20;max-height:220px;overflow:auto;display:none;width:100%"></div>
+                    </div>
+                    <input type="hidden" name="existing_student_id" id="existingStudentIdInput">
+                    <div id="existingStudentSelected" class="mt-2" style="display:none"></div>
+                </div>
+
+                
                 <div class="col-md-6">
                     <label class="form-label fw-semibold" style="font-size:.78rem">Nama <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" name="name" value="<?php echo e($registration->name); ?>" required>
@@ -705,12 +731,12 @@
     
     <div id="successPanel" class="pw-card d-none text-center">
         <i class="bi bi-check-circle-fill text-success" style="font-size:3rem"></i>
-        <h5 class="fw-bold mt-3 mb-1">Akun Siswa Berhasil Dibuat</h5>
-        <p class="text-muted" style="font-size:.85rem">Kirim informasi akun ini ke WhatsApp siswa agar bisa langsung login.</p>
+        <h5 class="fw-bold mt-3 mb-1" id="successTitle">Akun Siswa Berhasil Dibuat</h5>
+        <p class="text-muted" style="font-size:.85rem" id="successSubtitle">Kirim informasi akun ini ke WhatsApp siswa agar bisa langsung login.</p>
         <div class="mx-auto text-start p-3 rounded-3 mt-3" style="max-width:420px;background:var(--input-bg);border:1px solid var(--card-border)">
             <div class="d-flex justify-content-between align-items-center mb-2"><span class="text-muted" style="font-size:.78rem">Nama</span><strong id="cred-name">–</strong></div>
             <div class="d-flex justify-content-between align-items-center mb-2"><span class="text-muted" style="font-size:.78rem">Email</span><code id="cred-email">–</code></div>
-            <div class="d-flex justify-content-between align-items-center"><span class="text-muted" style="font-size:.78rem">Password</span><code id="cred-password">–</code></div>
+            <div class="d-flex justify-content-between align-items-center" id="cred-password-row"><span class="text-muted" style="font-size:.78rem">Password</span><code id="cred-password">–</code></div>
         </div>
         <div class="d-flex justify-content-center gap-2 mt-4 flex-wrap">
             <button type="button" class="btn btn-success" onclick="sendToWA()"><i class="bi bi-whatsapp me-1"></i>Kirim ke WhatsApp Siswa</button>
@@ -727,6 +753,7 @@
 <script>
 const _processUrl  = "<?php echo e(route('admin.registration-list.process.store', $registration->id)); ?>";
 const _csrf        = "<?php echo e(csrf_token()); ?>";
+const _studentSearchUrl = "<?php echo e(route('admin.registration-list.student-search')); ?>";
 let _credData = {};
 
 function showStep(step) {
@@ -1239,6 +1266,78 @@ function buildPreview() {
 }
 
 // ═══════════════════════════════════════════
+// STEP 1 — Tipe Pendaftaran: Siswa Baru vs Siswa Lama
+// ═══════════════════════════════════════════
+function pwSetRegType(type) {
+    document.getElementById('registrationTypeInput').value = type;
+    document.getElementById('regTypeBaruBtn').classList.toggle('active', type === 'baru');
+    document.getElementById('regTypeLamaBtn').classList.toggle('active', type === 'lama');
+    document.getElementById('existingStudentWrapper').style.display = type === 'lama' ? '' : 'none';
+    if (type === 'baru') {
+        document.getElementById('existingStudentIdInput').value = '';
+        document.getElementById('existingStudentSearch').value = '';
+        document.getElementById('existingStudentSelected').style.display = 'none';
+    }
+}
+
+let _existingStudentSearchTimer = null;
+document.getElementById('existingStudentSearch')?.addEventListener('input', function () {
+    clearTimeout(_existingStudentSearchTimer);
+    const q = this.value.trim();
+    const resultsBox = document.getElementById('existingStudentResults');
+    document.getElementById('existingStudentIdInput').value = '';
+    if (q.length < 2) { resultsBox.style.display = 'none'; return; }
+    _existingStudentSearchTimer = setTimeout(() => {
+        fetch(_studentSearchUrl + '?q=' + encodeURIComponent(q), { headers: { 'Accept': 'application/json' } })
+            .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(data => {
+                resultsBox.innerHTML = '';
+                const students = data.students || [];
+                if (!students.length) {
+                    resultsBox.innerHTML = '<div class="list-group-item text-muted" style="font-size:.8rem">Tidak ada siswa ditemukan</div>';
+                } else {
+                    students.forEach(s => {
+                        const item = document.createElement('button');
+                        item.type = 'button';
+                        item.className = 'list-group-item list-group-item-action';
+                        item.style.fontSize = '.82rem';
+                        item.innerHTML = '<strong>' + s.name + '</strong><br>' +
+                            '<span class="text-muted" style="font-size:.72rem">' +
+                            (s.nis || '-') + ' &middot; ' + (s.phone || '-') + ' &middot; ' + (s.branch || '-') + '</span>';
+                        item.onclick = () => pwSelectExistingStudent(s);
+                        resultsBox.appendChild(item);
+                    });
+                }
+                resultsBox.style.display = '';
+            })
+            .catch(() => {
+                resultsBox.innerHTML = '<div class="list-group-item text-danger" style="font-size:.8rem">Gagal memuat data siswa.</div>';
+                resultsBox.style.display = '';
+            });
+    }, 300);
+});
+
+function pwSelectExistingStudent(s) {
+    document.getElementById('existingStudentIdInput').value = s.id;
+    document.getElementById('existingStudentSearch').value = s.name;
+    document.getElementById('existingStudentResults').style.display = 'none';
+    const box = document.getElementById('existingStudentSelected');
+    box.style.display = '';
+    box.innerHTML = '<div class="alert alert-success py-2 px-3 mb-0" style="font-size:.78rem">' +
+        '<i class="bi bi-check-circle me-1"></i>Terpilih: <strong>' + s.name + '</strong> (' + (s.nis || '-') + ') &mdash; ' + (s.phone || '-') + '</div>';
+    const nameField = document.querySelector('[name="name"]');
+    const phoneField = document.querySelector('[name="phone"]');
+    if (nameField) nameField.value = s.name;
+    if (phoneField) phoneField.value = s.phone || '';
+}
+
+document.addEventListener('click', function (e) {
+    const wrapper = document.getElementById('existingStudentWrapper');
+    const resultsBox = document.getElementById('existingStudentResults');
+    if (wrapper && resultsBox && !wrapper.contains(e.target)) resultsBox.style.display = 'none';
+});
+
+// ═══════════════════════════════════════════
 // STEP 1 — Tempat Belajar & Jadwal JS
 // ═══════════════════════════════════════════
 function pickTempat(val, el) {
@@ -1447,6 +1546,11 @@ document.getElementById('btnCekSemuaGuru')?.addEventListener('click', function()
 
 document.getElementById('processForm').addEventListener('submit', function(e) {
     e.preventDefault();
+    if (document.getElementById('registrationTypeInput').value === 'lama' && !document.getElementById('existingStudentIdInput').value) {
+        showToast('Pilih siswa lama terlebih dahulu, atau ganti ke "Daftar Siswa Baru".', 'error');
+        showStep(1);
+        return;
+    }
     const checkedCourses = document.querySelectorAll('.course-check:checked').length;
     if (checkedCourses === 0) {
         showToast('Pilih minimal satu mata pelajaran sebelum melanjutkan.', 'error');
@@ -1480,7 +1584,17 @@ document.getElementById('processForm').addEventListener('submit', function(e) {
             _credData = d;
             document.getElementById('cred-name').textContent = d.name || '–';
             document.getElementById('cred-email').textContent = d.email || '–';
-            document.getElementById('cred-password').textContent = d.password || '–';
+            const passwordRow = document.getElementById('cred-password-row');
+            if (d.is_existing) {
+                document.getElementById('successTitle').textContent = 'Siswa Lama Didaftarkan ke Kelas Baru';
+                document.getElementById('successSubtitle').textContent = 'Akun sudah ada sebelumnya — cukup infokan siswa tentang program/kelas barunya, tidak perlu kirim password baru.';
+                passwordRow.style.display = 'none';
+            } else {
+                document.getElementById('successTitle').textContent = 'Akun Siswa Berhasil Dibuat';
+                document.getElementById('successSubtitle').textContent = 'Kirim informasi akun ini ke WhatsApp siswa agar bisa langsung login.';
+                document.getElementById('cred-password').textContent = d.password || '–';
+                passwordRow.style.display = '';
+            }
             document.getElementById('processForm').classList.add('d-none');
             document.getElementById('successPanel').classList.remove('d-none');
         } else {
@@ -1504,15 +1618,24 @@ function sendToWA() {
     const wa = phone.startsWith('0') ? '62' + phone.slice(1) : phone;
     const loginUrl = '<?php echo e(url("/login")); ?>';
     const msg = encodeURIComponent(
-        'Halo ' + (_credData.name || 'Siswa') + ',\n\n' +
-        'Selamat datang di Smart Center Indonesia!\n\n' +
-        'Pendaftaran Anda telah *diverifikasi*. Berikut data akun login Anda:\n\n' +
-        '*Email:* ' + (_credData.email || '-') + '\n' +
-        '*Password:* ' + (_credData.password || '-') + '\n' +
-        '*No. Registrasi:* ' + (_credData.no_reg || '-') + '\n\n' +
-        '*Link Login:*\n' + loginUrl + '\n\n' +
-        'Segera login dan lengkapi profil Anda. Jangan bagikan password kepada siapapun.\n\n' +
-        'Terima kasih & selamat belajar!'
+        _credData.is_existing
+            ? (
+                'Halo ' + (_credData.name || 'Siswa') + ',\n\n' +
+                'Pendaftaran Anda untuk program/kelas baru di Smart Center Indonesia telah *diverifikasi*.\n\n' +
+                'Akun login Anda tetap sama seperti sebelumnya, silakan login untuk melihat kelas & jadwal terbaru:\n' + loginUrl + '\n\n' +
+                'Terima kasih & selamat belajar!'
+            )
+            : (
+                'Halo ' + (_credData.name || 'Siswa') + ',\n\n' +
+                'Selamat datang di Smart Center Indonesia!\n\n' +
+                'Pendaftaran Anda telah *diverifikasi*. Berikut data akun login Anda:\n\n' +
+                '*Email:* ' + (_credData.email || '-') + '\n' +
+                '*Password:* ' + (_credData.password || '-') + '\n' +
+                '*No. Registrasi:* ' + (_credData.no_reg || '-') + '\n\n' +
+                '*Link Login:*\n' + loginUrl + '\n\n' +
+                'Segera login dan lengkapi profil Anda. Jangan bagikan password kepada siapapun.\n\n' +
+                'Terima kasih & selamat belajar!'
+            )
     );
     window.open('https://wa.me/' + wa + '?text=' + msg, '_blank');
 }
