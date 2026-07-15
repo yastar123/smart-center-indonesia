@@ -54,6 +54,26 @@ class RegistrationListController extends Controller
         return view('admin.registration.registration-list', compact('registrations', 'stats'));
     }
 
+    /**
+     * GET /admin/registration-list/create — entry point for admin-initiated registration
+     * (replaces the old standalone /admin/registration-create page). Creates a blank
+     * pending lead and immediately redirects into the process wizard, where the admin
+     * picks "Daftar Siswa Baru" or "Siswa Lama" in Langkah 1.
+     */
+    public function createNew()
+    {
+        $registration = StudentRegistration::create([
+            'no_reg'          => 'REG-' . now()->format('YmdHis') . '-' . rand(100, 999),
+            'name'            => 'Siswa Baru',
+            'status'          => 'pending',
+            'academic_status' => 'pending',
+            'payment_status'  => 'belum_bayar',
+            'branch'          => optional(Branch::find(auth()->user()->branch_id))->name,
+        ]);
+
+        return redirect()->route('admin.registration-list.process', $registration);
+    }
+
     /** GET /admin/registration-list/{registration}/process — multi-step setup wizard */
     public function process(StudentRegistration $registration)
     {

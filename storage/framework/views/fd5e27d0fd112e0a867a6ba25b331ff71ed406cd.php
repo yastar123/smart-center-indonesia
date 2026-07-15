@@ -13,7 +13,7 @@
             <h4 class="fw-bold mb-1" style="color:white;font-size:clamp(16px,2vw,22px)">Daftar Registrasi Siswa</h4>
             <p style="opacity:.72;margin:0;font-size:13px">Kelola pendaftaran, status pembayaran, dan penugasan kelas siswa baru.</p>
         </div>
-        <a href="<?php echo e(route('admin.registration.create')); ?>"
+        <a href="<?php echo e(route('admin.registration-list.create')); ?>"
            class="btn fw-semibold px-4"
            style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.3);border-radius:12px;backdrop-filter:blur(10px);white-space:nowrap">
             <i class="bi bi-person-plus-fill me-2"></i>Registrasi Siswa

@@ -25,7 +25,7 @@ class TestAllPages extends Command
             '/admin/tryouts', '/admin/messages', '/admin/module',
             '/admin/module/create', '/admin/billing', '/admin/attendance',
             '/admin/attendance-history', '/admin/reschedule',
-            '/admin/registration-create',
+            '/admin/registration-list',
             '/admin/course-package', '/admin/course-package/create',
             '/admin/subject', '/admin/subject/create', '/admin/schedule',
             '/admin/tagihan-siswa', '/admin/riwayat-guru-mengajar',
