@@ -188,6 +188,63 @@ class RegistrationListController extends Controller
         ]);
     }
 
+    /** AJAX: ambil detail lengkap satu siswa untuk panel edit "Siswa Lama" */
+    public function studentDetail(Student $student)
+    {
+        $student->load(['branch:id,name', 'user:id,email']);
+        return response()->json([
+            'success' => true,
+            'student' => [
+                'id'                     => $student->id,
+                'nis'                    => $student->nis,
+                'name'                   => $student->name,
+                'phone'                  => $student->phone,
+                'gender'                 => $student->gender,
+                'birth_place'            => $student->birth_place,
+                'birth_date'             => $student->birth_date?->format('Y-m-d'),
+                'address'                => $student->address,
+                'parent_name'            => $student->parent_name,
+                'parent_phone'           => $student->parent_phone,
+                'kategori_peserta_didik' => $student->kategori_peserta_didik,
+                'status'                 => $student->status,
+                'branch_id'              => $student->branch_id,
+                'branch_name'            => $student->branch->name ?? null,
+                'email'                  => $student->user->email ?? null,
+            ],
+        ]);
+    }
+
+    /** AJAX PATCH: update data siswa dari panel "Siswa Lama" di wizard pendaftaran */
+    public function studentUpdate(Request $request, Student $student)
+    {
+        $data = $request->validate([
+            'name'                   => 'required|string|max:100',
+            'phone'                  => 'nullable|string|max:20',
+            'gender'                 => 'nullable|in:L,P',
+            'birth_place'            => 'nullable|string|max:100',
+            'birth_date'             => 'nullable|date',
+            'address'                => 'nullable|string',
+            'parent_name'            => 'nullable|string|max:100',
+            'parent_phone'           => 'nullable|string|max:20',
+            'kategori_peserta_didik' => 'nullable|string',
+            'status'                 => 'nullable|in:aktif,nonaktif',
+            'branch_id'              => 'nullable|exists:branches,id',
+        ]);
+
+        $student->update($data);
+
+        if ($student->user) {
+            $student->user->update([
+                'name'      => $data['name'],
+                'phone'     => $data['phone'] ?? $student->user->phone,
+                'branch_id' => $data['branch_id'] ?? $student->user->branch_id,
+                'is_active' => ($data['status'] ?? 'aktif') === 'aktif',
+            ]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Data siswa berhasil diperbarui.']);
+    }
+
     /**
      * AJAX: cari siswa lama (nama/no HP/NIS) untuk step "Siswa Lama" pada wizard
      * proses pendaftaran — supaya admin bisa mendaftarkan program/kelas baru untuk

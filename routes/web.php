@@ -210,6 +210,8 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::post('/registration-list/{registration}/process',        [RegistrationListController::class, 'processStore'])->name('registration-list.process.store');
         Route::post('/registration-list/guru-conflict-check',            [RegistrationListController::class, 'guruConflictCheck'])->name('registration-list.guru-conflict-check');
         Route::get('/registration-list/student-search',                  [RegistrationListController::class, 'studentSearch'])->name('registration-list.student-search');
+        Route::get('/registration-list/student-detail/{student}',        [RegistrationListController::class, 'studentDetail'])->name('registration-list.student-detail');
+        Route::patch('/registration-list/student-update/{student}',      [RegistrationListController::class, 'studentUpdate'])->name('registration-list.student-update');
 
         // STUDENT REGISTRATIONS (pendaftar dari form publik)
         Route::get('/student-registrations/{studentRegistration}',        [StudentRegistrationController::class, 'show'])    ->name('student-registrations.show');
