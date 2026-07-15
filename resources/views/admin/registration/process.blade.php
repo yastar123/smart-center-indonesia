@@ -109,111 +109,25 @@
                     </div>
                     <input type="hidden" name="existing_student_id" id="existingStudentIdInput">
 
-                    {{-- Panel data siswa terpilih — muncul setelah pilih dari dropdown --}}
-                    <div id="existingStudentPanel" style="display:none" class="mt-3">
-                        <div class="d-flex align-items-center justify-content-between mb-3 pb-2" style="border-bottom:1px solid var(--card-border)">
+                    {{-- Chip siswa terpilih — muncul setelah memilih dari dropdown --}}
+                    <div id="existingStudentChip" style="display:none" class="mt-2">
+                        <div class="d-flex align-items-center justify-content-between px-3 py-2"
+                             style="background:rgba(200,77,223,.08);border:1.5px solid rgba(200,77,223,.3);border-radius:10px">
                             <div class="d-flex align-items-center gap-2">
-                                <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#c84ddf,#461256);display:flex;align-items:center;justify-content:center">
-                                    <i class="bi bi-person-fill" style="color:white;font-size:.9rem"></i>
-                                </div>
+                                <i class="bi bi-person-check-fill" style="color:#c84ddf;font-size:1rem"></i>
                                 <div>
-                                    <div class="fw-bold" id="espPanelName" style="font-size:.9rem"></div>
-                                    <div class="text-muted" id="espPanelMeta" style="font-size:.72rem"></div>
+                                    <span class="fw-semibold" id="espChipName" style="font-size:.83rem;color:#461256"></span>
+                                    <span class="text-muted ms-1" id="espChipMeta" style="font-size:.72rem"></span>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-sm" onclick="pwClearExistingStudent()"
-                                style="background:var(--input-bg);border:1px solid var(--card-border);font-size:.75rem;color:var(--text-muted);border-radius:8px">
-                                <i class="bi bi-x me-1"></i>Ganti Siswa
+                            <button type="button" onclick="pwClearExistingStudent()"
+                                class="btn btn-sm" style="font-size:.75rem;color:var(--text-muted);border:1px solid var(--card-border);background:var(--input-bg);border-radius:7px;padding:.2rem .6rem">
+                                <i class="bi bi-x me-1"></i>Ganti
                             </button>
                         </div>
-
-                        <div class="row g-2" id="espFormFields">
-                            {{-- Baris 1: Nama, No HP --}}
-                            <div class="col-md-6">
-                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Nama Lengkap <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control form-control-sm" id="espName">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">No. HP</label>
-                                <input type="text" class="form-control form-control-sm" id="espPhone">
-                            </div>
-                            {{-- Baris 2: Jenis Kelamin, Kategori --}}
-                            <div class="col-md-6">
-                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Jenis Kelamin</label>
-                                <select class="form-select form-select-sm" id="espGender">
-                                    <option value="">Pilih…</option>
-                                    <option value="L">Laki-laki</option>
-                                    <option value="P">Perempuan</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Kategori Peserta Didik</label>
-                                <select class="form-select form-select-sm" id="espKategori">
-                                    <option value="">Pilih…</option>
-                                    @foreach(['Pra Sekolah (PAUD/TK)','Sekolah Dasar (SD)','Sekolah Menengah Pertama (SMP)','Sekolah Menengah Atas/Kejuruan (SMA/SMK)','Mahasiswa','Umum'] as $k)
-                                    <option value="{{ $k }}">{{ $k }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            {{-- Baris 3: Tempat & Tgl Lahir --}}
-                            <div class="col-md-6">
-                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Tempat Lahir</label>
-                                <input type="text" class="form-control form-control-sm" id="espBirthPlace">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Tanggal Lahir</label>
-                                <input type="date" class="form-control form-control-sm" id="espBirthDate">
-                            </div>
-                            {{-- Baris 4: Alamat --}}
-                            <div class="col-12">
-                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Alamat</label>
-                                <input type="text" class="form-control form-control-sm" id="espAddress">
-                            </div>
-                            {{-- Baris 5: Nama & HP Ortu --}}
-                            <div class="col-md-6">
-                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Nama Orang Tua</label>
-                                <input type="text" class="form-control form-control-sm" id="espParentName">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">No. HP Orang Tua</label>
-                                <input type="text" class="form-control form-control-sm" id="espParentPhone">
-                            </div>
-                            {{-- Baris 6: Status, Cabang --}}
-                            <div class="col-md-6">
-                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Status</label>
-                                <select class="form-select form-select-sm" id="espStatus">
-                                    <option value="aktif">Aktif</option>
-                                    <option value="nonaktif">Nonaktif</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Cabang</label>
-                                <select class="form-select form-select-sm" id="espBranch">
-                                    <option value="">— Pilih Cabang —</option>
-                                    @foreach($branches as $b)
-                                    <option value="{{ $b->id }}">{{ $b->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            {{-- Baris 7: NIS (readonly), Email (readonly) --}}
-                            <div class="col-md-6">
-                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">NIS</label>
-                                <input type="text" class="form-control form-control-sm" id="espNis" readonly style="background:var(--input-bg);cursor:default">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Email Akun</label>
-                                <input type="text" class="form-control form-control-sm" id="espEmail" readonly style="background:var(--input-bg);cursor:default">
-                            </div>
+                        <div class="mt-1" style="font-size:.71rem;color:var(--text-muted)">
+                            <i class="bi bi-pencil-square me-1"></i>Data di bawah sudah terisi dari data siswa ini &mdash; edit jika perlu, lalu lanjutkan ke langkah berikutnya.
                         </div>
-
-                        <div class="d-flex justify-content-end mt-3 pt-2" style="border-top:1px solid var(--card-border)">
-                            <button type="button" id="espSaveBtn" onclick="pwSaveExistingStudent()"
-                                class="btn btn-sm fw-semibold px-4"
-                                style="background:linear-gradient(135deg,#461256,#c84ddf);color:white;border:none;border-radius:8px">
-                                <i class="bi bi-floppy me-1"></i>Simpan Perubahan
-                            </button>
-                        </div>
-                        <div id="espSaveStatus" class="mt-2" style="display:none;font-size:.78rem"></div>
                     </div>
                 </div>
 
@@ -1427,118 +1341,62 @@ document.getElementById('existingStudentSearch')?.addEventListener('input', func
     }, 300);
 });
 
-let _currentStudentId = null;
-
 function pwSelectExistingStudent(s) {
     document.getElementById('existingStudentIdInput').value = s.id;
     document.getElementById('existingStudentSearch').value = s.name;
     document.getElementById('existingStudentResults').style.display = 'none';
-    _currentStudentId = s.id;
 
-    // Tampilkan panel dengan loading state
-    const panel = document.getElementById('existingStudentPanel');
-    panel.style.display = '';
-    document.getElementById('espPanelName').textContent = s.name;
-    document.getElementById('espPanelMeta').textContent = (s.nis || '-') + ' · ' + (s.phone || '-') + (s.branch ? ' · ' + s.branch : '');
-    document.getElementById('espFormFields').style.opacity = '.4';
-    document.getElementById('espSaveBtn').disabled = true;
+    // Tampilkan chip siswa terpilih
+    document.getElementById('espChipName').textContent = s.name;
+    document.getElementById('espChipMeta').textContent = (s.nis ? 'NIS: ' + s.nis : '') + (s.phone ? ' · ' + s.phone : '') + (s.branch ? ' · ' + s.branch : '');
+    document.getElementById('existingStudentChip').style.display = '';
 
-    // Ambil data lengkap siswa
+    // Tampilkan loading di field form
+    const formFields = document.querySelectorAll(
+        '[name="name"],[name="phone"],[name="gender"],[name="education_level"],' +
+        '[name="birth_place"],[name="birth_date"],[name="address"],[name="parent_name"],[name="parent_phone"]'
+    );
+    formFields.forEach(el => { el.style.opacity = '.4'; el.disabled = true; });
+
+    // Ambil semua data siswa lalu isi ke field form yang sudah ada
     fetch(_studentDetailBase + '/' + s.id, { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
             const d = data.student;
-            document.getElementById('espName').value         = d.name || '';
-            document.getElementById('espPhone').value        = d.phone || '';
-            document.getElementById('espGender').value       = d.gender || '';
-            document.getElementById('espKategori').value     = d.kategori_peserta_didik || '';
-            document.getElementById('espBirthPlace').value   = d.birth_place || '';
-            document.getElementById('espBirthDate').value    = d.birth_date || '';
-            document.getElementById('espAddress').value      = d.address || '';
-            document.getElementById('espParentName').value   = d.parent_name || '';
-            document.getElementById('espParentPhone').value  = d.parent_phone || '';
-            document.getElementById('espStatus').value       = d.status || 'aktif';
-            document.getElementById('espBranch').value       = d.branch_id || '';
-            document.getElementById('espNis').value          = d.nis || '';
-            document.getElementById('espEmail').value        = d.email || '';
-            // Update header meta
-            document.getElementById('espPanelMeta').textContent =
-                (d.nis || '-') + ' · ' + (d.phone || '-') + (d.branch_name ? ' · ' + d.branch_name : '');
-            document.getElementById('espFormFields').style.opacity = '1';
-            document.getElementById('espSaveBtn').disabled = false;
-            // Isi juga field utama form (untuk proses wizard)
-            const nameField = document.querySelector('[name="name"]');
-            const phoneField = document.querySelector('[name="phone"]');
-            if (nameField) nameField.value = d.name || '';
-            if (phoneField) phoneField.value = d.phone || '';
+            const set = (name, val) => {
+                const el = document.querySelector('[name="' + name + '"]');
+                if (el) el.value = val || '';
+            };
+            set('name',            d.name);
+            set('phone',           d.phone);
+            set('gender',          d.gender);
+            set('education_level', d.kategori_peserta_didik);
+            set('birth_place',     d.birth_place);
+            set('birth_date',      d.birth_date);
+            set('address',         d.address);
+            set('parent_name',     d.parent_name);
+            set('parent_phone',    d.parent_phone);
+            // Perbarui chip meta dengan data lengkap
+            document.getElementById('espChipName').textContent = d.name || s.name;
+            document.getElementById('espChipMeta').textContent =
+                (d.nis ? 'NIS: ' + d.nis : '') + (d.phone ? ' · ' + d.phone : '') + (d.branch_name ? ' · ' + d.branch_name : '');
         })
-        .catch(() => {
-            document.getElementById('espFormFields').style.opacity = '1';
-            document.getElementById('espSaveBtn').disabled = false;
-            showToast('Gagal memuat data siswa.', 'error');
+        .catch(() => showToast('Gagal memuat data siswa.', 'error'))
+        .finally(() => {
+            formFields.forEach(el => { el.style.opacity = '1'; el.disabled = false; });
         });
 }
 
 function pwClearExistingStudent() {
-    _currentStudentId = null;
     document.getElementById('existingStudentIdInput').value = '';
     document.getElementById('existingStudentSearch').value = '';
-    document.getElementById('existingStudentPanel').style.display = 'none';
-    document.getElementById('espSaveStatus').style.display = 'none';
-}
-
-async function pwSaveExistingStudent() {
-    if (!_currentStudentId) return;
-    const btn = document.getElementById('espSaveBtn');
-    const status = document.getElementById('espSaveStatus');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Menyimpan…';
-    status.style.display = 'none';
-
-    const payload = {
-        _method:                 'PATCH',
-        name:                    document.getElementById('espName').value,
-        phone:                   document.getElementById('espPhone').value,
-        gender:                  document.getElementById('espGender').value,
-        kategori_peserta_didik:  document.getElementById('espKategori').value,
-        birth_place:             document.getElementById('espBirthPlace').value,
-        birth_date:              document.getElementById('espBirthDate').value,
-        address:                 document.getElementById('espAddress').value,
-        parent_name:             document.getElementById('espParentName').value,
-        parent_phone:            document.getElementById('espParentPhone').value,
-        status:                  document.getElementById('espStatus').value,
-        branch_id:               document.getElementById('espBranch').value,
-    };
-
-    try {
-        const r = await fetch(_studentUpdateBase + '/' + _currentStudentId, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': _csrf, 'X-Requested-With': 'XMLHttpRequest' },
-            body: JSON.stringify(payload),
+    document.getElementById('existingStudentChip').style.display = 'none';
+    // Reset field form ke nilai kosong / default
+    ['name','phone','gender','education_level','birth_place','birth_date','address','parent_name','parent_phone']
+        .forEach(name => {
+            const el = document.querySelector('[name="' + name + '"]');
+            if (el) el.value = '';
         });
-        const data = await r.json();
-        if (data.success) {
-            showToast('Data siswa berhasil diperbarui.', 'success');
-            // Perbarui header panel
-            document.getElementById('espPanelName').textContent = payload.name;
-            const branchSel = document.getElementById('espBranch');
-            const branchLabel = branchSel.options[branchSel.selectedIndex]?.text || '';
-            document.getElementById('espPanelMeta').textContent =
-                (document.getElementById('espNis').value || '-') + ' · ' + (payload.phone || '-') + (branchLabel ? ' · ' + branchLabel : '');
-            // Sync field utama
-            const nameField = document.querySelector('[name="name"]');
-            const phoneField = document.querySelector('[name="phone"]');
-            if (nameField) nameField.value = payload.name;
-            if (phoneField) phoneField.value = payload.phone || '';
-        } else {
-            showToast(data.message || 'Gagal menyimpan.', 'error');
-        }
-    } catch (e) {
-        showToast('Terjadi kesalahan jaringan.', 'error');
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="bi bi-floppy me-1"></i>Simpan Perubahan';
-    }
 }
 
 document.addEventListener('click', function (e) {
