@@ -1300,7 +1300,7 @@ function pwSetRegType(type) {
     if (type === 'baru') {
         document.getElementById('existingStudentIdInput').value = '';
         document.getElementById('existingStudentSearch').value = '';
-        document.getElementById('existingStudentSelected').style.display = 'none';
+        document.getElementById('existingStudentChip').style.display = 'none';
     }
 }
 
