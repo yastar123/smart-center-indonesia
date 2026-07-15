@@ -15,7 +15,6 @@ use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\ScheduleDashboardController;
 use App\Http\Controllers\Admin\ScheduleListController;
 use App\Http\Controllers\Admin\RescheduleController;
-use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\RegistrationListController;
 use App\Http\Controllers\Admin\StudentRegistrationController;
 use App\Http\Controllers\Admin\BillingController;
@@ -203,8 +202,6 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::post('/reschedule/{proposal}/reject',    [RescheduleController::class, 'reject'])  ->name('reschedule.reject');
 
         // REGISTRATION WIZARD (Registrasi Siswa Baru — 5 langkah + kirim akun ke WA)
-        Route::get('/registrasi-baru',           [RegistrationController::class, 'wizardCreate']) ->name('registration.wizard');
-        Route::post('/registrasi-baru',          [RegistrationController::class, 'wizardStore'])  ->name('registration.wizard.store');
 
         // REGISTRATION LIST (Daftar Registrasi dari Form Publik)
         Route::get('/registration-list',                                [RegistrationListController::class, 'index'])       ->name('registration-list.index');
