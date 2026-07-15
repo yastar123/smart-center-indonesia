@@ -100,11 +100,120 @@
                 <div class="col-12" id="existingStudentWrapper" style="display:none">
                     <label class="form-label fw-semibold" style="font-size:.78rem">Cari Siswa Lama <span class="text-danger">*</span></label>
                     <div class="position-relative">
-                        <input type="text" class="form-control" id="existingStudentSearch" placeholder="Cari nama / no HP / NIS…" autocomplete="off">
-                        <div id="existingStudentResults" class="list-group shadow-sm" style="position:absolute;z-index:20;max-height:220px;overflow:auto;display:none;width:100%"></div>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background:var(--input-bg);border-color:var(--card-border)"><i class="bi bi-search text-muted"></i></span>
+                            <input type="text" class="form-control" id="existingStudentSearch" placeholder="Ketik nama, no HP, atau NIS siswa…" autocomplete="off">
+                        </div>
+                        <div id="existingStudentResults" class="list-group shadow-sm" style="position:absolute;z-index:20;max-height:220px;overflow:auto;display:none;width:100%;top:100%;left:0"></div>
                     </div>
                     <input type="hidden" name="existing_student_id" id="existingStudentIdInput">
-                    <div id="existingStudentSelected" class="mt-2" style="display:none"></div>
+
+                    
+                    <div id="existingStudentPanel" style="display:none" class="mt-3">
+                        <div class="d-flex align-items-center justify-content-between mb-3 pb-2" style="border-bottom:1px solid var(--card-border)">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#c84ddf,#461256);display:flex;align-items:center;justify-content:center">
+                                    <i class="bi bi-person-fill" style="color:white;font-size:.9rem"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold" id="espPanelName" style="font-size:.9rem"></div>
+                                    <div class="text-muted" id="espPanelMeta" style="font-size:.72rem"></div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm" onclick="pwClearExistingStudent()"
+                                style="background:var(--input-bg);border:1px solid var(--card-border);font-size:.75rem;color:var(--text-muted);border-radius:8px">
+                                <i class="bi bi-x me-1"></i>Ganti Siswa
+                            </button>
+                        </div>
+
+                        <div class="row g-2" id="espFormFields">
+                            
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Nama Lengkap <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm" id="espName">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">No. HP</label>
+                                <input type="text" class="form-control form-control-sm" id="espPhone">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Jenis Kelamin</label>
+                                <select class="form-select form-select-sm" id="espGender">
+                                    <option value="">Pilih…</option>
+                                    <option value="L">Laki-laki</option>
+                                    <option value="P">Perempuan</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Kategori Peserta Didik</label>
+                                <select class="form-select form-select-sm" id="espKategori">
+                                    <option value="">Pilih…</option>
+                                    <?php $__currentLoopData = ['Pra Sekolah (PAUD/TK)','Sekolah Dasar (SD)','Sekolah Menengah Pertama (SMP)','Sekolah Menengah Atas/Kejuruan (SMA/SMK)','Mahasiswa','Umum']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $k): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($k); ?>"><?php echo e($k); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Tempat Lahir</label>
+                                <input type="text" class="form-control form-control-sm" id="espBirthPlace">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Tanggal Lahir</label>
+                                <input type="date" class="form-control form-control-sm" id="espBirthDate">
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Alamat</label>
+                                <input type="text" class="form-control form-control-sm" id="espAddress">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Nama Orang Tua</label>
+                                <input type="text" class="form-control form-control-sm" id="espParentName">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">No. HP Orang Tua</label>
+                                <input type="text" class="form-control form-control-sm" id="espParentPhone">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Status</label>
+                                <select class="form-select form-select-sm" id="espStatus">
+                                    <option value="aktif">Aktif</option>
+                                    <option value="nonaktif">Nonaktif</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Cabang</label>
+                                <select class="form-select form-select-sm" id="espBranch">
+                                    <option value="">— Pilih Cabang —</option>
+                                    <?php $__currentLoopData = $branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $b): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($b->id); ?>"><?php echo e($b->name); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">NIS</label>
+                                <input type="text" class="form-control form-control-sm" id="espNis" readonly style="background:var(--input-bg);cursor:default">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size:.75rem;color:var(--text-muted)">Email Akun</label>
+                                <input type="text" class="form-control form-control-sm" id="espEmail" readonly style="background:var(--input-bg);cursor:default">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-3 pt-2" style="border-top:1px solid var(--card-border)">
+                            <button type="button" id="espSaveBtn" onclick="pwSaveExistingStudent()"
+                                class="btn btn-sm fw-semibold px-4"
+                                style="background:linear-gradient(135deg,#461256,#c84ddf);color:white;border:none;border-radius:8px">
+                                <i class="bi bi-floppy me-1"></i>Simpan Perubahan
+                            </button>
+                        </div>
+                        <div id="espSaveStatus" class="mt-2" style="display:none;font-size:.78rem"></div>
+                    </div>
                 </div>
 
                 
@@ -751,9 +860,11 @@
 
 <?php $__env->startPush('scripts'); ?>
 <script>
-const _processUrl  = "<?php echo e(route('admin.registration-list.process.store', $registration->id)); ?>";
-const _csrf        = "<?php echo e(csrf_token()); ?>";
-const _studentSearchUrl = "<?php echo e(route('admin.registration-list.student-search')); ?>";
+const _processUrl         = "<?php echo e(route('admin.registration-list.process.store', $registration->id)); ?>";
+const _csrf               = "<?php echo e(csrf_token()); ?>";
+const _studentSearchUrl   = "<?php echo e(route('admin.registration-list.student-search')); ?>";
+const _studentDetailBase  = "<?php echo e(url('admin/registration-list/student-detail')); ?>";
+const _studentUpdateBase  = "<?php echo e(url('admin/registration-list/student-update')); ?>";
 let _credData = {};
 
 function showStep(step) {
@@ -1317,18 +1428,118 @@ document.getElementById('existingStudentSearch')?.addEventListener('input', func
     }, 300);
 });
 
+let _currentStudentId = null;
+
 function pwSelectExistingStudent(s) {
     document.getElementById('existingStudentIdInput').value = s.id;
     document.getElementById('existingStudentSearch').value = s.name;
     document.getElementById('existingStudentResults').style.display = 'none';
-    const box = document.getElementById('existingStudentSelected');
-    box.style.display = '';
-    box.innerHTML = '<div class="alert alert-success py-2 px-3 mb-0" style="font-size:.78rem">' +
-        '<i class="bi bi-check-circle me-1"></i>Terpilih: <strong>' + s.name + '</strong> (' + (s.nis || '-') + ') &mdash; ' + (s.phone || '-') + '</div>';
-    const nameField = document.querySelector('[name="name"]');
-    const phoneField = document.querySelector('[name="phone"]');
-    if (nameField) nameField.value = s.name;
-    if (phoneField) phoneField.value = s.phone || '';
+    _currentStudentId = s.id;
+
+    // Tampilkan panel dengan loading state
+    const panel = document.getElementById('existingStudentPanel');
+    panel.style.display = '';
+    document.getElementById('espPanelName').textContent = s.name;
+    document.getElementById('espPanelMeta').textContent = (s.nis || '-') + ' · ' + (s.phone || '-') + (s.branch ? ' · ' + s.branch : '');
+    document.getElementById('espFormFields').style.opacity = '.4';
+    document.getElementById('espSaveBtn').disabled = true;
+
+    // Ambil data lengkap siswa
+    fetch(_studentDetailBase + '/' + s.id, { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(data => {
+            const d = data.student;
+            document.getElementById('espName').value         = d.name || '';
+            document.getElementById('espPhone').value        = d.phone || '';
+            document.getElementById('espGender').value       = d.gender || '';
+            document.getElementById('espKategori').value     = d.kategori_peserta_didik || '';
+            document.getElementById('espBirthPlace').value   = d.birth_place || '';
+            document.getElementById('espBirthDate').value    = d.birth_date || '';
+            document.getElementById('espAddress').value      = d.address || '';
+            document.getElementById('espParentName').value   = d.parent_name || '';
+            document.getElementById('espParentPhone').value  = d.parent_phone || '';
+            document.getElementById('espStatus').value       = d.status || 'aktif';
+            document.getElementById('espBranch').value       = d.branch_id || '';
+            document.getElementById('espNis').value          = d.nis || '';
+            document.getElementById('espEmail').value        = d.email || '';
+            // Update header meta
+            document.getElementById('espPanelMeta').textContent =
+                (d.nis || '-') + ' · ' + (d.phone || '-') + (d.branch_name ? ' · ' + d.branch_name : '');
+            document.getElementById('espFormFields').style.opacity = '1';
+            document.getElementById('espSaveBtn').disabled = false;
+            // Isi juga field utama form (untuk proses wizard)
+            const nameField = document.querySelector('[name="name"]');
+            const phoneField = document.querySelector('[name="phone"]');
+            if (nameField) nameField.value = d.name || '';
+            if (phoneField) phoneField.value = d.phone || '';
+        })
+        .catch(() => {
+            document.getElementById('espFormFields').style.opacity = '1';
+            document.getElementById('espSaveBtn').disabled = false;
+            showToast('Gagal memuat data siswa.', 'error');
+        });
+}
+
+function pwClearExistingStudent() {
+    _currentStudentId = null;
+    document.getElementById('existingStudentIdInput').value = '';
+    document.getElementById('existingStudentSearch').value = '';
+    document.getElementById('existingStudentPanel').style.display = 'none';
+    document.getElementById('espSaveStatus').style.display = 'none';
+}
+
+async function pwSaveExistingStudent() {
+    if (!_currentStudentId) return;
+    const btn = document.getElementById('espSaveBtn');
+    const status = document.getElementById('espSaveStatus');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Menyimpan…';
+    status.style.display = 'none';
+
+    const payload = {
+        _method:                 'PATCH',
+        name:                    document.getElementById('espName').value,
+        phone:                   document.getElementById('espPhone').value,
+        gender:                  document.getElementById('espGender').value,
+        kategori_peserta_didik:  document.getElementById('espKategori').value,
+        birth_place:             document.getElementById('espBirthPlace').value,
+        birth_date:              document.getElementById('espBirthDate').value,
+        address:                 document.getElementById('espAddress').value,
+        parent_name:             document.getElementById('espParentName').value,
+        parent_phone:            document.getElementById('espParentPhone').value,
+        status:                  document.getElementById('espStatus').value,
+        branch_id:               document.getElementById('espBranch').value,
+    };
+
+    try {
+        const r = await fetch(_studentUpdateBase + '/' + _currentStudentId, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': _csrf, 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify(payload),
+        });
+        const data = await r.json();
+        if (data.success) {
+            showToast('Data siswa berhasil diperbarui.', 'success');
+            // Perbarui header panel
+            document.getElementById('espPanelName').textContent = payload.name;
+            const branchSel = document.getElementById('espBranch');
+            const branchLabel = branchSel.options[branchSel.selectedIndex]?.text || '';
+            document.getElementById('espPanelMeta').textContent =
+                (document.getElementById('espNis').value || '-') + ' · ' + (payload.phone || '-') + (branchLabel ? ' · ' + branchLabel : '');
+            // Sync field utama
+            const nameField = document.querySelector('[name="name"]');
+            const phoneField = document.querySelector('[name="phone"]');
+            if (nameField) nameField.value = payload.name;
+            if (phoneField) phoneField.value = payload.phone || '';
+        } else {
+            showToast(data.message || 'Gagal menyimpan.', 'error');
+        }
+    } catch (e) {
+        showToast('Terjadi kesalahan jaringan.', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-floppy me-1"></i>Simpan Perubahan';
+    }
 }
 
 document.addEventListener('click', function (e) {
