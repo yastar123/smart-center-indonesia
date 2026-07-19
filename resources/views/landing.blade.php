@@ -29,6 +29,7 @@
     $dbHighlights= \App\Models\LandingHighlight::active()->orderBy('sort_order')->get();
     $dbGalleries = \App\Models\LandingGallery::active()->orderBy('sort_order')->get();
     $dbFaqs      = \App\Models\LandingFaq::active()->orderBy('sort_order')->get();
+    $dbArticles  = \App\Models\Article::with('penulis')->published()->latest('published_at')->take(3)->get();
     $tutorGrads = [
         'linear-gradient(160deg,#260632,#c84ddf)',
         'linear-gradient(160deg,#1a3a6b,#2563eb)',
@@ -144,6 +145,35 @@
 
         /* ─── HERO ─────────────────────────────────────────────────── */
         .hero { position:relative; height:100vh; min-height:560px; overflow:hidden; }
+        @media (max-width:767px) {
+            .hero {
+                height: 210px;
+                min-height: unset;
+                /* 64px = tinggi fixed navbar; 0.75rem = gap bawah navbar */
+                margin: calc(64px + 0.75rem) 0.875rem 0;
+                border-radius: 16px;
+                box-shadow: 0 6px 24px rgba(0,0,0,.22);
+            }
+            .hero-slide-overlay {
+                background: linear-gradient(160deg, rgba(104,17,126,.35) 0%, rgba(38,6,50,.25) 60%, rgba(104,17,126,.4) 100%);
+            }
+            .hero-notify { display: none !important; }
+            .hero-scroll-text, .hero-scroll-chevron { display: none !important; }
+            .hero-scroll-hint {
+                bottom: 0.75rem;
+            }
+            .hero-dots { margin-top: 0; }
+            .hero-dot { width: 7px; height: 7px; }
+            .hero-dot.active { width: 20px; }
+            .hero-arrow {
+                width: 28px; height: 28px;
+                font-size: .75rem;
+                background: rgba(255,255,255,.22);
+                border-color: rgba(255,255,255,.25);
+            }
+            .hero-arrow-left  { left: 0.5rem; }
+            .hero-arrow-right { right: 0.5rem; }
+        }
         .hero-slides { position:absolute; inset:0; z-index:0; }
         .hero-slide { position:absolute; inset:0; background-size:cover; background-position:center center; background-repeat:no-repeat; opacity:0; transition:opacity 1.4s ease-in-out; }
         .hero-slide.active { opacity:1; animation:hero-zoom 9s ease-in-out forwards; }
@@ -570,6 +600,24 @@
         .cabang-address { font-size:.82rem; color:var(--text-muted); line-height:1.5; }
         .cabang-tag { display:inline-flex; align-items:center; gap:4px; margin-top:.75rem; font-size:.7rem; font-weight:700; color:var(--success); background:rgba(16,185,129,.08); padding:3px 10px; border-radius:50px; }
 
+        /* ─── ARTIKEL TERBARU ────────────────────────────────────── */
+        .artikel-section { background:#faf5ff; padding:5.5rem 0; }
+        .art-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:2.5rem; }
+        @media(max-width:900px){ .art-grid { grid-template-columns:repeat(2,1fr); } }
+        @media(max-width:580px){ .art-grid { grid-template-columns:1fr; } }
+        .art-lp-card { background:white; border-radius:18px; overflow:hidden; box-shadow:0 2px 18px rgba(38,6,50,.07); transition:transform .25s,box-shadow .25s; display:flex; flex-direction:column; text-decoration:none; color:inherit; }
+        .art-lp-card:hover { transform:translateY(-6px); box-shadow:0 14px 40px rgba(104,17,126,.14); color:inherit; }
+        .art-lp-thumb { height:190px; overflow:hidden; flex-shrink:0; position:relative; }
+        .art-lp-thumb img { width:100%; height:100%; object-fit:cover; transition:transform .5s; }
+        .art-lp-card:hover .art-lp-thumb img { transform:scale(1.06); }
+        .art-lp-kat { position:absolute; top:10px; left:10px; font-size:.68rem; font-weight:700; padding:3px 11px; border-radius:50px; color:white; }
+        .art-lp-body { padding:1.25rem; flex:1; display:flex; flex-direction:column; }
+        .art-lp-title { font-family:var(--font-display); font-size:.98rem; font-weight:800; color:var(--deep); line-height:1.35; margin-bottom:.45rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        .art-lp-desc { font-size:.82rem; color:var(--text-muted); line-height:1.65; flex:1; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        .art-lp-meta { display:flex; align-items:center; gap:.875rem; margin-top:.875rem; padding-top:.75rem; border-top:1px solid rgba(200,77,223,.1); font-size:.73rem; color:var(--text-muted); }
+        .art-lp-cta { display:inline-flex; align-items:center; gap:6px; margin-top:2rem; padding:.65rem 1.75rem; border-radius:50px; background:linear-gradient(135deg,var(--primary-dark),var(--primary)); color:white; font-weight:700; font-size:.9rem; text-decoration:none; transition:transform .2s,box-shadow .2s; box-shadow:0 6px 20px rgba(200,77,223,.3); }
+        .art-lp-cta:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(200,77,223,.45); color:white; }
+
         /* ─── CTA ─────────────────────────────────────────────────── */
         .cta-section { padding:6rem 0; }
         .cta-box { background:linear-gradient(160deg,var(--deep) 0%,var(--mid) 60%,#8b1fa8 100%); border-radius:32px; padding:4.5rem 3rem; text-align:center; position:relative; overflow:hidden; }
@@ -748,11 +796,8 @@
         }
         @media (max-width:480px) {
             .section-pad { padding:3rem 0; }
-            .hero-inner { padding:6.5rem 1.25rem 5.5rem; }
-            .hero-title { font-size:clamp(1.9rem,8vw,2.4rem); }
             .btn-hero-primary, .btn-hero-secondary { width:100%; justify-content:center; }
             .cta-btns > * { width:100%; justify-content:center; }
-            .hero-dots { bottom:4.5rem; }
             .galeri-grid { grid-template-columns:1fr; }
             .galeri-item.large { min-height:240px; }
             .testi-card { width:300px; }
@@ -1473,6 +1518,51 @@
         </div>
     </div>
 </section>
+
+{{-- ──────────────────────────── ARTIKEL TERBARU ────────────────────────────── --}}
+@if($dbArticles->isNotEmpty())
+@php
+    $artKatColor = ['tips'=>'#c84ddf','berita'=>'#2563eb','akademik'=>'#10b981','promo'=>'#f59e0b','lainnya'=>'#6b7280'];
+    $artKatLabel = ['tips'=>'Tips & Trik','berita'=>'Berita','akademik'=>'Akademik','promo'=>'Promo','lainnya'=>'Lainnya'];
+@endphp
+<section class="artikel-section" id="artikel">
+    <div class="container-lp">
+        <div class="text-center reveal">
+            <div class="program-photo-eyebrow">Blog & Artikel</div>
+            <h2 class="section-title">Artikel <em class="section-title-accent">Terbaru</em></h2>
+            <p class="section-subtitle mx-auto">Tips belajar, berita pendidikan, dan inspirasi untuk siswa &amp; orang tua dari Smart Center Indonesia.</p>
+        </div>
+
+        <div class="art-grid">
+            @foreach($dbArticles as $ai => $art)
+            <a href="{{ route('articles.show', $art->slug) }}" class="art-lp-card reveal reveal-delay-{{ ($ai % 3) + 1 }}">
+                <div class="art-lp-thumb">
+                    <img src="{{ $art->thumbnail_url }}" alt="{{ $art->judul }}" loading="lazy">
+                    <span class="art-lp-kat" style="background:{{ $artKatColor[$art->kategori] }}">{{ $artKatLabel[$art->kategori] }}</span>
+                </div>
+                <div class="art-lp-body">
+                    <div class="art-lp-title">{{ $art->judul }}</div>
+                    @if($art->ringkasan)
+                    <div class="art-lp-desc">{{ $art->ringkasan }}</div>
+                    @endif
+                    <div class="art-lp-meta">
+                        <span><i class="bi bi-person me-1"></i>{{ $art->penulis?->name ?? 'Admin' }}</span>
+                        <span><i class="bi bi-calendar3 me-1"></i>{{ $art->published_at?->format('d M Y') ?? '–' }}</span>
+                        <span><i class="bi bi-eye me-1"></i>{{ $art->views }}</span>
+                    </div>
+                </div>
+            </a>
+            @endforeach
+        </div>
+
+        <div class="text-center">
+            <a href="{{ route('articles.index') }}" class="art-lp-cta">
+                <i class="bi bi-newspaper"></i> Lihat Semua Artikel
+            </a>
+        </div>
+    </div>
+</section>
+@endif
 
 {{-- ──────────────────────────── BANTUAN & KONTAK ──────────────────────────── --}}
 <section class="bantuan-section" id="bantuan">

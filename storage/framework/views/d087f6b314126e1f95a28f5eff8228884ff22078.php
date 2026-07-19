@@ -344,8 +344,12 @@
         }
         .accordion-cat:hover { border-color: #c84ddf; background: #fdf4ff; }
         .accordion-cat.open { border-color: #c84ddf; background: linear-gradient(135deg,#fdf4ff,#f7e7ff); }
+        .accordion-cat.all-selected { border-color: #c84ddf; background: linear-gradient(135deg,#f3e8ff,#ede3ff); box-shadow: 0 0 0 2px rgba(200,77,223,.18); }
         .accordion-cat .acc-arrow { transition: transform .2s; font-size: .7rem; color: #9ca3af; }
         .accordion-cat.open .acc-arrow { transform: rotate(90deg); color: #c84ddf; }
+        .accordion-cat .cat-select-hint { transition: opacity .2s; }
+        .accordion-cat:not(:hover) .cat-select-hint { opacity: 0; }
+        .accordion-cat:hover .cat-select-hint { opacity: 1; }
         .accordion-body { display: none; padding: 6px 2px 10px; }
         .accordion-body.open { display: block; }
 
@@ -667,14 +671,18 @@ unset($__errorArgs, $__bag); ?>
                                 <?php if(!$subjects->has($jenis)): ?> <?php continue; ?> <?php endif; ?>
                                 <?php $items = $subjects[$jenis]; ?>
                                 <div class="mb-2" id="section-<?php echo e($jenis); ?>">
-                                    <div class="accordion-cat" onclick="toggleAccordion('acc-<?php echo e($jenis); ?>', this)">
-                                        <span>
-                                            <i class="bi <?php echo e($jenisIcons[$jenis] ?? 'bi-journal'); ?> me-2" style="color:#c84ddf"></i>
+                                    <div class="accordion-cat" onclick="toggleAccordion('acc-<?php echo e($jenis); ?>', this)" data-jenis="<?php echo e($jenis); ?>">
+                                        <span style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
+                                            <i class="bi <?php echo e($jenisIcons[$jenis] ?? 'bi-journal'); ?> me-1" style="color:#c84ddf;flex-shrink:0"></i>
                                             <?php echo e($jenisLabels[$jenis] ?? ucfirst($jenis)); ?>
 
-                                            <span class="badge ms-2" style="background:rgba(200,77,223,.12);color:#c84ddf;font-size:.63rem;font-weight:600;border-radius:10px;padding:2px 7px"><?php echo e($items->count()); ?></span>
+                                            <span class="badge ms-1" style="background:rgba(200,77,223,.12);color:#c84ddf;font-size:.63rem;font-weight:600;border-radius:10px;padding:2px 7px" title="Total mata pelajaran"><?php echo e($items->count()); ?></span>
+                                            <span class="cat-selected-badge" id="sel-badge-<?php echo e($jenis); ?>" style="display:none;background:rgba(200,77,223,.9);color:white;font-size:.63rem;font-weight:700;border-radius:10px;padding:2px 8px"></span>
                                         </span>
-                                        <i class="bi bi-chevron-right acc-arrow"></i>
+                                        <span style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+                                            <span class="cat-select-hint" id="hint-<?php echo e($jenis); ?>" style="font-size:.7rem;font-weight:600;color:#c84ddf;opacity:.75">Pilih semua</span>
+                                            <i class="bi bi-chevron-right acc-arrow"></i>
+                                        </span>
                                     </div>
                                     <div class="accordion-body <?php echo e(collect(old('program_minat', []))->intersect($items->pluck('nama'))->isNotEmpty() ? 'open' : ''); ?>" id="acc-<?php echo e($jenis); ?>">
                                         <div class="check-grid">
@@ -894,15 +902,62 @@ function pickProgram(val, el) {
 
 function togglePill(el) {
     const cb = el.querySelector('input[type=checkbox]');
-    setTimeout(() => { el.classList.toggle('selected', cb.checked); }, 0);
+    setTimeout(() => {
+        el.classList.toggle('selected', cb.checked);
+        // Update the category badge after individual pill toggle
+        const body = el.closest('.accordion-body');
+        if (body) updateCatBadge(body);
+    }, 0);
 }
 
-// Accordion for government program categories
+// Update selected-count badge and hint text for a given accordion body
+function updateCatBadge(body) {
+    if (!body) return;
+    const jenis    = body.id.replace('acc-', '');
+    const pills    = body.querySelectorAll('.check-pill input[type=checkbox]');
+    const checked  = body.querySelectorAll('.check-pill input[type=checkbox]:checked');
+    const badge    = document.getElementById('sel-badge-' + jenis);
+    const hint     = document.getElementById('hint-' + jenis);
+    const header   = body.previousElementSibling;
+    const allSel   = checked.length === pills.length && pills.length > 0;
+
+    if (badge) {
+        if (checked.length > 0) {
+            badge.textContent = checked.length + ' dipilih';
+            badge.style.display = '';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+    if (hint) hint.textContent = allSel ? 'Hapus semua' : 'Pilih semua';
+    if (header) header.classList.toggle('all-selected', allSel);
+}
+
+// Accordion: click header → select all subcategories (or deselect if all already selected)
 function toggleAccordion(id, headerEl) {
     const body = document.getElementById(id);
     if (!body) return;
-    const isOpen = body.classList.toggle('open');
-    if (headerEl) headerEl.classList.toggle('open', isOpen);
+
+    const pills   = body.querySelectorAll('.check-pill');
+    const inputs  = body.querySelectorAll('input[type=checkbox]');
+    const checked = body.querySelectorAll('input[type=checkbox]:checked');
+    const allSel  = checked.length === inputs.length && inputs.length > 0;
+
+    // Toggle checked state: deselect-all if all selected, else select-all
+    const nextState = !allSel;
+    pills.forEach(pill => {
+        const cb = pill.querySelector('input[type=checkbox]');
+        if (cb) {
+            cb.checked = nextState;
+            pill.classList.toggle('selected', nextState);
+        }
+    });
+
+    // Always open the accordion when items exist
+    if (!body.classList.contains('open')) body.classList.add('open');
+    if (headerEl) headerEl.classList.add('open');
+
+    updateCatBadge(body);
 }
 
 // Auto-open accordion if any item was pre-checked (old() repopulation)
@@ -913,6 +968,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const header = body.previousElementSibling;
             if (header && header.classList.contains('accordion-cat')) header.classList.add('open');
         }
+        // Init badges
+        updateCatBadge(body);
     });
 });
 

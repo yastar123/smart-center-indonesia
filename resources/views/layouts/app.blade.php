@@ -3385,6 +3385,12 @@
         <div class="nav-header">KOMUNIKASI</div>
 
         <div class="nav-item">
+            <a href="{{ route('admin.articles.index') }}" class="nav-link {{ request()->routeIs('admin.articles.*') ? 'active' : '' }}" data-label="Artikel">
+                <i class="bi bi-newspaper"></i>
+                <span>Artikel</span>
+            </a>
+        </div>
+        <div class="nav-item">
             <a href="{{ route('admin.announcements.index') }}" class="nav-link {{ request()->routeIs('admin.announcements.*') ? 'active' : '' }}" data-label="Pengumuman">
                 <i class="bi bi-megaphone"></i>
                 <span>Pengumuman</span>

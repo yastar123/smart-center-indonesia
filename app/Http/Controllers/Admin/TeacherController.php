@@ -71,18 +71,20 @@ class TeacherController extends Controller
         }
 
         $request->validate([
-            'name'       => 'required|string|max:100',
-            'nig'        => 'required|string|unique:teachers,nig',
-            'gender'     => 'required|in:L,P',
-            'birth_date' => 'nullable|date',
-            'phone'      => 'nullable|string|max:20',
-            'email'      => ['required', 'email', 'unique:teachers,email', 'unique:users,email'],
-            'password'   => 'required|string|min:8',
-            'branch_id'  => 'nullable|exists:branches,id',
-            'education'  => 'nullable|string|max:50',
-            'subjects'   => 'nullable|string',
-            'photo'      => 'nullable|image|max:2048',
-            'cv'         => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+            'name'        => 'required|string|max:100',
+            'nig'         => 'required|string|unique:teachers,nig',
+            'gender'      => 'required|in:L,P',
+            'birth_date'  => 'nullable|date',
+            'phone'       => 'nullable|string|max:20',
+            'email'       => ['required', 'email', 'unique:teachers,email', 'unique:users,email'],
+            'password'    => 'required|string|min:8',
+            'branch_id'   => 'nullable|exists:branches,id',
+            'education'   => 'nullable|string|max:50',
+            'subjects'    => 'nullable|string',
+            'photo'       => 'nullable|image|max:2048',
+            'cv'          => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+            'jenis_guru'  => 'required|in:kontrak,freelance',
+            'salary_base' => 'required_if:jenis_guru,kontrak|nullable|numeric|min:0',
         ]);
 
         $teacher = DB::transaction(function () use ($request) {
@@ -99,6 +101,10 @@ class TeacherController extends Controller
             $data['join_date'] = now()->toDateString();
             $data['status'] = 'aktif';
             $data['subjects'] = $subjects;
+            // Only kontrak teachers may have a salary
+            if (($data['jenis_guru'] ?? '') !== 'kontrak') {
+                $data['salary_base'] = 0;
+            }
 
             if ($request->hasFile('photo')) {
                 $data['photo'] = $request->file('photo')->store('teachers', 'public');
@@ -161,12 +167,12 @@ class TeacherController extends Controller
         }
 
         $request->validate([
-            'name'       => 'required|string|max:100',
-            'nig'        => 'required|string|unique:teachers,nig,' . $teacher->id,
-            'gender'     => 'required|in:L,P',
-            'birth_date' => 'nullable|date',
-            'branch_id'  => 'nullable|exists:branches,id',
-            'email'      => [
+            'name'        => 'required|string|max:100',
+            'nig'         => 'required|string|unique:teachers,nig,' . $teacher->id,
+            'gender'      => 'required|in:L,P',
+            'birth_date'  => 'nullable|date',
+            'branch_id'   => 'nullable|exists:branches,id',
+            'email'       => [
                 'nullable',
                 'email',
                 Rule::unique('teachers', 'email')->ignore($teacher->id),
@@ -177,6 +183,8 @@ class TeacherController extends Controller
             'course_ids.*'=> 'exists:courses,id',
             'photo'       => 'nullable|image|max:2048',
             'cv'          => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+            'jenis_guru'  => 'nullable|in:kontrak,freelance',
+            'salary_base' => 'required_if:jenis_guru,kontrak|nullable|numeric|min:0',
         ]);
 
         DB::transaction(function () use ($request, $teacher) {
@@ -189,6 +197,10 @@ class TeacherController extends Controller
 
             $data = $request->except(['photo', 'cv', 'password', 'course_ids', 'subjects']);
             $data['subjects'] = $courseNames;
+            // Only kontrak teachers may have a salary
+            if (($data['jenis_guru'] ?? $teacher->jenis_guru) !== 'kontrak') {
+                $data['salary_base'] = 0;
+            }
 
             if ($request->hasFile('photo')) {
                 if ($teacher->photo) Storage::disk('public')->delete($teacher->photo);

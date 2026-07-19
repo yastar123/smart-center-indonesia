@@ -158,13 +158,14 @@
                     <th class="small text-muted fw-semibold py-3">TGL LAHIR</th>
                     <th class="small text-muted fw-semibold py-3">KONTAK</th>
                     <th class="small text-muted fw-semibold py-3">CV</th>
+                    <th class="small text-muted fw-semibold py-3">JENIS / GAJI</th>
                     <th class="small text-muted fw-semibold py-3">STATUS</th>
                     <th class="small text-muted fw-semibold py-3 text-center" style="width:100px">AKSI</th>
                 </tr>
             </thead>
             <tbody id="teacherBody">
                 <tr>
-                    <td colspan="12" class="text-center py-5">
+                    <td colspan="13" class="text-center py-5">
                         <div class="spinner-border text-success mb-2" style="width:1.8rem;height:1.8rem"></div>
                         <div class="text-muted small">Memuat data guru...</div>
                     </td>
@@ -303,11 +304,21 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small fw-semibold">Jenis Guru <span class="text-danger">*</span></label>
-                                <select name="jenis_guru" id="jenis_guru" class="form-select form-select-sm" required>
+                                <select name="jenis_guru" id="jenis_guru" class="form-select form-select-sm" required
+                                        onchange="toggleGajiField(this,'gajiSectionModal','salary_base_modal')">
                                     <option value="">Pilih...</option>
                                     <option value="kontrak">Kontrak</option>
                                     <option value="freelance">Freelance</option>
                                 </select>
+                            </div>
+                            <div class="col-md-6" id="gajiSectionModal" style="display:none">
+                                <label class="form-label small fw-semibold">Gaji Bulanan <span class="text-danger">*</span></label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="number" name="salary_base" id="salary_base_modal" class="form-control"
+                                           placeholder="Contoh: 3000000" min="0" step="1000">
+                                </div>
+                                <div class="form-text">Gaji tetap per bulan untuk guru kontrak.</div>
                             </div>
                         </div>
                     </div>
@@ -353,13 +364,24 @@
 <script>
 let currentPage = 1;
 
+// ── Gaji Bulanan show/hide (shared helper) ─────────────────────────────────
+function toggleGajiField(selectEl, sectionId, inputId) {
+    const isKontrak = selectEl.value === 'kontrak';
+    const section   = document.getElementById(sectionId);
+    const input     = document.getElementById(inputId);
+    if (!section || !input) return;
+    section.style.display = isKontrak ? '' : 'none';
+    input.required        = isKontrak;
+    if (!isKontrak) input.value = '';
+}
+
 // ---- LOAD TEACHERS (AJAX) ----
 function loadTeachers(page) {
     page = page || 1;
     currentPage = page;
 
     document.getElementById('teacherBody').innerHTML = `
-        <tr><td colspan="12" class="text-center py-5">
+        <tr><td colspan="13" class="text-center py-5">
             <div class="spinner-border text-success mb-2" style="width:1.8rem;height:1.8rem"></div>
             <div class="text-muted small">Memuat data...</div>
         </td></tr>`;
@@ -386,7 +408,7 @@ function loadTeachers(page) {
             const teachers = res.data || [];
 
             if (!teachers.length) {
-                html = `<tr><td colspan="12" class="py-5">
+                html = `<tr><td colspan="13" class="py-5">
                     <div class="text-center">
                         <div style="width:72px;height:72px;border-radius:50%;background:var(--input-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
                             <i class="bi bi-person-badge" style="font-size:2rem;opacity:.35"></i>
@@ -439,6 +461,15 @@ function loadTeachers(page) {
                         </td>
                         <td>${t.cv_path ? `<a href="/storage/${t.cv_path}" target="_blank" class="btn btn-sm btn-outline-info" style="border-radius:8px"><i class="bi bi-file-earmark-text"></i></a>` : '<span class="text-muted">–</span>'}</td>
                         <td>
+                            ${t.jenis_guru === 'kontrak'
+                                ? `<div style="white-space:nowrap">
+                                       <span style="background:#f3e8ff;color:#7e22ce;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700">Kontrak</span>
+                                       <div class="fw-semibold mt-1" style="font-size:12px;color:var(--text-muted)">${t.salary_base > 0 ? 'Rp ' + Number(t.salary_base).toLocaleString('id-ID') : '<span class="text-muted">–</span>'}</div>
+                                   </div>`
+                                : `<span style="background:var(--input-bg);color:var(--text-muted);padding:3px 9px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid var(--card-border)">${t.jenis_guru ? (t.jenis_guru.charAt(0).toUpperCase()+t.jenis_guru.slice(1)) : '–'}</span>`
+                            }
+                        </td>
+                        <td>
                             <span style="background:${badgeBg};color:${badgeCol};padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600">
                                 <i class="bi bi-circle-fill me-1" style="font-size:7px"></i>${badgeLbl}
                             </span>
@@ -479,7 +510,7 @@ function loadTeachers(page) {
         },
         error() {
             document.getElementById('teacherBody').innerHTML = `
-                <tr><td colspan="12" class="text-center py-5 text-danger">
+                <tr><td colspan="13" class="text-center py-5 text-danger">
                     <i class="bi bi-exclamation-triangle d-block mb-2" style="font-size:2rem"></i>
                     Gagal memuat data. <a href="javascript:loadTeachers()">Coba lagi</a>
                 </td></tr>`;
@@ -515,6 +546,12 @@ function editTeacher(id) {
         document.getElementById('education').value   = t.education   ?? '';
         document.getElementById('address').value     = t.address     ?? '';
         document.getElementById('jenis_guru').value  = t.jenis_guru  ?? '';
+        // show/hide gaji field based on jenis_guru
+        const gajiSec = document.getElementById('gajiSectionModal');
+        const gajiInp = document.getElementById('salary_base_modal');
+        const isKontrak = (t.jenis_guru === 'kontrak');
+        if (gajiSec) gajiSec.style.display = isKontrak ? '' : 'none';
+        if (gajiInp) { gajiInp.required = isKontrak; gajiInp.value = isKontrak && t.salary_base > 0 ? t.salary_base : ''; }
         const avatar = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(t.name) + '&background=68117e&color=fff&size=120';
         document.getElementById('photoPreview').src = t.photo ? '/storage/' + t.photo : avatar;
         new bootstrap.Modal('#teacherModal').show();

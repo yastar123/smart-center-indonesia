@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ModuleController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Admin\SalaryController;
 use App\Http\Controllers\Admin\AnnouncementController;
+use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\ScheduleDashboardController;
 use App\Http\Controllers\Admin\ScheduleListController;
 use App\Http\Controllers\Admin\RescheduleController;
@@ -37,6 +38,36 @@ Route::get('/', function () {
 
 Route::get('/cabang/{branch}', [\App\Http\Controllers\Public\BranchLandingController::class, 'show'])
     ->name('cabang.show');
+
+// ARTICLES — public pages
+Route::get('/artikel', function () {
+    $articles = \App\Models\Article::with('penulis')
+        ->published()
+        ->when(request('kategori'), fn($q) => $q->where('kategori', request('kategori')))
+        ->latest('published_at')
+        ->paginate(9);
+    return view('articles.index', compact('articles'));
+})->name('articles.index');
+
+Route::get('/artikel/{slug}', function (string $slug) {
+    $article = \App\Models\Article::with('penulis')
+        ->where('slug', $slug)
+        ->where('status', 'published')
+        ->firstOrFail();
+
+    // Increment views
+    $article->increment('views');
+
+    // Related articles (same category, exclude current)
+    $related = \App\Models\Article::published()
+        ->where('kategori', $article->kategori)
+        ->where('id', '!=', $article->id)
+        ->latest('published_at')
+        ->take(3)
+        ->get();
+
+    return view('articles.show', compact('article', 'related'));
+})->name('articles.show');
 
 Route::post('/public/student-registrations', [StudentRegistrationPublicController::class, 'store'])
     ->name('public.student-registrations.store');
@@ -160,6 +191,13 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
             Route::delete('/salaries/{salary}', [SalaryController::class, 'destroy'])  ->name('salaries.destroy');
             Route::get('/salaries/{salary}/slip', [SalaryController::class, 'printSlip'])->name('salaries.slip');
         });
+
+        // ARTICLES (Artikel)
+        Route::get('/articles',              [ArticleController::class, 'index'])   ->name('articles.index');
+        Route::post('/articles',             [ArticleController::class, 'store'])   ->name('articles.store');
+        Route::get('/articles/{article}',    [ArticleController::class, 'show'])    ->name('articles.show');
+        Route::put('/articles/{article}',    [ArticleController::class, 'update'])  ->name('articles.update');
+        Route::delete('/articles/{article}', [ArticleController::class, 'destroy']) ->name('articles.destroy');
 
         // ANNOUNCEMENTS (Pengumuman)
         Route::get('/announcements',                    [AnnouncementController::class, 'index'])   ->name('announcements.index');

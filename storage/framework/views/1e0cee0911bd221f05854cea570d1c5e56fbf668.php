@@ -144,6 +144,35 @@
 
         /* ─── HERO ─────────────────────────────────────────────────── */
         .hero { position:relative; height:100vh; min-height:560px; overflow:hidden; }
+        @media (max-width:767px) {
+            .hero {
+                height: 210px;
+                min-height: unset;
+                /* 64px = tinggi fixed navbar; 0.75rem = gap bawah navbar */
+                margin: calc(64px + 0.75rem) 0.875rem 0;
+                border-radius: 16px;
+                box-shadow: 0 6px 24px rgba(0,0,0,.22);
+            }
+            .hero-slide-overlay {
+                background: linear-gradient(160deg, rgba(104,17,126,.35) 0%, rgba(38,6,50,.25) 60%, rgba(104,17,126,.4) 100%);
+            }
+            .hero-notify { display: none !important; }
+            .hero-scroll-text, .hero-scroll-chevron { display: none !important; }
+            .hero-scroll-hint {
+                bottom: 0.75rem;
+            }
+            .hero-dots { margin-top: 0; }
+            .hero-dot { width: 7px; height: 7px; }
+            .hero-dot.active { width: 20px; }
+            .hero-arrow {
+                width: 28px; height: 28px;
+                font-size: .75rem;
+                background: rgba(255,255,255,.22);
+                border-color: rgba(255,255,255,.25);
+            }
+            .hero-arrow-left  { left: 0.5rem; }
+            .hero-arrow-right { right: 0.5rem; }
+        }
         .hero-slides { position:absolute; inset:0; z-index:0; }
         .hero-slide { position:absolute; inset:0; background-size:cover; background-position:center center; background-repeat:no-repeat; opacity:0; transition:opacity 1.4s ease-in-out; }
         .hero-slide.active { opacity:1; animation:hero-zoom 9s ease-in-out forwards; }
@@ -748,11 +777,8 @@
         }
         @media (max-width:480px) {
             .section-pad { padding:3rem 0; }
-            .hero-inner { padding:6.5rem 1.25rem 5.5rem; }
-            .hero-title { font-size:clamp(1.9rem,8vw,2.4rem); }
             .btn-hero-primary, .btn-hero-secondary { width:100%; justify-content:center; }
             .cta-btns > * { width:100%; justify-content:center; }
-            .hero-dots { bottom:4.5rem; }
             .galeri-grid { grid-template-columns:1fr; }
             .galeri-item.large { min-height:240px; }
             .testi-card { width:300px; }

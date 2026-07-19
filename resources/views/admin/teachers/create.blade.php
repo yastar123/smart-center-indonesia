@@ -104,11 +104,22 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-semibold">Jenis Guru <span class="text-danger">*</span></label>
-                            <select name="jenis_guru" class="form-select form-select-sm" required>
+                            <select name="jenis_guru" id="jenis_guru_create" class="form-select form-select-sm" required onchange="toggleGajiField(this,'gajiSectionCreate','salary_base_create')">
                                 <option value="">Pilih...</option>
                                 <option value="kontrak" {{ old('jenis_guru') == 'kontrak' ? 'selected' : '' }}>Kontrak</option>
                                 <option value="freelance" {{ old('jenis_guru') == 'freelance' ? 'selected' : '' }}>Freelance</option>
                             </select>
+                        </div>
+                        <div class="col-md-6" id="gajiSectionCreate" style="{{ old('jenis_guru') == 'kontrak' ? '' : 'display:none' }}">
+                            <label class="form-label small fw-semibold">Gaji Bulanan <span class="text-danger">*</span></label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">Rp</span>
+                                <input type="number" name="salary_base" id="salary_base_create" class="form-control"
+                                       placeholder="Contoh: 3000000" min="0" step="1000"
+                                       value="{{ old('salary_base', '') }}"
+                                       {{ old('jenis_guru') == 'kontrak' ? 'required' : '' }}>
+                            </div>
+                            <div class="form-text">Gaji tetap per bulan untuk guru kontrak.</div>
                         </div>
                         <div class="col-12">
                             <label class="form-label small fw-semibold">Mata Pelajaran</label>
@@ -171,6 +182,22 @@
 
 @push('scripts')
 <script>
+// ── Gaji Bulanan show/hide (shared by create, edit, modal) ─────────────────
+function toggleGajiField(selectEl, sectionId, inputId) {
+    const isKontrak = selectEl.value === 'kontrak';
+    const section   = document.getElementById(sectionId);
+    const input     = document.getElementById(inputId);
+    if (!section || !input) return;
+    section.style.display = isKontrak ? '' : 'none';
+    input.required        = isKontrak;
+    if (!isKontrak) input.value = '';
+}
+// Init on page load
+(function() {
+    const sel = document.getElementById('jenis_guru_create');
+    if (sel) sel.dispatchEvent(new Event('change'));
+})();
+
 document.getElementById('photoInput')?.addEventListener('change', function () {
     if (this.files && this.files[0]) {
         const reader = new FileReader();
