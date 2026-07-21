@@ -152,7 +152,6 @@
                     <th class="small text-muted fw-semibold py-3">GURU</th>
                     <th class="small text-muted fw-semibold py-3">NIG</th>
                     <th class="small text-muted fw-semibold py-3">GENDER</th>
-                    <th class="small text-muted fw-semibold py-3">CABANG</th>
                     <th class="small text-muted fw-semibold py-3">MATA PELAJARAN</th>
                     <th class="small text-muted fw-semibold py-3">PENDIDIKAN</th>
                     <th class="small text-muted fw-semibold py-3">TGL LAHIR</th>
@@ -165,7 +164,7 @@
             </thead>
             <tbody id="teacherBody">
                 <tr>
-                    <td colspan="13" class="text-center py-5">
+                    <td colspan="12" class="text-center py-5">
                         <div class="spinner-border text-success mb-2" style="width:1.8rem;height:1.8rem"></div>
                         <div class="text-muted small">Memuat data guru...</div>
                     </td>
@@ -408,7 +407,7 @@ function loadTeachers(page) {
             const teachers = res.data || [];
 
             if (!teachers.length) {
-                html = `<tr><td colspan="13" class="py-5">
+                html = `<tr><td colspan="12" class="py-5">
                     <div class="text-center">
                         <div style="width:72px;height:72px;border-radius:50%;background:var(--input-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
                             <i class="bi bi-person-badge" style="font-size:2rem;opacity:.35"></i>
@@ -443,11 +442,6 @@ function loadTeachers(page) {
                         </td>
                         <td><code style="background:var(--input-bg);padding:3px 8px;border-radius:6px;font-size:12px;color:var(--bs-primary)">${t.nig}</code></td>
                         <td><span class="text-muted" style="font-size:12px">${t.gender === 'L' ? 'Laki-laki' : 'Perempuan'}</span></td>
-                        <td>
-                            <span style="background:var(--input-bg);color:var(--text-muted);border:1px solid var(--card-border);padding:3px 10px;border-radius:6px;font-size:11px;white-space:nowrap">
-                                <i class="bi bi-building me-1"></i>${t.branch?.name ?? 'Pusat'}
-                            </span>
-                        </td>
                         <td>
                             <span class="text-muted" style="font-size:12.5px;max-width:220px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
                                 ${courseNames}
@@ -510,7 +504,7 @@ function loadTeachers(page) {
         },
         error() {
             document.getElementById('teacherBody').innerHTML = `
-                <tr><td colspan="13" class="text-center py-5 text-danger">
+                <tr><td colspan="12" class="text-center py-5 text-danger">
                     <i class="bi bi-exclamation-triangle d-block mb-2" style="font-size:2rem"></i>
                     Gagal memuat data. <a href="javascript:loadTeachers()">Coba lagi</a>
                 </td></tr>`;

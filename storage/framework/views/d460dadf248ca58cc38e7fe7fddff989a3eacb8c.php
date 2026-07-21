@@ -1,23 +1,23 @@
-@extends('layouts.app')
-@section('title','Buat Jadwal Kelas')
-@section('page-title','Buat Jadwal Kelas')
+<?php $__env->startSection('title','Buat Jadwal Kelas'); ?>
+<?php $__env->startSection('page-title','Buat Jadwal Kelas'); ?>
 
-@php
+<?php
+$conflictCheckUrl      = route('admin.schedules.conflict-check');
 $subjectStudentsBase   = '/admin/schedules/subject';
 $teacherStatsBase      = '/admin/schedules/teacher';
-@endphp
+?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="fade-up">
 
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ route('admin.schedules.index') }}">Jadwal Sesi</a></li>
+        <li class="breadcrumb-item"><a href="<?php echo e(route('admin.schedules.index')); ?>">Jadwal Sesi</a></li>
         <li class="breadcrumb-item active">Buat Jadwal Kelas</li>
     </ol>
 </nav>
 
-{{-- HEADER --}}
+
 <div class="dashboard-card mb-4" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
     <div style="position:absolute;right:-20px;top:-20px;width:160px;height:160px;background:rgba(255,255,255,.05);border-radius:50%;pointer-events:none"></div>
     <div class="d-flex align-items-center justify-content-between" style="position:relative">
@@ -30,31 +30,32 @@ $teacherStatsBase      = '/admin/schedules/teacher';
                 <div style="font-size:12px;opacity:.8">Pilih mata pelajaran → tentukan siswa, waktu & guru → simpan</div>
             </div>
         </div>
-        <a href="{{ route('admin.schedules.index') }}" class="btn btn-sm"
+        <a href="<?php echo e(route('admin.schedules.index')); ?>" class="btn btn-sm"
            style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.3)">
             <i class="bi bi-arrow-left me-1"></i>Kembali
         </a>
     </div>
 </div>
 
-@if(session('success'))
+<?php if(session('success')): ?>
 <div class="alert alert-success alert-dismissible fade show mb-4">
-    <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
+    <i class="bi bi-check-circle me-2"></i><?php echo e(session('success')); ?>
+
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 </div>
-@endif
+<?php endif; ?>
 
-<form action="{{ route('admin.schedules.store') }}" method="POST" id="scheduleForm">
-@csrf
-@if($errors->any())
+<form action="<?php echo e(route('admin.schedules.store')); ?>" method="POST" id="scheduleForm">
+<?php echo csrf_field(); ?>
+<?php if($errors->any()): ?>
 <div class="alert alert-danger mb-4">
-    <ul class="mb-0 ps-3">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+    <ul class="mb-0 ps-3"><?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $e): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><li><?php echo e($e); ?></li><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?></ul>
 </div>
-@endif
+<?php endif; ?>
 
-{{-- ═══════════════════════════════════════════════════════ --}}
-{{-- BAGIAN 1: MATA PELAJARAN & SISWA                        --}}
-{{-- ═══════════════════════════════════════════════════════ --}}
+
+
+
 <div class="dashboard-card mb-4">
     <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
         <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#c84ddf,#461256);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
@@ -66,21 +67,22 @@ $teacherStatsBase      = '/admin/schedules/teacher';
         </div>
     </div>
 
-    {{-- PILIH MATA PELAJARAN --}}
+    
     <div class="mb-4">
         <label class="form-label fw-semibold">Mata Pelajaran <span class="text-danger">*</span></label>
         <select name="mata_pelajaran_id" id="mata_pelajaran_id" class="form-select" required onchange="onCourseChange(this.value)">
             <option value="">— Pilih Mata Pelajaran —</option>
-            @foreach($courses as $c)
-            <option value="{{ $c->id }}" {{ old('mata_pelajaran_id') == $c->id ? 'selected' : '' }}>
-                {{ $c->nama }}
+            <?php $__currentLoopData = $courses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $c): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <option value="<?php echo e($c->id); ?>" <?php echo e(old('mata_pelajaran_id') == $c->id ? 'selected' : ''); ?>>
+                <?php echo e($c->nama); ?>
+
             </option>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </select>
-        <div class="form-text">Data mata pelajaran dikelola di halaman <a href="{{ route('owner.subject.index') }}" target="_blank">Master Mata Pelajaran</a></div>
+        <div class="form-text">Data mata pelajaran dikelola di halaman <a href="<?php echo e(route('owner.subject.index')); ?>" target="_blank">Master Mata Pelajaran</a></div>
     </div>
 
-    {{-- DAFTAR SISWA (muncul setelah pilih mapel) --}}
+    
     <div id="siswaBox" style="display:none">
         <div class="p-3 rounded-3" style="border:1px solid var(--card-border);background:var(--input-bg)">
             <div class="d-flex align-items-center justify-content-between mb-3">
@@ -129,9 +131,9 @@ $teacherStatsBase      = '/admin/schedules/teacher';
     </div>
 </div>
 
-{{-- ═══════════════════════════════════════════════════════ --}}
-{{-- BAGIAN 2: PROGRAM & WAKTU                               --}}
-{{-- ═══════════════════════════════════════════════════════ --}}
+
+
+
 <div class="dashboard-card mb-4">
     <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
         <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#0ea5e9,#0369a1);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
@@ -143,7 +145,7 @@ $teacherStatsBase      = '/admin/schedules/teacher';
         </div>
     </div>
 
-    {{-- PROGRAM BELAJAR --}}
+    
     <div class="mb-4">
         <label class="form-label fw-semibold">Program Belajar <span class="text-danger">*</span></label>
         <div class="row g-3" id="programPicker">
@@ -170,10 +172,10 @@ $teacherStatsBase      = '/admin/schedules/teacher';
                 </div>
             </div>
         </div>
-        <input type="hidden" name="program_belajar" id="program_belajar" value="{{ old('program_belajar','kelas') }}" required>
+        <input type="hidden" name="program_belajar" id="program_belajar" value="<?php echo e(old('program_belajar','kelas')); ?>" required>
     </div>
 
-    {{-- SISTEM BELAJAR --}}
+    
     <div class="mb-4">
         <label class="form-label fw-semibold">Sistem Belajar <span class="text-danger">*</span></label>
         <div class="row g-3" id="sistemPicker">
@@ -200,29 +202,29 @@ $teacherStatsBase      = '/admin/schedules/teacher';
                 </div>
             </div>
         </div>
-        <input type="hidden" name="jenis" id="jenis" value="{{ old('jenis','offline') }}" required>
+        <input type="hidden" name="jenis" id="jenis" value="<?php echo e(old('jenis','offline')); ?>" required>
     </div>
 
-    {{-- TANGGAL & JAM --}}
+    
     <div class="row g-3 mb-4">
         <div class="col-md-4">
             <label class="form-label fw-semibold">Tanggal <span class="text-danger">*</span></label>
             <input type="date" name="tanggal" id="tanggal" class="form-control"
-                   value="{{ old('tanggal', date('Y-m-d')) }}" required>
+                   value="<?php echo e(old('tanggal', date('Y-m-d'))); ?>" required>
         </div>
         <div class="col-md-4">
             <label class="form-label fw-semibold">Jam Mulai <span class="text-danger">*</span></label>
             <input type="time" name="jam_mulai" id="jam_mulai" class="form-control"
-                   value="{{ old('jam_mulai') }}" required>
+                   value="<?php echo e(old('jam_mulai')); ?>" required>
         </div>
         <div class="col-md-4">
             <label class="form-label fw-semibold">Jam Selesai <span class="text-danger">*</span></label>
             <input type="time" name="jam_selesai" id="jam_selesai" class="form-control"
-                   value="{{ old('jam_selesai') }}" required>
+                   value="<?php echo e(old('jam_selesai')); ?>" required>
         </div>
     </div>
 
-    {{-- LOKASI --}}
+    
     <div class="mb-4 p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
         <div class="fw-semibold mb-3" style="font-size:13px" id="lokasiTitle">
             <i class="bi bi-geo-alt me-2"></i>Lokasi Kelas
@@ -233,7 +235,7 @@ $teacherStatsBase      = '/admin/schedules/teacher';
             <div class="input-group" style="max-width:400px">
                 <span class="input-group-text" style="background:var(--input-bg);border-color:var(--card-border)"><i class="bi bi-door-open text-muted"></i></span>
                 <input type="text" name="ruangan" id="ruangan" class="form-control"
-                       value="{{ old('ruangan') }}" placeholder="cth: Ruang A1, Ruang B2...">
+                       value="<?php echo e(old('ruangan')); ?>" placeholder="cth: Ruang A1, Ruang B2...">
             </div>
         </div>
         <div id="lokasiOnline" style="display:none">
@@ -241,41 +243,61 @@ $teacherStatsBase      = '/admin/schedules/teacher';
             <div class="input-group" style="max-width:500px">
                 <span class="input-group-text" style="background:var(--input-bg);border-color:var(--card-border)"><i class="bi bi-camera-video text-muted"></i></span>
                 <input type="url" name="link_meeting" id="link_meeting" class="form-control"
-                       value="{{ old('link_meeting') }}" placeholder="https://zoom.us/j/...">
+                       value="<?php echo e(old('link_meeting')); ?>" placeholder="https://zoom.us/j/...">
             </div>
         </div>
     </div>
 
-    {{-- TOPIK & CATATAN --}}
+    
     <div class="row g-3">
         <div class="col-lg-6">
             <label class="form-label fw-semibold">Topik / Materi <span class="text-muted fw-normal">(opsional)</span></label>
-            <input type="text" name="topik" class="form-control" value="{{ old('topik') }}"
+            <input type="text" name="topik" class="form-control" value="<?php echo e(old('topik')); ?>"
                    placeholder="cth: Persamaan Kuadrat, Present Tense...">
         </div>
         <div class="col-lg-6">
             <label class="form-label fw-semibold">Catatan <span class="text-muted fw-normal">(opsional)</span></label>
-            <input type="text" name="catatan" class="form-control" value="{{ old('catatan') }}"
+            <input type="text" name="catatan" class="form-control" value="<?php echo e(old('catatan')); ?>"
                    placeholder="Catatan tambahan untuk sesi ini">
         </div>
     </div>
 </div>
 
-{{-- ═══════════════════════════════════════════════════════ --}}
-{{-- BAGIAN 3: GURU                                         --}}
-{{-- ═══════════════════════════════════════════════════════ --}}
+
+
+
+<div class="dashboard-card mb-4">
+    <div class="d-flex align-items-center gap-2 mb-3 pb-3 border-bottom">
+        <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
+            <i class="bi bi-shield-check"></i>
+        </div>
+        <div>
+            <div class="fw-bold" style="font-size:15px">Langkah 3 — Cek Konflik <span class="text-muted fw-normal" style="font-size:12px">(opsional)</span></div>
+            <div class="text-muted" style="font-size:12px">Periksa ketersediaan ruangan dan guru di waktu yang dipilih</div>
+        </div>
+    </div>
+
+    <button type="button" class="btn btn-outline-primary btn-sm px-4" onclick="runConflictCheck()" id="btnCekKonflik">
+        <i class="bi bi-shield-check me-2"></i>Cek Konflik Sekarang
+    </button>
+    <div id="konflikResults" class="mt-3"></div>
+</div>
+
+
+
+
 <div class="dashboard-card mb-4">
     <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
         <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#10b981,#047857);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
             <i class="bi bi-person-badge"></i>
         </div>
         <div>
-            <div class="fw-bold" style="font-size:15px">Langkah 3 — Guru</div>
-            <div class="text-muted" style="font-size:12px">Pilih guru pengajar untuk sesi ini</div>
+            <div class="fw-bold" style="font-size:15px">Langkah 4 — Guru &amp; Honor</div>
+            <div class="text-muted" style="font-size:12px">Pilih guru pengajar dan kunci nominal honor per sesi</div>
         </div>
     </div>
 
-    {{-- MAPEL SUMMARY --}}
+    
     <div class="mb-3 p-3 rounded-3" style="background:var(--soft-primary-bg,rgba(200,77,223,.08));border:1.5px solid var(--soft-primary-border,rgba(200,77,223,.2))">
         <div class="d-flex align-items-center gap-2" style="font-size:13px">
             <i class="bi bi-book text-primary"></i>
@@ -285,7 +307,7 @@ $teacherStatsBase      = '/admin/schedules/teacher';
         </div>
     </div>
 
-    {{-- TEACHER LIST --}}
+    
     <div class="mb-4">
         <label class="form-label fw-semibold">Pilih Guru Pengajar <span class="text-danger">*</span></label>
         <div id="guruList" class="row g-2">
@@ -296,13 +318,36 @@ $teacherStatsBase      = '/admin/schedules/teacher';
         <input type="hidden" name="guru_id" id="guru_id" required>
     </div>
 
-    {{-- GURU STATS (muncul setelah pilih guru) --}}
+    
     <div id="guruStatsBox" style="display:none" class="mb-4 p-3 rounded-3" style="border:1px solid var(--card-border);background:var(--input-bg)">
         <div class="fw-semibold mb-3" style="font-size:13px"><i class="bi bi-bar-chart-line me-2 text-primary"></i>Statistik Guru Terpilih</div>
         <div class="row g-3" id="guruStatsContent"></div>
     </div>
 
-    {{-- SUBMIT --}}
+    
+    <div class="p-3 rounded-3 mb-4" style="background:var(--input-bg);border:1px solid var(--card-border)">
+        <div class="fw-semibold mb-1" style="font-size:13px">
+            <i class="bi bi-cash-coin me-2" style="color:#f6af23"></i>Honor Guru per Sesi
+        </div>
+        <div class="text-muted mb-3" style="font-size:11px">Honor ini akan menjadi dasar penggajian guru untuk setiap sesi yang terlaksana.</div>
+        <div class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text" style="background:var(--input-bg);border-color:var(--card-border);font-weight:600">Rp</span>
+                    <input type="number" name="honor_per_sesi" id="honor_per_sesi" class="form-control"
+                           value="<?php echo e(old('honor_per_sesi')); ?>" min="0" step="1000" placeholder="cth: 150000">
+                    <span class="input-group-text" style="background:var(--input-bg);border-color:var(--card-border)">/sesi</span>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div id="honorDisplay" class="text-muted" style="font-size:12px">
+                    <i class="bi bi-info-circle me-1"></i>Masukkan nominal honor per sesi yang disepakati.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
     <div class="pt-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div class="text-muted" style="font-size:12px">
             <i class="bi bi-info-circle me-1"></i>Menyimpan jadwal akan otomatis menyiapkan draft absensi untuk siswa yang dipilih.
@@ -315,9 +360,9 @@ $teacherStatsBase      = '/admin/schedules/teacher';
 
 </form>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@php
+<?php
 $teachersJson = $teachers->map(function ($t) {
     return [
         'id'         => $t->id,
@@ -332,20 +377,20 @@ $teachersJson = $teachers->map(function ($t) {
 });
 
 $coursesJson = $courses->map(fn($c) => [
-    'id'           => $c->id,
-    'nama'         => $c->nama,
-    'kategori'     => $c->kategori ?? '',
-    'jenis_kursus' => $c->jenis_kursus ?? '',
+    'id'       => $c->id,
+    'nama'     => $c->nama,
+    'kategori' => $c->kategori ?? '',
 ]);
-@endphp
+?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
-const teachers             = @json($teachersJson);
-const courses              = @json($coursesJson);
+const teachers             = <?php echo json_encode($teachersJson, 15, 512) ?>;
+const courses              = <?php echo json_encode($coursesJson, 15, 512) ?>;
 const csrf                 = document.querySelector('meta[name="csrf-token"]').content;
-const subjectStudentsBase  = @json($subjectStudentsBase);
-const teacherStatsBase     = @json($teacherStatsBase);
+const conflictCheckUrl     = <?php echo json_encode($conflictCheckUrl, 15, 512) ?>;
+const subjectStudentsBase  = <?php echo json_encode($subjectStudentsBase, 15, 512) ?>;
+const teacherStatsBase     = <?php echo json_encode($teacherStatsBase, 15, 512) ?>;
 
 let currentCourseId  = null;
 let busyTeacherIds   = [];
@@ -369,6 +414,7 @@ function onCourseChange(courseId) {
 
     document.getElementById('guru_id').value = '';
     document.getElementById('submitBtn').disabled = true;
+    document.getElementById('konflikResults').innerHTML = '';
     hideEl('guruStatsBox');
     document.getElementById('guruList').innerHTML =
         '<div class="col-12 text-muted" style="font-size:13px"><i class="bi bi-info-circle me-1"></i>Pilih mata pelajaran terlebih dahulu untuk melihat daftar guru.</div>';
@@ -388,9 +434,6 @@ function onCourseChange(courseId) {
 
     // Render guru list filtered by this course
     renderGuruList();
-
-    // Auto-fill schedule inputs from selected course if still empty/default
-    populateScheduleFieldsFromCourse(courseId);
 }
 
 // ─── Load students by course ───────────────────────────────────────────────
@@ -496,55 +539,96 @@ function selectSistem(val) {
     document.getElementById('lokasiOnline').style.display  = val === 'online'  ? '' : 'none';
 }
 
-function populateScheduleFieldsFromCourse(courseId) {
-    const course = courses.find(c => c.id == courseId);
-    if (!course) return;
+// ─── Step 3: Cek Konflik ───────────────────────────────────────────────────
 
-    const programInput = document.getElementById('program_belajar');
-    const jenisInput   = document.getElementById('jenis');
-    const tanggalInput = document.getElementById('tanggal');
-    const mulaiInput   = document.getElementById('jam_mulai');
-    const selesaiInput = document.getElementById('jam_selesai');
-    const topikInput   = document.querySelector('[name="topik"]');
-    const catatanInput = document.querySelector('[name="catatan"]');
+async function runConflictCheck() {
+    const btn = document.getElementById('btnCekKonflik');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memeriksa...';
 
-    const normalizedKategori = (course.kategori || '').toLowerCase();
-    const normalizedJenis   = (course.jenis_kursus || '').toLowerCase();
+    const jenis    = document.getElementById('jenis').value;
+    const ruangan  = jenis === 'offline' ? (document.getElementById('ruangan').value || '') : '';
 
-    const defaultProgram = normalizedKategori.includes('privat') || normalizedJenis.includes('private') ? 'private' : 'kelas';
-    const defaultJenis   = normalizedKategori.includes('online') || normalizedJenis.includes('online') ? 'online' : 'offline';
+    const payload = new FormData();
+    payload.append('_token',     csrf);
+    payload.append('tanggal',    document.getElementById('tanggal').value);
+    payload.append('jam_mulai',  document.getElementById('jam_mulai').value);
+    payload.append('jam_selesai',document.getElementById('jam_selesai').value);
+    payload.append('ruangan',    ruangan);
+    if (selectedGuruId) payload.append('guru_id', selectedGuruId);
 
-    if (programInput && !programInput.value.trim()) {
-        selectProgram(defaultProgram);
-    } else if (programInput && programInput.value.trim() === 'kelas' && defaultProgram === 'private') {
-        selectProgram(defaultProgram);
-    }
-
-    if (jenisInput && !jenisInput.value.trim()) {
-        selectSistem(defaultJenis);
-    } else if (jenisInput && jenisInput.value.trim() === 'offline' && defaultJenis === 'online') {
-        selectSistem(defaultJenis);
-    }
-
-    const today = new Date().toISOString().slice(0, 10);
-    if (tanggalInput && !tanggalInput.value) {
-        tanggalInput.value = today;
-    }
-    if (mulaiInput && !mulaiInput.value) {
-        mulaiInput.value = '08:00';
-    }
-    if (selesaiInput && !selesaiInput.value) {
-        selesaiInput.value = '09:30';
-    }
-    if (topikInput && !topikInput.value.trim()) {
-        topikInput.value = course.nama || '';
-    }
-    if (catatanInput && !catatanInput.value.trim()) {
-        catatanInput.value = `Sesi ${course.nama}`;
+    try {
+        const res  = await fetch(conflictCheckUrl, { method: 'POST', body: payload });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const json = await res.json();
+        const data = json.data || {};
+        busyTeacherIds = data.busy_teacher_ids || [];
+        renderKonflikResults(data, jenis, ruangan);
+        if (currentCourseId) renderGuruList();
+    } catch {
+        showToast('Gagal menghubungi server. Coba lagi.', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-shield-check me-2"></i>Cek Konflik Sekarang';
     }
 }
 
-// ─── Step 3: Guru list & stats ─────────────────────────────────────────────
+function renderKonflikResults(data, jenis, ruangan) {
+    let html = '<div class="row g-3">';
+
+    if (jenis === 'offline' && ruangan && data.room) {
+        const r  = data.room;
+        const ok = !r.conflict;
+        html += `<div class="col-md-6">
+            <div class="p-3 rounded-3 d-flex align-items-start gap-3" style="background:${ok ? 'var(--soft-success-bg,#d1fae5)' : '#fef2f2'};border:1.5px solid ${ok ? '#10b981' : '#ef4444'}">
+                <div style="font-size:22px;line-height:1">${ok ? '✅' : '❌'}</div>
+                <div>
+                    <div class="fw-semibold" style="font-size:13px;color:${ok ? '#047857' : '#b91c1c'}">${ok ? 'Ruangan Tersedia' : 'Ruangan Bentrok!'}</div>
+                    <div style="font-size:12px;color:var(--text-muted)">${r.detail}</div>
+                </div>
+            </div>
+        </div>`;
+    } else if (jenis === 'online') {
+        html += `<div class="col-md-6">
+            <div class="p-3 rounded-3 d-flex align-items-start gap-3" style="background:rgba(59,130,246,.08);border:1.5px solid #3b82f6">
+                <div style="font-size:22px;line-height:1">💻</div>
+                <div><div class="fw-semibold" style="font-size:13px;color:#1d4ed8">Kelas Online</div>
+                <div style="font-size:12px;color:var(--text-muted)">Tidak ada pengecekan ruang fisik untuk kelas online.</div></div>
+            </div>
+        </div>`;
+    }
+
+    if (data.teacher) {
+        const t  = data.teacher;
+        const ok = !t.conflict;
+        html += `<div class="col-md-6">
+            <div class="p-3 rounded-3 d-flex align-items-start gap-3" style="background:${ok ? 'var(--soft-success-bg,#d1fae5)' : '#fef2f2'};border:1.5px solid ${ok ? '#10b981' : '#ef4444'}">
+                <div style="font-size:22px;line-height:1">${ok ? '👨‍🏫' : '⚠️'}</div>
+                <div>
+                    <div class="fw-semibold" style="font-size:13px;color:${ok ? '#047857' : '#b91c1c'}">${ok ? 'Guru Tersedia' : 'Guru Sedang Mengajar!'}</div>
+                    <div style="font-size:12px;color:var(--text-muted)">${t.detail}</div>
+                </div>
+            </div>
+        </div>`;
+    } else {
+        const busyCount = busyTeacherIds.length;
+        const freeCount = teachers.length - busyCount;
+        html += `<div class="col-md-6">
+            <div class="p-3 rounded-3 d-flex align-items-start gap-3" style="background:${freeCount > 0 ? 'var(--soft-success-bg,#d1fae5)' : '#fef2f2'};border:1.5px solid ${freeCount > 0 ? '#10b981' : '#ef4444'}">
+                <div style="font-size:22px;line-height:1">${freeCount > 0 ? '👨‍🏫' : '⚠️'}</div>
+                <div>
+                    <div class="fw-semibold" style="font-size:13px;color:${freeCount > 0 ? '#047857' : '#b91c1c'}">${freeCount} Guru Tersedia di Waktu Ini</div>
+                    <div style="font-size:12px;color:var(--text-muted)">${busyCount} guru sedang mengajar di jam ini.</div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    html += '</div>';
+    document.getElementById('konflikResults').innerHTML = html;
+}
+
+// ─── Step 4: Guru list & stats ─────────────────────────────────────────────
 
 function renderGuruList() {
     const mapelId = currentCourseId;
@@ -627,6 +711,11 @@ async function selectGuru(guruId) {
     highlightGuruCard(guruId);
 
     const t = teachers.find(x => x.id == guruId);
+    if (t) {
+        document.getElementById('honorDisplay').innerHTML =
+            `<i class="bi bi-person-check me-1 text-success"></i><strong>${t.name}</strong> dipilih. Masukkan honor per sesi jika ada kesepakatan khusus.`;
+    }
+
     document.getElementById('submitBtn').disabled = false;
 
     // Load teacher stats
@@ -701,4 +790,6 @@ selectSistem(document.getElementById('jenis').value || 'offline');
 const initCourse = document.getElementById('mata_pelajaran_id').value;
 if (initCourse) onCourseChange(initCourse);
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\Edu Juanda Pratama\Downloads\smart-center-indonesia-1 (2)\smart-center-indonesia\resources\views/admin/schedules/create.blade.php ENDPATH**/ ?>

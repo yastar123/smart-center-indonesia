@@ -3160,6 +3160,10 @@
     <script>!function(){var t=localStorage.getItem('theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}();</script>
 </head>
 <body>
+    @php
+        $currentUser = auth()->user();
+    @endphp
+
     @if(session()->has('impersonate.original_user'))
         <div class="impersonate-banner">
             <i class="bi bi-person-fill-gear me-2"></i>
@@ -3195,14 +3199,24 @@
         </button>
     </a>
 
-    <div class="sidebar-user">
-        <img src="{{ auth()->user()->avatar ? asset('storage/'.auth()->user()->avatar) : 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&background=68117e&color=fff&size=80' }}"
-             class="sidebar-avatar" alt="Avatar" id="sidebarAvatar">
-        <div>
-            <div class="user-name">{{ auth()->user()->name }}</div>
-            <div class="user-role">{{ ucfirst(auth()->user()->getRoleNames()->first() ?? 'User') }}</div>
+    @if($currentUser)
+        <div class="sidebar-user">
+            <img src="{{ $currentUser->avatar ? asset('storage/'.$currentUser->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($currentUser->name).'&background=68117e&color=fff&size=80' }}"
+                 class="sidebar-avatar" alt="Avatar" id="sidebarAvatar">
+            <div>
+                <div class="user-name">{{ $currentUser->name }}</div>
+                <div class="user-role">{{ ucfirst($currentUser->getRoleNames()->first() ?? 'User') }}</div>
+            </div>
         </div>
-    </div>
+    @else
+        <div class="sidebar-user">
+            <div class="sidebar-avatar" id="sidebarAvatar" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#68117e,#c84ddf);color:#fff;font-weight:800">SCI</div>
+            <div>
+                <div class="user-name">Tamu</div>
+                <div class="user-role">Silakan masuk</div>
+            </div>
+        </div>
+    @endif
 
     <div class="sidebar-nav">
 
@@ -3614,36 +3628,43 @@
                 @endif
             </button>
 
-            <div class="dropdown">
-                <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border"
-                        data-bs-toggle="dropdown" style="border-radius:12px;padding:6px 12px 6px 8px;font-size:13px">
-                    <img id="topbarAvatar"
-                         src="{{ auth()->user()->avatar ? asset('storage/'.auth()->user()->avatar) : 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&background=68117e&color=fff&size=64' }}"
-                         width="32" height="32" class="rounded-circle" style="object-fit:cover">
-                    <div class="text-start d-none d-md-block">
-                        <div class="fw-semibold" style="font-size:13px;line-height:1.2">{{ Str::limit(auth()->user()->name, 16) }}</div>
-                        <div style="font-size:10px;color:var(--text-muted)">{{ ucfirst(auth()->user()->getRoleNames()->first() ?? 'User') }}</div>
-                    </div>
-                    <i class="bi bi-chevron-down small d-none d-md-block ms-1" style="font-size:10px"></i>
-                </button>
+            @if($currentUser)
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border"
+                            data-bs-toggle="dropdown" style="border-radius:12px;padding:6px 12px 6px 8px;font-size:13px">
+                        <img id="topbarAvatar"
+                             src="{{ $currentUser->avatar ? asset('storage/'.$currentUser->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($currentUser->name).'&background=68117e&color=fff&size=64' }}"
+                             width="32" height="32" class="rounded-circle" style="object-fit:cover">
+                        <div class="text-start d-none d-md-block">
+                            <div class="fw-semibold" style="font-size:13px;line-height:1.2">{{ Str::limit($currentUser->name, 16) }}</div>
+                            <div style="font-size:10px;color:var(--text-muted)">{{ ucfirst($currentUser->getRoleNames()->first() ?? 'User') }}</div>
+                        </div>
+                        <i class="bi bi-chevron-down small d-none d-md-block ms-1" style="font-size:10px"></i>
+                    </button>
 
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius:14px;min-width:180px">
-                    <li>
-                        <a class="dropdown-item py-2" href="{{ route('profile.edit') }}">
-                            <i class="bi bi-person me-2 text-primary"></i>Profil Saya
-                        </a>
-                    </li>
-                    <li><hr class="dropdown-divider my-1"></li>
-                    <li>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button class="dropdown-item py-2 text-danger">
-                                <i class="bi bi-box-arrow-right me-2"></i>Logout
-                            </button>
-                        </form>
-                    </li>
-                </ul>
-            </div>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius:14px;min-width:180px">
+                        <li>
+                            <a class="dropdown-item py-2" href="{{ route('profile.edit') }}">
+                                <i class="bi bi-person me-2 text-primary"></i>Profil Saya
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider my-1"></li>
+                        <li>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button class="dropdown-item py-2 text-danger">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            @else
+                <a href="{{ route('login') }}" class="top-btn d-none d-md-flex align-items-center gap-2" style="text-decoration:none;padding:0 12px;font-size:12.5px">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    <span>Masuk</span>
+                </a>
+            @endif
 
         </div>
 
@@ -4321,9 +4342,12 @@ document.querySelectorAll('.placeholder').forEach(el => el.classList.add('skelet
         }
 
         @php
-            $announcementsRoute = auth()->user()->hasAnyRole(['admin','owner'])
-                ? route('admin.announcements.index')
-                : (auth()->user()->hasRole('siswa') ? route('siswa.announcements') : '');
+            $announcementsRoute = '';
+            if (auth()->check()) {
+                $announcementsRoute = auth()->user()->hasAnyRole(['admin','owner'])
+                    ? route('admin.announcements.index')
+                    : (auth()->user()->hasRole('siswa') ? route('siswa.announcements') : '');
+            }
         @endphp
         const announcementsRoute = @json($announcementsRoute);
 

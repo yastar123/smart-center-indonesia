@@ -503,6 +503,7 @@
             <li><a href="#lokasi">Lokasi</a></li>
             <li><a href="#testimoni">Testimoni</a></li>
             <li><a href="#faq">FAQ</a></li>
+            <li><a href="{{ route('articles.index') }}">Artikel</a></li>
         </ul>
         <a href="https://wa.me/{{ $branchWa }}?text={{ urlencode('Halo SCI '.$cityName.'! Saya ingin konsultasi gratis tentang les privat.') }}"
            target="_blank" class="btn-bl-cta">
@@ -525,6 +526,7 @@
     <a href="#lokasi"     onclick="closeBLMenu()">Lokasi</a>
     <a href="#testimoni"  onclick="closeBLMenu()">Testimoni</a>
     <a href="#faq"        onclick="closeBLMenu()">FAQ</a>
+    <a href="{{ route('articles.index') }}" onclick="closeBLMenu()">Artikel</a>
 </div>
 
 {{-- ──────────────── HERO ───────────────────────────────────────────── --}}

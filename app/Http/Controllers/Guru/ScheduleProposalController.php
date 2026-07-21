@@ -77,6 +77,8 @@ class ScheduleProposalController extends Controller
             'jenis'        => 'required|in:online,offline,private',
             'ruangan'      => 'nullable|string|max:255',
             'link_meeting' => 'nullable|url|max:500',
+        ], [
+            'tanggal.after_or_equal' => 'Tanggal harus hari ini atau tanggal yang akan datang.',
         ]);
 
         $class = SchoolClass::find($request->class_id);

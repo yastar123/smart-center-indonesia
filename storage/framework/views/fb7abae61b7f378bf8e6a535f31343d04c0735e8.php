@@ -1100,4 +1100,4 @@ document.getElementById('regForm').addEventListener('submit', function() {
 </script>
 </body>
 </html>
-<?php /**PATH /home/runner/workspace/resources/views/auth/register.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\Users\Edu Juanda Pratama\Downloads\smart-center-indonesia-1 (2)\smart-center-indonesia\resources\views/auth/register.blade.php ENDPATH**/ ?>

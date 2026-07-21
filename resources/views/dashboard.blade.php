@@ -38,6 +38,7 @@
 
     // Recent registrations from public /register form
     $recentRegistrations = \App\Models\StudentRegistration::latest()->limit(10)->get();
+    $pendingTeacherRegistrations = \App\Models\TeacherRegistration::latest()->limit(10)->get();
 
     // Invoice revenue
     $revenueThisMonthInvoice = \App\Models\Payment::where('status', 'verified')
@@ -287,6 +288,64 @@
         </div>
     </div>
 
+</div>
+@endif
+
+{{-- TEACHER REGISTRATIONS (owner & admin) --}}
+@if($isOwnerAdmin)
+<div class="dashboard-card fade-up mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h6 class="fw-bold mb-0">
+            <i class="bi bi-person-plus-fill text-primary me-2"></i>Guru Baru Terdaftar
+        </h6>
+        @php $pendingTeacherCount = $pendingTeacherRegistrations->where('status', 'pending')->count(); @endphp
+        @if($pendingTeacherCount > 0)
+        <span class="badge" style="background:var(--soft-warning-bg);color:var(--soft-warning-text);font-size:.73rem;padding:5px 12px;border-radius:20px">
+            <i class="bi bi-clock me-1"></i>{{ $pendingTeacherCount }} Menunggu
+        </span>
+        @endif
+    </div>
+
+    @forelse($pendingTeacherRegistrations as $teacherReg)
+    <div class="border rounded-3 p-3 mb-2" style="background:var(--card-bg);border-color:var(--card-border)">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div>
+                <div class="fw-semibold">{{ $teacherReg->name }}</div>
+                <div class="text-muted small">
+                    {{ $teacherReg->nig }} · {{ $teacherReg->jenis_guru }} · {{ $teacherReg->phone ?? '-' }}
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                @if($teacherReg->status === 'pending')
+                    <form action="{{ route('admin.teacher-registrations.verify', $teacherReg) }}" method="POST" onsubmit="return confirm('Verifikasi guru ini dan lanjutkan ke form tambah guru?')">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-success">
+                            <i class="bi bi-check-circle me-1"></i>Verifikasi
+                        </button>
+                    </form>
+                @else
+                    <button class="btn btn-sm btn-outline-success" disabled>
+                        <i class="bi bi-check-circle me-1"></i>Sudah di verifikasi
+                    </button>
+                @endif
+
+                <form action="{{ route('admin.teacher-registrations.destroy', $teacherReg) }}" method="POST" onsubmit="return confirm('Hapus pendaftaran ini?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash me-1"></i>Hapus
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    @empty
+    <div class="text-center py-5">
+        <i class="bi bi-inbox d-block mb-3" style="font-size:3rem;opacity:.2"></i>
+        <div class="fw-semibold mb-1">Belum ada guru baru</div>
+        <p class="text-muted" style="font-size:.83rem">Data akan muncul ketika calon guru mendaftar di halaman registrasi guru publik.</p>
+    </div>
+    @endforelse
 </div>
 @endif
 

@@ -209,7 +209,15 @@ document.getElementById('photoInput')?.addEventListener('change', function () {
 });
 
 // ── Mata Pelajaran tag-picker ──────────────────────────────────────────────
-let _selected = {};   // { courseId: courseName }
+let _selected = {};
+const initialCourseIds = @json(old('course_ids', []));
+const courseNameMap = {};
+Array.from(document.querySelectorAll('#courseSelect option')).forEach(opt => {
+    if (opt.value) courseNameMap[opt.value] = opt.dataset.nama || opt.textContent;
+});
+initialCourseIds.forEach(id => {
+    if (id) _selected[id] = courseNameMap[id] || '';
+});
 
 function _renderCourses() {
     const chips  = document.getElementById('selectedCourses');

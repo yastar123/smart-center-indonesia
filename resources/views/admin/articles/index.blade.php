@@ -20,9 +20,9 @@
             </div>
         </div>
         <div class="col-md-4 text-md-end">
-            <button onclick="openModal()" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px">
+            <a href="{{ route('admin.articles.create') }}" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px">
                 <i class="bi bi-plus-lg me-2"></i>Tulis Artikel
-            </button>
+            </a>
         </div>
     </div>
 </div>

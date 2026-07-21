@@ -174,7 +174,7 @@
                 </div>
                 <div class="col-md-3">
                     <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Sistem</label>
-                    <select class="form-select" name="system">
+                    <select class="form-select" name="system" id="systemSelect">
                         <option value="">Pilih…</option>
                         <option value="online" <?php echo e($registration->system==='online'?'selected':''); ?>>Online</option>
                         <option value="offline" <?php echo e($registration->system==='offline'?'selected':''); ?>>Offline</option>
@@ -274,12 +274,16 @@
 
             
             <input type="hidden" name="is_custom_package" id="isCustomPackage" value="0">
-            <div class="d-flex gap-2 mb-3">
+            <input type="hidden" name="package_mode" id="packageModeInput" value="standard">
+            <div class="d-flex gap-2 mb-3 flex-wrap">
                 <button type="button" id="btnStandard" onclick="switchPackage('standard')" class="btn btn-sm btn-primary flex-fill">
                     <i class="bi bi-box-seam me-1"></i>Paket Standar
                 </button>
                 <button type="button" id="btnCustom" onclick="switchPackage('custom')" class="btn btn-sm btn-outline-secondary flex-fill">
                     <i class="bi bi-pencil-square me-1"></i>Paket Custom
+                </button>
+                <button type="button" id="btnRequest" onclick="switchPackage('request')" class="btn btn-sm btn-outline-secondary flex-fill">
+                    <i class="bi bi-chat-square-text me-1"></i>Paket Request
                 </button>
             </div>
 
@@ -311,7 +315,8 @@
 
             
             <div id="customPackage" style="display:none">
-                <p class="text-muted" style="font-size:.83rem">Susun paket belajar khusus untuk siswa ini. Paket akan dibuat dan tersimpan di data master paket.</p>
+                <div id="packagePanelTitle" class="fw-semibold mb-2" style="font-size:.9rem">Buat Paket Custom</div>
+                <p id="packagePanelHint" class="text-muted" style="font-size:.83rem">Susun paket belajar khusus untuk siswa ini. Paket akan dibuat dan tersimpan di data master paket.</p>
                 <div class="row g-3">
                     <div class="col-12">
                         <label class="form-label fw-semibold" style="font-size:.78rem">Nama Paket <span class="text-danger">*</span></label>
@@ -416,9 +421,31 @@
                                     <select class="form-select form-select-sm guru-select" name="course_teacher[<?php echo e($course->id); ?>]" data-course-id="<?php echo e($course->id); ?>">
                                         <option value="">Pilih guru…</option>
                                         <?php $__currentLoopData = $course->guru; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        <option value="<?php echo e($t->id); ?>"><?php echo e($t->name); ?></option>
+                                        <option value="<?php echo e($t->id); ?>" data-jenis-guru="<?php echo e($t->jenis_guru ?? ''); ?>" data-salary-base="<?php echo e((float)($t->salary_base ?? 0)); ?>">
+                                            <?php echo e($t->name); ?><?php if($t->jenis_guru): ?>
+                                                • <?php echo e(ucfirst($t->jenis_guru)); ?><?php if($t->jenis_guru === 'kontrak' && (float)($t->salary_base ?? 0) > 0): ?>
+                                                    • Gaji: Rp <?php echo e(number_format((float)($t->salary_base ?? 0), 0, ',', '.')); ?>
+
+                                                <?php endif; ?>
+                                            <?php endif; ?>
+                                        </option>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </select>
+                                    <div class="teacher-contract-info text-muted mt-1" style="font-size:.68rem"></div>
+                                    <?php $klassOptions = $activeClassesByCourse[$course->id] ?? collect(); ?>
+                                    <div class="course-class-picker mt-2">
+                                        <div class="text-muted mb-1" style="font-size:.68rem">Kelas aktif untuk mata pelajaran ini</div>
+                                        <select class="form-select form-select-sm existing-class-select" name="course_class[<?php echo e($course->id); ?>]" data-course-id="<?php echo e($course->id); ?>">
+                                            <option value="">Pilih kelas aktif yang sedang berlangsung…</option>
+                                            <?php $__currentLoopData = $klassOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $klass): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <option value="<?php echo e($klass->id); ?>" data-course-id="<?php echo e($course->id); ?>" data-class-name="<?php echo e($klass->nama_kelas); ?>" data-guru-name="<?php echo e($klass->guru?->name ?? '—'); ?>" data-student-count="<?php echo e($klass->siswa->count()); ?>" data-student-names="<?php echo e(implode(' | ', $klass->siswa->pluck('name')->filter()->all())); ?>" data-schedule-count="<?php echo e($klass->jadwal->count()); ?>" data-class-type="<?php echo e($klass->jenis ?? '-'); ?>">
+                                                <?php echo e($klass->nama_kelas); ?> (<?php echo e($klass->siswa->count()); ?> siswa)
+                                            </option>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        </select>
+                                        <div class="existing-class-detail mt-1 text-muted" style="font-size:.68rem"></div>
+                                        <div class="form-text mt-1" style="font-size:.68rem">Jika ada kelas aktif, admin bisa memakai kelas itu untuk siswa baru. Bila tidak, sistem akan membuat kelas baru.</div>
+                                    </div>
                                 </div>
                                 <div class="col-md-1">
                                     <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[<?php echo e($course->id); ?>]" placeholder="Sesi" value="<?php echo e($registration->interest_sessions[$course->nama] ?? 8); ?>" oninput="updateRowMargin(this)">
@@ -430,10 +457,17 @@
                                     </div>
                                 </div>
                                 <div class="col-md-2">
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text">Rp</span>
-                                        <input type="number" min="0" class="form-control honor-input" name="course_honor[<?php echo e($course->id); ?>]" value="<?php echo e($honor); ?>" oninput="updateRowMargin(this)">
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                        <div class="input-group input-group-sm flex-grow-1">
+                                            <span class="input-group-text">Rp</span>
+                                            <input type="number" min="0" class="form-control honor-input" name="course_honor[<?php echo e($course->id); ?>]" value="<?php echo e($honor); ?>" oninput="updateRowMargin(this)" disabled>
+                                        </div>
+                                        <div class="form-check form-switch ms-1">
+                                            <input class="form-check-input course-use-honor" type="checkbox" name="course_use_honor[<?php echo e($course->id); ?>]" value="1">
+                                            <label class="form-check-label" style="font-size:.68rem">Tambah honor/sesi</label>
+                                        </div>
                                     </div>
+                                    <div class="honor-help text-muted mt-1" style="font-size:.68rem;display:none">Honor per sesi dapat ditambahkan sebagai tambahan gaji guru kontrak.</div>
                                 </div>
                                 <?php $honorTotal = $honor * $sesiDef; ?>
                                 <div class="col-md-2">
@@ -511,7 +545,7 @@
                                     <th style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Hari</th>
                                     <th style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Jam Mulai</th>
                                     <th style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Jam Berakhir</th>
-                                    <th style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Ruang / Media</th>
+                                    <th class="room-column-header" style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Ruang / Media</th>
                                 </tr>
                             </thead>
                             <tbody id="scheduleRowsContainer">
@@ -542,7 +576,7 @@
                                     <td>
                                         <input type="time" class="form-control form-control-sm jam-selesai-input" name="schedule_jam_selesai[<?php echo e($course->id); ?>]" data-course-id="<?php echo e($course->id); ?>" value="10:00" style="min-width:100px">
                                     </td>
-                                    <td>
+                                    <td class="room-column-cell">
                                         <select class="form-select form-select-sm room-select" name="schedule_room[<?php echo e($course->id); ?>]" data-course-id="<?php echo e($course->id); ?>" style="min-width:140px">
                                             <option value="">— Pilih ruang —</option>
                                             <?php $__currentLoopData = $rooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -571,12 +605,30 @@
                     </button>
                 </div>
                 <div class="p-3">
-                    <p class="text-muted mb-3" style="font-size:.82rem">Klik <strong>Cek Semua Guru</strong> untuk memeriksa apakah guru yang dipilih memiliki jadwal lain yang bentrok. Status juga diperbarui otomatis saat guru, hari, atau jam diubah di tabel jadwal.</p>
+                    <p class="text-muted mb-3" style="font-size:.82rem">Klik <strong>Cek Semua Guru</strong> untuk memeriksa apakah guru yang dipilih memiliki jadwal lain yang bentrok. Panel ini juga menampilkan kelas aktif yang bisa dipakai siswa, lengkap dengan guru, jumlah siswa, dan sisa sesi kelas.</p>
                     <div id="conflictResultsPanel">
                         <?php $__currentLoopData = $courses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <div class="d-flex align-items-center gap-2 mb-2 p-2 rounded-3" id="conflict-result-<?php echo e($course->id); ?>" style="background:var(--input-bg)">
-                            <span class="badge rounded-pill flex-shrink-0" style="background:rgba(200,77,223,.12);color:#461256;font-size:.74rem;font-weight:600;padding:.3em .7em;min-width:80px;text-align:center"><?php echo e($course->nama); ?></span>
-                            <div class="conflict-warning-box text-muted" data-course-id="<?php echo e($course->id); ?>" style="font-size:.8rem">—</div>
+                        <?php
+                            $activeClassSummaries = ($activeClassesByCourse[$course->id] ?? collect())->map(function ($klass) {
+                                return [
+                                    'id' => $klass->id,
+                                    'nama_kelas' => $klass->nama_kelas,
+                                    'guru_name' => $klass->guru?->name ?? '—',
+                                    'siswa_count' => $klass->siswa->count(),
+                                    'total_sessions' => (int) ($klass->jumlah_pertemuan ?? 0),
+                                    'scheduled_sessions' => $klass->jadwal->count(),
+                                    'jenis' => $klass->jenis ?? '—',
+                                ];
+                            })->values();
+                        ?>
+                        <div class="conflict-card mb-2 p-2 rounded-3" id="conflict-result-<?php echo e($course->id); ?>" data-course-id="<?php echo e($course->id); ?>" data-active-classes='<?php echo json_encode($activeClassSummaries, 15, 512) ?>' style="background:var(--input-bg)">
+                            <div class="d-flex align-items-start gap-2">
+                                <span class="badge rounded-pill flex-shrink-0" style="background:rgba(200,77,223,.12);color:#461256;font-size:.74rem;font-weight:600;padding:.3em .7em;min-width:80px;text-align:center"><?php echo e($course->nama); ?></span>
+                                <div class="flex-grow-1">
+                                    <div class="conflict-warning-box text-muted" data-course-id="<?php echo e($course->id); ?>" style="font-size:.8rem">—</div>
+                                    <div class="active-class-summary mt-2"></div>
+                                </div>
+                            </div>
                         </div>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
@@ -824,10 +876,12 @@ function recalcTotal() {
         if (chk.checked) {
             const feeInput   = row.querySelector('.fee-input');
             const honorInput = row.querySelector('.honor-input');
+            const honorToggle = row.querySelector('.course-use-honor');
             const sesiInput  = row.querySelector('input[name^="course_sessions"]');
             const sesi       = parseInt(sesiInput?.value || 0, 10);
             total      += parseFloat(feeInput?.value   || 0);
-            totalHonor += parseFloat(honorInput?.value || 0) * sesi; // honor per sesi × jumlah sesi
+            const useHonor = !!(honorToggle && honorToggle.checked);
+            totalHonor += useHonor ? (parseFloat(honorInput?.value || 0) * sesi) : 0;
             totalSesi  += sesi;
         }
     });
@@ -851,8 +905,10 @@ function updateRowMargin(input) {
     const row    = input.closest('.pw-course-row');
     const fee    = parseFloat(row.querySelector('.fee-input')?.value   || 0);
     const honor  = parseFloat(row.querySelector('.honor-input')?.value || 0); // honor per sesi
+    const honorToggle = row.querySelector('.course-use-honor');
     const sesi   = parseInt(row.querySelector('input[name^="course_sessions"]')?.value || 0, 10);
-    const margin = fee - (honor * sesi);
+    const useHonor = !!(honorToggle && honorToggle.checked);
+    const margin = fee - (useHonor ? (honor * sesi) : 0);
     const pct    = fee > 0 ? Math.round((margin / fee) * 100) : 0;
     const display = row.querySelector('.margin-display');
     if (display) {
@@ -862,6 +918,8 @@ function updateRowMargin(input) {
         display.style.borderColor = margin >= 0 ? 'rgba(16,185,129,.2)' : 'rgba(220,38,38,.2)';
         display.querySelector('.margin-rp').style.color = margin >= 0 ? '#10b981' : '#dc2626';
     }
+    // update contract addition (if any) and totals
+    updateContractAddition(row);
     recalcTotal();
 }
 
@@ -957,20 +1015,197 @@ function bindGuruConflictEvents(courseId) {
     guruSelect.addEventListener('change', () => syncGuruName(courseId));
 }
 
+function applyTeacherContractMeta(selectEl) {
+    const row = selectEl.closest('.pw-course-row');
+    if (!row) return;
+    const infoBox = row.querySelector('.teacher-contract-info');
+    const honorInput = row.querySelector('.honor-input');
+    const honorToggle = row.querySelector('.course-use-honor');
+    const honorHelp = row.querySelector('.honor-help');
+    const sesiInput = row.querySelector('input[name^="course_sessions"]');
+    const selected = selectEl.selectedOptions[0];
+    const jenisGuru = (selected?.dataset.jenisGuru || '').toLowerCase();
+    const salaryBase = parseFloat(selected?.dataset.salaryBase || 0);
+    const sesi = Math.max(parseInt(sesiInput?.value || 8, 10), 1);
+    const isContract = jenisGuru === 'kontrak' && salaryBase > 0;
+
+    if (infoBox) {
+        if (isContract) {
+            infoBox.innerHTML = '<span class="badge rounded-pill me-1" style="background:rgba(14,165,233,.10);color:#0369a1;border:1px solid rgba(14,165,233,.35);font-size:.66rem;padding:.25em .6em">Jenis: Kontrak</span>' +
+                '<span class="badge rounded-pill" style="background:rgba(16,185,129,.10);color:#047857;border:1px solid rgba(16,185,129,.35);font-size:.66rem;padding:.25em .6em">Gaji Bulanan: Rp ' + Number(salaryBase).toLocaleString('id-ID') + '</span>';
+        } else if (jenisGuru === 'freelance') {
+            infoBox.innerHTML = '<span class="badge rounded-pill" style="background:rgba(246,175,35,.12);color:#8a5e00;border:1px solid rgba(246,175,35,.35);font-size:.66rem;padding:.25em .6em">Jenis: Freelance</span>';
+        } else {
+            infoBox.textContent = '';
+        }
+    }
+
+    if (honorToggle) {
+        honorToggle.disabled = !isContract;
+        if (!isContract) honorToggle.checked = false;
+    }
+
+    if (honorInput) {
+        if (isContract) {
+            honorInput.disabled = !honorToggle?.checked;
+            if (!honorInput.value || parseFloat(honorInput.value) <= 0) {
+                honorInput.value = Math.round(salaryBase / sesi);
+            }
+        } else {
+            honorInput.disabled = true;
+        }
+    }
+
+    if (honorHelp) {
+        honorHelp.style.display = isContract ? '' : 'none';
+    }
+
+    updateContractAddition(row);
+    recalcTotal();
+}
+
+function updateContractAddition(row) {
+    if (!row) return;
+    const sel = row.querySelector('.guru-select');
+    const honorInput = row.querySelector('.honor-input');
+    const honorToggle = row.querySelector('.course-use-honor');
+    const sesiInput = row.querySelector('input[name^="course_sessions"]');
+    const addBoxClass = 'contract-salary-add';
+    let addBox = row.querySelector('.' + addBoxClass);
+    const selected = sel && sel.selectedOptions ? sel.selectedOptions[0] : null;
+    const jenisGuru = (selected?.dataset.jenisGuru || '').toLowerCase();
+    const salaryBase = parseFloat(selected?.dataset.salaryBase || 0);
+    const honorPerSesi = parseFloat(honorInput?.value || 0);
+    const sesi = Math.max(parseInt(sesiInput?.value || 0, 10), 0);
+    const useHonor = !!(honorToggle && honorToggle.checked);
+    const tambahan = useHonor ? (honorPerSesi * sesi) : 0;
+
+    if (jenisGuru === 'kontrak' && salaryBase > 0 && useHonor && tambahan > 0) {
+        if (!addBox) {
+            addBox = document.createElement('div');
+            addBox.className = addBoxClass + ' mt-2 text-muted';
+            addBox.style.fontSize = '.68rem';
+            const infoContainer = row.querySelector('.teacher-contract-info');
+            if (infoContainer) infoContainer.insertAdjacentElement('afterend', addBox);
+        }
+        addBox.innerHTML = '<strong>Tambahan ke gaji bulanan:</strong> Rp ' + Number(tambahan).toLocaleString('id-ID');
+    } else if (addBox) {
+        addBox.remove();
+    }
+}
+
+function syncExistingClassDetail(selectEl) {
+    const row = selectEl.closest('.pw-course-row');
+    const detailBox = row?.querySelector('.existing-class-detail');
+    if (!detailBox) return;
+    const selected = selectEl.selectedOptions[0];
+    if (!selected || !selected.value) {
+        detailBox.innerHTML = '<span class="text-muted">Tidak ada kelas aktif dipilih. Sistem akan membuat kelas baru untuk mata pelajaran ini.</span>';
+        return;
+    }
+
+    const className = selected.dataset.className || 'Kelas Aktif';
+    const guruName = selected.dataset.guruName || '—';
+    const studentCount = selected.dataset.studentCount || '0';
+    const studentNames = (selected.dataset.studentNames || '').trim();
+    const scheduleCount = selected.dataset.scheduleCount || '0';
+    const classType = selected.dataset.classType || '—';
+    detailBox.innerHTML = '<span class="badge rounded-pill" style="background:rgba(16,185,129,.10);color:#047857;border:1px solid rgba(16,185,129,.35);font-size:.66rem;padding:.25em .6em">' + className + '</span>' +
+        '<div class="mt-1">Guru: ' + guruName + ' • Siswa: ' + studentCount + ' • Jenis: ' + classType + '</div>' +
+        '<div class="mt-1 text-muted">Jadwal terdaftar: ' + scheduleCount + ' • Siswa yang sudah ada: ' + (studentNames || 'Belum ada') + '</div>' +
+        '<div class="mt-1"><span class="badge rounded-pill" style="background:rgba(37,99,235,.10);color:#1d4ed8;border:1px solid rgba(37,99,235,.24);font-size:.64rem;padding:.25em .55em">Pakai kelas ini</span></div>';
+}
+
+function renderActiveClassInsights() {
+    document.querySelectorAll('#conflictResultsPanel .conflict-card').forEach(card => {
+        const summary = card.querySelector('.active-class-summary');
+        if (!summary) return;
+        let items = [];
+        try {
+            items = JSON.parse(card.dataset.activeClasses || '[]');
+        } catch (e) {
+            items = [];
+        }
+
+        if (!items.length) {
+            summary.innerHTML = '<div class="text-muted" style="font-size:.74rem">Belum ada kelas aktif untuk mata pelajaran ini. Sistem akan membuat kelas baru saat pendaftaran selesai.</div>';
+            return;
+        }
+
+        summary.innerHTML = items.map(item => {
+            const remaining = Math.max(0, (Number(item.total_sessions || 0) - Number(item.scheduled_sessions || 0)));
+            return '<div class="border rounded-3 p-2 mb-2" style="background:rgba(16,185,129,.05);border-color:rgba(16,185,129,.2)">' +
+                '<div class="fw-semibold" style="font-size:.76rem">' + (item.nama_kelas || 'Kelas Aktif') + '</div>' +
+                '<div class="mt-1" style="font-size:.72rem">Guru: ' + (item.guru_name || '—') + ' • Siswa: ' + (item.siswa_count || 0) + ' • Jenis: ' + (item.jenis || '—') + '</div>' +
+                '<div class="mt-1 text-muted" style="font-size:.72rem">Sesi total: ' + (item.total_sessions || 0) + ' • Sudah terjadwal: ' + (item.scheduled_sessions || 0) + ' • Sisa: ' + remaining + '</div>' +
+                '<div class="mt-2 d-flex gap-2 flex-wrap">' +
+                '<button type="button" class="btn btn-sm btn-outline-primary" onclick="selectExistingClass(' + card.dataset.courseId + ', ' + item.id + ')"><i class="bi bi-check2-circle me-1"></i>Pakai kelas ini</button>' +
+                '<button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearExistingClassSelection(' + card.dataset.courseId + ')"><i class="bi bi-plus-circle me-1"></i>Buat kelas baru</button>' +
+                '</div></div>';
+        }).join('');
+    });
+}
+
+function selectExistingClass(courseId, classId) {
+    const select = document.querySelector('.existing-class-select[data-course-id="' + courseId + '"]');
+    if (!select) return;
+    select.value = classId;
+    select.dispatchEvent(new Event('change'));
+    syncExistingClassDetail(select);
+    showToast('Kelas aktif dipilih untuk mata pelajaran ini.', 'success');
+}
+
+function clearExistingClassSelection(courseId) {
+    const select = document.querySelector('.existing-class-select[data-course-id="' + courseId + '"]');
+    if (!select) return;
+    select.value = '';
+    select.dispatchEvent(new Event('change'));
+    syncExistingClassDetail(select);
+    showToast('Sistem akan membuat kelas baru untuk mata pelajaran ini.', 'info');
+}
+
 function bindCourseRowEvents(row) {
-    row.querySelectorAll('.course-check, .fee-input, input[name^="course_sessions"]').forEach(el => el.addEventListener('input', recalcTotal));
+    row.querySelectorAll('.course-check, .fee-input, input[name^="course_sessions"], .honor-input, .course-use-honor').forEach(el => el.addEventListener('input', recalcTotal));
+    row.querySelectorAll('.course-check, .fee-input, input[name^="course_sessions"], .honor-input, .course-use-honor').forEach(el => el.addEventListener('change', recalcTotal));
     row.querySelectorAll('.course-check').forEach(el => el.addEventListener('change', recalcTotal));
     const courseId = row.dataset.courseRow;
+    const guruSelect = row.querySelector('.guru-select');
+    const classSelect = row.querySelector('.existing-class-select');
+    const honorToggle = row.querySelector('.course-use-honor');
+    if (guruSelect) {
+        guruSelect.addEventListener('change', () => applyTeacherContractMeta(guruSelect));
+        applyTeacherContractMeta(guruSelect);
+    }
+    if (classSelect) {
+        classSelect.addEventListener('change', () => syncExistingClassDetail(classSelect));
+    }
+    if (honorToggle) {
+        honorToggle.addEventListener('change', () => {
+            const honorInput = row.querySelector('.honor-input');
+            if (honorInput) honorInput.disabled = !honorToggle.checked;
+            updateContractAddition(row);
+            recalcTotal();
+        });
+    }
     bindGuruConflictEvents(courseId);
 }
 document.querySelectorAll('.pw-course-row').forEach(bindCourseRowEvents);
 recalcTotal();
+renderActiveClassInsights();
 
 // ── CRUD Mata Pelajaran (semua mapel bisa ditambah/dihapus admin) ─────────────
 const courseMetaList = <?php echo json_encode($courseMeta, 15, 512) ?>;
 const courseMetaMap  = {};
 courseMetaList.forEach(c => courseMetaMap[c.id] = c);
 const usedCourseIds = new Set(<?php echo json_encode($courses->pluck('id')->values(), 15, 512) ?>);
+
+function formatTeacherOptionLabel(t) {
+    const jenis = (t && t.jenis_guru) ? t.jenis_guru.toString().toLowerCase() : '';
+    const salary = Number(t && t.salary_base ? t.salary_base : 0);
+    const jenisLabel = jenis ? ' • ' + jenis.charAt(0).toUpperCase() + jenis.slice(1) : '';
+    const salaryLabel = jenis === 'kontrak' && salary > 0 ? ' • Gaji: Rp ' + Number(salary).toLocaleString('id-ID') : '';
+    return `${t.name || ''}${jenisLabel}${salaryLabel}`;
+}
 
 function refreshExtraCourseSelect() {
     const sel = document.getElementById('extraCourseSelect');
@@ -985,7 +1220,7 @@ function buildCourseRow(course, isAdmin) {
     const row = document.createElement('div');
     row.className = 'pw-course-row';
     row.dataset.courseRow = course.id;
-    const guruOptions = course.guru.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+    const guruOptions = course.guru.map(t => `<option value="${t.id}" data-jenis-guru="${t.jenis_guru || ''}" data-salary-base="${Number(t.salary_base || 0)}">${formatTeacherOptionLabel(t)}</option>`).join('');
     const fee    = parseFloat(course.fee) || 0;
     const sesiDef = 8;
     const honor  = Math.round((fee * 0.6) / sesiDef); // honor per sesi
@@ -1005,6 +1240,7 @@ function buildCourseRow(course, isAdmin) {
                     <option value="">Pilih guru…</option>
                     ${guruOptions}
                 </select>
+                <div class="teacher-contract-info text-muted mt-1" style="font-size:.68rem"></div>
             </div>
             <div class="col-md-1">
                 <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[${course.id}]" placeholder="Sesi" value="8">
@@ -1016,10 +1252,17 @@ function buildCourseRow(course, isAdmin) {
                 </div>
             </div>
             <div class="col-md-2">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text">Rp</span>
-                    <input type="number" min="0" class="form-control honor-input" name="course_honor[${course.id}]" value="${honor}" oninput="updateRowMargin(this)">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <div class="input-group input-group-sm flex-grow-1">
+                        <span class="input-group-text">Rp</span>
+                        <input type="number" min="0" class="form-control honor-input" name="course_honor[${course.id}]" value="${honor}" oninput="updateRowMargin(this)" disabled>
+                    </div>
+                    <div class="form-check form-switch ms-1">
+                        <input class="form-check-input course-use-honor" type="checkbox" name="course_use_honor[${course.id}]" value="1">
+                        <label class="form-check-label" style="font-size:.68rem">Tambah honor/sesi</label>
+                    </div>
                 </div>
+                <div class="honor-help text-muted mt-1" style="font-size:.68rem;display:none">Honor per sesi dapat ditambahkan sebagai tambahan gaji guru kontrak.</div>
             </div>
             <div class="col-md-2">
                 <div class="margin-display px-2 py-1 rounded-2 text-center" style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);font-size:.78rem">
@@ -1051,8 +1294,8 @@ function buildScheduleRow(course) {
             </select>
         </td>
         <td><input type="time" class="form-control form-control-sm jam-mulai-input" name="schedule_jam_mulai[${course.id}]" data-course-id="${course.id}" value="08:00" style="min-width:100px"></td>
-        <td><input type="time" class="form-control form-control-sm jam-selesai-input" name="schedule_jam_selesai[${course.id}]" data-course-id="${course.id}" value="10:00" style="min-width:100px"></td>
-        <td><select class="form-select form-select-sm room-select" name="schedule_room[${course.id}]" data-course-id="${course.id}" style="min-width:140px">${_roomOptions}</select></td>`;
+        <td><input type="time" class="form-control form-select-sm jam-selesai-input" name="schedule_jam_selesai[${course.id}]" data-course-id="${course.id}" value="10:00" style="min-width:100px"></td>
+        <td class="room-column-cell"><select class="form-select form-select-sm room-select" name="schedule_room[${course.id}]" data-course-id="${course.id}" style="min-width:140px">${_roomOptions}</select></td>`;
     return tr;
 }
 
@@ -1124,13 +1367,35 @@ function onPackageDropdownChange() {
 packageDropdown.addEventListener('change', onPackageDropdownChange);
 
 let isCustomPkg = false;
+let packageMode = 'standard';
+
 function switchPackage(type) {
-    isCustomPkg = (type === 'custom');
+    packageMode = type;
+    isCustomPkg = (type === 'custom' || type === 'request');
+    document.getElementById('packageModeInput').value = packageMode;
     document.getElementById('isCustomPackage').value = isCustomPkg ? '1' : '0';
     document.getElementById('standardPackage').style.display = isCustomPkg ? 'none' : '';
     document.getElementById('customPackage').style.display = isCustomPkg ? '' : 'none';
-    document.getElementById('btnStandard').className = 'btn btn-sm flex-fill ' + (!isCustomPkg ? 'btn-primary' : 'btn-outline-secondary');
-    document.getElementById('btnCustom').className = 'btn btn-sm flex-fill ' + (isCustomPkg ? 'btn-primary' : 'btn-outline-secondary');
+
+    const btnStandard = document.getElementById('btnStandard');
+    const btnCustom   = document.getElementById('btnCustom');
+    const btnRequest  = document.getElementById('btnRequest');
+    btnStandard.className = 'btn btn-sm flex-fill ' + (type === 'standard' ? 'btn-primary' : 'btn-outline-secondary');
+    btnCustom.className   = 'btn btn-sm flex-fill ' + (type === 'custom' ? 'btn-primary' : 'btn-outline-secondary');
+    btnRequest.className  = 'btn btn-sm flex-fill ' + (type === 'request' ? 'btn-primary' : 'btn-outline-secondary');
+
+    const titleEl = document.getElementById('packagePanelTitle');
+    const hintEl  = document.getElementById('packagePanelHint');
+    if (titleEl && hintEl) {
+        if (type === 'request') {
+            titleEl.textContent = 'Request Paket Kelas Baru';
+            hintEl.textContent = 'Admin bisa mengajukan paket belajar khusus untuk siswa ini, lengkap dengan mata pelajaran, sesi, nominal, dan detail lainnya.';
+        } else {
+            titleEl.textContent = 'Buat Paket Custom';
+            hintEl.textContent = 'Susun paket belajar khusus untuk siswa ini. Paket akan dibuat dan tersimpan di data master paket.';
+        }
+    }
+
     if (isCustomPkg) {
         document.getElementById('totalBiaya').value = document.getElementById('customPackagePrice').value || 0;
     } else {
@@ -1145,7 +1410,8 @@ function buildPreview() {
     let pkgName = 'Tanpa Paket';
     if (isCustomPkg) {
         const cpName = document.querySelector('[name="custom_package_name"]')?.value;
-        pkgName = cpName ? (cpName + ' (Custom)') : '— (Custom, belum diisi)';
+        const suffix = packageMode === 'request' ? ' (Request)' : ' (Custom)';
+        pkgName = cpName ? (cpName + suffix) : `— (${packageMode === 'request' ? 'Request' : 'Custom'}, belum diisi)`;
     } else {
         const sel = packageDropdown.selectedOptions[0];
         pkgName = packageDropdown.value ? sel.text.split(' — ')[0] : 'Tanpa Paket';
@@ -1413,6 +1679,7 @@ function pickTempat(val, el) {
     el.closest('.d-flex').querySelectorAll('.pw-opt-btn').forEach(b => b.classList.remove('active'));
     el.classList.add('active');
     document.getElementById('tempatBelajarInput').value = val;
+    pwToggleRoomColumn();
 }
 
 // Tempat Belajar & Jadwal Belajar hanya relevan untuk program Privat —
@@ -1425,7 +1692,50 @@ function pwToggleLearningLogistics() {
     wrapper.style.display = isPrivat ? '' : 'none';
     wrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = !isPrivat);
 }
-document.addEventListener('DOMContentLoaded', pwToggleLearningLogistics);
+
+function pwToggleCourseClassSelectors() {
+    const program = document.getElementById('programSelect')?.value;
+    const isKelas = program === 'kelas';
+    document.querySelectorAll('.course-class-picker').forEach(wrapper => {
+        wrapper.style.display = isKelas ? '' : 'none';
+    });
+    document.querySelectorAll('.existing-class-select').forEach(selectEl => {
+        selectEl.disabled = !isKelas;
+    });
+}
+
+function pwToggleRoomColumn() {
+    const system = document.getElementById('systemSelect')?.value;
+    const program = document.getElementById('programSelect')?.value;
+    const tempat = document.getElementById('tempatBelajarInput')?.value || 'kantor';
+    const shouldHide = system === 'online' || (program === 'privat' && tempat === 'rumah');
+
+    document.querySelectorAll('.room-column-header, .room-column-cell').forEach(el => {
+        el.style.display = shouldHide ? 'none' : '';
+    });
+    document.querySelectorAll('.room-select').forEach(el => {
+        el.disabled = shouldHide;
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    pwToggleLearningLogistics();
+    pwToggleCourseClassSelectors();
+    pwToggleRoomColumn();
+    const systemSelect = document.getElementById('systemSelect');
+    const programSelect = document.getElementById('programSelect');
+    if (systemSelect) {
+        systemSelect.addEventListener('change', pwToggleRoomColumn);
+    }
+    if (programSelect) {
+        programSelect.addEventListener('change', function () {
+            pwToggleLearningLogistics();
+            pwToggleCourseClassSelectors();
+            pwToggleRoomColumn();
+        });
+    }
+    document.querySelectorAll('.existing-class-select').forEach(selectEl => syncExistingClassDetail(selectEl));
+});
 
 const PW_DAY_ORDER = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
 
@@ -1598,6 +1908,7 @@ document.getElementById('btnCekSemuaGuru')?.addEventListener('click', function()
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Mengecek…';
     runAllConflictChecks();
+    renderActiveClassInsights();
     setTimeout(() => {
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-shield-check me-1"></i>Cek Semua Guru';
@@ -1629,8 +1940,9 @@ document.getElementById('processForm').addEventListener('submit', function(e) {
     if (isCustomPkg) {
         const cpName = document.querySelector('[name="custom_package_name"]').value.trim();
         const cpJenis = document.querySelector('[name="custom_jenis"]').value;
+        const packageLabel = packageMode === 'request' ? 'Paket Request' : 'Paket Custom';
         if (!cpName || !cpJenis) {
-            showToast('Lengkapi Nama Paket & Jenis Paket pada Paket Custom.', 'error');
+            showToast(`Lengkapi Nama Paket & Jenis Paket pada ${packageLabel}.`, 'error');
             showStep(2);
             return;
         }
@@ -1711,4 +2023,4 @@ function sendToWA() {
 </script>
 <?php $__env->stopPush(); ?>
 
-<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/runner/workspace/resources/views/admin/registration/process.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\Edu Juanda Pratama\Downloads\smart-center-indonesia-1 (2)\smart-center-indonesia\resources\views/admin/registration/process.blade.php ENDPATH**/ ?>

@@ -85,6 +85,8 @@ class TeacherController extends Controller
             'cv'          => 'nullable|file|mimes:pdf,doc,docx|max:5120',
             'jenis_guru'  => 'required|in:kontrak,freelance',
             'salary_base' => 'required_if:jenis_guru,kontrak|nullable|numeric|min:0',
+            'course_ids'  => 'nullable|array',
+            'course_ids.*'=> 'exists:courses,id',
         ]);
 
         $teacher = DB::transaction(function () use ($request) {
@@ -131,15 +133,32 @@ class TeacherController extends Controller
 
             $teacher = Teacher::create($data);
 
+            $courseIds = array_filter(array_map('intval', $request->input('course_ids', [])));
+            if (!empty($courseIds)) {
+                $teacher->courses()->sync($courseIds);
+            }
+
             return $teacher;
         });
+
+        $waUrl = $this->buildTeacherWelcomeWaUrl(
+            $teacher,
+            $request->input('phone'),
+            $request->input('email'),
+            $request->input('password')
+        );
 
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
                 'message' => 'Guru dan akun login berhasil ditambahkan!',
                 'data' => $teacher,
+                'wa_url' => $waUrl,
             ]);
+        }
+
+        if ($waUrl) {
+            return redirect()->away($waUrl);
         }
 
         return redirect()->route('admin.teachers.index')
@@ -238,6 +257,35 @@ class TeacherController extends Controller
         });
 
         return redirect()->route('admin.teachers.index')->with('success', 'Data guru dan akun login berhasil diupdate!');
+    }
+
+    private function buildTeacherWelcomeWaUrl(Teacher $teacher, ?string $phone, ?string $email, ?string $password): ?string
+    {
+        $rawPhone = trim((string) ($phone ?? ''));
+        if ($rawPhone === '') {
+            return null;
+        }
+
+        $digits = preg_replace('/[^0-9]/', '', $rawPhone);
+        if ($digits === '') {
+            return null;
+        }
+
+        if (str_starts_with($digits, '0')) {
+            $digits = '62' . substr($digits, 1);
+        } elseif (!str_starts_with($digits, '62')) {
+            $digits = '62' . $digits;
+        }
+
+        $branchName = $teacher->branch?->name ?? 'Pusat';
+        $message = "Halo {$teacher->name}! Akun guru Anda di Smart Center Indonesia sudah dibuat.\n\n"
+            . "Email: " . ($email ?? '-') . "\n"
+            . "Password: " . ($password ?? '-') . "\n"
+            . "NIG: " . ($teacher->nig ?? '-') . "\n"
+            . "Cabang: " . $branchName . "\n\n"
+            . "Silakan login di: " . route('login');
+
+        return 'https://wa.me/' . $digits . '?text=' . urlencode($message);
     }
 
     public function destroy(Teacher $teacher)

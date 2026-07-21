@@ -29,6 +29,7 @@
     $dbHighlights= \App\Models\LandingHighlight::active()->orderBy('sort_order')->get();
     $dbGalleries = \App\Models\LandingGallery::active()->orderBy('sort_order')->get();
     $dbFaqs      = \App\Models\LandingFaq::active()->orderBy('sort_order')->get();
+    $dbArticles  = \App\Models\Article::with('penulis')->published()->latest('published_at')->take(3)->get();
     $tutorGrads = [
         'linear-gradient(160deg,#260632,#c84ddf)',
         'linear-gradient(160deg,#1a3a6b,#2563eb)',
@@ -296,9 +297,10 @@
         .mobile-menu.open a:nth-child(4)  { opacity:1; transform:none; transition-delay:.21s; }
         .mobile-menu.open a:nth-child(5)  { opacity:1; transform:none; transition-delay:.26s; }
         .mobile-menu.open a:nth-child(6)  { opacity:1; transform:none; transition-delay:.31s; }
-        .mobile-menu.open .mobile-divider { opacity:1; transform:none; transition-delay:.34s; }
-        .mobile-menu.open a:nth-child(8)  { opacity:1; transform:none; transition-delay:.38s; }
+        .mobile-menu.open a:nth-child(7)  { opacity:1; transform:none; transition-delay:.36s; }
+        .mobile-menu.open .mobile-divider { opacity:1; transform:none; transition-delay:.39s; }
         .mobile-menu.open a:nth-child(9)  { opacity:1; transform:none; transition-delay:.43s; }
+        .mobile-menu.open a:nth-child(10) { opacity:1; transform:none; transition-delay:.48s; }
         /* close button always visible */
         .mobile-menu .mobile-close { opacity:1 !important; transform:none !important; }
 
@@ -598,6 +600,24 @@
         .cabang-name { font-size:1rem; font-weight:800; color:var(--deep); font-family:var(--font-display); margin-bottom:.3rem; }
         .cabang-address { font-size:.82rem; color:var(--text-muted); line-height:1.5; }
         .cabang-tag { display:inline-flex; align-items:center; gap:4px; margin-top:.75rem; font-size:.7rem; font-weight:700; color:var(--success); background:rgba(16,185,129,.08); padding:3px 10px; border-radius:50px; }
+
+        /* ─── ARTIKEL TERBARU ────────────────────────────────────── */
+        .artikel-section { background:#faf5ff; padding:5.5rem 0; }
+        .art-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:2.5rem; }
+        @media(max-width:900px){ .art-grid { grid-template-columns:repeat(2,1fr); } }
+        @media(max-width:580px){ .art-grid { grid-template-columns:1fr; } }
+        .art-lp-card { background:white; border-radius:18px; overflow:hidden; box-shadow:0 2px 18px rgba(38,6,50,.07); transition:transform .25s,box-shadow .25s; display:flex; flex-direction:column; text-decoration:none; color:inherit; }
+        .art-lp-card:hover { transform:translateY(-6px); box-shadow:0 14px 40px rgba(104,17,126,.14); color:inherit; }
+        .art-lp-thumb { height:190px; overflow:hidden; flex-shrink:0; position:relative; }
+        .art-lp-thumb img { width:100%; height:100%; object-fit:cover; transition:transform .5s; }
+        .art-lp-card:hover .art-lp-thumb img { transform:scale(1.06); }
+        .art-lp-kat { position:absolute; top:10px; left:10px; font-size:.68rem; font-weight:700; padding:3px 11px; border-radius:50px; color:white; }
+        .art-lp-body { padding:1.25rem; flex:1; display:flex; flex-direction:column; }
+        .art-lp-title { font-family:var(--font-display); font-size:.98rem; font-weight:800; color:var(--deep); line-height:1.35; margin-bottom:.45rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        .art-lp-desc { font-size:.82rem; color:var(--text-muted); line-height:1.65; flex:1; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        .art-lp-meta { display:flex; align-items:center; gap:.875rem; margin-top:.875rem; padding-top:.75rem; border-top:1px solid rgba(200,77,223,.1); font-size:.73rem; color:var(--text-muted); }
+        .art-lp-cta { display:inline-flex; align-items:center; gap:6px; margin-top:2rem; padding:.65rem 1.75rem; border-radius:50px; background:linear-gradient(135deg,var(--primary-dark),var(--primary)); color:white; font-weight:700; font-size:.9rem; text-decoration:none; transition:transform .2s,box-shadow .2s; box-shadow:0 6px 20px rgba(200,77,223,.3); }
+        .art-lp-cta:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(200,77,223,.45); color:white; }
 
         /* ─── CTA ─────────────────────────────────────────────────── */
         .cta-section { padding:6rem 0; }
@@ -1005,10 +1025,12 @@
             <li><a href="#testimonials" class="nav-link-item">Testimoni</a></li>
             <li><a href="#tutor"        class="nav-link-item">Tutor</a></li>
             <li><a href="#cabang"       class="nav-link-item">Cabang</a></li>
+            <li><a href="<?php echo e(route('articles.index')); ?>" class="nav-link-item">Artikel</a></li>
         </ul>
 
         <div class="nav-cta">
             <a href="<?php echo e(route('login')); ?>"    class="btn-nav-login">Masuk</a>
+            <a href="<?php echo e(route('public.teacher-registration.create')); ?>" class="btn-nav-register">Daftar Guru</a>
             <a href="<?php echo e(route('register')); ?>" class="btn-nav-register">Daftar Sekarang</a>
         </div>
 
@@ -1029,8 +1051,10 @@
     <a href="#testimonials" onclick="closeMobile()">Testimoni</a>
     <a href="#tutor"        onclick="closeMobile()">Tutor</a>
     <a href="#cabang"       onclick="closeMobile()">Cabang</a>
+    <a href="<?php echo e(route('articles.index')); ?>" onclick="closeMobile()">Artikel</a>
     <div class="mobile-divider"></div>
     <a href="<?php echo e(route('login')); ?>"    onclick="closeMobile()" style="color:rgba(255,255,255,.65);font-size:1.05rem;font-weight:600"><i class="bi bi-box-arrow-in-right" style="font-size:.9rem"></i> Masuk</a>
+    <a href="<?php echo e(route('public.teacher-registration.create')); ?>" onclick="closeMobile()" style="background:linear-gradient(135deg,#461256,#c84ddf);padding:.8rem 2.5rem;border-radius:14px;font-size:1rem;color:white">Daftar Guru</a>
     <a href="<?php echo e(route('register')); ?>" onclick="closeMobile()" style="background:linear-gradient(135deg,var(--primary-dark),var(--primary));padding:.8rem 2.5rem;border-radius:14px;font-size:1rem;color:white">Daftar Sekarang</a>
 </div>
 
@@ -1500,6 +1524,51 @@
         </div>
     </div>
 </section>
+
+
+<?php if($dbArticles->isNotEmpty()): ?>
+<?php
+    $artKatColor = ['tips'=>'#c84ddf','berita'=>'#2563eb','akademik'=>'#10b981','promo'=>'#f59e0b','lainnya'=>'#6b7280'];
+    $artKatLabel = ['tips'=>'Tips & Trik','berita'=>'Berita','akademik'=>'Akademik','promo'=>'Promo','lainnya'=>'Lainnya'];
+?>
+<section class="artikel-section" id="artikel">
+    <div class="container-lp">
+        <div class="text-center reveal">
+            <div class="program-photo-eyebrow">Blog & Artikel</div>
+            <h2 class="section-title">Artikel <em class="section-title-accent">Terbaru</em></h2>
+            <p class="section-subtitle mx-auto">Tips belajar, berita pendidikan, dan inspirasi untuk siswa &amp; orang tua dari Smart Center Indonesia.</p>
+        </div>
+
+        <div class="art-grid">
+            <?php $__currentLoopData = $dbArticles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ai => $art): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <a href="<?php echo e(route('articles.show', $art->slug)); ?>" class="art-lp-card reveal reveal-delay-<?php echo e(($ai % 3) + 1); ?>">
+                <div class="art-lp-thumb">
+                    <img src="<?php echo e($art->thumbnail_url); ?>" alt="<?php echo e($art->judul); ?>" loading="lazy">
+                    <span class="art-lp-kat" style="background:<?php echo e($artKatColor[$art->kategori]); ?>"><?php echo e($artKatLabel[$art->kategori]); ?></span>
+                </div>
+                <div class="art-lp-body">
+                    <div class="art-lp-title"><?php echo e($art->judul); ?></div>
+                    <?php if($art->ringkasan): ?>
+                    <div class="art-lp-desc"><?php echo e($art->ringkasan); ?></div>
+                    <?php endif; ?>
+                    <div class="art-lp-meta">
+                        <span><i class="bi bi-person me-1"></i><?php echo e($art->penulis?->name ?? 'Admin'); ?></span>
+                        <span><i class="bi bi-calendar3 me-1"></i><?php echo e($art->published_at?->format('d M Y') ?? '–'); ?></span>
+                        <span><i class="bi bi-eye me-1"></i><?php echo e($art->views); ?></span>
+                    </div>
+                </div>
+            </a>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </div>
+
+        <div class="text-center">
+            <a href="<?php echo e(route('articles.index')); ?>" class="art-lp-cta">
+                <i class="bi bi-newspaper"></i> Lihat Semua Artikel
+            </a>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
 
 
 <section class="bantuan-section" id="bantuan">
@@ -2014,4 +2083,4 @@ if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 </script>
 </body>
 </html>
-<?php /**PATH /home/runner/workspace/resources/views/landing.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\Users\Edu Juanda Pratama\Downloads\smart-center-indonesia-1 (2)\smart-center-indonesia\resources\views/landing.blade.php ENDPATH**/ ?>

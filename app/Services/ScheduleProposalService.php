@@ -87,6 +87,18 @@ class ScheduleProposalService
                         'message' => "Pertemuan ke-{$pertemuanKe} sudah memiliki absensi dan tidak dapat dijadwalkan ulang.",
                     ];
                 }
+
+                // Validate: teacher can only propose schedule change max 1 day before the existing schedule
+                $existingDate = Carbon::parse($existing->tanggal);
+                $daysDiff = now()->diffInDays($existingDate, false);
+                
+                if ($daysDiff < 1) {
+                    $roleText = $proposerType === 'guru' ? 'Guru' : 'Siswa';
+                    return [
+                        'success' => false,
+                        'message' => "{$roleText} hanya dapat mengajukan perubahan jadwal maksimal 1 hari sebelum jadwal berlangsung. Jadwal saat ini: {$existingDate->format('d M Y')}.",
+                    ];
+                }
             }
         }
 

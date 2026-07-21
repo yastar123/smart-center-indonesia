@@ -124,7 +124,6 @@
                     <th style="min-width:140px">Detail Sesi</th>
                     <th style="min-width:140px">Kapasitas Murid</th>
                     <th style="min-width:90px">Status</th>
-                    <th class="text-center" style="min-width:120px">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -237,18 +236,10 @@
                             {{ $statusBadge['label'] }}
                         </span>
                     </td>
-
-                    {{-- Aksi --}}
-                    <td class="text-center">
-                        <button class="btn btn-sm btn-primary fw-semibold" style="font-size:11px;border-radius:8px;white-space:nowrap"
-                            onclick="addStudentToClass({{ $kelas->id }}, '{{ addslashes($kelas->nama_kelas) }}')">
-                            <i class="bi bi-person-plus me-1"></i>Tambah Murid
-                        </button>
-                    </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="text-center py-5">
+                    <td colspan="6" class="text-center py-5">
                         <div>
                             <i class="bi bi-collection" style="font-size:48px;color:var(--text-muted);opacity:.4;display:block;margin-bottom:12px"></i>
                             <div class="fw-semibold mb-1">Belum ada kelas</div>
@@ -278,37 +269,5 @@
     @endif
 </div>
 
-{{-- Modal Tambah Murid (placeholder) --}}
-<div class="modal fade" id="addStudentModal" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius:18px;overflow:hidden">
-            <div class="modal-header border-0 p-4" style="background:linear-gradient(135deg,#461256,#68117e);color:#fff">
-                <h6 class="modal-title fw-bold"><i class="bi bi-person-plus me-2"></i>Tambah Murid ke Kelas</h6>
-                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4">
-                <p class="text-muted mb-1" style="font-size:13px">Kelas yang dipilih:</p>
-                <div class="fw-bold mb-3" id="addStudentClassName" style="font-size:15px"></div>
-                <p class="text-muted" style="font-size:13px">Fitur tambah murid ke kelas ini sedang dalam pengembangan. Silakan gunakan menu <strong>Manajemen Siswa</strong> untuk mendaftarkan siswa ke paket.</p>
-            </div>
-            <div class="modal-footer border-0 p-3">
-                <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal" style="border-radius:10px">Tutup</button>
-                <a href="{{ route('admin.students.index') }}" class="btn btn-primary px-4 fw-semibold" style="border-radius:10px">
-                    <i class="bi bi-people me-1"></i>Ke Manajemen Siswa
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
 </div>
 @endsection
-
-@push('scripts')
-<script>
-function addStudentToClass(classId, className) {
-    document.getElementById('addStudentClassName').textContent = className;
-    new bootstrap.Modal(document.getElementById('addStudentModal')).show();
-}
-</script>
-@endpush

@@ -48,6 +48,17 @@
     </div>
 </div>
 
+{{-- BATAS WAKTU INFO --}}
+<div class="dashboard-card mb-4 fade-up" style="border-left:4px solid #f6af23;background:rgba(246,175,35,.05)">
+    <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-exclamation-triangle-fill" style="color:#f6af23;font-size:16px"></i>
+        <div>
+            <span class="fw-semibold" style="font-size:13px;color:#f6af23">Batas Waktu Pengajuan Perubahan Jadwal</span>
+            <div style="font-size:12px;color:var(--text-muted)">Perubahan jadwal hanya dapat diajukan maksimal <strong>1 hari sebelum</strong> jadwal yang akan diubah berlangsung.</div>
+        </div>
+    </div>
+</div>
+
 {{-- STATS --}}
 <div class="row g-3 mb-4">
     <div class="col-6 col-lg-3 fade-up">

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 — Halaman Tidak Ditemukan | Smart Center</title>
+    <title>403 — Akses Ditolak | Smart Center</title>
     <script>!function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}();</script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
@@ -18,24 +18,24 @@
             padding:2rem 1rem;position:relative;overflow:hidden;
         }
         body::before{
-            content:'';position:fixed;width:600px;height:600px;
-            background:radial-gradient(circle,rgba(200,77,223,.2) 0%,transparent 70%);
-            top:-200px;right:-200px;border-radius:50%;
-            animation:orb1 8s ease-in-out infinite alternate;pointer-events:none;
+            content:'';position:fixed;width:500px;height:500px;
+            background:radial-gradient(circle,rgba(200,77,223,.25) 0%,transparent 70%);
+            top:-150px;right:-150px;border-radius:50%;
+            animation:orb 8s ease-in-out infinite alternate;pointer-events:none;
         }
         body::after{
             content:'';position:fixed;width:400px;height:400px;
             background:radial-gradient(circle,rgba(246,175,35,.1) 0%,transparent 70%);
-            bottom:-150px;left:-150px;border-radius:50%;
+            bottom:-120px;left:-120px;border-radius:50%;
             animation:orb2 10s ease-in-out infinite alternate;pointer-events:none;
         }
-        @keyframes orb1{from{transform:translate(0,0) scale(1);}to{transform:translate(30px,20px) scale(1.1);}}
-        @keyframes orb2{from{transform:translate(0,0) scale(1);}to{transform:translate(-20px,-30px) scale(1.12);}}
+        @keyframes orb{from{transform:translate(0,0);}to{transform:translate(30px,20px);}}
+        @keyframes orb2{from{transform:translate(0,0);}to{transform:translate(-20px,-30px);}}
 
         .error-card{
             width:min(560px,100%);
             background:white;border-radius:28px;overflow:hidden;
-            box-shadow:0 40px 80px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.08);
+            box-shadow:0 40px 80px rgba(0,0,0,.45);
             animation:slideUp .5s cubic-bezier(.22,1,.36,1) both;
             position:relative;z-index:1;
         }
@@ -46,14 +46,12 @@
             padding:2.5rem 2.5rem 2rem;
             text-align:center;color:white;position:relative;overflow:hidden;
         }
-        .error-band::before{
-            content:'';position:absolute;right:-40px;top:-40px;
-            width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%;
-        }
+        .error-band::before{content:'';position:absolute;right:-40px;top:-40px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%;}
+        .error-band::after{content:'';position:absolute;left:-40px;bottom:-40px;width:140px;height:140px;background:rgba(246,175,35,.06);border-radius:50%;}
         .error-num{
             font-family:'Plus Jakarta Sans',sans-serif;
             font-size:clamp(80px,14vw,120px);font-weight:900;line-height:1;
-            letter-spacing:-.04em;color:rgba(255,255,255,.15);
+            letter-spacing:-.04em;color:rgba(255,255,255,.1);
             position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
             user-select:none;pointer-events:none;
         }
@@ -73,36 +71,41 @@
             color:white;transition:.4s;text-decoration:none;display:inline-flex;
             align-items:center;gap:8px;
         }
-        .back-btn:hover{background-position:right center;transform:translateY(-2px);
-            box-shadow:0 10px 28px rgba(200,77,223,.45);color:white;}
+        .back-btn:hover{background-position:right center;transform:translateY(-2px);box-shadow:0 10px 28px rgba(200,77,223,.45);color:white;}
         .home-btn{
             background:transparent;border:2px solid #e5e7eb;border-radius:12px;
             padding:.85rem 2rem;font-size:.95rem;font-weight:600;
-            color:#461256;transition:.25s;text-decoration:none;display:inline-flex;
+            color:#68117e;transition:.25s;text-decoration:none;display:inline-flex;
             align-items:center;gap:8px;
         }
-        .home-btn:hover{border-color:#c84ddf;color:#c84ddf;background:#fdf4ff;}
+        .home-btn:hover{border-color:#c84ddf;color:#68117e;background:#fdf4ff;}
         @media(max-width:480px){.error-body,.error-band{padding:1.5rem;}.error-body .d-flex{flex-direction:column;}}
     </style>
 </head>
 <body>
 <div class="error-card">
     <div class="error-band" style="position:relative">
-        <div class="error-num">404</div>
+        <div class="error-num">403</div>
         <div class="error-icon-wrap">
-            <i class="bi bi-compass"></i>
+            <i class="bi bi-shield-lock-fill"></i>
         </div>
         <h5 style="font-weight:800;margin:0;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-.01em;position:relative;z-index:1">
-            Halaman Tidak Ditemukan
+            Akses Ditolak
         </h5>
         <p style="opacity:.75;font-size:13px;margin-top:6px;position:relative;z-index:1">
-            Halaman yang Anda cari tidak ada atau telah dipindahkan
+            Anda tidak memiliki izin untuk mengakses halaman ini
         </p>
     </div>
     <div class="error-body text-center">
+        <?php if(!empty($exception->getMessage())): ?>
+        <div class="mb-3 p-3 rounded-3" style="background:#fef2f2;border:1.5px solid #fecaca;color:#dc2626;font-size:13px">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i><?php echo e($exception->getMessage()); ?>
+
+        </div>
+        <?php endif; ?>
         <p style="color:#6b7280;font-size:14px;line-height:1.7;margin-bottom:2rem;max-width:380px;margin-left:auto;margin-right:auto">
-            URL yang Anda masukkan mungkin salah ketik, atau halaman sudah tidak tersedia.
-            Coba kembali ke halaman sebelumnya atau beranda.
+            Halaman ini hanya bisa diakses oleh pengguna dengan peran tertentu.
+            Pastikan Anda login dengan akun yang tepat.
         </p>
         <div class="d-flex gap-3 justify-content-center flex-wrap">
             <a href="javascript:history.back()" class="back-btn">
@@ -114,11 +117,11 @@
         </div>
         <div class="mt-4 pt-3" style="border-top:1px solid #f3f4f6;">
             <p style="color:#9ca3af;font-size:12px;margin:0">
-                Error 404 · Smart Center Indonesia
+                Error 403 · Smart Center Indonesia
             </p>
         </div>
     </div>
 </div>
 </body>
 </html>
-<?php /**PATH /home/runner/workspace/resources/views/errors/404.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\Users\Edu Juanda Pratama\Downloads\smart-center-indonesia-1 (2)\smart-center-indonesia\resources\views/errors/403.blade.php ENDPATH**/ ?>

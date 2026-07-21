@@ -2,8 +2,8 @@
 -- SQL DUMP — Migrasi + Seeder
 -- Database  : laravel
 -- Host      : 127.0.0.1:3306
--- Dibuat    : 2026-07-15 19:34:56
--- Tabel     : 81 tabel
+-- Dibuat    : 2026-07-21 19:21:30
+-- Tabel     : 83 tabel
 -- Generator : generate_sql_dump.php
 -- ===========================================================================
 
@@ -87,7 +87,7 @@ CREATE TABLE `activity_log` (
   KEY `subject` (`subject_type`,`subject_id`),
   KEY `causer` (`causer_type`,`causer_id`),
   KEY `activity_log_log_name_index` (`log_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Tabel: `activity_logs`
 DROP TABLE IF EXISTS `activity_logs`;
@@ -120,6 +120,28 @@ CREATE TABLE `announcements` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Tabel: `articles`
+DROP TABLE IF EXISTS `articles`;
+CREATE TABLE `articles` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `judul` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL,
+  `ringkasan` text DEFAULT NULL,
+  `konten` longtext NOT NULL,
+  `thumbnail` varchar(255) DEFAULT NULL,
+  `kategori` enum('tips','berita','akademik','promo','lainnya') NOT NULL DEFAULT 'berita',
+  `status` enum('draft','published') NOT NULL DEFAULT 'draft',
+  `penulis_id` bigint(20) unsigned NOT NULL,
+  `views` int(10) unsigned NOT NULL DEFAULT 0,
+  `published_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `articles_slug_unique` (`slug`),
+  KEY `articles_penulis_id_foreign` (`penulis_id`),
+  CONSTRAINT `articles_penulis_id_foreign` FOREIGN KEY (`penulis_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Tabel: `branch_landing_settings`
 DROP TABLE IF EXISTS `branch_landing_settings`;
 CREATE TABLE `branch_landing_settings` (
@@ -132,7 +154,7 @@ CREATE TABLE `branch_landing_settings` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `branch_landing_settings_branch_id_key_unique` (`branch_id`,`key`),
   CONSTRAINT `branch_landing_settings_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Tabel: `branches`
 DROP TABLE IF EXISTS `branches`;
@@ -514,7 +536,7 @@ CREATE TABLE `landing_galleries` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Tabel: `landing_highlights`
 DROP TABLE IF EXISTS `landing_highlights`;
@@ -596,7 +618,7 @@ CREATE TABLE `landing_testimonials` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Tabel: `landing_tickers`
 DROP TABLE IF EXISTS `landing_tickers`;
@@ -664,7 +686,7 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=117 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=120 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Tabel: `model_has_permissions`
 DROP TABLE IF EXISTS `model_has_permissions`;
@@ -1317,6 +1339,37 @@ CREATE TABLE `teacher_courses` (
   CONSTRAINT `teacher_courses_teacher_id_foreign` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Tabel: `teacher_registrations`
+DROP TABLE IF EXISTS `teacher_registrations`;
+CREATE TABLE `teacher_registrations` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `no_reg` varchar(255) DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  `nig` varchar(255) NOT NULL,
+  `gender` enum('L','P') DEFAULT NULL,
+  `birth_date` date DEFAULT NULL,
+  `education` varchar(255) DEFAULT NULL,
+  `phone` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `branch_id` bigint(20) unsigned DEFAULT NULL,
+  `branch` varchar(255) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `jenis_guru` enum('kontrak','freelance') DEFAULT NULL,
+  `salary_base` decimal(15,2) NOT NULL DEFAULT 0.00,
+  `course_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`course_ids`)),
+  `cv_path` varchar(255) DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `status` enum('pending','verified','rejected') NOT NULL DEFAULT 'pending',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `teacher_registrations_nig_unique` (`nig`),
+  UNIQUE KEY `teacher_registrations_email_unique` (`email`),
+  UNIQUE KEY `teacher_registrations_no_reg_unique` (`no_reg`),
+  KEY `teacher_registrations_branch_id_foreign` (`branch_id`),
+  CONSTRAINT `teacher_registrations_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Tabel: `teachers`
 DROP TABLE IF EXISTS `teachers`;
 CREATE TABLE `teachers` (
@@ -1420,7 +1473,7 @@ CREATE TABLE `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`),
   UNIQUE KEY `users_username_unique` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ===========================================================================
 -- Akhir bagian SCHEMA
@@ -1442,71 +1495,19 @@ CREATE TABLE `users` (
 -- ---- Tabel: `academic_years` (1 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `academic_years` (`id`, `name`, `year_start`, `year_end`, `is_active`, `created_at`, `updated_at`) VALUES
-  ('1', '2025/2026', '2025', '2026', '1', '2026-07-05 22:32:36', '2026-07-05 22:32:36');
+  ('1', '2025/2026', '2025', '2026', '1', '2026-07-22 02:20:08', '2026-07-22 02:20:08');
 
--- ---- Tabel: `activity_log` (60 baris) ----
+-- ---- Tabel: `activity_log` (8 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `activity_log` (`id`, `log_name`, `description`, `subject_type`, `event`, `subject_id`, `causer_type`, `causer_id`, `properties`, `batch_uuid`, `created_at`, `updated_at`) VALUES
-  ('1', 'default', 'created', 'App\\Models\\User', 'created', '1', NULL, NULL, '{\"attributes\":{\"id\":1,\"name\":\"Admin Pusat SCI\",\"username\":null,\"email\":\"adminpusatsci@akademi.com\",\"phone\":null,\"avatar\":null,\"branch_id\":null,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$Oa9e8byokdZtIn5uyiXJdu1gZQXg08VdqGISFJy9iWRKUfxaPUVOS\",\"remember_token\":null,\"created_at\":\"2026-07-05T15:32:34.000000Z\",\"updated_at\":\"2026-07-05T15:32:34.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('2', 'default', 'created', 'App\\Models\\User', 'created', '2', NULL, NULL, '{\"attributes\":{\"id\":2,\"name\":\"Admin Cabang SCI\",\"username\":null,\"email\":\"admincabangsci@akademi.com\",\"phone\":null,\"avatar\":null,\"branch_id\":null,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$uUtXlrFCS3ZAPEwUhtRsLedPjZotBUAXxsWuzNfCVJPgfY2.d\\/DVG\",\"remember_token\":null,\"created_at\":\"2026-07-05T15:32:34.000000Z\",\"updated_at\":\"2026-07-05T15:32:34.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('3', 'default', 'deleted', 'App\\Models\\User', 'deleted', '2', NULL, NULL, '{\"old\":{\"id\":2,\"name\":\"Admin Cabang SCI\",\"username\":null,\"email\":\"admincabangsci@akademi.com\",\"phone\":null,\"avatar\":null,\"branch_id\":null,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$uUtXlrFCS3ZAPEwUhtRsLedPjZotBUAXxsWuzNfCVJPgfY2.d\\/DVG\",\"remember_token\":null,\"created_at\":\"2026-07-05T15:32:34.000000Z\",\"updated_at\":\"2026-07-05T15:32:34.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-05 22:32:36', '2026-07-05 22:32:36'),
-  ('4', 'default', 'created', 'App\\Models\\User', 'created', '3', NULL, NULL, '{\"attributes\":{\"id\":3,\"name\":\"Budi Santoso, S.Pd.\",\"username\":null,\"email\":\"budi.santoso@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$I6gQsa4s71Z061CrdXy4Qe852Xm\\/aJo.000DNnXwG0VHzB9hiIbZe\",\"remember_token\":null,\"created_at\":\"2026-07-05T15:32:36.000000Z\",\"updated_at\":\"2026-07-05T15:32:36.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-05 22:32:36', '2026-07-05 22:32:36'),
-  ('5', 'default', 'created', 'App\\Models\\User', 'created', '4', NULL, NULL, '{\"attributes\":{\"id\":4,\"name\":\"Sari Dewi, S.Pd.\",\"username\":null,\"email\":\"sari.dewi@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":2,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$79n3T0fWR9\\/RpoFVDo4fuesq2F23pLggsjozTmtYxciWmoMYkM82G\",\"remember_token\":null,\"created_at\":\"2026-07-05T15:32:36.000000Z\",\"updated_at\":\"2026-07-05T15:32:36.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-05 22:32:36', '2026-07-05 22:32:36'),
-  ('6', 'default', 'created', 'App\\Models\\User', 'created', '5', NULL, NULL, '{\"attributes\":{\"id\":5,\"name\":\"Andi Nugroho\",\"username\":null,\"email\":\"andi.nugroho@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$0FtGUKXj4EVaUBNGNlI0q.T2DBlEu\\/iGSISbJg\\/Uo117Pn0rQ70p.\",\"remember_token\":null,\"created_at\":\"2026-07-05T15:32:36.000000Z\",\"updated_at\":\"2026-07-05T15:32:36.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-05 22:32:36', '2026-07-05 22:32:36'),
-  ('7', 'default', 'created', 'App\\Models\\User', 'created', '6', NULL, NULL, '{\"attributes\":{\"id\":6,\"name\":\"Citra Lestari\",\"username\":null,\"email\":\"citra.lestari@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$DFhIPc\\/gx7SwsN9MUThPh.S.3UogXlO56upLbPAmHVb4.sTdnz97G\",\"remember_token\":null,\"created_at\":\"2026-07-05T15:32:36.000000Z\",\"updated_at\":\"2026-07-05T15:32:36.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-05 22:32:36', '2026-07-05 22:32:36'),
-  ('8', 'default', 'created', 'App\\Models\\User', 'created', '7', NULL, NULL, '{\"attributes\":{\"id\":7,\"name\":\"Ahmad Fauzi, S.Si.\",\"username\":null,\"email\":\"gurusci@gmail.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$pEsYlhdmblqY7LgEJ\\/hfbuUqH3XIyCF27GZ2zR5XFqeKD1wrblJJe\",\"remember_token\":null,\"created_at\":\"2026-07-05T15:32:37.000000Z\",\"updated_at\":\"2026-07-05T15:32:37.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('9', 'default', 'updated', 'App\\Models\\User', 'updated', '1', NULL, NULL, '{\"attributes\":{\"password\":\"$2y$10$LECyZuCPdusq3zHZtrcxuOGhOWr8aBq77LUmRTLhQRLCDMFw9WJXK\",\"updated_at\":\"2026-07-05T17:32:32.000000Z\"},\"old\":{\"password\":\"$2y$10$Oa9e8byokdZtIn5uyiXJdu1gZQXg08VdqGISFJy9iWRKUfxaPUVOS\",\"updated_at\":\"2026-07-05T15:32:34.000000Z\"}}', NULL, '2026-07-06 00:32:32', '2026-07-06 00:32:32'),
-  ('10', 'default', 'created', 'App\\Models\\User', 'created', '8', NULL, NULL, '{\"attributes\":{\"id\":8,\"name\":\"Admin Cabang SCI\",\"username\":null,\"email\":\"admincabangsci@akademi.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$VGNBnA1kTk9t9pqhIIMOXuhTr0UHS2\\/B\\/7AGbs388QZit5LzNoREi\",\"remember_token\":null,\"created_at\":\"2026-07-05T17:32:32.000000Z\",\"updated_at\":\"2026-07-05T17:32:32.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-06 00:32:32', '2026-07-06 00:32:32'),
-  ('11', 'default', 'deleted', 'App\\Models\\User', 'deleted', '3', NULL, NULL, '{\"old\":{\"id\":3,\"name\":\"Budi Santoso, S.Pd.\",\"username\":null,\"email\":\"budi.santoso@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$I6gQsa4s71Z061CrdXy4Qe852Xm\\/aJo.000DNnXwG0VHzB9hiIbZe\",\"remember_token\":null,\"created_at\":\"2026-07-05T15:32:36.000000Z\",\"updated_at\":\"2026-07-05T15:32:36.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-06 00:32:34', '2026-07-06 00:32:34'),
-  ('12', 'default', 'deleted', 'App\\Models\\User', 'deleted', '4', NULL, NULL, '{\"old\":{\"id\":4,\"name\":\"Sari Dewi, S.Pd.\",\"username\":null,\"email\":\"sari.dewi@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":2,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$79n3T0fWR9\\/RpoFVDo4fuesq2F23pLggsjozTmtYxciWmoMYkM82G\",\"remember_token\":null,\"created_at\":\"2026-07-05T15:32:36.000000Z\",\"updated_at\":\"2026-07-05T15:32:36.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-06 00:32:34', '2026-07-06 00:32:34'),
-  ('13', 'default', 'deleted', 'App\\Models\\User', 'deleted', '5', NULL, NULL, '{\"old\":{\"id\":5,\"name\":\"Andi Nugroho\",\"username\":null,\"email\":\"andi.nugroho@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$0FtGUKXj4EVaUBNGNlI0q.T2DBlEu\\/iGSISbJg\\/Uo117Pn0rQ70p.\",\"remember_token\":null,\"created_at\":\"2026-07-05T15:32:36.000000Z\",\"updated_at\":\"2026-07-05T15:32:36.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-06 00:32:34', '2026-07-06 00:32:34'),
-  ('14', 'default', 'deleted', 'App\\Models\\User', 'deleted', '6', NULL, NULL, '{\"old\":{\"id\":6,\"name\":\"Citra Lestari\",\"username\":null,\"email\":\"citra.lestari@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$DFhIPc\\/gx7SwsN9MUThPh.S.3UogXlO56upLbPAmHVb4.sTdnz97G\",\"remember_token\":null,\"created_at\":\"2026-07-05T15:32:36.000000Z\",\"updated_at\":\"2026-07-05T15:32:36.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-06 00:32:34', '2026-07-06 00:32:34'),
-  ('15', 'default', 'deleted', 'App\\Models\\User', 'deleted', '7', NULL, NULL, '{\"old\":{\"id\":7,\"name\":\"Ahmad Fauzi, S.Si.\",\"username\":null,\"email\":\"gurusci@gmail.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$pEsYlhdmblqY7LgEJ\\/hfbuUqH3XIyCF27GZ2zR5XFqeKD1wrblJJe\",\"remember_token\":null,\"created_at\":\"2026-07-05T15:32:37.000000Z\",\"updated_at\":\"2026-07-05T15:32:37.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-06 00:32:34', '2026-07-06 00:32:34'),
-  ('16', 'default', 'deleted', 'App\\Models\\User', 'deleted', '8', NULL, NULL, '{\"old\":{\"id\":8,\"name\":\"Admin Cabang SCI\",\"username\":null,\"email\":\"admincabangsci@akademi.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$VGNBnA1kTk9t9pqhIIMOXuhTr0UHS2\\/B\\/7AGbs388QZit5LzNoREi\",\"remember_token\":null,\"created_at\":\"2026-07-05T17:32:32.000000Z\",\"updated_at\":\"2026-07-05T17:32:32.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-06 00:32:34', '2026-07-06 00:32:34'),
-  ('17', 'default', 'created', 'App\\Models\\User', 'created', '9', NULL, NULL, '{\"attributes\":{\"id\":9,\"name\":\"Budi Santoso, S.Pd.\",\"username\":null,\"email\":\"budi.santoso@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$IB6SrD\\/ahgtKovynoU6v7eCEF8\\/qfPXI1QPSuijmEWVM7fAEREKSe\",\"remember_token\":null,\"created_at\":\"2026-07-05T17:32:34.000000Z\",\"updated_at\":\"2026-07-05T17:32:34.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-06 00:32:34', '2026-07-06 00:32:34'),
-  ('18', 'default', 'created', 'App\\Models\\User', 'created', '10', NULL, NULL, '{\"attributes\":{\"id\":10,\"name\":\"Sari Dewi, S.Pd.\",\"username\":null,\"email\":\"sari.dewi@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":2,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$HTXb7INTYn2UfM0cSM9CvuRhWjNGdzQlmPbCiT87aYa0pzATXkrzi\",\"remember_token\":null,\"created_at\":\"2026-07-05T17:32:34.000000Z\",\"updated_at\":\"2026-07-05T17:32:34.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-06 00:32:34', '2026-07-06 00:32:34'),
-  ('19', 'default', 'created', 'App\\Models\\User', 'created', '11', NULL, NULL, '{\"attributes\":{\"id\":11,\"name\":\"Andi Nugroho\",\"username\":null,\"email\":\"andi.nugroho@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$ivE8tu3xvBA80NzITDDrF.R0IjrMU5sLybUK6oV4A6gBlEDDo0OGy\",\"remember_token\":null,\"created_at\":\"2026-07-05T17:32:34.000000Z\",\"updated_at\":\"2026-07-05T17:32:34.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-06 00:32:34', '2026-07-06 00:32:34'),
-  ('20', 'default', 'created', 'App\\Models\\User', 'created', '12', NULL, NULL, '{\"attributes\":{\"id\":12,\"name\":\"Citra Lestari\",\"username\":null,\"email\":\"citra.lestari@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$aSMddLpeMHp3JNWGRNiXlu4i6vnxUXXVAmhrUeQzsc2.x5vxgaMdq\",\"remember_token\":null,\"created_at\":\"2026-07-05T17:32:35.000000Z\",\"updated_at\":\"2026-07-05T17:32:35.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-06 00:32:35', '2026-07-06 00:32:35'),
-  ('21', 'default', 'created', 'App\\Models\\User', 'created', '13', NULL, NULL, '{\"attributes\":{\"id\":13,\"name\":\"Ahmad Fauzi, S.Si.\",\"username\":null,\"email\":\"gurusci@gmail.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$FRYSNudgdXyAGJpMycpAVe7D9eYa3FIJ8eDFlQmLCZ5oPShRyGbqS\",\"remember_token\":null,\"created_at\":\"2026-07-05T17:32:35.000000Z\",\"updated_at\":\"2026-07-05T17:32:35.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-06 00:32:35', '2026-07-06 00:32:35'),
-  ('22', 'default', 'updated', 'App\\Models\\User', 'updated', '1', NULL, NULL, '{\"attributes\":{\"password\":\"$2y$10$CiSN9xxRaBwhIZVnaXoVButBcM3mj0l9b\\/C5xQUoMiu\\/UYb6uS6Q2\",\"updated_at\":\"2026-07-13T18:33:50.000000Z\"},\"old\":{\"password\":\"$2y$10$LECyZuCPdusq3zHZtrcxuOGhOWr8aBq77LUmRTLhQRLCDMFw9WJXK\",\"updated_at\":\"2026-07-05T17:32:32.000000Z\"}}', NULL, '2026-07-14 01:33:50', '2026-07-14 01:33:50'),
-  ('23', 'default', 'created', 'App\\Models\\User', 'created', '14', NULL, NULL, '{\"attributes\":{\"id\":14,\"name\":\"Admin Cabang SCI\",\"username\":null,\"email\":\"admincabangsci@akademi.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$bMRZJ7NBMYbvAWwOr7K0W.yr91kI6h294GkWRU2pOf9hBZfYrwJk.\",\"remember_token\":null,\"created_at\":\"2026-07-13T18:33:50.000000Z\",\"updated_at\":\"2026-07-13T18:33:50.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 01:33:50', '2026-07-14 01:33:50'),
-  ('24', 'default', 'deleted', 'App\\Models\\User', 'deleted', '9', NULL, NULL, '{\"old\":{\"id\":9,\"name\":\"Budi Santoso, S.Pd.\",\"username\":null,\"email\":\"budi.santoso@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$IB6SrD\\/ahgtKovynoU6v7eCEF8\\/qfPXI1QPSuijmEWVM7fAEREKSe\",\"remember_token\":null,\"created_at\":\"2026-07-05T17:32:34.000000Z\",\"updated_at\":\"2026-07-05T17:32:34.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 01:33:53', '2026-07-14 01:33:53'),
-  ('25', 'default', 'deleted', 'App\\Models\\User', 'deleted', '10', NULL, NULL, '{\"old\":{\"id\":10,\"name\":\"Sari Dewi, S.Pd.\",\"username\":null,\"email\":\"sari.dewi@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":2,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$HTXb7INTYn2UfM0cSM9CvuRhWjNGdzQlmPbCiT87aYa0pzATXkrzi\",\"remember_token\":null,\"created_at\":\"2026-07-05T17:32:34.000000Z\",\"updated_at\":\"2026-07-05T17:32:34.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 01:33:53', '2026-07-14 01:33:53'),
-  ('26', 'default', 'deleted', 'App\\Models\\User', 'deleted', '11', NULL, NULL, '{\"old\":{\"id\":11,\"name\":\"Andi Nugroho\",\"username\":null,\"email\":\"andi.nugroho@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$ivE8tu3xvBA80NzITDDrF.R0IjrMU5sLybUK6oV4A6gBlEDDo0OGy\",\"remember_token\":null,\"created_at\":\"2026-07-05T17:32:34.000000Z\",\"updated_at\":\"2026-07-05T17:32:34.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 01:33:53', '2026-07-14 01:33:53'),
-  ('27', 'default', 'deleted', 'App\\Models\\User', 'deleted', '12', NULL, NULL, '{\"old\":{\"id\":12,\"name\":\"Citra Lestari\",\"username\":null,\"email\":\"citra.lestari@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$aSMddLpeMHp3JNWGRNiXlu4i6vnxUXXVAmhrUeQzsc2.x5vxgaMdq\",\"remember_token\":null,\"created_at\":\"2026-07-05T17:32:35.000000Z\",\"updated_at\":\"2026-07-05T17:32:35.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 01:33:53', '2026-07-14 01:33:53'),
-  ('28', 'default', 'deleted', 'App\\Models\\User', 'deleted', '13', NULL, NULL, '{\"old\":{\"id\":13,\"name\":\"Ahmad Fauzi, S.Si.\",\"username\":null,\"email\":\"gurusci@gmail.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$FRYSNudgdXyAGJpMycpAVe7D9eYa3FIJ8eDFlQmLCZ5oPShRyGbqS\",\"remember_token\":null,\"created_at\":\"2026-07-05T17:32:35.000000Z\",\"updated_at\":\"2026-07-05T17:32:35.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 01:33:53', '2026-07-14 01:33:53'),
-  ('29', 'default', 'deleted', 'App\\Models\\User', 'deleted', '14', NULL, NULL, '{\"old\":{\"id\":14,\"name\":\"Admin Cabang SCI\",\"username\":null,\"email\":\"admincabangsci@akademi.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$bMRZJ7NBMYbvAWwOr7K0W.yr91kI6h294GkWRU2pOf9hBZfYrwJk.\",\"remember_token\":null,\"created_at\":\"2026-07-13T18:33:50.000000Z\",\"updated_at\":\"2026-07-13T18:33:50.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 01:33:53', '2026-07-14 01:33:53'),
-  ('30', 'default', 'created', 'App\\Models\\User', 'created', '15', NULL, NULL, '{\"attributes\":{\"id\":15,\"name\":\"Budi Santoso, S.Pd.\",\"username\":null,\"email\":\"budi.santoso@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$1pbAO6PP.wLX91pcnEHTruaW4.0BUSM5oBnpxDSn8QTDVv\\/DsgwaC\",\"remember_token\":null,\"created_at\":\"2026-07-13T18:33:53.000000Z\",\"updated_at\":\"2026-07-13T18:33:53.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 01:33:53', '2026-07-14 01:33:53'),
-  ('31', 'default', 'created', 'App\\Models\\User', 'created', '16', NULL, NULL, '{\"attributes\":{\"id\":16,\"name\":\"Sari Dewi, S.Pd.\",\"username\":null,\"email\":\"sari.dewi@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":2,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$HOX4nGaE5F5pvAefnRUaBe.wnNQffMYOQWFS8ZxEaz6DxkncVuYdy\",\"remember_token\":null,\"created_at\":\"2026-07-13T18:33:53.000000Z\",\"updated_at\":\"2026-07-13T18:33:53.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 01:33:53', '2026-07-14 01:33:53'),
-  ('32', 'default', 'created', 'App\\Models\\User', 'created', '17', NULL, NULL, '{\"attributes\":{\"id\":17,\"name\":\"Andi Nugroho\",\"username\":null,\"email\":\"andi.nugroho@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$xQBsaeyEMlsmvYlaiuJG0ulO.uetzHSo8dTI6V13NZbmF\\/NJpusju\",\"remember_token\":null,\"created_at\":\"2026-07-13T18:33:53.000000Z\",\"updated_at\":\"2026-07-13T18:33:53.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 01:33:53', '2026-07-14 01:33:53'),
-  ('33', 'default', 'created', 'App\\Models\\User', 'created', '18', NULL, NULL, '{\"attributes\":{\"id\":18,\"name\":\"Citra Lestari\",\"username\":null,\"email\":\"citra.lestari@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$BVXVTO6IYQpb.UQf59TzSeIqE\\/djTTmv\\/8Dm8MwTmn3L\\/.C56SM2K\",\"remember_token\":null,\"created_at\":\"2026-07-13T18:33:54.000000Z\",\"updated_at\":\"2026-07-13T18:33:54.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 01:33:54', '2026-07-14 01:33:54'),
-  ('34', 'default', 'created', 'App\\Models\\User', 'created', '19', NULL, NULL, '{\"attributes\":{\"id\":19,\"name\":\"Ahmad Fauzi, S.Si.\",\"username\":null,\"email\":\"gurusci@gmail.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$Tb\\/5fm2JmrW9ZDMovntiCetRhi9GvR.7V6JgMtQIuf7wyfIHWgxES\",\"remember_token\":null,\"created_at\":\"2026-07-13T18:33:54.000000Z\",\"updated_at\":\"2026-07-13T18:33:54.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 01:33:54', '2026-07-14 01:33:54'),
-  ('35', 'default', 'updated', 'App\\Models\\User', 'updated', '1', NULL, NULL, '{\"attributes\":{\"password\":\"$2y$10$\\/OD7iohSu.nN1kLJQORkouF6UQv8zrGO6NzWMEEGS98EnZ7ekqZry\",\"updated_at\":\"2026-07-13T22:44:53.000000Z\"},\"old\":{\"password\":\"$2y$10$CiSN9xxRaBwhIZVnaXoVButBcM3mj0l9b\\/C5xQUoMiu\\/UYb6uS6Q2\",\"updated_at\":\"2026-07-13T18:33:50.000000Z\"}}', NULL, '2026-07-14 05:44:53', '2026-07-14 05:44:53'),
-  ('36', 'default', 'created', 'App\\Models\\User', 'created', '20', NULL, NULL, '{\"attributes\":{\"id\":20,\"name\":\"Admin Cabang SCI\",\"username\":null,\"email\":\"admincabangsci@akademi.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$J4MFF1W5q5HTiga4JNhDMe0VupBL6.Y8M7rISnUcggRICiHz7kfR.\",\"remember_token\":null,\"created_at\":\"2026-07-13T22:44:53.000000Z\",\"updated_at\":\"2026-07-13T22:44:53.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 05:44:53', '2026-07-14 05:44:53'),
-  ('37', 'default', 'deleted', 'App\\Models\\User', 'deleted', '15', NULL, NULL, '{\"old\":{\"id\":15,\"name\":\"Budi Santoso, S.Pd.\",\"username\":null,\"email\":\"budi.santoso@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$1pbAO6PP.wLX91pcnEHTruaW4.0BUSM5oBnpxDSn8QTDVv\\/DsgwaC\",\"remember_token\":null,\"created_at\":\"2026-07-13T18:33:53.000000Z\",\"updated_at\":\"2026-07-13T18:33:53.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 05:44:56', '2026-07-14 05:44:56'),
-  ('38', 'default', 'deleted', 'App\\Models\\User', 'deleted', '16', NULL, NULL, '{\"old\":{\"id\":16,\"name\":\"Sari Dewi, S.Pd.\",\"username\":null,\"email\":\"sari.dewi@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":2,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$HOX4nGaE5F5pvAefnRUaBe.wnNQffMYOQWFS8ZxEaz6DxkncVuYdy\",\"remember_token\":null,\"created_at\":\"2026-07-13T18:33:53.000000Z\",\"updated_at\":\"2026-07-13T18:33:53.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 05:44:56', '2026-07-14 05:44:56'),
-  ('39', 'default', 'deleted', 'App\\Models\\User', 'deleted', '17', NULL, NULL, '{\"old\":{\"id\":17,\"name\":\"Andi Nugroho\",\"username\":null,\"email\":\"andi.nugroho@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$xQBsaeyEMlsmvYlaiuJG0ulO.uetzHSo8dTI6V13NZbmF\\/NJpusju\",\"remember_token\":null,\"created_at\":\"2026-07-13T18:33:53.000000Z\",\"updated_at\":\"2026-07-13T18:33:53.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 05:44:56', '2026-07-14 05:44:56'),
-  ('40', 'default', 'deleted', 'App\\Models\\User', 'deleted', '18', NULL, NULL, '{\"old\":{\"id\":18,\"name\":\"Citra Lestari\",\"username\":null,\"email\":\"citra.lestari@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$BVXVTO6IYQpb.UQf59TzSeIqE\\/djTTmv\\/8Dm8MwTmn3L\\/.C56SM2K\",\"remember_token\":null,\"created_at\":\"2026-07-13T18:33:54.000000Z\",\"updated_at\":\"2026-07-13T18:33:54.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 05:44:56', '2026-07-14 05:44:56'),
-  ('41', 'default', 'deleted', 'App\\Models\\User', 'deleted', '19', NULL, NULL, '{\"old\":{\"id\":19,\"name\":\"Ahmad Fauzi, S.Si.\",\"username\":null,\"email\":\"gurusci@gmail.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$Tb\\/5fm2JmrW9ZDMovntiCetRhi9GvR.7V6JgMtQIuf7wyfIHWgxES\",\"remember_token\":null,\"created_at\":\"2026-07-13T18:33:54.000000Z\",\"updated_at\":\"2026-07-13T18:33:54.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 05:44:56', '2026-07-14 05:44:56'),
-  ('42', 'default', 'deleted', 'App\\Models\\User', 'deleted', '20', NULL, NULL, '{\"old\":{\"id\":20,\"name\":\"Admin Cabang SCI\",\"username\":null,\"email\":\"admincabangsci@akademi.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$J4MFF1W5q5HTiga4JNhDMe0VupBL6.Y8M7rISnUcggRICiHz7kfR.\",\"remember_token\":null,\"created_at\":\"2026-07-13T22:44:53.000000Z\",\"updated_at\":\"2026-07-13T22:44:53.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 05:44:56', '2026-07-14 05:44:56'),
-  ('43', 'default', 'created', 'App\\Models\\User', 'created', '21', NULL, NULL, '{\"attributes\":{\"id\":21,\"name\":\"Budi Santoso, S.Pd.\",\"username\":null,\"email\":\"budi.santoso@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$XJyU.rgKuZHIfVHBCI9nBu8BZtYGdtzVaIwkHGDricfJNzPaW9VY.\",\"remember_token\":null,\"created_at\":\"2026-07-13T22:44:56.000000Z\",\"updated_at\":\"2026-07-13T22:44:56.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 05:44:56', '2026-07-14 05:44:56'),
-  ('44', 'default', 'created', 'App\\Models\\User', 'created', '22', NULL, NULL, '{\"attributes\":{\"id\":22,\"name\":\"Sari Dewi, S.Pd.\",\"username\":null,\"email\":\"sari.dewi@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":2,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$XUHf95TA7SmWEqMsRg38CO4Z5SyVUBLiHr9FKm4N91mKeiv4ibXsm\",\"remember_token\":null,\"created_at\":\"2026-07-13T22:44:56.000000Z\",\"updated_at\":\"2026-07-13T22:44:56.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 05:44:56', '2026-07-14 05:44:56'),
-  ('45', 'default', 'created', 'App\\Models\\User', 'created', '23', NULL, NULL, '{\"attributes\":{\"id\":23,\"name\":\"Andi Nugroho\",\"username\":null,\"email\":\"andi.nugroho@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$kB05f\\/FgBb6912WOaYUqkOPwdULqQPc5.S5NAuWtxY\\/q4\\/FFQy6E6\",\"remember_token\":null,\"created_at\":\"2026-07-13T22:44:56.000000Z\",\"updated_at\":\"2026-07-13T22:44:56.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 05:44:56', '2026-07-14 05:44:56'),
-  ('46', 'default', 'created', 'App\\Models\\User', 'created', '24', NULL, NULL, '{\"attributes\":{\"id\":24,\"name\":\"Citra Lestari\",\"username\":null,\"email\":\"citra.lestari@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$XPDCfECyKOVfbBrpg7EiEOWwIt\\/Gjs.5l6aFTG0Ftk\\/zGvHeve4Hu\",\"remember_token\":null,\"created_at\":\"2026-07-13T22:44:56.000000Z\",\"updated_at\":\"2026-07-13T22:44:56.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 05:44:56', '2026-07-14 05:44:56'),
-  ('47', 'default', 'created', 'App\\Models\\User', 'created', '25', NULL, NULL, '{\"attributes\":{\"id\":25,\"name\":\"Ahmad Fauzi, S.Si.\",\"username\":null,\"email\":\"gurusci@gmail.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$tpQdjaNJ.njJT\\/vSxXObgOgsvJpZ3qIwJEcZPZwsxFTYy6T7N8k2O\",\"remember_token\":null,\"created_at\":\"2026-07-13T22:44:57.000000Z\",\"updated_at\":\"2026-07-13T22:44:57.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-14 05:44:57', '2026-07-14 05:44:57'),
-  ('48', 'default', 'updated', 'App\\Models\\User', 'updated', '1', NULL, NULL, '{\"attributes\":{\"password\":\"$2y$10$ewNwdf32w9Ktw6hqTsE1gevXhXfILGnOetUnAcZE2.5M0stp0z9La\",\"updated_at\":\"2026-07-15T19:32:06.000000Z\"},\"old\":{\"password\":\"$2y$10$\\/OD7iohSu.nN1kLJQORkouF6UQv8zrGO6NzWMEEGS98EnZ7ekqZry\",\"updated_at\":\"2026-07-13T22:44:53.000000Z\"}}', NULL, '2026-07-16 02:32:06', '2026-07-16 02:32:06'),
-  ('49', 'default', 'created', 'App\\Models\\User', 'created', '26', NULL, NULL, '{\"attributes\":{\"id\":26,\"name\":\"Admin Cabang SCI\",\"username\":null,\"email\":\"admincabangsci@akademi.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$9cV9zCgsWjJesCVg4zjxGuxtPJMZB..WWKkpUwdkshDWips1W3oZi\",\"remember_token\":null,\"created_at\":\"2026-07-15T19:32:06.000000Z\",\"updated_at\":\"2026-07-15T19:32:06.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-16 02:32:06', '2026-07-16 02:32:06'),
-  ('50', 'default', 'deleted', 'App\\Models\\User', 'deleted', '21', NULL, NULL, '{\"old\":{\"id\":21,\"name\":\"Budi Santoso, S.Pd.\",\"username\":null,\"email\":\"budi.santoso@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$XJyU.rgKuZHIfVHBCI9nBu8BZtYGdtzVaIwkHGDricfJNzPaW9VY.\",\"remember_token\":null,\"created_at\":\"2026-07-13T22:44:56.000000Z\",\"updated_at\":\"2026-07-13T22:44:56.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-16 02:32:08', '2026-07-16 02:32:08'),
-  ('51', 'default', 'deleted', 'App\\Models\\User', 'deleted', '22', NULL, NULL, '{\"old\":{\"id\":22,\"name\":\"Sari Dewi, S.Pd.\",\"username\":null,\"email\":\"sari.dewi@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":2,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$XUHf95TA7SmWEqMsRg38CO4Z5SyVUBLiHr9FKm4N91mKeiv4ibXsm\",\"remember_token\":null,\"created_at\":\"2026-07-13T22:44:56.000000Z\",\"updated_at\":\"2026-07-13T22:44:56.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-16 02:32:08', '2026-07-16 02:32:08'),
-  ('52', 'default', 'deleted', 'App\\Models\\User', 'deleted', '23', NULL, NULL, '{\"old\":{\"id\":23,\"name\":\"Andi Nugroho\",\"username\":null,\"email\":\"andi.nugroho@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$kB05f\\/FgBb6912WOaYUqkOPwdULqQPc5.S5NAuWtxY\\/q4\\/FFQy6E6\",\"remember_token\":null,\"created_at\":\"2026-07-13T22:44:56.000000Z\",\"updated_at\":\"2026-07-13T22:44:56.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-16 02:32:08', '2026-07-16 02:32:08'),
-  ('53', 'default', 'deleted', 'App\\Models\\User', 'deleted', '24', NULL, NULL, '{\"old\":{\"id\":24,\"name\":\"Citra Lestari\",\"username\":null,\"email\":\"citra.lestari@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$XPDCfECyKOVfbBrpg7EiEOWwIt\\/Gjs.5l6aFTG0Ftk\\/zGvHeve4Hu\",\"remember_token\":null,\"created_at\":\"2026-07-13T22:44:56.000000Z\",\"updated_at\":\"2026-07-13T22:44:56.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-16 02:32:08', '2026-07-16 02:32:08'),
-  ('54', 'default', 'deleted', 'App\\Models\\User', 'deleted', '25', NULL, NULL, '{\"old\":{\"id\":25,\"name\":\"Ahmad Fauzi, S.Si.\",\"username\":null,\"email\":\"gurusci@gmail.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$tpQdjaNJ.njJT\\/vSxXObgOgsvJpZ3qIwJEcZPZwsxFTYy6T7N8k2O\",\"remember_token\":null,\"created_at\":\"2026-07-13T22:44:57.000000Z\",\"updated_at\":\"2026-07-13T22:44:57.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-16 02:32:08', '2026-07-16 02:32:08'),
-  ('55', 'default', 'deleted', 'App\\Models\\User', 'deleted', '26', NULL, NULL, '{\"old\":{\"id\":26,\"name\":\"Admin Cabang SCI\",\"username\":null,\"email\":\"admincabangsci@akademi.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$9cV9zCgsWjJesCVg4zjxGuxtPJMZB..WWKkpUwdkshDWips1W3oZi\",\"remember_token\":null,\"created_at\":\"2026-07-15T19:32:06.000000Z\",\"updated_at\":\"2026-07-15T19:32:06.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-16 02:32:08', '2026-07-16 02:32:08'),
-  ('56', 'default', 'created', 'App\\Models\\User', 'created', '27', NULL, NULL, '{\"attributes\":{\"id\":27,\"name\":\"Budi Santoso, S.Pd.\",\"username\":null,\"email\":\"budi.santoso@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$1mP5bVnNoytScLmHPkLbb.0j9ba\\/fMgrc7P6cfkkEOJGYN\\/7FGAJ6\",\"remember_token\":null,\"created_at\":\"2026-07-15T19:32:08.000000Z\",\"updated_at\":\"2026-07-15T19:32:08.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-16 02:32:08', '2026-07-16 02:32:08'),
-  ('57', 'default', 'created', 'App\\Models\\User', 'created', '28', NULL, NULL, '{\"attributes\":{\"id\":28,\"name\":\"Sari Dewi, S.Pd.\",\"username\":null,\"email\":\"sari.dewi@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":2,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$Yr60cTj1sMGbW82pFaqmqOC8UCj8QlPjc8iXCpD6fQYh7gWTNn8UK\",\"remember_token\":null,\"created_at\":\"2026-07-15T19:32:08.000000Z\",\"updated_at\":\"2026-07-15T19:32:08.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-16 02:32:08', '2026-07-16 02:32:08'),
-  ('58', 'default', 'created', 'App\\Models\\User', 'created', '29', NULL, NULL, '{\"attributes\":{\"id\":29,\"name\":\"Andi Nugroho\",\"username\":null,\"email\":\"andi.nugroho@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$M1M9cd02UWi0i01ZFt5xien\\/IwIvQ\\/Ry0KV3rzjAbC7YoSVlrNoJi\",\"remember_token\":null,\"created_at\":\"2026-07-15T19:32:08.000000Z\",\"updated_at\":\"2026-07-15T19:32:08.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-16 02:32:08', '2026-07-16 02:32:08'),
-  ('59', 'default', 'created', 'App\\Models\\User', 'created', '30', NULL, NULL, '{\"attributes\":{\"id\":30,\"name\":\"Citra Lestari\",\"username\":null,\"email\":\"citra.lestari@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$sQofKNKhKFXyW5K65uenVeMDGCAtXO32UWulPKjqtHjaR1mJAHonO\",\"remember_token\":null,\"created_at\":\"2026-07-15T19:32:08.000000Z\",\"updated_at\":\"2026-07-15T19:32:08.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-16 02:32:08', '2026-07-16 02:32:08'),
-  ('60', 'default', 'created', 'App\\Models\\User', 'created', '31', NULL, NULL, '{\"attributes\":{\"id\":31,\"name\":\"Ahmad Fauzi, S.Si.\",\"username\":null,\"email\":\"gurusci@gmail.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$2Dx5I9ZR6fIlSxsYlbiDEOM7uvOkUgZyTvCdm0mWgBwQyC7kFeqzq\",\"remember_token\":null,\"created_at\":\"2026-07-15T19:32:09.000000Z\",\"updated_at\":\"2026-07-15T19:32:09.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-16 02:32:09', '2026-07-16 02:32:09');
+  ('1', 'default', 'created', 'App\\Models\\User', 'created', '1', NULL, NULL, '{\"attributes\":{\"id\":1,\"name\":\"Admin Pusat SCI\",\"username\":null,\"email\":\"adminpusatsci@akademi.com\",\"phone\":null,\"avatar\":null,\"branch_id\":null,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$\\/tLETCeT\\/sUAl9d5iChH0eAEGx0EG0gVsBQUM14GxvMlvVNaZXx\\/m\",\"remember_token\":null,\"created_at\":\"2026-07-21T19:20:06.000000Z\",\"updated_at\":\"2026-07-21T19:20:06.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-22 02:20:06', '2026-07-22 02:20:06'),
+  ('2', 'default', 'created', 'App\\Models\\User', 'created', '2', NULL, NULL, '{\"attributes\":{\"id\":2,\"name\":\"Admin Cabang SCI\",\"username\":null,\"email\":\"admincabangsci@akademi.com\",\"phone\":null,\"avatar\":null,\"branch_id\":null,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$FMW3G5jJkTIrNv.6emc1ru8qI2P3HlZHqgD8j0kJPFroknwM8MNI2\",\"remember_token\":null,\"created_at\":\"2026-07-21T19:20:06.000000Z\",\"updated_at\":\"2026-07-21T19:20:06.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-22 02:20:06', '2026-07-22 02:20:06'),
+  ('3', 'default', 'deleted', 'App\\Models\\User', 'deleted', '2', NULL, NULL, '{\"old\":{\"id\":2,\"name\":\"Admin Cabang SCI\",\"username\":null,\"email\":\"admincabangsci@akademi.com\",\"phone\":null,\"avatar\":null,\"branch_id\":null,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$FMW3G5jJkTIrNv.6emc1ru8qI2P3HlZHqgD8j0kJPFroknwM8MNI2\",\"remember_token\":null,\"created_at\":\"2026-07-21T19:20:06.000000Z\",\"updated_at\":\"2026-07-21T19:20:06.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-22 02:20:08', '2026-07-22 02:20:08'),
+  ('4', 'default', 'created', 'App\\Models\\User', 'created', '3', NULL, NULL, '{\"attributes\":{\"id\":3,\"name\":\"Budi Santoso, S.Pd.\",\"username\":null,\"email\":\"budi.santoso@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$CTgSAKEDI9xjx35JwfuNDOJXWWsRWAaqsLCIMdiHUUxmtXioW9Mbi\",\"remember_token\":null,\"created_at\":\"2026-07-21T19:20:08.000000Z\",\"updated_at\":\"2026-07-21T19:20:08.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-22 02:20:08', '2026-07-22 02:20:08'),
+  ('5', 'default', 'created', 'App\\Models\\User', 'created', '4', NULL, NULL, '{\"attributes\":{\"id\":4,\"name\":\"Sari Dewi, S.Pd.\",\"username\":null,\"email\":\"sari.dewi@guru.akademisci.com\",\"phone\":null,\"avatar\":null,\"branch_id\":2,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$aemFKZHpo8\\/8ksr6au5KI.on.iwr\\/UUqCa\\/8MBtwdvMR15etEdS.C\",\"remember_token\":null,\"created_at\":\"2026-07-21T19:20:08.000000Z\",\"updated_at\":\"2026-07-21T19:20:08.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-22 02:20:08', '2026-07-22 02:20:08'),
+  ('6', 'default', 'created', 'App\\Models\\User', 'created', '5', NULL, NULL, '{\"attributes\":{\"id\":5,\"name\":\"Andi Nugroho\",\"username\":null,\"email\":\"andi.nugroho@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$iBFFUVjox7d6j8ge3OPkcejwddodFcoNnF8nUJoCn.CX\\/Pmw9QlIi\",\"remember_token\":null,\"created_at\":\"2026-07-21T19:20:08.000000Z\",\"updated_at\":\"2026-07-21T19:20:08.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-22 02:20:08', '2026-07-22 02:20:08'),
+  ('7', 'default', 'created', 'App\\Models\\User', 'created', '6', NULL, NULL, '{\"attributes\":{\"id\":6,\"name\":\"Citra Lestari\",\"username\":null,\"email\":\"citra.lestari@siswa.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$rpRzL14MJfYrruQgOYnNPOiQG78XDzyE9ScQq6rkPhqXQ2Dsc2rDK\",\"remember_token\":null,\"created_at\":\"2026-07-21T19:20:08.000000Z\",\"updated_at\":\"2026-07-21T19:20:08.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-22 02:20:08', '2026-07-22 02:20:08'),
+  ('8', 'default', 'created', 'App\\Models\\User', 'created', '7', NULL, NULL, '{\"attributes\":{\"id\":7,\"name\":\"Ahmad Fauzi, S.Si.\",\"username\":null,\"email\":\"gurusci@gmail.com\",\"phone\":null,\"avatar\":null,\"branch_id\":1,\"is_active\":true,\"last_login_at\":null,\"email_verified_at\":null,\"password\":\"$2y$10$nNeFsX4JG4.rKsEVpmkCZ.nK74GEzX770Cj6zGw\\/Jo5t2pPJUev.y\",\"remember_token\":null,\"created_at\":\"2026-07-21T19:20:09.000000Z\",\"updated_at\":\"2026-07-21T19:20:09.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-22 02:20:09', '2026-07-22 02:20:09');
 
 -- ---- Tabel: `activity_logs` (0 baris) ----
 -- (kosong)
@@ -1514,36 +1515,20 @@ INSERT INTO `activity_log` (`id`, `log_name`, `description`, `subject_type`, `ev
 -- ---- Tabel: `announcements` (2 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `announcements` (`id`, `cabang_id`, `dibuat_oleh`, `judul`, `konten`, `jenis`, `target`, `target_teacher_ids`, `target_student_ids`, `file`, `tanggal_mulai`, `tanggal_selesai`, `is_pinned`, `status`, `created_at`, `updated_at`) VALUES
-  ('1', '1', '1', 'Selamat Datang di Akademi SCI', 'Selamat datang di sistem manajemen Akademi SCI. Kami siap mendukung proses belajar Anda.', 'info', 'semua', NULL, NULL, NULL, '2026-07-16', '2027-01-16', '1', 'aktif', '2026-07-16 02:32:09', '2026-07-16 02:32:09'),
-  ('2', '1', '1', 'Jadwal Tryout SNBT Bulan Februari', 'Tryout SNBT akan diadakan pada 15 Februari 2025. Harap mempersiapkan diri dengan baik.', 'event', 'siswa', NULL, NULL, NULL, '2025-02-01', '2025-02-15', '0', 'aktif', '2026-07-16 02:32:09', '2026-07-16 02:32:09');
+  ('1', '1', '1', 'Selamat Datang di Akademi SCI', 'Selamat datang di sistem manajemen Akademi SCI. Kami siap mendukung proses belajar Anda.', 'info', 'semua', NULL, NULL, NULL, '2026-07-22', '2027-01-22', '1', 'aktif', '2026-07-22 02:20:08', '2026-07-22 02:20:08'),
+  ('2', '1', '1', 'Jadwal Tryout SNBT Bulan Februari', 'Tryout SNBT akan diadakan pada 15 Februari 2025. Harap mempersiapkan diri dengan baik.', 'event', 'siswa', NULL, NULL, NULL, '2025-02-01', '2025-02-15', '0', 'aktif', '2026-07-22 02:20:08', '2026-07-22 02:20:08');
 
--- ---- Tabel: `branch_landing_settings` (18 baris) ----
-SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
-INSERT INTO `branch_landing_settings` (`id`, `branch_id`, `key`, `value`, `created_at`, `updated_at`) VALUES
-  ('1', '2', 'hero_bg', '/storage/landing/cabang/2/0hWI4aE7qLKxUHuYlblYHhdruTXQRhPWZ2XDYKT5.png', '2026-07-06 00:58:03', '2026-07-06 00:58:03'),
-  ('2', '2', 'hero_badge', '#1 Jasa Les Privat BANDUNG Terpercaya', '2026-07-06 00:58:03', '2026-07-06 00:58:03'),
-  ('3', '2', 'hero_description', 'Smart Center Indonesia hadir di Bandung dengan tutor bersertifikat. Layanan home visit, online, dan offline untuk semua jenjang dari TK hingga umum.', '2026-07-06 00:58:03', '2026-07-06 00:58:03'),
-  ('4', '2', 'hours_weekday', '08.00 – 20.00 WIB', '2026-07-06 00:58:03', '2026-07-06 00:58:03'),
-  ('5', '2', 'hours_weekend', '09.00 – 16.00 WIB', '2026-07-06 00:58:03', '2026-07-06 00:58:03'),
-  ('6', '2', 'price_homevisi', 'Rp 65.000', '2026-07-06 00:58:03', '2026-07-06 00:58:03'),
-  ('7', '2', 'price_online', 'Rp 50.000', '2026-07-06 00:58:03', '2026-07-06 00:58:03'),
-  ('8', '2', 'price_offline', 'Rp 55.000', '2026-07-06 00:58:03', '2026-07-06 00:58:03'),
-  ('9', '2', 'cta_eyebrow', '🎉 Bergabung Sekarang', '2026-07-06 00:58:03', '2026-07-06 00:58:03'),
-  ('10', '2', 'cta_title', 'Siap Mulai Belajar', '2026-07-06 00:58:03', '2026-07-06 00:58:03'),
-  ('11', '2', 'cta_desc', '', '2026-07-06 00:58:03', '2026-07-06 00:58:03'),
-  ('12', '2', 'areas', '[]', '2026-07-06 00:58:03', '2026-07-06 00:58:03'),
-  ('13', '2', 'promo_items', '[\"Mulai belajar dari Rp 50.000\\/sesi\",\"Garansi nilai naik atau sesi gratis!\",\"Tersedia Home Visit, Online & Offline\",\"Gratis Konsultasi Pertama\",\"#1 Les Privat Terbaik di Bandung\"]', '2026-07-06 00:58:03', '2026-07-06 00:58:03'),
-  ('14', '2', 'faq_items', '[{\"q\":\"Berapa harga les privat SCI Bandung?\",\"a\":\"Harga les privat SCI Bandung mulai dari Rp 50.000\\/sesi untuk online.\"},{\"q\":\"Apakah bisa home visit di Bandung?\",\"a\":\"Ya! SCI Bandung melayani home visit ke seluruh area.\"}]', '2026-07-06 00:58:03', '2026-07-06 00:58:03'),
-  ('15', '2', 'features', '[{\"num\":\"01\",\"icon\":\"\\ud83d\\udc69\\u200d\\ud83c\\udfeb\",\"title\":\"Tutor Bersertifikat\",\"desc\":\"Semua tutor SCI Bandung telah melalui seleksi ketat dan memiliki sertifikat mengajar resmi.\"},{\"num\":\"02\",\"icon\":\"\\ud83c\\udfe0\",\"title\":\"Home Visit\",\"desc\":\"Tutor datang ke rumah Anda di seluruh wilayah Bandung. Nyaman, privat, dan efisien.\"},{\"num\":\"03\",\"icon\":\"\\ud83d\\udcc8\",\"title\":\"Prestasi Meningkat\",\"desc\":\"Mayoritas siswa SCI Bandung mengalami peningkatan nilai dalam beberapa bulan pertama.\"},{\"num\":\"04\",\"icon\":\"\\u23f0\",\"title\":\"Jadwal Fleksibel\",\"desc\":\"Belajar bisa pagi, siang, sore, ataupun malam hari sesuai kebutuhan siswa.\"},{\"num\":\"05\",\"icon\":\"\\ud83d\\udcb0\",\"title\":\"Harga Transparan\",\"desc\":\"Tidak ada biaya tersembunyi. Tersedia paket hemat dan pembayaran per sesi.\"},{\"num\":\"06\",\"icon\":\"\\ud83d\\udee1\\ufe0f\",\"title\":\"Garansi Kepuasan\",\"desc\":\"Tutor dapat diganti apabila kurang cocok tanpa biaya tambahan.\"}]', '2026-07-06 00:58:03', '2026-07-06 00:58:03'),
-  ('16', '2', 'subjects', '[{\"icon\":\"\\ud83d\\udd22\",\"name\":\"Matematika\",\"desc\":\"SD, SMP, SMA, Kuliah.\",\"badge\":\"Terpopuler\",\"badge_type\":\"popular\"},{\"icon\":\"\\u26a1\",\"name\":\"Fisika\",\"desc\":\"Mekanika, gelombang, listrik.\",\"badge\":\"SMP\\u2013SMA\",\"badge_type\":\"level\"},{\"icon\":\"\\ud83e\\uddea\",\"name\":\"Kimia\",\"desc\":\"Organik, anorganik, stoikiometri.\",\"badge\":\"SMP\\u2013SMA\",\"badge_type\":\"level\"},{\"icon\":\"\\ud83c\\udf3f\",\"name\":\"Biologi\",\"desc\":\"Sel, genetika, ekosistem.\",\"badge\":\"SMP\\u2013SMA\",\"badge_type\":\"level\"},{\"icon\":\"\\ud83c\\uddec\\ud83c\\udde7\",\"name\":\"Bahasa Inggris\",\"desc\":\"Speaking, grammar, TOEFL\\/IELTS.\",\"badge\":\"Terpopuler\",\"badge_type\":\"popular\"},{\"icon\":\"\\ud83d\\udcbb\",\"name\":\"Komputer\",\"desc\":\"MS Office, Programming, Canva.\",\"badge\":\"Populer\",\"badge_type\":\"hot\"},{\"icon\":\"\\ud83d\\udcca\",\"name\":\"Akuntansi\",\"desc\":\"Akuntansi dasar\\u2013profesional.\",\"badge\":\"Umum\",\"badge_type\":\"general\"},{\"icon\":\"\\ud83c\\uddef\\ud83c\\uddf5\",\"name\":\"Bahasa Jepang\",\"desc\":\"Hiragana, katakana, JLPT.\",\"badge\":\"Semua Level\",\"badge_type\":\"general\"},{\"icon\":\"\\ud83d\\udcd0\",\"name\":\"Bahasa Indonesia\",\"desc\":\"Tata bahasa, UN\\/UTBK.\",\"badge\":\"SD\\u2013SMA\",\"badge_type\":\"level\"},{\"icon\":\"\\ud83c\\udfa8\",\"name\":\"Seni & Desain\",\"desc\":\"Menggambar, desain grafis.\",\"badge\":\"Umum\",\"badge_type\":\"general\"},{\"icon\":\"\\ud83d\\udde3\\ufe0f\",\"name\":\"Public Speaking\",\"desc\":\"Percaya diri, debat, presentasi.\",\"badge\":\"Semua Level\",\"badge_type\":\"general\"},{\"icon\":\"\\ud83d\\udcda\",\"name\":\"Persiapan SBMPTN\",\"desc\":\"Latihan soal UTBK, simulasi.\",\"badge\":\"SMA\",\"badge_type\":\"level\"}]', '2026-07-06 00:58:03', '2026-07-06 00:58:03'),
-  ('17', '2', 'pricing_cards', '[{\"name\":\"Paket Reguler\",\"desc\":\"Cocok untuk pemula dan maintenance nilai.\",\"price\":\"Rp 50.000\",\"unit\":\"\\/sesi\",\"sessions\":\"1\\u00d7 per minggu (4 sesi\\/bln)\",\"fitur\":[\"Durasi 90 menit\\/sesi\",\"Pilihan tutor sesuai kebutuhan\",\"Laporan perkembangan bulanan\",\"Bisa home visit\\/online\\/offline\"],\"unggulan\":false},{\"name\":\"Paket Intensif\",\"desc\":\"Cocok untuk persiapan ujian dan akselerasi nilai.\",\"price\":\"Rp 45.000\",\"unit\":\"\\/sesi\",\"sessions\":\"2\\u20133\\u00d7 per minggu (8\\u201312 sesi\\/bln)\",\"fitur\":[\"Durasi 90 menit\\/sesi\",\"Materi soal ujian eksklusif\",\"Laporan perkembangan mingguan\",\"Try-out bulanan gratis\",\"Konsultasi guru kapan saja\"],\"unggulan\":true},{\"name\":\"Paket Premium\",\"desc\":\"Solusi lengkap untuk target nilai terbaik.\",\"price\":\"Hubungi Kami\",\"unit\":\"\\/sesi\",\"sessions\":\"Jadwal & sesi fleksibel\",\"fitur\":[\"Sesi tak terbatas per bulan\",\"Tutor spesialis bidang studi\",\"Monitoring nilai real-time\",\"Garansi nilai naik tertulis\",\"Materi custom sesuai kurikulum\"],\"unggulan\":false}]', '2026-07-06 00:58:03', '2026-07-06 00:58:03'),
-  ('18', '2', 'branch_testimonials', '[{\"text\":\"Anakku yang awalnya kesulitan Matematika sekarang jadi juara kelas!\",\"name\":\"Bunda Sari\",\"role\":\"Orang Tua Siswa \\u00b7 Bandung\",\"initial\":\"B\",\"gradient\":\"linear-gradient(135deg,#f97316,#ea580c)\"},{\"text\":\"Belajar di SCI sangat menyenangkan! Nilai saya meningkat pesat.\",\"name\":\"Aisyah R.\",\"role\":\"Siswa SMA \\u00b7 Matematika\",\"initial\":\"A\",\"gradient\":\"linear-gradient(135deg,#c84ddf,#68117e)\"},{\"text\":\"Program persiapan SBMPTN SCI sangat membantu. Akhirnya lolos kampus impian!\",\"name\":\"Ricky P.\",\"role\":\"Mahasiswa \\u00b7 SBMPTN\",\"initial\":\"R\",\"gradient\":\"linear-gradient(135deg,#10b981,#059669)\"},{\"text\":\"Home visit-nya sangat nyaman. Tutornya datang tepat waktu dan sabar.\",\"name\":\"Pak Hendra\",\"role\":\"Orang Tua Siswa \\u00b7 Home Visit\",\"initial\":\"H\",\"gradient\":\"linear-gradient(135deg,#6366f1,#4338ca)\"}]', '2026-07-06 00:58:03', '2026-07-06 00:58:03');
+-- ---- Tabel: `articles` (0 baris) ----
+-- (kosong)
+
+-- ---- Tabel: `branch_landing_settings` (0 baris) ----
+-- (kosong)
 
 -- ---- Tabel: `branches` (2 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `branches` (`id`, `user_id`, `name`, `address`, `photo`, `phone`, `city`, `admin_id`, `created_by`, `updated_by`, `student_count`, `status`, `created_at`, `updated_at`, `regency`, `email`, `password`, `can_students`, `can_teachers`, `can_schedules`, `can_payments`, `can_tryouts`, `allowed_pages`) VALUES
-  ('1', NULL, 'Cabang Jakarta', 'Jl. Sudirman No. 1, Jakarta Pusat', NULL, '021-5555001', 'Jakarta', NULL, NULL, NULL, '0', 'active', '2026-07-05 22:32:36', '2026-07-05 22:32:36', 'Jakarta Pusat', 'jakarta@akademisci.com', NULL, '1', '1', '1', '1', '1', NULL),
-  ('2', NULL, 'Cabang Bandung', 'Jl. Braga No. 22, Bandung', NULL, '022-4444001', 'Bandung', NULL, NULL, NULL, '0', 'active', '2026-07-05 22:32:36', '2026-07-05 22:32:36', 'Bandung Kota', 'bandung@akademisci.com', NULL, '1', '1', '1', '1', '1', NULL);
+  ('1', NULL, 'Cabang Jakarta', 'Jl. Sudirman No. 1, Jakarta Pusat', NULL, '021-5555001', 'Jakarta', NULL, NULL, NULL, '0', 'active', '2026-07-22 02:20:08', '2026-07-22 02:20:08', 'Jakarta Pusat', 'jakarta@akademisci.com', NULL, '1', '1', '1', '1', '1', NULL),
+  ('2', NULL, 'Cabang Bandung', 'Jl. Braga No. 22, Bandung', NULL, '022-4444001', 'Bandung', NULL, NULL, NULL, '0', 'active', '2026-07-22 02:20:08', '2026-07-22 02:20:08', 'Bandung Kota', 'bandung@akademisci.com', NULL, '1', '1', '1', '1', '1', NULL);
 
 -- ---- Tabel: `categories` (0 baris) ----
 -- (kosong)
@@ -1551,8 +1536,8 @@ INSERT INTO `branches` (`id`, `user_id`, `name`, `address`, `photo`, `phone`, `c
 -- ---- Tabel: `certificates` (2 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `certificates` (`id`, `siswa_id`, `cabang_id`, `course_id`, `diterbitkan_oleh`, `nomor_sertifikat`, `jenis`, `judul`, `deskripsi`, `tanggal_terbit`, `tanggal_expired`, `file_sertifikat`, `file_qrcode`, `created_at`, `updated_at`, `deleted_at`) VALUES
-  ('1', '1', '1', '1', '1', 'CERT-2025-0001', 'kelulusan', 'Sertifikat Kelulusan Matematika', 'Dinyatakan lulus program Matematika Reguler.', '2025-01-31', NULL, NULL, NULL, '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL),
-  ('2', '2', '1', '2', '1', 'CERT-2025-0002', 'kelulusan', 'Sertifikat Kelulusan Bahasa Inggris', 'Dinyatakan lulus program Bahasa Inggris Dasar.', '2025-01-31', NULL, NULL, NULL, '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL);
+  ('1', '1', '1', '1', '1', 'CERT-2025-0001', 'kelulusan', 'Sertifikat Kelulusan Matematika', 'Dinyatakan lulus program Matematika Reguler.', '2025-01-31', NULL, NULL, NULL, '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL),
+  ('2', '2', '1', '2', '1', 'CERT-2025-0002', 'kelulusan', 'Sertifikat Kelulusan Bahasa Inggris', 'Dinyatakan lulus program Bahasa Inggris Dasar.', '2025-01-31', NULL, NULL, NULL, '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL);
 
 -- ---- Tabel: `chat_messages` (0 baris) ----
 -- (kosong)
@@ -1569,8 +1554,8 @@ INSERT INTO `class_students` (`id`, `class_id`, `student_id`, `created_at`, `upd
 -- ---- Tabel: `course_fees` (2 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `course_fees` (`id`, `course_id`, `amount`, `created_at`, `updated_at`) VALUES
-  ('1', '1', '350000.00', '2026-07-16 02:32:08', '2026-07-16 02:32:08'),
-  ('2', '2', '300000.00', '2026-07-16 02:32:08', '2026-07-16 02:32:08');
+  ('1', '1', '350000.00', '2026-07-22 02:20:08', '2026-07-22 02:20:08'),
+  ('2', '2', '300000.00', '2026-07-22 02:20:08', '2026-07-22 02:20:08');
 
 -- ---- Tabel: `course_package` (0 baris) ----
 -- (kosong)
@@ -1578,47 +1563,47 @@ INSERT INTO `course_fees` (`id`, `course_id`, `amount`, `created_at`, `updated_a
 -- ---- Tabel: `courses` (41 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `courses` (`id`, `created_at`, `updated_at`, `cabang_id`, `kode`, `nama`, `kategori`, `jenis_kursus`, `deskripsi`, `status`, `deleted_at`) VALUES
-  ('1', '2026-07-16 02:32:08', '2026-07-16 02:32:08', '1', 'MAT-001', 'Matematika', 'Saintek', NULL, 'Matematika dasar dan lanjutan untuk semua jenjang.', 'aktif', NULL),
-  ('2', '2026-07-16 02:32:08', '2026-07-16 02:32:08', '2', 'ING-001', 'Bahasa Inggris', 'Umum', NULL, 'Grammar, reading, writing, dan speaking skills.', 'aktif', NULL),
-  ('3', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'KOM-01', 'Microsoft Office Perkantoran', 'skill', 'komputer', NULL, 'aktif', NULL),
-  ('4', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'KOM-02', 'Word', 'skill', 'komputer', NULL, 'aktif', NULL),
-  ('5', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'KOM-03', 'Excel', 'skill', 'komputer', NULL, 'aktif', NULL),
-  ('6', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'KOM-04', 'PowerPoint', 'skill', 'komputer', NULL, 'aktif', NULL),
-  ('7', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'KOM-05', 'Desain Grafis', 'skill', 'komputer', NULL, 'aktif', NULL),
-  ('8', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'KOM-06', 'CorelDraw', 'skill', 'komputer', NULL, 'aktif', NULL),
-  ('9', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'KOM-07', 'Photoshop', 'skill', 'komputer', NULL, 'aktif', NULL),
-  ('10', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'KOM-08', 'AutoCAD', 'skill', 'komputer', NULL, 'aktif', NULL),
-  ('11', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'KOM-09', 'Programmer / Coding', 'skill', 'komputer', NULL, 'aktif', NULL),
-  ('12', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'BHS-01', 'Bahasa Inggris', 'skill', 'bahasa', NULL, 'aktif', NULL),
-  ('13', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'BHS-02', 'Bahasa Arab', 'skill', 'bahasa', NULL, 'aktif', NULL),
-  ('14', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'BHS-03', 'Bahasa Mandarin', 'skill', 'bahasa', NULL, 'aktif', NULL),
-  ('15', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'BHS-04', 'Bahasa Jepang', 'skill', 'bahasa', NULL, 'aktif', NULL),
-  ('16', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'BHS-05', 'Bahasa Korea', 'skill', 'bahasa', NULL, 'aktif', NULL),
-  ('17', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'MAP-01', 'Matematika', 'academic', 'mapel', NULL, 'aktif', NULL),
-  ('18', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'MAP-02', 'Kimia', 'academic', 'mapel', NULL, 'aktif', NULL),
-  ('19', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'MAP-03', 'Biologi', 'academic', 'mapel', NULL, 'aktif', NULL),
-  ('20', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'MAP-04', 'Bahasa Indonesia', 'academic', 'mapel', NULL, 'aktif', NULL),
-  ('21', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'MAP-05', 'Fisika', 'academic', 'mapel', NULL, 'aktif', NULL),
-  ('22', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'MAP-06', 'Akuntansi / Ekonomi', 'academic', 'mapel', NULL, 'aktif', NULL),
-  ('23', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'MAP-07', 'Geografi', 'academic', 'mapel', NULL, 'aktif', NULL),
-  ('24', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'MAP-08', 'IPA', 'academic', 'mapel', NULL, 'aktif', NULL),
-  ('25', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'MAP-09', 'IPS', 'academic', 'mapel', NULL, 'aktif', NULL),
-  ('26', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'DIN-01', 'SKD TIU', 'academic', 'kedinasan', NULL, 'aktif', NULL),
-  ('27', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'DIN-02', 'SKD TWK', 'academic', 'kedinasan', NULL, 'aktif', NULL),
-  ('28', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'DIN-03', 'SKD TKP', 'academic', 'kedinasan', NULL, 'aktif', NULL),
-  ('29', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'DIN-04', 'TPA', 'academic', 'kedinasan', NULL, 'aktif', NULL),
-  ('30', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'DIN-05', 'Psikotes', 'academic', 'kedinasan', NULL, 'aktif', NULL),
-  ('31', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'DIN-06', 'TBI', 'academic', 'kedinasan', NULL, 'aktif', NULL),
-  ('32', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'AKP-01', 'Pengetahuan Umum', 'academic', 'akpol', NULL, 'aktif', NULL),
-  ('33', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'AKP-02', 'Wawasan Kebangsaan', 'academic', 'akpol', NULL, 'aktif', NULL),
-  ('34', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'AKP-03', 'TKD', 'academic', 'akpol', NULL, 'aktif', NULL),
-  ('35', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'AKP-04', 'Tes Akademik', 'academic', 'akpol', NULL, 'aktif', NULL),
-  ('36', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'CPN-01', 'SKD TIU (CPNS)', 'academic', 'cpns', NULL, 'aktif', NULL),
-  ('37', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'CPN-02', 'SKD TWK (CPNS)', 'academic', 'cpns', NULL, 'aktif', NULL),
-  ('38', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'CPN-03', 'SKD TKP (CPNS)', 'academic', 'cpns', NULL, 'aktif', NULL),
-  ('39', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'BUM-01', 'TKD BUMN', 'academic', 'bumn', NULL, 'aktif', NULL),
-  ('40', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'BUM-02', 'Tes AKHLAK', 'academic', 'bumn', NULL, 'aktif', NULL),
-  ('41', '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL, 'BUM-03', 'TWK BUMN', 'academic', 'bumn', NULL, 'aktif', NULL);
+  ('1', '2026-07-22 02:20:08', '2026-07-22 02:20:08', '1', 'MAT-001', 'Matematika', 'Saintek', NULL, 'Matematika dasar dan lanjutan untuk semua jenjang.', 'aktif', NULL),
+  ('2', '2026-07-22 02:20:08', '2026-07-22 02:20:08', '2', 'ING-001', 'Bahasa Inggris', 'Umum', NULL, 'Grammar, reading, writing, dan speaking skills.', 'aktif', NULL),
+  ('3', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'KOM-01', 'Microsoft Office Perkantoran', 'skill', 'komputer', NULL, 'aktif', NULL),
+  ('4', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'KOM-02', 'Word', 'skill', 'komputer', NULL, 'aktif', NULL),
+  ('5', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'KOM-03', 'Excel', 'skill', 'komputer', NULL, 'aktif', NULL),
+  ('6', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'KOM-04', 'PowerPoint', 'skill', 'komputer', NULL, 'aktif', NULL),
+  ('7', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'KOM-05', 'Desain Grafis', 'skill', 'komputer', NULL, 'aktif', NULL),
+  ('8', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'KOM-06', 'CorelDraw', 'skill', 'komputer', NULL, 'aktif', NULL),
+  ('9', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'KOM-07', 'Photoshop', 'skill', 'komputer', NULL, 'aktif', NULL),
+  ('10', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'KOM-08', 'AutoCAD', 'skill', 'komputer', NULL, 'aktif', NULL),
+  ('11', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'KOM-09', 'Programmer / Coding', 'skill', 'komputer', NULL, 'aktif', NULL),
+  ('12', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'BHS-01', 'Bahasa Inggris', 'skill', 'bahasa', NULL, 'aktif', NULL),
+  ('13', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'BHS-02', 'Bahasa Arab', 'skill', 'bahasa', NULL, 'aktif', NULL),
+  ('14', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'BHS-03', 'Bahasa Mandarin', 'skill', 'bahasa', NULL, 'aktif', NULL),
+  ('15', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'BHS-04', 'Bahasa Jepang', 'skill', 'bahasa', NULL, 'aktif', NULL),
+  ('16', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'BHS-05', 'Bahasa Korea', 'skill', 'bahasa', NULL, 'aktif', NULL),
+  ('17', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'MAP-01', 'Matematika', 'academic', 'mapel', NULL, 'aktif', NULL),
+  ('18', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'MAP-02', 'Kimia', 'academic', 'mapel', NULL, 'aktif', NULL),
+  ('19', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'MAP-03', 'Biologi', 'academic', 'mapel', NULL, 'aktif', NULL),
+  ('20', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'MAP-04', 'Bahasa Indonesia', 'academic', 'mapel', NULL, 'aktif', NULL),
+  ('21', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'MAP-05', 'Fisika', 'academic', 'mapel', NULL, 'aktif', NULL),
+  ('22', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'MAP-06', 'Akuntansi / Ekonomi', 'academic', 'mapel', NULL, 'aktif', NULL),
+  ('23', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'MAP-07', 'Geografi', 'academic', 'mapel', NULL, 'aktif', NULL),
+  ('24', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'MAP-08', 'IPA', 'academic', 'mapel', NULL, 'aktif', NULL),
+  ('25', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'MAP-09', 'IPS', 'academic', 'mapel', NULL, 'aktif', NULL),
+  ('26', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'DIN-01', 'SKD TIU', 'academic', 'kedinasan', NULL, 'aktif', NULL),
+  ('27', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'DIN-02', 'SKD TWK', 'academic', 'kedinasan', NULL, 'aktif', NULL),
+  ('28', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'DIN-03', 'SKD TKP', 'academic', 'kedinasan', NULL, 'aktif', NULL),
+  ('29', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'DIN-04', 'TPA', 'academic', 'kedinasan', NULL, 'aktif', NULL),
+  ('30', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'DIN-05', 'Psikotes', 'academic', 'kedinasan', NULL, 'aktif', NULL),
+  ('31', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'DIN-06', 'TBI', 'academic', 'kedinasan', NULL, 'aktif', NULL),
+  ('32', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'AKP-01', 'Pengetahuan Umum', 'academic', 'akpol', NULL, 'aktif', NULL),
+  ('33', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'AKP-02', 'Wawasan Kebangsaan', 'academic', 'akpol', NULL, 'aktif', NULL),
+  ('34', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'AKP-03', 'TKD', 'academic', 'akpol', NULL, 'aktif', NULL),
+  ('35', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'AKP-04', 'Tes Akademik', 'academic', 'akpol', NULL, 'aktif', NULL),
+  ('36', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'CPN-01', 'SKD TIU (CPNS)', 'academic', 'cpns', NULL, 'aktif', NULL),
+  ('37', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'CPN-02', 'SKD TWK (CPNS)', 'academic', 'cpns', NULL, 'aktif', NULL),
+  ('38', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'CPN-03', 'SKD TKP (CPNS)', 'academic', 'cpns', NULL, 'aktif', NULL),
+  ('39', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'BUM-01', 'TKD BUMN', 'academic', 'bumn', NULL, 'aktif', NULL),
+  ('40', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'BUM-02', 'Tes AKHLAK', 'academic', 'bumn', NULL, 'aktif', NULL),
+  ('41', '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL, 'BUM-03', 'TWK BUMN', 'academic', 'bumn', NULL, 'aktif', NULL);
 
 -- ---- Tabel: `curricula` (0 baris) ----
 -- (kosong)
@@ -1647,8 +1632,8 @@ INSERT INTO `courses` (`id`, `created_at`, `updated_at`, `cabang_id`, `kode`, `n
 -- ---- Tabel: `invoices` (2 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `invoices` (`id`, `created_at`, `updated_at`, `siswa_id`, `cabang_id`, `kelas_id`, `nomor_invoice`, `subtotal`, `diskon`, `pajak`, `total`, `deskripsi`, `periode`, `jatuh_tempo`, `status`, `catatan`, `deleted_at`) VALUES
-  ('1', '2026-07-16 02:32:09', '2026-07-16 02:32:09', '1', '1', NULL, 'INV-2025-0001', '750000.00', '0.00', '0.00', '750000.00', 'Biaya Paket Reguler SMA - Januari 2025', '2025-01', '2025-01-15', 'lunas', NULL, NULL),
-  ('2', '2026-07-16 02:32:09', '2026-07-16 02:32:09', '2', '1', NULL, 'INV-2025-0002', '2500000.00', '0.00', '0.00', '2500000.00', 'Biaya Paket Intensif SNBT - Februari 2025', '2025-02', '2025-02-15', 'belum_bayar', NULL, NULL);
+  ('1', '2026-07-22 02:20:08', '2026-07-22 02:20:08', '1', '1', NULL, 'INV-2025-0001', '750000.00', '0.00', '0.00', '750000.00', 'Biaya Paket Reguler SMA - Januari 2025', '2025-01', '2025-01-15', 'lunas', NULL, NULL),
+  ('2', '2026-07-22 02:20:08', '2026-07-22 02:20:08', '2', '1', NULL, 'INV-2025-0002', '2500000.00', '0.00', '0.00', '2500000.00', 'Biaya Paket Intensif SNBT - Februari 2025', '2025-02', '2025-02-15', 'belum_bayar', NULL, NULL);
 
 -- ---- Tabel: `jadwals` (0 baris) ----
 -- (kosong)
@@ -1662,144 +1647,142 @@ INSERT INTO `invoices` (`id`, `created_at`, `updated_at`, `siswa_id`, `cabang_id
 -- ---- Tabel: `landing_faqs` (6 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `landing_faqs` (`id`, `question`, `answer`, `is_active`, `sort_order`, `created_at`, `updated_at`) VALUES
-  ('1', 'Bagaimana cara mendaftar di SCI?', 'Anda bisa mendaftar melalui website ini, menghubungi kami via WhatsApp, atau langsung datang ke cabang SCI terdekat. Tim kami akan membantu proses pendaftaran dengan mudah dan cepat.', '1', '0', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('2', 'Apakah bisa datang ke rumah?', 'Ya! Kami menyediakan layanan home visit di mana tutor kami akan datang langsung ke rumah Anda. Jadwal fleksibel dan nyaman tanpa perlu keluar rumah.', '1', '1', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('3', 'Jenjang apa saja yang dilayani?', 'SCI melayani semua jenjang mulai dari TK, SD, SMP, SMA, hingga mahasiswa dan umum. Tersedia juga kursus bahasa, komputer, dan akuntansi untuk semua usia.', '1', '2', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('4', 'Berapa biaya les privat di SCI?', 'Biaya bervariasi tergantung jenjang, mata pelajaran, dan metode belajar (online/offline/home visit). Hubungi kami untuk mendapatkan penawaran terbaik sesuai kebutuhan Anda.', '1', '3', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('5', 'Apakah ada garansi hasil belajar?', 'Ya! SCI memberikan garansi hasil belajar. Jika nilai tidak meningkat sesuai target yang disepakati, kami siap memberikan sesi tambahan tanpa biaya ekstra.', '1', '4', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('6', 'Bagaimana sistem pembayaran di SCI?', 'Pembayaran bisa dilakukan bulanan atau per paket belajar. Tersedia berbagai metode pembayaran termasuk transfer bank, dompet digital, dan tunai di cabang.', '1', '5', '2026-07-05 22:32:38', '2026-07-05 22:32:38');
+  ('1', 'Bagaimana cara mendaftar di SCI?', 'Anda bisa mendaftar melalui website ini, menghubungi kami via WhatsApp, atau langsung datang ke cabang SCI terdekat. Tim kami akan membantu proses pendaftaran dengan mudah dan cepat.', '1', '0', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('2', 'Apakah bisa datang ke rumah?', 'Ya! Kami menyediakan layanan home visit di mana tutor kami akan datang langsung ke rumah Anda. Jadwal fleksibel dan nyaman tanpa perlu keluar rumah.', '1', '1', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('3', 'Jenjang apa saja yang dilayani?', 'SCI melayani semua jenjang mulai dari TK, SD, SMP, SMA, hingga mahasiswa dan umum. Tersedia juga kursus bahasa, komputer, dan akuntansi untuk semua usia.', '1', '2', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('4', 'Berapa biaya les privat di SCI?', 'Biaya bervariasi tergantung jenjang, mata pelajaran, dan metode belajar (online/offline/home visit). Hubungi kami untuk mendapatkan penawaran terbaik sesuai kebutuhan Anda.', '1', '3', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('5', 'Apakah ada garansi hasil belajar?', 'Ya! SCI memberikan garansi hasil belajar. Jika nilai tidak meningkat sesuai target yang disepakati, kami siap memberikan sesi tambahan tanpa biaya ekstra.', '1', '4', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('6', 'Bagaimana sistem pembayaran di SCI?', 'Pembayaran bisa dilakukan bulanan atau per paket belajar. Tersedia berbagai metode pembayaran termasuk transfer bank, dompet digital, dan tunai di cabang.', '1', '5', '2026-07-22 02:20:10', '2026-07-22 02:20:10');
 
 -- ---- Tabel: `landing_features` (6 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `landing_features` (`id`, `icon`, `label`, `is_active`, `sort_order`, `created_at`, `updated_at`) VALUES
-  ('1', 'bi-patch-check-fill', 'Tutor Bersertifikat', '1', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('2', 'bi-house-heart-fill', 'Bisa Home Visit', '1', '1', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('3', 'bi-camera-video-fill', 'Kelas Online & Offline', '1', '2', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('4', 'bi-bar-chart-fill', 'Evaluasi Rutin Bulanan', '1', '3', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('5', 'bi-headset', 'Konsultasi 24/7', '1', '4', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('6', 'bi-bullseye', 'Target & Hasil Terukur', '1', '5', '2026-07-05 22:32:38', '2026-07-05 22:32:38');
+  ('1', 'bi-patch-check-fill', 'Tutor Bersertifikat', '1', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('2', 'bi-house-heart-fill', 'Bisa Home Visit', '1', '1', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('3', 'bi-camera-video-fill', 'Kelas Online & Offline', '1', '2', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('4', 'bi-bar-chart-fill', 'Evaluasi Rutin Bulanan', '1', '3', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('5', 'bi-headset', 'Konsultasi 24/7', '1', '4', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('6', 'bi-bullseye', 'Target & Hasil Terukur', '1', '5', '2026-07-22 02:20:09', '2026-07-22 02:20:09');
 
--- ---- Tabel: `landing_galleries` (9 baris) ----
+-- ---- Tabel: `landing_galleries` (8 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `landing_galleries` (`id`, `image`, `alt`, `is_active`, `sort_order`, `created_at`, `updated_at`) VALUES
-  ('1', 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=700&q=80', 'Kelas Belajar', '1', '0', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('2', 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=700&q=80', 'Diskusi Kelompok', '1', '1', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('3', 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=700&q=80', 'Les Online', '1', '2', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('4', 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=700&q=80', 'Tutor Mengajar', '1', '3', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('5', 'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=700&q=80', 'Les Privat', '1', '4', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('6', 'https://images.unsplash.com/photo-1509869175650-a1d97972541a?w=700&q=80', 'Kursus Komputer', '1', '5', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('7', 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=700&q=80', 'Persiapan Ujian', '1', '6', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('8', 'https://images.unsplash.com/photo-1543269865-cbf427effbad?w=700&q=80', 'Belajar Bersama', '1', '7', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('9', '/storage/landing/gallery/LJeGbt5bfPPK02b7kSq1jRm75tUtbXdGM6AtMmsn.png', 'Test Upload Image - SCI Testing', '1', '8', '2026-07-06 00:45:44', '2026-07-06 00:45:44');
+  ('1', 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=700&q=80', 'Kelas Belajar', '1', '0', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('2', 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=700&q=80', 'Diskusi Kelompok', '1', '1', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('3', 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=700&q=80', 'Les Online', '1', '2', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('4', 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=700&q=80', 'Tutor Mengajar', '1', '3', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('5', 'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=700&q=80', 'Les Privat', '1', '4', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('6', 'https://images.unsplash.com/photo-1509869175650-a1d97972541a?w=700&q=80', 'Kursus Komputer', '1', '5', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('7', 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=700&q=80', 'Persiapan Ujian', '1', '6', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('8', 'https://images.unsplash.com/photo-1543269865-cbf427effbad?w=700&q=80', 'Belajar Bersama', '1', '7', '2026-07-22 02:20:10', '2026-07-22 02:20:10');
 
 -- ---- Tabel: `landing_highlights` (5 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `landing_highlights` (`id`, `image`, `title`, `description`, `is_active`, `sort_order`, `created_at`, `updated_at`) VALUES
-  ('1', 'https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=200&q=80', 'Tutor Profesional', 'Pengajar ahli bersertifikat resmi dengan pengalaman bertahun-tahun dan rekam jejak hasil nyata.', '1', '0', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('2', 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&q=80', 'Bisa Home Visit', 'Tutor kami siap datang ke rumah Anda kapan saja. Jadwal fleksibel, nyaman, dan tanpa perlu repot.', '1', '1', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('3', 'https://images.unsplash.com/photo-1581092334651-ddf26d9a09d0?w=200&q=80', 'Metode Modern', 'Sistem belajar interaktif yang disesuaikan dengan gaya belajar masing-masing siswa. Belajar itu menyenangkan!', '1', '2', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('4', 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=200&q=80', 'Hasil Terukur', 'Evaluasi rutin, progress terpantau, laporan bulanan. Nilai meningkat signifikan — dijamin atau kami ulang!', '1', '3', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('5', 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80', 'Support Penuh', 'Bantuan belajar & konsultasi 24/7 via WhatsApp. Kami selalu ada untuk mendukung perjalanan belajar Anda.', '1', '4', '2026-07-05 22:32:38', '2026-07-05 22:32:38');
+  ('1', 'https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=200&q=80', 'Tutor Profesional', 'Pengajar ahli bersertifikat resmi dengan pengalaman bertahun-tahun dan rekam jejak hasil nyata.', '1', '0', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('2', 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&q=80', 'Bisa Home Visit', 'Tutor kami siap datang ke rumah Anda kapan saja. Jadwal fleksibel, nyaman, dan tanpa perlu repot.', '1', '1', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('3', 'https://images.unsplash.com/photo-1581092334651-ddf26d9a09d0?w=200&q=80', 'Metode Modern', 'Sistem belajar interaktif yang disesuaikan dengan gaya belajar masing-masing siswa. Belajar itu menyenangkan!', '1', '2', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('4', 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=200&q=80', 'Hasil Terukur', 'Evaluasi rutin, progress terpantau, laporan bulanan. Nilai meningkat signifikan — dijamin atau kami ulang!', '1', '3', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('5', 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80', 'Support Penuh', 'Bantuan belajar & konsultasi 24/7 via WhatsApp. Kami selalu ada untuk mendukung perjalanan belajar Anda.', '1', '4', '2026-07-22 02:20:10', '2026-07-22 02:20:10');
 
 -- ---- Tabel: `landing_jenjangs` (4 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `landing_jenjangs` (`id`, `name`, `label`, `image`, `emoji`, `is_active`, `sort_order`, `created_at`, `updated_at`) VALUES
-  ('1', 'TK', 'Taman Kanak-Kanak', 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=200&q=80&auto=format&fit=crop', '🌱', '1', '0', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('2', 'SD', 'Sekolah Dasar', 'https://images.unsplash.com/photo-1588072432836-e10032774350?w=200&q=80&auto=format&fit=crop', '📚', '1', '1', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('3', 'SMP', 'Sekolah Menengah Pertama', 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=200&q=80&auto=format&fit=crop', '🔬', '1', '2', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('4', 'SMA / Umum', 'SMA & Karyawan', 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=200&q=80&auto=format&fit=crop', '🎓', '1', '3', '2026-07-05 22:32:38', '2026-07-05 22:32:38');
+  ('1', 'TK', 'Taman Kanak-Kanak', 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=200&q=80&auto=format&fit=crop', '🌱', '1', '0', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('2', 'SD', 'Sekolah Dasar', 'https://images.unsplash.com/photo-1588072432836-e10032774350?w=200&q=80&auto=format&fit=crop', '📚', '1', '1', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('3', 'SMP', 'Sekolah Menengah Pertama', 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=200&q=80&auto=format&fit=crop', '🔬', '1', '2', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('4', 'SMA / Umum', 'SMA & Karyawan', 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=200&q=80&auto=format&fit=crop', '🎓', '1', '3', '2026-07-22 02:20:10', '2026-07-22 02:20:10');
 
 -- ---- Tabel: `landing_programs` (6 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `landing_programs` (`id`, `title`, `description`, `badge_label`, `badge_bg`, `badge_color`, `icon_emoji`, `image`, `is_active`, `is_popular`, `is_new`, `sort_order`, `created_at`, `updated_at`) VALUES
-  ('1', 'Bimbel Mata Pelajaran', 'Bimbingan semua mata pelajaran sekolah dengan metode efektif dan menyenangkan.', 'SEMUA JENJANG', '#e8f5e9', '#2e7d32', '📖', 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=600&q=80', '1', '0', '0', '0', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('2', 'Persiapan Ujian', 'Persiapan UTS, UAS & Ujian Sekolah agar nilai meningkat pesat dan lulus terbaik.', 'SMP · SMA', '#f3e8ff', '#7e22ce', '📝', 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=600&q=80', '1', '0', '0', '1', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('3', 'Persiapan Tes & SBMPTN', 'Persiapan masuk sekolah favorit, PTN, CPNS & tes lainnya secara intensif.', 'INTENSIF', '#fff7ed', '#c2410c', '🎯', 'https://images.unsplash.com/photo-1503676382389-4809596d5290?w=600&q=80', '1', '0', '0', '2', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('4', 'Kursus Bahasa', 'Inggris, Jepang, Mandarin, Arab — tingkatkan kemampuan bahasa Anda bersama kami.', 'SEMUA LEVEL', '#e0f2fe', '#0369a1', '🗣️', 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&q=80', '1', '0', '0', '3', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('5', 'Kursus Komputer', 'Microsoft Office, Desain Grafis, Programming — teknologi terkini untuk karir masa depan.', 'POPULER 🔥', '#fef2f2', '#b91c1c', '💻', 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&q=80', '1', '1', '0', '4', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('6', 'Kursus Akuntansi', 'Akuntansi dasar hingga profesional: perpajakan & keuangan untuk mahasiswa dan karyawan.', 'TERBARU ✨', '#f5f3ff', '#6d28d9', '📊', 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&q=80', '1', '0', '1', '5', '2026-07-05 22:32:38', '2026-07-05 22:32:38');
+  ('1', 'Bimbel Mata Pelajaran', 'Bimbingan semua mata pelajaran sekolah dengan metode efektif dan menyenangkan.', 'SEMUA JENJANG', '#e8f5e9', '#2e7d32', '📖', 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=600&q=80', '1', '0', '0', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('2', 'Persiapan Ujian', 'Persiapan UTS, UAS & Ujian Sekolah agar nilai meningkat pesat dan lulus terbaik.', 'SMP · SMA', '#f3e8ff', '#7e22ce', '📝', 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=600&q=80', '1', '0', '0', '1', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('3', 'Persiapan Tes & SBMPTN', 'Persiapan masuk sekolah favorit, PTN, CPNS & tes lainnya secara intensif.', 'INTENSIF', '#fff7ed', '#c2410c', '🎯', 'https://images.unsplash.com/photo-1503676382389-4809596d5290?w=600&q=80', '1', '0', '0', '2', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('4', 'Kursus Bahasa', 'Inggris, Jepang, Mandarin, Arab — tingkatkan kemampuan bahasa Anda bersama kami.', 'SEMUA LEVEL', '#e0f2fe', '#0369a1', '🗣️', 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&q=80', '1', '0', '0', '3', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('5', 'Kursus Komputer', 'Microsoft Office, Desain Grafis, Programming — teknologi terkini untuk karir masa depan.', 'POPULER 🔥', '#fef2f2', '#b91c1c', '💻', 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&q=80', '1', '1', '0', '4', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('6', 'Kursus Akuntansi', 'Akuntansi dasar hingga profesional: perpajakan & keuangan untuk mahasiswa dan karyawan.', 'TERBARU ✨', '#f5f3ff', '#6d28d9', '📊', 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&q=80', '1', '0', '1', '5', '2026-07-22 02:20:10', '2026-07-22 02:20:10');
 
 -- ---- Tabel: `landing_settings` (46 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `landing_settings` (`id`, `section`, `key`, `value`, `type`, `label`, `sort_order`, `created_at`, `updated_at`) VALUES
-  ('1', 'hero', 'hero.badge_text', 'Bimbel & Kursus Terbaik #1 di Indonesia', 'text', 'Teks Badge Hero', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('2', 'hero', 'hero.title_line1', 'Wujudkan Mimpi,', 'text', 'Judul Baris 1', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('3', 'hero', 'hero.title_line2', 'Raih Prestasi!', 'text', 'Judul Baris 2', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('4', 'hero', 'hero.description', 'Lembaga bimbingan belajar, kursus, dan les privat terbaik di Indonesia. Melayani TK hingga umum dengan tutor profesional dan hasil terukur.', 'text', 'Deskripsi Hero', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('5', 'hero', 'hero.slide_1_url', 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1920&q=80', 'image', 'Slide 1 URL', '0', '2026-07-05 22:32:37', '2026-07-06 00:32:35'),
-  ('6', 'hero', 'hero.slide_2_url', 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1920&q=80', 'image', 'Slide 2 URL', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('7', 'hero', 'hero.slide_3_url', 'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&w=1920&q=80', 'image', 'Slide 3 URL', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('8', 'hero', 'hero.float1_title', '', 'text', 'Float Card 1 Judul', '0', '2026-07-05 22:32:37', '2026-07-06 00:32:35'),
-  ('9', 'hero', 'hero.float1_subtitle', '', 'text', 'Float Card 1 Subjudul', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('10', 'hero', 'hero.float2_title', '', 'text', 'Float Card 2 Judul', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('11', 'hero', 'hero.float2_subtitle', '', 'text', 'Float Card 2 Subjudul', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('12', 'stats', 'stats.years_exp', '14+', 'text', 'Tahun Pengalaman', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('13', 'stats', 'stats.satisfaction', '98%', 'text', 'Kepuasan Pelanggan', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('14', 'cta', 'cta.eyebrow', 'Mulai Sekarang', 'text', 'Eyebrow CTA', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('15', 'cta', 'cta.title', 'Wujudkan Mimpi Bersama SCI!', 'text', 'Judul CTA', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('16', 'cta', 'cta.description', 'Daftar sekarang dan mulai perjalanan belajarmu bersama tutor terbaik kami.', 'text', 'Deskripsi CTA', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('17', 'footer', 'footer.brand_desc', 'Platform pendidikan modern untuk semua jenjang. Dari TK hingga profesional — kami selalu ada untuk mendukung perjalanan belajar Anda.', 'text', 'Deskripsi Brand Footer', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('18', 'footer', 'footer.instagram', '#', 'text', 'URL Instagram', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('19', 'footer', 'footer.facebook', '#', 'text', 'URL Facebook', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('20', 'footer', 'footer.youtube', '#', 'text', 'URL YouTube', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('21', 'tentang', 'tentang.title_line1', 'Tentang', 'text', 'Judul Baris 1', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('22', 'tentang', 'tentang.title_accent', 'Smart Center Indonesia', 'text', 'Judul Aksen', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('23', 'tentang', 'tentang.desc1', 'Smart Center Indonesia (SCI) adalah lembaga pendidikan yang bergerak di bidang bimbingan belajar, kursus, dan les privat (1 guru 1 siswa) berbasis offline dan online yang berkomitmen menjadi lembaga terbaik nomor 1 di Indonesia.', 'text', 'Deskripsi 1', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('24', 'tentang', 'tentang.desc2', 'Dengan metode pembelajaran efektif, pengajar berpengalaman, serta pendekatan personal, SCI hadir sebagai solusi pendidikan terpercaya.', 'text', 'Deskripsi 2', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('25', 'tentang', 'tentang.quote', 'Wujudkan mimpi, raih prestasi!', 'text', 'Kutipan', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('26', 'cariguru', 'cariguru.eyebrow', 'TEMUKAN PENGAJAR TERBAIK', 'text', 'Eyebrow', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('27', 'cariguru', 'cariguru.title_line1', 'Cari Guru', 'text', 'Judul Baris 1', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('28', 'cariguru', 'cariguru.title_accent', 'Terbaik', 'text', 'Judul Aksen', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('29', 'cariguru', 'cariguru.title_line2', ', Secepat Klik', 'text', 'Judul Baris 2', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('30', 'cariguru', 'cariguru.subtitle', 'Temukan tutor privat terbaik di kotamu — pilih berdasarkan mata pelajaran, lokasi, dan metode belajar yang kamu inginkan.', 'text', 'Subjudul', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('31', 'keunggulan', 'keunggulan.title_accent', 'SCI', 'text', 'Judul Aksen', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('32', 'keunggulan', 'keunggulan.subtitle', 'Lima pilar yang membuat SCI menjadi pilihan terpercaya jutaan keluarga Indonesia selama 14+ tahun.', 'text', 'Subjudul', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('33', 'galeri', 'galeri.subtitle', 'Momen belajar menyenangkan bersama siswa dan tutor terbaik SCI di seluruh Indonesia.', 'text', 'Subjudul', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('34', 'bantuan', 'bantuan.eyebrow', 'Bantuan & Kontak', 'text', 'Eyebrow', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('35', 'bantuan', 'bantuan.subtitle', 'Punya pertanyaan atau ingin bergabung? Kami siap membantu Anda kapan saja.', 'text', 'Subjudul', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('36', 'cabang', 'cabang.eyebrow', 'Hadir di Seluruh Indonesia', 'text', 'Eyebrow', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('37', 'cabang', 'cabang.subtitle', 'Dengan 150+ cabang di berbagai kota, SCI selalu dekat dengan Anda dan keluarga.', 'text', 'Subjudul', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('38', 'galeri', 'galeri.title_line1', 'Galeri', 'text', 'Judul Baris 1', '0', '2026-07-06 00:32:35', '2026-07-06 00:32:35'),
-  ('39', 'galeri', 'galeri.title_accent', 'Kegiatan', 'text', 'Judul Aksen', '0', '2026-07-06 00:32:35', '2026-07-06 00:32:35'),
-  ('40', 'bantuan', 'bantuan.title_line1', 'Pertanyaan &', 'text', 'Judul Baris 1', '0', '2026-07-06 00:32:35', '2026-07-06 00:32:35'),
-  ('41', 'bantuan', 'bantuan.title_accent', 'Hubungi Kami', 'text', 'Judul Aksen', '0', '2026-07-06 00:32:35', '2026-07-06 00:32:35'),
-  ('42', 'tutor', 'tutor.eyebrow', 'Tim Pengajar', 'text', 'Eyebrow', '0', '2026-07-06 00:32:35', '2026-07-06 00:32:35'),
-  ('43', 'tutor', 'tutor.title_line1', 'Tutor', 'text', 'Judul Baris 1', '0', '2026-07-06 00:32:35', '2026-07-06 00:32:35'),
-  ('44', 'tutor', 'tutor.title_accent', 'Terbaik', 'text', 'Judul Aksen', '0', '2026-07-06 00:32:35', '2026-07-06 00:32:35'),
-  ('45', 'tutor', 'tutor.title_line2', 'Kami', 'text', 'Judul Baris 2', '0', '2026-07-06 00:32:35', '2026-07-06 00:32:35'),
-  ('46', 'tutor', 'tutor.subtitle', 'Dilatih secara profesional dan berpengalaman di bidangnya masing-masing untuk memberikan hasil terbaik bagi setiap siswa.', 'text', 'Subjudul', '0', '2026-07-06 00:32:35', '2026-07-06 00:32:35');
+  ('1', 'hero', 'hero.badge_text', 'Bimbel & Kursus Terbaik #1 di Indonesia', 'text', 'Teks Badge Hero', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('2', 'hero', 'hero.title_line1', 'Wujudkan Mimpi,', 'text', 'Judul Baris 1', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('3', 'hero', 'hero.title_line2', 'Raih Prestasi!', 'text', 'Judul Baris 2', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('4', 'hero', 'hero.description', 'Lembaga bimbingan belajar, kursus, dan les privat terbaik di Indonesia. Melayani TK hingga umum dengan tutor profesional dan hasil terukur.', 'text', 'Deskripsi Hero', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('5', 'hero', 'hero.slide_1_url', 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1920&q=80', 'image', 'Slide 1 URL', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('6', 'hero', 'hero.slide_2_url', 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1920&q=80', 'image', 'Slide 2 URL', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('7', 'hero', 'hero.slide_3_url', 'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&w=1920&q=80', 'image', 'Slide 3 URL', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('8', 'hero', 'hero.float1_title', '', 'text', 'Float Card 1 Judul', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('9', 'hero', 'hero.float1_subtitle', '', 'text', 'Float Card 1 Subjudul', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('10', 'hero', 'hero.float2_title', '', 'text', 'Float Card 2 Judul', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('11', 'hero', 'hero.float2_subtitle', '', 'text', 'Float Card 2 Subjudul', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('12', 'stats', 'stats.years_exp', '14+', 'text', 'Tahun Pengalaman', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('13', 'stats', 'stats.satisfaction', '98%', 'text', 'Kepuasan Pelanggan', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('14', 'cta', 'cta.eyebrow', 'Mulai Sekarang', 'text', 'Eyebrow CTA', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('15', 'cta', 'cta.title', 'Wujudkan Mimpi Bersama SCI!', 'text', 'Judul CTA', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('16', 'cta', 'cta.description', 'Daftar sekarang dan mulai perjalanan belajarmu bersama tutor terbaik kami.', 'text', 'Deskripsi CTA', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('17', 'footer', 'footer.brand_desc', 'Platform pendidikan modern untuk semua jenjang. Dari TK hingga profesional — kami selalu ada untuk mendukung perjalanan belajar Anda.', 'text', 'Deskripsi Brand Footer', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('18', 'footer', 'footer.instagram', '#', 'text', 'URL Instagram', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('19', 'footer', 'footer.facebook', '#', 'text', 'URL Facebook', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('20', 'footer', 'footer.youtube', '#', 'text', 'URL YouTube', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('21', 'tentang', 'tentang.title_line1', 'Tentang', 'text', 'Judul Baris 1', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('22', 'tentang', 'tentang.title_accent', 'Smart Center Indonesia', 'text', 'Judul Aksen', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('23', 'tentang', 'tentang.desc1', 'Smart Center Indonesia (SCI) adalah lembaga pendidikan yang bergerak di bidang bimbingan belajar, kursus, dan les privat (1 guru 1 siswa) berbasis offline dan online yang berkomitmen menjadi lembaga terbaik nomor 1 di Indonesia.', 'text', 'Deskripsi 1', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('24', 'tentang', 'tentang.desc2', 'Dengan metode pembelajaran efektif, pengajar berpengalaman, serta pendekatan personal, SCI hadir sebagai solusi pendidikan terpercaya.', 'text', 'Deskripsi 2', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('25', 'tentang', 'tentang.quote', 'Wujudkan mimpi, raih prestasi!', 'text', 'Kutipan', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('26', 'cariguru', 'cariguru.eyebrow', 'TEMUKAN PENGAJAR TERBAIK', 'text', 'Eyebrow', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('27', 'cariguru', 'cariguru.title_line1', 'Cari Guru', 'text', 'Judul Baris 1', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('28', 'cariguru', 'cariguru.title_accent', 'Terbaik', 'text', 'Judul Aksen', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('29', 'cariguru', 'cariguru.title_line2', ', Secepat Klik', 'text', 'Judul Baris 2', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('30', 'cariguru', 'cariguru.subtitle', 'Temukan tutor privat terbaik di kotamu — pilih berdasarkan mata pelajaran, lokasi, dan metode belajar yang kamu inginkan.', 'text', 'Subjudul', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('31', 'keunggulan', 'keunggulan.title_accent', 'SCI', 'text', 'Judul Aksen', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('32', 'keunggulan', 'keunggulan.subtitle', 'Lima pilar yang membuat SCI menjadi pilihan terpercaya jutaan keluarga Indonesia selama 14+ tahun.', 'text', 'Subjudul', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('33', 'galeri', 'galeri.subtitle', 'Momen belajar menyenangkan bersama siswa dan tutor terbaik SCI di seluruh Indonesia.', 'text', 'Subjudul', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('34', 'galeri', 'galeri.title_line1', 'Galeri', 'text', 'Judul Baris 1', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('35', 'galeri', 'galeri.title_accent', 'Kegiatan', 'text', 'Judul Aksen', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('36', 'bantuan', 'bantuan.eyebrow', 'Bantuan & Kontak', 'text', 'Eyebrow', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('37', 'bantuan', 'bantuan.title_line1', 'Pertanyaan &', 'text', 'Judul Baris 1', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('38', 'bantuan', 'bantuan.title_accent', 'Hubungi Kami', 'text', 'Judul Aksen', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('39', 'bantuan', 'bantuan.subtitle', 'Punya pertanyaan atau ingin bergabung? Kami siap membantu Anda kapan saja.', 'text', 'Subjudul', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('40', 'tutor', 'tutor.eyebrow', 'Tim Pengajar', 'text', 'Eyebrow', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('41', 'tutor', 'tutor.title_line1', 'Tutor', 'text', 'Judul Baris 1', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('42', 'tutor', 'tutor.title_accent', 'Terbaik', 'text', 'Judul Aksen', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('43', 'tutor', 'tutor.title_line2', 'Kami', 'text', 'Judul Baris 2', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('44', 'tutor', 'tutor.subtitle', 'Dilatih secara profesional dan berpengalaman di bidangnya masing-masing untuk memberikan hasil terbaik bagi setiap siswa.', 'text', 'Subjudul', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('45', 'cabang', 'cabang.eyebrow', 'Hadir di Seluruh Indonesia', 'text', 'Eyebrow', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('46', 'cabang', 'cabang.subtitle', 'Dengan 150+ cabang di berbagai kota, SCI selalu dekat dengan Anda dan keluarga.', 'text', 'Subjudul', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09');
 
--- ---- Tabel: `landing_testimonials` (5 baris) ----
+-- ---- Tabel: `landing_testimonials` (4 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `landing_testimonials` (`id`, `name`, `role`, `text`, `gradient`, `initial`, `photo`, `is_active`, `sort_order`, `created_at`, `updated_at`) VALUES
-  ('1', 'Aisyah Rahma', 'Siswa SMA · Matematika', 'Belajar di SCI sangat menyenangkan! Tutor menjelaskan dengan cara yang mudah dipahami dan nilai saya meningkat pesat. Sangat merekomendasikan untuk semua!', 'linear-gradient(135deg,#c84ddf,#68117e)', 'A', NULL, '1', '0', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('2', 'Ricky Pratama', 'Mahasiswa · Persiapan SBMPTN', 'Program persiapan ujian di SCI sangat membantu. Akhirnya lolos ke kampus impian! Materinya lengkap banget dan tutornya super sabar dan profesional.', 'linear-gradient(135deg,#10b981,#059669)', 'R', NULL, '1', '1', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('3', 'Dinda Lestari', 'Mahasiswi · Akuntansi', 'Kursus akuntansi di SCI sangat bermanfaat untuk tugas kuliah dan persiapan kerja. Tutornya sabar, materi lengkap, dan nilai kuliah saya jadi meningkat!', 'linear-gradient(135deg,#6366f1,#4338ca)', 'D', NULL, '1', '2', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('4', 'Bunda Sari', 'Orang Tua Siswa · Jakarta', 'Anakku yang awalnya kesulitan di pelajaran IPA sekarang jadi juara kelas! Metode belajar di SCI sangat efektif dan tutornya sangat sabar dan perhatian.', 'linear-gradient(135deg,#f97316,#ea580c)', 'B', NULL, '1', '3', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('5', 'Budi Testing Update', 'Siswa TK · Bandung', 'Testing testimoni baru - SCI adalah pilihan terbaik untuk belajar!', 'linear-gradient(135deg,#c84ddf,#68117e)', 'B', NULL, '1', '4', '2026-07-06 00:37:01', '2026-07-06 00:38:25');
+  ('1', 'Aisyah Rahma', 'Siswa SMA · Matematika', 'Belajar di SCI sangat menyenangkan! Tutor menjelaskan dengan cara yang mudah dipahami dan nilai saya meningkat pesat. Sangat merekomendasikan untuk semua!', 'linear-gradient(135deg,#c84ddf,#68117e)', 'A', NULL, '1', '0', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('2', 'Ricky Pratama', 'Mahasiswa · Persiapan SBMPTN', 'Program persiapan ujian di SCI sangat membantu. Akhirnya lolos ke kampus impian! Materinya lengkap banget dan tutornya super sabar dan profesional.', 'linear-gradient(135deg,#10b981,#059669)', 'R', NULL, '1', '1', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('3', 'Dinda Lestari', 'Mahasiswi · Akuntansi', 'Kursus akuntansi di SCI sangat bermanfaat untuk tugas kuliah dan persiapan kerja. Tutornya sabar, materi lengkap, dan nilai kuliah saya jadi meningkat!', 'linear-gradient(135deg,#6366f1,#4338ca)', 'D', NULL, '1', '2', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('4', 'Bunda Sari', 'Orang Tua Siswa · Jakarta', 'Anakku yang awalnya kesulitan di pelajaran IPA sekarang jadi juara kelas! Metode belajar di SCI sangat efektif dan tutornya sangat sabar dan perhatian.', 'linear-gradient(135deg,#f97316,#ea580c)', 'B', NULL, '1', '3', '2026-07-22 02:20:10', '2026-07-22 02:20:10');
 
 -- ---- Tabel: `landing_tickers` (6 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `landing_tickers` (`id`, `emoji`, `text`, `is_active`, `sort_order`, `created_at`, `updated_at`) VALUES
-  ('1', '🎉', 'Diskon Spesial! Gratis biaya pendaftaran bulan ini', '1', '0', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('2', '📚', 'Daftar sekarang & dapatkan sesi konsultasi GRATIS!', '1', '1', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('3', '🎁', 'Promo Paket Hemat: Beli 10 sesi gratis 2 sesi ekstra', '1', '2', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('4', '⭐', 'Lebih dari 1.000+ siswa sudah bergabung bersama kami', '1', '3', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('5', '🏆', 'Tutor berpengalaman & bersertifikat nasional', '1', '4', '2026-07-05 22:32:37', '2026-07-05 22:32:37'),
-  ('6', '📞', 'Hubungi kami sekarang — konsultasi gratis!', '1', '5', '2026-07-05 22:32:37', '2026-07-05 22:32:37');
+  ('1', '🎉', 'Diskon Spesial! Gratis biaya pendaftaran bulan ini', '1', '0', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('2', '📚', 'Daftar sekarang & dapatkan sesi konsultasi GRATIS!', '1', '1', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('3', '🎁', 'Promo Paket Hemat: Beli 10 sesi gratis 2 sesi ekstra', '1', '2', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('4', '⭐', 'Lebih dari 1.000+ siswa sudah bergabung bersama kami', '1', '3', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('5', '🏆', 'Tutor berpengalaman & bersertifikat nasional', '1', '4', '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('6', '📞', 'Hubungi kami sekarang — konsultasi gratis!', '1', '5', '2026-07-22 02:20:09', '2026-07-22 02:20:09');
 
 -- ---- Tabel: `landing_trusts` (4 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `landing_trusts` (`id`, `icon`, `text`, `is_active`, `sort_order`, `created_at`, `updated_at`) VALUES
-  ('1', 'bi-patch-check-fill', '500+ Tutor Bersertifikat', '1', '0', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('2', 'bi-lightning-fill', 'Respon dalam 1 Jam', '1', '1', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('3', 'bi-shield-fill-check', 'Aman & Terpercaya', '1', '2', '2026-07-05 22:32:38', '2026-07-05 22:32:38'),
-  ('4', 'bi-award-fill', 'Garansi Hasil Belajar', '1', '3', '2026-07-05 22:32:38', '2026-07-05 22:32:38');
+  ('1', 'bi-patch-check-fill', '500+ Tutor Bersertifikat', '1', '0', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('2', 'bi-lightning-fill', 'Respon dalam 1 Jam', '1', '1', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('3', 'bi-shield-fill-check', 'Aman & Terpercaya', '1', '2', '2026-07-22 02:20:10', '2026-07-22 02:20:10'),
+  ('4', 'bi-award-fill', 'Garansi Hasil Belajar', '1', '3', '2026-07-22 02:20:10', '2026-07-22 02:20:10');
 
 -- ---- Tabel: `landing_wa_numbers` (1 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `landing_wa_numbers` (`id`, `label`, `number`, `description`, `is_primary`, `is_active`, `sort_order`, `created_at`, `updated_at`) VALUES
-  ('1', 'WhatsApp Pusat', '6285333399210', 'Nomor utama kantor pusat', '1', '1', '0', '2026-07-05 22:32:38', '2026-07-05 22:32:38');
+  ('1', 'WhatsApp Pusat', '6285333399210', 'Nomor utama kantor pusat', '1', '1', '0', '2026-07-22 02:20:10', '2026-07-22 02:20:10');
 
 -- ---- Tabel: `mapel_paket` (0 baris) ----
 -- (kosong)
@@ -1807,7 +1790,7 @@ INSERT INTO `landing_wa_numbers` (`id`, `label`, `number`, `description`, `is_pr
 -- ---- Tabel: `mapels` (0 baris) ----
 -- (kosong)
 
--- ---- Tabel: `migrations` (116 baris) ----
+-- ---- Tabel: `migrations` (119 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
   ('1', '2014_10_12_000000_create_users_table', '1'),
@@ -1924,8 +1907,11 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
   ('112', '2026_07_04_170952_create_branch_landing_settings_table', '1'),
   ('113', '2026_07_04_173915_create_landing_extra_content_tables', '1'),
   ('114', '2026_07_04_173916_add_image_fields_to_landing_and_branches_tables', '1'),
-  ('115', '2026_07_13_000001_make_rooms_branch_id_nullable', '2'),
-  ('116', '2026_07_13_221111_restore_pertemuan_ke_on_schedules', '3');
+  ('115', '2026_07_13_000001_make_rooms_branch_id_nullable', '1'),
+  ('116', '2026_07_13_221111_restore_pertemuan_ke_on_schedules', '1'),
+  ('117', '2026_07_19_100000_create_articles_table', '1'),
+  ('118', '2026_07_19_100001_create_teacher_registrations_table', '1'),
+  ('119', '2026_07_21_000001_make_teacher_registration_email_nullable', '1');
 
 -- ---- Tabel: `model_has_permissions` (0 baris) ----
 -- (kosong)
@@ -1933,17 +1919,17 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 -- ---- Tabel: `model_has_roles` (6 baris) ----
 INSERT INTO `model_has_roles` (`role_id`, `model_type`, `model_id`) VALUES
   ('1', 'App\\Models\\User', '1'),
-  ('3', 'App\\Models\\User', '27'),
-  ('3', 'App\\Models\\User', '28'),
-  ('3', 'App\\Models\\User', '31'),
-  ('4', 'App\\Models\\User', '29'),
-  ('4', 'App\\Models\\User', '30');
+  ('3', 'App\\Models\\User', '3'),
+  ('3', 'App\\Models\\User', '4'),
+  ('3', 'App\\Models\\User', '7'),
+  ('4', 'App\\Models\\User', '5'),
+  ('4', 'App\\Models\\User', '6');
 
 -- ---- Tabel: `modules` (2 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `modules` (`id`, `kode_modul`, `created_at`, `updated_at`, `mata_pelajaran_id`, `diupload_oleh`, `judul`, `deskripsi`, `jenis`, `file_path`, `file_url`, `ukuran_file`, `is_gratis`, `status`, `jumlah_download`, `deleted_at`) VALUES
-  ('1', 'MOD-001', '2026-07-16 02:32:08', '2026-07-16 02:32:08', '1', '27', 'Modul Aljabar Dasar', 'Materi aljabar dasar untuk kelas 10 SMA.', 'pdf', NULL, NULL, NULL, '1', 'aktif', '0', NULL),
-  ('2', 'MOD-002', '2026-07-16 02:32:09', '2026-07-16 02:32:09', '2', '28', 'Modul Grammar Dasar', 'Panduan grammar Bahasa Inggris untuk pemula.', 'pdf', NULL, NULL, NULL, '1', 'aktif', '0', NULL);
+  ('1', 'MOD-001', '2026-07-22 02:20:08', '2026-07-22 02:20:08', '1', '3', 'Modul Aljabar Dasar', 'Materi aljabar dasar untuk kelas 10 SMA.', 'pdf', NULL, NULL, NULL, '1', 'aktif', '0', NULL),
+  ('2', 'MOD-002', '2026-07-22 02:20:08', '2026-07-22 02:20:08', '2', '4', 'Modul Grammar Dasar', 'Panduan grammar Bahasa Inggris untuk pemula.', 'pdf', NULL, NULL, NULL, '1', 'aktif', '0', NULL);
 
 -- ---- Tabel: `moduls` (0 baris) ----
 -- (kosong)
@@ -1957,8 +1943,8 @@ INSERT INTO `modules` (`id`, `kode_modul`, `created_at`, `updated_at`, `mata_pel
 -- ---- Tabel: `packages` (2 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `packages` (`id`, `created_at`, `updated_at`, `cabang_id`, `guru_id`, `nama`, `deskripsi`, `harga`, `durasi_bulan`, `jumlah_pertemuan`, `jenis`, `metode_absensi`, `tipe_kelas`, `fitur`, `is_unggulan`, `status`, `deleted_at`) VALUES
-  ('1', '2026-07-16 02:32:08', '2026-07-16 02:32:08', '1', NULL, 'Paket Reguler SMA', 'Paket reguler 8 pertemuan per bulan untuk siswa SMA.', '750000.00', '1', '8', 'reguler', 'dual', 'offline', '[\"8 pertemuan\\/bulan\",\"Modul digital\",\"Evaluasi bulanan\"]', '0', 'aktif', NULL),
-  ('2', '2026-07-16 02:32:08', '2026-07-16 02:32:08', '1', NULL, 'Paket Intensif SNBT', 'Program intensif 3 bulan persiapan SNBT dengan tryout rutin.', '2500000.00', '3', '36', 'intensif', 'dual', 'offline', '[\"36 pertemuan\",\"Tryout mingguan\",\"Mentor pribadi\"]', '1', 'aktif', NULL);
+  ('1', '2026-07-22 02:20:08', '2026-07-22 02:20:08', '1', NULL, 'Paket Reguler SMA', 'Paket reguler 8 pertemuan per bulan untuk siswa SMA.', '750000.00', '1', '8', 'reguler', 'dual', 'offline', '[\"8 pertemuan\\/bulan\",\"Modul digital\",\"Evaluasi bulanan\"]', '0', 'aktif', NULL),
+  ('2', '2026-07-22 02:20:08', '2026-07-22 02:20:08', '1', NULL, 'Paket Intensif SNBT', 'Program intensif 3 bulan persiapan SNBT dengan tryout rutin.', '2500000.00', '3', '36', 'intensif', 'dual', 'offline', '[\"36 pertemuan\",\"Tryout mingguan\",\"Mentor pribadi\"]', '1', 'aktif', NULL);
 
 -- ---- Tabel: `pakets` (0 baris) ----
 -- (kosong)
@@ -1969,7 +1955,7 @@ INSERT INTO `packages` (`id`, `created_at`, `updated_at`, `cabang_id`, `guru_id`
 -- ---- Tabel: `payments` (1 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `payments` (`id`, `created_at`, `updated_at`, `invoice_id`, `siswa_id`, `cabang_id`, `nomor_pembayaran`, `jumlah`, `metode`, `nama_bank`, `nomor_rekening`, `bukti_pembayaran`, `tanggal_pembayaran`, `status`, `alasan_penolakan`, `catatan`, `disetujui_oleh`, `tanggal_disetujui`, `deleted_at`) VALUES
-  ('1', '2026-07-16 02:32:09', '2026-07-16 02:32:09', '1', '1', '1', NULL, '750000.00', 'transfer', NULL, NULL, NULL, '2025-01-10', 'verified', NULL, NULL, NULL, NULL, NULL);
+  ('1', '2026-07-22 02:20:08', '2026-07-22 02:20:08', '1', '1', '1', NULL, '750000.00', 'transfer', NULL, NULL, NULL, '2025-01-10', 'verified', NULL, NULL, NULL, NULL, NULL);
 
 -- ---- Tabel: `pembayarans` (0 baris) ----
 -- (kosong)
@@ -1977,44 +1963,44 @@ INSERT INTO `payments` (`id`, `created_at`, `updated_at`, `invoice_id`, `siswa_i
 -- ---- Tabel: `permissions` (38 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `permissions` (`id`, `name`, `guard_name`, `created_at`, `updated_at`) VALUES
-  ('1', 'branch.view', 'web', '2026-07-05 22:32:33', '2026-07-05 22:32:33'),
-  ('2', 'branch.create', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('3', 'branch.edit', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('4', 'branch.delete', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('5', 'student.view', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('6', 'student.create', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('7', 'student.edit', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('8', 'student.delete', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('9', 'teacher.view', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('10', 'teacher.create', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('11', 'teacher.edit', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('12', 'teacher.delete', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('13', 'employee.view', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('14', 'employee.create', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('15', 'employee.edit', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('16', 'employee.delete', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('17', 'schedule.view', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('18', 'schedule.create', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('19', 'schedule.edit', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('20', 'schedule.delete', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('21', 'payment.view', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('22', 'payment.create', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('23', 'payment.edit', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('24', 'payment.approve', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('25', 'tryout.view', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('26', 'tryout.create', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('27', 'tryout.edit', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('28', 'tryout.delete', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('29', 'report.view', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('30', 'report.export', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('31', 'setting.view', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('32', 'setting.edit', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('33', 'salary.view', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('34', 'salary.create', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('35', 'salary.edit', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('36', 'certificate.view', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('37', 'certificate.create', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('38', 'certificate.download', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34');
+  ('1', 'branch.view', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('2', 'branch.create', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('3', 'branch.edit', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('4', 'branch.delete', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('5', 'student.view', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('6', 'student.create', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('7', 'student.edit', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('8', 'student.delete', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('9', 'teacher.view', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('10', 'teacher.create', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('11', 'teacher.edit', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('12', 'teacher.delete', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('13', 'employee.view', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('14', 'employee.create', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('15', 'employee.edit', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('16', 'employee.delete', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('17', 'schedule.view', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('18', 'schedule.create', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('19', 'schedule.edit', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('20', 'schedule.delete', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('21', 'payment.view', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('22', 'payment.create', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('23', 'payment.edit', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('24', 'payment.approve', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('25', 'tryout.view', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('26', 'tryout.create', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('27', 'tryout.edit', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('28', 'tryout.delete', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('29', 'report.view', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('30', 'report.export', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('31', 'setting.view', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('32', 'setting.edit', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('33', 'salary.view', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('34', 'salary.create', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('35', 'salary.edit', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('36', 'certificate.view', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('37', 'certificate.create', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('38', 'certificate.download', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05');
 
 -- ---- Tabel: `personal_access_tokens` (0 baris) ----
 -- (kosong)
@@ -2106,11 +2092,11 @@ INSERT INTO `role_has_permissions` (`permission_id`, `role_id`) VALUES
 -- ---- Tabel: `roles` (5 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `roles` (`id`, `name`, `guard_name`, `created_at`, `updated_at`) VALUES
-  ('1', 'owner', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('2', 'admin', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('3', 'guru', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('4', 'siswa', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34'),
-  ('5', 'karyawan', 'web', '2026-07-05 22:32:34', '2026-07-05 22:32:34');
+  ('1', 'owner', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('2', 'admin', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('3', 'guru', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('4', 'siswa', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05'),
+  ('5', 'karyawan', 'web', '2026-07-22 02:20:05', '2026-07-22 02:20:05');
 
 -- ---- Tabel: `rooms` (0 baris) ----
 -- (kosong)
@@ -2118,8 +2104,8 @@ INSERT INTO `roles` (`id`, `name`, `guard_name`, `created_at`, `updated_at`) VAL
 -- ---- Tabel: `salaries` (2 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `salaries` (`id`, `created_at`, `updated_at`, `guru_id`, `cabang_id`, `periode`, `tipe_gaji`, `gaji_pokok`, `jam_mengajar`, `tarif_per_jam`, `total_gaji_mengajar`, `bonus`, `potongan`, `total_gaji`, `metode_pembayaran`, `nama_bank`, `nomor_rekening`, `tanggal_pembayaran`, `status`, `catatan`, `bukti_pembayaran`, `dibayar_oleh`, `deleted_at`) VALUES
-  ('1', '2026-07-16 02:32:09', '2026-07-16 02:32:09', '1', '1', '2025-01', 'bulanan', '4500000.00', NULL, NULL, '0.00', '500000.00', '0.00', '5000000.00', NULL, NULL, NULL, '2025-01-28', 'dibayar', NULL, NULL, NULL, NULL),
-  ('2', '2026-07-16 02:32:09', '2026-07-16 02:32:09', '2', '2', '2025-01', 'bulanan', '4000000.00', NULL, NULL, '0.00', '0.00', '0.00', '4000000.00', NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+  ('1', '2026-07-22 02:20:08', '2026-07-22 02:20:08', '1', '1', '2025-01', 'bulanan', '4500000.00', NULL, NULL, '0.00', '500000.00', '0.00', '5000000.00', NULL, NULL, NULL, '2025-01-28', 'dibayar', NULL, NULL, NULL, NULL),
+  ('2', '2026-07-22 02:20:08', '2026-07-22 02:20:08', '2', '2', '2025-01', 'bulanan', '4000000.00', NULL, NULL, '0.00', '0.00', '0.00', '4000000.00', NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 
 -- ---- Tabel: `schedule_proposal_approvals` (0 baris) ----
 -- (kosong)
@@ -2136,8 +2122,8 @@ INSERT INTO `salaries` (`id`, `created_at`, `updated_at`, `guru_id`, `cabang_id`
 -- ---- Tabel: `school_classes` (2 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `school_classes` (`id`, `created_at`, `updated_at`, `cabang_id`, `mata_pelajaran_id`, `guru_id`, `tahun_akademik_id`, `nama`, `nama_kelas`, `kapasitas`, `jumlah_pertemuan`, `jenis`, `link_zoom`, `status`, `billing_mode`, `deleted_at`) VALUES
-  ('1', '2026-07-16 02:32:08', '2026-07-16 02:32:08', '1', '1', '1', '1', NULL, 'Matematika Reguler A', '15', '8', 'offline', NULL, 'aktif', 'per_kelas', NULL),
-  ('2', '2026-07-16 02:32:08', '2026-07-16 02:32:08', '2', '2', '2', '1', NULL, 'Bahasa Inggris Reguler A', '12', '8', 'offline', NULL, 'aktif', 'per_kelas', NULL);
+  ('1', '2026-07-22 02:20:08', '2026-07-22 02:20:08', '1', '1', '1', '1', NULL, 'Matematika Reguler A', '15', '8', 'offline', NULL, 'aktif', 'per_kelas', NULL),
+  ('2', '2026-07-22 02:20:08', '2026-07-22 02:20:08', '2', '2', '2', '1', NULL, 'Bahasa Inggris Reguler A', '12', '8', 'offline', NULL, 'aktif', 'per_kelas', NULL);
 
 -- ---- Tabel: `semesters` (0 baris) ----
 -- (kosong)
@@ -2154,8 +2140,8 @@ INSERT INTO `school_classes` (`id`, `created_at`, `updated_at`, `cabang_id`, `ma
 -- ---- Tabel: `student_registrations` (2 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `student_registrations` (`id`, `no_reg`, `name`, `phone`, `gender`, `education_level`, `birth_place`, `birth_date`, `address`, `parent_name`, `parent_phone`, `job`, `program`, `system`, `learning_place`, `pickup_mode`, `branch`, `interests`, `interest_sessions`, `interest_teachers`, `interest_teacher_honor`, `interest_teacher_sesi`, `day_preferences`, `schedule_time`, `start_date`, `notes`, `status`, `payment_status`, `academic_status`, `assigned_teacher_id`, `biaya_per_sesi`, `total_sessions`, `total_biaya`, `invoice_id`, `student_id`, `created_at`, `updated_at`) VALUES
-  ('1', 'REG-2025-0001', 'Rizal Maulana', '081298765401', 'L', 'SMA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Cabang Jakarta', '[\"Matematika\",\"Fisika\"]', '{\"Matematika\":8,\"Fisika\":8}', NULL, NULL, NULL, NULL, NULL, NULL, 'Ingin mempersiapkan SNBT tahun depan.', 'pending', 'belum_bayar', 'pending', NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-16 02:32:09', '2026-07-16 02:32:09'),
-  ('2', 'REG-2025-0002', 'Nadia Putri Utami', '082198765402', 'P', 'SMP', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Cabang Jakarta', '[\"Bahasa Inggris\"]', '{\"Bahasa Inggris\":8}', NULL, NULL, NULL, NULL, NULL, NULL, 'Perlu persiapan ujian sekolah.', 'verified', 'belum_bayar', 'pending', NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-16 02:32:09', '2026-07-16 02:32:09');
+  ('1', 'REG-2025-0001', 'Rizal Maulana', '081298765401', 'L', 'SMA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Cabang Jakarta', '[\"Matematika\",\"Fisika\"]', '{\"Matematika\":8,\"Fisika\":8}', NULL, NULL, NULL, NULL, NULL, NULL, 'Ingin mempersiapkan SNBT tahun depan.', 'pending', 'belum_bayar', 'pending', NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-22 02:20:09', '2026-07-22 02:20:09'),
+  ('2', 'REG-2025-0002', 'Nadia Putri Utami', '082198765402', 'P', 'SMP', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Cabang Jakarta', '[\"Bahasa Inggris\"]', '{\"Bahasa Inggris\":8}', NULL, NULL, NULL, NULL, NULL, NULL, 'Perlu persiapan ujian sekolah.', 'verified', 'belum_bayar', 'pending', NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-22 02:20:09', '2026-07-22 02:20:09');
 
 -- ---- Tabel: `student_teachers` (0 baris) ----
 -- (kosong)
@@ -2163,8 +2149,8 @@ INSERT INTO `student_registrations` (`id`, `no_reg`, `name`, `phone`, `gender`, 
 -- ---- Tabel: `students` (2 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `students` (`id`, `created_at`, `updated_at`, `deleted_at`, `branch_id`, `package_id`, `total_sesi`, `user_id`, `nis`, `name`, `gender`, `birth_date`, `birth_place`, `address`, `phone`, `parent_name`, `parent_phone`, `photo`, `status`, `join_date`, `school_name`, `grade`, `kategori_peserta_didik`) VALUES
-  ('1', '2026-07-16 02:32:08', '2026-07-16 02:32:08', NULL, '1', NULL, '0', '29', 'SIS-2025-001', 'Andi Nugroho', 'L', NULL, NULL, NULL, '081200000001', NULL, NULL, NULL, 'aktif', NULL, NULL, NULL, NULL),
-  ('2', '2026-07-16 02:32:08', '2026-07-16 02:32:08', NULL, '1', NULL, '0', '30', 'SIS-2025-002', 'Citra Lestari', 'P', NULL, NULL, NULL, '081200000002', NULL, NULL, NULL, 'aktif', NULL, NULL, NULL, NULL);
+  ('1', '2026-07-22 02:20:08', '2026-07-22 02:20:08', NULL, '1', NULL, '0', '5', 'SIS-2025-001', 'Andi Nugroho', 'L', NULL, NULL, NULL, '081200000001', NULL, NULL, NULL, 'aktif', NULL, NULL, NULL, NULL),
+  ('2', '2026-07-22 02:20:08', '2026-07-22 02:20:08', NULL, '1', NULL, '0', '6', 'SIS-2025-002', 'Citra Lestari', 'P', NULL, NULL, NULL, '081200000002', NULL, NULL, NULL, 'aktif', NULL, NULL, NULL, NULL);
 
 -- ---- Tabel: `system_settings` (0 baris) ----
 -- (kosong)
@@ -2178,15 +2164,18 @@ INSERT INTO `students` (`id`, `created_at`, `updated_at`, `deleted_at`, `branch_
 -- ---- Tabel: `teacher_courses` (2 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `teacher_courses` (`id`, `teacher_id`, `course_id`, `created_at`, `updated_at`) VALUES
-  ('1', '1', '1', '2026-07-05 22:32:36', '2026-07-05 22:32:36'),
-  ('2', '2', '2', '2026-07-05 22:32:36', '2026-07-05 22:32:36');
+  ('1', '1', '1', '2026-07-22 02:20:08', '2026-07-22 02:20:08'),
+  ('2', '2', '2', '2026-07-22 02:20:08', '2026-07-22 02:20:08');
+
+-- ---- Tabel: `teacher_registrations` (0 baris) ----
+-- (kosong)
 
 -- ---- Tabel: `teachers` (3 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `teachers` (`id`, `user_id`, `branch_id`, `nig`, `name`, `gender`, `birth_date`, `birth_place`, `address`, `phone`, `email`, `education`, `subjects`, `photo`, `cv_path`, `salary_base`, `join_date`, `status`, `jenis_guru`, `deleted_at`, `created_at`, `updated_at`) VALUES
-  ('1', '27', '1', 'NIG-2024-001', 'Budi Santoso, S.Pd.', 'L', NULL, NULL, NULL, NULL, 'budi.santoso@guru.akademisci.com', NULL, '[\"Matematika\"]', NULL, NULL, '4500000.00', NULL, 'aktif', 'tetap', NULL, '2026-07-16 02:32:08', '2026-07-16 02:32:08'),
-  ('2', '28', '2', 'NIG-2024-002', 'Sari Dewi, S.Pd.', 'P', NULL, NULL, NULL, NULL, 'sari.dewi@guru.akademisci.com', NULL, '[\"Bahasa Inggris\"]', NULL, NULL, '4000000.00', NULL, 'aktif', 'tetap', NULL, '2026-07-16 02:32:08', '2026-07-16 02:32:08'),
-  ('3', '31', '1', 'NIG-2024-000', 'Ahmad Fauzi, S.Si.', 'L', NULL, NULL, NULL, NULL, 'gurusci@gmail.com', NULL, '[\"Matematika\"]', NULL, NULL, '4500000.00', NULL, 'aktif', 'tetap', NULL, '2026-07-16 02:32:09', '2026-07-16 02:32:09');
+  ('1', '3', '1', 'NIG-2024-001', 'Budi Santoso, S.Pd.', 'L', NULL, NULL, NULL, NULL, 'budi.santoso@guru.akademisci.com', NULL, '[\"Matematika\"]', NULL, NULL, '4500000.00', NULL, 'aktif', 'tetap', NULL, '2026-07-22 02:20:08', '2026-07-22 02:20:08'),
+  ('2', '4', '2', 'NIG-2024-002', 'Sari Dewi, S.Pd.', 'P', NULL, NULL, NULL, NULL, 'sari.dewi@guru.akademisci.com', NULL, '[\"Bahasa Inggris\"]', NULL, NULL, '4000000.00', NULL, 'aktif', 'tetap', NULL, '2026-07-22 02:20:08', '2026-07-22 02:20:08'),
+  ('3', '7', '1', 'NIG-2024-000', 'Ahmad Fauzi, S.Si.', 'L', NULL, NULL, NULL, NULL, 'gurusci@gmail.com', NULL, '[\"Matematika\"]', NULL, NULL, '4500000.00', NULL, 'aktif', 'tetap', NULL, '2026-07-22 02:20:09', '2026-07-22 02:20:09');
 
 -- ---- Tabel: `tryout_attempts` (0 baris) ----
 -- (kosong)
@@ -2194,22 +2183,22 @@ INSERT INTO `teachers` (`id`, `user_id`, `branch_id`, `nig`, `name`, `gender`, `
 -- ---- Tabel: `tryouts` (2 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `tryouts` (`id`, `created_at`, `updated_at`, `cabang_id`, `dibuat_oleh`, `judul`, `deskripsi`, `kategori`, `durasi_menit`, `total_soal`, `nilai_kelulusan`, `waktu_mulai`, `waktu_selesai`, `is_random`, `tampilkan_hasil_langsung`, `tampilkan_kunci_jawaban`, `maksimal_percobaan`, `status`, `deleted_at`) VALUES
-  ('1', '2026-07-16 02:32:09', '2026-07-16 02:32:09', '1', '1', 'Tryout SNBT Februari 2025', 'Simulasi SNBT dengan soal terkini.', 'SNBT', '120', '40', '60.00', '2025-02-15 08:00:00', '2025-02-15 10:00:00', '0', '1', '0', '1', 'aktif', NULL),
-  ('2', '2026-07-16 02:32:09', '2026-07-16 02:32:09', '1', '1', 'Tryout Matematika Reguler', 'Latihan soal matematika untuk penilaian bulanan.', 'Reguler', '60', '20', '70.00', '2025-03-01 09:00:00', '2025-03-01 10:00:00', '0', '1', '1', '2', 'draft', NULL);
+  ('1', '2026-07-22 02:20:08', '2026-07-22 02:20:08', '1', '1', 'Tryout SNBT Februari 2025', 'Simulasi SNBT dengan soal terkini.', 'SNBT', '120', '40', '60.00', '2025-02-15 08:00:00', '2025-02-15 10:00:00', '0', '1', '0', '1', 'aktif', NULL),
+  ('2', '2026-07-22 02:20:09', '2026-07-22 02:20:09', '1', '1', 'Tryout Matematika Reguler', 'Latihan soal matematika untuk penilaian bulanan.', 'Reguler', '60', '20', '70.00', '2025-03-01 09:00:00', '2025-03-01 10:00:00', '0', '1', '1', '2', 'draft', NULL);
 
 -- ---- Tabel: `users` (6 baris) ----
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT INTO `users` (`id`, `name`, `username`, `email`, `phone`, `avatar`, `branch_id`, `is_active`, `last_login_at`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`, `deleted_at`) VALUES
-  ('1', 'Admin Pusat SCI', NULL, 'adminpusatsci@akademi.com', NULL, NULL, NULL, '1', NULL, NULL, '$2y$10$ewNwdf32w9Ktw6hqTsE1gevXhXfILGnOetUnAcZE2.5M0stp0z9La', NULL, '2026-07-05 22:32:34', '2026-07-16 02:32:06', NULL),
-  ('27', 'Budi Santoso, S.Pd.', NULL, 'budi.santoso@guru.akademisci.com', NULL, NULL, '1', '1', NULL, NULL, '$2y$10$1mP5bVnNoytScLmHPkLbb.0j9ba/fMgrc7P6cfkkEOJGYN/7FGAJ6', NULL, '2026-07-16 02:32:08', '2026-07-16 02:32:08', NULL),
-  ('28', 'Sari Dewi, S.Pd.', NULL, 'sari.dewi@guru.akademisci.com', NULL, NULL, '2', '1', NULL, NULL, '$2y$10$Yr60cTj1sMGbW82pFaqmqOC8UCj8QlPjc8iXCpD6fQYh7gWTNn8UK', NULL, '2026-07-16 02:32:08', '2026-07-16 02:32:08', NULL),
-  ('29', 'Andi Nugroho', NULL, 'andi.nugroho@siswa.com', NULL, NULL, '1', '1', NULL, NULL, '$2y$10$M1M9cd02UWi0i01ZFt5xien/IwIvQ/Ry0KV3rzjAbC7YoSVlrNoJi', NULL, '2026-07-16 02:32:08', '2026-07-16 02:32:08', NULL),
-  ('30', 'Citra Lestari', NULL, 'citra.lestari@siswa.com', NULL, NULL, '1', '1', NULL, NULL, '$2y$10$sQofKNKhKFXyW5K65uenVeMDGCAtXO32UWulPKjqtHjaR1mJAHonO', NULL, '2026-07-16 02:32:08', '2026-07-16 02:32:08', NULL),
-  ('31', 'Ahmad Fauzi, S.Si.', NULL, 'gurusci@gmail.com', NULL, NULL, '1', '1', NULL, NULL, '$2y$10$2Dx5I9ZR6fIlSxsYlbiDEOM7uvOkUgZyTvCdm0mWgBwQyC7kFeqzq', NULL, '2026-07-16 02:32:09', '2026-07-16 02:32:09', NULL);
+  ('1', 'Admin Pusat SCI', NULL, 'adminpusatsci@akademi.com', NULL, NULL, NULL, '1', NULL, NULL, '$2y$10$/tLETCeT/sUAl9d5iChH0eAEGx0EG0gVsBQUM14GxvMlvVNaZXx/m', NULL, '2026-07-22 02:20:06', '2026-07-22 02:20:06', NULL),
+  ('3', 'Budi Santoso, S.Pd.', NULL, 'budi.santoso@guru.akademisci.com', NULL, NULL, '1', '1', NULL, NULL, '$2y$10$CTgSAKEDI9xjx35JwfuNDOJXWWsRWAaqsLCIMdiHUUxmtXioW9Mbi', NULL, '2026-07-22 02:20:08', '2026-07-22 02:20:08', NULL),
+  ('4', 'Sari Dewi, S.Pd.', NULL, 'sari.dewi@guru.akademisci.com', NULL, NULL, '2', '1', NULL, NULL, '$2y$10$aemFKZHpo8/8ksr6au5KI.on.iwr/UUqCa/8MBtwdvMR15etEdS.C', NULL, '2026-07-22 02:20:08', '2026-07-22 02:20:08', NULL),
+  ('5', 'Andi Nugroho', NULL, 'andi.nugroho@siswa.com', NULL, NULL, '1', '1', NULL, NULL, '$2y$10$iBFFUVjox7d6j8ge3OPkcejwddodFcoNnF8nUJoCn.CX/Pmw9QlIi', NULL, '2026-07-22 02:20:08', '2026-07-22 02:20:08', NULL),
+  ('6', 'Citra Lestari', NULL, 'citra.lestari@siswa.com', NULL, NULL, '1', '1', NULL, NULL, '$2y$10$rpRzL14MJfYrruQgOYnNPOiQG78XDzyE9ScQq6rkPhqXQ2Dsc2rDK', NULL, '2026-07-22 02:20:08', '2026-07-22 02:20:08', NULL),
+  ('7', 'Ahmad Fauzi, S.Si.', NULL, 'gurusci@gmail.com', NULL, NULL, '1', '1', NULL, NULL, '$2y$10$nNeFsX4JG4.rKsEVpmkCZ.nK74GEzX770Cj6zGw/Jo5t2pPJUev.y', NULL, '2026-07-22 02:20:09', '2026-07-22 02:20:09', NULL);
 
 -- ===========================================================================
 -- Akhir bagian DATA
 -- ===========================================================================
 
 SET FOREIGN_KEY_CHECKS = 1;
--- Selesai — 2026-07-15 19:34:57
+-- Selesai — 2026-07-21 19:21:30

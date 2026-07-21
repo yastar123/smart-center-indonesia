@@ -10,6 +10,26 @@ use Illuminate\Support\Facades\Storage;
 
 class BranchLandingContentController extends Controller
 {
+    private function storePublicImage(Request $request, string $field, string $relativeDir): ?string
+    {
+        if (!$request->hasFile($field) || !$request->file($field)->isValid()) {
+            return null;
+        }
+
+        $file = $request->file($field);
+        $dir = public_path($relativeDir);
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+
+        $ext = strtolower($file->getClientOriginalExtension() ?: 'jpg');
+        $filename = uniqid('img_', true) . '.' . $ext;
+        $file->move($dir, $filename);
+
+        return '/' . trim($relativeDir, '/') . '/' . $filename;
+    }
+
     public function index()
     {
         $branches = Branch::orderBy('name')->get();
@@ -33,9 +53,9 @@ class BranchLandingContentController extends Controller
         $data = $request->only(['name','city','address','phone','email']);
         $data['status'] = $request->input('status', 'aktif');
 
-        if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
-            $path = $request->file('photo')->store('landing/cabang/photos', 'public');
-            $data['photo'] = Storage::url($path);
+        $photoPath = $this->storePublicImage($request, 'photo', 'landing/cabang/photos');
+        if ($photoPath) {
+            $data['photo'] = $photoPath;
         }
 
         Branch::create($data);
@@ -58,9 +78,9 @@ class BranchLandingContentController extends Controller
         $data = $request->only(['name','city','address','phone','email']);
         $data['status'] = $request->input('status', $branch->status);
 
-        if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
-            $path = $request->file('photo')->store('landing/cabang/photos', 'public');
-            $data['photo'] = Storage::url($path);
+        $photoPath = $this->storePublicImage($request, 'photo', 'landing/cabang/photos');
+        if ($photoPath) {
+            $data['photo'] = $photoPath;
         }
 
         $branch->update($data);
@@ -85,9 +105,9 @@ class BranchLandingContentController extends Controller
 
     private function uploadImage(Request $request, string $field, int $bid): void
     {
-        if ($request->hasFile($field) && $request->file($field)->isValid()) {
-            $path = $request->file($field)->store("landing/cabang/{$bid}", 'public');
-            BranchLandingSetting::setVal($bid, $field, Storage::url($path));
+        $path = $this->storePublicImage($request, $field, "landing/cabang/{$bid}");
+        if ($path) {
+            BranchLandingSetting::setVal($bid, $field, $path);
         }
     }
 

@@ -297,9 +297,10 @@
         .mobile-menu.open a:nth-child(4)  { opacity:1; transform:none; transition-delay:.21s; }
         .mobile-menu.open a:nth-child(5)  { opacity:1; transform:none; transition-delay:.26s; }
         .mobile-menu.open a:nth-child(6)  { opacity:1; transform:none; transition-delay:.31s; }
-        .mobile-menu.open .mobile-divider { opacity:1; transform:none; transition-delay:.34s; }
-        .mobile-menu.open a:nth-child(8)  { opacity:1; transform:none; transition-delay:.38s; }
+        .mobile-menu.open a:nth-child(7)  { opacity:1; transform:none; transition-delay:.36s; }
+        .mobile-menu.open .mobile-divider { opacity:1; transform:none; transition-delay:.39s; }
         .mobile-menu.open a:nth-child(9)  { opacity:1; transform:none; transition-delay:.43s; }
+        .mobile-menu.open a:nth-child(10) { opacity:1; transform:none; transition-delay:.48s; }
         /* close button always visible */
         .mobile-menu .mobile-close { opacity:1 !important; transform:none !important; }
 
@@ -1024,10 +1025,12 @@
             <li><a href="#testimonials" class="nav-link-item">Testimoni</a></li>
             <li><a href="#tutor"        class="nav-link-item">Tutor</a></li>
             <li><a href="#cabang"       class="nav-link-item">Cabang</a></li>
+            <li><a href="{{ route('articles.index') }}" class="nav-link-item">Artikel</a></li>
         </ul>
 
         <div class="nav-cta">
             <a href="{{ route('login') }}"    class="btn-nav-login">Masuk</a>
+            <a href="{{ route('public.teacher-registration.create') }}" class="btn-nav-register">Daftar Guru</a>
             <a href="{{ route('register') }}" class="btn-nav-register">Daftar Sekarang</a>
         </div>
 
@@ -1048,8 +1051,10 @@
     <a href="#testimonials" onclick="closeMobile()">Testimoni</a>
     <a href="#tutor"        onclick="closeMobile()">Tutor</a>
     <a href="#cabang"       onclick="closeMobile()">Cabang</a>
+    <a href="{{ route('articles.index') }}" onclick="closeMobile()">Artikel</a>
     <div class="mobile-divider"></div>
     <a href="{{ route('login') }}"    onclick="closeMobile()" style="color:rgba(255,255,255,.65);font-size:1.05rem;font-weight:600"><i class="bi bi-box-arrow-in-right" style="font-size:.9rem"></i> Masuk</a>
+    <a href="{{ route('public.teacher-registration.create') }}" onclick="closeMobile()" style="background:linear-gradient(135deg,#461256,#c84ddf);padding:.8rem 2.5rem;border-radius:14px;font-size:1rem;color:white">Daftar Guru</a>
     <a href="{{ route('register') }}" onclick="closeMobile()" style="background:linear-gradient(135deg,var(--primary-dark),var(--primary));padding:.8rem 2.5rem;border-radius:14px;font-size:1rem;color:white">Daftar Sekarang</a>
 </div>
 

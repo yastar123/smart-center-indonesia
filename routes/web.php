@@ -21,7 +21,9 @@ use App\Http\Controllers\Admin\StudentRegistrationController;
 use App\Http\Controllers\Admin\BillingController;
 use App\Http\Controllers\Admin\TryoutController;
 use App\Http\Controllers\Public\StudentRegistrationPublicController;
+use App\Http\Controllers\Public\TeacherRegistrationPublicController;
 use App\Http\Controllers\Admin\MessageController;
+use App\Http\Controllers\Admin\TeacherRegistrationController;
 use App\Http\Controllers\Owner\BranchController;
 use App\Http\Controllers\Owner\SubjectController as OwnerSubjectController;
 use App\Http\Controllers\Owner\CoursePackageController as OwnerCoursePackageController;
@@ -69,8 +71,14 @@ Route::get('/artikel/{slug}', function (string $slug) {
     return view('articles.show', compact('article', 'related'));
 })->name('articles.show');
 
+Route::get('/guru/register', [TeacherRegistrationPublicController::class, 'create'])
+    ->name('public.teacher-registration.create');
+
 Route::post('/public/student-registrations', [StudentRegistrationPublicController::class, 'store'])
     ->name('public.student-registrations.store');
+
+Route::post('/public/teacher-registrations', [TeacherRegistrationPublicController::class, 'store'])
+    ->name('public.teacher-registrations.store');
 
 Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -111,6 +119,8 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
         Route::get('/teachers',              [TeacherController::class, 'index'])   ->name('teachers.index');
         Route::get('/teachers/create',       [TeacherController::class, 'create'])  ->name('teachers.create');
         Route::post('/teachers',             [TeacherController::class, 'store'])   ->name('teachers.store');
+        Route::post('/teacher-registrations/{teacherRegistration}/verify', [TeacherRegistrationController::class, 'verify'])->name('teacher-registrations.verify');
+        Route::delete('/teacher-registrations/{teacherRegistration}', [TeacherRegistrationController::class, 'destroy'])->name('teacher-registrations.destroy');
         Route::get('/teachers/{teacher}/edit', [TeacherController::class, 'edit'])   ->name('teachers.edit');
         Route::get('/teachers/{teacher}',    [TeacherController::class, 'show'])    ->name('teachers.show');
         Route::put('/teachers/{teacher}',    [TeacherController::class, 'update'])  ->name('teachers.update');
@@ -194,6 +204,7 @@ Route::middleware(['auth', 'role:admin|owner', 'check.branch.access'])
 
         // ARTICLES (Artikel)
         Route::get('/articles',              [ArticleController::class, 'index'])   ->name('articles.index');
+        Route::get('/articles/create',       [ArticleController::class, 'create'])  ->name('articles.create');
         Route::post('/articles',             [ArticleController::class, 'store'])   ->name('articles.store');
         Route::get('/articles/{article}',    [ArticleController::class, 'show'])    ->name('articles.show');
         Route::put('/articles/{article}',    [ArticleController::class, 'update'])  ->name('articles.update');
