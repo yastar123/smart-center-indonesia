@@ -94,7 +94,7 @@ class RegistrationListController extends Controller
 
         $interests = $registration->interests ?? [];
 
-        $allCoursesFull = Course::with(['fee', 'guru'])->orderBy('nama')->get();
+        $allCoursesFull = Course::with(['fee', 'guru', 'modul'])->orderBy('nama')->get();
 
         // Some course names exist both as a branch-specific record and as a global
         // (cabang_id = null) master record. Without deduping, whereIn('nama', ...)
@@ -122,37 +122,54 @@ class RegistrationListController extends Controller
                     'jenis_guru'  => $t->jenis_guru,
                     'salary_base' => (float) ($t->salary_base ?? 0),
                 ])->values(),
+                'modules' => $c->modul->map(fn ($m) => [
+                    'id' => $m->id,
+                    'judul' => $m->judul,
+                ])->values(),
             ];
         })->values();
 
-        $packages = Package::where('status', 'aktif')->orderBy('nama')->get(['id', 'cabang_id', 'nama', 'harga', 'tipe_kelas', 'jumlah_pertemuan']);
+        $packages = Package::where('status', 'aktif')
+            ->with(['mataPelajaran' => function ($q) {
+                $q->select('courses.id', 'courses.nama');
+            }])
+            ->orderBy('nama')
+            ->get(['id', 'cabang_id', 'nama', 'harga', 'tipe_kelas', 'jumlah_pertemuan']);
+
+        $packageList = $packages->map(fn($p) => [
+            'id' => $p->id,
+            'nama' => $p->nama,
+            'harga' => (float) ($p->harga ?? 0),
+            'tipe_kelas' => $p->tipe_kelas,
+            'jumlah_pertemuan' => $p->jumlah_pertemuan,
+            'mata_pelajaran' => $p->mataPelajaran->map(fn($c) => [
+                'id' => $c->id,
+                'nama' => $c->nama,
+            ])->values(),
+        ])->values();
 
         $rooms = Room::where('status', 'aktif')
             ->orderBy('nama_ruangan')
             ->get(['id', 'nama_ruangan', 'kapasitas']);
 
         $activeClassesByCourse = [];
-        if ($matchedBranch) {
-            $activeClasses = SchoolClass::with(['guru', 'siswa.user', 'jadwal'])
-                ->where('cabang_id', $matchedBranch->id)
-                ->where('status', 'aktif')
-                ->orderBy('nama_kelas')
-                ->get();
+        $activeClasses = SchoolClass::with(['guru', 'siswa.user', 'jadwal', 'mataPelajaran'])
+            ->when($matchedBranch, fn ($q) => $q->where('cabang_id', $matchedBranch->id))
+            ->where('status', 'aktif')
+            ->orderBy('nama_kelas')
+            ->get();
 
-            foreach ($courses as $course) {
-                $activeClassesByCourse[$course->id] = $activeClasses
-                    ->filter(fn ($klass) => (int) $klass->mata_pelajaran_id === (int) $course->id)
-                    ->map(function ($klass) {
-                        return $klass->setRelation('siswa', $klass->siswa)->only([
-                            'id', 'nama_kelas', 'guru', 'siswa', 'jumlah_pertemuan', 'jadwal', 'jenis'
-                        ]);
-                    })
-                    ->values();
-            }
+        foreach ($courses as $course) {
+            $activeClassesByCourse[$course->id] = $activeClasses
+                ->filter(fn ($klass) => (int) $klass->mata_pelajaran_id === (int) $course->id)
+                ->map(function ($klass) {
+                    return $klass->setRelation('siswa', $klass->siswa);
+                })
+                ->values();
         }
 
         return view('admin.registration.process', compact(
-            'registration', 'branches', 'matchedBranch', 'courses', 'courseMeta', 'packages', 'rooms', 'activeClassesByCourse'
+            'registration', 'branches', 'matchedBranch', 'courses', 'courseMeta', 'packages', 'packageList', 'rooms', 'activeClassesByCourse', 'activeClasses'
         ));
     }
 
@@ -194,10 +211,50 @@ class RegistrationListController extends Controller
             ->first();
 
         if (!$overlap) {
-            return response()->json(['success' => true, 'conflict' => false]);
+            $schedules = Schedule::where('guru_id', $data['guru_id'])
+                ->where('status', '!=', 'dibatalkan')
+                ->with(['mataPelajaran', 'kelas'])
+                ->orderBy('tanggal')
+                ->orderBy('jam_mulai')
+                ->get()
+                ->map(function ($s) {
+                    return [
+                        'id' => $s->id,
+                        'mata_pelajaran' => $s->mataPelajaran->nama ?? null,
+                        'kelas' => $s->kelas->nama_kelas ?? null,
+                        'tanggal' => $s->tanggal?->format('Y-m-d'),
+                        'hari' => $s->tanggal?->format('l'),
+                        'jam_mulai' => substr($s->jam_mulai ?? '', 0, 5),
+                        'jam_selesai' => substr($s->jam_selesai ?? '', 0, 5),
+                        'topik' => $s->topik ?? null,
+                        'status' => $s->status,
+                    ];
+                })->values();
+
+            return response()->json(['success' => true, 'conflict' => false, 'schedules' => $schedules]);
         }
 
         $hariNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', "Jum'at", 'Sabtu'];
+
+        $schedules = Schedule::where('guru_id', $data['guru_id'])
+            ->where('status', '!=', 'dibatalkan')
+            ->with(['mataPelajaran', 'kelas'])
+            ->orderBy('tanggal')
+            ->orderBy('jam_mulai')
+            ->get()
+            ->map(function ($s) {
+                return [
+                    'id' => $s->id,
+                    'mata_pelajaran' => $s->mataPelajaran->nama ?? null,
+                    'kelas' => $s->kelas->nama_kelas ?? null,
+                    'tanggal' => $s->tanggal?->format('Y-m-d'),
+                    'hari' => $s->tanggal?->format('l'),
+                    'jam_mulai' => substr($s->jam_mulai ?? '', 0, 5),
+                    'jam_selesai' => substr($s->jam_selesai ?? '', 0, 5),
+                    'topik' => $s->topik ?? null,
+                    'status' => $s->status,
+                ];
+            })->values();
 
         return response()->json([
             'success'  => true,
@@ -210,6 +267,7 @@ class RegistrationListController extends Controller
                 substr($overlap->jam_selesai, 0, 5),
                 $overlap->topik ?: 'tanpa topik'
             ),
+            'schedules' => $schedules,
         ]);
     }
 
@@ -231,6 +289,8 @@ class RegistrationListController extends Controller
                 'parent_name'            => $student->parent_name,
                 'parent_phone'           => $student->parent_phone,
                 'kategori_peserta_didik' => $student->kategori_peserta_didik,
+                'school_name'            => $student->school_name,
+                'grade'                  => $student->grade,
                 'status'                 => $student->status,
                 'branch_id'              => $student->branch_id,
                 'branch_name'            => $student->branch->name ?? null,
@@ -252,6 +312,8 @@ class RegistrationListController extends Controller
             'parent_name'            => 'nullable|string|max:100',
             'parent_phone'           => 'nullable|string|max:20',
             'kategori_peserta_didik' => 'nullable|string',
+            'school_name'            => 'nullable|string|max:255',
+            'grade'                  => 'nullable|string|max:100',
             'status'                 => 'nullable|in:aktif,nonaktif',
             'branch_id'              => 'nullable|exists:branches,id',
         ]);
@@ -321,15 +383,19 @@ class RegistrationListController extends Controller
             'address'              => 'nullable|string',
             'parent_name'          => 'nullable|string|max:255',
             'parent_phone'         => 'nullable|string|max:30',
+            'school_name'          => 'required_if:education_level,Pra Sekolah (PAUD/TK),Sekolah Dasar (SD),Sekolah Menengah Pertama (SMP),Sekolah Menengah Atas/Kejuruan (SMA/SMK),Mahasiswa|nullable|string|max:255',
+            'grade'                => 'required_if:education_level,Pra Sekolah (PAUD/TK),Sekolah Dasar (SD),Sekolah Menengah Pertama (SMP),Sekolah Menengah Atas/Kejuruan (SMA/SMK)|nullable|string|max:100',
+            'semester'             => 'required_if:education_level,Mahasiswa|nullable|string|max:100',
             'program'              => 'nullable|in:kelas,privat',
             'system'               => 'nullable|in:online,offline',
             'education_level'      => 'nullable|string|max:255',
-            'tempat_belajar'       => 'nullable|in:kantor,rumah',
+            'tempat_belajar'       => 'nullable|in:kantor,rumah,online',
+            'private_address'      => 'nullable|string|max:500',
             'hari_belajar'         => 'nullable|array',
             'hari_belajar.*'       => 'nullable|string|max:20',
             'jam_detail'           => 'nullable|array',
             'is_custom_package'    => 'nullable|in:0,1',
-            'package_mode'         => 'nullable|in:standard,custom,request',
+            'package_mode'         => 'nullable|in:standard,custom,request,free',
             'package_id'           => 'nullable|exists:packages,id',
             'custom_package_name'  => 'required_if:is_custom_package,1|nullable|string|max:150',
             'custom_jenis'         => 'required_if:is_custom_package,1|nullable|in:reguler,intensif,privat,online',
@@ -343,6 +409,8 @@ class RegistrationListController extends Controller
             'course_ids.*'         => 'exists:courses,id',
             'course_teacher'       => 'nullable|array',
             'course_teacher.*'     => 'nullable|exists:teachers,id',
+            'course_module'        => 'nullable|array',
+            'course_module.*'      => 'nullable|exists:modules,id',
             'course_sessions'      => 'nullable|array',
             'course_sessions.*'    => 'nullable|integer|min:0',
             'course_fee'           => 'nullable|array',
@@ -359,6 +427,8 @@ class RegistrationListController extends Controller
             'schedule_jam_selesai.*' => 'nullable',
             'schedule_room'        => 'nullable|array',
             'schedule_room.*'      => 'nullable|exists:rooms,id',
+            'schedule_link_meeting'    => 'nullable|array',
+            'schedule_link_meeting.*'  => 'nullable|string|max:500',
             'total_biaya'            => 'required|numeric|min:0',
             'biaya_per_sesi'         => 'nullable|numeric|min:0',
             'biaya_admin'            => 'nullable|numeric|min:0',
@@ -416,10 +486,14 @@ class RegistrationListController extends Controller
                 'address'         => $data['address'] ?? null,
                 'parent_name'     => $data['parent_name'] ?? null,
                 'parent_phone'    => $data['parent_phone'] ?? null,
+                'school_name'     => $data['school_name'] ?? null,
+                'grade'           => $data['grade'] ?? null,
+                'semester'        => $data['semester'] ?? null,
                 'program'         => $data['program'] ?? $registration->program,
                 'system'          => $data['system'] ?? $registration->system,
                 'education_level' => $data['education_level'] ?? $registration->education_level,
                 'learning_place'  => $data['tempat_belajar'] ?? $registration->learning_place,
+                'private_address' => $data['private_address'] ?? null,
                 'day_preferences' => $data['hari_belajar'] ?? $registration->day_preferences ?? [],
                 'schedule_time'   => $scheduleTime ?? $registration->schedule_time,
             ]);
@@ -472,6 +546,41 @@ class RegistrationListController extends Controller
             $courseSessions = $data['course_sessions'] ?? [];
             $totalSesi      = array_sum(array_map('intval', $courseSessions));
 
+            $packageMode = $data['package_mode'] ?? (($data['is_custom_package'] ?? '0') == '1' ? 'custom' : 'standard');
+            $selectedCourses = array_filter($data['course_ids'] ?? []);
+
+            if ($packageMode === 'request') {
+                if (count($selectedCourses) !== 1) {
+                    throw new \Exception('Paket Request hanya bisa diajukan untuk satu mata pelajaran.');
+                }
+                $firstCourseId = reset($selectedCourses);
+                $sessionCount = intval($courseSessions[$firstCourseId] ?? 0);
+                if ($sessionCount !== 1) {
+                    throw new \Exception('Paket Request harus memiliki tepat 1 sesi.');
+                }
+            }
+
+            if ($packageMode === 'standard' && !empty($data['package_id'])) {
+                $selectedPackage = Package::find($data['package_id']);
+                if ($selectedPackage && !empty($selectedPackage->jumlah_pertemuan) && $totalSesi > (int) $selectedPackage->jumlah_pertemuan) {
+                    throw new \Exception('Total sesi melebihi jumlah pertemuan paket standar.');
+                }
+            }
+            if ($packageMode === 'free' && $totalSesi === 0) {
+                throw new \Exception('Paket Bebas membutuhkan minimal satu sesi yang terisi.');
+            }
+
+            // Untuk kelas online, setidaknya salah satu link meeting harus tersedia pada jadwal mapel yang aktif.
+            $system = $data['system'] ?? null;
+            if ($system === 'online') {
+                foreach ($selectedCourses as $courseId) {
+                    $hari = $data['schedule_hari'][$courseId] ?? null;
+                    if ($hari !== null && $hari !== '' && !trim($data['schedule_link_meeting'][$courseId] ?? '')) {
+                        throw new \Exception('Untuk kelas online, link meeting wajib diisi pada jadwal mapel yang dipilih.');
+                    }
+                }
+            }
+
             // Resolve teacher(s) chosen per mata pelajaran before the package is created,
             // so a custom package can be linked to the primary teacher.
             $courseTeachers   = array_filter($data['course_teacher'] ?? []);
@@ -481,7 +590,6 @@ class RegistrationListController extends Controller
             // reusing an existing one, mirroring the "Konfigurasi Kelas & Paket" flow used
             // in admin/registrasi-baru (RegistrationController@store).
             $resolvedPackageId = $data['package_id'] ?? null;
-            $packageMode = $data['package_mode'] ?? (($data['is_custom_package'] ?? '0') == '1' ? 'custom' : 'standard');
             if (in_array($packageMode, ['custom', 'request'], true) && !empty($data['custom_package_name'])) {
                 $deskripsi = $data['custom_deskripsi'] ?? null;
                 if ($packageMode === 'request') {
@@ -519,6 +627,8 @@ class RegistrationListController extends Controller
                     'address'                => $registration->address ?? $existingStudent->address,
                     'parent_name'            => $registration->parent_name ?? $existingStudent->parent_name,
                     'parent_phone'           => $registration->parent_phone ?? $existingStudent->parent_phone,
+                    'school_name'            => $registration->school_name ?? $existingStudent->school_name,
+                    'grade'                  => $registration->grade ?? $existingStudent->grade,
                     'package_id'             => $resolvedPackageId ?: $existingStudent->package_id,
                     'total_sesi'             => $totalSesi ? ($existingStudent->total_sesi ?? 0) + $totalSesi : $existingStudent->total_sesi,
                     'status'                 => 'aktif',
@@ -538,6 +648,8 @@ class RegistrationListController extends Controller
                     'address'                => $registration->address,
                     'parent_name'            => $registration->parent_name,
                     'parent_phone'           => $registration->parent_phone,
+                    'school_name'            => $registration->school_name,
+                    'grade'                  => $registration->grade,
                     'branch_id'              => $branch->id,
                     'package_id'             => $resolvedPackageId,
                     'total_sesi'             => $totalSesi ?: null,
@@ -572,6 +684,7 @@ class RegistrationListController extends Controller
             $scheduleJamMulai   = $data['schedule_jam_mulai']   ?? [];
             $scheduleJamSelesai = $data['schedule_jam_selesai'] ?? [];
             $scheduleRoom = $data['schedule_room']        ?? [];
+            $scheduleLinkMeeting = $data['schedule_link_meeting'] ?? [];
             $programBelajarSchedule = ($data['program'] ?? null) === 'privat' ? 'private' : 'kelas';
 
             foreach ($data['course_ids'] as $courseId) {
@@ -633,8 +746,9 @@ class RegistrationListController extends Controller
                 $mulai  = $scheduleJamMulai[$courseId] ?? null;
                 $selesai = $scheduleJamSelesai[$courseId] ?? null;
                 if ($isNewClass && $hari !== null && $hari !== '' && $mulai && $selesai) {
-                    $roomId   = $scheduleRoom[$courseId] ?? null;
-                    $roomName = $roomId ? optional(Room::find($roomId))->nama_ruangan : null;
+                    $roomId       = $scheduleRoom[$courseId] ?? null;
+                    $roomName     = $roomId ? optional(Room::find($roomId))->nama_ruangan : null;
+                    $meetingLink  = trim($scheduleLinkMeeting[$courseId] ?? '');
                     $useHonor = !empty($courseUseHonor[$courseId]) && ($courseUseHonor[$courseId] !== '0' && $courseUseHonor[$courseId] !== false && $courseUseHonor[$courseId] !== 'false');
                     $honorPerSesi = $useHonor && array_key_exists($courseId, $courseHonor) ? (float) $courseHonor[$courseId] : null;
                     $jumlahSesi   = (int) ($courseSessions[$courseId] ?? 8);
@@ -644,10 +758,12 @@ class RegistrationListController extends Controller
                         $tanggal = $tanggal->addDay();
                     }
 
+                    $moduleId = $data['course_module'][$courseId] ?? null;
                     for ($i = 0; $i < $jumlahSesi; $i++) {
                         Schedule::create([
                             'kelas_id'          => $schoolClass->id,
                             'mata_pelajaran_id' => $courseId,
+                            'module_id'         => $moduleId,
                             'guru_id'           => $teacherId,
                             'cabang_id'         => $branch->id,
                             'tanggal'           => $tanggal->copy()->addWeeks($i)->toDateString(),
@@ -656,6 +772,7 @@ class RegistrationListController extends Controller
                             'program_belajar'   => $programBelajarSchedule,
                             'jenis'             => $jenisKelas,
                             'ruangan'           => $roomName,
+                            'link_meeting'      => $meetingLink ?: null,
                             'honor_per_sesi'    => $honorPerSesi,
                             'status'            => 'dijadwalkan',
                         ]);

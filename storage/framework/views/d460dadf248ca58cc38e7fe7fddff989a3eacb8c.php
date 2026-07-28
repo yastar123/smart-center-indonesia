@@ -2,7 +2,6 @@
 <?php $__env->startSection('page-title','Buat Jadwal Kelas'); ?>
 
 <?php
-$conflictCheckUrl      = route('admin.schedules.conflict-check');
 $subjectStudentsBase   = '/admin/schedules/subject';
 $teacherStatsBase      = '/admin/schedules/teacher';
 ?>
@@ -267,33 +266,13 @@ $teacherStatsBase      = '/admin/schedules/teacher';
 
 
 <div class="dashboard-card mb-4">
-    <div class="d-flex align-items-center gap-2 mb-3 pb-3 border-bottom">
-        <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
-            <i class="bi bi-shield-check"></i>
-        </div>
-        <div>
-            <div class="fw-bold" style="font-size:15px">Langkah 3 — Cek Konflik <span class="text-muted fw-normal" style="font-size:12px">(opsional)</span></div>
-            <div class="text-muted" style="font-size:12px">Periksa ketersediaan ruangan dan guru di waktu yang dipilih</div>
-        </div>
-    </div>
-
-    <button type="button" class="btn btn-outline-primary btn-sm px-4" onclick="runConflictCheck()" id="btnCekKonflik">
-        <i class="bi bi-shield-check me-2"></i>Cek Konflik Sekarang
-    </button>
-    <div id="konflikResults" class="mt-3"></div>
-</div>
-
-
-
-
-<div class="dashboard-card mb-4">
     <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
         <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#10b981,#047857);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;flex-shrink:0">
             <i class="bi bi-person-badge"></i>
         </div>
         <div>
-            <div class="fw-bold" style="font-size:15px">Langkah 4 — Guru &amp; Honor</div>
-            <div class="text-muted" style="font-size:12px">Pilih guru pengajar dan kunci nominal honor per sesi</div>
+            <div class="fw-bold" style="font-size:15px">Langkah 3 — Guru</div>
+            <div class="text-muted" style="font-size:12px">Pilih guru pengajar untuk sesi ini</div>
         </div>
     </div>
 
@@ -322,29 +301,6 @@ $teacherStatsBase      = '/admin/schedules/teacher';
     <div id="guruStatsBox" style="display:none" class="mb-4 p-3 rounded-3" style="border:1px solid var(--card-border);background:var(--input-bg)">
         <div class="fw-semibold mb-3" style="font-size:13px"><i class="bi bi-bar-chart-line me-2 text-primary"></i>Statistik Guru Terpilih</div>
         <div class="row g-3" id="guruStatsContent"></div>
-    </div>
-
-    
-    <div class="p-3 rounded-3 mb-4" style="background:var(--input-bg);border:1px solid var(--card-border)">
-        <div class="fw-semibold mb-1" style="font-size:13px">
-            <i class="bi bi-cash-coin me-2" style="color:#f6af23"></i>Honor Guru per Sesi
-        </div>
-        <div class="text-muted mb-3" style="font-size:11px">Honor ini akan menjadi dasar penggajian guru untuk setiap sesi yang terlaksana.</div>
-        <div class="row g-3 align-items-end">
-            <div class="col-md-5">
-                <div class="input-group">
-                    <span class="input-group-text" style="background:var(--input-bg);border-color:var(--card-border);font-weight:600">Rp</span>
-                    <input type="number" name="honor_per_sesi" id="honor_per_sesi" class="form-control"
-                           value="<?php echo e(old('honor_per_sesi')); ?>" min="0" step="1000" placeholder="cth: 150000">
-                    <span class="input-group-text" style="background:var(--input-bg);border-color:var(--card-border)">/sesi</span>
-                </div>
-            </div>
-            <div class="col-md-7">
-                <div id="honorDisplay" class="text-muted" style="font-size:12px">
-                    <i class="bi bi-info-circle me-1"></i>Masukkan nominal honor per sesi yang disepakati.
-                </div>
-            </div>
-        </div>
     </div>
 
     
@@ -377,9 +333,10 @@ $teachersJson = $teachers->map(function ($t) {
 });
 
 $coursesJson = $courses->map(fn($c) => [
-    'id'       => $c->id,
-    'nama'     => $c->nama,
-    'kategori' => $c->kategori ?? '',
+    'id'           => $c->id,
+    'nama'         => $c->nama,
+    'kategori'     => $c->kategori ?? '',
+    'jenis_kursus' => $c->jenis_kursus ?? '',
 ]);
 ?>
 
@@ -388,7 +345,6 @@ $coursesJson = $courses->map(fn($c) => [
 const teachers             = <?php echo json_encode($teachersJson, 15, 512) ?>;
 const courses              = <?php echo json_encode($coursesJson, 15, 512) ?>;
 const csrf                 = document.querySelector('meta[name="csrf-token"]').content;
-const conflictCheckUrl     = <?php echo json_encode($conflictCheckUrl, 15, 512) ?>;
 const subjectStudentsBase  = <?php echo json_encode($subjectStudentsBase, 15, 512) ?>;
 const teacherStatsBase     = <?php echo json_encode($teacherStatsBase, 15, 512) ?>;
 
@@ -414,7 +370,6 @@ function onCourseChange(courseId) {
 
     document.getElementById('guru_id').value = '';
     document.getElementById('submitBtn').disabled = true;
-    document.getElementById('konflikResults').innerHTML = '';
     hideEl('guruStatsBox');
     document.getElementById('guruList').innerHTML =
         '<div class="col-12 text-muted" style="font-size:13px"><i class="bi bi-info-circle me-1"></i>Pilih mata pelajaran terlebih dahulu untuk melihat daftar guru.</div>';
@@ -434,6 +389,9 @@ function onCourseChange(courseId) {
 
     // Render guru list filtered by this course
     renderGuruList();
+
+    // Auto-fill schedule inputs from selected course if still empty/default
+    populateScheduleFieldsFromCourse(courseId);
 }
 
 // ─── Load students by course ───────────────────────────────────────────────
@@ -539,96 +497,55 @@ function selectSistem(val) {
     document.getElementById('lokasiOnline').style.display  = val === 'online'  ? '' : 'none';
 }
 
-// ─── Step 3: Cek Konflik ───────────────────────────────────────────────────
+function populateScheduleFieldsFromCourse(courseId) {
+    const course = courses.find(c => c.id == courseId);
+    if (!course) return;
 
-async function runConflictCheck() {
-    const btn = document.getElementById('btnCekKonflik');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memeriksa...';
+    const programInput = document.getElementById('program_belajar');
+    const jenisInput   = document.getElementById('jenis');
+    const tanggalInput = document.getElementById('tanggal');
+    const mulaiInput   = document.getElementById('jam_mulai');
+    const selesaiInput = document.getElementById('jam_selesai');
+    const topikInput   = document.querySelector('[name="topik"]');
+    const catatanInput = document.querySelector('[name="catatan"]');
 
-    const jenis    = document.getElementById('jenis').value;
-    const ruangan  = jenis === 'offline' ? (document.getElementById('ruangan').value || '') : '';
+    const normalizedKategori = (course.kategori || '').toLowerCase();
+    const normalizedJenis   = (course.jenis_kursus || '').toLowerCase();
 
-    const payload = new FormData();
-    payload.append('_token',     csrf);
-    payload.append('tanggal',    document.getElementById('tanggal').value);
-    payload.append('jam_mulai',  document.getElementById('jam_mulai').value);
-    payload.append('jam_selesai',document.getElementById('jam_selesai').value);
-    payload.append('ruangan',    ruangan);
-    if (selectedGuruId) payload.append('guru_id', selectedGuruId);
+    const defaultProgram = normalizedKategori.includes('privat') || normalizedJenis.includes('private') ? 'private' : 'kelas';
+    const defaultJenis   = normalizedKategori.includes('online') || normalizedJenis.includes('online') ? 'online' : 'offline';
 
-    try {
-        const res  = await fetch(conflictCheckUrl, { method: 'POST', body: payload });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const json = await res.json();
-        const data = json.data || {};
-        busyTeacherIds = data.busy_teacher_ids || [];
-        renderKonflikResults(data, jenis, ruangan);
-        if (currentCourseId) renderGuruList();
-    } catch {
-        showToast('Gagal menghubungi server. Coba lagi.', 'error');
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="bi bi-shield-check me-2"></i>Cek Konflik Sekarang';
+    if (programInput && !programInput.value.trim()) {
+        selectProgram(defaultProgram);
+    } else if (programInput && programInput.value.trim() === 'kelas' && defaultProgram === 'private') {
+        selectProgram(defaultProgram);
+    }
+
+    if (jenisInput && !jenisInput.value.trim()) {
+        selectSistem(defaultJenis);
+    } else if (jenisInput && jenisInput.value.trim() === 'offline' && defaultJenis === 'online') {
+        selectSistem(defaultJenis);
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+    if (tanggalInput && !tanggalInput.value) {
+        tanggalInput.value = today;
+    }
+    if (mulaiInput && !mulaiInput.value) {
+        mulaiInput.value = '08:00';
+    }
+    if (selesaiInput && !selesaiInput.value) {
+        selesaiInput.value = '09:30';
+    }
+    if (topikInput && !topikInput.value.trim()) {
+        topikInput.value = course.nama || '';
+    }
+    if (catatanInput && !catatanInput.value.trim()) {
+        catatanInput.value = `Sesi ${course.nama}`;
     }
 }
 
-function renderKonflikResults(data, jenis, ruangan) {
-    let html = '<div class="row g-3">';
-
-    if (jenis === 'offline' && ruangan && data.room) {
-        const r  = data.room;
-        const ok = !r.conflict;
-        html += `<div class="col-md-6">
-            <div class="p-3 rounded-3 d-flex align-items-start gap-3" style="background:${ok ? 'var(--soft-success-bg,#d1fae5)' : '#fef2f2'};border:1.5px solid ${ok ? '#10b981' : '#ef4444'}">
-                <div style="font-size:22px;line-height:1">${ok ? '✅' : '❌'}</div>
-                <div>
-                    <div class="fw-semibold" style="font-size:13px;color:${ok ? '#047857' : '#b91c1c'}">${ok ? 'Ruangan Tersedia' : 'Ruangan Bentrok!'}</div>
-                    <div style="font-size:12px;color:var(--text-muted)">${r.detail}</div>
-                </div>
-            </div>
-        </div>`;
-    } else if (jenis === 'online') {
-        html += `<div class="col-md-6">
-            <div class="p-3 rounded-3 d-flex align-items-start gap-3" style="background:rgba(59,130,246,.08);border:1.5px solid #3b82f6">
-                <div style="font-size:22px;line-height:1">💻</div>
-                <div><div class="fw-semibold" style="font-size:13px;color:#1d4ed8">Kelas Online</div>
-                <div style="font-size:12px;color:var(--text-muted)">Tidak ada pengecekan ruang fisik untuk kelas online.</div></div>
-            </div>
-        </div>`;
-    }
-
-    if (data.teacher) {
-        const t  = data.teacher;
-        const ok = !t.conflict;
-        html += `<div class="col-md-6">
-            <div class="p-3 rounded-3 d-flex align-items-start gap-3" style="background:${ok ? 'var(--soft-success-bg,#d1fae5)' : '#fef2f2'};border:1.5px solid ${ok ? '#10b981' : '#ef4444'}">
-                <div style="font-size:22px;line-height:1">${ok ? '👨‍🏫' : '⚠️'}</div>
-                <div>
-                    <div class="fw-semibold" style="font-size:13px;color:${ok ? '#047857' : '#b91c1c'}">${ok ? 'Guru Tersedia' : 'Guru Sedang Mengajar!'}</div>
-                    <div style="font-size:12px;color:var(--text-muted)">${t.detail}</div>
-                </div>
-            </div>
-        </div>`;
-    } else {
-        const busyCount = busyTeacherIds.length;
-        const freeCount = teachers.length - busyCount;
-        html += `<div class="col-md-6">
-            <div class="p-3 rounded-3 d-flex align-items-start gap-3" style="background:${freeCount > 0 ? 'var(--soft-success-bg,#d1fae5)' : '#fef2f2'};border:1.5px solid ${freeCount > 0 ? '#10b981' : '#ef4444'}">
-                <div style="font-size:22px;line-height:1">${freeCount > 0 ? '👨‍🏫' : '⚠️'}</div>
-                <div>
-                    <div class="fw-semibold" style="font-size:13px;color:${freeCount > 0 ? '#047857' : '#b91c1c'}">${freeCount} Guru Tersedia di Waktu Ini</div>
-                    <div style="font-size:12px;color:var(--text-muted)">${busyCount} guru sedang mengajar di jam ini.</div>
-                </div>
-            </div>
-        </div>`;
-    }
-
-    html += '</div>';
-    document.getElementById('konflikResults').innerHTML = html;
-}
-
-// ─── Step 4: Guru list & stats ─────────────────────────────────────────────
+// ─── Step 3: Guru list & stats ─────────────────────────────────────────────
 
 function renderGuruList() {
     const mapelId = currentCourseId;
@@ -711,11 +628,6 @@ async function selectGuru(guruId) {
     highlightGuruCard(guruId);
 
     const t = teachers.find(x => x.id == guruId);
-    if (t) {
-        document.getElementById('honorDisplay').innerHTML =
-            `<i class="bi bi-person-check me-1 text-success"></i><strong>${t.name}</strong> dipilih. Masukkan honor per sesi jika ada kesepakatan khusus.`;
-    }
-
     document.getElementById('submitBtn').disabled = false;
 
     // Load teacher stats

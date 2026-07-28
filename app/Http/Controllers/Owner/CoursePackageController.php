@@ -135,17 +135,23 @@ class CoursePackageController extends Controller
             $courseIds = array_filter((array) $request->course_ids);
             $coursePackage->mataPelajaran()->sync($courseIds);
 
-            PackageCourseTeacher::where('package_id', $coursePackage->id)->delete();
-            $courseTeachers = $request->input('course_teachers', []);
-            foreach ($courseTeachers as $courseId => $teacherIds) {
-                if (!is_array($teacherIds)) continue;
-                foreach (array_filter($teacherIds) as $teacherId) {
-                    PackageCourseTeacher::firstOrCreate([
-                        'package_id' => $coursePackage->id,
-                        'course_id'  => (int) $courseId,
-                        'teacher_id' => (int) $teacherId,
-                    ]);
+            if ($request->has('course_teachers')) {
+                PackageCourseTeacher::where('package_id', $coursePackage->id)->delete();
+                $courseTeachers = $request->input('course_teachers', []);
+                foreach ($courseTeachers as $courseId => $teacherIds) {
+                    if (!is_array($teacherIds)) continue;
+                    foreach (array_filter($teacherIds) as $teacherId) {
+                        PackageCourseTeacher::firstOrCreate([
+                            'package_id' => $coursePackage->id,
+                            'course_id'  => (int) $courseId,
+                            'teacher_id' => (int) $teacherId,
+                        ]);
+                    }
                 }
+            } else {
+                PackageCourseTeacher::where('package_id', $coursePackage->id)
+                    ->whereNotIn('course_id', $courseIds)
+                    ->delete();
             }
         });
 

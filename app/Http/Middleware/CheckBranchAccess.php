@@ -113,14 +113,15 @@ class CheckBranchAccess
 
         // Explicit mappings for words that end in -es but retain the trailing 'e'
         $explicit = [
-            'courses'       => 'course',
-            'schedules'     => 'schedule',
-            'certificates'  => 'certificate',
-            'modules'       => 'module',
-            'packages'      => 'package',
-            'messages'      => 'message',
-            'videocalls'    => 'videocall',
-            'course-fees'   => 'course_fee',
+            'courses'          => 'course',
+            'schedules'        => 'schedule',
+            'certificates'     => 'certificate',
+            'modules'          => 'module',
+            'packages'         => 'package',
+            'messages'         => 'message',
+            'videocalls'       => 'videocall',
+            'course-fees'      => 'course_fee',
+            'registration-list'=> 'registration',
         ];
         if (isset($explicit[$word])) return $explicit[$word];
 

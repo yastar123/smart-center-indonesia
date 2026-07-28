@@ -38,8 +38,11 @@ class RegisteredUserController extends Controller
     public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
         $request->validate([
-            'name'  => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:30'],
+            'name'         => ['required', 'string', 'max:255'],
+            'phone'        => ['required', 'string', 'max:30'],
+            'school_name'  => ['nullable', 'string', 'max:255'],
+            'grade'        => ['nullable', 'string', 'max:100'],
+            'semester'     => ['nullable', 'string', 'max:100'],
         ]);
 
         StudentRegistration::create([
@@ -53,6 +56,9 @@ class RegisteredUserController extends Controller
             'address'         => $request->address,
             'parent_name'     => $request->parent_name,
             'parent_phone'    => $request->parent_phone,
+            'school_name'     => $request->school_name,
+            'grade'           => $request->grade,
+            'semester'        => $request->semester,
             'program'         => $request->program_belajar,
             'system'          => $request->sistem_belajar,
             'learning_place'  => $request->tempat_belajar,

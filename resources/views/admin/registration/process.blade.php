@@ -29,6 +29,18 @@
     .pw-step-dot { width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; background:currentColor; color:#fff; font-size:.68rem; font-weight:800; flex-shrink:0; }
     .pw-panel { display:none; }
     .pw-panel.active { display:block; }
+    .table-responsive {
+        overflow-x:auto;
+        overflow-y:hidden;
+        -webkit-overflow-scrolling: touch;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .table-responsive::-webkit-scrollbar {
+        height: 0;
+        width: 0;
+        display: none;
+    }
     .pw-card { background:var(--card-bg); border:1px solid var(--card-border); border-radius:0 0 14px 14px; padding:1.5rem; }
     .pw-course-row { border:1px solid var(--card-border); border-radius:12px; padding:1rem; margin-bottom:.75rem; background:var(--input-bg); }
     .pw-course-row.disabled { opacity:.45; }
@@ -38,15 +50,37 @@
     .pw-course-row .form-text { font-size:.75rem; }
     .pw-course-row .input-group-sm .form-control,
     .pw-course-row .form-select-sm { min-width:0; }
-    .pw-course-row .margin-display { min-height:48px; white-space:normal; }
+    .pw-course-row .margin-display { min-height:48px; white-space:normal; overflow-wrap:anywhere; word-break:break-word; }
+    .pw-course-row .form-control,
+    .pw-course-row .form-select,
+    .pw-course-row .input-group .form-control,
+    .pw-course-row .input-group .input-group-text {
+        min-width:0;
+        width:100%;
+        box-sizing:border-box;
+    }
+    .pw-course-row .col-md-2,
+    .pw-course-row .col-md-1 { min-width:0; }
+    .pw-course-row .d-flex.align-items-center.gap-2.flex-wrap > * { min-width:0; }
     .field-label-mobile { display:none; }
     .pw-actions { display:flex; justify-content:space-between; gap:.75rem; margin-top:1.5rem; }
+    #packageInfoBox .d-flex { flex-wrap:wrap; gap:.75rem; align-items:flex-start; }
+    #packageInfoBox .d-flex > div { min-width:0; }
+    #packageInfoBox .d-flex > div:first-child { flex:1 1 280px; }
+    #packageInfoBox #pkgInfoNama,
+    #packageInfoBox #pkgInfoDetail,
+    #packageInfoBox #pkgInfoExtra,
+    #packageInfoBox #pkgInfoHarga { min-width:0; }
+    #packageInfoBox #pkgInfoDetail,
+    #packageInfoBox #pkgInfoExtra { white-space:normal; }
     @media (max-width:767.98px) {
         .pw-course-row .row { align-items:flex-start; }
         .pw-course-row .btn-outline-danger { width:100%; }
         .pw-course-row .d-flex.align-items-center.gap-2.flex-wrap { gap:.65rem; }
         .pw-course-row .form-check { margin-bottom:0; }
         .field-label-mobile { display:block; }
+        #packageInfoBox .d-flex { justify-content:flex-start; }
+        #packageInfoBox #pkgInfoHarga { width:100%; text-align:left; }
     }
     @media (max-width:576px) {
         .pw-stepper-item span:last-child { display:none; }
@@ -82,16 +116,15 @@
 <div class="dashboard-card p-0" style="overflow:hidden">
     <div class="pw-stepper">
         <div class="pw-stepper-item active" data-stepper="1"><span class="pw-step-dot">1</span><span>Informasi Siswa</span></div>
-        <div class="pw-stepper-item" data-stepper="2"><span class="pw-step-dot">2</span><span>Paket Kelas</span></div>
-        <div class="pw-stepper-item" data-stepper="3"><span class="pw-step-dot">3</span><span>Mapel &amp; Guru</span></div>
-        <div class="pw-stepper-item" data-stepper="4"><span class="pw-step-dot">4</span><span>Pembayaran</span></div>
-        <div class="pw-stepper-item" data-stepper="5"><span class="pw-step-dot">5</span><span>Preview</span></div>
+        <div class="pw-stepper-item" data-stepper="2"><span class="pw-step-dot">2</span><span>Mapel &amp; Guru</span></div>
+        <div class="pw-stepper-item" data-stepper="3"><span class="pw-step-dot">3</span><span>Pembayaran</span></div>
+        <div class="pw-stepper-item" data-stepper="4"><span class="pw-step-dot">4</span><span>Preview</span></div>
     </div>
 
     <form id="processForm" class="pw-card">
         @csrf
 
-        {{-- STEP 1: INFORMASI SISWA --}}
+        {{-- STEP 1: INFORMASI SISWA + PAKET KELAS --}}
         <div class="pw-panel active" data-step="1">
             <h6 class="fw-bold mb-3"><i class="bi bi-person-vcard me-2 text-primary"></i>Informasi Siswa</h6>
             <p class="text-muted" style="font-size:.8rem">Data ini awalnya diisi siswa saat mendaftar &mdash; admin dapat mengoreksi/melengkapinya jika perlu.</p>
@@ -209,6 +242,44 @@
                     <input type="text" class="form-control" name="parent_phone" value="{{ $registration->parent_phone }}">
                 </div>
 
+                <div class="col-12" id="schoolDataSection">
+                    <div class="border rounded-3 p-3" style="background:rgba(200,77,223,.04);border-color:rgba(200,77,223,.16)!important">
+                        <div class="fw-semibold mb-2" style="font-size:.82rem;color:#461256"><i class="bi bi-mortarboard me-2"></i>Data Sekolah</div>
+                        <div class="row g-3">
+                            <div class="col-md-6 school-data-schoolname">
+                                <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Nama Sekolah</label>
+                                <input type="text" class="form-control" name="school_name" value="{{ $registration->school_name }}" placeholder="Nama sekolah">
+                            </div>
+                            <div class="col-md-6 school-data-grade" id="schoolDataGrade">
+                                <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Kelas</label>
+                                <input type="text" class="form-control" name="grade" value="{{ $registration->grade }}" placeholder="Contoh: Kelas 10 / XI IPA">
+                            </div>
+                            <div class="col-md-6 school-data-semester d-none" id="schoolDataSemester">
+                                <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Semester</label>
+                                <input type="text" class="form-control" name="semester" value="{{ $registration->semester ?? '' }}" placeholder="Contoh: Semester 3">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @php
+                    $interestNames = collect($registration->interests ?? [])->filter(fn ($item) => !empty($item))->values();
+                @endphp
+                @if($interestNames->isNotEmpty())
+                <div class="col-12">
+                    <div class="border rounded-3 p-3" style="background:rgba(14,165,233,.04);border-color:rgba(14,165,233,.16)!important">
+                        <div class="fw-semibold mb-2" style="font-size:.82rem;color:#0f4c81"><i class="bi bi-bookmark-heart me-2"></i>Program yang Diminati</div>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach($interestNames as $interest)
+                                <span class="badge rounded-pill" style="background:rgba(14,165,233,.12);color:#0f4c81;border:1px solid rgba(14,165,233,.25);padding:.45rem .7rem;font-size:.72rem">
+                                    {{ $interest }}
+                                </span>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                @endif
+
                 {{-- TEMPAT BELAJAR & JADWAL BELAJAR — hanya relevan untuk program Privat --}}
                 <div id="learningLogisticsWrapper" class="row g-3">
                     {{-- TEMPAT BELAJAR --}}
@@ -216,14 +287,22 @@
                         <label class="form-label fw-semibold" style="font-size:.78rem">Tempat Belajar</label>
                         @php $curTempat = $registration->learning_place ?? 'kantor'; @endphp
                         <div class="d-flex gap-2 flex-wrap">
-                            <div class="pw-opt-btn {{ $curTempat!=='rumah'?'active':'' }}" onclick="pickTempat('kantor',this)">
+                            <div class="pw-opt-btn {{ $curTempat!=='rumah' && $curTempat!=='online' ? 'active' : '' }}" onclick="pickTempat('kantor',this)">
                                 <i class="bi bi-building me-1"></i>Belajar di Kantor
                             </div>
-                            <div class="pw-opt-btn {{ $curTempat==='rumah'?'active':'' }}" onclick="pickTempat('rumah',this)">
+                            <div class="pw-opt-btn {{ $curTempat==='rumah' ? 'active' : '' }}" onclick="pickTempat('rumah',this)">
                                 <i class="bi bi-house-door me-1"></i>Guru ke Rumah
+                            </div>
+                            <div class="pw-opt-btn {{ $curTempat==='online' ? 'active' : '' }} d-none" id="onlinePlaceBtn" onclick="pickTempat('online',this)">
+                                <i class="bi bi-wifi me-1"></i>Belajar Online
                             </div>
                         </div>
                         <input type="hidden" name="tempat_belajar" id="tempatBelajarInput" value="{{ $curTempat }}">
+                    </div>
+                    <div class="col-12" id="privateAddressWrapper" style="display:none">
+                        <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Alamat Rumah</label>
+                        <input type="text" class="form-control" name="private_address" id="privateAddressInput" placeholder="Alamat lengkap tempat guru datang">
+                        <div class="form-text" style="font-size:.72rem">Isi alamat jika tempat belajar dipilih Guru ke Rumah.</div>
                     </div>
 
                     {{-- JADWAL BELAJAR --}}
@@ -280,177 +359,172 @@
                 </div>
 
             </div>
+            <div class="mb-4 mt-4 p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
+                <h6 class="fw-bold mb-3"><i class="bi bi-box-seam me-2 text-primary"></i>Paket Kelas</h6>
+
+                {{-- TOGGLE PAKET STANDAR / REQUEST --}}
+                <input type="hidden" name="is_custom_package" id="isCustomPackage" value="0">
+                <input type="hidden" name="package_mode" id="packageModeInput" value="standard">
+                <div class="d-flex gap-2 mb-3 flex-wrap">
+                    <button type="button" id="btnStandard" onclick="switchPackage('standard')" class="btn btn-sm btn-primary flex-fill">
+                        <i class="bi bi-box-seam me-1"></i>Paket Standar
+                    </button>
+                    <button type="button" id="btnRequest" onclick="switchPackage('request')" class="btn btn-sm btn-outline-secondary flex-fill">
+                        <i class="bi bi-chat-square-text me-1"></i>Paket Request
+                    </button>
+                </div>
+                <div class="mb-3">
+                    <div id="packagePanelTitle" class="fw-semibold" style="font-size:.92rem">Pilih Paket Belajar</div>
+                    <div id="packagePanelHint" class="text-muted" style="font-size:.8rem">Pilih paket standar atau ajukan request paket baru jika tidak ada paket yang cocok.</div>
+                </div>
+
+                {{-- PAKET STANDAR --}}
+                <div id="standardPackage">
+                    <p class="text-muted" style="font-size:.83rem">Pilih paket belajar untuk siswa ini (opsional — bisa dilewati jika belum ada paket yang cocok).</p>
+                    <div id="freePackageNote" class="alert alert-info d-none" style="font-size:.82rem;">
+                        <i class="bi bi-info-circle me-1"></i>Pilih Paket Bebas jika ingin menyusun tarif dan sesi secara manual tanpa paket master.
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="font-size:.78rem">Paket Kelas</label>
+                        <select name="package_id" id="packageDropdown" class="form-select">
+                            <option value="" data-harga="0">— Tanpa Paket (susun manual per mata pelajaran) —</option>
+                            @foreach($packages as $pkg)
+                            <option value="{{ $pkg->id }}" data-cabang="{{ $pkg->cabang_id }}" data-harga="{{ $pkg->harga }}" data-jumlah="{{ $pkg->jumlah_pertemuan ?? 0 }}">
+                                {{ $pkg->nama }} — {{ $pkg->tipe_kelas ?? 'Reguler' }} · {{ $pkg->jumlah_pertemuan ?? '–' }} pertemuan · Rp{{ number_format($pkg->harga ?? 0,0,',','.') }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div id="packageInfoBox" class="p-3 rounded-3 d-none" style="background:rgba(200,77,223,.06);border:1.5px solid rgba(200,77,223,.25)">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <div class="fw-semibold" id="pkgInfoNama">–</div>
+                                <div class="text-muted" style="font-size:.75rem" id="pkgInfoDetail">–</div>
+                                <div class="text-muted" style="font-size:.75rem" id="pkgInfoExtra">–</div>
+                            </div>
+                            <div class="fw-bold text-primary fs-6" id="pkgInfoHarga">–</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="customPackage" style="display:none" class="border rounded-3 p-3 mt-3" >
+                    <p class="text-muted" style="font-size:.82rem">Isi detail Paket Request untuk dibuat sebagai paket kelas baru di data master.</p>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" style="font-size:.78rem">Nama Paket</label>
+                            <input type="text" class="form-control" name="custom_package_name" placeholder="Nama paket untuk request">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" style="font-size:.78rem">Jenis Paket</label>
+                            <select class="form-select" name="custom_jenis">
+                                <option value="">Pilih…</option>
+                                <option value="reguler">Reguler</option>
+                                <option value="intensif">Intensif</option>
+                                <option value="privat">Privat</option>
+                                <option value="online">Online</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" style="font-size:.78rem">Jumlah Pertemuan</label>
+                            <input type="number" min="1" class="form-control" name="jumlah_pertemuan" value="1">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" style="font-size:.78rem">Harga Paket (Rp)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="number" min="0" class="form-control" name="custom_package_price" id="customPackagePrice" value="0">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" style="font-size:.78rem">Status Paket</label>
+                            <input type="text" class="form-control" name="custom_status" value="aktif" readonly>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold" style="font-size:.78rem">Keterangan Paket</label>
+                            <textarea class="form-control" name="custom_deskripsi" rows="3" placeholder="Catatan tambahan untuk paket request"></textarea>
+                        </div>
+                        <input type="hidden" name="custom_metode_absensi" value="manual">
+                        <input type="hidden" name="custom_tipe_kelas" value="offline">
+                    </div>
+                </div>
+            </div>
             <div class="pw-actions"><span></span><button type="button" class="btn btn-primary" data-action="next">Lanjut<i class="bi bi-arrow-right ms-1"></i></button></div>
         </div>
 
-        {{-- STEP 2: PAKET KELAS --}}
+        {{-- STEP 2: KELOLA KELAS --}}
         <div class="pw-panel" data-step="2">
-            <h6 class="fw-bold mb-3"><i class="bi bi-box-seam me-2 text-primary"></i>Paket Kelas</h6>
-
-            {{-- TOGGLE PAKET STANDAR / CUSTOM / REQUEST --}}
-            <input type="hidden" name="is_custom_package" id="isCustomPackage" value="0">
-            <input type="hidden" name="package_mode" id="packageModeInput" value="standard">
-            <div class="d-flex gap-2 mb-3 flex-wrap">
-                <button type="button" id="btnStandard" onclick="switchPackage('standard')" class="btn btn-sm btn-primary flex-fill">
-                    <i class="bi bi-box-seam me-1"></i>Paket Standar
-                </button>
-                <button type="button" id="btnCustom" onclick="switchPackage('custom')" class="btn btn-sm btn-outline-secondary flex-fill">
-                    <i class="bi bi-pencil-square me-1"></i>Paket Custom
-                </button>
-                <button type="button" id="btnRequest" onclick="switchPackage('request')" class="btn btn-sm btn-outline-secondary flex-fill">
-                    <i class="bi bi-chat-square-text me-1"></i>Paket Request
-                </button>
-            </div>
-
-            {{-- PAKET STANDAR --}}
-            <div id="standardPackage">
-                <p class="text-muted" style="font-size:.83rem">Pilih paket belajar untuk siswa ini (opsional — bisa dilewati jika belum ada paket yang cocok).</p>
-                <div class="mb-3">
-                    <label class="form-label fw-semibold" style="font-size:.78rem">Paket Kelas</label>
-                    <select name="package_id" id="packageDropdown" class="form-select">
-                        <option value="" data-harga="0">— Tanpa Paket (susun manual per mata pelajaran) —</option>
-                        @foreach($packages as $pkg)
-                        <option value="{{ $pkg->id }}" data-cabang="{{ $pkg->cabang_id }}" data-harga="{{ $pkg->harga }}">
-                            {{ $pkg->nama }} — {{ $pkg->tipe_kelas ?? 'Reguler' }} · {{ $pkg->jumlah_pertemuan ?? '–' }} pertemuan · Rp{{ number_format($pkg->harga ?? 0,0,',','.') }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div id="packageInfoBox" class="p-3 rounded-3 d-none" style="background:rgba(200,77,223,.06);border:1.5px solid rgba(200,77,223,.25)">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <div>
-                            <div class="fw-semibold" id="pkgInfoNama">–</div>
-                            <div class="text-muted" style="font-size:.75rem" id="pkgInfoDetail">–</div>
-                        </div>
-                        <div class="fw-bold text-primary fs-6" id="pkgInfoHarga">–</div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- PAKET CUSTOM / REQUEST --}}
-            <div id="customPackage" style="display:none">
-                <div id="packagePanelTitle" class="fw-semibold mb-2" style="font-size:.9rem">Buat Paket Custom</div>
-                <p id="packagePanelHint" class="text-muted" style="font-size:.83rem">Susun paket belajar khusus untuk siswa ini. Paket akan dibuat dan tersimpan di data master paket.</p>
-                <div class="row g-3">
-                    <div class="col-12">
-                        <label class="form-label fw-semibold" style="font-size:.78rem">Nama Paket <span class="text-danger">*</span></label>
-                        <input type="text" name="custom_package_name" class="form-control" placeholder="cth. Intensif UTBK 12 SMA" maxlength="150">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold" style="font-size:.78rem">Jenis Paket <span class="text-danger">*</span></label>
-                        <select name="custom_jenis" class="form-select">
-                            <option value="">Pilih jenis…</option>
-                            <option value="reguler">Reguler</option>
-                            <option value="intensif">Intensif</option>
-                            <option value="privat" selected>Privat (1 Siswa)</option>
-                            <option value="online">Online</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold" style="font-size:.78rem">Jumlah Sesi <span class="text-danger">*</span></label>
-                        <input type="number" name="jumlah_pertemuan" class="form-control" value="8" min="1">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold" style="font-size:.78rem">Metode Absensi <span class="text-danger">*</span></label>
-                        <select name="custom_metode_absensi" class="form-select">
-                            <option value="manual" selected>Manual</option>
-                            <option value="otomatis">Otomatis</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold" style="font-size:.78rem">Tipe Kelas <span class="text-danger">*</span></label>
-                        <select name="custom_tipe_kelas" class="form-select">
-                            <option value="offline" selected>Offline</option>
-                            <option value="online">Online</option>
-                            <option value="private">Private</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold" style="font-size:.78rem">Harga Dasar (Rp) <span class="text-danger">*</span></label>
-                        <input type="number" name="custom_package_price" id="customPackagePrice" class="form-control" placeholder="0" value="0" min="0">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold" style="font-size:.78rem">Status</label>
-                        <select name="custom_status" class="form-select">
-                            <option value="aktif" selected>Aktif</option>
-                            <option value="nonaktif">Non Aktif</option>
-                        </select>
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Deskripsi</label>
-                        <textarea name="custom_deskripsi" class="form-control" rows="2" placeholder="Deskripsi paket belajar…"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pw-actions">
-                <button type="button" class="btn btn-outline-secondary" data-action="prev"><i class="bi bi-arrow-left me-1"></i>Kembali</button>
-                <button type="button" class="btn btn-primary" data-action="next">Lanjut<i class="bi bi-arrow-right ms-1"></i></button>
-            </div>
-        </div>
-
-        {{-- STEP 3: MAPEL & GURU --}}
-        <div class="pw-panel" data-step="3">
-            <h6 class="fw-bold mb-3"><i class="bi bi-journal-bookmark me-2 text-primary"></i>Mata Pelajaran, Guru &amp; Jadwal</h6>
+            <h6 class="fw-bold mb-3"><i class="bi bi-journal-bookmark me-2 text-primary"></i>Kelola Kelas, Guru &amp; Jadwal</h6>
             @if($courses->isEmpty())
             <div class="alert alert-warning" style="font-size:.85rem"><i class="bi bi-exclamation-triangle me-2"></i>Tidak ditemukan mata pelajaran yang cocok dengan minat pendaftaran ini di data master. Hubungi bagian akademik untuk melengkapi data mata pelajaran.</div>
             @else
             <p class="text-muted mb-3" style="font-size:.83rem">Centang mata pelajaran yang akan diambil siswa, tentukan guru &amp; jumlah sesi, lalu isi jadwal kelas untuk pengecekan konflik guru.</p>
             @endif
 
-            {{-- CARD A: MATA PELAJARAN & GURU --}}
+            {{-- CARD A: KELOLA KELAS --}}
             <div class="mb-3" style="border:1px solid var(--card-border);border-radius:14px;overflow:hidden">
                 <div class="px-3 py-2 d-flex align-items-center gap-2" style="background:linear-gradient(90deg,rgba(70,18,86,.07),transparent);border-bottom:1px solid var(--card-border)">
                     <i class="bi bi-journal-bookmark text-primary"></i>
-                    <span class="fw-bold" style="font-size:.85rem">Mata Pelajaran &amp; Guru</span>
+                    <span class="fw-bold" style="font-size:.85rem">Kelola Kelas</span>
                 </div>
                 <div class="p-3">
-                    {{-- Column headers (md+) --}}
-                    <div class="row g-2 mb-1 d-none d-md-flex px-1">
-                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Mata Pelajaran</span></div>
-                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Guru Pengajar</span></div>
-                        <div class="col-md-1"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Sesi</span></div>
-                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Biaya Siswa (Rp)</span></div>
-                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Honor Guru (Rp) / Sesi</span></div>
-                        <div class="col-md-2"><span style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em">Margin</span></div>
+                    <div class="d-flex gap-2 flex-wrap mb-3">
+                        <button type="button" id="kelolaNewBtn" class="btn btn-sm btn-primary active" onclick="setKelolaKelasMode('new')">Buat Kelas Baru</button>
+                        <button type="button" id="kelolaJoinBtn" class="btn btn-sm btn-outline-secondary" onclick="setKelolaKelasMode('join')">Gabung Kelas</button>
                     </div>
 
-                    <div id="courseRowsContainer">
-                        @foreach($courses as $course)
-                        @php
-                            $fee     = $course->fee->amount ?? 0;
-                            $sesiDef = $registration->interest_sessions[$course->nama] ?? 8;
-                            $honor   = round(($fee * 0.6) / max($sesiDef, 1));
-                        @endphp
-                        <div class="pw-course-row" data-course-row="{{ $course->id }}">
-                            <div class="row g-2 align-items-center">
-                                <div class="col-md-2">
-                                    <div class="field-label-mobile fw-semibold text-muted mb-1">Mata Pelajaran</div>
-                                    <div class="form-check">
-                                        <input class="form-check-input course-check" type="checkbox" name="course_ids[]" value="{{ $course->id }}" id="course{{ $course->id }}" checked>
-                                        <label class="form-check-label fw-semibold" for="course{{ $course->id }}" style="font-size:.82rem">{{ $course->nama }}</label>
+                    <div id="kelolaNewPanel">
+                        <div id="courseRowsContainer" class="d-grid gap-3">
+                            @foreach($courses as $course)
+                            @php
+                                $fee     = $course->fee->amount ?? 0;
+                                $sesiDef = $registration->interest_sessions[$course->nama] ?? 8;
+                                $honor   = round(($fee * 0.6) / max($sesiDef, 1));
+                            @endphp
+                            <div class="pw-course-row" data-course-row="{{ $course->id }}">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="form-check">
+                                            <input class="form-check-input course-check" type="checkbox" name="course_ids[]" value="{{ $course->id }}" id="course{{ $course->id }}" checked>
+                                            <label class="form-check-label fw-semibold" for="course{{ $course->id }}" style="font-size:.92rem">{{ $course->nama }}</label>
+                                        </div>
+                                        <div class="form-text" style="font-size:.78rem">Mapel pilihan siswa</div>
                                     </div>
-                                    <div class="form-text" style="font-size:.67rem">Mapel pilihan siswa</div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="field-label-mobile fw-semibold text-muted mb-1">Guru Pengajar</div>
-                                    <select class="form-select form-select-sm guru-select" name="course_teacher[{{ $course->id }}]" data-course-id="{{ $course->id }}">
-                                        <option value="">Pilih guru…</option>
-                                        @foreach($course->guru as $t)
-                                        <option value="{{ $t->id }}" data-jenis-guru="{{ $t->jenis_guru ?? '' }}" data-salary-base="{{ (float)($t->salary_base ?? 0) }}">
-                                            {{ $t->name }}@if($t->jenis_guru)
-                                                • {{ ucfirst($t->jenis_guru) }}@if($t->jenis_guru === 'kontrak' && (float)($t->salary_base ?? 0) > 0)
-                                                    • Gaji: Rp {{ number_format((float)($t->salary_base ?? 0), 0, ',', '.') }}
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold" style="font-size:.78rem">Guru Pengajar</label>
+                                        <select class="form-select" name="course_teacher[{{ $course->id }}]" data-course-id="{{ $course->id }}">
+                                            <option value="">Pilih guru…</option>
+                                            @foreach($course->guru as $t)
+                                            <option value="{{ $t->id }}" data-jenis-guru="{{ $t->jenis_guru ?? '' }}" data-salary-base="{{ (float)($t->salary_base ?? 0) }}">
+                                                {{ $t->name }}@if($t->jenis_guru)
+                                                    • {{ ucfirst($t->jenis_guru) }}@if($t->jenis_guru === 'kontrak' && (float)($t->salary_base ?? 0) > 0)
+                                                        • Gaji: Rp {{ number_format((float)($t->salary_base ?? 0), 0, ',', '.') }}
+                                                    @endif
                                                 @endif
-                                            @endif
-                                        </option>
-                                        @endforeach
-                                    </select>
-                                    <div class="teacher-contract-info text-muted mt-1" style="font-size:.68rem"></div>
-                                    @php $klassOptions = $activeClassesByCourse[$course->id] ?? collect(); @endphp
-                                    <div class="course-class-picker mt-2">
-                                        <div class="text-muted mb-1" style="font-size:.68rem">Kelas aktif untuk mata pelajaran ini</div>
-                                        <select class="form-select form-select-sm existing-class-select" name="course_class[{{ $course->id }}]" data-course-id="{{ $course->id }}">
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold" style="font-size:.78rem">Sesi</label>
+                                        <input type="number" min="1" class="form-control" name="course_sessions[{{ $course->id }}]" placeholder="Sesi" value="{{ $registration->interest_sessions[$course->nama] ?? 8 }}" oninput="updateRowMargin(this)">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold" style="font-size:.78rem">Modul</label>
+                                        <select class="form-select" name="course_module[{{ $course->id }}][]" multiple style="min-height:120px">
+                                            @foreach($course->modul as $modul)
+                                            <option value="{{ $modul->id }}">{{ $modul->judul }}</option>
+                                            @endforeach
+                                        </select>
+                                        <div class="form-text" style="font-size:.74rem">Pilih satu atau lebih modul.</div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold" style="font-size:.78rem">Kelas Aktif</label>
+                                        @php $klassOptions = $activeClassesByCourse[$course->id] ?? collect(); @endphp
+                                        <select class="form-select" name="course_class[{{ $course->id }}]" data-course-id="{{ $course->id }}">
                                             <option value="">Pilih kelas aktif yang sedang berlangsung…</option>
                                             @foreach($klassOptions as $klass)
                                             <option value="{{ $klass->id }}" data-course-id="{{ $course->id }}" data-class-name="{{ $klass->nama_kelas }}" data-guru-name="{{ $klass->guru?->name ?? '—' }}" data-student-count="{{ $klass->siswa->count() }}" data-student-names="{{ implode(' | ', $klass->siswa->pluck('name')->filter()->all()) }}" data-schedule-count="{{ $klass->jadwal->count() }}" data-class-type="{{ $klass->jenis ?? '-' }}">
@@ -458,49 +532,90 @@
                                             </option>
                                             @endforeach
                                         </select>
-                                        <div class="existing-class-detail mt-1 text-muted" style="font-size:.68rem"></div>
-                                        <div class="form-text mt-1" style="font-size:.68rem">Jika ada kelas aktif, admin bisa memakai kelas itu untuk siswa baru. Bila tidak, sistem akan membuat kelas baru.</div>
+                                        <div class="existing-class-detail mt-1 text-muted" style="font-size:.75rem">Pilih kelas aktif atau biarkan kosong untuk buat kelas baru.</div>
                                     </div>
-                                </div>
-                                <div class="col-md-1">
-                                    <div class="field-label-mobile fw-semibold text-muted mb-1">Sesi</div>
-                                    <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[{{ $course->id }}]" placeholder="Sesi" value="{{ $registration->interest_sessions[$course->nama] ?? 8 }}" oninput="updateRowMargin(this)">
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="field-label-mobile fw-semibold text-muted mb-1">Biaya Siswa</div>
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text">Rp</span>
-                                        <input type="number" min="0" class="form-control fee-input" name="course_fee[{{ $course->id }}]" value="{{ $fee }}" oninput="updateRowMargin(this)">
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold" style="font-size:.78rem">Biaya Siswa (Rp)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">Rp</span>
+                                            <input type="number" min="0" class="form-control fee-input" name="course_fee[{{ $course->id }}]" value="{{ $fee }}" oninput="updateRowMargin(this)">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="field-label-mobile fw-semibold text-muted mb-1">Honor Guru / Sesi</div>
-                                    <div class="d-flex align-items-center gap-2 flex-wrap">
-                                        <div class="input-group input-group-sm flex-grow-1">
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold" style="font-size:.78rem">Honor Guru / Sesi</label>
+                                        <div class="input-group">
                                             <span class="input-group-text">Rp</span>
                                             <input type="number" min="0" class="form-control honor-input" name="course_honor[{{ $course->id }}]" value="{{ $honor }}" oninput="updateRowMargin(this)" disabled>
                                         </div>
-                                        <div class="form-check form-switch ms-1">
+                                        <div class="form-check form-switch mt-2">
                                             <input class="form-check-input course-use-honor" type="checkbox" name="course_use_honor[{{ $course->id }}]" value="1">
-                                            <label class="form-check-label" style="font-size:.68rem">Tambah honor/sesi</label>
+                                            <label class="form-check-label" style="font-size:.78rem">Tambah honor/sesi</label>
                                         </div>
                                     </div>
-                                    <div class="honor-help text-muted mt-1" style="font-size:.68rem;display:none">Honor per sesi dapat ditambahkan sebagai tambahan gaji guru kontrak.</div>
-                                </div>
-                                @php $honorTotal = $honor * $sesiDef; @endphp
-                                <div class="col-md-2">
-                                    <div class="field-label-mobile fw-semibold text-muted mb-1">Margin</div>
-                                    <div class="margin-display px-2 py-1 rounded-2 text-center" style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);font-size:.78rem">
-                                        <span class="margin-rp fw-semibold" style="color:#10b981">Rp{{ number_format($fee - $honorTotal, 0, ',', '.') }}</span>
-                                        <span class="margin-pct text-muted ms-1" style="font-size:.7rem">({{ $fee > 0 ? round((($fee-$honorTotal)/$fee)*100) : 0 }}%)</span>
+
+                                    @php $honorTotal = $honor * $sesiDef; @endphp
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold" style="font-size:.78rem">Margin</label>
+                                        <div class="margin-display p-3 rounded-2" style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);font-size:.88rem">
+                                            <div class="fw-semibold" style="color:#10b981">Rp{{ number_format($fee - $honorTotal, 0, ',', '.') }}</div>
+                                            <div class="text-muted" style="font-size:.78rem">{{ $fee > 0 ? round((($fee-$honorTotal)/$fee)*100) : 0 }}%</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 text-end">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCourseRow(this, {{ $course->id }})" title="Hapus mapel ini"><i class="bi bi-trash"></i> Hapus</button>
                                     </div>
                                 </div>
-                                <div class="col-md-1 text-end">
-                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCourseRow(this, {{ $course->id }})" title="Hapus mapel ini"><i class="bi bi-trash"></i></button>
-                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div id="kelolaJoinPanel" style="display:none">
+                        <div class="mb-3">
+                            <p class="text-muted mb-2" style="font-size:.83rem">Pilih kelas aktif yang sedang berlangsung untuk memasukkan siswa ke kelas tersebut. Tabel ini menampilkan semua kelas aktif di cabang yang sesuai.</p>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered align-middle mb-0" style="font-size:.83rem;min-width:880px">
+                                    <thead>
+                                        <tr style="background:var(--input-bg)">
+                                            <th style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Nama Paket</th>
+                                            <th style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Guru</th>
+                                            <th style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Mapel</th>
+                                            <th class="text-center" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Jumlah Siswa</th>
+                                            <th style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Jadwal</th>
+                                            <th class="text-center" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($activeClasses as $klass)
+                                        @php
+                                            $scheduleDetails = $klass->jadwal->map(function ($jadwal) {
+                                                $dateLabel = optional($jadwal->tanggal)->format('d M Y');
+                                                $timeLabel = trim(($jadwal->jam_mulai ?? '') . ' - ' . ($jadwal->jam_selesai ?? ''));
+                                                return trim(($dateLabel ? $dateLabel . ' ' : '') . $timeLabel);
+                                            })->filter()->values()->all();
+                                        @endphp
+                                        <tr>
+                                            <td>{{ $klass->nama_kelas ?? '—' }} @if($klass->jenis) <span class="text-muted" style="font-size:.75rem">({{ ucfirst($klass->jenis) }})</span>@endif</td>
+                                            <td>{{ $klass->guru?->name ?? '—' }}</td>
+                                            <td>{{ $klass->mataPelajaran?->nama ?? '—' }}</td>
+                                            <td class="text-center">{{ $klass->siswa->count() }}</td>
+                                            <td style="min-width:220px">{{ $scheduleDetails ? implode(' | ', $scheduleDetails) : '—' }}</td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-sm btn-outline-primary">Gabung</button>
+                                            </td>
+                                        </tr>
+                                        @empty
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted" style="font-size:.82rem">Tidak ada kelas aktif yang tersedia.</td>
+                                        </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                        @endforeach
                     </div>
 
                     {{-- TAMBAH MATA PELAJARAN LAIN --}}
@@ -546,7 +661,7 @@
             </div>
 
             {{-- CARD B: JADWAL KELAS --}}
-            <div class="mb-3" style="border:1px solid var(--card-border);border-radius:14px;overflow:hidden">
+            <div id="scheduleCard" class="mb-3" style="border:1px solid var(--card-border);border-radius:14px;overflow:hidden">
                 <div class="px-3 py-2 d-flex align-items-center gap-2" style="background:linear-gradient(90deg,rgba(70,18,86,.07),transparent);border-bottom:1px solid var(--card-border)">
                     <i class="bi bi-calendar-week text-primary"></i>
                     <span class="fw-bold" style="font-size:.85rem">Jadwal Kelas</span>
@@ -554,13 +669,12 @@
                 </div>
                 <div class="p-3">
                     <p class="text-muted mb-3" style="font-size:.82rem">Isi hari, jam, dan ruang/media untuk setiap mata pelajaran. Guru ditampilkan otomatis sesuai pilihan di tabel atas. Pengisian ini <strong>tidak wajib</strong> dan tidak memblokir submit.</p>
-                    <div class="table-responsive">
+                    <div id="scheduleTableWrapper" class="table-responsive">
                         <table class="table table-sm table-bordered align-middle mb-0" style="font-size:.83rem;min-width:700px">
                             <thead>
                                 <tr style="background:var(--input-bg)">
                                     <th style="width:40px;font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">No</th>
                                     <th style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Mata Pelajaran</th>
-                                    <th style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Guru</th>
                                     <th style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Hari</th>
                                     <th style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Jam Mulai</th>
                                     <th style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Jam Berakhir</th>
@@ -573,9 +687,6 @@
                                     <td class="text-center text-muted sched-no" style="font-size:.78rem">{{ $loop->iteration }}</td>
                                     <td>
                                         <span class="badge rounded-pill" style="background:rgba(200,77,223,.12);color:#461256;font-size:.75rem;font-weight:600;padding:.3em .75em">{{ $course->nama }}</span>
-                                    </td>
-                                    <td>
-                                        <span class="sched-guru-name text-muted" data-course-id="{{ $course->id }}" style="font-size:.82rem">—</span>
                                     </td>
                                     <td>
                                         <select class="form-select form-select-sm hari-select" name="schedule_hari[{{ $course->id }}]" data-course-id="{{ $course->id }}" style="min-width:88px">
@@ -596,12 +707,17 @@
                                         <input type="time" class="form-control form-control-sm jam-selesai-input" name="schedule_jam_selesai[{{ $course->id }}]" data-course-id="{{ $course->id }}" value="10:00" style="min-width:100px">
                                     </td>
                                     <td class="room-column-cell">
-                                        <select class="form-select form-select-sm room-select" name="schedule_room[{{ $course->id }}]" data-course-id="{{ $course->id }}" style="min-width:140px">
-                                            <option value="">— Pilih ruang —</option>
-                                            @foreach($rooms as $room)
-                                            <option value="{{ $room->id }}">{{ $room->nama_ruangan }}{{ $room->kapasitas ? ' ('.$room->kapasitas.' org)' : '' }}</option>
-                                            @endforeach
-                                        </select>
+                                        <div class="room-field">
+                                            <select class="form-select form-select-sm room-select" name="schedule_room[{{ $course->id }}]" data-course-id="{{ $course->id }}" style="min-width:140px">
+                                                <option value="">— Pilih ruang —</option>
+                                                @foreach($rooms as $room)
+                                                <option value="{{ $room->id }}">{{ $room->nama_ruangan }}{{ $room->kapasitas ? ' ('.$room->kapasitas.' org)' : '' }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="meeting-field" style="display:none">
+                                            <input type="url" class="form-control form-control-sm meeting-input" name="schedule_link_meeting[{{ $course->id }}]" placeholder="Link meeting" autocomplete="off">
+                                        </div>
                                     </td>
                                 </tr>
                                 @endforeach
@@ -612,14 +728,13 @@
                 </div>
             </div>
 
-            {{-- CARD C: CEK KONFLIK JADWAL GURU --}}
-            <div class="mb-3" style="border:1px solid rgba(246,175,35,.4);border-radius:14px;overflow:hidden">
+            <div id="conflictCardWrapper" class="mb-3" style="border:1px solid rgba(246,175,35,.4);border-radius:14px;overflow:hidden">
                 <div class="px-3 py-2 d-flex align-items-center justify-content-between gap-2 flex-wrap" style="background:linear-gradient(90deg,rgba(246,175,35,.08),transparent);border-bottom:1px solid rgba(246,175,35,.3)">
                     <div class="d-flex align-items-center gap-2">
                         <i class="bi bi-search" style="color:#e09000"></i>
                         <span class="fw-bold" style="font-size:.85rem">Cek Konflik Jadwal Guru</span>
                     </div>
-                    <button type="button" id="btnCekSemuaGuru" class="btn btn-sm" style="background:rgba(246,175,35,.15);color:#8a5e00;border:1px solid rgba(246,175,35,.5);border-radius:10px">
+                    <button type="button" id="btnCekSemuaGuru" class="btn btn-sm" style="background:rgba(246,175,35,.15);color:#8a5e00;border:1px solid rgba(246,175,35,.5);border-radius:10px" onclick="handleCheckAllGuruClick(event)">
                         <i class="bi bi-search me-1"></i>Cek Semua Guru
                     </button>
                 </div>
@@ -646,7 +761,8 @@
                                 <span class="badge rounded-pill flex-shrink-0" style="background:rgba(200,77,223,.12);color:#461256;font-size:.74rem;font-weight:600;padding:.3em .7em;min-width:80px;text-align:center">{{ $course->nama }}</span>
                                 <div class="flex-grow-1">
                                     <div class="conflict-warning-box text-muted" data-course-id="{{ $course->id }}" style="font-size:.8rem">—</div>
-                                    <div class="active-class-summary mt-2"></div>
+                                <div class="teacher-schedule-list mt-2 text-muted" data-course-id="{{ $course->id }}" style="font-size:.78rem">Pilih guru pengajar untuk menampilkan jadwalnya.</div>
+                                <div class="active-class-summary mt-2"></div>
                                 </div>
                             </div>
                         </div>
@@ -661,8 +777,8 @@
             </div>
         </div>
 
-        {{-- STEP 4: PEMBAYARAN --}}
-        <div class="pw-panel" data-step="4">
+        {{-- STEP 3: PEMBAYARAN --}}
+        <div class="pw-panel" data-step="3">
             <h6 class="fw-bold mb-3"><i class="bi bi-cash-coin me-2 text-primary"></i>Pembayaran</h6>
 
             {{-- Total biaya (auto from step 3) --}}
@@ -808,8 +924,8 @@
             </div>
         </div>
 
-        {{-- STEP 5: PREVIEW --}}
-        <div class="pw-panel" data-step="5">
+        {{-- STEP 4: PREVIEW --}}
+        <div class="pw-panel" data-step="4">
             <h6 class="fw-bold mb-3"><i class="bi bi-clipboard2-check me-2 text-primary"></i>Preview &amp; Konfirmasi</h6>
             <div id="previewBox" class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border);font-size:.86rem"></div>
             <div class="alert alert-info mt-3" style="font-size:.82rem"><i class="bi bi-info-circle me-2"></i>Setelah disubmit, akun login siswa akan dibuat otomatis dan Anda dapat langsung mengirimkannya ke WhatsApp siswa.</div>
@@ -854,24 +970,45 @@ const _studentUpdateBase  = "{{ url('admin/registration-list/student-update') }}
 let _credData = {};
 
 function showStep(step) {
-    document.querySelectorAll('.pw-panel').forEach((panel, i) => panel.classList.toggle('active', i === step - 1));
+    const stepNum = Number(step);
+    document.querySelectorAll('.pw-panel').forEach(panel => {
+        panel.classList.toggle('active', Number(panel.dataset.step) === stepNum);
+    });
     document.querySelectorAll('.pw-stepper-item').forEach((item, i) => {
         const current = i + 1;
-        item.classList.toggle('active', current === step);
-        item.classList.toggle('completed', current < step);
+        item.classList.toggle('active', current === stepNum);
+        item.classList.toggle('completed', current < stepNum);
     });
-    if (step === 3) populateMapelGuruFromPreviousSteps();
-    if (step === 5) buildPreview();
+    if (stepNum === 2) populateMapelGuruFromPreviousSteps();
+    if (stepNum === 3) {
+        recalcTotal();
+        selectPaymentMethod(document.getElementById('paymentMethodInput')?.value || 'prabayar');
+    }
+    if (stepNum === 4) {
+        buildPreview();
+    }
 }
 
 document.querySelectorAll('[data-action="next"]').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         const current = document.querySelector('.pw-panel.active');
-        const next = parseInt(current.dataset.step, 10) + 1;
+        const next = parseInt(current?.dataset.step || '0', 10) + 1;
         if (current && current.dataset.step === '1' && next === 2) {
-            populatePackageFieldsFromStudentInfo();
+            try { populatePackageFieldsFromStudentInfo(); } catch (e) {}
         }
-        if (next <= 5) showStep(next);
+        if (next <= 4) {
+            const activeForm = document.getElementById('processForm');
+            if (activeForm) {
+                activeForm.querySelectorAll('input, select, textarea').forEach(el => {
+                    if (el.hasAttribute('required')) {
+                        el.removeAttribute('required');
+                    }
+                });
+            }
+            try { showStep(next); } catch (e) {}
+        }
     });
 });
 document.querySelectorAll('[data-action="prev"]').forEach(btn => {
@@ -885,7 +1022,15 @@ document.querySelectorAll('[data-action="prev"]').forEach(btn => {
 // ── Sinkronisasi baris jadwal saat mapel dicentang/tidak ──────────────────────
 function updateScheduleEmpty() {
     const visible = document.querySelectorAll('.pw-sched-tr:not([style*="display:none"]):not([style*="display: none"])');
-    document.getElementById('scheduleEmptyMsg').style.display = visible.length === 0 ? '' : 'none';
+    const scheduleWrapper = document.getElementById('scheduleTableWrapper');
+    const emptyMsg = document.getElementById('scheduleEmptyMsg');
+    if (visible.length === 0) {
+        if (scheduleWrapper) scheduleWrapper.style.display = 'none';
+        if (emptyMsg) emptyMsg.style.display = '';
+    } else {
+        if (scheduleWrapper) scheduleWrapper.style.display = '';
+        if (emptyMsg) emptyMsg.style.display = 'none';
+    }
 }
 
 function recalcTotal() {
@@ -936,11 +1081,10 @@ function updateRowMargin(input) {
     const pct    = fee > 0 ? Math.round((margin / fee) * 100) : 0;
     const display = row.querySelector('.margin-display');
     if (display) {
-        display.querySelector('.margin-rp').textContent  = 'Rp' + margin.toLocaleString('id-ID');
-        display.querySelector('.margin-pct').textContent = '(' + pct + '%)';
+        display.innerHTML = '<div class="fw-semibold" style="color:' + (margin >= 0 ? '#10b981' : '#dc2626') + '">Rp' + margin.toLocaleString('id-ID') + '</div>' +
+            '<div class="text-muted" style="font-size:.78rem">(' + pct + '%)</div>';
         display.style.background = margin >= 0 ? 'rgba(16,185,129,.07)' : 'rgba(220,38,38,.07)';
         display.style.borderColor = margin >= 0 ? 'rgba(16,185,129,.2)' : 'rgba(220,38,38,.2)';
-        display.querySelector('.margin-rp').style.color = margin >= 0 ? '#10b981' : '#dc2626';
     }
     // update contract addition (if any) and totals
     updateContractAddition(row);
@@ -955,10 +1099,44 @@ const _roomOptions = '<option value="">— Pilih ruang —</option>' +
 // ── Guru name sync: Card A guru-select → Card B table display ──────────────────
 function syncGuruName(courseId) {
     const sel = document.querySelector(`.guru-select[data-course-id="${courseId}"]`);
-    const span = document.querySelector(`.sched-guru-name[data-course-id="${courseId}"]`);
-    if (!sel || !span) return;
-    const chosen = sel.selectedOptions[0];
-    span.textContent = chosen && chosen.value ? chosen.text : '—';
+    if (!sel) return;
+    const chosen = sel.selectedOptions?.[0] || sel.options[sel.selectedIndex];
+    const guruText = chosen && chosen.value ? chosen.textContent.trim() : '—';
+    const spans = document.querySelectorAll(`.sched-guru-name[data-course-id="${courseId}"]`);
+    if (!spans.length) return;
+    spans.forEach(span => span.textContent = guruText || '—');
+}
+
+function syncAllGuruNames() {
+    document.querySelectorAll('.guru-select[data-course-id]').forEach(el => {
+        const courseId = el.dataset.courseId;
+        if (courseId) syncGuruName(courseId);
+    });
+}
+
+function renderTeacherSchedule(courseId, schedules, guruText) {
+    const card = document.getElementById('conflict-result-' + courseId);
+    if (!card) return;
+    const work = card.querySelector('.teacher-schedule-list');
+    if (!work) return;
+    const teacherLabel = guruText ? guruText : 'Guru belum dipilih';
+    if (!schedules || !schedules.length) {
+        work.innerHTML = '<div><strong>Jadwal guru:</strong> ' + teacherLabel + '</div>' +
+            '<div class="text-muted" style="font-size:.78rem">Belum ada jadwal terdaftar untuk guru ini.</div>';
+        return;
+    }
+    work.innerHTML = '<div><strong>Jadwal guru:</strong> ' + teacherLabel + '</div>' +
+        schedules.map(item => {
+            const tanggal = item.tanggal ? item.tanggal + ' • ' + item.hari : item.hari || 'Tanpa tanggal';
+            const subjek = item.mata_pelajaran || 'Mata pelajaran tidak tersedia';
+            const kelas = item.kelas ? ' • ' + item.kelas : '';
+            const topik = item.topik ? ' • ' + item.topik : '';
+            return `<div class="border rounded-2 p-2 mt-2" style="background:rgba(248,250,252,.9);font-size:.78rem">` +
+                `<div><strong>${tanggal}</strong></div>` +
+                `<div>${item.jam_mulai}–${item.jam_selesai}${kelas}</div>` +
+                `<div>${subjek}${topik}</div>` +
+                `</div>`;
+        }).join('');
 }
 
 // ── Renumber visible schedule rows ─────────────────────────────────────────────
@@ -985,12 +1163,10 @@ function runConflictCheck(courseId) {
     const hari    = hariSelect?.value;
     const mulai   = jamMulai?.value;
     const selesai = jamSelesai?.value;
-    if (!guruId || hari === '' || !mulai || !selesai) {
-        warningBox.innerHTML = '<span class="text-muted" style="font-size:.78rem">Lengkapi guru, hari &amp; jam terlebih dahulu.</span>';
-        return;
-    }
-    if (mulai >= selesai) {
-        warningBox.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>Jam berakhir harus setelah jam mulai.</span>';
+    const guruText = guruSelect?.selectedOptions?.[0]?.textContent.trim() || '—';
+    if (!guruId) {
+        warningBox.innerHTML = '<span class="text-muted" style="font-size:.78rem">Pilih guru terlebih dahulu untuk melihat jadwal.</span>';
+        renderTeacherSchedule(courseId, [], guruText);
         return;
     }
     warningBox.innerHTML = '<span class="text-muted"><i class="bi bi-hourglass-split me-1"></i>Mengecek…</span>';
@@ -1001,11 +1177,19 @@ function runConflictCheck(courseId) {
     })
     .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
     .then(data => {
-        warningBox.innerHTML = data.conflict
-            ? `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>${data.detail}</span>`
-            : '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Guru tersedia.</span>';
+        if (data.conflict) {
+            warningBox.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>${data.detail}</span>`;
+        } else if (hari === '' || !mulai || !selesai) {
+            warningBox.innerHTML = '<span class="text-muted" style="font-size:.78rem">Pilih hari & jam untuk memeriksa bentrok. Jadwal guru tetap ditampilkan di bawah.</span>';
+        } else {
+            warningBox.innerHTML = '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Guru tersedia.</span>';
+        }
+        renderTeacherSchedule(courseId, data.schedules || [], guruText);
     })
-    .catch(() => { warningBox.innerHTML = '<span class="text-muted">Gagal mengecek.</span>'; });
+    .catch(() => {
+        warningBox.innerHTML = '<span class="text-muted">Gagal mengecek.</span>';
+        renderTeacherSchedule(courseId, [], guruText);
+    });
 }
 
 function runAllConflictChecks() {
@@ -1202,8 +1386,12 @@ function bindCourseRowEvents(row) {
     const classSelect = row.querySelector('.existing-class-select');
     const honorToggle = row.querySelector('.course-use-honor');
     if (guruSelect) {
-        guruSelect.addEventListener('change', () => applyTeacherContractMeta(guruSelect));
+        guruSelect.addEventListener('change', () => {
+            applyTeacherContractMeta(guruSelect);
+            syncGuruName(courseId);
+        });
         applyTeacherContractMeta(guruSelect);
+        syncGuruName(courseId);
     }
     if (classSelect) {
         classSelect.addEventListener('change', () => syncExistingClassDetail(classSelect));
@@ -1219,14 +1407,22 @@ function bindCourseRowEvents(row) {
     bindGuruConflictEvents(courseId);
 }
 document.querySelectorAll('.pw-course-row').forEach(bindCourseRowEvents);
-recalcTotal();
-renderActiveClassInsights();
-
-// ── CRUD Mata Pelajaran (semua mapel bisa ditambah/dihapus admin) ─────────────
-const courseMetaList = @json($courseMeta);
-const courseMetaMap  = {};
+// Ensure all teacher selections sync to schedule row labels immediately.
+document.querySelectorAll('.guru-select').forEach(el => {
+    const courseId = el.dataset.courseId;
+    if (!courseId) return;
+    el.addEventListener('change', () => syncGuruName(courseId));
+    syncGuruName(courseId);
+});
+    syncAllGuruNames();
+const courseMetaList = @json($courseMeta ?? []);
+const courseMetaMap = {};
 courseMetaList.forEach(c => courseMetaMap[c.id] = c);
 const usedCourseIds = new Set(@json($courses->pluck('id')->values()));
+
+const packageList = @json($packageList);
+const packageMetaMap = {};
+packageList.forEach(p => packageMetaMap[p.id] = p);
 
 function formatTeacherOptionLabel(t) {
     const jenis = (t && t.jenis_guru) ? t.jenis_guru.toString().toLowerCase() : '';
@@ -1250,6 +1446,7 @@ function buildCourseRow(course, isAdmin) {
     row.className = 'pw-course-row';
     row.dataset.courseRow = course.id;
     const guruOptions = course.guru.map(t => `<option value="${t.id}" data-jenis-guru="${t.jenis_guru || ''}" data-salary-base="${Number(t.salary_base || 0)}">${formatTeacherOptionLabel(t)}</option>`).join('');
+    const moduleOptions = (course.modules || []).map(m => `<option value="${m.id}">${m.judul}</option>`).join('');
     const fee    = parseFloat(course.fee) || 0;
     const sesiDef = 8;
     const honor  = Math.round((fee * 0.6) / sesiDef); // honor per sesi
@@ -1272,6 +1469,13 @@ function buildCourseRow(course, isAdmin) {
                     ${guruOptions}
                 </select>
                 <div class="teacher-contract-info text-muted mt-1" style="font-size:.68rem"></div>
+                <div class="mt-2">
+                    <label class="form-label fw-semibold" style="font-size:.74rem">Modul</label>
+                    <select class="form-select form-select-sm" name="course_module[${course.id}][]" multiple style="min-height:120px">
+                        ${moduleOptions}
+                    </select>
+                    <div class="form-text" style="font-size:.7rem">Pilih satu atau lebih modul.</div>
+                </div>
             </div>
             <div class="col-12 col-md-1">
                 <div class="field-label-mobile fw-semibold text-muted mb-1">Sesi</div>
@@ -1308,7 +1512,7 @@ function buildCourseRow(course, isAdmin) {
             <div class="col-12 col-md-1 text-end">
                 <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCourseRow(this, ${course.id})" title="Hapus mapel ini"><i class="bi bi-trash"></i></button>
             </div>
-        </div>`;}]}
+        </div>`;
     return row;
 }
 
@@ -1320,7 +1524,6 @@ function buildScheduleRow(course) {
     tr.innerHTML = `
         <td class="text-center text-muted sched-no" style="font-size:.78rem">—</td>
         <td><span class="badge rounded-pill" style="background:rgba(200,77,223,.12);color:#461256;font-size:.75rem;font-weight:600;padding:.3em .75em">${course.nama}</span></td>
-        <td><span class="sched-guru-name text-muted" data-course-id="${course.id}" style="font-size:.82rem">—</span></td>
         <td>
             <select class="form-select form-select-sm hari-select" name="schedule_hari[${course.id}]" data-course-id="${course.id}" style="min-width:88px">
                 <option value="">Pilih…</option>
@@ -1330,7 +1533,10 @@ function buildScheduleRow(course) {
         </td>
         <td><input type="time" class="form-control form-control-sm jam-mulai-input" name="schedule_jam_mulai[${course.id}]" data-course-id="${course.id}" value="08:00" style="min-width:100px"></td>
         <td><input type="time" class="form-control form-select-sm jam-selesai-input" name="schedule_jam_selesai[${course.id}]" data-course-id="${course.id}" value="10:00" style="min-width:100px"></td>
-        <td class="room-column-cell"><select class="form-select form-select-sm room-select" name="schedule_room[${course.id}]" data-course-id="${course.id}" style="min-width:140px">${_roomOptions}</select></td>`;
+        <td class="room-column-cell">
+            <div class="room-field"><select class="form-select form-select-sm room-select" name="schedule_room[${course.id}]" data-course-id="${course.id}" style="min-width:140px">${_roomOptions}</select></div>
+            <div class="meeting-field" style="display:none"><input type="url" class="form-control form-control-sm meeting-input" name="schedule_link_meeting[${course.id}]" placeholder="Link meeting" autocomplete="off"></div>
+        </td>`;
     return tr;
 }
 
@@ -1364,6 +1570,37 @@ function addExtraCourse() {
     recalcTotal();
 }
 
+function setKelolaKelasMode(mode) {
+    const newBtn = document.getElementById('kelolaNewBtn');
+    const joinBtn = document.getElementById('kelolaJoinBtn');
+    const newPanel = document.getElementById('kelolaNewPanel');
+    const joinPanel = document.getElementById('kelolaJoinPanel');
+    const conflictWrapper = document.getElementById('conflictCardWrapper');
+    if (!newBtn || !joinBtn || !newPanel || !joinPanel) return;
+
+    if (mode === 'join') {
+        newBtn.classList.remove('btn-primary');
+        newBtn.classList.add('btn-outline-secondary');
+        joinBtn.classList.remove('btn-outline-secondary');
+        joinBtn.classList.add('btn-primary');
+        newPanel.style.display = 'none';
+        joinPanel.style.display = '';
+        if (conflictWrapper) conflictWrapper.style.display = 'none';
+        const scheduleCard = document.getElementById('scheduleCard');
+        if (scheduleCard) scheduleCard.style.display = 'none';
+    } else {
+        newBtn.classList.add('btn-primary');
+        newBtn.classList.remove('btn-outline-secondary');
+        joinBtn.classList.remove('btn-primary');
+        joinBtn.classList.add('btn-outline-secondary');
+        newPanel.style.display = '';
+        joinPanel.style.display = 'none';
+        if (conflictWrapper) conflictWrapper.style.display = '';
+        const scheduleCard = document.getElementById('scheduleCard');
+        if (scheduleCard) scheduleCard.style.display = '';
+    }
+}
+
 function removeCourseRow(btn, id) {
     btn.closest('.pw-course-row').remove();
     const schedRow = document.querySelector(`#scheduleRowsContainer .pw-sched-tr[data-schedule-row="${id}"]`);
@@ -1385,15 +1622,40 @@ function onPackageDropdownChange() {
     const sel = packageDropdown.selectedOptions[0];
     const val = packageDropdown.value;
     if (val) {
-        const text = sel.text;
-        const harga = parseFloat(sel.dataset.harga || 0);
-        // Parse detail from option text: "Nama — tipe · N pertemuan · RpXXX"
-        const parts = text.split(' — ');
-        document.getElementById('pkgInfoNama').textContent = parts[0] || text;
-        document.getElementById('pkgInfoDetail').textContent = parts.slice(1).join(' — ').replace(/·\s*Rp[\d.,]+/, '').trim();
-        document.getElementById('pkgInfoHarga').textContent = 'Rp' + Number(harga).toLocaleString('id-ID');
-        packageInfoBox.classList.remove('d-none');
-        document.getElementById('totalBiaya').value = harga;
+        const price = parseFloat(sel.dataset.harga || 0);
+        const pkg = packageMetaMap[val] || packageMetaMap[Number(val)];
+        if (pkg) {
+            const detailParts = [];
+            if (pkg.tipe_kelas) {
+                detailParts.push(pkg.tipe_kelas.charAt(0).toUpperCase() + pkg.tipe_kelas.slice(1));
+            }
+            if (pkg.jumlah_pertemuan) {
+                detailParts.push(pkg.jumlah_pertemuan + ' pertemuan');
+            }
+            const mapelNames = Array.isArray(pkg.mata_pelajaran)
+                ? pkg.mata_pelajaran.map(c => c.nama).filter(Boolean)
+                : [];
+            const mapelText = mapelNames.length
+                ? 'Mata Pelajaran: ' + mapelNames.join(', ')
+                : 'Mata Pelajaran: —';
+
+            document.getElementById('pkgInfoNama').textContent = pkg.nama;
+            document.getElementById('pkgInfoDetail').textContent = detailParts.join(' · ') || 'Detail paket tidak tersedia';
+            document.getElementById('pkgInfoExtra').textContent = mapelText;
+            document.getElementById('pkgInfoHarga').textContent = 'Rp' + Number(price).toLocaleString('id-ID');
+            packageInfoBox.classList.remove('d-none');
+            document.getElementById('totalBiaya').value = price;
+        } else {
+            const text = sel.text;
+            const harga = parseFloat(sel.dataset.harga || 0);
+            const parts = text.split(' — ');
+            document.getElementById('pkgInfoNama').textContent = parts[0] || text;
+            document.getElementById('pkgInfoDetail').textContent = parts.slice(1).join(' — ').replace(/·\s*Rp[\d.,]+/, '').trim();
+            document.getElementById('pkgInfoExtra').textContent = 'Mata Pelajaran: —';
+            document.getElementById('pkgInfoHarga').textContent = 'Rp' + Number(harga).toLocaleString('id-ID');
+            packageInfoBox.classList.remove('d-none');
+            document.getElementById('totalBiaya').value = harga;
+        }
     } else {
         packageInfoBox.classList.add('d-none');
         recalcTotal();
@@ -1529,42 +1791,69 @@ let packageMode = 'standard';
 function switchPackage(type) {
     packageMode = type;
     isCustomPkg = (type === 'custom' || type === 'request');
-    document.getElementById('packageModeInput').value = packageMode;
-    document.getElementById('isCustomPackage').value = isCustomPkg ? '1' : '0';
-    document.getElementById('standardPackage').style.display = isCustomPkg ? 'none' : '';
-    document.getElementById('customPackage').style.display = isCustomPkg ? '' : 'none';
-    if (isCustomPkg) {
-        populatePackageFieldsFromStudentInfo();
+
+    const packageModeInput = document.getElementById('packageModeInput');
+    const isCustomPackageInput = document.getElementById('isCustomPackage');
+    const standardPackageEl = document.getElementById('standardPackage');
+    const customPackageEl = document.getElementById('customPackage');
+    const freePackageNote = document.getElementById('freePackageNote');
+    const totalBiayaEl = document.getElementById('totalBiaya');
+    const customPackagePriceEl = document.getElementById('customPackagePrice');
+
+    if (packageModeInput) packageModeInput.value = packageMode;
+    if (isCustomPackageInput) isCustomPackageInput.value = isCustomPkg ? '1' : '0';
+    if (standardPackageEl) standardPackageEl.style.display = packageMode === 'standard' ? '' : 'none';
+    if (customPackageEl) customPackageEl.style.display = packageMode === 'request' ? '' : 'none';
+    if (freePackageNote) freePackageNote.classList.toggle('d-none', packageMode !== 'free');
+
+    if (packageMode === 'request') {
+        try { populatePackageFieldsFromStudentInfo(); } catch (e) {}
     }
 
     const btnStandard = document.getElementById('btnStandard');
-    const btnCustom   = document.getElementById('btnCustom');
     const btnRequest  = document.getElementById('btnRequest');
-    btnStandard.className = 'btn btn-sm flex-fill ' + (type === 'standard' ? 'btn-primary' : 'btn-outline-secondary');
-    btnCustom.className   = 'btn btn-sm flex-fill ' + (type === 'custom' ? 'btn-primary' : 'btn-outline-secondary');
-    btnRequest.className  = 'btn btn-sm flex-fill ' + (type === 'request' ? 'btn-primary' : 'btn-outline-secondary');
+    const btnFree     = document.getElementById('btnFree');
+    if (btnStandard) {
+        btnStandard.className = 'btn btn-sm flex-fill ' + (type === 'standard' ? 'btn-primary' : 'btn-outline-secondary');
+    }
+    if (btnRequest) {
+        btnRequest.className  = 'btn btn-sm flex-fill ' + (type === 'request' ? 'btn-primary' : 'btn-outline-secondary');
+    }
+    if (btnFree) {
+        btnFree.className  = 'btn btn-sm flex-fill ' + (type === 'free' ? 'btn-primary' : 'btn-outline-secondary');
+    }
 
     const titleEl = document.getElementById('packagePanelTitle');
     const hintEl  = document.getElementById('packagePanelHint');
     if (titleEl && hintEl) {
-        if (type === 'request') {
+        if (type === 'standard') {
+            titleEl.textContent = 'Pilih Paket Standar';
+            hintEl.textContent = 'Pilih paket standar untuk siswa ini atau lanjutkan tanpa paket jika belum cocok.';
+        } else if (type === 'request') {
             titleEl.textContent = 'Request Paket Kelas Baru';
             hintEl.textContent = 'Admin bisa mengajukan paket belajar khusus untuk siswa ini, lengkap dengan mata pelajaran, sesi, nominal, dan detail lainnya.';
-        } else {
-            titleEl.textContent = 'Buat Paket Custom';
-            hintEl.textContent = 'Susun paket belajar khusus untuk siswa ini. Paket akan dibuat dan tersimpan di data master paket.';
+        } else if (type === 'free') {
+            titleEl.textContent = 'Paket Bebas';
+            hintEl.textContent = 'Paket Bebas memungkinkan penyusunan tarif per mapel dan sesi secara manual tanpa memakai paket master.';
         }
     }
 
-    if (isCustomPkg) {
-        document.getElementById('totalBiaya').value = document.getElementById('customPackagePrice').value || 0;
-    } else {
-        onPackageDropdownChange();
+    if (isCustomPkg && totalBiayaEl && customPackagePriceEl) {
+        totalBiayaEl.value = customPackagePriceEl.value || 0;
+    } else if (packageMode === 'free') {
+        recalcTotal();
+    } else if (totalBiayaEl) {
+        try { onPackageDropdownChange(); } catch (e) {}
     }
 }
-document.getElementById('customPackagePrice').addEventListener('input', function() {
-    if (isCustomPkg) document.getElementById('totalBiaya').value = this.value || 0;
-});
+
+const customPackagePriceEl = document.getElementById('customPackagePrice');
+if (customPackagePriceEl) {
+    customPackagePriceEl.addEventListener('input', function() {
+        const totalBiayaEl = document.getElementById('totalBiaya');
+        if (isCustomPkg && totalBiayaEl) totalBiayaEl.value = this.value || 0;
+    });
+}
 
 function buildPreview() {
     let pkgName = 'Tanpa Paket';
@@ -1632,8 +1921,14 @@ function buildPreview() {
 
     // Hoist inline expressions so a dollar-brace-brace pattern never appears inside the template literal (Blade parses double braces even in JS blocks)
     const _previewEduLevel  = document.querySelector('[name="education_level"]')?.value || '–';
+    const _previewProgram   = document.getElementById('programSelect')?.selectedOptions[0]?.text || '–';
+    const _previewName      = document.querySelector('[name="name"]')?.value || '–';
+    const _previewPhone     = document.querySelector('[name="phone"]')?.value || '–';
+    const _previewSchool    = document.querySelector('[name="school_name"]')?.value || '–';
+    const _previewGrade     = document.querySelector('[name="grade"]')?.value || '–';
+    const _previewSemester  = document.querySelector('[name="semester"]')?.value || '–';
     const _isPrivatProgram  = document.getElementById('programSelect')?.value === 'privat';
-    const _tempatMap        = {kantor:'Di Kantor', rumah:'Guru ke Rumah'};
+    const _tempatMap        = {kantor:'Di Kantor', rumah:'Guru ke Rumah', online:'Belajar Online'};
     const _previewTempat    = _tempatMap[document.getElementById('tempatBelajarInput')?.value] || '–';
     const _previewJadwal    = (() => {
         const days = Array.from(document.querySelectorAll('input[name="hari_belajar[]"]:checked')).map(c => c.value);
@@ -1648,16 +1943,37 @@ function buildPreview() {
             <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Tempat Belajar:</span> <strong>${_previewTempat}</strong></div>
             <div class="col-md-8"><span class="text-muted" style="font-size:.83rem">Jadwal:</span> <strong style="font-size:.82rem">${_previewJadwal}</strong></div>` : '';
 
+    const _schoolDetail = _previewEduLevel === 'Mahasiswa'
+        ? `${_previewSchool}`
+        : `${_previewSchool}${_previewGrade && _previewSchool !== '–' ? ' · ' + _previewGrade : _previewGrade !== '–' ? _previewGrade : ''}`;
+    const _classLabel = _previewEduLevel === 'Mahasiswa' ? _previewSemester : _previewGrade;
+
     document.getElementById('previewBox').innerHTML = `
         {{-- Header info --}}
         <div class="row g-2 mb-3">
+            <div class="col-md-3"><span class="text-muted" style="font-size:.83rem">Nama:</span> <strong>${_previewName}</strong></div>
+            <div class="col-md-3"><span class="text-muted" style="font-size:.83rem">No. HP:</span> <strong>${_previewPhone}</strong></div>
+            <div class="col-md-3"><span class="text-muted" style="font-size:.83rem">Kategori:</span> <strong>${_previewEduLevel}</strong></div>
+            <div class="col-md-3"><span class="text-muted" style="font-size:.83rem">Program:</span> <strong>${_previewProgram}</strong></div>
+        </div>
+        <div class="row g-2 mb-3">
             <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Paket:</span> <strong>${pkgName}</strong></div>
-            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Kategori:</span> <strong>${_previewEduLevel}</strong></div>
-            ${_learningLogisticsHtml}
+            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Metode Pembayaran:</span> <strong>${metodeTxt}</strong></div>
+            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Sekolah:</span> <strong>${_schoolDetail || '–'}</strong></div>
+            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Kelas/Semester:</span> <strong>${_classLabel || '–'}</strong></div>
+        </div>
+        ${_learningLogisticsHtml}
+
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            <button type="button" class="btn btn-sm btn-success" onclick="sendInvoiceWA()"><i class="bi bi-whatsapp me-1"></i>Kirim Invoice WA</button>
+            <button type="button" class="btn btn-sm btn-outline-success" onclick="sendLoginPinWA()"><i class="bi bi-whatsapp me-1"></i>Kirim Login PIN WA</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="printPreviewSection('Formulir Pendaftaran')"><i class="bi bi-printer me-1"></i>Cetak Formulir</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="printPreviewSection('Draft Invoice')"><i class="bi bi-printer me-1"></i>Cetak Invoice</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="printPreviewSection('Kartu Siswa')"><i class="bi bi-credit-card me-1"></i>Cetak Kartu Siswa</button>
         </div>
 
         {{-- Mapel + Guru table --}}
-        <div class="fw-bold mb-2" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted)"><i class="bi bi-journal-bookmark me-1"></i>Mata Pelajaran & Guru</div>
+        <div class="fw-bold mb-2" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted)"><i class="bi bi-journal-bookmark me-1"></i>Kelola Kelas</div>
         <div class="table-responsive mb-3">
             <table class="table table-sm table-bordered align-middle mb-0" style="font-size:.82rem">
                 <thead><tr style="background:var(--input-bg)">
@@ -1781,7 +2097,7 @@ function pwSelectExistingStudent(s) {
     // Tampilkan loading di field form
     const formFields = document.querySelectorAll(
         '[name="name"],[name="phone"],[name="gender"],[name="education_level"],' +
-        '[name="birth_place"],[name="birth_date"],[name="address"],[name="parent_name"],[name="parent_phone"]'
+        '[name="birth_place"],[name="birth_date"],[name="address"],[name="parent_name"],[name="parent_phone"],[name="school_name"],[name="grade"]'
     );
     formFields.forEach(el => { el.style.opacity = '.4'; el.disabled = true; });
 
@@ -1803,6 +2119,9 @@ function pwSelectExistingStudent(s) {
             set('address',         d.address);
             set('parent_name',     d.parent_name);
             set('parent_phone',    d.parent_phone);
+            set('school_name',     d.school_name);
+            set('grade',           d.grade);
+            set('semester',        d.semester);
             // Perbarui chip meta dengan data lengkap
             document.getElementById('espChipName').textContent = d.name || s.name;
             document.getElementById('espChipMeta').textContent =
@@ -1819,7 +2138,7 @@ function pwClearExistingStudent() {
     document.getElementById('existingStudentSearch').value = '';
     document.getElementById('existingStudentChip').style.display = 'none';
     // Reset field form ke nilai kosong / default
-    ['name','phone','gender','education_level','birth_place','birth_date','address','parent_name','parent_phone']
+    ['name','phone','gender','education_level','birth_place','birth_date','address','parent_name','parent_phone','school_name','grade','semester']
         .forEach(name => {
             const el = document.querySelector('[name="' + name + '"]');
             if (el) el.value = '';
@@ -1868,14 +2187,32 @@ function pwToggleRoomColumn() {
     const system = document.getElementById('systemSelect')?.value;
     const program = document.getElementById('programSelect')?.value;
     const tempat = document.getElementById('tempatBelajarInput')?.value || 'kantor';
-    const shouldHide = system === 'online' || (program === 'privat' && tempat === 'rumah');
+    const isOnlineLearningPlace = tempat === 'online';
+    const shouldHideRoom = system === 'online' || (program === 'privat' && (tempat === 'rumah' || isOnlineLearningPlace));
+    const shouldShowMeeting = system === 'online' || isOnlineLearningPlace;
 
-    document.querySelectorAll('.room-column-header, .room-column-cell').forEach(el => {
-        el.style.display = shouldHide ? 'none' : '';
+    document.querySelectorAll('.room-column-header').forEach(el => {
+        el.style.display = shouldHideRoom && !shouldShowMeeting ? 'none' : '';
+    });
+    document.querySelectorAll('.room-column-cell').forEach(cell => {
+        const roomGroup = cell.querySelector('.room-field');
+        const meetingGroup = cell.querySelector('.meeting-field');
+        if (roomGroup) roomGroup.style.display = shouldShowMeeting ? 'none' : '';
+        if (meetingGroup) meetingGroup.style.display = shouldShowMeeting ? '' : 'none';
+        cell.style.display = shouldHideRoom && !shouldShowMeeting ? 'none' : '';
     });
     document.querySelectorAll('.room-select').forEach(el => {
-        el.disabled = shouldHide;
+        el.disabled = shouldHideRoom && !shouldShowMeeting;
     });
+    document.querySelectorAll('.meeting-input').forEach(el => {
+        el.disabled = !shouldShowMeeting;
+    });
+
+    const privateAddressWrapper = document.getElementById('privateAddressWrapper');
+    if (privateAddressWrapper) {
+        privateAddressWrapper.style.display = tempat === 'rumah' ? '' : 'none';
+        document.getElementById('privateAddressInput').required = tempat === 'rumah';
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -1884,6 +2221,7 @@ document.addEventListener('DOMContentLoaded', function () {
     pwToggleRoomColumn();
     const systemSelect = document.getElementById('systemSelect');
     const programSelect = document.getElementById('programSelect');
+    const educationLevelSelect = document.querySelector('[name="education_level"]');
     if (systemSelect) {
         systemSelect.addEventListener('change', pwToggleRoomColumn);
     }
@@ -1894,7 +2232,39 @@ document.addEventListener('DOMContentLoaded', function () {
             pwToggleRoomColumn();
         });
     }
+    if (educationLevelSelect) {
+        educationLevelSelect.addEventListener('change', pwToggleSchoolData);
+    }
+    pwToggleSchoolData();
     document.querySelectorAll('.existing-class-select').forEach(selectEl => syncExistingClassDetail(selectEl));
+    setKelolaKelasMode('new');
+
+function pwToggleSchoolData() {
+    const educationLevel = document.querySelector('[name="education_level"]')?.value;
+    const schoolSection = document.getElementById('schoolDataSection');
+    const gradeField = document.getElementById('schoolDataGrade');
+    if (!schoolSection) return;
+
+    const showSchoolData = ['Pra Sekolah (PAUD/TK)','Sekolah Dasar (SD)','Sekolah Menengah Pertama (SMP)','Sekolah Menengah Atas/Kejuruan (SMA/SMK)','Mahasiswa'].includes(educationLevel);
+    const showGrade = educationLevel && educationLevel !== 'Mahasiswa';
+    const showSemester = educationLevel === 'Mahasiswa';
+    const semesterField = document.getElementById('schoolDataSemester');
+    const schoolNameInput = document.querySelector('[name="school_name"]');
+    const gradeInput = document.querySelector('[name="grade"]');
+    const semesterInput = document.querySelector('[name="semester"]');
+
+    schoolSection.style.display = showSchoolData ? '' : 'none';
+    schoolSection.querySelectorAll('input, select, textarea').forEach(el => el.disabled = !showSchoolData);
+    if (schoolNameInput) schoolNameInput.required = showSchoolData;
+    if (gradeInput) gradeInput.required = showGrade;
+    if (semesterInput) semesterInput.required = showSemester;
+    if (gradeField) {
+        gradeField.style.display = showGrade ? '' : 'none';
+    }
+    if (semesterField) {
+        semesterField.style.display = showSemester ? '' : 'none';
+    }
+}
 });
 
 const PW_DAY_ORDER = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
@@ -2052,19 +2422,25 @@ function updateCicilanTotal() {
 }
 
 // Sync totalBiaya changes → lunas display + cicilan total
-document.getElementById('totalBiaya').addEventListener('input', function() {
-    updateLunasDisplay();
-    if (document.getElementById('cicilanPanel').style.display !== 'none') {
-        updateCicilanTotal();
-    }
-});
+const totalBiayaEl = document.getElementById('totalBiaya');
+if (totalBiayaEl) {
+    totalBiayaEl.addEventListener('input', function() {
+        updateLunasDisplay();
+        if (document.getElementById('cicilanPanel').style.display !== 'none') {
+            updateCicilanTotal();
+        }
+    });
+}
 
 // Auto-initialise payment method to prabayar on page load
-selectPaymentMethod('prabayar');
+if (document.querySelectorAll('.pm-card').length > 0) {
+    recalcTotal();
+    selectPaymentMethod('prabayar');
+}
 
-// Conflict check button — add loading state + toast summary
-document.getElementById('btnCekSemuaGuru')?.addEventListener('click', function() {
-    const btn = this;
+function handleCheckAllGuruClick(event) {
+    const btn = event.currentTarget || document.getElementById('btnCekSemuaGuru');
+    if (!btn) return;
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Mengecek…';
     runAllConflictChecks();
@@ -2080,7 +2456,12 @@ document.getElementById('btnCekSemuaGuru')?.addEventListener('click', function()
             if (checked > 0) showToast('Semua guru tersedia — tidak ada konflik jadwal.', 'success');
         }
     }, 1800);
-});
+}
+
+// Conflict check button — add loading state + toast summary
+if (document.getElementById('btnCekSemuaGuru')) {
+    document.getElementById('btnCekSemuaGuru').addEventListener('click', handleCheckAllGuruClick);
+}
 
 // ── end STEP 4 JS ──
 
@@ -2094,12 +2475,78 @@ document.getElementById('processForm').addEventListener('submit', function(e) {
     const checkedCourses = document.querySelectorAll('.course-check:checked').length;
     if (checkedCourses === 0) {
         showToast('Pilih minimal satu mata pelajaran sebelum melanjutkan.', 'error');
-        showStep(3);
+        showStep(2);
         return;
     }
+    const educationLevel = document.querySelector('[name="education_level"]')?.value;
+    const schoolName = document.querySelector('[name="school_name"]')?.value.trim();
+    const grade = document.querySelector('[name="grade"]')?.value.trim();
+    const semester = document.querySelector('[name="semester"]')?.value.trim();
+    const schoolRequiredLevels = ['Pra Sekolah (PAUD/TK)', 'Sekolah Dasar (SD)', 'Sekolah Menengah Pertama (SMP)', 'Sekolah Menengah Atas/Kejuruan (SMA/SMK)', 'Mahasiswa'];
+    if (schoolRequiredLevels.includes(educationLevel) && !schoolName) {
+        showToast('Nama sekolah wajib diisi untuk kategori ' + educationLevel + '.', 'error');
+        showStep(1);
+        return;
+    }
+    if (educationLevel === 'Mahasiswa' && !semester) {
+        showToast('Semester wajib diisi untuk kategori Mahasiswa.', 'error');
+        showStep(1);
+        return;
+    }
+    if (['Pra Sekolah (PAUD/TK)', 'Sekolah Dasar (SD)', 'Sekolah Menengah Pertama (SMP)', 'Sekolah Menengah Atas/Kejuruan (SMA/SMK)'].includes(educationLevel) && !grade) {
+        showToast('Kelas wajib diisi untuk peserta sekolah.', 'error');
+        showStep(1);
+        return;
+    }
+    if (packageMode === 'request') {
+        if (checkedCourses !== 1) {
+            showToast('Paket Request hanya boleh untuk 1 mata pelajaran.', 'error');
+            showStep(2);
+            return;
+        }
+        const selectedRow = document.querySelector('.course-check:checked')?.closest('.pw-course-row');
+        const selectedSessions = parseInt(selectedRow?.querySelector('input[name^="course_sessions"]')?.value || 0, 10);
+        if (selectedSessions !== 1) {
+            showToast('Paket Request harus berupa 1 sesi saja.', 'error');
+            showStep(2);
+            return;
+        }
+    }
+    if (packageMode === 'standard') {
+        const selectedOption = packageDropdown?.selectedOptions[0];
+        const packageMaxSessions = parseInt(selectedOption?.dataset.jumlah || 0, 10);
+        if (packageMaxSessions > 0) {
+            const totalSesiSelected = Array.from(document.querySelectorAll('.course-check:checked')).reduce((sum, chk) => {
+                const row = chk.closest('.pw-course-row');
+                const sesi = parseInt(row?.querySelector('input[name^="course_sessions"]')?.value || 0, 10);
+                return sum + (isNaN(sesi) ? 0 : sesi);
+            }, 0);
+            if (totalSesiSelected > packageMaxSessions) {
+                showToast('Total sesi melebihi jumlah pertemuan paket standar.', 'error');
+                showStep(2);
+                return;
+            }
+        }
+    }
+
+    const isOnline = document.getElementById('systemSelect')?.value === 'online';
+    if (isOnline) {
+        const missingMeeting = Array.from(document.querySelectorAll('.course-check:checked')).some(chk => {
+            const courseId = chk.value;
+            const hari = document.querySelector(`[name="schedule_hari[${courseId}]"]`)?.value;
+            const meeting = document.querySelector(`[name="schedule_link_meeting[${courseId}]"]`)?.value.trim();
+            return hari && hari !== '' && !meeting;
+        });
+        if (missingMeeting) {
+            showToast('Untuk kelas online, semua mapel yang dijadwalkan harus memiliki link meeting.', 'error');
+            showStep(2);
+            return;
+        }
+    }
+
     if (isCustomPkg) {
-        const cpName = document.querySelector('[name="custom_package_name"]').value.trim();
-        const cpJenis = document.querySelector('[name="custom_jenis"]').value;
+        const cpName = document.querySelector('[name="custom_package_name"]')?.value.trim();
+        const cpJenis = document.querySelector('[name="custom_jenis"]')?.value;
         const packageLabel = packageMode === 'request' ? 'Paket Request' : 'Paket Custom';
         if (!cpName || !cpJenis) {
             showToast(`Lengkapi Nama Paket & Jenis Paket pada ${packageLabel}.`, 'error');
@@ -2179,6 +2626,65 @@ function sendToWA() {
             )
     );
     window.open('https://wa.me/' + wa + '?text=' + msg, '_blank');
+}
+
+function getPreviewContact() {
+    const name = document.querySelector('[name="name"]')?.value || 'Siswa';
+    const phone = (document.querySelector('[name="phone"]')?.value || '').replace(/\D/g, '');
+    const wa = phone.startsWith('0') ? '62' + phone.slice(1) : phone;
+    return { name, phone, wa };
+}
+
+function sendInvoiceWA() {
+    const { name, wa } = getPreviewContact();
+    if (!wa) { showToast('Nomor HP siswa tidak tersedia.', 'error'); return; }
+    const invoiceText = encodeURIComponent(
+        'Halo ' + name + ',\n\n' +
+        'Terima kasih atas pendaftaran Anda di Smart Center Indonesia. ' +
+        'Berikut informasi invoice sementara:\n' +
+        document.querySelector('[name="name"]') ? '\n' : '' +
+        '\nMohon tunggu konfirmasi akhir dari admin untuk rincian pembayaran lengkap.\n\n' +
+        'Jika sudah siap, kami akan kirimkan invoice resmi dan detail pembayaran.'
+    );
+    window.open('https://wa.me/' + wa + '?text=' + invoiceText, '_blank');
+}
+
+function sendLoginPinWA() {
+    const { name, wa } = getPreviewContact();
+    if (!wa) { showToast('Nomor HP siswa tidak tersedia.', 'error'); return; }
+    const loginUrl = '{{ url("/login") }}';
+    const pinText = encodeURIComponent(
+        'Halo ' + name + ',\n\n' +
+        'Selamat! Pendaftaran Anda di Smart Center Indonesia dalam proses verifikasi. ' +
+        'Gunakan link login berikut untuk mengakses akun Anda:\n' + loginUrl + '\n\n' +
+        'PIN login akan dikirim setelah akun aktif. Mohon simpan pesan ini untuk referensi.'
+    );
+    window.open('https://wa.me/' + wa + '?text=' + pinText, '_blank');
+}
+
+function printPreviewSection(title) {
+    const previewBox = document.getElementById('previewBox');
+    if (!previewBox) return;
+    const style = `
+        <style>
+        body { font-family: sans-serif; color: #111; margin: 0; padding: 20px; }
+        .print-header { margin-bottom: 18px; }
+        .print-header h1 { font-size: 18px; margin: 0 0 8px; }
+        .print-header p { margin: 0; color: #555; font-size: 13px; }
+        .print-content { font-size: 12px; }
+        .print-content table { width: 100%; border-collapse: collapse; }
+        .print-content table, .print-content th, .print-content td { border: 1px solid #ccc; }
+        .print-content th, .print-content td { padding: 8px; text-align: left; }
+        .print-content th { background: #f5f5f5; }
+        </style>`;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`<!doctype html><html><head><title>${title}</title>${style}</head><body>`);
+    printWindow.document.write(`<div class="print-header"><h1>${title}</h1><p>Preview pendaftaran siswa dari wizard admin.</p></div>`);
+    printWindow.document.write('<div class="print-content">' + previewBox.innerHTML + '</div>');
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => printWindow.print(), 300);
 }
 </script>
 @endpush

@@ -1,10 +1,9 @@
-@extends('layouts.app')
-@section('title', 'Dashboard')
-@section('page-title', 'Dashboard')
+<?php $__env->startSection('title', 'Dashboard'); ?>
+<?php $__env->startSection('page-title', 'Dashboard'); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 
-@php
+<?php
     $user = auth()->user();
     $role = $user->getRoleNames()->first() ?? 'user';
     $isOwnerAdmin = in_array($role, ['owner','admin']);
@@ -70,9 +69,9 @@
     // Combined revenue
     $revenueThisMonth = $revenueThisMonthInvoice + $revenueThisMonthCourse;
     $revenueTotal = $revenueTotalInvoice + $revenueTotalCourse;
-@endphp
+?>
 
-{{-- WELCOME BANNER --}}
+
 <div class="dashboard-card mb-4 fade-up"
      style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
     <div style="position:absolute;right:-60px;top:-60px;width:220px;height:220px;background:rgba(255,255,255,.05);border-radius:50%;pointer-events:none"></div>
@@ -80,23 +79,24 @@
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative">
         <div>
             <div style="font-size:12px;opacity:.65;margin-bottom:5px;letter-spacing:.05em;text-transform:uppercase">
-                {{ \Carbon\Carbon::now()->locale('id')->isoFormat('dddd, D MMMM Y') }}
+                <?php echo e(\Carbon\Carbon::now()->locale('id')->isoFormat('dddd, D MMMM Y')); ?>
+
             </div>
             <h3 style="font-size:clamp(18px,2.5vw,26px);font-weight:800;margin-bottom:8px;color:white;letter-spacing:-.02em">
-                Halo, {{ explode(' ',$user->name)[0] }}! 👋
+                Halo, <?php echo e(explode(' ',$user->name)[0]); ?>! 👋
             </h3>
             <p style="opacity:.75;margin:0;font-size:14px;line-height:1.6">
-                @if($role==='owner') Anda login sebagai <strong>Owner</strong> — akses penuh ke semua cabang dan laporan.
-                @elseif($role==='admin')
-                    @if($isPusatAdmin)
+                <?php if($role==='owner'): ?> Anda login sebagai <strong>Owner</strong> — akses penuh ke semua cabang dan laporan.
+                <?php elseif($role==='admin'): ?>
+                    <?php if($isPusatAdmin): ?>
                         Anda login sebagai <strong>Admin Pusat</strong> — kelola seluruh cabang, siswa, guru, dan keuangan.
-                    @else
+                    <?php else: ?>
                         Anda login sebagai <strong>Admin Cabang</strong> — kelola siswa, guru, dan keuangan.
-                    @endif
-                @elseif($role==='guru') Anda login sebagai <strong>Guru</strong> — lihat jadwal dan input nilai siswa.
-                @elseif($role==='siswa') Anda login sebagai <strong>Siswa</strong> — cek jadwal dan status pembayaran.
-                @else Selamat bekerja hari ini!
-                @endif
+                    <?php endif; ?>
+                <?php elseif($role==='guru'): ?> Anda login sebagai <strong>Guru</strong> — lihat jadwal dan input nilai siswa.
+                <?php elseif($role==='siswa'): ?> Anda login sebagai <strong>Siswa</strong> — cek jadwal dan status pembayaran.
+                <?php else: ?> Selamat bekerja hari ini!
+                <?php endif; ?>
             </p>
         </div>
         <div style="font-size:80px;opacity:.1;line-height:1;flex-shrink:0">
@@ -105,7 +105,7 @@
     </div>
 </div>
 
-{{-- STAT CARDS --}}
+
 <div class="row g-3 mb-4">
 
     <div class="col-6 col-xl-3 fade-up">
@@ -113,10 +113,10 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Total Siswa</div>
-                    <div class="stat-value text-primary count-up" data-target="{{ $totalStudents }}">0</div>
+                    <div class="stat-value text-primary count-up" data-target="<?php echo e($totalStudents); ?>">0</div>
                     <div class="stat-growth text-success">
                         <i class="bi bi-person-check-fill"></i>
-                        <span class="count-up" data-target="{{ $activeStudents }}">0</span> aktif
+                        <span class="count-up" data-target="<?php echo e($activeStudents); ?>">0</span> aktif
                     </div>
                 </div>
                 <div class="stat-icon bg-primary-soft" style="color:white">
@@ -131,10 +131,10 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Total Guru</div>
-                    <div class="stat-value text-success count-up" data-target="{{ $totalTeachers }}">0</div>
+                    <div class="stat-value text-success count-up" data-target="<?php echo e($totalTeachers); ?>">0</div>
                     <div class="stat-growth text-muted">
                         <i class="bi bi-person-badge-fill"></i>
-                        <span class="count-up" data-target="{{ $activeTeachers }}">0</span> aktif
+                        <span class="count-up" data-target="<?php echo e($activeTeachers); ?>">0</span> aktif
                     </div>
                 </div>
                 <div class="stat-icon bg-success-soft" style="color:white">
@@ -149,10 +149,10 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Cabang Aktif</div>
-                    <div class="stat-value text-warning count-up" data-target="{{ $activeBranches }}">0</div>
+                    <div class="stat-value text-warning count-up" data-target="<?php echo e($activeBranches); ?>">0</div>
                     <div class="stat-growth text-muted">
                         <i class="bi bi-building"></i>
-                        dari <span class="count-up" data-target="{{ $totalBranches }}">0</span> cabang
+                        dari <span class="count-up" data-target="<?php echo e($totalBranches); ?>">0</span> cabang
                     </div>
                 </div>
                 <div class="stat-icon bg-warning-soft" style="color:white">
@@ -167,12 +167,13 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Pendapatan Bulan Ini</div>
-                    <div class="stat-value text-success" style="font-size:{{ strlen('Rp '.number_format($revenueThisMonth,0,',','.')) > 14 ? '16px' : '20px' }}">
-                        Rp {{ number_format($revenueThisMonth, 0, ',', '.') }}
+                    <div class="stat-value text-success" style="font-size:<?php echo e(strlen('Rp '.number_format($revenueThisMonth,0,',','.')) > 14 ? '16px' : '20px'); ?>">
+                        Rp <?php echo e(number_format($revenueThisMonth, 0, ',', '.')); ?>
+
                     </div>
                     <div class="stat-growth text-muted">
                         <i class="bi bi-calendar-month"></i>
-                        Total: Rp {{ number_format($revenueTotal/1000000, 1, ',', '.') }}Jt
+                        Total: Rp <?php echo e(number_format($revenueTotal/1000000, 1, ',', '.')); ?>Jt
                     </div>
                 </div>
                 <div class="stat-icon bg-success-soft" style="color:white">
@@ -184,11 +185,11 @@
 
 </div>
 
-{{-- CHARTS ROW (owner & admin only) --}}
-@if($isOwnerAdmin)
+
+<?php if($isOwnerAdmin): ?>
 <div class="row g-3 mb-4">
 
-    {{-- TREND LINE CHART --}}
+    
     <div class="col-lg-7 fade-up">
         <div class="dashboard-card h-100">
             <div class="d-flex align-items-center justify-content-between mb-3">
@@ -201,7 +202,7 @@
         </div>
     </div>
 
-    {{-- GENDER DONUT --}}
+    
     <div class="col-lg-5 fade-up" style="animation-delay:.05s">
         <div class="dashboard-card h-100">
             <h6 class="fw-bold mb-3">
@@ -213,10 +214,10 @@
 
 </div>
 
-{{-- SECOND CHARTS ROW --}}
+
 <div class="row g-3 mb-4">
 
-    {{-- STATUS BAR --}}
+    
     <div class="col-md-5 fade-up" style="animation-delay:.05s">
         <div class="dashboard-card h-100">
             <h6 class="fw-bold mb-3">
@@ -226,7 +227,7 @@
         </div>
     </div>
 
-    {{-- QUICK ACTIONS --}}
+    
     <div class="col-md-7 fade-up" style="animation-delay:.10s">
         <div class="dashboard-card h-100">
             <h6 class="fw-bold mb-3">
@@ -234,7 +235,7 @@
             </h6>
             <div class="row g-2">
                 <div class="col-6">
-                    <a href="{{ route('admin.students.index') }}"
+                    <a href="<?php echo e(route('admin.students.index')); ?>"
                        class="d-flex align-items-center gap-2 p-3 rounded-3 text-decoration-none quick-dash"
                        style="background:var(--soft-primary-bg);border:1px solid var(--soft-primary-border)">
                         <i class="bi bi-person-plus-fill" style="font-size:1.4rem;color:#c84ddf"></i>
@@ -245,7 +246,7 @@
                     </a>
                 </div>
                 <div class="col-6">
-                    <a href="{{ route('admin.teachers.index') }}"
+                    <a href="<?php echo e(route('admin.teachers.index')); ?>"
                        class="d-flex align-items-center gap-2 p-3 rounded-3 text-decoration-none quick-dash"
                        style="background:var(--soft-primary-bg);border:1px solid var(--soft-primary-border)">
                         <i class="bi bi-person-workspace" style="font-size:1.4rem;color:#c84ddf"></i>
@@ -256,7 +257,7 @@
                     </a>
                 </div>
                 <div class="col-6">
-                    <a href="{{ route('admin.schedules.index') }}"
+                    <a href="<?php echo e(route('admin.schedules.index')); ?>"
                        class="d-flex align-items-center gap-2 p-3 rounded-3 text-decoration-none quick-dash"
                        style="background:var(--soft-primary-bg);border:1px solid var(--soft-primary-border)">
                         <i class="bi bi-calendar-week" style="font-size:1.4rem;color:#c84ddf"></i>
@@ -266,9 +267,9 @@
                         </div>
                     </a>
                 </div>
-                @if($role === 'owner')
+                <?php if($role === 'owner'): ?>
                 <div class="col-6">
-                    <a href="{{ route('owner.branches.index') }}"
+                    <a href="<?php echo e(route('owner.branches.index')); ?>"
                        class="d-flex align-items-center gap-2 p-3 rounded-3 text-decoration-none quick-dash"
                        style="background:var(--soft-warning-bg);border:1px solid var(--soft-warning-border)">
                         <i class="bi bi-building" style="font-size:1.4rem;color:#e09000"></i>
@@ -278,9 +279,9 @@
                         </div>
                     </a>
                 </div>
-                @endif
+                <?php endif; ?>
                 <div class="col-6">
-                    <a href="{{ route('admin.tryouts.index') }}"
+                    <a href="<?php echo e(route('admin.tryouts.index')); ?>"
                        class="d-flex align-items-center gap-2 p-3 rounded-3 text-decoration-none quick-dash"
                        style="background:var(--soft-primary-bg);border:1px solid var(--soft-primary-border)">
                         <i class="bi bi-ui-checks-grid" style="font-size:1.4rem;color:#c84ddf"></i>
@@ -295,49 +296,50 @@
     </div>
 
 </div>
-@endif
+<?php endif; ?>
 
-{{-- TEACHER REGISTRATIONS (owner & admin) --}}
-@if($isOwnerAdmin)
+
+<?php if($isOwnerAdmin): ?>
 <div class="dashboard-card fade-up mb-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h6 class="fw-bold mb-0">
             <i class="bi bi-person-plus-fill text-primary me-2"></i>Guru Baru Terdaftar
         </h6>
-        @php $pendingTeacherCount = $pendingTeacherRegistrations->where('status', 'pending')->count(); @endphp
-        @if($pendingTeacherCount > 0)
+        <?php $pendingTeacherCount = $pendingTeacherRegistrations->where('status', 'pending')->count(); ?>
+        <?php if($pendingTeacherCount > 0): ?>
         <span class="badge" style="background:var(--soft-warning-bg);color:var(--soft-warning-text);font-size:.73rem;padding:5px 12px;border-radius:20px">
-            <i class="bi bi-clock me-1"></i>{{ $pendingTeacherCount }} Menunggu
+            <i class="bi bi-clock me-1"></i><?php echo e($pendingTeacherCount); ?> Menunggu
         </span>
-        @endif
+        <?php endif; ?>
     </div>
 
-    @forelse($pendingTeacherRegistrations as $teacherReg)
+    <?php $__empty_1 = true; $__currentLoopData = $pendingTeacherRegistrations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $teacherReg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
     <div class="border rounded-3 p-3 mb-2" style="background:var(--card-bg);border-color:var(--card-border)">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
             <div>
-                <div class="fw-semibold">{{ $teacherReg->name }}</div>
+                <div class="fw-semibold"><?php echo e($teacherReg->name); ?></div>
                 <div class="text-muted small">
-                    {{ $teacherReg->nig }} · {{ $teacherReg->jenis_guru }} · {{ $teacherReg->phone ?? '-' }}
+                    <?php echo e($teacherReg->nig); ?> · <?php echo e($teacherReg->jenis_guru); ?> · <?php echo e($teacherReg->phone ?? '-'); ?>
+
                 </div>
             </div>
             <div class="d-flex gap-2">
-                @if($teacherReg->status === 'pending')
-                    <form action="{{ route('admin.teacher-registrations.verify', $teacherReg) }}" method="POST" onsubmit="return confirm('Verifikasi guru ini dan lanjutkan ke form tambah guru?')">
-                        @csrf
+                <?php if($teacherReg->status === 'pending'): ?>
+                    <form action="<?php echo e(route('admin.teacher-registrations.verify', $teacherReg)); ?>" method="POST" onsubmit="return confirm('Verifikasi guru ini dan lanjutkan ke form tambah guru?')">
+                        <?php echo csrf_field(); ?>
                         <button type="submit" class="btn btn-sm btn-success">
                             <i class="bi bi-check-circle me-1"></i>Verifikasi
                         </button>
                     </form>
-                @else
+                <?php else: ?>
                     <button class="btn btn-sm btn-outline-success" disabled>
                         <i class="bi bi-check-circle me-1"></i>Sudah di verifikasi
                     </button>
-                @endif
+                <?php endif; ?>
 
-                <form action="{{ route('admin.teacher-registrations.destroy', $teacherReg) }}" method="POST" onsubmit="return confirm('Hapus pendaftaran ini?')">
-                    @csrf
-                    @method('DELETE')
+                <form action="<?php echo e(route('admin.teacher-registrations.destroy', $teacherReg)); ?>" method="POST" onsubmit="return confirm('Hapus pendaftaran ini?')">
+                    <?php echo csrf_field(); ?>
+                    <?php echo method_field('DELETE'); ?>
                     <button type="submit" class="btn btn-sm btn-danger">
                         <i class="bi bi-trash me-1"></i>Hapus
                     </button>
@@ -345,33 +347,33 @@
             </div>
         </div>
     </div>
-    @empty
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
     <div class="text-center py-5">
         <i class="bi bi-inbox d-block mb-3" style="font-size:3rem;opacity:.2"></i>
         <div class="fw-semibold mb-1">Belum ada guru baru</div>
         <p class="text-muted" style="font-size:.83rem">Data akan muncul ketika calon guru mendaftar di halaman registrasi guru publik.</p>
     </div>
-    @endforelse
+    <?php endif; ?>
 </div>
-@endif
+<?php endif; ?>
 
-{{-- RECENT REGISTRATIONS (owner & admin) --}}
-@if($isOwnerAdmin)
+
+<?php if($isOwnerAdmin): ?>
 <div class="dashboard-card fade-up">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h6 class="fw-bold mb-0">
             <i class="bi bi-clock-history text-primary me-2"></i>Siswa Terbaru Mendaftar
         </h6>
-        @php $pendingCount = $recentRegistrations->where('status','pending')->count(); @endphp
-        @if($pendingCount > 0)
+        <?php $pendingCount = $recentRegistrations->where('status','pending')->count(); ?>
+        <?php if($pendingCount > 0): ?>
         <span class="badge" style="background:var(--soft-warning-bg);color:var(--soft-warning-text);font-size:.73rem;padding:5px 12px;border-radius:20px">
-            <i class="bi bi-clock me-1"></i>{{ $pendingCount }} Menunggu
+            <i class="bi bi-clock me-1"></i><?php echo e($pendingCount); ?> Menunggu
         </span>
-        @endif
+        <?php endif; ?>
     </div>
 
-    @forelse($recentRegistrations as $idx => $reg)
-    @php
+    <?php $__empty_1 = true; $__currentLoopData = $recentRegistrations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $idx => $reg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+    <?php
         $avatar = 'https://ui-avatars.com/api/?name='.urlencode($reg->name).'&background='.($reg->gender==='P'?'ec4899':'c84ddf').'&color=fff&size=40';
         $regStatusColors = [
             'pending'  => ['var(--soft-warning-bg)','var(--soft-warning-text)'],
@@ -381,160 +383,163 @@
         $rsc   = $regStatusColors[$reg->status] ?? ['var(--soft-muted-bg)','var(--text-muted)'];
         $accId = 'reg-acc-'.$reg->id;
         $interests = $reg->interests ?? [];
-    @endphp
-    <div class="{{ $idx > 0 ? 'mt-2' : '' }}" style="border:1px solid var(--card-border);border-radius:12px;overflow:hidden;background:var(--card-bg)">
+    ?>
+    <div class="<?php echo e($idx > 0 ? 'mt-2' : ''); ?>" style="border:1px solid var(--card-border);border-radius:12px;overflow:hidden;background:var(--card-bg)">
 
-        {{-- Accordion Header --}}
+        
         <div class="d-flex align-items-center gap-3 px-3 py-3 reg-acc-toggle"
              style="cursor:pointer;user-select:none;transition:background .15s"
-             onclick="toggleRegAcc('{{ $accId }}')">
+             onclick="toggleRegAcc('<?php echo e($accId); ?>')">
 
-            {{-- Avatar --}}
-            <img src="{{ $avatar }}" class="rounded-circle flex-shrink-0" width="38" height="38"
+            
+            <img src="<?php echo e($avatar); ?>" class="rounded-circle flex-shrink-0" width="38" height="38"
                  style="object-fit:cover;border:2px solid var(--card-border)">
 
-            {{-- Info --}}
+            
             <div class="flex-grow-1 min-width-0">
-                <div class="fw-semibold" style="font-size:.9rem">{{ $reg->name }}</div>
+                <div class="fw-semibold" style="font-size:.9rem"><?php echo e($reg->name); ?></div>
                 <div class="text-muted" style="font-size:.72rem;line-height:1.4">
-                    <code style="background:var(--input-bg);padding:1px 5px;border-radius:4px;font-size:.68rem">{{ $reg->no_reg }}</code>
-                    @if($reg->phone) &nbsp;·&nbsp; <i class="bi bi-telephone" style="font-size:.65rem"></i> {{ $reg->phone }} @endif
-                    @if($reg->branch) &nbsp;·&nbsp; <i class="bi bi-building" style="font-size:.65rem"></i> {{ $reg->branch }} @endif
-                    &nbsp;·&nbsp; {{ $reg->created_at->format('d M Y') }}
+                    <code style="background:var(--input-bg);padding:1px 5px;border-radius:4px;font-size:.68rem"><?php echo e($reg->no_reg); ?></code>
+                    <?php if($reg->phone): ?> &nbsp;·&nbsp; <i class="bi bi-telephone" style="font-size:.65rem"></i> <?php echo e($reg->phone); ?> <?php endif; ?>
+                    <?php if($reg->branch): ?> &nbsp;·&nbsp; <i class="bi bi-building" style="font-size:.65rem"></i> <?php echo e($reg->branch); ?> <?php endif; ?>
+                    &nbsp;·&nbsp; <?php echo e($reg->created_at->format('d M Y')); ?>
+
                 </div>
             </div>
 
-            {{-- Status badge + chevron --}}
+            
             <div class="d-flex align-items-center gap-2 flex-shrink-0">
-                <span class="badge" style="background:{{ $rsc[0] }};color:{{ $rsc[1] }};padding:4px 10px;border-radius:20px;font-size:.7rem">
-                    {{ $reg->status === 'pending' ? 'Menunggu' : ($reg->status === 'verified' ? 'Terverifikasi' : ucfirst($reg->status)) }}
+                <span class="badge" style="background:<?php echo e($rsc[0]); ?>;color:<?php echo e($rsc[1]); ?>;padding:4px 10px;border-radius:20px;font-size:.7rem">
+                    <?php echo e($reg->status === 'pending' ? 'Menunggu' : ($reg->status === 'verified' ? 'Terverifikasi' : ucfirst($reg->status))); ?>
+
                 </span>
-                @if(count($interests) > 0)
+                <?php if(count($interests) > 0): ?>
                 <span class="badge d-none d-sm-inline-block" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);padding:4px 9px;border-radius:20px;font-size:.7rem">
-                    <i class="bi bi-journal-bookmark me-1"></i>{{ count($interests) }} Minat
+                    <i class="bi bi-journal-bookmark me-1"></i><?php echo e(count($interests)); ?> Minat
                 </span>
-                @endif
-                <i class="bi bi-chevron-down reg-acc-chevron" id="chevron-{{ $accId }}"
+                <?php endif; ?>
+                <i class="bi bi-chevron-down reg-acc-chevron" id="chevron-<?php echo e($accId); ?>"
                    style="font-size:.8rem;color:var(--text-muted);transition:transform .22s"></i>
             </div>
         </div>
 
-        {{-- Accordion Body --}}
-        <div id="{{ $accId }}" style="display:none;border-top:1px solid var(--card-border)">
+        
+        <div id="<?php echo e($accId); ?>" style="display:none;border-top:1px solid var(--card-border)">
 
-            {{-- Detail rows --}}
+            
             <div class="px-3 pt-3 pb-2">
                 <div class="row g-3">
-                    {{-- Program info --}}
+                    
                     <div class="col-md-6">
                         <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
                             <div class="fw-semibold mb-2" style="font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Info Program</div>
                             <div class="d-flex flex-column gap-1" style="font-size:.82rem">
-                                <div><span class="text-muted" style="min-width:110px;display:inline-block">Program</span> <strong>{{ $reg->program ?? '–' }}</strong></div>
-                                <div><span class="text-muted" style="min-width:110px;display:inline-block">Sistem</span> {{ $reg->system ?? '–' }}</div>
-                                <div><span class="text-muted" style="min-width:110px;display:inline-block">Tempat Belajar</span> {{ $reg->learning_place ?? '–' }}</div>
-                                <div><span class="text-muted" style="min-width:110px;display:inline-block">Cabang</span> {{ $reg->branch ?? '–' }}</div>
+                                <div><span class="text-muted" style="min-width:110px;display:inline-block">Program</span> <strong><?php echo e($reg->program ?? '–'); ?></strong></div>
+                                <div><span class="text-muted" style="min-width:110px;display:inline-block">Sistem</span> <?php echo e($reg->system ?? '–'); ?></div>
+                                <div><span class="text-muted" style="min-width:110px;display:inline-block">Tempat Belajar</span> <?php echo e($reg->learning_place ?? '–'); ?></div>
+                                <div><span class="text-muted" style="min-width:110px;display:inline-block">Cabang</span> <?php echo e($reg->branch ?? '–'); ?></div>
                             </div>
                         </div>
                     </div>
 
-                    {{-- Personal info --}}
+                    
                     <div class="col-md-6">
                         <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
                             <div class="fw-semibold mb-2" style="font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Data Pribadi</div>
                             <div class="d-flex flex-column gap-1" style="font-size:.82rem">
-                                <div><span class="text-muted" style="min-width:110px;display:inline-block">Jenis Kelamin</span> {{ $reg->gender === 'L' ? '👦 Laki-laki' : ($reg->gender === 'P' ? '👧 Perempuan' : ($reg->gender ?? '–')) }}</div>
-                                @if($reg->birth_date)<div><span class="text-muted" style="min-width:110px;display:inline-block">Tgl Lahir</span> {{ $reg->birth_date->format('d M Y') }}</div>@endif
-                                @if($reg->address)<div><span class="text-muted" style="min-width:110px;display:inline-block">Alamat</span> <span style="white-space:pre-line">{{ $reg->address }}</span></div>@endif
-                                @if($reg->parent_name)<div><span class="text-muted" style="min-width:110px;display:inline-block">Orang Tua</span> {{ $reg->parent_name }}</div>@endif
-                                @if($reg->parent_phone)<div><span class="text-muted" style="min-width:110px;display:inline-block">HP Ortu</span> {{ $reg->parent_phone }}</div>@endif
+                                <div><span class="text-muted" style="min-width:110px;display:inline-block">Jenis Kelamin</span> <?php echo e($reg->gender === 'L' ? '👦 Laki-laki' : ($reg->gender === 'P' ? '👧 Perempuan' : ($reg->gender ?? '–'))); ?></div>
+                                <?php if($reg->birth_date): ?><div><span class="text-muted" style="min-width:110px;display:inline-block">Tgl Lahir</span> <?php echo e($reg->birth_date->format('d M Y')); ?></div><?php endif; ?>
+                                <?php if($reg->address): ?><div><span class="text-muted" style="min-width:110px;display:inline-block">Alamat</span> <span style="white-space:pre-line"><?php echo e($reg->address); ?></span></div><?php endif; ?>
+                                <?php if($reg->parent_name): ?><div><span class="text-muted" style="min-width:110px;display:inline-block">Orang Tua</span> <?php echo e($reg->parent_name); ?></div><?php endif; ?>
+                                <?php if($reg->parent_phone): ?><div><span class="text-muted" style="min-width:110px;display:inline-block">HP Ortu</span> <?php echo e($reg->parent_phone); ?></div><?php endif; ?>
                             </div>
                         </div>
                     </div>
 
-                    {{-- Interests --}}
-                    @if(count($interests) > 0)
+                    
+                    <?php if(count($interests) > 0): ?>
                     <div class="col-12">
                         <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
                             <div class="fw-semibold mb-2" style="font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Program yang Diminati</div>
                             <div class="d-flex flex-wrap gap-2">
-                                @foreach($interests as $interest)
+                                <?php $__currentLoopData = $interests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $interest): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <span class="badge" style="background:var(--soft-primary-bg);color:var(--soft-primary-text);padding:5px 11px;border-radius:20px;font-size:.75rem;font-weight:500">
-                                    <i class="bi bi-check2 me-1"></i>{{ $interest }}
+                                    <i class="bi bi-check2 me-1"></i><?php echo e($interest); ?>
+
                                 </span>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                         </div>
                     </div>
-                    @endif
+                    <?php endif; ?>
 
-                    {{-- Schedule --}}
-                    @if(($reg->day_preferences && count($reg->day_preferences) > 0) || $reg->schedule_time || $reg->start_date)
+                    
+                    <?php if(($reg->day_preferences && count($reg->day_preferences) > 0) || $reg->schedule_time || $reg->start_date): ?>
                     <div class="col-12">
                         <div class="p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
                             <div class="fw-semibold mb-2" style="font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Jadwal Belajar</div>
                             <div class="d-flex flex-wrap gap-2 align-items-center" style="font-size:.82rem">
-                                @if($reg->day_preferences && count($reg->day_preferences) > 0)
-                                    @foreach($reg->day_preferences as $day)
-                                    <span class="badge" style="background:var(--soft-info-bg);color:var(--soft-info-text);padding:4px 10px;border-radius:20px;font-size:.73rem">{{ $day }}</span>
-                                    @endforeach
-                                @endif
-                                @if($reg->schedule_time) <span class="text-muted">·</span> <span>🕐 {{ $reg->schedule_time }}</span> @endif
-                                @if($reg->start_date) <span class="text-muted">·</span> <span>📅 Mulai {{ $reg->start_date->format('d M Y') }}</span> @endif
+                                <?php if($reg->day_preferences && count($reg->day_preferences) > 0): ?>
+                                    <?php $__currentLoopData = $reg->day_preferences; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $day): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <span class="badge" style="background:var(--soft-info-bg);color:var(--soft-info-text);padding:4px 10px;border-radius:20px;font-size:.73rem"><?php echo e($day); ?></span>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                <?php endif; ?>
+                                <?php if($reg->schedule_time): ?> <span class="text-muted">·</span> <span>🕐 <?php echo e($reg->schedule_time); ?></span> <?php endif; ?>
+                                <?php if($reg->start_date): ?> <span class="text-muted">·</span> <span>📅 Mulai <?php echo e($reg->start_date->format('d M Y')); ?></span> <?php endif; ?>
                             </div>
                         </div>
                     </div>
-                    @endif
+                    <?php endif; ?>
 
-                    {{-- Notes --}}
-                    @if($reg->notes)
+                    
+                    <?php if($reg->notes): ?>
                     <div class="col-12">
                         <div class="p-3 rounded-3" style="background:var(--soft-warning-bg);border:1px solid rgba(245,158,11,.15)">
                             <div class="fw-semibold mb-1" style="font-size:.78rem;color:var(--soft-warning-text);text-transform:uppercase;letter-spacing:.05em"><i class="bi bi-chat-text me-1"></i>Catatan</div>
-                            <div style="font-size:.82rem;color:var(--text-primary)">{{ $reg->notes }}</div>
+                            <div style="font-size:.82rem;color:var(--text-primary)"><?php echo e($reg->notes); ?></div>
                         </div>
                     </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </div>
 
-            {{-- Action buttons --}}
+            
             <div class="px-3 pb-3 d-flex gap-2 justify-content-end">
                 <button type="button" class="btn btn-sm btn-outline-secondary"
-                        onclick="openRegDetail({{ $reg->id }})"
+                        onclick="openRegDetail(<?php echo e($reg->id); ?>)"
                         style="border-radius:8px;font-size:.78rem;padding:5px 14px">
                     <i class="bi bi-eye me-1"></i>Detail
                 </button>
-                @if($reg->status === 'pending')
-                <a href="{{ route('admin.registration-list.process', $reg->id) }}"
+                <?php if($reg->status === 'pending'): ?>
+                <a href="<?php echo e(route('admin.registration-list.process', $reg->id)); ?>"
                    class="btn btn-sm btn-outline-success"
                    style="border-radius:8px;font-size:.78rem;padding:5px 14px">
                     <i class="bi bi-check-circle me-1"></i>Verifikasi
                 </a>
-                @else
+                <?php else: ?>
                 <button type="button" class="btn btn-sm btn-outline-success" disabled
                         style="border-radius:8px;font-size:.78rem;padding:5px 14px;opacity:.5">
                     <i class="bi bi-check-circle-fill me-1"></i>Terverifikasi
                 </button>
-                @endif
+                <?php endif; ?>
                 <button type="button" class="btn btn-sm btn-outline-danger"
-                        onclick="deleteReg({{ $reg->id }}, this)"
+                        onclick="deleteReg(<?php echo e($reg->id); ?>, this)"
                         style="border-radius:8px;font-size:.78rem;padding:5px 14px">
                     <i class="bi bi-trash me-1"></i>Hapus
                 </button>
             </div>
         </div>
     </div>
-    @empty
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
     <div class="text-center py-5">
         <i class="bi bi-inbox d-block mb-3" style="font-size:3rem;opacity:.2"></i>
         <div class="fw-semibold mb-1">Belum ada pendaftar</div>
         <p class="text-muted" style="font-size:.83rem">Data akan muncul ketika calon siswa mengisi form pendaftaran di halaman /register</p>
     </div>
-    @endforelse
+    <?php endif; ?>
 </div>
 
-{{-- DETAIL MODAL --}}
+
 <div class="modal fade" id="regDetailModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content" style="border-radius:16px;border:1px solid var(--card-border);background:var(--card-bg)">
@@ -555,9 +560,9 @@
 .reg-acc-chevron.open { transform: rotate(180deg); }
 </style>
 <script>
-const _regDetailUrl = '{{ url("admin/student-registrations") }}';
-const _regVerifyUrl = '{{ url("admin/student-registrations") }}';
-const _regCsrf      = '{{ csrf_token() }}';
+const _regDetailUrl = '<?php echo e(url("admin/student-registrations")); ?>';
+const _regVerifyUrl = '<?php echo e(url("admin/student-registrations")); ?>';
+const _regCsrf      = '<?php echo e(csrf_token()); ?>';
 
 function toggleRegAcc(id) {
     const body    = document.getElementById(id);
@@ -625,11 +630,11 @@ function deleteReg(id, btn) {
     }, null, { title: 'Hapus Pendaftaran', okText: '<i class="bi bi-trash me-1"></i>Hapus', btnClass: 'btn-danger' });
 }
 </script>
-@endif
+<?php endif; ?>
 
-{{-- GURU REDIRECT CARD --}}
-@if($role === 'guru')
-@php $teacher = \App\Models\Teacher::where('user_id', auth()->id())->first(); @endphp
+
+<?php if($role === 'guru'): ?>
+<?php $teacher = \App\Models\Teacher::where('user_id', auth()->id())->first(); ?>
 <div class="row g-3">
     <div class="col-12 fade-up">
         <div class="dashboard-card" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
@@ -637,42 +642,42 @@ function deleteReg(id, btn) {
             <div style="position:absolute;right:80px;bottom:-50px;width:120px;height:120px;background:rgba(255,255,255,.03);border-radius:50%;pointer-events:none"></div>
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative">
                 <div class="d-flex align-items-center gap-4">
-                    @if($teacher?->photo)
-                        <img src="{{ asset('storage/'.$teacher->photo) }}" alt="Foto Guru"
+                    <?php if($teacher?->photo): ?>
+                        <img src="<?php echo e(asset('storage/'.$teacher->photo)); ?>" alt="Foto Guru"
                              style="width:72px;height:72px;border-radius:18px;object-fit:cover;border:3px solid rgba(255,255,255,.3);flex-shrink:0">
-                    @else
+                    <?php else: ?>
                         <div style="width:72px;height:72px;border-radius:18px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">
                             <i class="bi bi-person-workspace"></i>
                         </div>
-                    @endif
+                    <?php endif; ?>
                     <div>
                         <div style="font-size:11px;opacity:.6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Portal Guru</div>
-                        <h4 class="fw-bold mb-1" style="color:white;font-size:clamp(16px,2vw,22px)">Selamat datang, {{ explode(' ',$user->name)[0] }}!</h4>
-                        <p style="opacity:.7;margin:0;font-size:13px">{{ $teacher ? 'NIG: '.$teacher->nig.' · '.(is_array($teacher->subjects) ? implode(', ', $teacher->subjects) : ($teacher->subjects ?? 'Semua Mapel')) : 'Profil guru belum dilengkapi' }}</p>
+                        <h4 class="fw-bold mb-1" style="color:white;font-size:clamp(16px,2vw,22px)">Selamat datang, <?php echo e(explode(' ',$user->name)[0]); ?>!</h4>
+                        <p style="opacity:.7;margin:0;font-size:13px"><?php echo e($teacher ? 'NIG: '.$teacher->nig.' · '.(is_array($teacher->subjects) ? implode(', ', $teacher->subjects) : ($teacher->subjects ?? 'Semua Mapel')) : 'Profil guru belum dilengkapi'); ?></p>
                     </div>
                 </div>
                 <div class="d-flex flex-column gap-2 flex-shrink-0">
-                    <a href="{{ route('guru.dashboard') }}" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
+                    <a href="<?php echo e(route('guru.dashboard')); ?>" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
                         <i class="bi bi-grid-fill me-2"></i>Buka Portal Guru
                     </a>
-                    <a href="{{ route('guru.classes.index') }}" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);border-radius:10px">
+                    <a href="<?php echo e(route('guru.classes.index')); ?>" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);border-radius:10px">
                         <i class="bi bi-diagram-3 me-2"></i>Kelas Saya
                     </a>
                 </div>
             </div>
         </div>
     </div>
-    {{-- QUICK STATS for guru --}}
-    @php
+    
+    <?php
         $guruSchedulesToday = $teacher ? \App\Models\Schedule::where('guru_id', $teacher->id)->whereDate('tanggal', today())->count() : 0;
         $guruSchedulesWeek  = $teacher ? \App\Models\Schedule::where('guru_id', $teacher->id)->whereBetween('tanggal',[now()->startOfWeek(), now()->endOfWeek()])->count() : 0;
-    @endphp
+    ?>
     <div class="col-6 col-md-3 fade-up" style="animation-delay:.05s">
         <div class="stat-card" style="border-top:3px solid #c84ddf">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Sesi Hari Ini</div>
-                    <div class="stat-value text-primary">{{ $guruSchedulesToday }}</div>
+                    <div class="stat-value text-primary"><?php echo e($guruSchedulesToday); ?></div>
                     <div class="stat-growth text-muted"><i class="bi bi-calendar-day me-1"></i>Jadwal mengajar</div>
                 </div>
                 <div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-calendar-day"></i></div>
@@ -684,7 +689,7 @@ function deleteReg(id, btn) {
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Sesi Minggu Ini</div>
-                    <div class="stat-value text-success">{{ $guruSchedulesWeek }}</div>
+                    <div class="stat-value text-success"><?php echo e($guruSchedulesWeek); ?></div>
                     <div class="stat-growth text-muted"><i class="bi bi-calendar-week me-1"></i>Total sesi</div>
                 </div>
                 <div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-calendar-week"></i></div>
@@ -705,7 +710,7 @@ function deleteReg(id, btn) {
     </div>
     <div class="col-6 col-md-3 fade-up" style="animation-delay:.20s">
         <div class="stat-card" style="border-top:3px solid #68117e">
-            <a href="{{ route('profile.edit') }}" class="text-decoration-none d-block">
+            <a href="<?php echo e(route('profile.edit')); ?>" class="text-decoration-none d-block">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <div class="stat-title">Profil Saya</div>
@@ -718,11 +723,11 @@ function deleteReg(id, btn) {
         </div>
     </div>
 </div>
-@endif
+<?php endif; ?>
 
-{{-- SISWA REDIRECT CARD --}}
-@if($role === 'siswa')
-@php $student = \App\Models\Student::where('user_id', auth()->id())->first(); @endphp
+
+<?php if($role === 'siswa'): ?>
+<?php $student = \App\Models\Student::where('user_id', auth()->id())->first(); ?>
 <div class="row g-3">
     <div class="col-12 fade-up">
         <div class="dashboard-card" style="background:linear-gradient(135deg,#260632 0%,#461256 50%,#c84ddf 100%);color:white;border:none;overflow:hidden;position:relative">
@@ -730,45 +735,45 @@ function deleteReg(id, btn) {
             <div style="position:absolute;right:80px;bottom:-50px;width:120px;height:120px;background:rgba(255,255,255,.03);border-radius:50%;pointer-events:none"></div>
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative">
                 <div class="d-flex align-items-center gap-4">
-                    @if($student?->photo)
-                        <img src="{{ asset('storage/'.$student->photo) }}" alt="Foto Siswa"
+                    <?php if($student?->photo): ?>
+                        <img src="<?php echo e(asset('storage/'.$student->photo)); ?>" alt="Foto Siswa"
                              style="width:72px;height:72px;border-radius:18px;object-fit:cover;border:3px solid rgba(255,255,255,.3);flex-shrink:0">
-                    @else
+                    <?php else: ?>
                         <div style="width:72px;height:72px;border-radius:18px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">
                             <i class="bi bi-mortarboard-fill"></i>
                         </div>
-                    @endif
+                    <?php endif; ?>
                     <div>
                         <div style="font-size:11px;opacity:.6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Portal Siswa</div>
-                        <h4 class="fw-bold mb-1" style="color:white;font-size:clamp(16px,2vw,22px)">Halo, {{ explode(' ',$user->name)[0] }}! 👋</h4>
-                        <p style="opacity:.7;margin:0;font-size:13px">{{ $student ? 'NIS: '.$student->nis.' · Kelas: '.($student->grade ?? '-').' · '.$student->branch?->name : 'Profil siswa belum tersambung ke akun ini' }}</p>
+                        <h4 class="fw-bold mb-1" style="color:white;font-size:clamp(16px,2vw,22px)">Halo, <?php echo e(explode(' ',$user->name)[0]); ?>! 👋</h4>
+                        <p style="opacity:.7;margin:0;font-size:13px"><?php echo e($student ? 'NIS: '.$student->nis.' · Kelas: '.($student->grade ?? '-').' · '.$student->branch?->name : 'Profil siswa belum tersambung ke akun ini'); ?></p>
                     </div>
                 </div>
                 <div class="d-flex flex-column gap-2 flex-shrink-0">
-                    <a href="{{ route('siswa.dashboard') }}" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
+                    <a href="<?php echo e(route('siswa.dashboard')); ?>" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;backdrop-filter:blur(10px)">
                         <i class="bi bi-grid-fill me-2"></i>Buka Portal Siswa
                     </a>
-                    <a href="{{ route('siswa.dashboard') }}" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);border-radius:10px">
+                    <a href="<?php echo e(route('siswa.dashboard')); ?>" class="btn fw-semibold px-4" style="background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);border-radius:10px">
                         <i class="bi bi-calendar-event me-2"></i>Jadwal (diakses dari Portal)
                     </a>
                 </div>
             </div>
         </div>
     </div>
-    {{-- QUICK STATS for siswa --}}
-    @php
+    
+    <?php
         $jadwalHariIni = $student ? \App\Models\Schedule::where('cabang_id', $student->branch_id)->whereDate('tanggal', today())->count() : 0;
         $jadwalMingguIni = $student ? \App\Models\Schedule::where('cabang_id', $student->branch_id)->whereBetween('tanggal',[now()->startOfWeek(), now()->endOfWeek()])->count() : 0;
         $sertifikatCount = $student ? \App\Models\Certificate::where('student_id', $student->id)->count() : 0;
         $invoiceBelum = $student ? \App\Models\Invoice::where('siswa_id', $student->id)->where('status','belum_bayar')->count() : 0;
-    @endphp
+    ?>
     <div class="col-6 col-md-3 fade-up" style="animation-delay:.05s">
         <div class="stat-card" style="border-top:3px solid #c84ddf">
-            <a href="{{ route('siswa.dashboard') }}" class="text-decoration-none d-block">
+            <a href="<?php echo e(route('siswa.dashboard')); ?>" class="text-decoration-none d-block">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <div class="stat-title">Jadwal Hari Ini</div>
-                        <div class="stat-value text-primary">{{ $jadwalHariIni }}</div>
+                        <div class="stat-value text-primary"><?php echo e($jadwalHariIni); ?></div>
                         <div class="stat-growth text-muted"><i class="bi bi-calendar-day me-1"></i>Sesi belajar</div>
                     </div>
                     <div class="stat-icon bg-primary-soft" style="color:white"><i class="bi bi-calendar-day"></i></div>
@@ -778,11 +783,11 @@ function deleteReg(id, btn) {
     </div>
     <div class="col-6 col-md-3 fade-up" style="animation-delay:.10s">
         <div class="stat-card" style="border-top:3px solid #10b981">
-            <a href="{{ route('siswa.dashboard') }}" class="text-decoration-none d-block">
+            <a href="<?php echo e(route('siswa.dashboard')); ?>" class="text-decoration-none d-block">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <div class="stat-title">Jadwal Minggu Ini</div>
-                        <div class="stat-value text-success">{{ $jadwalMingguIni }}</div>
+                        <div class="stat-value text-success"><?php echo e($jadwalMingguIni); ?></div>
                         <div class="stat-growth text-muted"><i class="bi bi-calendar-week me-1"></i>Total sesi</div>
                     </div>
                     <div class="stat-icon bg-success-soft" style="color:white"><i class="bi bi-calendar-week"></i></div>
@@ -792,11 +797,11 @@ function deleteReg(id, btn) {
     </div>
     <div class="col-6 col-md-3 fade-up" style="animation-delay:.15s">
         <div class="stat-card" style="border-top:3px solid #f6af23">
-            <a href="{{ route('siswa.certificates.index') }}" class="text-decoration-none d-block">
+            <a href="<?php echo e(route('siswa.certificates.index')); ?>" class="text-decoration-none d-block">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <div class="stat-title">Sertifikat</div>
-                        <div class="stat-value text-warning">{{ $sertifikatCount }}</div>
+                        <div class="stat-value text-warning"><?php echo e($sertifikatCount); ?></div>
                         <div class="stat-growth text-muted"><i class="bi bi-award me-1"></i>Diperoleh</div>
                     </div>
                     <div class="stat-icon bg-warning-soft" style="color:white"><i class="bi bi-award"></i></div>
@@ -805,43 +810,44 @@ function deleteReg(id, btn) {
         </div>
     </div>
     <div class="col-6 col-md-3 fade-up" style="animation-delay:.20s">
-        <div class="stat-card" style="{{ $invoiceBelum > 0 ? 'border-top:3px solid #ef4444' : 'border-top:3px solid #10b981' }}">
+        <div class="stat-card" style="<?php echo e($invoiceBelum > 0 ? 'border-top:3px solid #ef4444' : 'border-top:3px solid #10b981'); ?>">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-title">Tagihan Belum Bayar</div>
-                    <div class="stat-value {{ $invoiceBelum > 0 ? 'text-danger' : 'text-success' }}">{{ $invoiceBelum }}</div>
-                    <div class="stat-growth {{ $invoiceBelum > 0 ? 'text-danger' : 'text-success' }}">
-                        <i class="bi {{ $invoiceBelum > 0 ? 'bi-exclamation-circle' : 'bi-check-circle' }} me-1"></i>
-                        {{ $invoiceBelum > 0 ? 'Harap segera dibayar' : 'Semua lunas!' }}
+                    <div class="stat-value <?php echo e($invoiceBelum > 0 ? 'text-danger' : 'text-success'); ?>"><?php echo e($invoiceBelum); ?></div>
+                    <div class="stat-growth <?php echo e($invoiceBelum > 0 ? 'text-danger' : 'text-success'); ?>">
+                        <i class="bi <?php echo e($invoiceBelum > 0 ? 'bi-exclamation-circle' : 'bi-check-circle'); ?> me-1"></i>
+                        <?php echo e($invoiceBelum > 0 ? 'Harap segera dibayar' : 'Semua lunas!'); ?>
+
                     </div>
                 </div>
-                <div class="stat-icon {{ $invoiceBelum > 0 ? 'bg-danger-soft' : 'bg-success-soft' }}" style="color:white">
-                    <i class="bi {{ $invoiceBelum > 0 ? 'bi-exclamation-circle-fill' : 'bi-check-circle-fill' }}"></i>
+                <div class="stat-icon <?php echo e($invoiceBelum > 0 ? 'bg-danger-soft' : 'bg-success-soft'); ?>" style="color:white">
+                    <i class="bi <?php echo e($invoiceBelum > 0 ? 'bi-exclamation-circle-fill' : 'bi-check-circle-fill'); ?>"></i>
                 </div>
             </div>
         </div>
     </div>
 </div>
-@endif
+<?php endif; ?>
 
-{{-- OTHER ROLES --}}
-@if(!in_array($role, ['owner','admin','guru','siswa']))
+
+<?php if(!in_array($role, ['owner','admin','guru','siswa'])): ?>
 <div class="row g-3">
     <div class="col-12 fade-up">
         <div class="dashboard-card text-center py-5">
             <div style="width:80px;height:80px;border-radius:24px;background:linear-gradient(135deg,#68117e,#c84ddf);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 12px 32px rgba(200,77,223,.4)">
                 <i class="bi bi-mortarboard-fill text-white" style="font-size:36px"></i>
             </div>
-            <h5 class="fw-bold mb-2">Halo, {{ $user->name }}!</h5>
+            <h5 class="fw-bold mb-2">Halo, <?php echo e($user->name); ?>!</h5>
             <p class="text-muted mb-4" style="max-width:340px;margin:0 auto">
                 Selamat datang di Smart Center Indonesia.
             </p>
             <div class="d-flex gap-2 justify-content-center flex-wrap">
-                <a href="{{ route('profile.edit') }}" class="btn btn-outline-primary btn-sm">
+                <a href="<?php echo e(route('profile.edit')); ?>" class="btn btn-outline-primary btn-sm">
                     <i class="bi bi-person me-1"></i>Edit Profil
                 </a>
-                <form method="POST" action="{{ route('logout') }}" class="d-inline">
-                    @csrf
+                <form method="POST" action="<?php echo e(route('logout')); ?>" class="d-inline">
+                    <?php echo csrf_field(); ?>
                     <button class="btn btn-outline-danger btn-sm" type="submit">
                         <i class="bi bi-box-arrow-left me-1"></i>Logout
                     </button>
@@ -850,12 +856,12 @@ function deleteReg(id, btn) {
         </div>
     </div>
 </div>
-@endif
+<?php endif; ?>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 // ── Counter Animation ──────────────────────────────────────────────────────
 function animateCount(el) {
@@ -907,10 +913,11 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             series: [{
                 name: 'Siswa Baru',
-                data: {!! json_encode(array_values($monthCounts)) !!}
+                data: <?php echo json_encode(array_values($monthCounts)); ?>
+
             }],
             xaxis: {
-                categories: {!! json_encode(array_values($monthLabels)) !!},
+                categories: <?php echo json_encode(array_values($monthLabels)); ?>,
                 labels: { style: { colors: textColor, fontSize: '12px' } },
                 axisBorder: { show: false },
                 axisTicks: { show: false }
@@ -945,7 +952,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 background: 'transparent',
                 animations: { enabled: true, speed: 800 }
             },
-            series: [{{ $male }}, {{ $female }}],
+            series: [<?php echo e($male); ?>, <?php echo e($female); ?>],
             labels: ['Laki-laki', 'Perempuan'],
             colors: ['#c84ddf', '#ec4899'],
             legend: {
@@ -959,7 +966,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         total: {
                             show: true, label: 'Total',
                             color: textColor, fontSize: '13px', fontWeight: 600,
-                            formatter: () => '{{ $male + $female }}'
+                            formatter: () => '<?php echo e($male + $female); ?>'
                         }
                     }}
                 }
@@ -981,7 +988,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 background: 'transparent',
                 animations: { enabled: true, speed: 800 }
             },
-            series: [{ name: 'Siswa', data: [{{ $aktif }}, {{ $nonaktif }}, {{ $lulus }}] }],
+            series: [{ name: 'Siswa', data: [<?php echo e($aktif); ?>, <?php echo e($nonaktif); ?>, <?php echo e($lulus); ?>] }],
             xaxis: {
                 categories: ['Aktif', 'Nonaktif', 'Lulus'],
                 labels: { style: { colors: textColor, fontSize: '12px' } },
@@ -1010,4 +1017,6 @@ window.toggleDark = function() {
     setTimeout(() => location.reload(), 150);
 };
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\Edu Juanda Pratama\Downloads\smart-center-indonesia-1 (2)\smart-center-indonesia\resources\views/dashboard.blade.php ENDPATH**/ ?>

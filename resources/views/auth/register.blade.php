@@ -530,6 +530,27 @@
                                 <option value="Umum" {{ old('education_level')=='Umum'?'selected':'' }}>Umum</option>
                             </select>
                         </div>
+                        <div class="col-12 school-data-heading {{ in_array(old('education_level'), ['Pra Sekolah (PAUD/TK)','Sekolah Dasar (SD)','Sekolah Menengah Pertama (SMP)','Sekolah Menengah Atas/Kejuruan (SMA/SMK)','Mahasiswa']) ? '' : 'd-none' }}" id="schoolDataSectionHeading">
+                            <div class="section-subtitle" style="font-size:.95rem;font-weight:600;margin-bottom:.75rem;color:#3730a3">Data Sekolah</div>
+                        </div>
+                        <div class="col-md-6 school-data-schoolname {{ in_array(old('education_level'), ['Pra Sekolah (PAUD/TK)','Sekolah Dasar (SD)','Sekolah Menengah Pertama (SMP)','Sekolah Menengah Atas/Kejuruan (SMA/SMK)','Mahasiswa']) ? '' : 'd-none' }}">
+                            <label class="form-label">Nama Sekolah</label>
+                            <input type="text" name="school_name" class="form-control @error('school_name') is-invalid @enderror"
+                                   value="{{ old('school_name') }}" placeholder="Nama sekolah">
+                            @error('school_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-6 school-data-class {{ in_array(old('education_level'), ['Pra Sekolah (PAUD/TK)','Sekolah Dasar (SD)','Sekolah Menengah Pertama (SMP)','Sekolah Menengah Atas/Kejuruan (SMA/SMK)']) ? '' : 'd-none' }}">
+                            <label class="form-label">Kelas</label>
+                            <input type="text" name="grade" class="form-control @error('grade') is-invalid @enderror"
+                                   value="{{ old('grade') }}" placeholder="Contoh: Kelas 10 / XI IPA">
+                            @error('grade')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-6 school-data-semester {{ old('education_level')==='Mahasiswa' ? '' : 'd-none' }}">
+                            <label class="form-label">Semester</label>
+                            <input type="text" name="semester" class="form-control @error('semester') is-invalid @enderror"
+                                   value="{{ old('semester') }}" placeholder="Contoh: Semester 3">
+                            @error('semester')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
 
                     </div>
                 </div>
@@ -1056,6 +1077,33 @@ document.querySelectorAll('[data-action="prev"]').forEach(btn => {
 });
 
 // Restore pill states on page load (for old() repopulation)
+function toggleSchoolData() {
+    const selected = document.getElementById('education_level')?.value;
+    const showSchoolDataHeading = ['Pra Sekolah (PAUD/TK)','Sekolah Dasar (SD)','Sekolah Menengah Pertama (SMP)','Sekolah Menengah Atas/Kejuruan (SMA/SMK)','Mahasiswa'].includes(selected);
+    const showClassField = ['Pra Sekolah (PAUD/TK)','Sekolah Dasar (SD)','Sekolah Menengah Pertama (SMP)','Sekolah Menengah Atas/Kejuruan (SMA/SMK)'].includes(selected);
+    const showSemesterField = selected === 'Mahasiswa';
+
+    document.querySelectorAll('.school-data-heading').forEach(el => el.classList.toggle('d-none', !showSchoolDataHeading));
+    document.querySelectorAll('.school-data-schoolname').forEach(el => el.classList.toggle('d-none', !showSchoolDataHeading));
+    document.querySelectorAll('.school-data-class').forEach(el => el.classList.toggle('d-none', !showClassField));
+    document.querySelectorAll('.school-data-semester').forEach(el => el.classList.toggle('d-none', !showSemesterField));
+}
+
+document.getElementById('education_level')?.addEventListener('change', toggleSchoolData);
+
+document.addEventListener('DOMContentLoaded', function() {
+    toggleSchoolData();
+    document.querySelectorAll('.accordion-body').forEach(body => {
+        if (body.querySelector('input:checked')) {
+            body.classList.add('open');
+            const header = body.previousElementSibling;
+            if (header && header.classList.contains('accordion-cat')) header.classList.add('open');
+        }
+        // Init badges
+        updateCatBadge(body);
+    });
+});
+
 document.querySelectorAll('.check-pill input:checked').forEach(cb => {
     cb.closest('.check-pill').classList.add('selected');
 });

@@ -12,7 +12,8 @@ class StudentRegistration extends Model
     protected $fillable = [
         'no_reg', 'name', 'phone', 'gender', 'education_level',
         'birth_place', 'birth_date', 'address', 'parent_name', 'parent_phone',
-        'job', 'program', 'system', 'learning_place', 'pickup_mode', 'branch',
+        'school_name', 'grade', 'semester',
+        'job', 'program', 'system', 'learning_place', 'private_address', 'pickup_mode', 'branch',
         'interests', 'interest_sessions', 'interest_teachers', 'day_preferences', 'schedule_time', 'start_date', 'notes',
         'status', 'payment_status', 'academic_status',
         'assigned_teacher_id', 'biaya_per_sesi', 'total_sessions',
