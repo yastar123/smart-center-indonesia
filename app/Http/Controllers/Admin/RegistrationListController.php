@@ -420,15 +420,20 @@ class RegistrationListController extends Controller
             'course_use_honor'     => 'nullable|array',
             'course_use_honor.*'   => 'nullable|in:0,1,true,false',
             'schedule_hari'        => 'nullable|array',
-            'schedule_hari.*'      => 'nullable|string|max:20',
+            'schedule_hari.*'      => 'nullable',
+            'schedule_hari.*.*'    => 'nullable|string|max:20',
             'schedule_jam_mulai'   => 'nullable|array',
             'schedule_jam_mulai.*' => 'nullable',
+            'schedule_jam_mulai.*.*' => 'nullable',
             'schedule_jam_selesai' => 'nullable|array',
             'schedule_jam_selesai.*' => 'nullable',
+            'schedule_jam_selesai.*.*' => 'nullable',
             'schedule_room'        => 'nullable|array',
-            'schedule_room.*'      => 'nullable|exists:rooms,id',
+            'schedule_room.*'      => 'nullable',
+            'schedule_room.*.*'    => 'nullable|exists:rooms,id',
             'schedule_link_meeting'    => 'nullable|array',
-            'schedule_link_meeting.*'  => 'nullable|string|max:500',
+            'schedule_link_meeting.*'  => 'nullable',
+            'schedule_link_meeting.*.*' => 'nullable|string|max:500',
             'total_biaya'            => 'required|numeric|min:0',
             'biaya_per_sesi'         => 'nullable|numeric|min:0',
             'biaya_admin'            => 'nullable|numeric|min:0',
@@ -574,8 +579,18 @@ class RegistrationListController extends Controller
             $system = $data['system'] ?? null;
             if ($system === 'online') {
                 foreach ($selectedCourses as $courseId) {
-                    $hari = $data['schedule_hari'][$courseId] ?? null;
-                    if ($hari !== null && $hari !== '' && !trim($data['schedule_link_meeting'][$courseId] ?? '')) {
+                    $slots = $this->normalizeScheduleSlots($data, $courseId);
+                    if (empty($slots)) {
+                        continue;
+                    }
+                    $hasMeetingLink = false;
+                    foreach ($slots as $slot) {
+                        if (!empty($slot['hari']) && !empty($slot['jam_mulai']) && !empty($slot['jam_selesai']) && trim((string) ($slot['meeting_link'] ?? '')) !== '') {
+                            $hasMeetingLink = true;
+                            break;
+                        }
+                    }
+                    if (!$hasMeetingLink) {
                         throw new \Exception('Untuk kelas online, link meeting wajib diisi pada jadwal mapel yang dipilih.');
                     }
                 }
@@ -738,44 +753,52 @@ class RegistrationListController extends Controller
                     'updated_at' => now(),
                 ]);
 
-                // Generate the recurring weekly sessions for this brand-new class from
-                // the "Jadwal Kelas" table on the process form (hari/jam/ruang per mapel).
-                // Only for classes we just created — an existing/reused class already
-                // has its own schedule, so we never duplicate sessions onto it.
-                $hari   = $scheduleHari[$courseId] ?? null;
-                $mulai  = $scheduleJamMulai[$courseId] ?? null;
-                $selesai = $scheduleJamSelesai[$courseId] ?? null;
-                if ($isNewClass && $hari !== null && $hari !== '' && $mulai && $selesai) {
-                    $roomId       = $scheduleRoom[$courseId] ?? null;
-                    $roomName     = $roomId ? optional(Room::find($roomId))->nama_ruangan : null;
-                    $meetingLink  = trim($scheduleLinkMeeting[$courseId] ?? '');
+                // Generate recurring weekly sessions from the "Jadwal Kelas" table on
+                // the registration form. We seed schedules for a newly created class, and
+                // also for an existing active class when it still has no schedule rows yet.
+                // This avoids duplicates for classes that already have an established schedule.
+                $hasExistingSchedules = Schedule::where('kelas_id', $schoolClass->id)->exists();
+                if ($isNewClass || !$hasExistingSchedules) {
+                    $slots = $this->normalizeScheduleSlots($data, $courseId);
                     $useHonor = !empty($courseUseHonor[$courseId]) && ($courseUseHonor[$courseId] !== '0' && $courseUseHonor[$courseId] !== false && $courseUseHonor[$courseId] !== 'false');
                     $honorPerSesi = $useHonor && array_key_exists($courseId, $courseHonor) ? (float) $courseHonor[$courseId] : null;
                     $jumlahSesi   = (int) ($courseSessions[$courseId] ?? 8);
-
-                    $tanggal = now()->startOfDay();
-                    while ((int) $tanggal->dayOfWeek !== (int) $hari) {
-                        $tanggal = $tanggal->addDay();
-                    }
-
                     $moduleId = $data['course_module'][$courseId] ?? null;
-                    for ($i = 0; $i < $jumlahSesi; $i++) {
-                        Schedule::create([
-                            'kelas_id'          => $schoolClass->id,
-                            'mata_pelajaran_id' => $courseId,
-                            'module_id'         => $moduleId,
-                            'guru_id'           => $teacherId,
-                            'cabang_id'         => $branch->id,
-                            'tanggal'           => $tanggal->copy()->addWeeks($i)->toDateString(),
-                            'jam_mulai'         => $mulai,
-                            'jam_selesai'       => $selesai,
-                            'program_belajar'   => $programBelajarSchedule,
-                            'jenis'             => $jenisKelas,
-                            'ruangan'           => $roomName,
-                            'link_meeting'      => $meetingLink ?: null,
-                            'honor_per_sesi'    => $honorPerSesi,
-                            'status'            => 'dijadwalkan',
-                        ]);
+
+                    foreach ($slots as $slot) {
+                        $hari = $slot['hari'] ?? null;
+                        $mulai = $slot['jam_mulai'] ?? null;
+                        $selesai = $slot['jam_selesai'] ?? null;
+                        if ($hari === null || $hari === '' || !$mulai || !$selesai) {
+                            continue;
+                        }
+
+                        $roomId = $slot['room_id'] ?? null;
+                        $roomName = $roomId ? optional(Room::find($roomId))->nama_ruangan : null;
+                        $meetingLink = trim((string) ($slot['meeting_link'] ?? ''));
+                        $tanggal = now()->startOfDay();
+                        while ((int) $tanggal->dayOfWeek !== (int) $hari) {
+                            $tanggal = $tanggal->addDay();
+                        }
+
+                        for ($i = 0; $i < $jumlahSesi; $i++) {
+                            Schedule::create([
+                                'kelas_id'          => $schoolClass->id,
+                                'mata_pelajaran_id' => $courseId,
+                                'module_id'         => $moduleId,
+                                'guru_id'           => $teacherId,
+                                'cabang_id'         => $branch->id,
+                                'tanggal'           => $tanggal->copy()->addWeeks($i)->toDateString(),
+                                'jam_mulai'         => $mulai,
+                                'jam_selesai'       => $selesai,
+                                'program_belajar'   => $programBelajarSchedule,
+                                'jenis'             => $jenisKelas,
+                                'ruangan'           => $roomName,
+                                'link_meeting'      => $meetingLink ?: null,
+                                'honor_per_sesi'    => $honorPerSesi,
+                                'status'            => 'dijadwalkan',
+                            ]);
+                        }
                     }
                 }
             }
@@ -906,5 +929,40 @@ class RegistrationListController extends Controller
             DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Gagal memproses: ' . $e->getMessage()], 500);
         }
+    }
+
+    private function normalizeScheduleSlots(array $data, int|string $courseId): array
+    {
+        $courseSchedule = $data['schedule_hari'][$courseId] ?? null;
+        $courseStart = $data['schedule_jam_mulai'][$courseId] ?? null;
+        $courseEnd = $data['schedule_jam_selesai'][$courseId] ?? null;
+        $courseRooms = $data['schedule_room'][$courseId] ?? null;
+        $courseMeetings = $data['schedule_link_meeting'][$courseId] ?? null;
+
+        if (is_array($courseSchedule)) {
+            $slots = [];
+            foreach ($courseSchedule as $index => $hari) {
+                $slots[] = [
+                    'hari' => $hari,
+                    'jam_mulai' => $courseStart[$index] ?? null,
+                    'jam_selesai' => $courseEnd[$index] ?? null,
+                    'room_id' => $courseRooms[$index] ?? null,
+                    'meeting_link' => $courseMeetings[$index] ?? null,
+                ];
+            }
+            return array_values(array_filter($slots, fn ($slot) => !empty($slot['hari']) || !empty($slot['jam_mulai']) || !empty($slot['jam_selesai']) || !empty($slot['room_id']) || !empty($slot['meeting_link'])));
+        }
+
+        if ($courseSchedule !== null && $courseSchedule !== '') {
+            return [[
+                'hari' => $courseSchedule,
+                'jam_mulai' => $courseStart ?? null,
+                'jam_selesai' => $courseEnd ?? null,
+                'room_id' => $courseRooms ?? null,
+                'meeting_link' => $courseMeetings ?? null,
+            ]];
+        }
+
+        return [];
     }
 }

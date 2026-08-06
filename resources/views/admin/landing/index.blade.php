@@ -80,6 +80,13 @@
                                 <input type="text" name="settings[hero.title_line2]" class="form-control" value="{{ $settings['hero.title_line2']->value ?? 'Raih Prestasi!' }}">
                             </div>
                             <div class="col-12">
+                                <label class="form-label fw-semibold">Logo Homepage</label>
+                                <input type="file" name="setting_files[brand.logo_url]" class="form-control" accept="image/*">
+                                @if(!empty($settings['brand.logo_url']->value))
+                                <img src="{{ str_starts_with($settings['brand.logo_url']->value,'http') ? $settings['brand.logo_url']->value : asset($settings['brand.logo_url']->value) }}" class="mt-2 rounded" style="height:60px;width:60px;object-fit:contain">
+                                @endif
+                            </div>
+                            <div class="col-12">
                                 <label class="form-label fw-semibold">Deskripsi Hero</label>
                                 <textarea name="settings[hero.description]" class="form-control" rows="3">{{ $settings['hero.description']->value ?? '' }}</textarea>
                             </div>

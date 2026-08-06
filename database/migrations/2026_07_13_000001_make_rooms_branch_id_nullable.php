@@ -1,12 +1,18 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     public function up(): void
     {
+        $driver = Config::get('database.default');
+        if ($driver !== 'mysql') {
+            return;
+        }
+
         $foreignKey = DB::selectOne("SELECT CONSTRAINT_NAME
             FROM information_schema.KEY_COLUMN_USAGE
             WHERE TABLE_SCHEMA = DATABASE()
@@ -23,6 +29,11 @@ return new class extends Migration {
 
     public function down(): void
     {
+        $driver = Config::get('database.default');
+        if ($driver !== 'mysql') {
+            return;
+        }
+
         DB::statement('ALTER TABLE rooms MODIFY COLUMN branch_id BIGINT UNSIGNED NOT NULL');
     }
 };

@@ -22,6 +22,7 @@
     $dbPrograms  = \App\Models\LandingProgram::active()->orderBy('sort_order')->get();
     $waMain      = \App\Models\LandingWaNumber::primaryNumber($ls('footer.wa_number','628001234567'));
     $waNumbers   = \App\Models\LandingWaNumber::active()->orderBy('sort_order')->get();
+    $brandLogo   = $ls('brand.logo_url', '');
     $dbTickers   = \App\Models\LandingTicker::active()->orderBy('sort_order')->get();
     $dbFeatures  = \App\Models\LandingFeature::active()->orderBy('sort_order')->get();
     $dbJenjangs  = \App\Models\LandingJenjang::active()->orderBy('sort_order')->get();
@@ -183,7 +184,7 @@
         /* Arrow nav */
         .hero-arrow {
             position:absolute; top:50%; transform:translateY(-50%); z-index:4;
-            width:42px; height:42px; border-radius:50%;
+            width:48px; height:42px; border-radius:12px;
             background:rgba(255,255,255,.18); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
             border:1.5px solid rgba(255,255,255,.3);
             color:white; font-size:1rem; cursor:pointer;
@@ -1011,7 +1012,13 @@
 <nav class="lp-nav" id="navbar">
     <div class="nav-inner">
         <a href="{{ url('/') }}" class="nav-brand">
-            <div class="nav-brand-icon"><i class="bi bi-mortarboard-fill"></i></div>
+            <div class="nav-brand-icon" style="overflow:hidden;">
+                @if($brandLogo)
+                    <img src="{{ str_starts_with($brandLogo,'http') ? $brandLogo : asset($brandLogo) }}" alt="Smart Center Indonesia" style="width:100%;height:100%;object-fit:contain;display:block">
+                @else
+                    <i class="bi bi-mortarboard-fill"></i>
+                @endif
+            </div>
             <div class="nav-brand-text">
                 Smart Center
                 <small>Indonesia</small>
@@ -1653,12 +1660,15 @@
         <div class="cpc-carousel-wrap reveal" id="cabangCarousel">
             <div class="cpc-track" id="cpcTrack">
                 @foreach($carouselBranches as $cb)
-                @php $bName = $cb->name ?? 'Cabang SCI'; @endphp
+                @php
+                    $bName = $cb->name ?? 'Cabang SCI';
+                    $cityLabel = $cb->city ?: $bName;
+                @endphp
                 <a href="{{ route('cabang.show', $cb->id) }}" class="cpc">
-                    <img src="{{ $cbPhotoUrl($cb) }}" alt="{{ $bName }}" loading="lazy">
+                    <img src="{{ $cbPhotoUrl($cb) }}" alt="{{ $cityLabel }}" loading="lazy">
                     <div class="cpc-overlay">
-                        <div class="cpc-name">{{ $bName }}</div>
-                        <div class="cpc-sub">Jasa Les Privat {{ $bName }}</div>
+                        <div class="cpc-name">{{ $cityLabel }}</div>
+                        <div class="cpc-sub">Jasa Les Privat {{ $cityLabel }}</div>
                         <span class="btn-cpc">Lihat Detail <i class="bi bi-arrow-right"></i></span>
                     </div>
                 </a>

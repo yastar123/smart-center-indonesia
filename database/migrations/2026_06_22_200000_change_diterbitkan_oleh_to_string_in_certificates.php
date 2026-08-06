@@ -12,7 +12,7 @@ return new class extends Migration
 
         if ($driver === 'pgsql') {
             DB::statement('ALTER TABLE certificates ALTER COLUMN diterbitkan_oleh TYPE VARCHAR(200) USING diterbitkan_oleh::VARCHAR(200)');
-        } else {
+        } elseif ($driver === 'mysql') {
             DB::statement('ALTER TABLE certificates MODIFY diterbitkan_oleh VARCHAR(200)');
         }
     }
@@ -23,7 +23,7 @@ return new class extends Migration
 
         if ($driver === 'pgsql') {
             DB::statement('ALTER TABLE certificates ALTER COLUMN diterbitkan_oleh TYPE BIGINT USING NULL');
-        } else {
+        } elseif ($driver === 'mysql') {
             DB::statement('ALTER TABLE certificates MODIFY diterbitkan_oleh BIGINT');
         }
     }

@@ -1,3 +1,4 @@
+
 <?php $__env->startSection('title', 'Proses Pendaftaran'); ?>
 <?php $__env->startSection('page-title', 'Proses Pendaftaran Siswa'); ?>
 
@@ -241,17 +242,21 @@
                     <input type="text" class="form-control" name="parent_phone" value="<?php echo e($registration->parent_phone); ?>">
                 </div>
 
-                <div class="col-12">
+                <div class="col-12" id="schoolDataSection">
                     <div class="border rounded-3 p-3" style="background:rgba(200,77,223,.04);border-color:rgba(200,77,223,.16)!important">
                         <div class="fw-semibold mb-2" style="font-size:.82rem;color:#461256"><i class="bi bi-mortarboard me-2"></i>Data Sekolah</div>
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Nama Sekolah</label>
-                                <input type="text" class="form-control" name="school_name" value="<?php echo e($registration->school_name); ?>" placeholder="Nama sekolah">
+                            <div class="col-md-6 school-data-schoolname">
+                                <label class="form-label" id="schoolNameLabel" style="font-size:.78rem;color:var(--text-muted)">Nama Sekolah</label>
+                                <input type="text" class="form-control" id="schoolNameInput" name="school_name" value="<?php echo e($registration->school_name); ?>" placeholder="Nama sekolah">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 school-data-grade" id="schoolDataGrade">
                                 <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Kelas</label>
                                 <input type="text" class="form-control" name="grade" value="<?php echo e($registration->grade); ?>" placeholder="Contoh: Kelas 10 / XI IPA">
+                            </div>
+                            <div class="col-md-6 school-data-semester d-none" id="schoolDataSemester">
+                                <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Semester</label>
+                                <input type="text" class="form-control" name="semester" value="<?php echo e($registration->semester ?? ''); ?>" placeholder="Contoh: Semester 3">
                             </div>
                         </div>
                     </div>
@@ -283,14 +288,22 @@
                         <label class="form-label fw-semibold" style="font-size:.78rem">Tempat Belajar</label>
                         <?php $curTempat = $registration->learning_place ?? 'kantor'; ?>
                         <div class="d-flex gap-2 flex-wrap">
-                            <div class="pw-opt-btn <?php echo e($curTempat!=='rumah'?'active':''); ?>" onclick="pickTempat('kantor',this)">
+                            <div class="pw-opt-btn <?php echo e($curTempat!=='rumah' && $curTempat!=='online' ? 'active' : ''); ?>" onclick="pickTempat('kantor',this)">
                                 <i class="bi bi-building me-1"></i>Belajar di Kantor
                             </div>
-                            <div class="pw-opt-btn <?php echo e($curTempat==='rumah'?'active':''); ?>" onclick="pickTempat('rumah',this)">
+                            <div class="pw-opt-btn <?php echo e($curTempat==='rumah' ? 'active' : ''); ?>" onclick="pickTempat('rumah',this)">
                                 <i class="bi bi-house-door me-1"></i>Guru ke Rumah
+                            </div>
+                            <div class="pw-opt-btn <?php echo e($curTempat==='online' ? 'active' : ''); ?>" id="onlinePlaceBtn" onclick="pickTempat('online',this)">
+                                <i class="bi bi-wifi me-1"></i>Belajar Online
                             </div>
                         </div>
                         <input type="hidden" name="tempat_belajar" id="tempatBelajarInput" value="<?php echo e($curTempat); ?>">
+                    </div>
+                    <div class="col-12" id="privateAddressWrapper" style="display:none">
+                        <label class="form-label" style="font-size:.78rem;color:var(--text-muted)">Alamat Belajar</label>
+                        <input type="text" class="form-control" name="private_address" id="privateAddressInput" placeholder="Alamat lengkap tempat guru datang / belajar">
+                        <div class="form-text" style="font-size:.72rem">Isi alamat jika tempat belajar dipilih Guru ke Rumah.</div>
                     </div>
 
                     
@@ -358,23 +371,27 @@
                     <button type="button" id="btnStandard" onclick="switchPackage('standard')" class="btn btn-sm btn-primary flex-fill">
                         <i class="bi bi-box-seam me-1"></i>Paket Standar
                     </button>
-                    <button type="button" id="btnCustom" onclick="switchPackage('custom')" class="btn btn-sm btn-outline-secondary flex-fill">
-                        <i class="bi bi-pencil-square me-1"></i>Paket Custom
-                    </button>
                     <button type="button" id="btnRequest" onclick="switchPackage('request')" class="btn btn-sm btn-outline-secondary flex-fill">
                         <i class="bi bi-chat-square-text me-1"></i>Paket Request
                     </button>
+                </div>
+                <div class="mb-3">
+                    <div id="packagePanelTitle" class="fw-semibold" style="font-size:.92rem">Pilih Paket Belajar</div>
+                    <div id="packagePanelHint" class="text-muted" style="font-size:.8rem">Pilih paket standar atau ajukan request paket baru jika tidak ada paket yang cocok.</div>
                 </div>
 
                 
                 <div id="standardPackage">
                     <p class="text-muted" style="font-size:.83rem">Pilih paket belajar untuk siswa ini (opsional — bisa dilewati jika belum ada paket yang cocok).</p>
+                    <div id="freePackageNote" class="alert alert-info d-none" style="font-size:.82rem;">
+                        <i class="bi bi-info-circle me-1"></i>Pilih Paket Bebas jika ingin menyusun tarif dan sesi secara manual tanpa paket master.
+                    </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold" style="font-size:.78rem">Paket Kelas</label>
                         <select name="package_id" id="packageDropdown" class="form-select">
                             <option value="" data-harga="0">— Tanpa Paket (susun manual per mata pelajaran) —</option>
                             <?php $__currentLoopData = $packages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pkg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value="<?php echo e($pkg->id); ?>" data-cabang="<?php echo e($pkg->cabang_id); ?>" data-harga="<?php echo e($pkg->harga); ?>">
+                            <option value="<?php echo e($pkg->id); ?>" data-cabang="<?php echo e($pkg->cabang_id); ?>" data-harga="<?php echo e($pkg->harga); ?>" data-jumlah="<?php echo e($pkg->jumlah_pertemuan ?? 0); ?>">
                                 <?php echo e($pkg->nama); ?> — <?php echo e($pkg->tipe_kelas ?? 'Reguler'); ?> · <?php echo e($pkg->jumlah_pertemuan ?? '–'); ?> pertemuan · Rp<?php echo e(number_format($pkg->harga ?? 0,0,',','.')); ?>
 
                             </option>
@@ -393,6 +410,46 @@
                     </div>
                 </div>
 
+                <div id="customPackage" style="display:none" class="border rounded-3 p-3 mt-3" >
+                    <p class="text-muted" style="font-size:.82rem">Isi detail Paket Request untuk dibuat sebagai paket kelas baru di data master.</p>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" style="font-size:.78rem">Nama Paket</label>
+                            <input type="text" class="form-control" name="custom_package_name" placeholder="Nama paket untuk request">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" style="font-size:.78rem">Jenis Paket</label>
+                            <select class="form-select" name="custom_jenis">
+                                <option value="">Pilih…</option>
+                                <option value="reguler">Reguler</option>
+                                <option value="intensif">Intensif</option>
+                                <option value="privat">Privat</option>
+                                <option value="online">Online</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" style="font-size:.78rem">Jumlah Pertemuan</label>
+                            <input type="number" min="1" class="form-control" name="jumlah_pertemuan" value="1">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" style="font-size:.78rem">Harga Paket (Rp)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="number" min="0" class="form-control" name="custom_package_price" id="customPackagePrice" value="0">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" style="font-size:.78rem">Status Paket</label>
+                            <input type="text" class="form-control" name="custom_status" value="aktif" readonly>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold" style="font-size:.78rem">Keterangan Paket</label>
+                            <textarea class="form-control" name="custom_deskripsi" rows="3" placeholder="Catatan tambahan untuk paket request"></textarea>
+                        </div>
+                        <input type="hidden" name="custom_metode_absensi" value="manual">
+                        <input type="hidden" name="custom_tipe_kelas" value="offline">
+                    </div>
+                </div>
             </div>
             <div class="pw-actions"><span></span><button type="button" class="btn btn-primary" data-action="next">Lanjut<i class="bi bi-arrow-right ms-1"></i></button></div>
         </div>
@@ -426,7 +483,7 @@
                                 $sesiDef = $registration->interest_sessions[$course->nama] ?? 8;
                                 $honor   = round(($fee * 0.6) / max($sesiDef, 1));
                             ?>
-                            <div class="pw-course-row" data-course-row="<?php echo e($course->id); ?>">
+                            <div class="pw-course-row" data-course-row="<?php echo e($course->id); ?>" data-default-fee="<?php echo e($fee); ?>" data-default-honor="<?php echo e($honor); ?>">
                                 <div class="row g-3">
                                     <div class="col-12">
                                         <div class="form-check">
@@ -480,35 +537,6 @@
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </select>
                                         <div class="existing-class-detail mt-1 text-muted" style="font-size:.75rem">Pilih kelas aktif atau biarkan kosong untuk buat kelas baru.</div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold" style="font-size:.78rem">Biaya Siswa (Rp)</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text">Rp</span>
-                                            <input type="number" min="0" class="form-control fee-input" name="course_fee[<?php echo e($course->id); ?>]" value="<?php echo e($fee); ?>" oninput="updateRowMargin(this)">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold" style="font-size:.78rem">Honor Guru / Sesi</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text">Rp</span>
-                                            <input type="number" min="0" class="form-control honor-input" name="course_honor[<?php echo e($course->id); ?>]" value="<?php echo e($honor); ?>" oninput="updateRowMargin(this)" disabled>
-                                        </div>
-                                        <div class="form-check form-switch mt-2">
-                                            <input class="form-check-input course-use-honor" type="checkbox" name="course_use_honor[<?php echo e($course->id); ?>]" value="1">
-                                            <label class="form-check-label" style="font-size:.78rem">Tambah honor/sesi</label>
-                                        </div>
-                                    </div>
-
-                                    <?php $honorTotal = $honor * $sesiDef; ?>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold" style="font-size:.78rem">Margin</label>
-                                        <div class="margin-display p-3 rounded-2" style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);font-size:.88rem">
-                                            <div class="fw-semibold" style="color:#10b981">Rp<?php echo e(number_format($fee - $honorTotal, 0, ',', '.')); ?></div>
-                                            <div class="text-muted" style="font-size:.78rem"><?php echo e($fee > 0 ? round((($fee-$honorTotal)/$fee)*100) : 0); ?>%</div>
-                                        </div>
                                     </div>
 
                                     <div class="col-12 text-end">
@@ -577,33 +605,6 @@
                         <div class="text-muted mt-2" id="extraCourseEmptyMsg" style="font-size:.72rem;display:none">Semua mata pelajaran di data master sudah ditambahkan.</div>
                     </div>
 
-                    
-                    <div class="row g-3 mt-3">
-                        <div class="col-6 col-md-3">
-                            <div class="p-2 rounded-3 text-center" style="background:rgba(200,77,223,.08);border:1.5px solid rgba(200,77,223,.35)">
-                                <div class="text-muted" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.04em">Total Sesi</div>
-                                <div class="fw-bold fs-5 text-primary" id="summaryTotalSesi">0</div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <div class="p-2 rounded-3 text-center" style="background:rgba(200,77,223,.08);border:1.5px solid rgba(200,77,223,.35)">
-                                <div class="text-muted" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.04em">Total Biaya Siswa</div>
-                                <div class="fw-bold fs-5 text-primary" id="summaryTotalFee">Rp0</div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <div class="p-2 rounded-3 text-center" style="background:rgba(14,165,233,.08);border:1.5px solid rgba(14,165,233,.3)">
-                                <div class="text-muted" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.04em">Total Honor Guru</div>
-                                <div class="fw-bold fs-5" id="summaryTotalHonor" style="color:#0ea5e9">Rp0</div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <div class="p-2 rounded-3 text-center" style="background:rgba(16,185,129,.08);border:1.5px solid rgba(16,185,129,.3)">
-                                <div class="text-muted" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.04em">Est. Margin Bimbel</div>
-                                <div class="fw-bold fs-5" id="summaryMargin" style="color:#10b981">Rp0 <span id="summaryMarginPct" class="fw-normal" style="font-size:.65rem">(0%)</span></div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -617,7 +618,7 @@
                 <div class="p-3">
                     <p class="text-muted mb-3" style="font-size:.82rem">Isi hari, jam, dan ruang/media untuk setiap mata pelajaran. Guru ditampilkan otomatis sesuai pilihan di tabel atas. Pengisian ini <strong>tidak wajib</strong> dan tidak memblokir submit.</p>
                     <div id="scheduleTableWrapper" class="table-responsive">
-                        <table class="table table-sm table-bordered align-middle mb-0" style="font-size:.83rem;min-width:700px">
+                        <table class="table table-sm table-bordered align-middle mb-0" style="font-size:.83rem;min-width:860px">
                             <thead>
                                 <tr style="background:var(--input-bg)">
                                     <th style="width:40px;font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">No</th>
@@ -626,6 +627,7 @@
                                     <th style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Jam Mulai</th>
                                     <th style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Jam Berakhir</th>
                                     <th class="room-column-header" style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Ruang / Media</th>
+                                    <th style="width:70px;font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="scheduleRowsContainer">
@@ -635,31 +637,57 @@
                                     <td>
                                         <span class="badge rounded-pill" style="background:rgba(200,77,223,.12);color:#461256;font-size:.75rem;font-weight:600;padding:.3em .75em"><?php echo e($course->nama); ?></span>
                                     </td>
-                                    <td>
-                                        <select class="form-select form-select-sm hari-select" name="schedule_hari[<?php echo e($course->id); ?>]" data-course-id="<?php echo e($course->id); ?>" style="min-width:88px">
-                                            <option value="">Pilih…</option>
-                                            <option value="1">Senin</option>
-                                            <option value="2">Selasa</option>
-                                            <option value="3">Rabu</option>
-                                            <option value="4">Kamis</option>
-                                            <option value="5">Jum'at</option>
-                                            <option value="6">Sabtu</option>
-                                            <option value="0">Minggu</option>
-                                        </select>
+                                    <td colspan="5" class="p-0">
+                                        <div class="schedule-slot-list" data-course-id="<?php echo e($course->id); ?>">
+                                            <div class="schedule-slot-row border-bottom p-2" data-slot-index="0">
+                                                <div class="row g-2 align-items-end">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label fw-semibold" style="font-size:.72rem">Hari</label>
+                                                        <select class="form-select form-select-sm hari-select" name="schedule_hari[<?php echo e($course->id); ?>][0]" data-course-id="<?php echo e($course->id); ?>" style="min-width:88px">
+                                                            <option value="">Pilih…</option>
+                                                            <option value="1">Senin</option>
+                                                            <option value="2">Selasa</option>
+                                                            <option value="3">Rabu</option>
+                                                            <option value="4">Kamis</option>
+                                                            <option value="5">Jum'at</option>
+                                                            <option value="6">Sabtu</option>
+                                                            <option value="0">Minggu</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label class="form-label fw-semibold" style="font-size:.72rem">Mulai</label>
+                                                        <input type="time" class="form-control form-control-sm jam-mulai-input" name="schedule_jam_mulai[<?php echo e($course->id); ?>][0]" data-course-id="<?php echo e($course->id); ?>" value="08:00" style="min-width:100px">
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label class="form-label fw-semibold" style="font-size:.72rem">Selesai</label>
+                                                        <input type="time" class="form-control form-control-sm jam-selesai-input" name="schedule_jam_selesai[<?php echo e($course->id); ?>][0]" data-course-id="<?php echo e($course->id); ?>" value="10:00" style="min-width:100px">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label fw-semibold" style="font-size:.72rem">Ruang / Media</label>
+                                                        <div class="room-field">
+                                                            <select class="form-select form-select-sm room-select" name="schedule_room[<?php echo e($course->id); ?>][0]" data-course-id="<?php echo e($course->id); ?>" style="min-width:140px">
+                                                                <option value="">— Pilih ruang —</option>
+                                                                <?php $__currentLoopData = $rooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                <option value="<?php echo e($room->id); ?>"><?php echo e($room->nama_ruangan); ?><?php echo e($room->kapasitas ? ' ('.$room->kapasitas.' org)' : ''); ?></option>
+                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                            </select>
+                                                        </div>
+                                                        <div class="meeting-field" style="display:none">
+                                                            <input type="url" class="form-control form-control-sm meeting-input" name="schedule_link_meeting[<?php echo e($course->id); ?>][0]" placeholder="Link meeting" autocomplete="off">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2 text-end">
+                                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeScheduleSlot(this)"><i class="bi bi-trash"></i></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addScheduleSlot(this, <?php echo e($course->id); ?>)"><i class="bi bi-plus-circle me-1"></i>Tambah slot jadwal</button>
+                                        </div>
                                     </td>
-                                    <td>
-                                        <input type="time" class="form-control form-control-sm jam-mulai-input" name="schedule_jam_mulai[<?php echo e($course->id); ?>]" data-course-id="<?php echo e($course->id); ?>" value="08:00" style="min-width:100px">
-                                    </td>
-                                    <td>
-                                        <input type="time" class="form-control form-control-sm jam-selesai-input" name="schedule_jam_selesai[<?php echo e($course->id); ?>]" data-course-id="<?php echo e($course->id); ?>" value="10:00" style="min-width:100px">
-                                    </td>
-                                    <td class="room-column-cell">
-                                        <select class="form-select form-select-sm room-select" name="schedule_room[<?php echo e($course->id); ?>]" data-course-id="<?php echo e($course->id); ?>" style="min-width:140px">
-                                            <option value="">— Pilih ruang —</option>
-                                            <?php $__currentLoopData = $rooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <option value="<?php echo e($room->id); ?>"><?php echo e($room->nama_ruangan); ?><?php echo e($room->kapasitas ? ' ('.$room->kapasitas.' org)' : ''); ?></option>
-                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                        </select>
+                                    <td class="text-center align-middle">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCourseScheduleRow(this, <?php echo e($course->id); ?>)" title="Hapus semua slot jadwal mapel ini"><i class="bi bi-trash"></i></button>
                                     </td>
                                 </tr>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -731,6 +759,43 @@
                     <input type="number" min="0" class="form-control fw-bold" id="totalBiaya" name="total_biaya" required>
                 </div>
                 <div class="form-text" style="font-size:.72rem">Dihitung otomatis dari mapel/paket — bisa disesuaikan.</div>
+            </div>
+
+            <div class="mb-4 p-3 rounded-3" style="background:var(--input-bg);border:1px solid var(--card-border)">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                    <div>
+                        <label class="form-label fw-semibold mb-1" style="font-size:.78rem">Rincian Keuangan Per Mapel</label>
+                        <div class="form-text" style="font-size:.72rem">Isi biaya siswa dan honor guru untuk setiap mapel terpilih. Nilai ini akan ikut ke preview dan invoice.</div>
+                    </div>
+                    <span class="badge rounded-pill" style="background:rgba(200,77,223,.12);color:#461256" id="financeSelectedCount">0 mapel</span>
+                </div>
+                <div id="financeCourseRows" class="d-grid gap-2"></div>
+                <div class="row g-3 mt-2">
+                    <div class="col-6 col-md-3">
+                        <div class="p-2 rounded-3 text-center" style="background:rgba(200,77,223,.08);border:1.5px solid rgba(200,77,223,.35)">
+                            <div class="text-muted" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.04em">Total Sesi</div>
+                            <div class="fw-bold fs-5 text-primary" id="summaryTotalSesi">0</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-2 rounded-3 text-center" style="background:rgba(200,77,223,.08);border:1.5px solid rgba(200,77,223,.35)">
+                            <div class="text-muted" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.04em">Total Biaya Siswa</div>
+                            <div class="fw-bold fs-5 text-primary" id="summaryTotalFee">Rp0</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-2 rounded-3 text-center" style="background:rgba(14,165,233,.08);border:1.5px solid rgba(14,165,233,.3)">
+                            <div class="text-muted" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.04em">Total Honor Guru</div>
+                            <div class="fw-bold fs-5" id="summaryTotalHonor" style="color:#0ea5e9">Rp0</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-2 rounded-3 text-center" style="background:rgba(16,185,129,.08);border:1.5px solid rgba(16,185,129,.3)">
+                            <div class="text-muted" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.04em">Est. Margin Bimbel</div>
+                            <div class="fw-bold fs-5" id="summaryMargin" style="color:#10b981">Rp0 <span id="summaryMarginPct" class="fw-normal" style="font-size:.65rem">(0%)</span></div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             
@@ -940,6 +1005,9 @@ document.querySelectorAll('[data-action="next"]').forEach(btn => {
         if (current && current.dataset.step === '1' && next === 2) {
             try { populatePackageFieldsFromStudentInfo(); } catch (e) {}
         }
+        if (current && current.dataset.step === '2' && !validateStep2()) {
+            return;
+        }
         if (next <= 4) {
             const activeForm = document.getElementById('processForm');
             if (activeForm) {
@@ -977,26 +1045,31 @@ function updateScheduleEmpty() {
 
 function recalcTotal() {
     let total = 0, totalHonor = 0, totalSesi = 0;
-    document.querySelectorAll('.course-check').forEach(chk => {
-        const row = chk.closest('.pw-course-row');
+    document.querySelectorAll('.pw-course-row').forEach(row => {
+        const chk = row.querySelector('.course-check');
+        if (!chk) return;
         row.classList.toggle('disabled', !chk.checked);
         row.querySelectorAll('select, input').forEach(el => { if (el !== chk) el.disabled = !chk.checked; });
-        // Sync matching schedule row visibility
-        const schedRow = document.querySelector(`.pw-sched-tr[data-schedule-row="${chk.value}"]`);
+        const schedRow = document.querySelector(`.pw-sched-tr[data-schedule-row="${row.dataset.courseRow}"]`);
         if (schedRow) schedRow.style.display = chk.checked ? '' : 'none';
         if (chk.checked) {
-            const feeInput   = row.querySelector('.fee-input');
-            const honorInput = row.querySelector('.honor-input');
-            const honorToggle = row.querySelector('.course-use-honor');
+            const courseId = row.dataset.courseRow;
+            const financeRow = document.querySelector(`#financeCourseRows .finance-row[data-course-id="${courseId}"]`);
+            const feeInput   = financeRow?.querySelector('.fee-input');
+            const honorInput = financeRow?.querySelector('.honor-input');
+            const honorToggle = financeRow?.querySelector('.course-use-honor');
             const sesiInput  = row.querySelector('input[name^="course_sessions"]');
             const sesi       = parseInt(sesiInput?.value || 0, 10);
-            total      += parseFloat(feeInput?.value   || 0);
+            const fee        = parseFloat(feeInput?.value || 0);
+            const honorPerSesi = parseFloat(honorInput?.value || 0);
+            total += fee;
             const useHonor = !!(honorToggle && honorToggle.checked);
-            totalHonor += useHonor ? (parseFloat(honorInput?.value || 0) * sesi) : 0;
-            totalSesi  += sesi;
+            totalHonor += useHonor ? (honorPerSesi * sesi) : 0;
+            totalSesi += sesi;
         }
     });
-    document.getElementById('totalBiaya').value = total || 0;
+    const totalBiayaEl = document.getElementById('totalBiaya');
+    if (totalBiayaEl) totalBiayaEl.value = total || 0;
     const margin = total - totalHonor;
     const pct    = total > 0 ? Math.round((margin / total) * 100) : 0;
     const fmt    = v => 'Rp' + Number(v).toLocaleString('id-ID');
@@ -1007,29 +1080,37 @@ function recalcTotal() {
         document.getElementById('summaryMargin').childNodes[0].textContent = fmt(margin) + ' ';
         document.getElementById('summaryMarginPct').textContent = '(' + pct + '%)';
     }
+    if (document.getElementById('financeSelectedCount')) {
+        const selected = document.querySelectorAll('#financeCourseRows .finance-row').length;
+        document.getElementById('financeSelectedCount').textContent = selected + ' mapel';
+    }
     updateScheduleEmpty();
     renumberScheduleRows();
 }
 
-// Update a single row's margin display when fee or honor changes
 function updateRowMargin(input) {
-    const row    = input.closest('.pw-course-row');
-    const fee    = parseFloat(row.querySelector('.fee-input')?.value   || 0);
-    const honor  = parseFloat(row.querySelector('.honor-input')?.value || 0); // honor per sesi
-    const honorToggle = row.querySelector('.course-use-honor');
-    const sesi   = parseInt(row.querySelector('input[name^="course_sessions"]')?.value || 0, 10);
+    const financeRow = input.closest('.finance-row');
+    const courseRow = input.closest('.pw-course-row');
+    const host = financeRow || courseRow;
+    if (!host) return;
+    const courseId = host.dataset.courseId || courseRow?.dataset.courseRow;
+    const financeRowTarget = courseId ? document.querySelector(`#financeCourseRows .finance-row[data-course-id="${courseId}"]`) : null;
+    const activeHost = financeRowTarget || host;
+    const fee = parseFloat(activeHost.querySelector('.fee-input')?.value || 0);
+    const honorInput = activeHost.querySelector('.honor-input');
+    const honorToggle = activeHost.querySelector('.course-use-honor');
+    const courseRowTarget = courseId ? document.querySelector(`.pw-course-row[data-course-row="${courseId}"]`) : courseRow;
+    const sesi = parseInt(courseRowTarget?.querySelector('input[name^="course_sessions"]')?.value || 0, 10);
     const useHonor = !!(honorToggle && honorToggle.checked);
-    const margin = fee - (useHonor ? (honor * sesi) : 0);
+    const margin = fee - (useHonor ? (parseFloat(honorInput?.value || 0) * sesi) : 0);
     const pct    = fee > 0 ? Math.round((margin / fee) * 100) : 0;
-    const display = row.querySelector('.margin-display');
+    const display = activeHost.querySelector('.margin-display');
     if (display) {
         display.innerHTML = '<div class="fw-semibold" style="color:' + (margin >= 0 ? '#10b981' : '#dc2626') + '">Rp' + margin.toLocaleString('id-ID') + '</div>' +
             '<div class="text-muted" style="font-size:.78rem">(' + pct + '%)</div>';
         display.style.background = margin >= 0 ? 'rgba(16,185,129,.07)' : 'rgba(220,38,38,.07)';
         display.style.borderColor = margin >= 0 ? 'rgba(16,185,129,.2)' : 'rgba(220,38,38,.2)';
     }
-    // update contract addition (if any) and totals
-    updateContractAddition(row);
     recalcTotal();
 }
 
@@ -1088,6 +1169,72 @@ function renumberScheduleRows() {
         const noCell = tr.querySelector('.sched-no');
         if (tr.style.display === 'none') return;
         if (noCell) noCell.textContent = n++;
+    });
+}
+
+function addScheduleSlot(btn, courseId) {
+    const list = btn.closest('.pw-sched-tr')?.querySelector('.schedule-slot-list');
+    if (!list) return;
+    const index = list.querySelectorAll('.schedule-slot-row').length;
+    const row = document.createElement('div');
+    row.className = 'schedule-slot-row border-top p-2';
+    row.dataset.slotIndex = index;
+    row.innerHTML = `
+        <div class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-semibold" style="font-size:.72rem">Hari</label>
+                <select class="form-select form-select-sm hari-select" name="schedule_hari[${courseId}][${index}]" data-course-id="${courseId}" style="min-width:88px">
+                    <option value="">Pilih…</option>
+                    <option value="1">Senin</option><option value="2">Selasa</option><option value="3">Rabu</option>
+                    <option value="4">Kamis</option><option value="5">Jum'at</option><option value="6">Sabtu</option><option value="0">Minggu</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold" style="font-size:.72rem">Mulai</label>
+                <input type="time" class="form-control form-control-sm jam-mulai-input" name="schedule_jam_mulai[${courseId}][${index}]" data-course-id="${courseId}" value="08:00" style="min-width:100px">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold" style="font-size:.72rem">Selesai</label>
+                <input type="time" class="form-control form-control-sm jam-selesai-input" name="schedule_jam_selesai[${courseId}][${index}]" data-course-id="${courseId}" value="10:00" style="min-width:100px">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold" style="font-size:.72rem">Ruang / Media</label>
+                <div class="room-field">
+                    <select class="form-select form-select-sm room-select" name="schedule_room[${courseId}][${index}]" data-course-id="${courseId}" style="min-width:140px">${_roomOptions}</select>
+                </div>
+                <div class="meeting-field" style="display:none">
+                    <input type="url" class="form-control form-control-sm meeting-input" name="schedule_link_meeting[${courseId}][${index}]" placeholder="Link meeting" autocomplete="off">
+                </div>
+            </div>
+            <div class="col-md-2 text-end">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeScheduleSlot(this)"><i class="bi bi-trash"></i></button>
+            </div>
+        </div>`;
+    list.appendChild(row);
+    bindScheduleSlotEvents(row);
+}
+
+function removeScheduleSlot(btn) {
+    const row = btn.closest('.schedule-slot-row');
+    if (!row) return;
+    row.remove();
+}
+
+function removeCourseScheduleRow(btn, courseId) {
+    const row = btn.closest('.pw-sched-tr');
+    if (!row) return;
+    row.remove();
+    renumberScheduleRows();
+}
+
+function bindScheduleSlotEvents(slotRow) {
+    const courseId = slotRow.closest('.pw-sched-tr')?.dataset.scheduleRow;
+    const guruSelect = document.querySelector(`.guru-select[data-course-id="${courseId}"]`);
+    const slotInputs = slotRow.querySelectorAll('.hari-select, .jam-mulai-input, .jam-selesai-input');
+    slotInputs.forEach(el => {
+        el.addEventListener('change', () => {
+            if (guruSelect) runConflictCheck(courseId);
+        });
     });
 }
 
@@ -1320,9 +1467,11 @@ function clearExistingClassSelection(courseId) {
 }
 
 function bindCourseRowEvents(row) {
-    row.querySelectorAll('.course-check, .fee-input, input[name^="course_sessions"], .honor-input, .course-use-honor').forEach(el => el.addEventListener('input', recalcTotal));
-    row.querySelectorAll('.course-check, .fee-input, input[name^="course_sessions"], .honor-input, .course-use-honor').forEach(el => el.addEventListener('change', recalcTotal));
-    row.querySelectorAll('.course-check').forEach(el => el.addEventListener('change', recalcTotal));
+    row.querySelectorAll('.course-check, input[name^="course_sessions"]').forEach(el => {
+        el.addEventListener('input', () => { recalcTotal(); });
+        el.addEventListener('change', () => { recalcTotal(); });
+    });
+    row.querySelectorAll('.course-check').forEach(el => el.addEventListener('change', () => { recalcTotal(); renderFinanceRows(); }));
     const courseId = row.dataset.courseRow;
     const guruSelect = row.querySelector('.guru-select');
     const classSelect = row.querySelector('.existing-class-select');
@@ -1349,6 +1498,92 @@ function bindCourseRowEvents(row) {
     bindGuruConflictEvents(courseId);
 }
 document.querySelectorAll('.pw-course-row').forEach(bindCourseRowEvents);
+function renderFinanceRows() {
+    const container = document.getElementById('financeCourseRows');
+    if (!container) return;
+    const existingState = {};
+    document.querySelectorAll('#financeCourseRows .finance-row').forEach(row => {
+        const courseId = row.dataset.courseId;
+        if (!courseId) return;
+        existingState[courseId] = {
+            fee: row.querySelector('.fee-input')?.value || '',
+            honor: row.querySelector('.honor-input')?.value || '',
+            useHonor: !!row.querySelector('.course-use-honor')?.checked,
+        };
+    });
+
+    const courseRows = Array.from(document.querySelectorAll('.pw-course-row'));
+    const selectedRows = courseRows.filter(row => {
+        const chk = row.querySelector('.course-check');
+        return !chk || chk.checked;
+    });
+
+    container.innerHTML = '';
+    if (!selectedRows.length) {
+        container.innerHTML = '<div class="text-muted" style="font-size:.8rem">Pilih setidaknya satu mapel di langkah sebelumnya untuk mengisi rincian keuangan.</div>';
+        recalcTotal();
+        return;
+    }
+
+    selectedRows.forEach(row => {
+        const courseId = row.dataset.courseRow;
+        const label = row.querySelector('.form-check-label')?.textContent.trim() || `Mapel ${courseId}`;
+        const state = existingState[courseId] || {};
+        const fee = state.fee ?? row.dataset.defaultFee ?? 0;
+        const honor = state.honor ?? row.dataset.defaultHonor ?? 0;
+        const useHonor = !!state.useHonor;
+        const financeRow = document.createElement('div');
+        financeRow.className = 'finance-row p-3 rounded-3 border';
+        financeRow.dataset.courseId = courseId;
+        financeRow.innerHTML = `
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold" style="font-size:.78rem">Mapel</label>
+                    <div class="fw-semibold" style="font-size:.9rem">${label}</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold" style="font-size:.78rem">Biaya Siswa (Rp)</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text">Rp</span>
+                        <input type="number" min="0" class="form-control fee-input" name="course_fee[${courseId}]" value="${fee}" oninput="updateRowMargin(this)">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold" style="font-size:.78rem">Honor Guru / Sesi</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text">Rp</span>
+                        <input type="number" min="0" class="form-control honor-input" name="course_honor[${courseId}]" value="${honor}" oninput="updateRowMargin(this)" ${useHonor ? '' : 'disabled'}>
+                    </div>
+                    <div class="form-check form-switch mt-2">
+                        <input class="form-check-input course-use-honor" type="checkbox" name="course_use_honor[${courseId}]" value="1" ${useHonor ? 'checked' : ''}>
+                        <label class="form-check-label" style="font-size:.78rem">Tambah honor/sesi</label>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="margin-display p-2 rounded-2" style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);font-size:.82rem">
+                        <div class="fw-semibold" style="color:#10b981">Rp0</div>
+                        <div class="text-muted" style="font-size:.76rem">(0%)</div>
+                    </div>
+                </div>
+            </div>`;
+        container.appendChild(financeRow);
+
+        const feeInput = financeRow.querySelector('.fee-input');
+        const honorInput = financeRow.querySelector('.honor-input');
+        const honorToggle = financeRow.querySelector('.course-use-honor');
+        if (feeInput) feeInput.addEventListener('input', () => updateRowMargin(feeInput));
+        if (honorInput) honorInput.addEventListener('input', () => updateRowMargin(honorInput));
+        if (honorToggle) honorToggle.addEventListener('change', () => {
+            if (honorInput) honorInput.disabled = !honorToggle.checked;
+            updateRowMargin(honorInput || feeInput);
+        });
+        updateRowMargin(feeInput || honorInput);
+    });
+
+    recalcTotal();
+}
+
+renderFinanceRows();
 // Ensure all teacher selections sync to schedule row labels immediately.
 document.querySelectorAll('.guru-select').forEach(el => {
     const courseId = el.dataset.courseId;
@@ -1387,13 +1622,13 @@ function buildCourseRow(course, isAdmin) {
     const row = document.createElement('div');
     row.className = 'pw-course-row';
     row.dataset.courseRow = course.id;
+    row.dataset.defaultFee = parseFloat(course.fee) || 0;
+    row.dataset.defaultHonor = Math.round(((parseFloat(course.fee) || 0) * 0.6) / 8);
     const guruOptions = course.guru.map(t => `<option value="${t.id}" data-jenis-guru="${t.jenis_guru || ''}" data-salary-base="${Number(t.salary_base || 0)}">${formatTeacherOptionLabel(t)}</option>`).join('');
     const moduleOptions = (course.modules || []).map(m => `<option value="${m.id}">${m.judul}</option>`).join('');
     const fee    = parseFloat(course.fee) || 0;
     const sesiDef = 8;
     const honor  = Math.round((fee * 0.6) / sesiDef); // honor per sesi
-    const margin = fee - (honor * sesiDef);
-    const pct    = fee > 0 ? Math.round((margin / fee) * 100) : 0;
     row.innerHTML = `
         <div class="row g-2 align-items-center">
             <div class="col-12 col-md-2">
@@ -1423,34 +1658,6 @@ function buildCourseRow(course, isAdmin) {
                 <div class="field-label-mobile fw-semibold text-muted mb-1">Sesi</div>
                 <input type="number" min="1" class="form-control form-control-sm" name="course_sessions[${course.id}]" placeholder="Sesi" value="8">
             </div>
-            <div class="col-12 col-md-2">
-                <div class="field-label-mobile fw-semibold text-muted mb-1">Biaya Siswa</div>
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text">Rp</span>
-                    <input type="number" min="0" class="form-control fee-input" name="course_fee[${course.id}]" value="${fee}" oninput="updateRowMargin(this)">
-                </div>
-            </div>
-            <div class="col-12 col-md-2">
-                <div class="field-label-mobile fw-semibold text-muted mb-1">Honor Guru / Sesi</div>
-                <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <div class="input-group input-group-sm flex-grow-1">
-                        <span class="input-group-text">Rp</span>
-                        <input type="number" min="0" class="form-control honor-input" name="course_honor[${course.id}]" value="${honor}" oninput="updateRowMargin(this)" disabled>
-                    </div>
-                    <div class="form-check form-switch ms-1">
-                        <input class="form-check-input course-use-honor" type="checkbox" name="course_use_honor[${course.id}]" value="1">
-                        <label class="form-check-label" style="font-size:.68rem">Tambah honor/sesi</label>
-                    </div>
-                </div>
-                <div class="honor-help text-muted mt-1" style="font-size:.68rem;display:none">Honor per sesi dapat ditambahkan sebagai tambahan gaji guru kontrak.</div>
-            </div>
-            <div class="col-12 col-md-2">
-                <div class="field-label-mobile fw-semibold text-muted mb-1">Margin</div>
-                <div class="margin-display px-2 py-1 rounded-2 text-center" style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);font-size:.78rem">
-                    <span class="margin-rp fw-semibold" style="color:#10b981">Rp${margin.toLocaleString('id-ID')}</span>
-                    <span class="margin-pct text-muted ms-1" style="font-size:.7rem">(${pct}%)</span>
-                </div>
-            </div>
             <div class="col-12 col-md-1 text-end">
                 <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCourseRow(this, ${course.id})" title="Hapus mapel ini"><i class="bi bi-trash"></i></button>
             </div>
@@ -1458,7 +1665,7 @@ function buildCourseRow(course, isAdmin) {
     return row;
 }
 
-// Builds Card B (jadwal kelas) table row — now a <tr> with 7 cols
+// Builds Card B (jadwal kelas) table row — now a <tr> with multiple schedule slots
 function buildScheduleRow(course) {
     const tr = document.createElement('tr');
     tr.className = 'pw-sched-tr';
@@ -1466,16 +1673,42 @@ function buildScheduleRow(course) {
     tr.innerHTML = `
         <td class="text-center text-muted sched-no" style="font-size:.78rem">—</td>
         <td><span class="badge rounded-pill" style="background:rgba(200,77,223,.12);color:#461256;font-size:.75rem;font-weight:600;padding:.3em .75em">${course.nama}</span></td>
-        <td>
-            <select class="form-select form-select-sm hari-select" name="schedule_hari[${course.id}]" data-course-id="${course.id}" style="min-width:88px">
-                <option value="">Pilih…</option>
-                <option value="1">Senin</option><option value="2">Selasa</option><option value="3">Rabu</option>
-                <option value="4">Kamis</option><option value="5">Jum'at</option><option value="6">Sabtu</option><option value="0">Minggu</option>
-            </select>
+        <td colspan="5" class="p-0">
+            <div class="schedule-slot-list" data-course-id="${course.id}">
+                <div class="schedule-slot-row border-bottom p-2" data-slot-index="0">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold" style="font-size:.72rem">Hari</label>
+                            <select class="form-select form-select-sm hari-select" name="schedule_hari[${course.id}][0]" data-course-id="${course.id}" style="min-width:88px">
+                                <option value="">Pilih…</option>
+                                <option value="1">Senin</option><option value="2">Selasa</option><option value="3">Rabu</option>
+                                <option value="4">Kamis</option><option value="5">Jum'at</option><option value="6">Sabtu</option><option value="0">Minggu</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold" style="font-size:.72rem">Mulai</label>
+                            <input type="time" class="form-control form-control-sm jam-mulai-input" name="schedule_jam_mulai[${course.id}][0]" data-course-id="${course.id}" value="08:00" style="min-width:100px">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold" style="font-size:.72rem">Selesai</label>
+                            <input type="time" class="form-control form-control-sm jam-selesai-input" name="schedule_jam_selesai[${course.id}][0]" data-course-id="${course.id}" value="10:00" style="min-width:100px">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold" style="font-size:.72rem">Ruang / Media</label>
+                            <div class="room-field"><select class="form-select form-select-sm room-select" name="schedule_room[${course.id}][0]" data-course-id="${course.id}" style="min-width:140px">${_roomOptions}</select></div>
+                            <div class="meeting-field" style="display:none"><input type="url" class="form-control form-control-sm meeting-input" name="schedule_link_meeting[${course.id}][0]" placeholder="Link meeting" autocomplete="off"></div>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeScheduleSlot(this)"><i class="bi bi-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-2 px-2 pb-2">
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addScheduleSlot(this, ${course.id})"><i class="bi bi-plus-circle me-1"></i>Tambah slot jadwal</button>
+            </div>
         </td>
-        <td><input type="time" class="form-control form-control-sm jam-mulai-input" name="schedule_jam_mulai[${course.id}]" data-course-id="${course.id}" value="08:00" style="min-width:100px"></td>
-        <td><input type="time" class="form-control form-select-sm jam-selesai-input" name="schedule_jam_selesai[${course.id}]" data-course-id="${course.id}" value="10:00" style="min-width:100px"></td>
-        <td class="room-column-cell"><select class="form-select form-select-sm room-select" name="schedule_room[${course.id}]" data-course-id="${course.id}" style="min-width:140px">${_roomOptions}</select></td>`;
+        <td class="text-center align-middle"><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCourseScheduleRow(this, ${course.id})" title="Hapus semua slot jadwal mapel ini"><i class="bi bi-trash"></i></button></td>`;
     return tr;
 }
 
@@ -1506,6 +1739,7 @@ function addExtraCourse() {
     document.getElementById('conflictResultsPanel').appendChild(conflictRow);
     bindCourseRowEvents(courseRow);
     refreshExtraCourseSelect();
+    renderFinanceRows();
     recalcTotal();
 }
 
@@ -1548,6 +1782,7 @@ function removeCourseRow(btn, id) {
     if (conflictRow) conflictRow.remove();
     usedCourseIds.delete(id);
     refreshExtraCourseSelect();
+    renderFinanceRows();
     recalcTotal();
 }
 
@@ -1735,41 +1970,52 @@ function switchPackage(type) {
     const isCustomPackageInput = document.getElementById('isCustomPackage');
     const standardPackageEl = document.getElementById('standardPackage');
     const customPackageEl = document.getElementById('customPackage');
+    const freePackageNote = document.getElementById('freePackageNote');
     const totalBiayaEl = document.getElementById('totalBiaya');
     const customPackagePriceEl = document.getElementById('customPackagePrice');
 
     if (packageModeInput) packageModeInput.value = packageMode;
     if (isCustomPackageInput) isCustomPackageInput.value = isCustomPkg ? '1' : '0';
-    if (standardPackageEl) standardPackageEl.style.display = isCustomPkg ? 'none' : '';
-    if (customPackageEl) customPackageEl.style.display = isCustomPkg ? '' : 'none';
+    if (standardPackageEl) standardPackageEl.style.display = packageMode === 'standard' ? '' : 'none';
+    if (customPackageEl) customPackageEl.style.display = packageMode === 'request' ? '' : 'none';
+    if (freePackageNote) freePackageNote.classList.toggle('d-none', packageMode !== 'free');
 
-    if (isCustomPkg) {
+    if (packageMode === 'request') {
         try { populatePackageFieldsFromStudentInfo(); } catch (e) {}
     }
 
     const btnStandard = document.getElementById('btnStandard');
-    const btnCustom   = document.getElementById('btnCustom');
     const btnRequest  = document.getElementById('btnRequest');
-    if (btnStandard && btnCustom && btnRequest) {
+    const btnFree     = document.getElementById('btnFree');
+    if (btnStandard) {
         btnStandard.className = 'btn btn-sm flex-fill ' + (type === 'standard' ? 'btn-primary' : 'btn-outline-secondary');
-        btnCustom.className   = 'btn btn-sm flex-fill ' + (type === 'custom' ? 'btn-primary' : 'btn-outline-secondary');
+    }
+    if (btnRequest) {
         btnRequest.className  = 'btn btn-sm flex-fill ' + (type === 'request' ? 'btn-primary' : 'btn-outline-secondary');
+    }
+    if (btnFree) {
+        btnFree.className  = 'btn btn-sm flex-fill ' + (type === 'free' ? 'btn-primary' : 'btn-outline-secondary');
     }
 
     const titleEl = document.getElementById('packagePanelTitle');
     const hintEl  = document.getElementById('packagePanelHint');
     if (titleEl && hintEl) {
-        if (type === 'request') {
+        if (type === 'standard') {
+            titleEl.textContent = 'Pilih Paket Standar';
+            hintEl.textContent = 'Pilih paket standar untuk siswa ini atau lanjutkan tanpa paket jika belum cocok.';
+        } else if (type === 'request') {
             titleEl.textContent = 'Request Paket Kelas Baru';
             hintEl.textContent = 'Admin bisa mengajukan paket belajar khusus untuk siswa ini, lengkap dengan mata pelajaran, sesi, nominal, dan detail lainnya.';
-        } else {
-            titleEl.textContent = 'Buat Paket Custom';
-            hintEl.textContent = 'Susun paket belajar khusus untuk siswa ini. Paket akan dibuat dan tersimpan di data master paket.';
+        } else if (type === 'free') {
+            titleEl.textContent = 'Paket Bebas';
+            hintEl.textContent = 'Paket Bebas memungkinkan penyusunan tarif per mapel dan sesi secara manual tanpa memakai paket master.';
         }
     }
 
     if (isCustomPkg && totalBiayaEl && customPackagePriceEl) {
         totalBiayaEl.value = customPackagePriceEl.value || 0;
+    } else if (packageMode === 'free') {
+        recalcTotal();
     } else if (totalBiayaEl) {
         try { onPackageDropdownChange(); } catch (e) {}
     }
@@ -1784,57 +2030,10 @@ if (customPackagePriceEl) {
 }
 
 function buildPreview() {
-    let pkgName = 'Tanpa Paket';
-    if (isCustomPkg) {
-        const cpName = document.querySelector('[name="custom_package_name"]')?.value;
-        const suffix = packageMode === 'request' ? ' (Request)' : ' (Custom)';
-        pkgName = cpName ? (cpName + suffix) : `— (${packageMode === 'request' ? 'Request' : 'Custom'}, belum diisi)`;
-    } else {
-        const sel = packageDropdown.selectedOptions[0];
-        pkgName = packageDropdown.value ? sel.text.split(' — ')[0] : 'Tanpa Paket';
-    }
-
-    // Collect per-course data for both the summary table and quotation
-    const rows = [];
-    let totalFee = 0, totalHonor = 0;
-    document.querySelectorAll('.course-check:checked').forEach(chk => {
-        const row     = chk.closest('.pw-course-row');
-        const teacher = row.querySelector('select').selectedOptions[0]?.text || '–';
-        const sesiRaw = parseInt(row.querySelector('input[name^="course_sessions"]').value || 0, 10);
-        const sesi    = sesiRaw || '–';
-        const fee     = parseFloat(row.querySelector('.fee-input')?.value   || 0);
-        const honorPerSesi = parseFloat(row.querySelector('.honor-input')?.value || 0);
-        const honor   = honorPerSesi * sesiRaw; // total honor guru = per sesi × jumlah sesi
-        const margin  = fee - honor;
-        const pct     = fee > 0 ? Math.round((margin / fee) * 100) : 0;
-        const name    = row.querySelector('.form-check-label').textContent.trim();
-        totalFee   += fee;
-        totalHonor += honor;
-        const marginColor  = margin >= 0 ? '#10b981' : '#dc2626';
-        rows.push({ name, teacher, sesi, fee, honorPerSesi, honor, margin, pct, marginColor });
-    });
-
-    const totalMargin = totalFee - totalHonor;
-    const totalPct    = totalFee > 0 ? Math.round((totalMargin / totalFee) * 100) : 0;
+    const data = getPreviewData();
     const fmt = v => 'Rp' + Number(v).toLocaleString('id-ID');
-
-    const method    = document.getElementById('paymentMethodInput').value;
-    const payStatus = document.getElementById('paymentStatusInput').value;
-    const prabType  = document.getElementById('prabayarTypeInput').value;
-    let metodeTxt = '–';
-    if (method === 'prabayar') {
-        if (prabType === 'cicilan') {
-            const n = document.getElementById('jumlahCicilan')?.value || '?';
-            metodeTxt = `Prabayar — Cicilan (${n}x)`;
-        } else {
-            metodeTxt = 'Prabayar — ' + (payStatus === 'lunas' ? 'Lunas Sekarang' : 'Invoice Dikirim');
-        }
-    } else if (method === 'pascabayar') {
-        metodeTxt = 'Pascabayar (Per Sesi)';
-    }
-
-    const rowsHtml = rows.length
-        ? rows.map(r => `
+    const rowsHtml = data.courses.length
+        ? data.courses.map(r => `
             <tr>
                 <td class="fw-semibold" style="font-size:.83rem">${r.name}</td>
                 <td style="font-size:.82rem">${r.teacher}</td>
@@ -1845,35 +2044,36 @@ function buildPreview() {
             </tr>`).join('')
         : '<tr><td colspan="6" class="text-muted text-center">Tidak ada mapel dipilih</td></tr>';
 
-    const totalMarginColor = totalMargin >= 0 ? '#10b981' : '#dc2626';
-
-    // Hoist inline expressions so a dollar-brace-brace pattern never appears inside the template literal (Blade parses double braces even in JS blocks)
-    const _previewEduLevel  = document.querySelector('[name="education_level"]')?.value || '–';
-    const _isPrivatProgram  = document.getElementById('programSelect')?.value === 'privat';
-    const _tempatMap        = {kantor:'Di Kantor', rumah:'Guru ke Rumah'};
-    const _previewTempat    = _tempatMap[document.getElementById('tempatBelajarInput')?.value] || '–';
-    const _previewJadwal    = (() => {
-        const days = Array.from(document.querySelectorAll('input[name="hari_belajar[]"]:checked')).map(c => c.value);
-        if (!days.length) return '–';
-        return days.map(d => {
-            const slots = Array.from(document.querySelectorAll('input[name="jam_detail[' + d + '][]"]'))
-                              .map(i => i.value).filter(Boolean);
-            return d + (slots.length ? ' (' + slots.join(', ') + ')' : '');
-        }).join(' · ');
-    })();
-    const _learningLogisticsHtml = _isPrivatProgram ? `
-            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Tempat Belajar:</span> <strong>${_previewTempat}</strong></div>
-            <div class="col-md-8"><span class="text-muted" style="font-size:.83rem">Jadwal:</span> <strong style="font-size:.82rem">${_previewJadwal}</strong></div>` : '';
+    const scheduleSummaryHtml = data.student.program.toLowerCase() === 'privat'
+        ? `
+            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Tempat Belajar:</span> <strong>${data.student.learningPlace}</strong></div>
+            <div class="col-md-8"><span class="text-muted" style="font-size:.83rem">Jadwal:</span> <strong style="font-size:.82rem">${data.student.generalSchedule}</strong></div>
+            <div class="col-12 mt-2">${renderScheduleSummary(data)}</div>`
+        : '';
 
     document.getElementById('previewBox').innerHTML = `
-        
         <div class="row g-2 mb-3">
-            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Paket:</span> <strong>${pkgName}</strong></div>
-            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Kategori:</span> <strong>${_previewEduLevel}</strong></div>
-            ${_learningLogisticsHtml}
+            <div class="col-md-3"><span class="text-muted" style="font-size:.83rem">Nama:</span> <strong>${data.student.name}</strong></div>
+            <div class="col-md-3"><span class="text-muted" style="font-size:.83rem">No. HP:</span> <strong>${data.student.phone}</strong></div>
+            <div class="col-md-3"><span class="text-muted" style="font-size:.83rem">Kategori:</span> <strong>${data.student.education_level}</strong></div>
+            <div class="col-md-3"><span class="text-muted" style="font-size:.83rem">Program:</span> <strong>${data.student.program}</strong></div>
+        </div>
+        <div class="row g-2 mb-3">
+            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Paket:</span> <strong>${data.packageName}</strong></div>
+            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Metode Pembayaran:</span> <strong>${data.payment.methodText}</strong></div>
+            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Sekolah:</span> <strong>${data.student.schoolDetail}</strong></div>
+            <div class="col-md-4"><span class="text-muted" style="font-size:.83rem">Kelas/Semester:</span> <strong>${data.student.classLabel}</strong></div>
+        </div>
+        ${scheduleSummaryHtml}
+
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            <button type="button" class="btn btn-sm btn-success" onclick="sendInvoiceWA()"><i class="bi bi-whatsapp me-1"></i>Kirim Invoice WA</button>
+            <button type="button" class="btn btn-sm btn-outline-success" onclick="sendLoginPinWA()"><i class="bi bi-whatsapp me-1"></i>Kirim Login PIN WA</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="printFormulir()"><i class="bi bi-printer me-1"></i>Cetak Formulir</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="printInvoice()"><i class="bi bi-printer me-1"></i>Cetak Invoice</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="printKartuSiswa()"><i class="bi bi-credit-card me-1"></i>Cetak Kartu Siswa</button>
         </div>
 
-        
         <div class="fw-bold mb-2" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted)"><i class="bi bi-journal-bookmark me-1"></i>Kelola Kelas</div>
         <div class="table-responsive mb-3">
             <table class="table table-sm table-bordered align-middle mb-0" style="font-size:.82rem">
@@ -1885,35 +2085,34 @@ function buildPreview() {
             </table>
         </div>
 
-        
         <div class="rounded-3 overflow-hidden mb-3" style="border:1.5px solid rgba(200,77,223,.35)">
             <div class="px-3 py-2 d-flex align-items-center gap-2" style="background:linear-gradient(90deg,rgba(70,18,86,.1),rgba(200,77,223,.08))">
                 <i class="bi bi-graph-up-arrow" style="color:#c84ddf"></i>
-                <span class="fw-bold" style="font-size:.82rem;color:#461256">📊 Live Quotation</span>
-                <span class="ms-auto badge rounded-pill" style="background:rgba(200,77,223,.15);color:#461256;font-size:.7rem">${rows.length} mapel</span>
+                <span class="fw-bold" style="font-size:.82rem;color:#461256">?? Live Quotation</span>
+                <span class="ms-auto badge rounded-pill" style="background:rgba(200,77,223,.15);color:#461256;font-size:.7rem">${data.courses.length} mapel</span>
             </div>
             <div class="p-3" style="background:var(--input-bg)">
                 <div class="row g-3">
                     <div class="col-md-4">
                         <div class="p-3 rounded-3 text-center h-100" style="background:rgba(200,77,223,.07);border:1.5px solid rgba(200,77,223,.25)">
                             <div class="text-muted mb-1" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.05em"><i class="bi bi-person me-1"></i>Total Tagihan Siswa</div>
-                            <div class="fw-bold" style="font-size:1.15rem;color:#461256">${fmt(totalFee)}</div>
+                            <div class="fw-bold" style="font-size:1.15rem;color:#461256">${fmt(data.totals.totalFee)}</div>
                             <div class="text-muted mt-1" style="font-size:.7rem">Tagihan yang diterbitkan ke siswa</div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="p-3 rounded-3 text-center h-100" style="background:rgba(14,165,233,.07);border:1.5px solid rgba(14,165,233,.25)">
                             <div class="text-muted mb-1" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.05em"><i class="bi bi-person-badge me-1"></i>Total Honor Guru</div>
-                            <div class="fw-bold" style="font-size:1.15rem;color:#0ea5e9">${fmt(totalHonor)}</div>
+                            <div class="fw-bold" style="font-size:1.15rem;color:#0ea5e9">${fmt(data.totals.totalHonor)}</div>
                             <div class="text-muted mt-1" style="font-size:.7rem">Biaya yang dibayarkan ke guru</div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="p-3 rounded-3 text-center h-100" style="background:rgba(16,185,129,.07);border:1.5px solid rgba(16,185,129,.25)">
                             <div class="text-muted mb-1" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.05em"><i class="bi bi-building me-1"></i>Pendapatan Bimbel</div>
-                            <div class="fw-bold" style="font-size:1.15rem;color:${totalMarginColor}">${fmt(totalMargin)}</div>
+                            <div class="fw-bold" style="font-size:1.15rem;color:${data.totals.totalMarginColor}">${fmt(data.totals.totalMargin)}</div>
                             <div class="mt-1">
-                                <span class="badge rounded-pill" style="background:${totalMargin>=0?'rgba(16,185,129,.15)':'rgba(220,38,38,.12)'};color:${totalMarginColor};font-size:.72rem">Margin ${totalPct}%</span>
+                                <span class="badge rounded-pill" style="background:${data.totals.totalMargin >= 0 ? 'rgba(16,185,129,.15)' : 'rgba(220,38,38,.12)'};color:${data.totals.totalMarginColor};font-size:.72rem">Margin ${data.totals.totalPct}%</span>
                             </div>
                         </div>
                     </div>
@@ -1921,18 +2120,16 @@ function buildPreview() {
                 <div class="mt-3 pt-3" style="border-top:1px solid var(--card-border)">
                     <div class="row g-2" style="font-size:.84rem">
                         <div class="col-md-6 d-flex justify-content-between py-1" style="border-bottom:1px dashed var(--card-border)">
-                            <span class="text-muted">Metode Pembayaran</span><strong>${metodeTxt}</strong>
+                            <span class="text-muted">Metode Pembayaran</span><strong>${data.payment.methodText}</strong>
                         </div>
                         <div class="col-md-6 d-flex justify-content-between py-1" style="border-bottom:1px dashed var(--card-border)">
-                            <span class="text-muted">Total Biaya (Final)</span><strong class="text-primary">${fmt(totalFee)}</strong>
-                        </div>
+                            <span class="text-muted">Total Biaya (Final)</span><strong class="text-primary">${fmt(data.totals.totalFee)}</strong></div>
                     </div>
                 </div>
             </div>
         </div>
     `;
 }
-
 // ═══════════════════════════════════════════
 // STEP 1 — Tipe Pendaftaran: Siswa Baru vs Siswa Lama
 // ═══════════════════════════════════════════
@@ -2022,6 +2219,7 @@ function pwSelectExistingStudent(s) {
             set('parent_phone',    d.parent_phone);
             set('school_name',     d.school_name);
             set('grade',           d.grade);
+            set('semester',        d.semester);
             // Perbarui chip meta dengan data lengkap
             document.getElementById('espChipName').textContent = d.name || s.name;
             document.getElementById('espChipMeta').textContent =
@@ -2038,7 +2236,7 @@ function pwClearExistingStudent() {
     document.getElementById('existingStudentSearch').value = '';
     document.getElementById('existingStudentChip').style.display = 'none';
     // Reset field form ke nilai kosong / default
-    ['name','phone','gender','education_level','birth_place','birth_date','address','parent_name','parent_phone','school_name','grade']
+    ['name','phone','gender','education_level','birth_place','birth_date','address','parent_name','parent_phone','school_name','grade','semester']
         .forEach(name => {
             const el = document.querySelector('[name="' + name + '"]');
             if (el) el.value = '';
@@ -2087,14 +2285,70 @@ function pwToggleRoomColumn() {
     const system = document.getElementById('systemSelect')?.value;
     const program = document.getElementById('programSelect')?.value;
     const tempat = document.getElementById('tempatBelajarInput')?.value || 'kantor';
-    const shouldHide = system === 'online' || (program === 'privat' && tempat === 'rumah');
+    const isOnlineLearningPlace = tempat === 'online';
+    const shouldHideRoom = system === 'online' || (program === 'privat' && (tempat === 'rumah' || isOnlineLearningPlace));
+    const shouldShowMeeting = system === 'online' || isOnlineLearningPlace;
 
-    document.querySelectorAll('.room-column-header, .room-column-cell').forEach(el => {
-        el.style.display = shouldHide ? 'none' : '';
+    document.querySelectorAll('.room-column-header').forEach(el => {
+        el.style.display = shouldHideRoom && !shouldShowMeeting ? 'none' : '';
+    });
+    document.querySelectorAll('.room-column-cell').forEach(cell => {
+        const roomGroup = cell.querySelector('.room-field');
+        const meetingGroup = cell.querySelector('.meeting-field');
+        if (roomGroup) roomGroup.style.display = shouldShowMeeting ? 'none' : '';
+        if (meetingGroup) meetingGroup.style.display = shouldShowMeeting ? '' : 'none';
+        cell.style.display = shouldHideRoom && !shouldShowMeeting ? 'none' : '';
     });
     document.querySelectorAll('.room-select').forEach(el => {
-        el.disabled = shouldHide;
+        const visible = el.offsetParent !== null;
+        el.disabled = shouldHideRoom && !shouldShowMeeting;
+        el.required = !el.disabled && visible;
     });
+    document.querySelectorAll('.meeting-input').forEach(el => {
+        const visible = el.offsetParent !== null;
+        el.disabled = !shouldShowMeeting;
+        el.required = !el.disabled && visible;
+    });
+
+    const privateAddressWrapper = document.getElementById('privateAddressWrapper');
+    if (privateAddressWrapper) {
+        privateAddressWrapper.style.display = tempat === 'rumah' ? '' : 'none';
+        document.getElementById('privateAddressInput').required = tempat === 'rumah';
+    }
+}
+
+function validateStep2() {
+    const program = document.getElementById('programSelect')?.value;
+    const system = document.getElementById('systemSelect')?.value;
+    const tempat = document.getElementById('tempatBelajarInput')?.value || 'kantor';
+    if (program === 'privat' && tempat === 'rumah') {
+        const address = document.getElementById('privateAddressInput')?.value.trim();
+        if (!address) {
+            showToast('Alamat Belajar wajib diisi untuk Privat ke Rumah.', 'error');
+            return false;
+        }
+    }
+
+    const roomSelects = Array.from(document.querySelectorAll('.room-select')).filter(el => el.offsetParent !== null && !el.disabled);
+    const meetingInputs = Array.from(document.querySelectorAll('.meeting-input')).filter(el => el.offsetParent !== null && !el.disabled);
+
+    if (roomSelects.length > 0) {
+        const missingRoom = roomSelects.some(el => !el.value);
+        if (missingRoom) {
+            showToast('Pilih Ruangan untuk setiap jadwal kelas Offline/Kantor.', 'error');
+            return false;
+        }
+    }
+
+    if (meetingInputs.length > 0) {
+        const missingMeeting = meetingInputs.some(el => !el.value.trim());
+        if (missingMeeting) {
+            showToast('Masukkan Link Meeting untuk setiap jadwal kelas Online.', 'error');
+            return false;
+        }
+    }
+
+    return true;
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -2103,6 +2357,7 @@ document.addEventListener('DOMContentLoaded', function () {
     pwToggleRoomColumn();
     const systemSelect = document.getElementById('systemSelect');
     const programSelect = document.getElementById('programSelect');
+    const educationLevelSelect = document.querySelector('[name="education_level"]');
     if (systemSelect) {
         systemSelect.addEventListener('change', pwToggleRoomColumn);
     }
@@ -2113,8 +2368,47 @@ document.addEventListener('DOMContentLoaded', function () {
             pwToggleRoomColumn();
         });
     }
+
+    if (educationLevelSelect) {
+        educationLevelSelect.addEventListener('change', pwToggleSchoolData);
+    }
+    pwToggleSchoolData();
     document.querySelectorAll('.existing-class-select').forEach(selectEl => syncExistingClassDetail(selectEl));
     setKelolaKelasMode('new');
+
+function pwToggleSchoolData() {
+    const educationLevel = document.querySelector('[name="education_level"]')?.value;
+    const schoolSection = document.getElementById('schoolDataSection');
+    const gradeField = document.getElementById('schoolDataGrade');
+    if (!schoolSection) return;
+
+    const showSchoolData = ['Pra Sekolah (PAUD/TK)','Sekolah Dasar (SD)','Sekolah Menengah Pertama (SMP)','Sekolah Menengah Atas/Kejuruan (SMA/SMK)','Mahasiswa'].includes(educationLevel);
+    const showGrade = educationLevel && educationLevel !== 'Mahasiswa';
+    const showSemester = educationLevel === 'Mahasiswa';
+    const semesterField = document.getElementById('schoolDataSemester');
+    const schoolNameInput = document.querySelector('[name="school_name"]');
+    const gradeInput = document.querySelector('[name="grade"]');
+    const semesterInput = document.querySelector('[name="semester"]');
+    const schoolNameLabel = document.getElementById('schoolNameLabel');
+
+    schoolSection.style.display = showSchoolData ? '' : 'none';
+    schoolSection.querySelectorAll('input, select, textarea').forEach(el => el.disabled = !showSchoolData);
+    if (schoolNameInput) schoolNameInput.required = showSchoolData;
+    if (gradeInput) gradeInput.required = showGrade;
+    if (semesterInput) semesterInput.required = showSemester;
+    if (gradeField) {
+        gradeField.style.display = showGrade ? '' : 'none';
+    }
+    if (semesterField) {
+        semesterField.style.display = showSemester ? '' : 'none';
+    }
+    if (schoolNameLabel) {
+        schoolNameLabel.textContent = educationLevel === 'Mahasiswa' ? 'Nama Perguruan Tinggi' : 'Nama Sekolah';
+    }
+    if (schoolNameInput) {
+        schoolNameInput.placeholder = educationLevel === 'Mahasiswa' ? 'Nama perguruan tinggi' : 'Nama sekolah';
+    }
+}
 });
 
 const PW_DAY_ORDER = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
@@ -2328,9 +2622,76 @@ document.getElementById('processForm').addEventListener('submit', function(e) {
         showStep(2);
         return;
     }
+    const educationLevel = document.querySelector('[name="education_level"]')?.value;
+    const schoolName = document.querySelector('[name="school_name"]')?.value.trim();
+    const grade = document.querySelector('[name="grade"]')?.value.trim();
+    const semester = document.querySelector('[name="semester"]')?.value.trim();
+    const schoolRequiredLevels = ['Pra Sekolah (PAUD/TK)', 'Sekolah Dasar (SD)', 'Sekolah Menengah Pertama (SMP)', 'Sekolah Menengah Atas/Kejuruan (SMA/SMK)', 'Mahasiswa'];
+    if (schoolRequiredLevels.includes(educationLevel) && !schoolName) {
+        const schoolLabel = educationLevel === 'Mahasiswa' ? 'Nama perguruan tinggi' : 'Nama sekolah';
+        showToast(schoolLabel + ' wajib diisi untuk kategori ' + educationLevel + '.', 'error');
+        showStep(1);
+        return;
+    }
+    if (educationLevel === 'Mahasiswa' && !semester) {
+        showToast('Semester wajib diisi untuk kategori Mahasiswa.', 'error');
+        showStep(1);
+        return;
+    }
+    if (['Pra Sekolah (PAUD/TK)', 'Sekolah Dasar (SD)', 'Sekolah Menengah Pertama (SMP)', 'Sekolah Menengah Atas/Kejuruan (SMA/SMK)'].includes(educationLevel) && !grade) {
+        showToast('Kelas wajib diisi untuk peserta sekolah.', 'error');
+        showStep(1);
+        return;
+    }
+    if (packageMode === 'request') {
+        if (checkedCourses !== 1) {
+            showToast('Paket Request hanya boleh untuk 1 mata pelajaran.', 'error');
+            showStep(2);
+            return;
+        }
+        const selectedRow = document.querySelector('.course-check:checked')?.closest('.pw-course-row');
+        const selectedSessions = parseInt(selectedRow?.querySelector('input[name^="course_sessions"]')?.value || 0, 10);
+        if (selectedSessions !== 1) {
+            showToast('Paket Request harus berupa 1 sesi saja.', 'error');
+            showStep(2);
+            return;
+        }
+    }
+    if (packageMode === 'standard') {
+        const selectedOption = packageDropdown?.selectedOptions[0];
+        const packageMaxSessions = parseInt(selectedOption?.dataset.jumlah || 0, 10);
+        if (packageMaxSessions > 0) {
+            const totalSesiSelected = Array.from(document.querySelectorAll('.course-check:checked')).reduce((sum, chk) => {
+                const row = chk.closest('.pw-course-row');
+                const sesi = parseInt(row?.querySelector('input[name^="course_sessions"]')?.value || 0, 10);
+                return sum + (isNaN(sesi) ? 0 : sesi);
+            }, 0);
+            if (totalSesiSelected > packageMaxSessions) {
+                showToast('Total sesi melebihi jumlah pertemuan paket standar.', 'error');
+                showStep(2);
+                return;
+            }
+        }
+    }
+
+    const isOnline = document.getElementById('systemSelect')?.value === 'online';
+    if (isOnline) {
+        const missingMeeting = Array.from(document.querySelectorAll('.course-check:checked')).some(chk => {
+            const courseId = chk.value;
+            const hari = document.querySelector(`[name="schedule_hari[${courseId}]"]`)?.value;
+            const meeting = document.querySelector(`[name="schedule_link_meeting[${courseId}]"]`)?.value.trim();
+            return hari && hari !== '' && !meeting;
+        });
+        if (missingMeeting) {
+            showToast('Untuk kelas online, semua mapel yang dijadwalkan harus memiliki link meeting.', 'error');
+            showStep(2);
+            return;
+        }
+    }
+
     if (isCustomPkg) {
-        const cpName = document.querySelector('[name="custom_package_name"]').value.trim();
-        const cpJenis = document.querySelector('[name="custom_jenis"]').value;
+        const cpName = document.querySelector('[name="custom_package_name"]')?.value.trim();
+        const cpJenis = document.querySelector('[name="custom_jenis"]')?.value;
         const packageLabel = packageMode === 'request' ? 'Paket Request' : 'Paket Custom';
         if (!cpName || !cpJenis) {
             showToast(`Lengkapi Nama Paket & Jenis Paket pada ${packageLabel}.`, 'error');
@@ -2411,6 +2772,267 @@ function sendToWA() {
     );
     window.open('https://wa.me/' + wa + '?text=' + msg, '_blank');
 }
+
+function getPreviewContact() {
+    const name = document.querySelector('[name="name"]')?.value || 'Siswa';
+    const phone = (document.querySelector('[name="phone"]')?.value || '').replace(/\D/g, '');
+    const wa = phone.startsWith('0') ? '62' + phone.slice(1) : phone;
+    return { name, phone, wa };
+}
+
+function getPreviewData() {
+    const tempMap = {kantor:'Di Kantor', rumah:'Guru ke Rumah', online:'Belajar Online'};
+    const educationLevel = document.querySelector('[name="education_level"]')?.value || '–';
+    const program = document.getElementById('programSelect')?.value || '–';
+    const programText = document.getElementById('programSelect')?.selectedOptions[0]?.text || '–';
+    const school = document.querySelector('[name="school_name"]')?.value || '–';
+    const grade = document.querySelector('[name="grade"]')?.value || '–';
+    const semester = document.querySelector('[name="semester"]')?.value || '–';
+    const tempat = tempMap[document.getElementById('tempatBelajarInput')?.value] || '–';
+    const hariBelajar = Array.from(document.querySelectorAll('input[name="hari_belajar[]"]:checked')).map(c => c.value);
+    const jamDetail = Array.from(document.querySelectorAll('[name^="jam_detail["]')).map(i => i.value).filter(Boolean);
+    const courseRows = [];
+    let totalFee = 0;
+    let totalHonor = 0;
+
+    document.querySelectorAll('.course-check:checked').forEach(chk => {
+        const row = chk.closest('.pw-course-row');
+        const courseId = row.dataset.courseRow;
+        const teacherText = row.querySelector('select')?.selectedOptions[0]?.text || '–';
+        const sesiRaw = parseInt(row.querySelector('input[name^="course_sessions"]')?.value || 0, 10);
+        const financeRow = document.querySelector(`#financeCourseRows .finance-row[data-course-id="${courseId}"]`);
+        const fee = parseFloat(financeRow?.querySelector('.fee-input')?.value || 0);
+        const honorPerSession = parseFloat(financeRow?.querySelector('.honor-input')?.value || 0);
+        const honor = honorPerSession * (sesiRaw || 0);
+        const margin = fee - honor;
+        const pct = fee > 0 ? Math.round((margin / fee) * 100) : 0;
+        const slots = [];
+        const schedRow = document.querySelector(`.pw-sched-tr[data-schedule-row="${courseId}"]`);
+        if (schedRow) {
+            schedRow.querySelectorAll('.schedule-slot-row').forEach(slot => {
+                const hari = slot.querySelector('.hari-select')?.selectedOptions[0]?.text || '';
+                const mulai = slot.querySelector('.jam-mulai-input')?.value || '';
+                const selesai = slot.querySelector('.jam-selesai-input')?.value || '';
+                const room = slot.querySelector('.room-select')?.selectedOptions[0]?.text || '';
+                const meeting = slot.querySelector('.meeting-input')?.value || '';
+                if (hari || mulai || selesai || room || meeting) {
+                    slots.push({ hari, mulai, selesai, room, meeting });
+                }
+            });
+        }
+        const name = row.querySelector('.form-check-label')?.textContent.trim() || '–';
+        totalFee += fee;
+        totalHonor += honor;
+        courseRows.push({ name, teacher: teacherText, sesi: sesiRaw || '–', fee, honor, honorPerSession, margin, pct, scheduleSlots: slots });
+    });
+
+    const totalMargin = totalFee - totalHonor;
+    const method = document.getElementById('paymentMethodInput')?.value || 'prabayar';
+    const status = document.getElementById('paymentStatusInput')?.value || 'belum_bayar';
+    const prabayarType = document.getElementById('prabayarTypeInput')?.value || 'lunas';
+    let methodText = '–';
+    if (method === 'prabayar') {
+        methodText = prabayarType === 'cicilan'
+            ? `Prabayar — Cicilan (${document.getElementById('jumlahCicilan')?.value || '?'}x)`
+            : `Prabayar — ${status === 'lunas' ? 'Lunas Sekarang' : 'Invoice Dikirim'}`;
+    } else if (method === 'pascabayar') {
+        methodText = 'Pascabayar (Per Sesi)';
+    }
+
+    let packageName = 'Tanpa Paket';
+    if (isCustomPkg) {
+        const cpName = document.querySelector('[name="custom_package_name"]')?.value;
+        packageName = cpName ? cpName + (packageMode === 'request' ? ' (Request)' : ' (Custom)') : `— (${packageMode === 'request' ? 'Request' : 'Custom'})`;
+    } else {
+        const sel = packageDropdown.selectedOptions[0];
+        packageName = packageDropdown.value ? sel.text.split(' — ')[0] : 'Tanpa Paket';
+    }
+
+    return {
+        student: {
+            name: document.querySelector('[name="name"]')?.value || '–',
+            phone: document.querySelector('[name="phone"]')?.value || '–',
+            education_level: educationLevel,
+            program: programText,
+            schoolDetail: educationLevel === 'Mahasiswa' ? school : `${school}${grade && school !== '–' ? ' · ' + grade : grade !== '–' ? grade : ''}`,
+            classLabel: educationLevel === 'Mahasiswa' ? semester : grade,
+            learningPlace: tempat,
+            generalSchedule: hariBelajar.length ? hariBelajar.join(' · ') : '–',
+            detailSchedule: jamDetail.length ? jamDetail.join(', ') : '–',
+        },
+        packageName,
+        payment: { method, status, methodText },
+        courses: courseRows,
+        totals: {
+            totalFee,
+            totalHonor,
+            totalMargin,
+            totalPct: totalFee > 0 ? Math.round((totalMargin / totalFee) * 100) : 0,
+            totalMarginColor: totalMargin >= 0 ? '#10b981' : '#dc2626',
+        },
+    };
+}
+
+function renderScheduleSummary(data) {
+    if (!data.courses.length) {
+        return `<div class="col-12"><span class="text-muted" style="font-size:.83rem">Jadwal tidak tersedia</span></div>`;
+    }
+    const lines = data.courses.map(course => {
+        if (!course.scheduleSlots.length) {
+            return `<div><strong>${course.name}</strong>: Belum diset jadwal</div>`;
+        }
+        const slots = course.scheduleSlots.map(slot => `${slot.hari} ${slot.mulai}-${slot.selesai}${slot.room ? ' / ' + slot.room : ''}${slot.meeting ? ' (' + slot.meeting + ')' : ''}`);
+        return `<div><strong>${course.name}</strong>: ${slots.join(' · ')}</div>`;
+    });
+    return `<div class="col-12"><span class="text-muted" style="font-size:.83rem">Jadwal per mapel:</span> <div style="font-size:.82rem">${lines.join('<br>')}</div></div>`;
+}
+
+function buildPrintHtml(title, contentHtml) {
+    const style = `
+        <style>
+        body { font-family: Arial, sans-serif; color: #111; margin: 0; padding: 24px; }
+        .header { margin-bottom: 18px; }
+        .header h1 { font-size: 22px; margin: 0 0 6px; }
+        .header p { margin: 0; color: #555; font-size: 13px; }
+        .section { margin-bottom: 20px; }
+        .section-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #333; }
+        .details { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .details th, .details td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        .details th { background: #f7f7f7; }
+        .summary-card { border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #fafafa; }
+        .summary-card strong { display: block; font-size: 16px; }
+        .text-right { text-align: right; }
+        </style>`;
+    return `<!doctype html><html><head><title>${title}</title>${style}</head><body><div class="header"><h1>${title}</h1><p>Dicetak dari halaman admin pendaftaran.</p></div>${contentHtml}</body></html>`;
+}
+
+function printFormulir() {
+    const data = getPreviewData();
+    const fmt = v => 'Rp' + Number(v).toLocaleString('id-ID');
+    const studentHtml = `
+        <div class="section">
+            <div class="section-title">Data Peserta</div>
+            <table class="details">
+                <tr><th>Nama</th><td>${data.student.name}</td></tr>
+                <tr><th>No. HP</th><td>${data.student.phone}</td></tr>
+                <tr><th>Kategori</th><td>${data.student.education_level}</td></tr>
+                <tr><th>Program</th><td>${data.student.program}</td></tr>
+                <tr><th>Paket</th><td>${data.packageName}</td></tr>
+                <tr><th>Sekolah / Perguruan Tinggi</th><td>${data.student.schoolDetail}</td></tr>
+                <tr><th>Kelas / Semester</th><td>${data.student.classLabel}</td></tr>
+                <tr><th>Tempat Belajar</th><td>${data.student.learningPlace}</td></tr>
+            </table>
+        </div>`;
+    const courseRowsHtml = data.courses.length
+        ? data.courses.map(r => `
+                <tr>
+                    <td>${r.name}</td>
+                    <td>${r.teacher}</td>
+                    <td>${r.sesi}</td>
+                    <td class="text-right">${fmt(r.fee)}</td>
+                    <td class="text-right">${fmt(r.honor)}</td>
+                </tr>`).join('')
+        : '<tr><td colspan="5" class="text-center">Tidak ada mapel dipilih</td></tr>';
+    const courseHtml = `
+        <div class="section">
+            <div class="section-title">Rincian Mata Pelajaran</div>
+            <table class="details">
+                <thead><tr><th>Mapel</th><th>Guru</th><th>Sesi</th><th class="text-right">Biaya</th><th class="text-right">Honor</th></tr></thead>
+                <tbody>${courseRowsHtml}</tbody>
+            </table>
+        </div>`;
+    const scheduleHtml = `
+        <div class="section">
+            <div class="section-title">Jadwal</div>
+            <div>${renderScheduleSummary(data)}</div>
+        </div>`;
+    const paymentHtml = `
+        <div class="section">
+            <div class="section-title">Pembayaran</div>
+            <div class="summary-card">
+                <strong>Metode</strong>${data.payment.methodText}
+                <strong>Total Tagihan</strong>${fmt(data.totals.totalFee)}
+            </div>
+        </div>`;
+    const html = studentHtml + courseHtml + scheduleHtml + paymentHtml;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(buildPrintHtml('Formulir Pendaftaran', html));
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => printWindow.print(), 300);
+}
+
+function printInvoice() {
+    const data = getPreviewData();
+    const fmt = v => 'Rp' + Number(v).toLocaleString('id-ID');
+    const invoiceRowsHtml = data.courses.length
+        ? data.courses.map(r => `
+                <tr>
+                    <td>${r.name}</td>
+                    <td>${r.teacher}</td>
+                    <td class="text-right">${fmt(r.fee)}</td>
+                </tr>`).join('')
+        : '<tr><td colspan="3" class="text-center">Tidak ada mapel dipilih</td></tr>';
+    const html = `
+        <div class="section">
+            <div class="section-title">Kepada</div>
+            <table class="details">
+                <tr><th>Nama</th><td>${data.student.name}</td></tr>
+                <tr><th>No. HP</th><td>${data.student.phone}</td></tr>
+                <tr><th>Paket</th><td>${data.packageName}</td></tr>
+                <tr><th>Sekolah / Perguruan Tinggi</th><td>${data.student.schoolDetail}</td></tr>
+                <tr><th>Metode Pembayaran</th><td>${data.payment.methodText}</td></tr>
+            </table>
+        </div>
+        <div class="section">
+            <div class="section-title">Rincian Tagihan</div>
+            <table class="details">
+                <thead><tr><th>Mapel</th><th>Guru</th><th class="text-right">Jumlah</th></tr></thead>
+                <tbody>${invoiceRowsHtml}</tbody>
+                <tfoot>
+                    <tr><th colspan="2">Total</th><th class="text-right">${fmt(data.totals.totalFee)}</th></tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="section">
+            <div class="section-title">Metode Pembayaran</div>
+            <div class="summary-card">${data.payment.methodText}</div>
+        </div>`;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(buildPrintHtml('Draft Invoice', html));
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => printWindow.print(), 300);
+}
+
+function printKartuSiswa() {
+    const data = getPreviewData();
+    const html = `
+        <div class="section">
+            <div class="section-title">Kartu Siswa</div>
+            <div class="summary-card">
+                <strong>${data.student.name}</strong>
+                <div>Kategori: ${data.student.education_level}</div>
+                <div>Sekolah / PT: ${data.student.schoolDetail}</div>
+                <div>Kelas / Semester: ${data.student.classLabel}</div>
+                <div>Program: ${data.student.program}</div>
+                <div>No. HP: ${data.student.phone}</div>
+            </div>
+        </div>
+        <div class="section">
+            <div class="section-title">Mapel Aktif</div>
+            <table class="details">
+                <thead><tr><th>Mapel</th><th>Guru</th><th class="text-right">Sesi</th></tr></thead>
+                <tbody>${data.courses.map(r => `<tr><td>${r.name}</td><td>${r.teacher}</td><td class="text-right">${r.sesi}</td></tr>`).join('') || '<tr><td colspan="3" class="text-center">Belum ada mapel</td></tr>'}</tbody>
+            </table>
+        </div>`;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(buildPrintHtml('Kartu Siswa', html));
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => printWindow.print(), 300);
+}
+
 </script>
 <?php $__env->stopPush(); ?>
 

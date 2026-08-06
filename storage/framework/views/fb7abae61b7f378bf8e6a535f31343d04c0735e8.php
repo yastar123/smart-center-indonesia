@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <title>Formulir Pendaftaran | Smart Center Indonesia</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -457,18 +457,18 @@
 
                 <div class="form-body">
 
-                    @if ($errors->any())
+                    <?php if($errors->any()): ?>
                     <div class="mx-3 mt-3 d-flex align-items-start gap-2 p-3 rounded-3" style="background:#fef2f2;border:1.5px solid #fecaca;color:#dc2626">
                         <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
                         <div style="font-size:.85rem">
                             <strong>Harap perbaiki:</strong>
-                            <ul class="mb-0 mt-1">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+                            <ul class="mb-0 mt-1"><?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $e): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><li><?php echo e($e); ?></li><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?></ul>
                         </div>
                     </div>
-                    @endif
+                    <?php endif; ?>
 
-                    <form method="POST" action="{{ route('register') }}" id="regForm">
-                        @csrf
+                    <form method="POST" action="<?php echo e(route('register')); ?>" id="regForm">
+                        <?php echo csrf_field(); ?>
 
                         <div class="stepper">
                             <div class="stepper-item active" data-stepper="1"><span class="step-dot">1</span><span>Data Siswa</span></div>
@@ -478,78 +478,148 @@
                             <div class="stepper-item" data-stepper="5"><span class="step-dot">5</span><span>Jadwal & Kirim</span></div>
                         </div>
 
-            {{-- STEP 1: DATA SISWA --}}
+            
             <div class="step-panel active" data-step="1">
                 <div class="section-card">
                     <div class="section-title">Data Siswa</div>
                     <div class="row g-3">
                         <div class="col-12">
                             <label class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
-                                   value="{{ old('name') }}" placeholder="Nama lengkap siswa" required autofocus>
-                            @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            <input type="text" name="name" class="form-control <?php $__errorArgs = ['name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                   value="<?php echo e(old('name')); ?>" placeholder="Nama lengkap siswa" required autofocus>
+                            <?php $__errorArgs = ['name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="invalid-feedback"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                         <div class="col-md-5">
                             <label class="form-label">Tempat Lahir</label>
-                            <input type="text" name="birth_place" class="form-control" value="{{ old('birth_place') }}" placeholder="Kota tempat lahir">
+                            <input type="text" name="birth_place" class="form-control" value="<?php echo e(old('birth_place')); ?>" placeholder="Kota tempat lahir">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Tanggal Lahir</label>
-                            <input type="date" name="birth_date" class="form-control" value="{{ old('birth_date') }}">
+                            <input type="date" name="birth_date" class="form-control" value="<?php echo e(old('birth_date')); ?>">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Jenis Kelamin</label>
                             <select name="gender" class="form-select">
                                 <option value="">Pilih...</option>
-                                <option value="L" {{ old('gender')=='L'?'selected':'' }}>Laki-laki</option>
-                                <option value="P" {{ old('gender')=='P'?'selected':'' }}>Perempuan</option>
+                                <option value="L" <?php echo e(old('gender')=='L'?'selected':''); ?>>Laki-laki</option>
+                                <option value="P" <?php echo e(old('gender')=='P'?'selected':''); ?>>Perempuan</option>
                             </select>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Alamat Tinggal</label>
-                            <textarea name="address" class="form-control" rows="2" placeholder="Alamat lengkap tempat tinggal">{{ old('address') }}</textarea>
+                            <textarea name="address" class="form-control" rows="2" placeholder="Alamat lengkap tempat tinggal"><?php echo e(old('address')); ?></textarea>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Nomor WA/HP <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text">+62</span>
-                                <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror"
-                                       value="{{ old('phone') }}" placeholder="8xxxxxxxxxx" required>
+                                <input type="text" name="phone" class="form-control <?php $__errorArgs = ['phone'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                       value="<?php echo e(old('phone')); ?>" placeholder="8xxxxxxxxxx" required>
                             </div>
-                            @error('phone')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                            <?php $__errorArgs = ['phone'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="invalid-feedback d-block"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Kategori Peserta Didik</label>
                             <select name="education_level" id="education_level" class="form-select">
                                 <option value="">-- Pilih Kategori --</option>
-                                <option value="Pra Sekolah (PAUD/TK)" {{ old('education_level')=='Pra Sekolah (PAUD/TK)'?'selected':'' }}>Pra Sekolah (PAUD/TK)</option>
-                                <option value="Sekolah Dasar (SD)" {{ old('education_level')=='Sekolah Dasar (SD)'?'selected':'' }}>Sekolah Dasar (SD)</option>
-                                <option value="Sekolah Menengah Pertama (SMP)" {{ old('education_level')=='Sekolah Menengah Pertama (SMP)'?'selected':'' }}>Sekolah Menengah Pertama (SMP)</option>
-                                <option value="Sekolah Menengah Atas/Kejuruan (SMA/SMK)" {{ old('education_level')=='Sekolah Menengah Atas/Kejuruan (SMA/SMK)'?'selected':'' }}>Sekolah Menengah Atas/Kejuruan (SMA/SMK)</option>
-                                <option value="Mahasiswa" {{ old('education_level')=='Mahasiswa'?'selected':'' }}>Mahasiswa</option>
-                                <option value="Umum" {{ old('education_level')=='Umum'?'selected':'' }}>Umum</option>
+                                <option value="Pra Sekolah (PAUD/TK)" <?php echo e(old('education_level')=='Pra Sekolah (PAUD/TK)'?'selected':''); ?>>Pra Sekolah (PAUD/TK)</option>
+                                <option value="Sekolah Dasar (SD)" <?php echo e(old('education_level')=='Sekolah Dasar (SD)'?'selected':''); ?>>Sekolah Dasar (SD)</option>
+                                <option value="Sekolah Menengah Pertama (SMP)" <?php echo e(old('education_level')=='Sekolah Menengah Pertama (SMP)'?'selected':''); ?>>Sekolah Menengah Pertama (SMP)</option>
+                                <option value="Sekolah Menengah Atas/Kejuruan (SMA/SMK)" <?php echo e(old('education_level')=='Sekolah Menengah Atas/Kejuruan (SMA/SMK)'?'selected':''); ?>>Sekolah Menengah Atas/Kejuruan (SMA/SMK)</option>
+                                <option value="Mahasiswa" <?php echo e(old('education_level')=='Mahasiswa'?'selected':''); ?>>Mahasiswa</option>
+                                <option value="Umum" <?php echo e(old('education_level')=='Umum'?'selected':''); ?>>Umum</option>
                             </select>
                         </div>
-                        <div class="col-12 school-data-heading {{ in_array(old('education_level'), ['Pra Sekolah (PAUD/TK)','Sekolah Dasar (SD)','Sekolah Menengah Pertama (SMP)','Sekolah Menengah Atas/Kejuruan (SMA/SMK)','Mahasiswa']) ? '' : 'd-none' }}" id="schoolDataSectionHeading">
+                        <div class="col-12 school-data-heading <?php echo e(in_array(old('education_level'), ['Pra Sekolah (PAUD/TK)','Sekolah Dasar (SD)','Sekolah Menengah Pertama (SMP)','Sekolah Menengah Atas/Kejuruan (SMA/SMK)','Mahasiswa']) ? '' : 'd-none'); ?>" id="schoolDataSectionHeading">
                             <div class="section-subtitle" style="font-size:.95rem;font-weight:600;margin-bottom:.75rem;color:#3730a3">Data Sekolah</div>
                         </div>
-                        <div class="col-md-6 school-data-schoolname {{ in_array(old('education_level'), ['Pra Sekolah (PAUD/TK)','Sekolah Dasar (SD)','Sekolah Menengah Pertama (SMP)','Sekolah Menengah Atas/Kejuruan (SMA/SMK)','Mahasiswa']) ? '' : 'd-none' }}">
+                        <div class="col-md-6 school-data-schoolname <?php echo e(in_array(old('education_level'), ['Pra Sekolah (PAUD/TK)','Sekolah Dasar (SD)','Sekolah Menengah Pertama (SMP)','Sekolah Menengah Atas/Kejuruan (SMA/SMK)','Mahasiswa']) ? '' : 'd-none'); ?>">
                             <label class="form-label" id="schoolNameLabel">Nama Sekolah</label>
-                            <input type="text" name="school_name" id="schoolNameInput" class="form-control @error('school_name') is-invalid @enderror"
-                                   value="{{ old('school_name') }}" placeholder="Nama sekolah">
-                            @error('school_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            <input type="text" name="school_name" id="schoolNameInput" class="form-control <?php $__errorArgs = ['school_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                   value="<?php echo e(old('school_name')); ?>" placeholder="Nama sekolah">
+                            <?php $__errorArgs = ['school_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="invalid-feedback"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
-                        <div class="col-md-6 school-data-class {{ in_array(old('education_level'), ['Pra Sekolah (PAUD/TK)','Sekolah Dasar (SD)','Sekolah Menengah Pertama (SMP)','Sekolah Menengah Atas/Kejuruan (SMA/SMK)']) ? '' : 'd-none' }}">
+                        <div class="col-md-6 school-data-class <?php echo e(in_array(old('education_level'), ['Pra Sekolah (PAUD/TK)','Sekolah Dasar (SD)','Sekolah Menengah Pertama (SMP)','Sekolah Menengah Atas/Kejuruan (SMA/SMK)']) ? '' : 'd-none'); ?>">
                             <label class="form-label">Kelas</label>
-                            <input type="text" name="grade" class="form-control @error('grade') is-invalid @enderror"
-                                   value="{{ old('grade') }}" placeholder="Contoh: Kelas 10 / XI IPA">
-                            @error('grade')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            <input type="text" name="grade" class="form-control <?php $__errorArgs = ['grade'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                   value="<?php echo e(old('grade')); ?>" placeholder="Contoh: Kelas 10 / XI IPA">
+                            <?php $__errorArgs = ['grade'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="invalid-feedback"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
-                        <div class="col-md-6 school-data-semester {{ old('education_level')==='Mahasiswa' ? '' : 'd-none' }}">
+                        <div class="col-md-6 school-data-semester <?php echo e(old('education_level')==='Mahasiswa' ? '' : 'd-none'); ?>">
                             <label class="form-label">Semester</label>
-                            <input type="text" name="semester" class="form-control @error('semester') is-invalid @enderror"
-                                   value="{{ old('semester') }}" placeholder="Contoh: Semester 3">
-                            @error('semester')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            <input type="text" name="semester" class="form-control <?php $__errorArgs = ['semester'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                   value="<?php echo e(old('semester')); ?>" placeholder="Contoh: Semester 3">
+                            <?php $__errorArgs = ['semester'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="invalid-feedback"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
 
                     </div>
@@ -560,7 +630,7 @@
                 </div>
             </div>
 
-            {{-- STEP 2: DATA ORANG TUA --}}
+            
             <div class="step-panel" data-step="2">
                 <div class="section-card">
                     <div class="section-title">Data Orang Tua / Wali</div>
@@ -568,13 +638,13 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Nama Orang Tua/Wali</label>
-                            <input type="text" name="parent_name" class="form-control" value="{{ old('parent_name') }}" placeholder="Nama lengkap orang tua/wali">
+                            <input type="text" name="parent_name" class="form-control" value="<?php echo e(old('parent_name')); ?>" placeholder="Nama lengkap orang tua/wali">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Nomor WA/HP Orang Tua/Wali</label>
                             <div class="input-group">
                                 <span class="input-group-text">+62</span>
-                                <input type="text" name="parent_phone" class="form-control" value="{{ old('parent_phone') }}" placeholder="8xxxxxxxxxx">
+                                <input type="text" name="parent_phone" class="form-control" value="<?php echo e(old('parent_phone')); ?>" placeholder="8xxxxxxxxxx">
                             </div>
                         </div>
                     </div>
@@ -585,39 +655,39 @@
                 </div>
             </div>
 
-            {{-- STEP 3: PROGRAM BELAJAR --}}
+            
             <div class="step-panel" data-step="3">
                 <div class="section-card">
                     <div class="section-title">Program Belajar</div>
 
-                    @php
+                    <?php
                         $oldSistem  = old('sistem_belajar');
                         $oldProgram = old('program_belajar');
-                    @endphp
+                    ?>
                     <div class="row g-4">
                         <div class="col-12" id="sistemBelajarSection">
                             <label class="form-label">Sistem Belajar</label>
                             <div class="option-btn-group" id="sistemGroup">
-                                <div class="option-btn {{ $oldSistem == 'offline' ? '' : 'active' }}" data-val="online" onclick="pickOption('sistem','online',this)">Online (Daring)</div>
-                                <div class="option-btn {{ $oldSistem == 'offline' ? 'active' : '' }}" data-val="offline" onclick="pickOption('sistem','offline',this)">Offline (Tatap Muka)</div>
+                                <div class="option-btn <?php echo e($oldSistem == 'offline' ? '' : 'active'); ?>" data-val="online" onclick="pickOption('sistem','online',this)">Online (Daring)</div>
+                                <div class="option-btn <?php echo e($oldSistem == 'offline' ? 'active' : ''); ?>" data-val="offline" onclick="pickOption('sistem','offline',this)">Offline (Tatap Muka)</div>
                             </div>
-                            <input type="hidden" name="sistem_belajar" id="sistem_belajar" value="{{ old('sistem_belajar','online') }}">
+                            <input type="hidden" name="sistem_belajar" id="sistem_belajar" value="<?php echo e(old('sistem_belajar','online')); ?>">
                         </div>
-                        <div class="col-12 {{ $oldSistem ? '' : 'd-none' }}" id="programBelajarSection">
+                        <div class="col-12 <?php echo e($oldSistem ? '' : 'd-none'); ?>" id="programBelajarSection">
                             <label class="form-label">Program Belajar</label>
                             <div class="option-btn-group" id="programGroup">
-                                <div class="option-btn {{ old('program_belajar','kelas') == 'kelas' ? 'active' : '' }}" data-val="kelas" onclick="pickProgram('kelas',this)">Kelas</div>
-                                <div class="option-btn {{ old('program_belajar','kelas') == 'privat' ? 'active' : '' }}" data-val="privat" onclick="pickProgram('privat',this)">Privat</div>
+                                <div class="option-btn <?php echo e(old('program_belajar','kelas') == 'kelas' ? 'active' : ''); ?>" data-val="kelas" onclick="pickProgram('kelas',this)">Kelas</div>
+                                <div class="option-btn <?php echo e(old('program_belajar','kelas') == 'privat' ? 'active' : ''); ?>" data-val="privat" onclick="pickProgram('privat',this)">Privat</div>
                             </div>
-                            <input type="hidden" name="program_belajar" id="program_belajar" value="{{ old('program_belajar','kelas') }}">
+                            <input type="hidden" name="program_belajar" id="program_belajar" value="<?php echo e(old('program_belajar','kelas')); ?>">
                         </div>
-                        <div class="col-12 {{ ($oldProgram && $oldSistem == 'offline') ? '' : 'd-none' }}" id="tempatBelajarSection">
+                        <div class="col-12 <?php echo e(($oldProgram && $oldSistem == 'offline') ? '' : 'd-none'); ?>" id="tempatBelajarSection">
                             <label class="form-label">Tempat Belajar</label>
                             <div class="option-btn-group" id="tempatGroup">
                                 <div class="option-btn active" data-val="kantor" onclick="pickOption('tempat','kantor',this)">Belajar di Kantor</div>
                                 <div class="option-btn d-none" data-val="rumah" id="tempatRumahBtn" onclick="pickOption('tempat','rumah',this)">Guru ke Rumah</div>
                             </div>
-                            <input type="hidden" name="tempat_belajar" id="tempat_belajar" value="{{ old('tempat_belajar','kantor') }}">
+                            <input type="hidden" name="tempat_belajar" id="tempat_belajar" value="<?php echo e(old('tempat_belajar','kantor')); ?>">
                         </div>
                     </div>
                 </div>
@@ -627,16 +697,16 @@
                 </div>
             </div>
 
-            {{-- STEP 4: PROGRAM YANG DIMINATI --}}
+            
             <div class="step-panel" data-step="4">
                 <div class="section-card">
                     <div class="section-title">Program yang Diminati</div>
                     <p class="text-muted mb-3" style="font-size:13px">Pilih satu atau lebih program yang ingin diikuti</p>
 
-                    @if($subjects->isEmpty())
+                    <?php if($subjects->isEmpty()): ?>
                         <p class="text-muted" style="font-size:.9rem">Belum ada program tersedia. Silakan hubungi admin.</p>
-                    @else
-                        @php
+                    <?php else: ?>
+                        <?php
                             $jenisLabels = [
                                 'komputer'  => 'Kursus Komputer',
                                 'bahasa'    => 'Kursus Bahasa Asing',
@@ -656,41 +726,43 @@
                                 'akpol'     => 'bi-shield',
                             ];
                             $jenisOrder = ['komputer','bahasa','mapel','kedinasan','cpns','bumn','akpol'];
-                        @endphp
+                        ?>
 
-                        {{-- All program types as accordion --}}
+                        
                         <div class="mt-2">
-                            @foreach($jenisOrder as $jenis)
-                                @if(!$subjects->has($jenis)) @continue @endif
-                                @php $items = $subjects[$jenis]; @endphp
-                                <div class="mb-2" id="section-{{ $jenis }}">
-                                    <div class="accordion-cat" onclick="toggleAccordion('acc-{{ $jenis }}', this)" data-jenis="{{ $jenis }}">
+                            <?php $__currentLoopData = $jenisOrder; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $jenis): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php if(!$subjects->has($jenis)): ?> <?php continue; ?> <?php endif; ?>
+                                <?php $items = $subjects[$jenis]; ?>
+                                <div class="mb-2" id="section-<?php echo e($jenis); ?>">
+                                    <div class="accordion-cat" onclick="toggleAccordion('acc-<?php echo e($jenis); ?>', this)" data-jenis="<?php echo e($jenis); ?>">
                                         <span style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
-                                            <i class="bi {{ $jenisIcons[$jenis] ?? 'bi-journal' }} me-1" style="color:#c84ddf;flex-shrink:0"></i>
-                                            {{ $jenisLabels[$jenis] ?? ucfirst($jenis) }}
-                                            <span class="badge ms-1" style="background:rgba(200,77,223,.12);color:#c84ddf;font-size:.63rem;font-weight:600;border-radius:10px;padding:2px 7px" title="Total mata pelajaran">{{ $items->count() }}</span>
-                                            <span class="cat-selected-badge" id="sel-badge-{{ $jenis }}" style="display:none;background:rgba(200,77,223,.9);color:white;font-size:.63rem;font-weight:700;border-radius:10px;padding:2px 8px"></span>
+                                            <i class="bi <?php echo e($jenisIcons[$jenis] ?? 'bi-journal'); ?> me-1" style="color:#c84ddf;flex-shrink:0"></i>
+                                            <?php echo e($jenisLabels[$jenis] ?? ucfirst($jenis)); ?>
+
+                                            <span class="badge ms-1" style="background:rgba(200,77,223,.12);color:#c84ddf;font-size:.63rem;font-weight:600;border-radius:10px;padding:2px 7px" title="Total mata pelajaran"><?php echo e($items->count()); ?></span>
+                                            <span class="cat-selected-badge" id="sel-badge-<?php echo e($jenis); ?>" style="display:none;background:rgba(200,77,223,.9);color:white;font-size:.63rem;font-weight:700;border-radius:10px;padding:2px 8px"></span>
                                         </span>
                                         <span style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-                                            <span class="cat-select-hint" id="hint-{{ $jenis }}" style="font-size:.7rem;font-weight:600;color:#c84ddf;opacity:.75">Pilih semua</span>
+                                            <span class="cat-select-hint" id="hint-<?php echo e($jenis); ?>" style="font-size:.7rem;font-weight:600;color:#c84ddf;opacity:.75">Pilih semua</span>
                                             <i class="bi bi-chevron-right acc-arrow"></i>
                                         </span>
                                     </div>
-                                    <div class="accordion-body {{ collect(old('program_minat', []))->intersect($items->pluck('nama'))->isNotEmpty() ? 'open' : '' }}" id="acc-{{ $jenis }}">
+                                    <div class="accordion-body <?php echo e(collect(old('program_minat', []))->intersect($items->pluck('nama'))->isNotEmpty() ? 'open' : ''); ?>" id="acc-<?php echo e($jenis); ?>">
                                         <div class="check-grid">
-                                            @foreach($items as $course)
-                                            <label class="check-pill {{ in_array($course->nama, old('program_minat', [])) ? 'selected' : '' }}" onclick="togglePill(this)">
-                                                <input type="checkbox" name="program_minat[]" value="{{ $course->nama }}"
-                                                       {{ in_array($course->nama, old('program_minat', [])) ? 'checked' : '' }}>
-                                                {{ $course->nama }}
+                                            <?php $__currentLoopData = $items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <label class="check-pill <?php echo e(in_array($course->nama, old('program_minat', [])) ? 'selected' : ''); ?>" onclick="togglePill(this)">
+                                                <input type="checkbox" name="program_minat[]" value="<?php echo e($course->nama); ?>"
+                                                       <?php echo e(in_array($course->nama, old('program_minat', [])) ? 'checked' : ''); ?>>
+                                                <?php echo e($course->nama); ?>
+
                                             </label>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </div>
                                     </div>
                                 </div>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
                 <div class="step-actions">
                     <button type="button" class="btn-step btn-prev" data-action="prev">Sebelumnya</button>
@@ -698,7 +770,7 @@
                 </div>
             </div>
 
-            {{-- STEP 5: JADWAL BELAJAR + SUBMIT --}}
+            
             <div class="step-panel" data-step="5">
                 <div class="section-card">
                     <div class="section-title">Jadwal Belajar</div>
@@ -710,58 +782,59 @@
                         <div class="col-12">
                             <label class="form-label">Hari Belajar</label>
                             <div class="day-check-group">
-                                @php
+                                <?php
                                     $days    = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
                                     $dayVals = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
                                     $oldHari = old('hari_belajar', []);
-                                @endphp
-                                @foreach($days as $i => $d)
-                                <label class="day-pill {{ in_array($dayVals[$i], $oldHari) ? 'selected' : '' }}"
-                                       onclick="toggleDay(this, '{{ $dayVals[$i] }}')">
-                                    <input type="checkbox" name="hari_belajar[]" value="{{ $dayVals[$i] }}" style="display:none"
-                                           {{ in_array($dayVals[$i], $oldHari) ? 'checked' : '' }}>
-                                    {{ $d }}
+                                ?>
+                                <?php $__currentLoopData = $days; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $d): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <label class="day-pill <?php echo e(in_array($dayVals[$i], $oldHari) ? 'selected' : ''); ?>"
+                                       onclick="toggleDay(this, '<?php echo e($dayVals[$i]); ?>')">
+                                    <input type="checkbox" name="hari_belajar[]" value="<?php echo e($dayVals[$i]); ?>" style="display:none"
+                                           <?php echo e(in_array($dayVals[$i], $oldHari) ? 'checked' : ''); ?>>
+                                    <?php echo e($d); ?>
+
                                 </label>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                         </div>
 
-                        {{-- Per-day time schedule --}}
-                        <div class="col-12" id="dayScheduleWrapper" style="{{ empty($oldHari) ? 'display:none' : '' }}">
+                        
+                        <div class="col-12" id="dayScheduleWrapper" style="<?php echo e(empty($oldHari) ? 'display:none' : ''); ?>">
                             <label class="form-label">Jam Belajar per Hari
                                 <span class="text-muted fw-normal" style="font-size:.75rem">(isi jam untuk setiap hari yang dipilih)</span>
                             </label>
                             <div id="dayScheduleContainer">
-                                @foreach($dayVals as $dayVal)
-                                    @if(in_array($dayVal, $oldHari))
-                                    @php $oldSlots = old("jam_detail.{$dayVal}", ['']); @endphp
-                                    <div class="schedule-row" id="srow-{{ $dayVal }}">
-                                        <div class="day-label">{{ $dayVal }}</div>
-                                        <div class="flex-fill" id="slots-{{ $dayVal }}">
-                                            @foreach((array)$oldSlots as $si => $slot)
-                                            <div class="time-slot {{ $si > 0 ? 'mt-1' : '' }}">
-                                                <input type="text" name="jam_detail[{{ $dayVal }}][]"
+                                <?php $__currentLoopData = $dayVals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dayVal): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php if(in_array($dayVal, $oldHari)): ?>
+                                    <?php $oldSlots = old("jam_detail.{$dayVal}", ['']); ?>
+                                    <div class="schedule-row" id="srow-<?php echo e($dayVal); ?>">
+                                        <div class="day-label"><?php echo e($dayVal); ?></div>
+                                        <div class="flex-fill" id="slots-<?php echo e($dayVal); ?>">
+                                            <?php $__currentLoopData = (array)$oldSlots; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $si => $slot): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <div class="time-slot <?php echo e($si > 0 ? 'mt-1' : ''); ?>">
+                                                <input type="text" name="jam_detail[<?php echo e($dayVal); ?>][]"
                                                        class="form-control"
                                                        placeholder="cth. 10:00 - 12:00"
-                                                       value="{{ $slot }}" autocomplete="off">
-                                                @if($si > 0)
+                                                       value="<?php echo e($slot); ?>" autocomplete="off">
+                                                <?php if($si > 0): ?>
                                                 <button type="button" class="btn-remove-slot" onclick="removeSlot(this)" title="Hapus"><i class="bi bi-x"></i></button>
-                                                @endif
+                                                <?php endif; ?>
                                             </div>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </div>
-                                        <button type="button" class="btn-add-slot" onclick="addSlot('{{ $dayVal }}')">
+                                        <button type="button" class="btn-add-slot" onclick="addSlot('<?php echo e($dayVal); ?>')">
                                             <i class="bi bi-plus me-1"></i>Tambah
                                         </button>
                                     </div>
-                                    @endif
-                                @endforeach
+                                    <?php endif; ?>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label">Tanggal Mulai Belajar</label>
-                            <input type="date" name="tanggal_mulai" class="form-control" value="{{ old('tanggal_mulai') }}">
+                            <input type="date" name="tanggal_mulai" class="form-control" value="<?php echo e(old('tanggal_mulai')); ?>">
                         </div>
                     </div>
                 </div>
@@ -774,7 +847,7 @@
                     </button>
                     <div class="text-center mt-3" style="font-size:.8rem;color:#9ca3af">
                         Sudah punya akun?
-                        <a href="{{ route('login') }}" style="color:#c84ddf;font-weight:600;text-decoration:none">Masuk di sini</a>
+                        <a href="<?php echo e(route('login')); ?>" style="color:#c84ddf;font-weight:600;text-decoration:none">Masuk di sini</a>
                     </div>
                 </div>
                 <div class="step-actions">
@@ -1126,3 +1199,4 @@ document.getElementById('regForm').addEventListener('submit', function() {
 </script>
 </body>
 </html>
+<?php /**PATH C:\Users\Edu Juanda Pratama\Downloads\smart-center-indonesia-1 (2)\smart-center-indonesia\resources\views/auth/register.blade.php ENDPATH**/ ?>

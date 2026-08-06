@@ -19,7 +19,7 @@ return new class extends Migration
                 DB::statement("ALTER TABLE school_classes ALTER COLUMN jenis SET DEFAULT 'offline'");
                 DB::statement("ALTER TABLE school_classes DROP CONSTRAINT IF EXISTS school_classes_jenis_check");
                 DB::statement("ALTER TABLE school_classes ADD CONSTRAINT school_classes_jenis_check CHECK (jenis IN ('online','offline','private'))");
-            } else {
+            } elseif ($driver === 'mysql') {
                 DB::statement("ALTER TABLE school_classes MODIFY jenis ENUM('online','offline','private') NOT NULL DEFAULT 'offline'");
             }
         }
@@ -31,7 +31,7 @@ return new class extends Migration
                 DB::statement("ALTER TABLE schedules ALTER COLUMN jenis SET DEFAULT 'offline'");
                 DB::statement("ALTER TABLE schedules DROP CONSTRAINT IF EXISTS schedules_jenis_check");
                 DB::statement("ALTER TABLE schedules ADD CONSTRAINT schedules_jenis_check CHECK (jenis IN ('online','offline','private'))");
-            } else {
+            } elseif ($driver === 'mysql') {
                 DB::statement("ALTER TABLE schedules MODIFY jenis ENUM('online','offline','private') NOT NULL DEFAULT 'offline'");
             }
         }
@@ -64,7 +64,7 @@ return new class extends Migration
             if ($driver === 'pgsql') {
                 DB::statement("ALTER TABLE school_classes DROP CONSTRAINT IF EXISTS school_classes_jenis_check");
                 DB::statement("ALTER TABLE school_classes ADD CONSTRAINT school_classes_jenis_check CHECK (jenis IN ('online','offline'))");
-            } else {
+            } elseif ($driver === 'mysql') {
                 DB::statement("ALTER TABLE school_classes MODIFY jenis ENUM('online','offline') NOT NULL DEFAULT 'offline'");
             }
         }
@@ -74,7 +74,7 @@ return new class extends Migration
             if ($driver === 'pgsql') {
                 DB::statement("ALTER TABLE schedules DROP CONSTRAINT IF EXISTS schedules_jenis_check");
                 DB::statement("ALTER TABLE schedules ADD CONSTRAINT schedules_jenis_check CHECK (jenis IN ('online','offline'))");
-            } else {
+            } elseif ($driver === 'mysql') {
                 DB::statement("ALTER TABLE schedules MODIFY jenis ENUM('online','offline') NOT NULL DEFAULT 'offline'");
             }
         }
